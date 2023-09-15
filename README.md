@@ -1,13 +1,8 @@
-# CME 302 Class Notes
+# CME 302 Class Notes 2023
 
 - [GitHub Pages web site](https://ericdarve.github.io/NLA/)
 - [CME 302](https://canvas.stanford.edu/courses/178134)
-- Built using [Obsidian](https://obsidian.md/) and Quartz.
-
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
-Quartz v4 features a from-the-ground rewrite focusing on end-user extensibility and ease-of-use.
-
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+- Built using [Obsidian](https://obsidian.md/) and [Quartz](https://quartz.jzhao.xyz/).
 
 ### How to generate the static web pages
 
