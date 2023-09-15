@@ -28,7 +28,7 @@ The lengths of the axes of this ellipsoid are the singular values of $A$.
 
 As we can expect, the [[Operator and matrix norms|size of a matrix]] can be related to its singular values:
 $$
-\| A \|_2 = \sigma_1(A) \qquad
+\| A \|_2 = \sigma_1(A), \qquad
 \| A \|_F = \sqrt{\sum_{i=1}^p \sigma_i^2}
 $$
 
@@ -45,7 +45,7 @@ We also recover the rank-nullity theorem.
 
 Connection with [[Eigenvalues|eigenvalues]]. The eigenvalues of $AA^T$ and $A^T A$ are equal to $\sigma_1^2$, ..., $\sigma_r^2$, or 0. The eigenvectors of $AA^T$ are given by $U$, and those of $A^T A$ by $V$:
 $$
-AA^T = U \Sigma^2 U^T \qquad
+AA^T = U \Sigma^2 U^T, \qquad
 A^TA = V \Sigma^2 V^T
 $$
 
