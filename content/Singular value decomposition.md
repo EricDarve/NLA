@@ -43,4 +43,10 @@ R(A^T) & = \{v_1, \ldots, v_r\} = N(A)^\perp
 $$
 We also recover the rank-nullity theorem.
 
+Connection with [[Eigenvalues|eigenvalues]]. The eigenvalues of $AA^T$ and $A^T A$ are equal to $\sigma_1^2$, ..., $\sigma_r^2$, or 0. The eigenvectors of $AA^T$ are given by $U$, and those of $A^T A$ by $V$:
+$$
+AA^T = U \Sigma^2 U^T \qquad
+A^TA = V \Sigma^2 V^T
+$$
+
 [[The four fundamental spaces]], [[Eigenvalues]], [[Operator and matrix norms]], [[Orthogonal matrix and projector]]

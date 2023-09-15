@@ -11,8 +11,30 @@
             "id": "890645fd19ca0642",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "Singular value decomposition.md",
+                "mode": "source",
+                "source": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "a7bbce852323ed8d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "04711f64bab6d927",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Singular value decomposition.md",
+                "mode": "preview",
+                "source": true
+              }
             }
           }
         ]
@@ -81,6 +103,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "Singular value decomposition.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +120,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "Singular value decomposition.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +142,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "Singular value decomposition.md"
+              }
             }
           }
         ]
@@ -138,8 +164,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "890645fd19ca0642",
+  "active": "04711f64bab6d927",
   "lastOpenFiles": [
+    "The four fundamental spaces.md",
+    "Singular value decomposition.md",
     "Cauchy-Schwarz.md",
     "Eigenvalues.md",
     "Orthogonal matrix and projector.md",
@@ -159,9 +187,7 @@
     "Unitarily diagonalizable matrices.md",
     "Invertible matrix.md",
     "Bootcamp.md",
-    "Singular value decomposition.md",
     "Dot product.md",
-    "The four fundamental spaces.md",
     "Solving linear systems.md",
     "Numerical Linear Algebra.md"
   ]
