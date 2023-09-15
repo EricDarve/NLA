@@ -7,7 +7,8 @@ export const sharedPageComponents: SharedLayout = {
   header: [],
   footer: Component.Footer({
     links: {
-      Canvas: "https://canvas.stanford.edu/courses/178134"
+      Canvas: "https://canvas.stanford.edu/courses/178134",
+      GitHub: "https://github.com/EricDarve/NLA"
     },
   }),
 }
