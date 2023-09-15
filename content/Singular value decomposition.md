@@ -26,7 +26,7 @@ The lengths of the axes of this ellipsoid are the singular values of $A$.
 
 ![[Pasted image 20230915132724.png]]
 
-As we can expect, the size of a matrix ([[Operator and matrix norms]]) can be related to its singular values:
+As we can expect, the [[Operator and matrix norms|size of a matrix]] can be related to its singular values:
 $$
 \| A \|_2 = \sigma_1(A) \qquad
 \| A \|_F = \sqrt{\sum_{i=1}^p \sigma_i^2}
