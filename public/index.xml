@@ -6,11 +6,23 @@
       <description>Last 10 notes on 📓 CME 302</description>
       <generator>Quartz -- quartz.jzhao.xyz</generator>
       <item>
-    <title>Solving linear systems</title>
-    <link>https://ericdarve.github.io/NLA/Solving-linear-systems</link>
-    <guid>https://ericdarve.github.io/NLA/Solving-linear-systems</guid>
-    <description>How to solve Ax=b? One of the most important computational tasks in NLA. Solving triangular systems § Solve triangular system. Draw system and solution process.</description>
-    <pubDate>Fri, 15 Sep 2023 22:52:23 GMT</pubDate>
+    <title>Bootcamp</title>
+    <link>https://ericdarve.github.io/NLA/Bootcamp</link>
+    <guid>https://ericdarve.github.io/NLA/Bootcamp</guid>
+    <description>More during recitation + read the chapter in textbook for full background Vectors and matrices Introduce notations Subspace and linear independence Core concept in linear algebra Important when solving linear systems Dot product Shows up in many places.</description>
+    <pubDate>Fri, 15 Sep 2023 20:16:00 GMT</pubDate>
+  </item><item>
+    <title>Cauchy-Schwarz</title>
+    <link>https://ericdarve.github.io/NLA/Cauchy-Schwarz</link>
+    <guid>https://ericdarve.github.io/NLA/Cauchy-Schwarz</guid>
+    <description> Very useful in proofs to derive upper bounds, e.g., when analyzing the error or the convergence rate of a numerical algorithm ∣xTy∣≤∥x∥2​∥y∥2​ Exercise: you can prove the triangle inequality using CS: ∥x+y∥2​≤∥x∥2​+∥y∥2​ Dot product, Vector norms .</description>
+    <pubDate>Fri, 15 Sep 2023 21:58:56 GMT</pubDate>
+  </item><item>
+    <title>Determinant</title>
+    <link>https://ericdarve.github.io/NLA/Determinant</link>
+    <guid>https://ericdarve.github.io/NLA/Determinant</guid>
+    <description>The determinant is equal to the product of the eigenvalues: det(A)=i=1∏n​λi​ Geometric interpretation. For any square matrix A, we consider its columns ai​ and the n-dimensional parallelepiped formed by the vectors ai​.</description>
+    <pubDate>Fri, 15 Sep 2023 21:59:10 GMT</pubDate>
   </item><item>
     <title>Dot product</title>
     <link>https://ericdarve.github.io/NLA/Dot-product</link>
@@ -18,17 +30,23 @@
     <description>Notation: xTy=x1​y1​+⋯+xn​yn​ Two vectors x and y are orthogonal if xTy=0. For a subspace S, we can define S⊥ as the subspace of vectors y such that: S⊥={y∣∀x∈S,xTy=0} We have: dim(S)+dim(S⊥)=n.</description>
     <pubDate>Fri, 15 Sep 2023 22:50:21 GMT</pubDate>
   </item><item>
-    <title>Singular value decomposition</title>
-    <link>https://ericdarve.github.io/NLA/Singular-value-decomposition</link>
-    <guid>https://ericdarve.github.io/NLA/Singular-value-decomposition</guid>
-    <description>One of the most important matrix decomposition in data science and machine learning. Eigenvalues are great for understanding An. Does it grow? Does it shrink? How can it be easily modeled? But it says nothing about the size of Ax.</description>
-    <pubDate>Fri, 15 Sep 2023 22:33:40 GMT</pubDate>
+    <title>Eigenvalues</title>
+    <link>https://ericdarve.github.io/NLA/Eigenvalues</link>
+    <guid>https://ericdarve.github.io/NLA/Eigenvalues</guid>
+    <description>For any square matrix A there exists at least a scalar λ∈C and x∈Cn such that Ax=λx. They are called an eigenvalue and eigenvector. A matrix A is diagonalizable if there exists a basis x1​, …, xn​ of eigenvectors.</description>
+    <pubDate>Fri, 15 Sep 2023 21:57:39 GMT</pubDate>
   </item><item>
-    <title>Bootcamp</title>
-    <link>https://ericdarve.github.io/NLA/Bootcamp</link>
-    <guid>https://ericdarve.github.io/NLA/Bootcamp</guid>
-    <description>More during recitation + read the chapter in textbook for full background Vectors and matrices Introduce notations Subspace and linear independence Core concept in linear algebra Important when solving linear systems Dot product Shows up in many places.</description>
-    <pubDate>Fri, 15 Sep 2023 20:16:00 GMT</pubDate>
+    <title>First lecture</title>
+    <link>https://ericdarve.github.io/NLA/First-lecture</link>
+    <guid>https://ericdarve.github.io/NLA/First-lecture</guid>
+    <description> My research NLA Parallel and HPC computing, GPU computing Machine learning, surrogate modeling, stochastic inversing, anomaly detection Cybersecurity Teaching team: Rajat Dwaraknath Ishani Karmarkar Chartsiri Jirachotkulthorn Style of class and what to expect This class will require some proof writing What is numerical linear algebra? Example: difference between the existence of eigenvalues and eigenvectors and how to compute them A class on numerical methods covers: Algorithms to solve a mathematical problem Computational cost Many algorithms are approximate; what is the error? how can it be controlled? how can it be estimated? Roundoff errors and stability: how do small errors in the data and during the calculation affect the final result? There will be some computer programming, but this is not the main focus We won’t discuss applications in detail The focus is on the algorithms, computational cost, and error analysis Content of class Solving linear systems: Ax=b.</description>
+    <pubDate>Thu, 14 Sep 2023 18:28:59 GMT</pubDate>
+  </item><item>
+    <title>Hermitian and symmetric matrices</title>
+    <link>https://ericdarve.github.io/NLA/Hermitian-and-symmetric-matrices</link>
+    <guid>https://ericdarve.github.io/NLA/Hermitian-and-symmetric-matrices</guid>
+    <description>The most important example of unitarily diagonalizable matrices. Complex Hermitian: A=AH. Then: A=QΛQH and Λ real. Real symmetric: A=AT. Then A=QΛQT and Λ and Q are real.</description>
+    <pubDate>Fri, 15 Sep 2023 20:11:35 GMT</pubDate>
   </item><item>
     <title>Invertible matrix</title>
     <link>https://ericdarve.github.io/NLA/Invertible-matrix</link>
@@ -36,35 +54,17 @@
     <description>A matrix A is invertible if and only if there is a matrix B such that AB=BA=I We denote: B=A−1. A matrix that is not invertible is said to be singular.</description>
     <pubDate>Fri, 15 Sep 2023 21:59:51 GMT</pubDate>
   </item><item>
-    <title>Unitarily diagonalizable matrices</title>
-    <link>https://ericdarve.github.io/NLA/Unitarily-diagonalizable-matrices</link>
-    <guid>https://ericdarve.github.io/NLA/Unitarily-diagonalizable-matrices</guid>
-    <description>A matrix A∈Cn×n is unitarily diagonalizable if there is a unitary matrix Q and a diagonal matrix Λ so that A=QΛQH Definition: A is normal if and only if AHA=AAH.</description>
-    <pubDate>Fri, 15 Sep 2023 22:43:52 GMT</pubDate>
-  </item><item>
-    <title>Vector norms</title>
-    <link>https://ericdarve.github.io/NLA/Vector-norms</link>
-    <guid>https://ericdarve.github.io/NLA/Vector-norms</guid>
-    <description> Key tool for proofs and formal derivations Essential to describe and understand properties of objects in LA Used to convert a vector to a single scalar number, its “size.</description>
-    <pubDate>Fri, 15 Sep 2023 22:45:03 GMT</pubDate>
-  </item><item>
-    <title>Subspace and linear independence</title>
-    <link>https://ericdarve.github.io/NLA/Subspace-and-linear-independence</link>
-    <guid>https://ericdarve.github.io/NLA/Subspace-and-linear-independence</guid>
-    <description>Vector subspace § Vector space: a set of elements that can be added together and multiplied by scalars (for this class, in R or C). Vectors and matrices Example: Rn.</description>
-    <pubDate>Fri, 15 Sep 2023 22:41:57 GMT</pubDate>
-  </item><item>
     <title>Matrix-vector and matrix-matrix product</title>
     <link>https://ericdarve.github.io/NLA/Matrix-vector-and-matrix-matrix-product</link>
     <guid>https://ericdarve.github.io/NLA/Matrix-vector-and-matrix-matrix-product</guid>
     <description>Vectors and matrices, Dot product A matrix can be defined as a linear map from Rn→Rm. This is the operator view of a matrix: A:x→Ax. Algebraically, we write y=Ax with yi​=j=1∑n​aij​xj​ Using the operator interpretation, we can define the product of two matrices C=AB as the result of composing A with B: Cx=(AB)x=A(Bx) This works when B:Rn→Rp and A:Rp→Rm.</description>
     <pubDate>Fri, 15 Sep 2023 22:38:21 GMT</pubDate>
   </item><item>
-    <title>Hermitian and symmetric matrices</title>
-    <link>https://ericdarve.github.io/NLA/Hermitian-and-symmetric-matrices</link>
-    <guid>https://ericdarve.github.io/NLA/Hermitian-and-symmetric-matrices</guid>
-    <description>The most important example of unitarily diagonalizable matrices. Complex Hermitian: A=AH. Then: A=QΛQH and Λ real. Real symmetric: A=AT. Then A=QΛQT and Λ and Q are real.</description>
-    <pubDate>Fri, 15 Sep 2023 20:11:35 GMT</pubDate>
+    <title>Operator and matrix norms</title>
+    <link>https://ericdarve.github.io/NLA/Operator-and-matrix-norms</link>
+    <guid>https://ericdarve.github.io/NLA/Operator-and-matrix-norms</guid>
+    <description>Measuring the size of a matrix § This is the main norm we will use. It can be derived from the Vector norms and extended to matrices ∥A∥p​=x=0sup​∥x∥p​∥Ax∥p​​=∥x∥p​=1max​∥Ax∥p​ Example: A=(20​11​) 2-norm / 1-norm / ∞-norm: Other norms that are useful.</description>
+    <pubDate>Fri, 15 Sep 2023 22:51:01 GMT</pubDate>
   </item>
     </channel>
   </rss>
