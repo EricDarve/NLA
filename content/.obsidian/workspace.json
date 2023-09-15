@@ -11,12 +11,8 @@
             "id": "890645fd19ca0642",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Vectors and matrices.md",
-                "mode": "source",
-                "source": true
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -85,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Vectors and matrices.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Vectors and matrices.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -124,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "Vectors and matrices.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -148,29 +140,29 @@
   },
   "active": "890645fd19ca0642",
   "lastOpenFiles": [
+    "Cauchy-Schwarz.md",
+    "Eigenvalues.md",
+    "Orthogonal matrix and projector.md",
+    "Vectors and matrices.md",
+    "Sherman-Morrison-Woodbury formula.md",
+    "Trace.md",
+    "Schur decomposition.md",
+    "index.md",
+    "Pythagorean theorem.md",
+    "Determinant.md",
+    "First lecture.md",
+    "Operator and matrix norms.md",
+    "Hermitian and symmetric matrices.md",
+    "Matrix-vector and matrix-matrix product.md",
+    "Subspace and linear independence.md",
     "Vector norms.md",
     "Unitarily diagonalizable matrices.md",
-    "Trace.md",
-    "The four fundamental spaces.md",
-    "Subspace and linear independence.md",
-    "Solving linear systems.md",
-    "Singular value decomposition.md",
-    "Sherman-Morrison-Woodbury formula.md",
-    "Schur decomposition.md",
-    "Pythagorean theorem.md",
-    "Orthogonal matrix and projector.md",
-    "Operator and matrix norms.md",
-    "Matrix-vector and matrix-matrix product.md",
     "Invertible matrix.md",
-    "index.md",
-    "Hermitian and symmetric matrices.md",
-    "First lecture.md",
-    "Eigenvalues.md",
-    "Dot product.md",
-    "Determinant.md",
-    "Cauchy-Schwarz.md",
     "Bootcamp.md",
-    "Vectors and matrices.md",
+    "Singular value decomposition.md",
+    "Dot product.md",
+    "The four fundamental spaces.md",
+    "Solving linear systems.md",
     "Numerical Linear Algebra.md"
   ]
 }
