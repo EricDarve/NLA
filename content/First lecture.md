@@ -1,0 +1,70 @@
+- My research
+	- NLA
+	- Parallel and HPC computing, GPU computing
+	- Machine learning, surrogate modeling, stochastic inversing, anomaly detection
+	- Cybersecurity
+- Teaching team:
+	- Rajat Dwaraknath
+	- Ishani Karmarkar
+	- Chartsiri Jirachotkulthorn
+- Style of class and what to expect
+	- This class will require some proof writing
+	- What is numerical linear algebra?
+		- Example: difference between the existence of eigenvalues and eigenvectors and how to compute them
+	- A class on numerical methods covers:
+		- Algorithms to solve a mathematical problem
+		- Computational cost
+		- Many algorithms are approximate; what is the error? how can it be controlled? how can it be estimated?
+		- Roundoff errors and stability: how do small errors in the data and during the calculation affect the final result?
+		- There will be some computer programming, but this is not the main focus
+		- We won't discuss applications in detail
+		- The focus is on the algorithms, computational cost, and error analysis
+- Content of class
+	- Solving linear systems: $Ax=b$.
+	- QR factorization and least-squares: $\min_x \|Ax-b\|$.
+	- Eigendecomposition using direct methods: $Ax = \lambda x$.
+	- Iterative methods and Krylov subspace; Conjugate Gradient, GMRES
+- Canvas
+- Survey
+- Ed Discussion forum
+	- Rules of conduct on forum
+	- Be civil, considerate, and courteous
+	- Make not to post answers or partial answers to homework assignments
+- Anonymous form to report issues and concerns
+- Office hours posted on canvas
+- Recitation sessions #fixme
+	- Recitation on Friday
+	- Basic LA review
+	- Julia / Python quick overviews
+- Programming languages
+	- Julia
+	- Python
+	- Matlab
+- Reading
+	- Required book: Darve and Wootters, Numerical Linear Algebra with Julia
+	- Optional books:
+		- Matrix Computations, by Gene H. Golub and Charles F. Van Loan
+		- Numerical Linear Algebra by Lloyd N. Trefethen and David Bau III
+		- Applied numerical linear algebra by James W. Demmel
+		- Direct methods for sparse linear systems by Timothy A. Davis
+- See searchworks.stanford.edu
+- Grading
+	- Homework 35%
+	- Midterm exam 1 15%
+	- Midterm exam 2 20%
+	- Final exam 30%
+- Gradescope
+- Late policy
+	- 72 hours; 10% penalty
+	- Excused late submissions: request must be submitted 24 hours before the ddl.
+- Access and accommodations
+	- Office of Accessible Education (OAE)
+	- Share your letter with us
+- Honor Code and Office of Community Standards
+	- Do not share answers with other students
+	- Do not let other students copy your answers
+	- Do not copy answers from previous years
+	- Do not copy answers from TAs or teaching staff
+	- Do not copy answers on the internet
+	- Do not post/share answers on the internet
+	- Answers must be *your own*
