@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Singular value decomposition.md",
+                "file": "Invertible matrix.md",
                 "mode": "source",
                 "source": true
               }
@@ -103,7 +103,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Singular value decomposition.md",
+                "file": "Invertible matrix.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +120,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Singular value decomposition.md",
+                "file": "Invertible matrix.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -143,7 +143,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Singular value decomposition.md"
+                "file": "Invertible matrix.md"
               }
             }
           }
@@ -164,10 +164,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "04711f64bab6d927",
+  "active": "890645fd19ca0642",
   "lastOpenFiles": [
-    "The four fundamental spaces.md",
     "Singular value decomposition.md",
+    "The four fundamental spaces.md",
     "Cauchy-Schwarz.md",
     "Eigenvalues.md",
     "Orthogonal matrix and projector.md",
