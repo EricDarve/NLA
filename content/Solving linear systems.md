@@ -1,59 +1,41 @@
 How to solve $Ax = b$? One of the most important computational tasks in NLA.
 
-## Solving triangular systems
+Notations | Description
+--- | ---
+$A$ | Matrix
+$n$ | Size of the matrix
+$A[1: k, 1: k]$ | Top left $k \times k$ block of $A$
+$a_{ij}$ | entry $(i,j)$
+$a_{,j}$ | column $j$
+$a_{i,}$ | row $i$
+det | determinant
 
-Solve triangular system.
+- This section covers the use of the LU factorization to solve linear systems like $Ax = b$. 
+- This method is fast and nearly optimal in terms of floating point operations. 
+- However, it suffers from stability and accuracy issues in some cases.
 
-Draw system and solution process.
-
-## General systems
-
-Assume we have $A = LU$.
-
-Show how to solve in 2 steps.
-
-## Triangular factorization
-
-How can we get $L$ and $U$?
-
-Product of matrices as a sum.
-$$
-A = BC\\
-a_{ij} = \sum_k b_{ik} c_{kj} = b_{i1} c_{1j} + b_{i2} c_{2j} + \dots\\
-A = \sum_k b_{,k} \, c_{k,}
-$$
-
-## Application to LU
-$$
-[LU]_{ij} = l_{i1} u_{1j} + l_{i2} u_{2j} + \dots + l_{in} u_{nj}\\[1em]
-LU = \sum_k l_{,k} \, u_{k,}
-$$
-- Column and row notations:
-	- $a_{i,}$: row $i$
-	- $a_{,j}$: column $j$
-
-Compact notation:
-$$
-LU = \sum_k l_{,k} \; u_{k,}
-$$
-
-Explain the process of computing the factors based on the sparsity pattern of the factors and the sum decomposition.
-
-Equations for column 1:
-$$
-a_{,1} = l_{,1} \; u_{11}
-$$
-
-Solution with $l_{11} = 1$ or $u_{11} = 1$. Choose: $l_{11} = 1$.
-
-- Final equations:
-	- $u_{1,} = a_{1,}$
-	- $l_{,1} = a_{,1} / a_{11}$
-
-**Full algorithm**
-
-- Loop over $k$: 1 to $n$:
-	- $u_{k,} = a_{k,}$
-	- $l_{,k} = a_{,k} / a_{kk}$
-	- $A \leftarrow A - l_{,k} * u_{k,}$
-	- This is called the Schur complement.
+- [[Solving triangular systems]]
+	- This is the starting point for efficient solution of linear systems.
+	- Solving triangular systems is easy and computationally efficient.
+- [[Solving linear systems using LU]]
+	- How the LU factorization allows us to solve linear systems
+- [[Outer form of matrix-matrix product]]
+	- How can we get $L$ and $U$ starting from $A$?
+	- The starting point is the outer form of the product $LU$.
+- [[Triangular factorization]]
+	- Solving triangular systems allows us to solve general systems of equations, provided the matrix is factorized as $A = LU$ using triangular factors.
+	- Computing $L$ and $U$ can be done iteratively column by column.
+	- This can be done using the outer form for the matrix-matrix product.
+- [[LU algorithm]]
+	- This is the step-by-step algorithm.
+- [[Existence of LU]]
+	- The LU factorization suffers from stability issues.
+	- This can lead to inaccurate solutions in some cases, or the algorithm may even break down.
+	- Under what condition does the LU factorization exist? What are the situations where the algorithm breaks down?
+- [[LU and determinant]]
+	- The determinant seems very complicated to calculate.
+	- But using LU, we can get the determinant very easily.
+	- Uses the fact that $\det U = \prod_{i=1}^n u_{ii}$ for triangular matrices.
+- [[Stability of the LU factorization]]
+	- The existence result describes what happens when a pivot is 0.
+	- What about a very small pivot? What can we expect in that case?
