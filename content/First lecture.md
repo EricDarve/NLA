@@ -32,7 +32,7 @@
 	- Make not to post answers or partial answers to homework assignments
 - Anonymous form to report issues and concerns
 - Office hours posted on canvas
-- Recitation sessions #fixme
+- Recitation sessions
 	- Recitation on Friday
 	- Basic LA review
 	- Julia / Python quick overviews
