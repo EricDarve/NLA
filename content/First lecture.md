@@ -8,7 +8,7 @@
 	- Ishani Karmarkar
 	- Chartsiri Jirachotkulthorn
 - Style of class and what to expect
-	- This class will require some proof writing
+	- This class will require some proof-writing
 	- What is numerical linear algebra?
 		- Example: difference between the existence of eigenvalues and eigenvectors and how to compute them
 	- A class on numerical methods covers:
@@ -18,7 +18,7 @@
 		- Roundoff errors and stability: how do small errors in the data and during the calculation affect the final result?
 		- There will be some computer programming, but this is not the main focus
 		- We won't discuss applications in detail
-		- The focus is on the algorithms, computational cost, and error analysis
+		- The focus is on the _algorithms, computational cost, and error analysis_
 - Content of class
 	- Solving linear systems: $Ax=b$.
 	- QR factorization and least-squares: $\min_x \|Ax-b\|$.
@@ -33,7 +33,7 @@
 - Anonymous form to report issues and concerns
 - Office hours posted on canvas
 - Recitation sessions
-	- Recitation on Monday; main lectures on Wednesday and Friday
+	- Main lectures on Wednesday and Friday; recitations on Monday
 	- Basic LA review
 	- Julia / Python quick overviews and getting started
 - Programming languages
@@ -41,9 +41,9 @@
 	- Python
 	- Matlab
 - Reading
-	- Required book: Darve and Wootters, Numerical Linear Algebra with Julia
+	- Required book: **Darve and Wootters, Numerical Linear Algebra with Julia**
 	- Optional books:
-		- Matrix Computations, by Gene H. Golub and Charles F. Van Loan
+		- Matrix Computations by Gene H. Golub and Charles F. Van Loan
 		- Numerical Linear Algebra by Lloyd N. Trefethen and David Bau III
 		- Applied numerical linear algebra by James W. Demmel
 		- Direct methods for sparse linear systems by Timothy A. Davis
@@ -53,7 +53,7 @@
 	- Midterm exam 1 15%
 	- Midterm exam 2 20%
 	- Final exam 30%
-- Gradescope; the website will manage the regrade requests
+- Gradescope; the website will manage the regrade requests.
 - Late policy
 	- 72 hours; 10% penalty
 	- Excused late submissions: requests must be submitted 24 hours before the deadline.

@@ -15,7 +15,7 @@ So the dot product can be used to measure the angle between two vectors.
 
 If two vectors are orthogonal, their dot product is equal to 0.
 
-We can also use the dot product to project a vector onto another:
+We can use the dot product and 2-norm to project a vector onto another:
 - Projection of $y$ unto $x$: $x^T y / \|x\|_2$.
 
 In data science and linear algebra, it's common to use different norms. They differ by the weight they assign to the components of a vector.
@@ -29,7 +29,7 @@ $$
 $$
   \| x \|_\infty = \max_{1 \le i \le n} |x_i|
 $$
-- Intermediate; as $p \to \infty$, the norm becomes closer to max-norm
+- Intermediate; as $p \to \infty$, the norm becomes closer to the max-norm
 $$
   \| x \|_p = \Big( \sum_{i=1}^n |x_i|^p \Big)^{1/p}
 $$
