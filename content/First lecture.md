@@ -48,12 +48,12 @@
 		- Applied numerical linear algebra by James W. Demmel
 		- Direct methods for sparse linear systems by Timothy A. Davis
 - See searchworks.stanford.edu
-- Grading; grades are typically curved to reach a typical distribution of As, Bs, and Cs.
+- Grading; grades are curved to reach a typical distribution of As, Bs, and Cs.
 	- Homework 35%
 	- Midterm exam 1 15%
 	- Midterm exam 2 20%
 	- Final exam 30%
-- Gradescope
+- Gradescope; the website will manage the regrade requests
 - Late policy
 	- 72 hours; 10% penalty
 	- Excused late submissions: requests must be submitted 24 hours before the deadline.
