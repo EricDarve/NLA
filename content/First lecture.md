@@ -29,13 +29,13 @@
 - Ed Discussion forum
 	- Rules of conduct on forum
 	- Be civil, considerate, and courteous
-	- Make not to post answers or partial answers to homework assignments
+	- Make sure not to post answers or partial answers to homework assignments
 - Anonymous form to report issues and concerns
 - Office hours posted on canvas
 - Recitation sessions
-	- Recitation on Friday
+	- Recitation on Monday; main lectures on Wednesday and Friday
 	- Basic LA review
-	- Julia / Python quick overviews
+	- Julia / Python quick overviews and getting started
 - Programming languages
 	- Julia
 	- Python
@@ -48,7 +48,7 @@
 		- Applied numerical linear algebra by James W. Demmel
 		- Direct methods for sparse linear systems by Timothy A. Davis
 - See searchworks.stanford.edu
-- Grading
+- Grading; grades are typically curved to reach a typical distribution of As, Bs, and Cs.
 	- Homework 35%
 	- Midterm exam 1 15%
 	- Midterm exam 2 20%
@@ -56,7 +56,7 @@
 - Gradescope
 - Late policy
 	- 72 hours; 10% penalty
-	- Excused late submissions: request must be submitted 24 hours before the ddl.
+	- Excused late submissions: requests must be submitted 24 hours before the deadline.
 - Access and accommodations
 	- Office of Accessible Education (OAE)
 	- Share your letter with us
