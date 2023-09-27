@@ -22,7 +22,7 @@ $$
 $$
 then $a_1 = \cdots = a_k = 0$.
 
-If the vectors are linearly independent, $k$ is the dimension of $S$.
+If the vectors are linearly independent, the dimension of $S$ is equal to $k$.
 
 Linear independence will be important when solving linear systems. It will guarantee that the solution is unique.
 

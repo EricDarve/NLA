@@ -1,6 +1,6 @@
 ### Measuring the size of a matrix
 
-This is the main norm we will use. It can be derived from the [[Vector norms]] and extended to matrices
+This is the main norm we will use. It can be derived from the [[Vector norms|vector norms]] and extended to matrices
 $$
 \| A \|_p = \sup_{x \neq 0} \frac{\|A x\|_p}{\|x\|_p} = \max_{\|x\|_p = 1} \| Ax \|_p
 $$

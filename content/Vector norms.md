@@ -1,7 +1,7 @@
 - Key tool for proofs and formal derivations
-- Essential to describe and understand properties of objects in LA
+- Essential to describe and understand the properties of objects in LA
 - Used to convert a vector to a single scalar number, its "size."
-- Most common norm is the 2-norm:
+- The most common norm is the 2-norm:
 $$
 \| x \|_2 = \Big( \sum_{i=1}^n (x_i)^2 \Big)^{1/2}
 = \sqrt{x^T x}
@@ -15,7 +15,7 @@ So the dot product can be used to measure the angle between two vectors.
 
 If two vectors are orthogonal, their dot product is equal to 0.
 
-We can also use the dot product to project a vector unto an other:
+We can also use the dot product to project a vector onto another:
 - Projection of $y$ unto $x$: $x^T y / \|x\|_2$.
 
 In data science and linear algebra, it's common to use different norms. They differ by the weight they assign to the components of a vector.
@@ -29,7 +29,7 @@ $$
 $$
   \| x \|_\infty = \max_{1 \le i \le n} |x_i|
 $$
-- Intermediate; as $p \to \infty$, norm becomes closer to max-norm
+- Intermediate; as $p \to \infty$, the norm becomes closer to max-norm
 $$
   \| x \|_p = \Big( \sum_{i=1}^n |x_i|^p \Big)^{1/p}
 $$
