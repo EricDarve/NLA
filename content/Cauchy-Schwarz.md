@@ -2,7 +2,7 @@
 $$
 | x^T y | \le \|x\|_2 \; \|y\|_2
 $$
-- Exercise: you can prove the triangle inequality using CS:
+- **Exercise:** you can prove the triangle inequality using CS:
 $$
 \| x+y \|_2 \le \|x\|_2 + \|y\|_2
 $$

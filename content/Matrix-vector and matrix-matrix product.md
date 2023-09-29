@@ -1,6 +1,9 @@
 [[Vectors and matrices]], [[Dot product]]
 
-A matrix can be defined as a linear map from $\mathbb R^n \to \mathbb R^m$. This is the operator view of a matrix: $A: x \to Ax$.
+A matrix can be defined as a linear map from $\mathbb R^n \to \mathbb R^m$. This is the operator view of a matrix: 
+$$
+A: x \to Ax
+$$
 
 Algebraically, we write
 $$
