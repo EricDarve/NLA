@@ -40,12 +40,14 @@ More during recitation + read the chapter in textbook for full background
 	- Useful for building algorithms with low error
 	- Key in many matrix decompositions or factorizations
 - [[Eigenvalues]]
-	- Key to analyzing powers of a matrix: $A^k$.
-	- This is important for time evolution and repeated applications of an operator
-	- Long-term evolution of a dynamical system
-	- Not useful to understand what happens when applying the operator once
+	- Key to analyzing the powers of a matrix: $A^k$.
+	- This is important for time evolution and repeated applications of an operator.
+	- Long-term evolution of a dynamical system.
+	- Not useful to understand what happens when applying the operator once.
+- [[Diagonalizable matrices]]
+	- A special matrix with a basis of eigenvectors.
 - [[Determinant]]
-	- How a matrix changes the volume of a subspace
+	- How a matrix changes the volume of a subspace.
 - [[Trace]]
 	- Connect matrix with vector field
 	- Trace = divergence of vector field = flux through a unit square
@@ -53,11 +55,11 @@ More during recitation + read the chapter in textbook for full background
 	- The simplest and most accurate case
 	- Diagonalizable + orthogonal matrices!
 - [[Hermitian and symmetric matrices]]
-	- An important special case of [[Unitarily diagonalizable matrices]]
+	- An important special case of [[Unitarily diagonalizable matrices|unitarily diagonalizable matrices]].
 - [[Schur decomposition]]
-	- This will be key to computing eigenvalues
-	- The fact that it uses orthogonal matrices will be important to ensure the accuracy of the algorithm
-	- Exists for all square matrices
+	- This will be key to computing eigenvalues.
+	- The fact that it uses orthogonal matrices will be important to ensure the accuracy of the algorithm.
+	- Exists for all square matrices.
 - [[Singular value decomposition]]
 	- Key to understanding how a matrix scales and transforms space
 	- A linear operator always transforms the unit ball to an $n$-ellipsoid.

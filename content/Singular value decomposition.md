@@ -32,18 +32,18 @@ $$
 \| A \|_F = \sqrt{\sum_{i=1}^p \sigma_i^2}
 $$
 
-[[The four fundamental spaces]]. Assume $A$ is $n \times m$. $r$: number of non-zero singular values = rank of the matrix. Then:
+[[The four fundamental spaces]]. Assume $A$ is $m \times n$. $r$: number of non-zero singular values = rank of the matrix. Then:
 $$
 \begin{aligned}
-N(A) & = \{v_{r+1}, \ldots, v_m\} \\
+N(A) & = \{v_{r+1}, \ldots, v_n\} \\
 R(A) & = \{u_1, \ldots, u_r\} \\
-N(A^T) & = \{u_{r+1}, \ldots, u_n\} = R(A)^\perp \\
+N(A^T) & = \{u_{r+1}, \ldots, u_m\} = R(A)^\perp \\
 R(A^T) & = \{v_1, \ldots, v_r\} = N(A)^\perp
 \end{aligned}
 $$
-We also recover the rank-nullity theorem.
+We also recover the [[The four fundamental spaces|rank-nullity theorem]].
 
-Connection with [[Eigenvalues|eigenvalues]]. The eigenvalues of $AA^T$ and $A^T A$ are equal to $\sigma_1^2$, ..., $\sigma_r^2$, or 0. The eigenvectors of $AA^T$ are given by $U$, and those of $A^T A$ by $V$:
+Connection with [[Eigenvalues|eigenvalues]]. The eigenvalues of $AA^T$ and $A^T A$ are equal to $\sigma_1^2,$ ..., $\sigma_r^2,$ or 0. The eigenvectors of $AA^T$ are given by $U$, and those of $A^T A$ by $V$:
 $$
 AA^T = U \Sigma^2 U^T, \qquad
 A^TA = V \Sigma^2 V^T

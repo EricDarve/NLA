@@ -5,6 +5,6 @@ $$
 
 Definition: $A$ is normal if and only if $A^H A = A A^H$.
 
-Property: all normal matrices are unitarily diagonalizable.
+Property: a matrix is normal if and only if it is unitarily diagonalizable.
 
 [[Eigenvalues]], [[Orthogonal matrix and projector]]
