@@ -13,6 +13,8 @@ More during recitation + read the chapter in textbook for full background
 - [[Vector norms]]
 	- How to measure things
 	- Key to calculating errors in numerical methods
+- [[Projection]]
+	- Using the dot product and norm for projection
 - [[Pythagorean theorem]]
 	- How to simply calculate the length of a vector given its decomposition into orthogonal subspaces
 	- This is key to computing the norm of a vector in certain situations.

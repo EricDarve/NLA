@@ -22,4 +22,4 @@ The matrix $P=QQ^T$ represents an orthogonal projection onto $R(Q)$ along $N(Q^T
 
 ![[Pasted image 20230914170201.png]]
 
-[[Dot product]], [[Vector norms]], [[Operator and matrix norms]]
+[[Dot product]], [[Vector norms]], [[Operator and matrix norms]], [[Projection]]

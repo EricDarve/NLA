@@ -15,8 +15,7 @@ So the dot product can be used to measure the angle between two vectors.
 
 If two vectors are orthogonal, their dot product is equal to 0.
 
-We can use the dot product and 2-norm to project a vector onto another:
-- Projection of $y$ unto $x$: $x^T y / \|x\|_2$.
+A unit vector is a vector with norm 1: $\|x\|_2 = 1$.
 
 In data science and linear algebra, it's common to use different norms. They differ by the weight they assign to the components of a vector.
 
