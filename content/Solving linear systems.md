@@ -58,7 +58,7 @@ det | determinant
 - [[Backward error analysis for LU]]
 	- Apply previous concepts to the LU factorization algorithm
 	- The current LU algorithm without pivoting is, in fact, backward **unstable.**
-	- This is consistent with our previous discussion in [[Stability of the LU factorization]].
+	- This is consistent with our previous observation in [[Stability of the LU factorization]].
 - [[Row pivoting]]
-	- Simplest and most efficient to make the LU factorization backward stable.
+	- The simplest and most efficient method to make the LU factorization backward stable.
 	- This is the most common implementation of the LU factorization.
