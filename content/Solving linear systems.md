@@ -39,3 +39,26 @@ det | determinant
 - [[Stability of the LU factorization]]
 	- The existence result describes what happens when a pivot is 0.
 	- What about a very small pivot? What can we expect in that case?
+- [[Floating point arithmetic]]
+	- A consequence of executing algorithms on computers
+	- Small errors can be magnified by unstable algorithms and lead to wrong answers
+- [[Floating point arithmetic is different from regular arithmetic]]
+	- Understanding this difference is important to understand how large errors can creep into a calculation
+- [[Unit roundoff error]]
+	- How to model and estimate roundoff errors
+	- This is important to estimate errors and provide accuracy bounds on calculations
+- [[Forward and backward error]]
+	- These are the main concepts for analyzing numerical errors in algorithms.
+	- This method can be used to prove that an algorithm is stable, that is, small perturbations in the input lead to small perturbations in the output.
+	- The opposite is an unstable algorithm in which errors cannot be controlled.
+- [[Sensitivity analysis]]
+	- This is the concept that connects the forward and backward error estimates.
+- [[Conditioning of a linear system]]
+	- Application of the concept of sensitivity and conditioning to the problem of solving a linear system.
+- [[Backward error analysis for LU]]
+	- Apply previous concepts to the LU factorization algorithm
+	- The current LU algorithm without pivoting is, in fact, backward **unstable.**
+	- This is consistent with our previous discussion in [[Stability of the LU factorization]].
+- [[Row pivoting]]
+	- Simplest and most efficient to make the LU factorization backward stable.
+	- This is the most common implementation of the LU factorization.
