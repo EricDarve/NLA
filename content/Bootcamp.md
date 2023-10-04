@@ -40,7 +40,7 @@ More during recitation + read the chapter in textbook for full background
 	- Useful for building algorithms with low error
 	- Key in many matrix decompositions or factorizations
 - [[Eigenvalues]]
-	- Key to analyzing the powers of a matrix: $A^k$.
+	- Key to analyzing the powers of a matrix, $A^k$ , and solving differential equations $\dot{x} = Ax$.
 	- This is important for time evolution and repeated applications of an operator.
 	- Long-term evolution of a dynamical system.
 	- Not useful to understand what happens when applying the operator once.
@@ -59,7 +59,7 @@ More during recitation + read the chapter in textbook for full background
 - [[Schur decomposition]]
 	- This will be key to computing eigenvalues.
 	- The fact that it uses orthogonal matrices will be important to ensure the accuracy of the algorithm.
-	- Exists for all square matrices.
+	- **Exists for all square matrices.**
 - [[Singular value decomposition]]
 	- Key to understanding how a matrix scales and transforms space
 	- A linear operator always transforms the unit ball to an $n$-ellipsoid.

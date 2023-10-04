@@ -3,8 +3,8 @@ $$
 A = Q \Lambda Q^H
 $$
 
-Definition: $A$ is normal if and only if $A^H A = A A^H$.
+**Definition:** $A$ is normal if and only if $A^H A = A A^H$.
 
-Property: a matrix is normal if and only if it is unitarily diagonalizable.
+**Property:** a matrix is normal if and only if it is unitarily diagonalizable.
 
 [[Eigenvalues]], [[Orthogonal matrix and projector]]
