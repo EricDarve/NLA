@@ -13,9 +13,9 @@ $$
 - $V$: orthogonal, $n \times n$. Right singular vectors
 - $\Sigma$: $m \times n$, diagonal matrix with real positive entries = pure scaling = singular values.
 
-![[Drawing 2023-10-04 12.13.49.excalidraw]]
+![[Drawing 2023-10-04 12.13.49.excalidraw.svg]]
 
-![[Drawing 2023-10-04 2.excalidraw]]
+![[Drawing 2023-10-04 2.excalidraw.svg]]
 
 - $A v_i = \sigma_i \, u_i$
 
@@ -28,7 +28,7 @@ Consider a ball $B$ in $R^n$. $A$ transforms this ball into an ellipsoid.
 
 The lengths of the axes of this ellipsoid are the singular values of $A$.
 
-![[Drawing 2023-10-04 12.26.03.excalidraw]]
+![[Drawing 2023-10-04 12.26.03.excalidraw.svg]]
 
 As we can expect, the [[Operator and matrix norms|size of a matrix]] can be related to its singular values:
 $$
