@@ -32,7 +32,7 @@ We will show that all the eigenvalues of $A$ can be found along the diagonal of 
 
 Let's prove the existence of $X$ and $T$.
 
-We use a proof by induction. The result can be verified when $n=1.$
+We use a proof by induction on the matrix size $n$. The result can be verified when $n=1.$
 
 Assume that the result is true for matrices of size less than $n.$ 
 
