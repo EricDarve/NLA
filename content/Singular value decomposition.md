@@ -52,4 +52,7 @@ $$
 AA^T = U \Sigma^2 U^T, \qquad
 A^TA = V \Sigma^2 V^T
 $$
+
+The computational cost of computing the singular value decomposition is $O(n^3)$.
+
 [[The four fundamental spaces]], [[Eigenvalues]], [[Operator and matrix norms]], [[Orthogonal matrix and projector]]

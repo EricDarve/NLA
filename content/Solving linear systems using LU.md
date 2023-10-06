@@ -5,6 +5,8 @@ We can solve $Ax = b$ in two steps:
 1. $Lz = b$
 2. $Ux = z$
 
-Both steps involve triangular systems. [[Solving triangular systems]]
+Both steps involve [[Solving triangular systems|triangular systems]].
+
+The computational cost of solving $Ax=b,$ assuming we have $A$ in the form $A=LU,$ is $O(n^2)$.
 
 How can we get $L$ and $U$ starting from $A$?

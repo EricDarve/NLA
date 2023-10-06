@@ -13,6 +13,8 @@ with
 $$
 y_i = \sum_{j=1}^n a_{ij} \, x_j
 $$
+Computational cost: $O(n)$.
+
 Using the operator interpretation, we can define the product of two matrices $C=AB$ as the result of composing $A$ with $B$: 
 $$
 Cx = (AB)x = A(Bx)
@@ -24,3 +26,5 @@ $$
 c_{ij} = \sum_{k=1}^p a_{ik} \, b_{kj}
 $$
 For the product to be defined, the number of columns of $A$, $p$, must be equal to the number of rows of $B$.
+
+Computational cost: $O(mnp)$.

@@ -26,3 +26,5 @@ x_i = u_{ii}^{-1} \, (b_i - \sum_{j=i+1}^n u_{ij} x_j)
 \end{gather}
 $$
 We solve iteratively in the reverse order: $x_n$, $x_{n-1}$, ..., $x_1$.
+
+The computational cost of solving a triangular system is $O(n^2)$.

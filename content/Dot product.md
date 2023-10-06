@@ -2,6 +2,7 @@ Notation:
 $$
 x^T y = x_1 y_1 + \cdots + x_n y_n
 $$
+Computational cost: $O(n)$.
 
 Two vectors $x$ and $y$ are _orthogonal_ if $x^T y = 0$.
 

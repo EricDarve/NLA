@@ -45,4 +45,6 @@ Q_3^H A Q_3 =
 $$
 is upper triangular. $\square$
 
+The computational cost of computing the Schur decomposition is $O(n^3)$. This will be covered in future sections.
+
 [[Eigenvalues]], [[Orthogonal matrix and projector]], [[Hermitian and symmetric matrices]]

@@ -33,6 +33,8 @@ $$
   \| x \|_p = \Big( \sum_{i=1}^n |x_i|^p \Big)^{1/p}
 $$
 
+Computational cost: $O(n)$.
+
 **Balls in different norms**
 ![[20220923_155344_image.png]]
 [[Vectors and matrices]]

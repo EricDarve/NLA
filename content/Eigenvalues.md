@@ -1,5 +1,7 @@
 For any square matrix $A$, there exists at least a scalar $\lambda \in \mathbb C$ and $x \in \mathbb C^n$ such that $Ax = \lambda x$. They are called an eigenvalue and eigenvector of $A$.
 
+The computational cost of computing all the eigenvalues is $O(n^3)$. This will be covered in greater detail in future chapters.
+
 ### Existence of eigenvalues
 
 We prove the existence of at least one eigenvalue and eigenvector $Ax = \lambda x$ with $\lambda \in \mathbb C$.

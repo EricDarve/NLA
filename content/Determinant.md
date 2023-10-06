@@ -45,4 +45,6 @@ In this product, eigenvalues are repeated according to their multiplicity.
 
 For any square matrix A, we consider its columns $a_i$ and the $n$-dimensional parallelepiped formed by the vectors $a_i$. The determinant of A is defined as the signed volume of this parallelepiped.
 
+The computational cost of computing the determinant is $O(n^3)$.
+
 [[Eigenvalues]], [[Orthogonal matrix and projector]]

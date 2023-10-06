@@ -1,6 +1,4 @@
-We wish to write $A$ in the form $A = LU$ where $L$ is lower triangular and $U$ is upper triangular. 
-
-[[Solving linear systems using LU]], [[Solving triangular systems]]
+We wish to write $A$ in the form $A = LU$ where $L$ is lower triangular and $U$ is upper triangular.
 
 Algebraic form:
 $$
@@ -50,3 +48,7 @@ $$
 A - \sum_{k=1}^2 l_{,k} \, u_{k,} = \sum_{k=3}^n l_{,k} \, u_{k,}
 $$
 Following an iterative process with $k=3$, ..., $n$, we can compute all the columns of $L$ and rows of $U$.
+
+The computational cost of computing the LU factorization $O(n^3)$.
+
+[[Solving linear systems using LU]], [[Solving triangular systems]]
