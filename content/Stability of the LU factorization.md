@@ -40,6 +40,19 @@ U = \begin{pmatrix}
 \end{pmatrix}
 $$
 for $\epsilon$ sufficiently small. $LU$ is no longer equal to $A$!
+$$
+\begin{pmatrix}
+	1 & 0 \\ \epsilon^{-1} & 1
+\end{pmatrix} 
+\begin{pmatrix}
+	\epsilon & 1 \\ 0 & - \epsilon^{-1}
+\end{pmatrix}
+=
+\begin{pmatrix}
+	\epsilon & 1 \\ 1 & 0
+\end{pmatrix}
+\neq A
+$$
 
 If we solve the linear system using the numerical approximations to $L$ and $U$, we will get the wrong result.
 

@@ -10,6 +10,6 @@ The expression above can be rewritten as:
 $$
 A = \sum_k b_{,k} \, c_{k,}
 $$
-This is the outer form of the product. This will be useful for several matrix factorizations, including the LU and QR factorizations.
+This is the **outer form** of the product. This will be useful for several matrix factorizations, including the LU and QR factorizations.
 
 [[Matrix-vector and matrix-matrix product]]

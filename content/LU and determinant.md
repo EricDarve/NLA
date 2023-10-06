@@ -3,7 +3,7 @@ $$
 \det(A) = \prod_{i=1}^n u_{ii}
 $$
 
-Proof: $A=LU$ and property of the determinant:
+Proof: Use $A=LU$ and the property of the [[Determinant|determinant]]:
 $$
 \det(A) = \det(L) \det(U)
 $$
