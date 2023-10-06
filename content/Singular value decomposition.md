@@ -1,4 +1,4 @@
-One of the most important matrix decomposition in data science and machine learning.
+One of the most important matrix decompositions in data science and machine learning.
 
 Eigenvalues are great for understanding $A^n$. Does it grow? Does it shrink? How can it be easily modeled?
 
@@ -23,7 +23,7 @@ Consider a ball $B$ in $R^n$. $A$ transforms this ball into an ellipsoid.
 
 - $Ax = U \Sigma V^Tx$:
 	- $V^T x$: point on the unit ball
-	- $\Sigma (V^ x)$: point on an ellipsoid; the axes are aligned with the coordinate axes.
+	- $\Sigma (V^T x)$: point on an ellipsoid; the axes are aligned with the coordinate axes.
 	- $U(\Sigma V^T x)$: rotate/reflect the ellipsoid.
 
 The lengths of the axes of this ellipsoid are the singular values of $A$.
