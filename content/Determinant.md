@@ -1,4 +1,12 @@
+The determinant is a function that maps square matrices to real (or complex) numbers. It can be defined by its properties. The determinant is the unique function defined on square $n \times n$ matrices that has the four following properties. 
+
+1. The determinant of the identity matrix is 1.
+2. The exchange of two columns multiplies the determinant by $−1$.
+3. Multiplying a column by a scalar multiplies the determinant by this scalar.
+4. Adding to a column a multiple of another column does not change the determinant.
+
 **Definition using the Leibniz formula**
+There are multiple other definitions. One of them uses the Leibniz formula:
 $$
 \det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma) 
 a_{1,\sigma(1)} \dots a_{n,\sigma(n)}
@@ -7,13 +15,13 @@ $S_n$ is the set of all permutations of the set $\{ 1,2,\dots,n \}$. The signatu
 
 **Properties**
 
+- $\det(A) = \prod_{i=1}^n a_{ii}$ if $A$ is a triangular matrix.
+- An alternating form: when two columns are identical, the determinant is 0; if you switch two columns, the determinant changes sign.
 - $\det(\alpha A) = \alpha^n \det(A)$
 - $n$-linear function: if we fix all the columns of A except column $i$, det($A$) is a linear function of $a_i$.
-- An alternating form: when two columns are identical, the determinant is 0; if you switch two columns, the determinant changes sign.
 - $A$ singular if and only if det($A$) = 0.
 - $\det(AB) = \det(A) \det(B)$
 - $\det(A^{-1}) = \det(A)^{-1}$
-- $\det(A) = \prod_{i=1}^n a_{ii}$ if $A$ is a triangular matrix.
 - $\det(A) = \det(A^T)$
 
 **Characteristic polynomial**

@@ -8,9 +8,9 @@ A =
 1 & \pi
 \end{pmatrix}
 $$
-LU breaks down immediately because $a_{11} = 0$.
+[[Existence of LU|LU breaks down]] immediately because $a_{11} = 0$.
 
-What happens when we have a small [[LU algorithm#^pivot]]?
+What happens when we have a small [[LU algorithm#^pivot|pivot]]?
 
 Consider now:
 $$

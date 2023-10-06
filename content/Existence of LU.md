@@ -1,4 +1,4 @@
-Let's look at a case where the LU factorization breaks down. This happens when an [[LU algorithm#^pivot]] becomes equal to 0.
+Let's look at a case where the LU factorization breaks down. This happens when a [[LU algorithm#^pivot|pivot]] becomes equal to 0.
 
 Consider:
 $$
