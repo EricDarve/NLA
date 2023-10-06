@@ -3,7 +3,7 @@ LU factorization algorithm:
 - Loop over $k$: 1 to $n$
 	- $u_{k,} = a_{k,}$; row $k$ of $U$
 	- $l_{,k} = a_{,k} / a_{kk}$; column $k$ of $L$
-	- $A \leftarrow A - l_{,k} * u_{k,}$. \[The resulting modified matrix $A$ is called the Schur complement.\]
+	- $A \leftarrow A - l_{,k} * u_{k,}$. In this step, we modify matrix $A$. The resulting modified matrix $A$ is called the Schur complement.
 
 [[Triangular factorization]], [[Solving linear systems using LU]]
 

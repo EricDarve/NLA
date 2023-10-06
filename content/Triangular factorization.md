@@ -37,7 +37,7 @@ There are many possible solutions when solving for $l_{11}$ and $u_{11}$. The si
 
 The final equations for column 1 are:
 - $u_{1,} = a_{1,}$
-- $l_{,1} = a_{,1} / a_{11}$
+- $l_{,1} = a_{,1} / a_{11}$, where we assume that $a_{11} \neq 0$.
 
 This completely specifies the first column of $L$ and the first row of $U$.
 
