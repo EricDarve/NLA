@@ -63,7 +63,7 @@ More during recitation + read the chapter in textbook for full background
 - [[Singular value decomposition]]
 	- Key to understanding how a matrix scales and transforms space
 	- A linear operator always transforms the unit ball to an $n$-ellipsoid.
-	- Connection with [[The four fundamental spaces]].
-	- Connection with [[Eigenvalues]] and determinant of a matrix.
+	- Connection with the [[The four fundamental spaces|four fundamental spaces]].
+	- Connection with [[Eigenvalues|eigenvalues]] and [[Determinant|determinant]] of a matrix.
 	- Key when solving least-squares problems: $\min_x \|Ax-b\|_2$.
-	- Relation to [[Operator and matrix norms]]
+	- Relation to [[Operator and matrix norms|operator and matrix norms]].
