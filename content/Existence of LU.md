@@ -42,7 +42,7 @@ for all $1 \le k \le n-1$.
 
 We make a few observations.
 
-If matrix $A$ is non-singular, then ${\rm rank}(A[1:n,1:k]) = k$ and $\det(A[1: k, 1: k]) \neq 0$ is a necessary and sufficient condition for the existence of an LU factorization.
+A matrix $A$ is non-singular if and only if ${\rm rank}(A[1:n,1:k]) = k$, $1 \le k \le n$. For non-singular matrices, $\det(A[1: k, 1: k]) \neq 0$, $1 \le k \le n-1$, is a necessary and sufficient condition for the existence of an LU factorization.
 
 Assume that $A$ has an LU factorization. If $u_{kk} = 0$, then $a_{,k}$ is a linear combination of the columns $l_{,j}$, $j < k$. If $u_{kk} = 0$ and $u_{ll} \neq 0$ for $l < k$, then $a_{,k}$ is a linear combination of the columns $a_{,j}$, $j < k$.
 
@@ -54,4 +54,4 @@ Theorem: There exists a unique $L$ and $U$ if and only if $\det(A[1: k, 1: k]) \
 
 Variant:
 
-Theorem: There exists a unique $L$ and non-singular $U$ if and only if $\det(A[1: k, 1: k]) \neq 0$ for all $1 \le k \le n$.
+Theorem: There exists a unique non-singular $L$ and $U$ if and only if $\det(A[1: k, 1: k]) \neq 0$ for all $1 \le k \le n$.
