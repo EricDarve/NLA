@@ -5,6 +5,6 @@
 $$
 \frac{x^T y}{\|x\|_2^2} \: x
 $$
-- If $x$ is a unit vector ($\|x\|_2=1$), we simply have that the projection is equal to to $x^Ty$.
+- If $x$ is a unit vector ($\|x\|_2=1$), we simply have that the projection is equal to to $x^Ty$ and $(x^Ty) x$ for the vector expression.
 
 [[Dot product]], [[Vector norms]]
