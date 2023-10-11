@@ -46,7 +46,7 @@ det | determinant
 	- Understanding this difference is important to understand how large errors can creep into a calculation
 - [[Unit roundoff error]]
 	- How to model and estimate roundoff errors
-	- This is important to estimate errors and provide accuracy bounds on calculations
+	- This is important to estimate errors and provide bounds on the accuracy of calculations.
 - [[Forward and backward error]]
 	- These are the main concepts for analyzing numerical errors in algorithms.
 	- This method can be used to prove that an algorithm is stable, that is, small perturbations in the input lead to small perturbations in the output.

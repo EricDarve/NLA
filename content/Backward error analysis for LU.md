@@ -25,15 +25,15 @@ U = \begin{pmatrix}
 \end{pmatrix}
 \end{gather}
 $$
-The error is $O(u \epsilon^{-1})$. It can become arbitrarily large regardless of how small $u$ is. We can keep $\epsilon$ as small as we want and make the backward error large.
+The backward error is $O(u \epsilon^{-1})$. It can become arbitrarily large regardless of how small $u$ is. We can choose $\epsilon$ as small as we want and make the backward error large.
 
-Where do these large entries come from?
+**Where do these large entries come from?**
 
 Recall the LU factorization:
 - $u_{k,} = a_{k,}$
 - $l_{,k} = a_{,k} / a_{kk}$
 - $A \leftarrow A - l_{,k} * u_{k,}$
 
-We have a problem when the pivot $a_{kk}$ becomes very small.
+We have a problem when the [[LU algorithm#^pivot|pivot]] $a_{kk}$ becomes very small.
 
-[[Stability of the LU factorization]], [[Forward and backward error]]
+[[LU algorithm]], [[Stability of the LU factorization]], [[Forward and backward error]]
