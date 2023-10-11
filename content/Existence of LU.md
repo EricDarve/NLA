@@ -13,12 +13,16 @@ $$
 Why does the LU algorithm break down?
 
 - $A = LU$
-- If det($A$) = 0, then det($U$) = 0. 
-- One of the diagonal entries of $U$ must be 0. 
-- From the algorithm, this implies that $a_{kk} = 0$ at some point. 
-- The algorithm is dividing by 0. One of the [[LU algorithm#^pivot|pivots]] is 0.
+- We have $\det(A) = \det(L) \det(U) = \det(U)$ because $L$ is lower triangular with 1 on the diagonal.
+- det($A$) = 0 if and only if det($U$) = 0. This is equivalent to saying that one of the diagonal entries of $U$ is 0. 
+- Furthermore, because $A = LU$ and the triangular form of $L$ and $U$ we have that
+$$
+A[1:k,1:k] = L[1:k,1:k] \: U[1:k,1:k]
+$$
+- Assume that all the pivots are non-zero up to step $k$. Then $A[1:k,1:k]$ is singular if and only if $u_{kk}$ is zero. This can be stated equivalently as $\det(A[1:k,1:k]) \neq 0$ if and only if $u_{kk} \neq 0$.
+- So, if $\det(A[1:k,1:k]) \neq 0$, $1 \le k \le n-1,$ then all the pivots remain non-zero and the algorithm completes.
 
-In our example, $u_{33} = 0$ at step $k=3$. We cannot proceed to step $k=4$.
+In our example, $u_{33} = 0$ at step $k=3$. This is because the top left $3 \times 3$ block of $A$ is singular. So we cannot proceed to step $k=4$.
 
 [[Triangular factorization]], [[LU algorithm]]
 
@@ -30,7 +34,7 @@ $$
 $$
 for all $1 \le k \le n-1$.
 
-A more precise version of this result is as follows.
+This was proved above. A more precise version of this result is as follows.
 
 Theorem: The LU factorization exists if and only if
 $$
