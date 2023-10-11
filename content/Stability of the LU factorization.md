@@ -1,4 +1,4 @@
-Numerical analysis precept: consider some algorithm $A(X)$. Suppose the algorithm breaks down when $X=X_0$ (e.g., division by 0). Then the numerical error is typically large when $X \sim X_0$.
+**Numerical analysis precept:** consider some algorithm $A(X)$. Suppose the algorithm breaks down when $X=X_0$ (e.g., division by 0). Then the numerical error is typically large when $X \sim X_0$.
 
 Consider this case:
 $$
@@ -10,9 +10,7 @@ A =
 $$
 [[Existence of LU|LU breaks down]] immediately because $a_{11} = 0$.
 
-What happens when we have a small [[LU algorithm#^pivot|pivot]]?
-
-Consider now:
+What happens when we have a small [[LU algorithm#^pivot|pivot]]? Consider now:
 $$
 \begin{gather}
 A =

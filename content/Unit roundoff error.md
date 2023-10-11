@@ -1,8 +1,8 @@
 A simple formula can be used to estimate the error resulting from floating point arithmetic.
 
-**Fundamental rule:** a floating point operation must approximate the corresponding real number arithmetic operation by rounding any result that is not a floating-point number itself to the nearest floating-point number.
+**Fundamental rule:** a floating point operation must approximate the corresponding real number arithmetic operation by rounding any result that is not a floating-point number to the nearest floating-point number.
 
-In short: a fl(op) b = fl(a op b), where op = `+,*,-,/`.
+In short: `a fl(op) b = fl(a op b)`, where `op` = `+,*,-,/`.
 
 Therefore: a fl(op) b = a op b + $\epsilon$ (a op b), where $|\epsilon| \le u$, and:
 $$
