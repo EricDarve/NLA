@@ -28,4 +28,4 @@ $$
 
 The forward error can be connected to the backward error using the conditioning of the problem.
 
-[[Stability of the LU factorization]], [[Floating point arithmetic]], [[Unit roundoff error]]
+[[Stability of the LU factorization]], [[Floating point numbers]], [[Floating point arithmetic and unit roundoff error]]

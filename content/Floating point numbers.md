@@ -1,4 +1,4 @@
-It is important to understand how computers make small errors during a computation. As a result, some algorithms may yield completely incorrect errors because these errors may be allowed to grow out of control. This happens for **unstable** algorithms.
+It is important to understand how computers make small errors during a computation. As a result, some algorithms may yield completely incorrect errors because these errors may be allowed to grow out of control. This happens for **unstable** algorithms. The first step is understanding how a computer stores numbers in memory. For this purpose, it uses floating point numbers.
 
 What is a floating point number?
 

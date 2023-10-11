@@ -23,4 +23,4 @@ a fp(+) b = b fp(+) a
 
 Challenge problem: can you calculate the exact value of $\sin \pi$ on a computer?
 
-[[Floating point arithmetic]]
+[[Floating point numbers]], [[Floating point arithmetic and unit roundoff error]]

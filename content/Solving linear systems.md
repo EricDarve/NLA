@@ -28,25 +28,25 @@ det | determinant
 	- This can be done using the outer form for the matrix-matrix product.
 - [[LU algorithm]]
 	- This is the step-by-step algorithm.
-- [[Existence of LU]]
-	- The LU factorization suffers from stability issues.
-	- This can lead to inaccurate solutions in some cases, or the algorithm may even break down.
-	- Under what condition does the LU factorization exist? What are the situations where the algorithm breaks down?
 - [[LU and determinant]]
 	- The determinant seems very complicated to calculate.
 	- But using LU, we can get the determinant very easily.
 	- Uses the fact that $\det U = \prod_{i=1}^n u_{ii}$ for triangular matrices.
+- [[Existence of LU]]
+	- The LU factorization suffers from stability issues.
+	- This can lead to inaccurate solutions in some cases, or the algorithm may even break down.
+	- Under what condition does the LU factorization exist? What are the situations where the algorithm breaks down?
 - [[Stability of the LU factorization]]
 	- The existence result describes what happens when a pivot is 0.
 	- What about a very small pivot? What can we expect in that case?
-- [[Floating point arithmetic]]
-	- A consequence of executing algorithms on computers
+- [[Floating point numbers]]
+	- A consequence of storing numbers and executing algorithms on computers
+- [[Floating point arithmetic and unit roundoff error]]
+	- How to model and estimate roundoff errors
+	- This is important to estimate errors and provide bounds on the accuracy of calculations.
 	- Small errors are magnified by unstable algorithms and lead to wrong answers
 - [[Floating point arithmetic is different from regular arithmetic]]
 	- Understanding this difference is important to understand how large errors can creep into a calculation
-- [[Unit roundoff error]]
-	- How to model and estimate roundoff errors
-	- This is important to estimate errors and provide bounds on the accuracy of calculations.
 - [[Forward and backward error]]
 	- These are the main concepts for analyzing numerical errors in algorithms.
 	- This method can be used to prove that an algorithm is stable, that is, small perturbations in the input lead to small perturbations in the output.

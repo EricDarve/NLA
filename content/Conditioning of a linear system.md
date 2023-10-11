@@ -20,6 +20,6 @@ Illustration of the condition number of matrix
 
 The condition number $\kappa(A)$ cannot be changed. Only the backward errors $\|E\|$ and $\|e\|$ can be controlled. **A good algorithm has a backward error on the order of $u$.**
 
-**Stable algorithm:** an algorithm where $\|E\|$ and $\|e\|$ can be controlled. Typically, stable algorithms achieve $\|E\| \in O(u)$ and $\|e\| \in O(u)$ where $u$ is the [[Unit roundoff error|unit roundoff error]].
+**Stable algorithm:** an algorithm where $\|E\|$ and $\|e\|$ can be controlled. Typically, stable algorithms achieve $\|E\| \in O(u)$ and $\|e\| \in O(u)$ where $u$ is the [[Floating point arithmetic and unit roundoff error|unit roundoff error]].
 
-[[Stability of the LU factorization]], [[Sensitivity analysis]], [[Forward and backward error]], [[Unit roundoff error]]
+[[Stability of the LU factorization]], [[Sensitivity analysis]], [[Forward and backward error]], [[Floating point arithmetic and unit roundoff error]]
