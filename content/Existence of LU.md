@@ -20,7 +20,7 @@ $$
 A[1:k,1:k] = L[1:k,1:k] \: U[1:k,1:k]
 $$
 - Assume that all the pivots are non-zero up to step $k$. Then $A[1:k,1:k]$ is singular if and only if $u_{kk}$ is zero. This can be stated equivalently as $\det(A[1:k,1:k]) \neq 0$ if and only if $u_{kk} \neq 0$.
-- So, if $\det(A[1:k,1:k]) \neq 0$, $1 \le k \le n-1,$ then all the pivots remain non-zero and the algorithm completes.
+- So, if $\det(A[1:k,1:k]) \neq 0$, $1 \le k \le n-1,$ then all the pivots remain non-zero, and the algorithm completes.
 
 In our example, $u_{33} = 0$ at step $k=3$. This is because the top left $3 \times 3$ block of $A$ is singular. So we cannot proceed to step $k=4$.
 

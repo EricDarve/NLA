@@ -52,7 +52,7 @@ $$
 \neq A
 $$
 
-If we solve the linear system using the numerical approximations to $L$ and $U$, we will get the wrong result.
+If we solve the linear system using numerical approximations to $L$ and $U$, we will get the wrong result.
 
 A computer program cannot store all the digits of $\epsilon^{-1}$. If $\epsilon^{-1} \approx 10^{20}$, $\pi$ appears around digit 20. If you store only 16 digits of $\epsilon^{-1}$, there is no room to store $\pi$.
 
