@@ -1,6 +1,6 @@
-Consider as an example problem solving $Ax = b$. We can think of the solution process as a map: $(A,b) \rightarrow x$.
+Consider as an example problem solving $Ax = b$. We can think of the solution process as a map f: $(A,b) \mapsto x$.
 
-Forward and backward error analysis can be formulated abstractly by representing the algorithm as a function $f$ that maps inputs to outputs.
+Forward and backward error analysis can be formulated abstractly by representing any algorithm as a function $f$ that maps inputs to outputs.
 
 Forward error equation: "What is the error in the solution computed with our algorithm?"
 

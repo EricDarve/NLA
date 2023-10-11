@@ -1,26 +1,31 @@
 This is the backward error bound for LU:
 $$
-(A + E) \; \tilde x = b\\[1em]
-|E| \le n \, u \; (2|A| + 4 |\tilde{L}| |\tilde{U}|) + O(u^2)
+\begin{gather}
+(A + E) \; \tilde x = b \\
+|E| \le n \, u \; (2|A| + 4 |\tilde{L}| \: |\tilde{U}|) + O(u^2)
+\end{gather}
 $$
+$|\tilde{L}|$, $|\tilde{U}|$: matrices obtained by taking the absolute value of the entries of $\tilde{L}$ and $\tilde{U}$. We use the same notation for $|E|$ and $|A|$.
 
 The backward error can become very large when we have large entries in $L$ or $U$. The LU factorization is **not** a backward stable algorithm.
 
 In our previous example:
 $$
+\begin{gather}
 A =
 \begin{pmatrix}
 \epsilon & 1 \\
 1 & \pi
-\end{pmatrix}, \\[1em]
+\end{pmatrix} \\[1em]
 L = \begin{pmatrix}
 1 & 0 \\ \epsilon^{-1} & 1
-\end{pmatrix}, \quad
+\end{pmatrix}, \qquad
 U = \begin{pmatrix}
 \epsilon & 1 \\ 0 & \pi - \epsilon^{-1}
 \end{pmatrix}
+\end{gather}
 $$
-Error is $O(u \epsilon^{-1})$. It can become arbitrarily large.
+The error is $O(u \epsilon^{-1})$. It can become arbitrarily large regardless of how small $u$ is. We can keep $\epsilon$ as small as we want and make the backward error large.
 
 Where do these large entries come from?
 
