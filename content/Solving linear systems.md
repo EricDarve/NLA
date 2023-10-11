@@ -41,7 +41,7 @@ det | determinant
 	- What about a very small pivot? What can we expect in that case?
 - [[Floating point arithmetic]]
 	- A consequence of executing algorithms on computers
-	- Small errors can be magnified by unstable algorithms and lead to wrong answers
+	- Small errors are magnified by unstable algorithms and lead to wrong answers
 - [[Floating point arithmetic is different from regular arithmetic]]
 	- Understanding this difference is important to understand how large errors can creep into a calculation
 - [[Unit roundoff error]]
