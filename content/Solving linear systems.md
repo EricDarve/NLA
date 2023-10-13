@@ -62,3 +62,16 @@ det | determinant
 - [[Row pivoting]]
 	- The simplest and most efficient method to make the LU factorization backward stable.
 	- This is the most common implementation of the LU factorization.
+- [[Symmetric Positive Definite Matrices]]
+	- Many algorithms (such as [[Cholesky factorization|Cholesky]]) require that the matrix is SPD.
+	- These matrices satisfy very strong properties and as a result, very fast and accurate algorithms exist for these matrices.
+	- This is a very important class of matrices in NLA.
+- [[Cholesky factorization]]
+	- The Cholesky factorization applies to any SPD matrix.
+	- This is a triangular factorization of the form $A=LL^T$ where $L$ is lower triangular.
+	- This factorization is faster and requires less memory than LU.
+- [[Existence of the Cholesky factorization]]
+	- We prove that the Cholesky factorization exists.
+	- [[Row pivoting|Pivoting]] is not required.
+- [[Stability of the Cholesky factorization]]
+	- The algorithm is always stable even without any pivoting.
