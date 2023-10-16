@@ -1,6 +1,7 @@
-We prove that the algorithm completes and that the [[Cholesky factorization|Cholesky]] factorization exists.
+- We prove that the algorithm completes and that the [[Cholesky factorization|Cholesky]] factorization exists. 
+- This decomposition is also unique.
 
-We use a proof by induction. Let's start with $k=1$. We have
+To prove existence, we use a proof by induction. Let's start with $k=1$. We have
 $$
 a_{11} = e_1^T A e_1 > 0
 $$
@@ -8,12 +9,11 @@ This holds because $A$ is [[Symmetric Positive Definite Matrices|SPD]]. So we ca
 $$
 A = [\sqrt{a_{11}} \, ] [\sqrt{a_{11}} \, ] = LL^T
 $$
-
-Now, let's consider a matrix of size $n$ and let's assume that the Cholesky factorization exists for matrices of size $n-1$.
+Now, let's consider a matrix of size $n$ and let's assume that the Cholesky factorization exists for SPD matrices of size $n-1$.
 
 Let's perform one step of the factorization starting from $A$. We will end up with a matrix of size $n-1$ and will be able to use the induction hypothesis.
 
-First step of Cholesky:
+The first step of Cholesky can be written in this equivalent form:
 $$
 A =
 \begin{pmatrix}
@@ -34,7 +34,7 @@ a_{11} & 0 \\
 0 & I
 \end{pmatrix}
 $$
-Note that
+Note that the first column of $L$ is equal to:
 $$
 l_{,1} = \frac{a_{,1}}{\sqrt{a_{11}}} =
 \sqrt{a_{11}}
@@ -50,7 +50,7 @@ We prove that $B - (1/a_{11}) c c^T$ is SPD.
 1. That matrix is symmetric.
 2. We now prove that $y^T (B - (1/a_{11}) c c^T) y > 0$ for any $y \neq 0.$
 
-Check that for any vector $z$:
+Check that for any row vector $z$:
 $$
 \begin{pmatrix}
     1 & z \\
@@ -191,7 +191,30 @@ L = \begin{pmatrix}
 \sqrt{a_{11}} & 0 \\
 0 & L_1
 \end{pmatrix}
+=
+\begin{pmatrix}
+\sqrt{a_{11}} & 0 \\
+\frac{1}{\sqrt{a_{11}}} c & L_1
+\end{pmatrix}
 $$
 Matrix $L$ is lower triangular as expected. This concludes the proof. $\square$
+
+To prove uniqueness, let's assume that we have two such factorizations:
+$$
+L_1 L_1^T = L_2 L_2^T
+$$
+This implies that
+$$
+L_2^{-1} L_1  = L_2^T L_1^{-T}
+$$
+where $^{-T}$ denotes the transpose of the inverse. The left-hand side is a lower-triangular matrix while the right-hand side is an upper-triangular matrix. Therefore both matrices are diagonal. If we match the diagonal terms on the left and right-hand sides we find that:
+$$
+\Big( \frac{[L_1]_{ii}}{[L_2]_{ii}} \Big)^2 = 1
+$$
+This implies that $|[L_1]_{ii}| = |[L_2]_{ii}|.$ But both terms are positive, so they are equal. So 
+$$
+L_2^{-1} L_1  = I
+$$
+and the matrices are equal.
 
 [[Symmetric Positive Definite Matrices]], [[Cholesky factorization]]

@@ -4,7 +4,7 @@ This can be seen from the equations:
 $$
 A = L L^T, \qquad \sum_j l_{ij}^2 = a_{ii}
 $$
-Therefore the entries of $L$ are [[Backward error analysis for LU|bounded]] by the square root of the diagonal entries of $A.$
+The entries of $L$ are [[Backward error analysis for LU|bounded]] by the square root of the diagonal entries of $A.$ From our [[Backward error analysis for LU|backward error analysis]], this implies that the factorization is backward stable.
 
 [[Stability of the LU factorization]], [[Backward error analysis for LU]], [[Row pivoting]], [[Cholesky factorization]], [[Existence of the Cholesky factorization]]
 
