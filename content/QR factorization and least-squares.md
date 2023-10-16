@@ -17,6 +17,8 @@ The QR factorization is an essential tool in NLA. It is used in many application
 - [[Gram-Schmidt]]
 	- Useful for many applications in particular for iterative methods to solve linear systems and compute eigenvalues.
 	- Computationally very efficient when $A$ is thin.
+- [[Uniqueness of the QR factorization]]
+	- We show that the QR factorization is unique if we require that $r_{ii} > 0$.
 - [[Least-squares problems]]
 	- Definition of least-squares.
 	- Equivalent form using a linear system.

@@ -71,7 +71,7 @@ det | determinant
 	- This is a triangular factorization of the form $A=LL^T$ where $L$ is lower triangular.
 	- This factorization is faster and requires less memory than LU.
 - [[Existence of the Cholesky factorization]]
-	- We prove that the Cholesky factorization exists.
+	- We prove that the Cholesky factorization exists and is unique.
 	- [[Row pivoting|Pivoting]] is not required.
 - [[Stability of the Cholesky factorization]]
 	- The algorithm is always stable even without any pivoting.

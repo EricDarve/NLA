@@ -215,6 +215,6 @@ This implies that $|[L_1]_{ii}| = |[L_2]_{ii}|.$ But both terms are positive, so
 $$
 L_2^{-1} L_1  = I
 $$
-and the matrices are equal.
+and the matrices are equal. $\square$
 
 [[Symmetric Positive Definite Matrices]], [[Cholesky factorization]]
