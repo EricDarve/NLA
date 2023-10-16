@@ -5,9 +5,10 @@ $$
 |E| \le n \, u \; (2|A| + 4 |\tilde{L}| \: |\tilde{U}|) + O(u^2)
 \end{gather}
 $$
-$|\tilde{L}|$, $|\tilde{U}|$: matrices obtained by taking the absolute value of the entries of $\tilde{L}$ and $\tilde{U}$. We use the same notation for $|E|$ and $|A|$.
-
-The backward error can become very large when we have large entries in $L$ or $U$. The LU factorization is **not** a backward stable algorithm.
+- $|\tilde{L}|$, $|\tilde{U}|$: matrices obtained by taking the absolute value of the entries of $\tilde{L}$ and $\tilde{U}$. 
+- We use the same notation for $|E|$ and $|A|$.
+- The backward error can become very large when we have large entries in $L$ or $U$. 
+- The LU factorization is **not** a backward stable algorithm.
 
 In our previous example:
 $$
@@ -25,7 +26,10 @@ U = \begin{pmatrix}
 \end{pmatrix}
 \end{gather}
 $$
-The backward error is $O(u \epsilon^{-1})$. It can become arbitrarily large regardless of how small $u$ is. We can choose $\epsilon$ as small as we want and make the backward error large.
+- The backward error is $O(u \epsilon^{-1})$, where $u$ is the [[Floating point arithmetic and unit roundoff error|unit roundoff]].
+- It can become arbitrarily large regardless of how small $u$ is. 
+- We can choose $\epsilon$ as small as we want and make the backward error large.
+- The factorization is not backward stable.
 
 **Where do these large entries come from?**
 

@@ -1,12 +1,16 @@
-**Remedy for instability:** perform row pivoting so that $a_{kk}$ is always the largest entry in the column.
-
-This guarantees that $|l_{ij}| \le 1$.
+- **Remedy for instability:** perform row pivoting so that $a_{kk}$ is always the largest entry in the column.
+- Since $l_{ij} = a_{ij} / a_{jj}$, row pivoting guarantees that $|l_{ij}| \le 1$.
 
 With row pivoting, our factorization looks like
 $$
 PA = LU
 $$
-Note that although $L$ is bounded by definition, there is no guarantee for $U$. But in most practical cases, this algorithm is very accurate.
+where $P$ is a permutation of the rows of $A$. $P$ is key for the existence of the LU factorization.
+
+- Note that although $L$ is bounded by definition, there is no guarantee for $U$. 
+- In most practical cases, this algorithm is very accurate.
+- This factorization exists for all square matrices.
+- This factorization is unique for all matrices such that $\det(A[1: k, 1: k]) \neq 0$ for all $1 \le k \le n-1$.
 
 Let's apply row pivoting to our previous case:
 $$
