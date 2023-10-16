@@ -10,3 +10,26 @@ The QR factorization is an essential tool in NLA. It is used in many application
 	- We explain how to apply a Householder transformation in a computationally efficient way.
 - [[QR using Householder transformations]]
 	- Explains how [[Householder transformation|Householder transformations]] can be used to compute the [[QR factorization]].
+- [[QR using Givens transformations]]
+	- Householder allows to zero out an entire column with a single orthogonal transformation.
+	- Givens only zeros out a single entry. This can be useful for sparse or matrices with a special sparsity pattern.
+	- The total cost is $O(n^3)$. This is similar to Householder.
+- [[Gram-Schmidt]]
+	- Useful for many applications in particular for iterative methods to solve linear systems and compute eigenvalues.
+	- Computationally very efficient when $A$ is thin.
+- [[Least-squares problems]]
+	- Definition of least-squares.
+	- Equivalent form using a linear system.
+- [[Method of normal equation]]
+	- This method is the simplest.
+	- It requires a [[Cholesky factorization]] factorization.
+	- However, the [[Conditioning of a linear system|condition]] number of the linear system can be very large, causing a loss in accuracy.
+- [[Least-squares solution using QR]]
+	- This is the recommended solution.
+	- It has a low computational cost in general.
+	- The condition number is as low as possible and the accuracy is high.
+- [[Least-squares solution using SVD]]
+	- This method is more expensive but is required when $A$ is not full column rank.
+	- In that case, the other methods fail.
+- [[Summary of least-squares solution methods]]
+	- A summary of all the methods and how they compare.

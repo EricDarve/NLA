@@ -8,4 +8,6 @@ QR factorization process using Householder transformations:
 
 The cost of applying each $Q_i^T$ is $O(n^2)$. So the total cost is $O(n^3)$.
 
+If matrix $A$ is $m \times n$, the cost is $O(mn^2)$.
+
 [[QR factorization]], [[Householder transformation]], [[Applying a Householder transformation]]
