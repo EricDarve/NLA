@@ -11,7 +11,7 @@ A = QR \\
 x = R^{-1} \, Q^T \, b
 \end{gather}
 $$
-[[Singular value decomposition|Method 3]]: for rank deficient $A$, we use the SVD:
+[[Least-squares solution using SVD|Method 3]]: for rank deficient $A$, we use the [[Singular value decomposition|SVD]]:
 $$
 \begin{gather}
 A = U \Sigma V^T \\
