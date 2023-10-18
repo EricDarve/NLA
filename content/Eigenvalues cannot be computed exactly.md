@@ -39,4 +39,4 @@ $$
 - But they converge very fast and the error is close to machine accuracy.
 - So they are indistinguishable from a direct “exact” method.
 
-[[Eigenvalues]], [[Computing Eigenvalues]]
+[[Eigenvalues]], [[Computing eigenvalues]]

@@ -81,6 +81,8 @@ We get the matrix in the desired upper triangular form.
 
 The computational cost of zeroing out a single entry is $O(n)$. So the cost for a single column is $O(n^2)$. The total computational cost for the entire matrix is $O(n^3)$.
 
-If matrix $A$ is $m \times n$, the cost is $O(mn^2)$.
+- If matrix $A$ is a general $m \times n$ matrix, the cost is $O(mn^2)$.
+- If $A$ is tri-diagonal, the cost is $O(\min(m,n))$.
+- If $A$ is upper-Hessenberg, the cost is $O(mn)$.
 
 [[QR factorization]], [[Householder transformation]], [[QR using Householder transformations]]
