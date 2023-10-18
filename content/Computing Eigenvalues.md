@@ -1,0 +1,9 @@
+- [[Why eigenvalues?]]
+	- We give some examples of operation that become very simple to compute when we use eigenvalues.
+- [[Eigenvalues cannot be computed exactly]]
+	- We show that computing eigenvalues is difficult and cannot be done exactly.
+	- However, we do have approximate but very fast and accurate algorithms that will give us excellent approximations, with errors down to the [[Floating point arithmetic and unit roundoff error|unit roundoff error]] $u$.
+- [[Method of power iteration]]
+	- Forms the basis of advanced methods: QR iteration
+	- Simple but only works marginally well
+	- Will be accelerated and improved to become the QR iteration
