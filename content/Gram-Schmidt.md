@@ -1,8 +1,8 @@
 Goal: $A = QR$
 
 Summary of the different approaches:
-1. Householder/Givens: Find $Q$ such that $Q^T A = R$.
-2. Gram-Schmidt: Find $R$ such that $A R^{-1} = Q$. **This is preferred when $A$ is tall and thin.**
+1. Householder/Givens: Find $Q$ such that $Q^T A = R$. Orthogonal triangularization.
+2. Gram-Schmidt: Find $R$ such that $A R^{-1} = Q$. **This is preferred when $A$ is tall and thin.** This is a triangular orthogonalization process.
 
 Regular QR factorization with a square matrix:
 

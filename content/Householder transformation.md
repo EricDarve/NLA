@@ -4,7 +4,7 @@ We can rewrite this equation as:
 $$
 Q^T A R
 $$
-Interpretation: apply an orthogonal transformation to make the matrix triangular.
+Interpretation: apply an orthogonal transformation to make the matrix triangular = orthogonal triangularization.
 
 Start with 1st column.
 $$

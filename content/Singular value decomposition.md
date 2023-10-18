@@ -35,6 +35,11 @@ $$
 \| A \|_2 = \sigma_1(A), \qquad
 \| A \|_F = \sqrt{\sum_{i=1}^p \sigma_i^2}
 $$
+We can also define a new operator norm using the SVD, the Schatten $p$-norm:
+$$
+\| A \|_p^\text{{Schatten}} = \| (\sigma_1, \dots, \sigma_r) \|_{p}
+$$
+where $r$ is the rank and $\| \; \|_{p}$ is the vector $p$-norm.
 
 [[The four fundamental spaces]]. Assume $A$ is $m \times n$. $r$: number of non-zero singular values = rank of the matrix. Then:
 $$
@@ -52,7 +57,6 @@ $$
 AA^T = U \Sigma^2 U^T, \qquad
 A^TA = V \Sigma^2 V^T
 $$
-
 The computational cost of computing the singular value decomposition is $O(n^3)$.
 
 [[The four fundamental spaces]], [[Eigenvalues]], [[Operator and matrix norms]], [[Orthogonal matrix and projector]]

@@ -7,3 +7,4 @@
 	- Forms the basis of advanced methods: QR iteration
 	- Simple but only works marginally well
 	- Will be accelerated and improved to become the QR iteration
+- [[Computing multiple eigenvalues]]
