@@ -14,7 +14,7 @@ QR factorization of a thin matrix $A$. The matrix $Q$ is square. $R$ is thin. $R
 
 QR factorization of a thin matrix. $Q$ is thin and has the same size as $A$. $R$ is upper triangular and square. This is a factorization that can be obtained using Gram-Schmidt.
 
-![[Drawing 2023-10-15 18.36.19.excalidraw.svg]]
+![[Drawing 2023-10-15 18.36.19.excalidraw]]
 
 The computational strategy is similar to LU and Cholesky.
 
@@ -24,17 +24,16 @@ A = \sum_k q_{,k} \, r_{k,}
 $$
 The first column is simple. We just need it to be of norm 1. Define
 $$
-\begin{gather}
-r_{11} = \|a_{,1}\|_2 \\
+r_{11} = \|a_{,1}\|_2, \qquad
 q_{,1} = \frac{a_{,1}}{\|a_{,1}\|_2}
-\end{gather}
 $$
 How do we get $r_{1,}$?
 
 Consider column $j$ of $A$:
 
-$a_{,j} = r_{1j} q_{,1} + \cdots + r_{jj} q_{,j}$
-
+$$
+a_{,j} = r_{1j} \, q_{,1} + \cdots + r_{jj} \, q_{,j}
+$$
 Use the fact that the $q_{,k}$ are orthogonal.
 
 $r_{1j} = q_{,1}^T \, a_{,j}$
