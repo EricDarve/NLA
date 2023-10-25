@@ -1,7 +1,7 @@
 ---
 title: CME 302 Numerical Linear Algebra 2023
 ---
-### Schedule
+### Weekly schedule Fall 2023
 
 1. Introduction to the class; linear algebra boot camp
 2. Linear algebra boot camp
