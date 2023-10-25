@@ -10,7 +10,7 @@ A^T (Ax - b) = 0 \\
 (A^T A) \, x = A^T b
 \end{gather}
 $$
-See [[Dot product]].
+See [[Dot product|dot product]] and orthogonality.
 
 This equation is a linear equation in $x$ with a square matrix $A^T A$.
 
