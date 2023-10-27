@@ -30,7 +30,7 @@ while not_converged:
     qk = zk / norm(zk)
 ```
 - `ev` converges to the eigenvalue. 
-- `qk` does not necessarily converge, but `span(qk)` converges to `span(x1)`.
+- `qk` does not necessarily converge, but `span(qk)` [[Angle between subspaces|converges]] to `span(x1)`.
 
 We can make a more precise statement. Denote by
 $$

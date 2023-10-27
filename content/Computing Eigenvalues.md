@@ -7,7 +7,7 @@
 	- Forms the basis of advanced methods: orthogonal and QR iterations.
 	- Simple but only works marginally well.
 	- Will be accelerated and improved to become the final QR iteration.
-	- The sequence of algorithms to understand is the method of power iteration → orthogonal iteration → QR iteration.
+	- The sequence of algorithms to understand is: method of power iteration → orthogonal iteration → QR iteration.
 - [[Computing multiple eigenvalues]]
 	- The problem with the previous approach is that it allows computing the largest eigenvalue only.
 	- We propose an initial idea for an algorithm to compute all the eigenvalues.

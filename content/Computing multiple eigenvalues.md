@@ -1,4 +1,4 @@
-[[Method of power iteration|This is great]], but how can we obtain the other eigenvalues as well?
+[[Method of power iteration|The power iteration is great]] for computing a single eigenvalue, but how can we obtain the other eigenvalues as well?
 
 We will now assume that
 $$
@@ -35,7 +35,7 @@ when $i \ge 2$. Then:
 $$
 PA = \sum_{k \ge 1} q_{,k} \, \tilde{t}_{k,} \, Q^H = Q \, \tilde{T} \, Q^H
 $$
-This is the [[Schur decomposition|Schur decomposition]] of $PA$. This shows that the largest eigenvalue of $PA$ is $\lambda_2$. Its eigenvector is $q_2$.
+This is the [[Schur decomposition|Schur decomposition]] of $PA$. The eigenvalues of $PA$ are on the diagonal of $\tilde{T}$ and are equal to 0, $\lambda_2$, ..., $\lambda_n$. So the largest eigenvalue of $PA$ is $\lambda_2$. Its eigenvector is $q_2$.
 
 Therefore, the [[Method of power iteration|power iteration]] applied to $PA$ yields $\lambda_2$ and $q_2$.
 
