@@ -7,11 +7,12 @@
 	- Forms the basis of advanced methods: orthogonal and QR iterations.
 	- Simple but only works marginally well.
 	- Will be accelerated and improved to become the final QR iteration.
-	- The sequence of algorithms to understand is: method of power iteration → orthogonal iteration → QR iteration.
+	- The sequence of algorithms to understand is: **[[Method of power iteration|method of power iteration]] → [[Orthogonal iteration|orthogonal iteration]] → QR iteration.**
 - [[Computing multiple eigenvalues]]
 	- The problem with the previous approach is that it allows computing the largest eigenvalue only.
 	- We propose an initial idea for an algorithm to compute all the eigenvalues.
 	- This is not a practical algorithm and will be replaced by the [[Orthogonal iteration|orthogonal iteration.]]
+	- The idea from this section is critical to understand the rest of this chapter. Make sure you understand all the steps and the key ideas.
 - [[Angle between subspaces]]
 	- This concept will be needed when discussing the [[Orthogonal iteration|orthogonal iteration]] process.
 - [[Orthogonal iteration]]

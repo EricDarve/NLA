@@ -35,7 +35,8 @@ while not_converged:
 We can make a more precise statement. Denote by
 $$
 \lambda_1 = \rho \: e^{i \theta}
-$$for a general complex eigenvalue. $\boldsymbol{x}_1$ is a unit eigenvector associated with $\lambda_1$.
+$$
+for a general complex eigenvalue. $\boldsymbol{x}_1$ is a unit eigenvector associated with $\lambda_1$.
 
 Then, because of the step `qk = zk / norm(zk)`, we get
 $$
