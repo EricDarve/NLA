@@ -4,7 +4,31 @@
 	- We show that computing eigenvalues is difficult and cannot be done exactly.
 	- However, we do have approximate but very fast and accurate algorithms that will give us excellent approximations, with errors down to the [[Floating point arithmetic and unit roundoff error|unit roundoff error]] $u$.
 - [[Method of power iteration]]
-	- Forms the basis of advanced methods: QR iteration
-	- Simple but only works marginally well
-	- Will be accelerated and improved to become the QR iteration
+	- Forms the basis of advanced methods: orthogonal and QR iterations.
+	- Simple but only works marginally well.
+	- Will be accelerated and improved to become the final QR iteration.
+	- The sequence of algorithms to understand is the method of power iteration → orthogonal iteration → QR iteration.
 - [[Computing multiple eigenvalues]]
+	- The problem with the previous approach is that it allows computing the largest eigenvalue only.
+	- We propose an initial idea for an algorithm to compute all the eigenvalues.
+	- This is not a practical algorithm and will be replaced by the [[Orthogonal iteration|orthogonal iteration.]]
+- [[Angle between subspaces]]
+	- This concept will be needed when discussing the [[Orthogonal iteration|orthogonal iteration]] process.
+- [[Orthogonal iteration]]
+	- This algorithm can be used to compute all the eigenvalues of the matrix.
+	- It extends the [[Method of power iteration|power iteration.]]
+	- This algorithm will be further refined into the QR iteration algorithm to reduce the computational cost.
+	- This algorithm is key to understanding how eigenvalues can be computed. Make sure you fully master it.
+- [[Orthogonal iteration algorithm]]
+	- Pseudo-algorithm for the [[Orthogonal iteration|orthogonal iteration]] process.
+- [[Computing eigenvectors using the Schur decomposition]]
+	- The previous algorithms lead to the [[Schur decomposition|Schur decomposition.]]
+	- The eigenvalues are on the [[Schur decomposition|diagonal]] of $T$.
+	- How can compute the eigenvectors from the [[Schur decomposition]]?
+- [[Convergence of the orthogonal iteration]]
+	- Understanding convergence is key to accelerating the algorithm.
+	- Generally speaking, the rate of convergence is related to ratios of the form $|\lambda_{i+1}|/|\lambda_i|$.
+- [[Accelerating convergence using a shift]]
+	- Shifting with $A - \lambda I$ is key to accelerating convergence.
+	- We briefly explain the idea here and will come back to it later.
+	- From now on, the focus will be on computing $T_k$ rather than $Q_k$.
