@@ -45,3 +45,19 @@
 	- Once the matrix is in [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]], the cost of the [[QR iteration]] is reduced from $O(n^3)$ to $O(n^2)$.
 	- This is a huge reduction in computational cost.
 	- This makes the QR iteration much more tractable for large matrices.
+- [[Symmetric and unsymmetric QR iteration]]
+	- We compare the computational cost of the [[QR iteration]] for [[Hermitian and symmetric matrices|symmetric]] and unsymmetric matrices.
+	-  The cost of the [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]] is the same: $O(n^3)$.
+	- However, once the matrix is in [[QR iteration for upper Hessenberg matrices|upper Hessenberg form,]] the cost per iteration is $O(n^2)$ for unsymmetric matrices, and $O(n)$ only for [[Hermitian and symmetric matrices|symmetric]] matrices.
+- [[Deflation in the QR iteration]]
+	- The [[QR iteration]] does not immediately turn $A$ into an upper triangular matrix.
+	- Instead, we transform $A$ to an upper **block triangular** matrix. Then we can apply the [[QR iteration]] again to the smaller blocks.
+	- This is how all the [[Eigenvalues|eigenvalues]] can be obtained.
+- [[QR iteration with shift]]
+	- We explain how the idea of [[Accelerating convergence using a shift|shifting]] can be used to accelerate the convergence of QR.
+	- This allows reducing $A$ very quickly to an upper block triangular form. At this point, [[Deflation in the QR iteration|deflation]] can be used to reduce the size of the matrix. The [[QR iteration]] process is then repeated with a matrix of size $(n-1) \times (n-1)$.
+- [[Algorithm for QR iteration with shift]]
+	- This is the practical implementation of the [[QR iteration with shift]].
+- [[Exact shift]]
+	- We investigate what happens if we use an [[QR iteration with shift|exact shift]], that is, we shift using an exact eigenvalue of $A$.
+	- In that case, as can be expected, matrix $A$ becomes exactly [[Deflation in the QR iteration|block upper triangular]], and we recover the exact eigenvalue.
