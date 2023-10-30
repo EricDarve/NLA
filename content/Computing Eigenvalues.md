@@ -41,3 +41,7 @@
 	- We can accelerate the [[QR iteration]] by using two tricks: upper [[Upper Hessenberg form for the QR iteration|Hessenberg form]], and applying a [[Accelerating convergence using a shift|shift]].
 	- $A$ can be turned into a matrix in upper Hessenberg form using $Q^T A Q = H$ where $Q$ is orthogonal.
 	- Performing a [[QR iteration]] with $H$ is much faster than with $A$.
+- [[QR iteration for upper Hessenberg matrices]]
+	- Once the matrix is in [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]], the cost of the [[QR iteration]] is reduced from $O(n^3)$ to $O(n^2)$.
+	- This is a huge reduction in computational cost.
+	- This makes the QR iteration much more tractable for large matrices.
