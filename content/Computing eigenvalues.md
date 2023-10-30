@@ -1,4 +1,4 @@
-- [[Why eigenvalues?]]
+- [[Why eigenvalues|Why eigenvalues?]]
 	- We give some examples of operations that become very simple to compute when we use eigenvalues.
 - [[Eigenvalues cannot be computed exactly]]
 	- We show that computing eigenvalues is difficult and cannot be done exactly.
