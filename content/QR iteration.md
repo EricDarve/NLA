@@ -31,7 +31,7 @@ T_{k+1} = Q_{k+1}^H A Q_{k+1}
 $$
 and recall that $T_k = Q_k^H A Q_k$. This leads to:
 $$
-T_{k+1} = Q_{k+1}^H Q_k T_k Q_k^H Q_{k+1}.\
+T_{k+1} = Q_{k+1}^H Q_k T_k Q_k^H Q_{k+1}.
 $$ 
 Note $Q_k$ must be square for this to be true. Recall the definition from the previous step:
 $$
