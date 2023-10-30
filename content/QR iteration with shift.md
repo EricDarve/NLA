@@ -28,7 +28,7 @@ T = Q^H A Q.
 $$
 The last row of $T_k$ converges to the last row of $T$: $[0, \dots, 0, \lambda_{n}]$.
 
-![[QR iteration with shift 2023-10-30 11.49.00.excalidraw]]
+![[QR iteration with shift 2023-10-30 11.49.00.excalidraw.svg]]
 
 We can now use [[Deflation in the QR iteration|deflation]], and work with a smaller $n-1 \times n-1$ matrix.
 

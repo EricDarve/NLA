@@ -9,7 +9,7 @@ Givens transformations will be very useful when dealing with Upper Hessenberg ma
 - Left figure: upper Hessenberg
 - Right figure: tri-diagonal matrix.
 
-![[QR using Givens transformations 2023-10-18 11.41.30.excalidraw]]
+![[QR using Givens transformations 2023-10-18 11.41.30.excalidraw.svg]]
 
 2 approaches:
 - Householder: one big Q transform. Fastest for dense matrices.

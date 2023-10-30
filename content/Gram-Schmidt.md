@@ -14,7 +14,7 @@ QR factorization of a thin matrix $A$. The matrix $Q$ is square. $R$ is thin. $R
 
 QR factorization of a thin matrix. $Q$ is thin and has the same size as $A$. $R$ is upper triangular and square. This is a factorization that can be obtained using Gram-Schmidt.
 
-![[Drawing 2023-10-15 18.36.19.excalidraw]]
+![[Drawing 2023-10-15 18.36.19.excalidraw.svg]]
 
 The computational strategy is similar to LU and Cholesky.
 
