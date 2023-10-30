@@ -33,3 +33,11 @@
 	- Shifting with $A - \lambda I$ is key to accelerating convergence.
 	- We briefly explain the idea here and will come back to it later.
 	- From now on, the focus will be on computing $T_k$ rather than $Q_k$.
+- [[QR iteration]]
+	- This iteration is in fact similar to the [[Orthogonal iteration|orthogonal iteration]]. The sequence of matrices is the same.
+	- However, the key difference is that the [[QR iteration]] works with $T_k$ directly. As a result, it allows us to very easily perform a shift $A - \lambda I$.
+	- [[QR iteration]] is the foundation for eigenvalue computation algorithms.
+- [[Upper Hessenberg form for the QR iteration]]
+	- We can accelerate the [[QR iteration]] by using two tricks: upper [[Upper Hessenberg form for the QR iteration|Hessenberg form]], and applying a [[Accelerating convergence using a shift|shift]].
+	- $A$ can be turned into a matrix in upper Hessenberg form using $Q^T A Q = H$ where $Q$ is orthogonal.
+	- Performing a [[QR iteration]] with $H$ is much faster than with $A$.
