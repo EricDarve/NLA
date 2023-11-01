@@ -65,3 +65,4 @@
 	- This example illustrates the [[QR iteration with shift]].
 	- We derive a result for the convergence of unsymmetric and symmetric matrices.
 - [[Summary of convergence and cost of the QR iteration]]
+	- We summarize the key results from this section for computational cost and convergence for symmetric and unsymmetric matrices.
