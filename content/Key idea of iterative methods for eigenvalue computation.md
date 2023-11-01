@@ -43,3 +43,26 @@ Start from $q_1$. Then:
 - If you continue this iterative process to the end, you get a [[Motivation of iterative methods for eigenvalue computation|dense matrix]] $H$.
 - The sparsity advantage is lost.
 - But what happens if we stop before the end?
+- By using the top left $k \times k$ block of $H$ we will be able to approximately compute eigenvalues and solve linear systems. As long as $k$ remains small, this can be computationally very fast.
+
+### Details of iterative process
+
+![[2022-10-28-15-38-28.png]]
+
+If we stop at step $k$, we get the following equation: ^d63511
+$$
+Q_k H_k + h_{k+1,k} \, q_{k+1} e_k^T = A Q_k
+$$
+and
+$$
+Q_k H_k \approx A Q_k
+$$
+if $h_{k+1,k}$ is small. This suggests using the following matrix $H_k$
+$$
+H_k = Q_k^T A Q_k
+$$
+instead of $A$. 
+
+From that point, iterative algorithms replace a calculation using $A$ with a calculation using $H_k$. $H_k$ is a small matrix, and "direct" methods are efficient and fast.
+
+The main application cases are the conjugate gradients method (which we will cover later) and the Arnoldi process.

@@ -49,6 +49,7 @@
 	- We compare the computational cost of the [[QR iteration]] for [[Hermitian and symmetric matrices|symmetric]] and unsymmetric matrices.
 	-  The cost of the [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]] is the same: $O(n^3)$.
 	- However, once the matrix is in [[QR iteration for upper Hessenberg matrices|upper Hessenberg form,]] the cost per iteration is $O(n^2)$ for unsymmetric matrices, and $O(n)$ only for [[Hermitian and symmetric matrices|symmetric]] matrices.
+	- See `QR iteration` animations and movies.
 - [[Deflation in the QR iteration]]
 	- The [[QR iteration]] does not immediately turn $A$ into an upper triangular matrix.
 	- Instead, we transform $A$ to an upper **block triangular** matrix. Then we can apply the [[QR iteration]] again to the smaller blocks.
