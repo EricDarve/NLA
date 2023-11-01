@@ -22,5 +22,6 @@ title: CME 302 Numerical Linear Algebra 2023
 - [[Solving linear systems]]
 - [[QR factorization and least-squares]]
 - [[Computing eigenvalues]]
+- [[Iterative methods for eigenvalue computation]]
 
 Book: [Numerical Linear Algebra with Julia](https://play.google.com/books/reader?id=lt9BEAAAQBAJ&pg=GBS.PR1), Darve and Wootters
