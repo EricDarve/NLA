@@ -21,5 +21,3 @@ end
 ```
 
 - This is a Gram-Schmidt like process.
-- See movies of convergence and `Arnoldi convergence.key`
-- But understanding convergence is not an easy task and is a complex topic.
