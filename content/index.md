@@ -9,9 +9,9 @@ title: CME 302 Numerical Linear Algebra 2023
 3. LU factorization, floating point arithmetic, stability, pivoting
 4. Cholesky factorization, QR factorization
 5. QR factorization and least-squares, normal equation, QR, SVD, eigenvalue computation
-6. Eigenvalue computation, power iteration, orthogonal iteration, QR iteration
-7. QR iteration, upper Hessenberg form, QR iteration with shift, iterative methods for eigenvalue computation
-8. Iterative methods, Krylov subspace, Lanczos, Arnoldi, classical iterative methods, Jacobi, Gauss-Seidel, SOR
+6. Eigenvalue computation, power iteration, orthogonal iteration, QR iteration, upper Hessenberg form, QR iteration with shift
+7. Iterative methods for eigenvalue computation, Krylov subspace, Lanczos, Arnoldi
+8. Classical iterative methods, Jacobi, Gauss-Seidel, SOR
 9. Iterative methods for solving sparse systems, Krylov methods, Conjugate Gradients
 10. GMRES, Preconditioning, Preconditioned Conjugate Gradients
 
