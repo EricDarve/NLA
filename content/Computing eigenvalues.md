@@ -61,3 +61,7 @@
 - [[Exact shift]]
 	- We investigate what happens if we use an [[QR iteration with shift|exact shift]], that is, we shift using an exact eigenvalue of $A$.
 	- In that case, as can be expected, matrix $A$ becomes exactly [[Deflation in the QR iteration|block upper triangular]], and we recover the exact eigenvalue.
+- [[QR iteration 2x2 example]]
+	- This example illustrates the [[QR iteration with shift]].
+	- We derive a result for the convergence of unsymmetric and symmetric matrices.
+- [[Summary of convergence and cost of the QR iteration]]
