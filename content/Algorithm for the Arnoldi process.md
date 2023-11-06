@@ -20,4 +20,6 @@ for k = 1:kmax
 end	
 ```
 
-- This is a Gram-Schmidt like process.
+This is a [[Gram-Schmidt|Gram-Schmidt-like]] process.
+
+[[Key idea of iterative methods for eigenvalue computation]], [[Arnoldi process]]
