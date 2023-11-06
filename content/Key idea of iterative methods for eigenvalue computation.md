@@ -17,7 +17,7 @@ $$
 A q_j = \sum_{k=1}^{j+1} h_{kj} \, q_k
 \end{gather}
 $$
-This algorithm is very similar to the [[QR factorization]] but uses $Aq_j$.
+This algorithm is very similar to the [[Gram-Schmidt]] algorithm for the [[QR factorization]] but it uses $Aq_j$.
 
 We get column $j$ of $h$
 $$
