@@ -45,7 +45,7 @@ Start from $q_1$. Then:
 - But what happens if we stop before the end?
 - By using the top left $k \times k$ block of $H$ we will be able to approximately compute eigenvalues and solve linear systems. As long as $k$ remains small, this can be computationally very fast.
 
-### Details of iterative process
+### Details of the iterative process
 
 ![[2022-10-28-15-38-28.png|500]]
 
