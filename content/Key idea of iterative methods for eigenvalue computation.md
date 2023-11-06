@@ -47,7 +47,7 @@ Start from $q_1$. Then:
 
 ### Details of iterative process
 
-![[2022-10-28-15-38-28.png]]
+![[2022-10-28-15-38-28.png|500]]
 
 If we stop at step $k$, we get the following equation: ^d63511
 $$
