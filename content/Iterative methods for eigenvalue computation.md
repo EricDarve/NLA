@@ -25,3 +25,13 @@
 	- Pseudo-code for the Lanczos process for symmetric matrices.
 - [[Computational cost of Arnoldi and Lanczos]]
 	- As expected, Lanczos is computationally cheaper than Arnoldi.
+- [[Convergence of Lanczos eigenvalues for symmetric matrices]]
+	- For symmetric matrices, we can prove relatively sharp bounds on the error using Lanczos.
+	- They involve Chebyshev polynomials and the Krylov subspace.
+	- Results for unsymmetric matrices are much more difficult to derive.
+- [[Convergence of Lanczos inner eigenvalues]]
+	- We can prove theoretical results for the convergence of inner eigenvalues.
+	- Inner eigenvalues tend to converge slower than the [[Convergence of Lanczos eigenvalues for symmetric matrices|extremal eigenvalues.]]
+- [[Ghost eigenvalues in the Lanczos process]]
+	- Because of the short recurrence used in Lanczos, some eigenvalues may fail to converge properly because of roundoff errors.
+	- These are called "ghost eigenvalues."
