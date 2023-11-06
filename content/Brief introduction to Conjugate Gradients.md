@@ -4,7 +4,7 @@ The key idea is to replace
 $$
 Ax = b
 $$
-by the solution of a smaller linear system. Denote by $x_k = Q_k y,$ and we set
+by the solution of a smaller linear system. Denote by $x_k = Q_k y.$ Then, we set
 $$
 Q_k^T A x_k = Q_k^T A Q_k \, y = H_k \, y = Q_k^T b
 $$

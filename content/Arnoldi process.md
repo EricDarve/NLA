@@ -21,7 +21,7 @@ $$
 A (Q_k X_k) \approx (Q_k X_k) \Lambda_k
 $$
 
-- $\Lambda_k$ are called the Ritz eigenvalues. 
+- $\Lambda_k$ are called the [[Convergence of the orthogonal iteration|Ritz eigenvalues.]]
 - $Q_k X_k$ are the approximate eigenvectors.
 
 **Arnoldi algorithm:**
