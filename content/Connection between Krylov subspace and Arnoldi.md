@@ -16,6 +16,4 @@ $$
 $$
 We find that $H^{j-1}(i,1) = 0$ for $j < i$. So matrix $R_k$ is upper triangular.
 
-$Q_k$ is an orthogonal basis of the [[Krylov subspace]] ${\mathcal K}(A,q_1,k).$ 
-
-So $Q_k R_k$ is the [[QR factorization]] of $K_k$.
+$Q_k$ is an orthogonal basis of the [[Krylov subspace]] ${\mathcal K}(A,q_1,k),$ and $Q_k R_k$ is the [[QR factorization]] of $K_k$.

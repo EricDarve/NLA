@@ -14,7 +14,7 @@ T =
 \end{pmatrix}
 $$
 
-As a result, the steps in Lanczos algorithm are simplified compared to [[Key idea of iterative methods for eigenvalue computation|Arnoldi:]]
+As a result, the steps in the Lanczos algorithm are simplified compared to [[Key idea of iterative methods for eigenvalue computation|Arnoldi:]]
 
 1. $\alpha_k = \boldsymbol q_{k}^T A \boldsymbol q_k$
 2. $\boldsymbol r_k = A \boldsymbol q_k - \beta_{k-1} \boldsymbol q_{k-1} - \alpha_k \boldsymbol q_k$; $\beta_{k-1}$ is from the previous iteration.

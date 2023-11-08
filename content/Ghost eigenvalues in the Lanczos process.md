@@ -1,6 +1,6 @@
 - Because of roundoff errors, some eigenvalues can appear more than once. 
 - This is caused by the short recurrence in [[Lanczos process|Lanczos]], as opposed to the full orthogonalization process in [[Key idea of iterative methods for eigenvalue computation|Arnoldi.]]
-- This creates a lot of difficulties in practice.
+- This does create difficulties in practice.
 - However, several modifications to [[Algorithm for the Lanczos process|Lanczos]] can be made to address this problem.
 
 ![[2022-11-05-18-37-14.png]]

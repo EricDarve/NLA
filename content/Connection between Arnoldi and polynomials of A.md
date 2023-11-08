@@ -1,12 +1,11 @@
 The [[Key idea of iterative methods for eigenvalue computation|vectors]] in span($Q_k$) have a special interpretation. Any vector in the span of $Q_k$ can be written as a polynomial of $A$ times $q_1.$
-
 $$
 \begin{gather}
 Q_k y = \sum_{i=1}^k y_i \, q_i = \sum_{i=1}^k z_i \, A^{i-1} q_1 \\[.5em]
 Q_k y = p_{k-1}(A) \, q_1
 \end{gather}
 $$
-Polynomials of $A$ can be used to interpret the convergence of [[Arnoldi process|Arnoldi]]. Arnoldi is a process that finds $p$ such that $p(A)$ is small in some appropriate sense.
+Polynomials of $A$ can be used to interpret the convergence of [[Arnoldi process|Arnoldi]]. Arnoldi is a process that finds a polynomial $p$ such that $p(A)$ is small in some appropriate sense.
 
 Making $p(A)$ small may start to make sense if we go back to the [[Determinant|characteristic polynomial.]] Recall the definition:
 $$
@@ -26,11 +25,7 @@ p(A) = X \, p(\Lambda) \, X^{-1} \\[.5em]
 [p(\Lambda)]_{ii} = p(\lambda_i)
 \end{gather}
 $$
-Since
-$$
-p_A(\Lambda) = 0
-$$
-we get
+Since $p_A(\Lambda) = 0,$ we get
 $$
 p_A(A) = 0
 $$
@@ -40,7 +35,7 @@ $\square$
 
 Let's explore in what sense [[Arnoldi process|Arnoldi]] makes $p(A)$ small. Here is the optimality condition statement:
 
-Arnoldi builds a $p_k(A)$ such that $\| p_k(A) \, q_1 \|_2$ is small.
+Arnoldi builds a $p_k(A)$ such that $\| p_k(A) \, q_1 \|_2$ is minimum.
 
 This leads to approximate eigenvalues.
 

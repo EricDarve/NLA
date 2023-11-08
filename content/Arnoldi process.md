@@ -14,7 +14,7 @@ Q_k (X_k \Lambda_k X_k^{-1}) + h_{k+1,k} \, q_{k+1} e_k^T = A Q_k
 $$
 Multiply by $X_k$ to the right:
 $$
-A (Q_k X_k) = (Q_k X_k) \Lambda_k + h_{k+1,k} \, q_{k+1} \, x_{k,}
+A (Q_k X_k) = (Q_k X_k) \Lambda_k + h_{k+1,k} \, \boldsymbol q_{k+1} \, \boldsymbol x_{k,}
 $$
 We see that we have approximate eigenvectors and eigenvalues of $A$ assuming that $h_{k+1,k}$ is small:
 $$
