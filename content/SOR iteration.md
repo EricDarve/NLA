@@ -66,5 +66,5 @@ end
 As in [[Gauss-Seidel iteration|Gauss-Seidel,]] the ordering matters in this algorithm.
 
 1. 1 to $n$
-2. 1 to $n$ followed by $n$ to 1 in Symmetric SOR
+2. 1 to $n$ followed by $n$ to 1 in **Symmetric SOR**
 3. Or, randomized at every iteration

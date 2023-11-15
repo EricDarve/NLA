@@ -1,4 +1,4 @@
-This may not be obvious at first sight, but [[SOR iteration|SOR]] is a splitting method:
+This may not be obvious at first sight, but [[SOR iteration|SOR]] is a [[Splitting methods|splitting method:]]
 $$
 x^{(k+1)}_{SOR} = x^{(k)}_{SOR} + \omega \bigg[ D^{-1}
 \big( b + L x^{(k+1)}_{SOR} + U x^{(k)}_{SOR} \big) - x^{(k)}_{SOR} \bigg]
@@ -24,13 +24,31 @@ The choice $\omega = 1$ corresponds to [[Gauss-Seidel iteration|Gauss-Seidel.]]
 
 We have
 $$
-G_{SOR} = M^{-1} N
+G_\text{SOR} = M^{-1} N
 $$
 We can prove that
 $$
-\rho(G_{SOR}) \ge |\omega - 1|.
+\rho(G_\text{SOR}) \ge |\omega - 1|.
 $$
 Therefore $0 < \omega < 2$ is required for convergence.
+
+**Proof**
+
+The proof uses the [[Determinant|determinant]] of $G_\text{SOR}$:
+$$
+\det G_\text{SOR} = (\det (\omega^{-1} D - L))^{-1} \;
+\det(( \omega^{-1} - 1) D + U)
+$$
+Using the fact that the matrices are triangular, we get
+$$
+\det G_\text{SOR} = \omega^n \; (\omega^{-1} - 1)^n
+= (1 - \omega)^n
+$$
+If all the eigenvalues are smaller than 1, then the determinant is in the interval $(-1,1)$ and
+$$
+|1 - \omega| < 1
+$$
+which implies that $0 < \omega < 2$ for stability. This is a required but not sufficient condition.
 
 **Theorem 2.**
 
