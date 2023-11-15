@@ -41,7 +41,7 @@ then both Jacobi and Gauss-Seidel always converge. An analogous result holds if 
 
 **Proof of Theorem 1.**
 
-Before proving the theorem we prove that diagonally dominant matrices cannot be singular. Consider matrix $A$ a strictly row diagonally dominant matrix. Assume that $A$ is singular. Then there exists $x \neq 0$ such that $Ax = 0$. This implies, with $A = D - L - U$, that
+Before proving the theorem we prove that diagonally dominant matrices cannot be singular. Consider matrix $A$ a strictly row diagonally dominant matrix. Assume that $A$ is singular. Then there exists $x \neq 0$ such that $Ax = 0$. This implies, with $A = D - L - U,$ that
 $$
 x = D^{-1}(L+U) x
 $$
@@ -53,7 +53,7 @@ This is a contradiction. So $A$ cannot be singular.
 
 We get a similar result for a strictly column diagonally dominant matrix. We show that $(L+U)D^{-1}$ has eigenvalue 1. But $\| (L+U)D^{-1} \|_1 < 1$, which is a contradiction.
 
-Let us prove our result for Gauss-Seidel. The iteration matrix in Gauss-Seidel is
+Let us now prove our result for Gauss-Seidel. The iteration matrix in Gauss-Seidel is
 $$
 G = (D-L)^{-1} U
 $$
