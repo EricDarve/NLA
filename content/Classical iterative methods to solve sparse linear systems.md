@@ -25,4 +25,4 @@ We will see more powerful methods later on, but a few simple strategies can be u
 	- SOR also converges for all [[Symmetric Positive Definite Matrices|symmetric positive definite]] matrices.
 - [[Chebyshev iteration]]
 	- This iterative method is very fast but it requires to estimate an interval that contains the eigenvalues.
-	- Its convergence rate can be near-optimal in some cases.
+	- Its convergence rate can be near-optimal when the parameters are chosen correctly.

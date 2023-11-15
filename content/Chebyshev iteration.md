@@ -1,6 +1,6 @@
-If we know an interval containing the eigenvalues, it is possible to design a scheme with near “optimal” convergence.
+If we know an interval containing the eigenvalues, it is possible to design a scheme with near optimal convergence.
 
-Let's start with:
+Let's start with a [[Splitting methods|splitting-style approach:]]
 $$
 \begin{gather}
 A = M - N \\
@@ -24,11 +24,11 @@ x^{(k+1)} = x^{(k)} + b - A x^{(k)}
 $$
 This substitution can also be interpreted as solving $M^{-1} A x = M^{-1} b$ instead of $Ax = b$.
 
-Let's apply our idea of relaxation:
+Let's apply our idea of [[SOR iteration|relaxation:]]
 $$
 x^{(k+1)} = x^{(k)} + \omega_k (b - A x^{(k)})
 $$
-Let's use $x = x + \omega_k \, (b - A x)$, and subtract:
+Let's use the equality $x = x + \omega_k \, (b - A x)$, and [[Convergence of classical iterative methods|subtract:]]
 $$
 \begin{gather}
 e^{(k)} = x^{(k)} - x \\
@@ -42,7 +42,7 @@ e^{(k+1)} = (I - \omega_k \, A) \cdots (I - \omega_0 A) \; e^{(0)} \\[.5em]
 e^{(k)} = p_k(A) \, e^{(0)}
 \end{gather}
 $$
-where $p_k$ is a polynomial of order $k$ with $p_k(0) = 1$.
+where $p_k$ is a [[Convergence of classical iterative methods|polynomial]] of order $k$ with $p_k(0) = 1$.
 
 Note: there is a variant where we use
 $$
@@ -62,11 +62,11 @@ Then define the following polynomial:
 $$
 p_k(x) = \frac{T_k(z(x))}{T_k(z(0))}
 $$
-where we used a shift-and-scale transformation of $x$:
+where $T_k$ is a [[Convergence of Lanczos eigenvalues for symmetric matrices|Chebyshev polynomial.]] Here we also used a [[Convergence of Lanczos eigenvalues for symmetric matrices|shift-and-scale]] transformation of $x$:
 $$
 z(x) = \frac{m + M - 2 x}{M - m}
 $$
-We have $q_k(0) = 1$. Moreover when $m \le x \le M$:
+We have $p_k(0) = 1$. Moreover when $m \le x \le M$:
 $$
 \begin{gather}
 2m \le 2x \le 2M \\[.3em]
@@ -140,6 +140,6 @@ $$
 \max_{x \in [m,M]} |p_k(x)| \le \frac{1}{|T_n(z)|} \le 2 \tau^n 
 \le 2 \Big( 1-\sqrt{\frac{m}{M}} \Big)^n
 $$
-The convergence is very fast. The figure below shows the polynomial with $m=0.2$ and $M=2.2$.
+The [[Convergence of Lanczos eigenvalues for symmetric matrices|convergence]] is very fast. The figure below shows the polynomial with $m=0.2$ and $M=2.2$.
 
 ![[2022-11-09-15-59-27.png|600]]
