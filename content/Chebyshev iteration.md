@@ -130,6 +130,7 @@ $$
 Finally:
 $$
 \max_{x \in [m,M]} |p_k(x)| \le \frac{1}{|T_n(z)|} = \frac{2}{\tau^{-n} + \tau^n}
+= \frac{2 \tau^n}{1 + \tau^{2n}}
 $$
 with 
 $$
