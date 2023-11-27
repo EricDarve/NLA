@@ -52,6 +52,6 @@ which implies that $0 < \omega < 2$ for stability. This is a required but not su
 
 **Theorem 2.**
 
-- If $A$ is symmetric positive definite, then $\rho(G_{SOR}) < 1$ for all $0 < \omega < 2$. 
+- If $A$ is [[Symmetric Positive Definite Matrices|symmetric positive definite,]] then $\rho(G_{SOR}) < 1$ for all $0 < \omega < 2$. 
 - In that case, SOR converges for all $0 < \omega < 2$. 
 - With $\omega = 1$, we recover that [[Gauss-Seidel iteration|Gauss-Seidel]] converges for [[Symmetric Positive Definite Matrices|symmetric positive definite matrices.]]

@@ -24,5 +24,6 @@ title: CME 302 Numerical Linear Algebra 2023
 - [[Computing eigenvalues]]
 - [[Iterative methods for eigenvalue computation]]
 - [[Classical iterative methods to solve sparse linear systems]]
+- [[Iterative and Krylov methods to solve sparse linear systems]]
 
 Book: [Numerical Linear Algebra with Julia](https://play.google.com/books/reader?id=lt9BEAAAQBAJ&pg=GBS.PR1), Darve and Wootters
