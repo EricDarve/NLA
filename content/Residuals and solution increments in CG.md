@@ -27,7 +27,7 @@ This implies that
 $$
 \text{span} \left\{ \Delta x^{(0)}, \ldots, \Delta x^{(k)} \right\} \subset \mathcal K(A, b, k+1)
 $$
-The steps $\Delta x^{(j)}$ are [[Orthogonality relations in CG|conjugate]] so they must be linearly independent. Since the dimensions of the spaces match, we have
+The steps $\Delta x^{(j)}$ are [[Some orthogonality relations in CG|conjugate]] so they must be linearly independent. Since the dimensions of the spaces match, we have
 $$
 \text{span} \left\{ \Delta x^{(0)}, \ldots, \Delta x^{(k)} \right\} = \mathcal K(A, b, k+1)
 $$
@@ -51,7 +51,7 @@ $$
 $$
 Let's assume that the dimension of $\text{span} \left\{ r^{(0)}, \ldots, r^{(k)} \right\}$ is less than $k+1$.
 
-Then there is a $j$ such that $r^{(j)} \in \mathcal K(A, b, j).$ [[Orthogonality relations in CG#^9bf4bf|We also have]] that $r^{(j)} \perp \mathcal K(A, b, j).$ So $r^{(j)} = 0,$ which is a contradiction. So
+Then there is a $j$ such that $r^{(j)} \in \mathcal K(A, b, j).$ [[Some orthogonality relations in CG#^9bf4bf|We also have]] that $r^{(j)} \perp \mathcal K(A, b, j).$ So $r^{(j)} = 0,$ which is a contradiction. So
 $$
 \text{span} \left\{ r^{(0)}, \ldots, r^{(k)} \right\}
 =

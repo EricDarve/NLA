@@ -1,4 +1,4 @@
-We derive all the [[Orthogonality relations in CG|orthogonality relations]] in CG that you need to know. This is the foundation to build the final steps of CG.
+We derive all the [[Some orthogonality relations in CG|orthogonality relations]] in CG that you need to know. This is the foundation to build the final steps of CG.
 
 [[CG search directions|Recall]] our definition of the search directions and residual vectors:
 $$
@@ -38,13 +38,13 @@ Note that these orthogonality relations are not a “new thing.” It’s a dire
 $$
 \min_{y} \| x - Q_k y \|_A
 $$
-and the [[Krylov subspace]]. We have seen [[Orthogonality relations in CG#^9bf4bf|previously]] that this implies that $r^{(k)}$ is $\perp$ to $\mathcal K_k.$
+and the [[Krylov subspace]]. We have seen [[Some orthogonality relations in CG#^9bf4bf|previously]] that this implies that $r^{(k)}$ is $\perp$ to $\mathcal K_k.$
 
 ** Property 5.**
 $$
 r^{(k)} \perp \mathcal K_k.
 $$
-See the [[Orthogonality relations in CG#^9bf4bf|previous section.]]
+See the [[Some orthogonality relations in CG#^9bf4bf|previous section.]]
 
 ** Property 6.**
 $$
@@ -59,9 +59,9 @@ $$
 This is a consequence of Properties 2 and 5.
 
 ** Property 8.**
-$p^{(k)} \perp A p^{(l)},$ $k \neq l.$ So $p^{(k)}$ and $p^{(l)}$ are [[Orthogonality relations in CG|conjugate.]]
+$p^{(k)} \perp A p^{(l)},$ $k \neq l.$ So $p^{(k)}$ and $p^{(l)}$ are [[Some orthogonality relations in CG|conjugate.]]
 
-This is a [[Orthogonality relations in CG|consequence of the conjugacy]] of the $\Delta x^{(k)}$ and $\Delta x^{(k)}$, along with 
+This is a [[Some orthogonality relations in CG|consequence of the conjugacy]] of the $\Delta x^{(k)}$ and $\Delta x^{(k)}$, along with 
 $$
 \Delta x^{(k)} = \mu_{k+1} \: p^{(k+1)}.
 $$
