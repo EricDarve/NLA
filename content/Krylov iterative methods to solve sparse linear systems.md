@@ -35,3 +35,17 @@
 - [[Convergence of the Conjugate Gradients]]
 	- We give an estimate for the convergence of CG.
 	- In some sense, this convergence can be considered to be optimal.
+- [[GMRES]]
+	- [[Conjugate Gradients algorithm|CG]] applies when the matrix is [[Symmetric Positive Definite Matrices|symmetric positive definite]].
+	- GMRES applies to general unsymmetric matrices.
+	- It requires a new definition of the norm used in the [[Conjugate Gradients Version 1|optimization problem.]]
+- [[GMRES least-squares problem]]
+	- We derive the least-squares problem GMRES is solving.
+- [[GMRES algorithm]]
+	- We explain the steps in the GMRES algorithm based on the [[GMRES least-squares problem|previous derivation.]]
+- [[Convergence of GMRES]]
+	- The convergence of GMRES depends on the distribution of the eigenvalues. This is similar to [[Convergence of the Conjugate Gradients|CG]]. 
+	- It also depends on the condition number of the eigenvector basis matrix $X.$
+- [[Space and time costs of CG and GMRES]]
+	- We derive the space and time computational cost for [[Conjugate Gradients algorithm|CG]] and [[GMRES algorithm|GMRES]].
+	- As expected, GMRES has a larger computational cost. GMRES has an extra factor $k$ in the cost compared to CG.

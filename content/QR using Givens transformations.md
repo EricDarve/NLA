@@ -2,14 +2,14 @@
 - However, it is less efficient to zero out a single entry in a matrix.
 - Example:
 
-![[2022-10-11-15-08-29.png]]
+![[2022-10-11-15-08-29.png|400]]
 
 Givens transformations will be very useful when dealing with Upper Hessenberg matrices (matrices that are zero below the sub-diagonal, i.e., $i > j+1$ implies that $a_{ij} = 0$) and tri-diagonal matrices.
 
 - Left figure: upper Hessenberg
 - Right figure: tri-diagonal matrix.
 
-![[QR using Givens transformations 2023-10-18 11.41.30.excalidraw.svg]]
+![[QR using Givens transformations 2023-10-18 11.41.30.excalidraw.svg|300]]
 
 2 approaches:
 - Householder: one big Q transform. Fastest for dense matrices.
@@ -20,7 +20,8 @@ Summary:
 - Givens approach: many small Qs
 
 Let's explain this on an example.
-![[2022-10-11-15-10-22.png]]
+
+![[2022-10-11-15-10-22.png|400]]
 
 Take a vector $r$ of size 2:
 $$
@@ -75,7 +76,8 @@ x \\ y
 \end{pmatrix}
 $$
 Let's apply this method to our example:
-![[2022-10-11-15-16-44.png]]
+
+![[2022-10-11-15-16-44.png|300]]
 
 We get the matrix in the desired upper triangular form.
 
