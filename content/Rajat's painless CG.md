@@ -117,7 +117,7 @@ $$
 
 ## Putting it all together
 
-We can now combine the [[Three-term recurrence|short recurrence]] for $p_k$ with the iterative update for $x_k$ and $r_k$ to get a more familiar version of the [[Conjugate Gradients algorithm|conjugate gradients]] method (we replace $k$ with $k+1$ and also write the $A$-inner products explicitly). 
+We can now combine the [[Three-term recurrence|short recurrence]] for $p_k$ with the iterative update for $x_k$ and $r_k$ to get a more familiar version of the [[Conjugate Gradients algorithm|Conjugate Gradients]] method (we replace $k$ with $k+1$ and also write the $A$-inner products explicitly). 
 $$
 \begin{align}
 p_{k+1} & = r_{k} - \frac{p_k^T A r_k}{p_k^T A p_k} p_{k} \\[.2em]
