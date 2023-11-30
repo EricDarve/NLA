@@ -34,11 +34,11 @@ Since the approximations are projections, we can also use the [[Conjugate Gradie
 $$
 x_k = \text{argmin}_{x \in \text{span}(p_1, \dots, p_k)} \Vert x - x^*\Vert_A
 $$
-Notice that there is some freedom in the choice of $\\{p_i\\}$ in this method. We use this freedom in a specific way to arrive at the _Conjugate Gradients_ method.
+Notice that there is some freedom in the choice of $\{p_i\}$ in this method. We use this freedom in a specific way to arrive at the _Conjugate Gradients_ method.
 
 ## Connecting to Conjugate Gradients
 
-The conjugate gradients method does exactly the above procedure, but for a very specific choice of the orthogonal basis $\left\{p_1, p_2, \dots, p_n\right\}$. Specifically, it requires that these vectors span the [[Krylov subspace|Krylov sequence]] of $A$ with starting vector $b$. More precisely, **CG chooses $\\{p_i\\}$ such that**
+The conjugate gradients method does exactly the above procedure, but for a very specific choice of the orthogonal basis $\left\{p_1, p_2, \dots, p_n\right\}$. Specifically, it requires that these vectors span the [[Krylov subspace|Krylov sequence]] of $A$ with starting vector $b$. More precisely, **CG chooses $\{p_i\}$ such that**
 $$
 \text{span}(p_1, \dots, p_k) = \mathcal{K}(A, b, k) := \mathcal{K}_k \text{ for all } k
 $$ 
@@ -48,11 +48,11 @@ x_k = \text{argmin}_{x \in \mathcal{K}_k} \Vert x - x^*\Vert_A
 $$
 which is exactly the starting definition of CG!
 
-What remains now is to find an efficient way of computing the _$A$-orthogonal_ basis $\\{p_i\\}$. It turns out that choosing the successive approximation subspaces to be the Krylov sequence allows us to compute $p_i$ using a [[Three-term recurrence|short recurrence]] by connecting to the Lanczos iteration.
+What remains now is to find an efficient way of computing the _$A$-orthogonal_ basis $\{p_i\}$. It turns out that choosing the successive approximation subspaces to be the Krylov sequence allows us to compute $p_i$ using a [[Three-term recurrence|short recurrence]] by connecting to the Lanczos iteration.
 
 ## The three-term recurrence for $p_i$
 
-To compute the _$A$-orthogonal_ basis $\\{p_i\\}$, we can perform [[Gram-Schmidt]] in the _$A$-inner product_ on some vectors $v_1, \dots, v_n$ that span the Krylov sequence. However, Gram-Schmidt is pretty slow since to compute $p_k$ we need to _$A$-project_ out the components of $v_k$ along $p_1, \dots, p_{k-1}$ and each projection needs $O(\text{nnz}(A))$ time since we need to compute an $A$-inner product which requires multiplication by $A$. So the total time to compute the basis $\\{p_1, \dots , p_k\\}$ is $O(\text{nnz}(A)k^2)$. It would be nice if we only needed to project out a few components instead of all $k$ at each step. We can achieve this with a smart choice of starting vectors $v_i$.
+To compute the _$A$-orthogonal_ basis $\{p_i\}$, we can perform [[Gram-Schmidt]] in the _$A$-inner product_ on some vectors $v_1, \dots, v_n$ that span the Krylov sequence. However, Gram-Schmidt is pretty slow since to compute $p_k$ we need to _$A$-project_ out the components of $v_k$ along $p_1, \dots, p_{k-1}$ and each projection needs $O(\text{nnz}(A))$ time since we need to compute an $A$-inner product which requires multiplication by $A$. So the total time to compute the basis $\{p_1, \dots , p_k\}$ is $O(\text{nnz}(A)k^2)$. It would be nice if we only needed to project out a few components instead of all $k$ at each step. We can achieve this with a smart choice of starting vectors $v_i$.
 
 A good choice of starting vectors $v_i$ would be one where they are already close to being $A$-orthogonal. Putting the vectors into a matrix $V_k := [v_1, \dots, v_k]$, we want the $A$-inner product of $V_k$ with its transpose to be close to a diagonal matrix. More precisely, we want $V_k^T A V_K$ to be close to a diagonal matrix. 
 
