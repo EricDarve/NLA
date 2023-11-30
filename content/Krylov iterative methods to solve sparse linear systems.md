@@ -35,6 +35,7 @@
 - [[Convergence of the Conjugate Gradients]]
 	- We give an estimate for the convergence of CG.
 	- In some sense, this convergence can be considered to be optimal.
+- [[Rajat's painless CG]]
 - [[GMRES]]
 	- [[Conjugate Gradients algorithm|CG]] applies when the matrix is [[Symmetric Positive Definite Matrices|symmetric positive definite]].
 	- GMRES applies to general unsymmetric matrices.
