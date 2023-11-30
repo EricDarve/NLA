@@ -87,7 +87,7 @@ Now, we can rewrite the residual as
 $$
 r_k = A(x^* - x_k) = A e_k
 $$
-where $e_k = x^* - x_k$ is the error in the approximation $x_k$. Now, since $x_k$ is the $A$-projection of $x^*$ onto the subspace $e_k$, we know by property of the projection that the error in this projection must be $A$-orthogonal to $\mathcal{K}_k$. That is, 
+where $e_k = x^* - x_k$ is the error in the approximation $x_k$. Now, since $x_k$ is the $A$-projection of $x^*$ onto the subspace $\mathcal{K}_k$, we know by property of the projection that the error in this projection must be $A$-orthogonal to $\mathcal{K}_k$. That is, 
 $$
 e_k \perp_A \mathcal{K}_k \implies A e_k \perp \mathcal{K}_k \implies r_k \perp \mathcal{K}_k
 $$
