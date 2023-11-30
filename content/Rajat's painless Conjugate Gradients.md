@@ -1,6 +1,7 @@
-# A geometric derivation of Conjugate Gradients
 
-Author: Rajat Vadiraj Dwaraknath
+**A geometric derivation of Conjugate Gradients**
+
+Author: **Rajat Vadiraj Dwaraknath**
 
 Thanks to Anjan Dwaraknath for helpful discussions.
 
