@@ -51,3 +51,20 @@
 	- We derive the space and time computational cost for [[Conjugate Gradients algorithm|CG]] and [[GMRES algorithm|GMRES]].
 	- As expected, GMRES has a larger computational cost. GMRES has an extra factor $k$ in the cost compared to CG.
 - [[MINRES]]
+	- This algorithm specializes GMRES for symmetric matrices.
+	- The space cost is reduced to $O(n)$ and the time cost to  $O(k({\rm nnz} + n))$.
+- [[Preconditioning]]
+	- This technique is used to reduce the number of iterations in iterative methods.
+	- It works by changing the way eigenvalues are distributed.
+	- Preconditioners need to be computationally cheap to apply and should reduce the condition number of the linear system.
+- [[Preconditioning the Conjugate Gradients algorithm]]
+	- We explain the basic idea behind preconditioning CG.
+	- Although we are working with $CAC^T$, because the Krylov subspace is based on using powers of the matrix, we can replace $C$ and $C^T$ by the simpler $M=C^TC$ matrix.
+	- Then any preconditioner $M$ that is SPD and such that $MA \approx I$ can be used to precondition CG.
+	- The only condition we require is that $M$ should be computationally cheap to apply.
+- [[Preconditioned Conjugate Gradients algorithm]]
+	- We describe how [[Preconditioning the Conjugate Gradients algorithm|our previous idea]] can be simplified to reduce the computational cost.
+	- The matrices $C$ and $C^T$ are replaced by $M$ and disappear entirely from the algorithm.
+	- The final algorithm is very close to the original [[Conjugate Gradients algorithm|CG algorithm.]]
+- [[Preconditioned Conjugate Gradients code]]
+	- We provide a short Julia code implementing the [[Preconditioned Conjugate Gradients algorithm|PCG]] algorithm.

@@ -30,7 +30,7 @@ Since $\underline{T}_k$ is tri-diagonal, $R_k$ is upper triangular with only two
 
 As in [[GMRES algorithm|GMRES]], we then solve the least-squares problem using the $G_k$s and $R_k$.
 
-Because of the tri-diagonal structure of $\underline{T}_k$ and the structure of $R_k$ with only two upper diagonals, we can efficiently transition from step $k-1$ to $k$ in MINRES with a [[Space and time costs of CG and GMRES|space and time cost]] of $O({\rm nnz} + n)$ instead of $O({\rm nnz} + kn)$. 
+Because of the tri-diagonal structure of $\underline{T}_k$ and the structure of $R_k$ with only two upper diagonals, we can efficiently transition from step $k-1$ to $k$ in MINRES with a [[Space and time costs of CG and GMRES|time cost]] per iteration of $O({\rm nnz} + n)$ instead of $O({\rm nnz} + kn)$. 
 
 This is the same cost as [[Space and time costs of CG and GMRES|CG]] but for general symmetric matrices instead of SPD.
 

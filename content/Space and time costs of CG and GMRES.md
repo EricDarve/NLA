@@ -5,7 +5,7 @@ CG | $O(\text{nnz} + n)$ | $O(n)$ | $O(k \, (\text{nnz} + n))$
 GMRES | $O(\text{nnz} + kn)$ | $O(kn)$ | $O(k \, \text{nnz} + k^2n)$
 
 
-- GMRES struggles for large $k$. 
+- GMRES struggles with large $k$. 
 - The algorithm is often restarted when $k$ gets too large to reduce the space and time costs. 
 - But restarting slows down the convergence and leads to more iterations.
 
