@@ -33,4 +33,9 @@ Because of the tri-diagonal structure of $\underline{T}_k$ and the structure of 
 
 This is the same cost as [[Space and time costs of CG and GMRES|CG]] but for general symmetric matrices instead of [[Symmetric Positive Definite Matrices|SPD.]]
 
-The efficient implementation of this algorithm is the MINRES algorithm of Paige and Saunders.
+The efficient implementation of this algorithm is the MINRES algorithm of [Paige and Saunders](https://web.stanford.edu/group/SOL/software/minres/).
+
+When $A$ is [[Symmetric Positive Definite Matrices|symmetric positive definite,]] we get an error bound similar to [[Convergence of the Conjugate Gradients|CG]]
+$$
+\|r^{(k)}\|_2 \le 2 \, \| r^{(0)} \|_2 \; \Big( \frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1} \Big)^k
+$$
