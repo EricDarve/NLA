@@ -1,8 +1,8 @@
-The [[GMRES algorithm]] can be made more efficient when $A$ is symmetric. This leads to the MINRES algorithm. The initial steps of the method are similar to GMRES.
+The [[GMRES algorithm]] becomes more efficient when $A$ is symmetric. This leads to the MINRES algorithm. The initial steps of MINRES are similar to those of GMRES.
 
-In MINRES, we also minimize $\|r^{(k)}\|_2$. The difference between [[GMRES]] and MINRES is the same as [[Arnoldi process|Arnoldi]] and [[Lanczos process|Lanczos.]]
+In MINRES, we also aim to minimize $\|r^{(k)}\|_2$. The primary distinction between [[GMRES]] and MINRES is analogous to the difference between the [[Arnoldi process|Arnoldi]] and [[Lanczos process|Lanczos]] processes.
 
-Recall that, following [[Lanczos process|Lanczos]]: $A Q = Q T$ where $T$ is tri-diagonal.
+Recall that, following [[Lanczos process|Lanczos,]] $A Q = Q T$ where $T$ is tri-diagonal.
 
 We get
 $$
@@ -25,13 +25,12 @@ G_k^T \cdots G_1^T \underline{T}_k =
 R_k \\ 0 
 \end{pmatrix}
 $$ 
-
 Since $\underline{T}_k$ is tri-diagonal, $R_k$ is upper triangular with only two upper diagonals.
 
 As in [[GMRES algorithm|GMRES]], we then solve the least-squares problem using the $G_k$s and $R_k$.
 
 Because of the tri-diagonal structure of $\underline{T}_k$ and the structure of $R_k$ with only two upper diagonals, we can efficiently transition from step $k-1$ to $k$ in MINRES with a [[Space and time costs of CG and GMRES|time cost]] per iteration of $O({\rm nnz} + n)$ instead of $O({\rm nnz} + kn)$. 
 
-This is the same cost as [[Space and time costs of CG and GMRES|CG]] but for general symmetric matrices instead of SPD.
+This is the same cost as [[Space and time costs of CG and GMRES|CG]] but for general symmetric matrices instead of [[Symmetric Positive Definite Matrices|SPD.]]
 
 The efficient implementation of this algorithm is the MINRES algorithm of Paige and Saunders.
