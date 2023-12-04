@@ -1,6 +1,7 @@
 How to solve triangular systems.
 
-![[Pasted image 20230915170125.png]]
+![[Pasted image 20230915170125.png|500]]
+
 $Lx = b$ with $L$ lower triangular. Algebraic equation:
 $$
 \sum_{j=1}^i l_{ij} x_j = b_i

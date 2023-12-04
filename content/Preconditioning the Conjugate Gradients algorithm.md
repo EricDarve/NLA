@@ -48,4 +48,4 @@ $$C^T \, \mathcal K(CAC^T,Cb,k) = \text{span} \{Mb, MA \, Mb, (MA)^2 Mb, \dots, 
 
 This seems promising. We can construct a [[Krylov subspace]] with $M$ only.
 
-Note that since we require $M = C^TC$, with $C$ non-singular, the preconditioner $M$ must be [[[Symmetric Positive Definite Matrices|SPD]].
+Note that since we require $M = C^TC$, with $C$ non-singular, the preconditioner $M$ must be [[Symmetric Positive Definite Matrices|SPD]].

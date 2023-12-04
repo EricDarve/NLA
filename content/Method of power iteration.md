@@ -44,4 +44,4 @@ $$
 $$
 So $e^{-i k \theta} \boldsymbol q_k$ converges to $\boldsymbol{x}_{1}$.
 
-[[Eigenvalues]], [[Eigenvalues cannot be computed exactly]], [[Why eigenvalues?]]
+[[Eigenvalues]], [[Eigenvalues cannot be computed exactly]], [[Why eigenvalues]]

@@ -1,16 +1,16 @@
 Let's first perform a [[QR factorization]] step using [[QR using Givens transformations|Givens]] transformations.
 
-![[2022-10-22-16-35-11.png]]
+![[2022-10-22-16-35-11.png|300]]
 
 Let's do this step-by-step.
 
 **Step 1:** We first perform a series of small [[QR using Givens transformations|Givens transformations]] applied to the left.
 
-![[2022-10-22-16-35-33.png]]
+![[2022-10-22-16-35-33.png|400]]
 
 **Step 2:** Then these Givens transformations are applied to the right.
 
-![[2022-10-22-16-35-52.png]]
+![[2022-10-22-16-35-52.png|400]]
 
 We obtain again a matrix in upper Hessenberg form.
 
@@ -47,4 +47,4 @@ end
 
 ### Summary of one step of the QR iteration with the upper Hessenberg form
 
-![[2022-10-22-16-45-37.png]]
+![[2022-10-22-16-45-37.png|600]]
