@@ -1,4 +1,4 @@
-[[GMRES|Recall]] that we are minimize the following norm
+[[GMRES|Recall]] that we are minimizing the following norm
 $$
 \|r^{(k)}\|_2 = \| b - A Q_k y \|_2 
 = \| (I - A q(A)) b \|_2
