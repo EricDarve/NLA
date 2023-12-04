@@ -8,7 +8,7 @@ GMRES is simpler than CG because fewer optimizations are possible.
 
 ## Norm to measure error
 
-The key in GMRES is to changes to [[Conjugate Gradients Version 1|cost function]] we are optimizing:
+The key in GMRES is to change the [[Conjugate Gradients Version 1|cost function]] we are optimizing:
 $$
 \| x - x^{(k)} \|_?
 $$
