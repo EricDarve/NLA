@@ -35,12 +35,12 @@ We can make this even cleaner with
 $$
 C^T (CAC^T)^k \, Cb = C^TCA (MA)^{k-1} C^TCb = (MA)^k Mb
 $$
-Only $M$ appears!
-In terms of [[Krylov subspace]], we can write:
+Only $M$ appears! 
+
+In terms of the [[Krylov subspace]], we can write:
 $$
 \mathcal K(CAC^T,Cb,k) = \text{span} \{Cb, CAC^T\, Cb, (CAC^T)^2 Cb, \dots, (CAC^T)^{k-1} Cb\}
 $$
-
 Multiply by $C^T$ and we get a sequence with $MA$ and $b$ only:
 $$
 C^T \, \mathcal K(CAC^T,Cb,k) = \text{span} \{Mb, MA \, Mb, (MA)^2 Mb, \dots, (MA)^{k-1} Mb\}
