@@ -19,7 +19,7 @@ Symmetric preconditioning is required for [[Conjugate Gradients algorithm|CG]] b
 $$
 M_1 A M_2
 $$
-with $M_1 = C$ and $M_2 = C^T$. The preconditioned system is:
+with $M_1 = C$ and $M_2 = C^T$. The preconditioned system must be constructed in a symmetric way as
 $$
 C A C^T.
 $$
