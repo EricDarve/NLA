@@ -68,3 +68,6 @@
 	- The final algorithm is very close to the original [[Conjugate Gradients algorithm|CG algorithm.]]
 - [[Preconditioned Conjugate Gradients code]]
 	- We provide a short Julia code implementing the [[Preconditioned Conjugate Gradients algorithm|PCG]] algorithm.
+- [[Flexible preconditioned conjugate gradient method]]
+	- This preconditioning technique is a variant of [[Preconditioned Conjugate Gradients algorithm|PCG]] that allows using a preconditioner like $M^{(k)}$ that varies at every step.
+	- This can be very useful in some circumstances.
