@@ -7,7 +7,7 @@ import spaRouterScript from "../../components/scripts/spa.inline"
 import plausibleScript from "../../components/scripts/plausible.inline"
 // @ts-ignore
 import popoverScript from "../../components/scripts/popover.inline"
-import styles from "../../styles/base.scss"
+import styles from "../../styles/custom.scss"
 import popoverStyle from "../../components/styles/popover.scss"
 import { BuildCtx } from "../../util/ctx"
 import { StaticResources } from "../../util/resources"
@@ -100,7 +100,7 @@ function addGlobalPageResources(
     componentResources.afterDOMLoaded.push(`
       const umamiScript = document.createElement("script")
       umamiScript.src = "https://analytics.umami.is/script.js"
-      umamiScript["data-website-id"] = "${cfg.analytics.websiteId}"
+      umamiScript.setAttribute("data-website-id", "${cfg.analytics.websiteId}")
       umamiScript.async = true
   
       document.head.appendChild(umamiScript)
@@ -164,7 +164,7 @@ export const ComponentResources: QuartzEmitterPlugin<Options> = (opts?: Partial<
 
       addGlobalPageResources(ctx, resources, componentResources)
 
-      const stylesheet = joinStyles(ctx.cfg.configuration.theme, styles, ...componentResources.css)
+      const stylesheet = joinStyles(ctx.cfg.configuration.theme, ...componentResources.css, styles)
       const prescript = joinScripts(componentResources.beforeDOMLoaded)
       const postscript = joinScripts(componentResources.afterDOMLoaded)
       const fps = await Promise.all([
