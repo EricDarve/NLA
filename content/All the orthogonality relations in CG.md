@@ -7,26 +7,16 @@ r^{(k)} = b - A x^{(k)}.
 $$
 From these definitions, we can derive all the results below. Make sure you understand the reasoning behind each result.
 
-**Property 1.**
-$$
-x^{(k)} \in \mathcal K_k.
-$$
+**Property 1.** $x^{(k)} \in \mathcal K_k.$
+
 This is because of the basic construction of iterative methods using the [[Krylov methods for sparse systems|Krylov subspace.]]
 
-**Property 2.**
-$$
-\Delta x^{(k)} \in \mathcal K_{k+1}
-$$ 
-and
-$$
-p^{(k+1)} \in \mathcal K_{k+1}.
-$$
+**Property 2.** $\Delta x^{(k)} \in \mathcal K_{k+1}$ and $p^{(k+1)} \in \mathcal K_{k+1}.$
+
 This is true because of the definition of the [[CG search directions|search directions]] above.
 
-**Property 3.**
-$$
-r^{(k)} \in \mathcal K_{k+1}.
-$$
+**Property 3.** $r^{(k)} \in \mathcal K_{k+1}.$
+
 This is true because of the definition of the [[Residuals and solution increments in CG|residual vectors]] and the [[Krylov subspace]].
 
 **Property 4.** If $y \in K_k$, then $Ay \in \mathcal K_{k+1}.$
@@ -39,25 +29,21 @@ $$
 $$
 and the [[Krylov subspace]]. We have seen [[Some orthogonality relations in CG#^9bf4bf|previously]] that this implies that $r^{(k)}$ is $\perp$ to $\mathcal K_k.$
 
-**Property 5.**
-$$
-r^{(k)} \perp \mathcal K_k.
-$$
+**Property 5.** $r^{(k)} \perp \mathcal K_k.$
+
 See the [[Some orthogonality relations in CG#^9bf4bf|previous section.]]
 
-**Property 6.**
-$$
-r^{(k)} \perp r^{(l)}, \quad k \neq l.
-$$
+**Property 6.** $r^{(k)} \perp r^{(l)}, \quad k \neq l.$
+
 This is a consequence of the results listed above (Properties 3 and 5).
 
-**Property 7.**
-$$
-r^{(k)} \perp \mathcal p^{(l)}, \quad l \le k.
-$$
+**Property 7.** $r^{(k)} \perp \mathcal p^{(l)}, \quad l \le k.$
+
 This is a consequence of Properties 2 and 5.
 
-**Property 8.** $p^{(k)} \perp A p^{(l)},$ $k \neq l.$ So $p^{(k)}$ and $p^{(l)}$ are [[Some orthogonality relations in CG|conjugate.]]
+**Property 8.** $p^{(k)} \perp A p^{(l)},$ $k \neq l.$ 
+
+So $p^{(k)}$ and $p^{(l)}$ are [[Some orthogonality relations in CG|conjugate.]]
 
 This is a [[Some orthogonality relations in CG|consequence of the conjugacy]] of the $\Delta x^{(k)}$ and $\Delta x^{(k)}$, along with 
 $$
