@@ -1,5 +1,6 @@
 /**
  * @typedef {import('hast').Root} Root
+ *
  * @typedef {Pick<import('hast-util-from-html').Options, 'fragment'>} Options
  */
 

@@ -1,47 +1,33 @@
 "use strict";
 
-const nwsapi = require("nwsapi");
+const domSelector = require("@asamuzakjp/dom-selector");
+const { wrapperForImpl } = require("../generated/utils");
 
-const idlUtils = require("../generated/utils");
-
-function initNwsapi(node) {
-  const { _globalObject, _ownerDocument } = node;
-
-  return nwsapi({
-    document: idlUtils.wrapperForImpl(_ownerDocument),
-    DOMException: _globalObject.DOMException
-  });
-}
-
-exports.matchesDontThrow = (elImpl, selector) => {
-  const document = elImpl._ownerDocument;
-
-  if (!document._nwsapiDontThrow) {
-    document._nwsapiDontThrow = initNwsapi(elImpl);
-    document._nwsapiDontThrow.configure({
-      LOGERRORS: false,
-      VERBOSITY: false,
-      IDS_DUPES: true,
-      MIXEDCASE: true
-    });
+exports.matchesDontThrow = (selectors, elementImpl) => {
+  const element = wrapperForImpl(elementImpl);
+  try {
+    return domSelector.matches(selectors, element);
+  } catch {
+    return false;
   }
-
-  return document._nwsapiDontThrow.match(selector, idlUtils.wrapperForImpl(elImpl));
 };
 
-// nwsapi gets `document.documentElement` at creation-time, so we have to initialize lazily, since in the initial
-// stages of Document initialization, there is no documentElement present yet.
-exports.addNwsapi = parentNode => {
-  const document = parentNode._ownerDocument;
+exports.matches = (selectors, elementImpl) => {
+  const element = wrapperForImpl(elementImpl);
+  return domSelector.matches(selectors, element);
+};
 
-  if (!document._nwsapi) {
-    document._nwsapi = initNwsapi(parentNode);
-    document._nwsapi.configure({
-      LOGERRORS: false,
-      IDS_DUPES: true,
-      MIXEDCASE: true
-    });
-  }
+exports.closest = (selectors, elementImpl) => {
+  const element = wrapperForImpl(elementImpl);
+  return domSelector.closest(selectors, element);
+};
 
-  return document._nwsapi;
+exports.querySelector = (selectors, parentNodeImpl) => {
+  const node = wrapperForImpl(parentNodeImpl);
+  return domSelector.querySelector(selectors, node);
+};
+
+exports.querySelectorAll = (selectors, parentNodeImpl) => {
+  const node = wrapperForImpl(parentNodeImpl);
+  return domSelector.querySelectorAll(selectors, node);
 };

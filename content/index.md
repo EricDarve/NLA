@@ -1,23 +1,9 @@
 ---
-title: CME 302 Numerical Linear Algebra 2023
+title: CME 302 Numerical Linear Algebra 2024
 ---
 
-### Weekly schedule Fall 2023
+### Class Notes 2024
 
-1. Introduction to the class; Linear Algebra boot camp
-2. Linear algebra boot camp
-3. LU factorization, floating point arithmetic, stability, pivoting
-4. Cholesky factorization, QR factorization
-5. QR factorization and least-squares, normal equation, QR, SVD, eigenvalue computation
-6. Eigenvalue computation, power iteration, orthogonal iteration, QR iteration, upper Hessenberg form, QR iteration with shift
-7. Iterative methods for eigenvalue computation, Krylov subspace, Lanczos, Arnoldi
-8. Classical iterative methods, Jacobi, Gauss-Seidel, SOR
-9. Iterative methods for solving sparse systems, Krylov methods, Conjugate Gradients
-10. GMRES, Preconditioning, Preconditioned Conjugate Gradients
-
-### Class Notes 2023
-
-- [[First lecture]]
 - [[Bootcamp]]
 - [[Solving linear systems]]
 - [[QR factorization and least-squares]]
@@ -26,4 +12,4 @@ title: CME 302 Numerical Linear Algebra 2023
 - [[Classical iterative methods to solve sparse linear systems]]
 - [[Krylov iterative methods to solve sparse linear systems]]
 
-Book: [Numerical Linear Algebra with Julia](https://play.google.com/books/reader?id=lt9BEAAAQBAJ&pg=GBS.PR1), Darve and Wootters
+Book: [Numerical Linear Algebra with Julia](https://epubs.siam.org/doi/book/10.1137/1.9781611976557), Darve and Wootters; [Amazon](https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545), [Google Books](https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ)

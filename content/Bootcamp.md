@@ -1,8 +1,5 @@
-
-More during recitation + read the chapter in textbook for full background
-
 - [[Vectors and matrices]]
-	- Introduce notations
+	- Introduces notations
 - [[Subspace and linear independence]]
 	- Core concept in linear algebra
 	- Important when solving linear systems

@@ -1,5 +1,6 @@
 /**
  * @typedef {import('hast').Root} Root
+ *
  * @typedef {typeof import('./index.js').fromHtmlIsomorphic} FromHtmlIsomorphic
  */
 

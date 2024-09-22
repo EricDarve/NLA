@@ -1,1 +1,2 @@
-import handler from"./handler.js";onmessage=handler;
+import handler from "./handler.js";
+onmessage = handler;

@@ -2,31 +2,36 @@ const userPref = window.matchMedia("(prefers-color-scheme: light)").matches ? "l
 const currentTheme = localStorage.getItem("theme") ?? userPref
 document.documentElement.setAttribute("saved-theme", currentTheme)
 
+const emitThemeChangeEvent = (theme: "light" | "dark") => {
+  const event: CustomEventMap["themechange"] = new CustomEvent("themechange", {
+    detail: { theme },
+  })
+  document.dispatchEvent(event)
+}
+
 document.addEventListener("nav", () => {
-  const switchTheme = (e: any) => {
-    if (e.target.checked) {
-      document.documentElement.setAttribute("saved-theme", "dark")
-      localStorage.setItem("theme", "dark")
-    } else {
-      document.documentElement.setAttribute("saved-theme", "light")
-      localStorage.setItem("theme", "light")
-    }
+  const switchTheme = (e: Event) => {
+    const newTheme =
+      document.documentElement.getAttribute("saved-theme") === "dark" ? "light" : "dark"
+    document.documentElement.setAttribute("saved-theme", newTheme)
+    localStorage.setItem("theme", newTheme)
+    emitThemeChangeEvent(newTheme)
   }
 
-  // Darkmode toggle
-  const toggleSwitch = document.querySelector("#darkmode-toggle") as HTMLInputElement
-  toggleSwitch.removeEventListener("change", switchTheme)
-  toggleSwitch.addEventListener("change", switchTheme)
-  if (currentTheme === "dark") {
-    toggleSwitch.checked = true
-  }
-
-  // Listen for changes in prefers-color-scheme
-  const colorSchemeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-  colorSchemeMediaQuery.addEventListener("change", (e) => {
+  const themeChange = (e: MediaQueryListEvent) => {
     const newTheme = e.matches ? "dark" : "light"
     document.documentElement.setAttribute("saved-theme", newTheme)
     localStorage.setItem("theme", newTheme)
-    toggleSwitch.checked = e.matches
-  })
+    emitThemeChangeEvent(newTheme)
+  }
+
+  // Darkmode toggle
+  const themeButton = document.querySelector("#darkmode") as HTMLButtonElement
+  themeButton.addEventListener("click", switchTheme)
+  window.addCleanup(() => themeButton.removeEventListener("click", switchTheme))
+
+  // Listen for changes in prefers-color-scheme
+  const colorSchemeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+  colorSchemeMediaQuery.addEventListener("change", themeChange)
+  window.addCleanup(() => colorSchemeMediaQuery.removeEventListener("change", themeChange))
 })

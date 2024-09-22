@@ -1,20 +1,20 @@
-import {Options as FastGlobOptions, Entry} from 'fast-glob';
+import type FastGlob from 'fast-glob';
 
-export type GlobEntry = Entry;
+export type GlobEntry = FastGlob.Entry;
 
-export interface GlobTask {
+export type GlobTask = {
 	readonly patterns: string[];
 	readonly options: Options;
-}
+};
 
 export type ExpandDirectoriesOption =
 	| boolean
 	| readonly string[]
 	| {files?: readonly string[]; extensions?: readonly string[]};
 
-type FastGlobOptionsWithoutCwd = Omit<FastGlobOptions, 'cwd'>;
+type FastGlobOptionsWithoutCwd = Omit<FastGlob.Options, 'cwd'>;
 
-export interface Options extends FastGlobOptionsWithoutCwd {
+export type Options = {
 	/**
 	If set to `true`, `globby` will automatically glob directories for you. If you define an `Array` it will only glob files that matches the patterns inside the `Array`. You can also define an `Object` with `files` and `extensions` like in the example below.
 
@@ -61,11 +61,11 @@ export interface Options extends FastGlobOptionsWithoutCwd {
 	@default process.cwd()
 	*/
 	readonly cwd?: URL | string;
-}
+} & FastGlobOptionsWithoutCwd;
 
-export interface GitignoreOptions {
+export type GitignoreOptions = {
 	readonly cwd?: URL | string;
-}
+};
 
 export type GlobbyFilterFunction = (path: URL | string) => boolean;
 
@@ -203,3 +203,5 @@ export function isGitIgnored(options?: GitignoreOptions): Promise<GlobbyFilterFu
 @returns A filter function indicating whether a given path is ignored via a `.gitignore` file.
 */
 export function isGitIgnoredSync(options?: GitignoreOptions): GlobbyFilterFunction;
+
+export function convertPathToPattern(source: string): FastGlob.Pattern;

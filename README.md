@@ -1,4 +1,4 @@
-# CME 302 Class Notes 2023
+# CME 302 Class Notes 2024
 
 - [GitHub Pages web site](https://ericdarve.github.io/NLA/)
 - [CME 302](https://canvas.stanford.edu/courses/178134)

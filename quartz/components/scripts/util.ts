@@ -3,6 +3,7 @@ export function registerEscapeHandler(outsideContainer: HTMLElement | null, cb: 
   function click(this: HTMLElement, e: HTMLElementEventMap["click"]) {
     if (e.target !== this) return
     e.preventDefault()
+    e.stopPropagation()
     cb()
   }
 
@@ -12,10 +13,10 @@ export function registerEscapeHandler(outsideContainer: HTMLElement | null, cb: 
     cb()
   }
 
-  outsideContainer?.removeEventListener("click", click)
   outsideContainer?.addEventListener("click", click)
-  document.removeEventListener("keydown", esc)
+  window.addCleanup(() => outsideContainer?.removeEventListener("click", click))
   document.addEventListener("keydown", esc)
+  window.addCleanup(() => document.removeEventListener("keydown", esc))
 }
 
 export function removeAllChildren(node: HTMLElement) {

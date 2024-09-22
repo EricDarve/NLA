@@ -254,12 +254,34 @@ var assert = function assert(value) {
 };
 /**
  * Return the protocol of a URL, or "_relative" if the URL does not specify a
- * protocol (and thus is relative).
+ * protocol (and thus is relative), or `null` if URL has invalid protocol
+ * (so should be outright rejected).
  */
 
 var protocolFromUrl = function protocolFromUrl(url) {
-  var protocol = /^\s*([^\\/#]*?)(?::|&#0*58|&#x0*3a)/i.exec(url);
-  return protocol != null ? protocol[1] : "_relative";
+  // Check for possible leading protocol.
+  // https://url.spec.whatwg.org/#url-parsing strips leading whitespace
+  // (U+20) or C0 control (U+00-U+1F) characters.
+  // eslint-disable-next-line no-control-regex
+  var protocol = /^[\x00-\x20]*([^\\/#?]*?)(:|&#0*58|&#x0*3a|&colon)/i.exec(url);
+
+  if (!protocol) {
+    return "_relative";
+  } // Reject weird colons
+
+
+  if (protocol[2] !== ":") {
+    return null;
+  } // Reject invalid characters in scheme according to
+  // https://datatracker.ietf.org/doc/html/rfc3986#section-3.1
+
+
+  if (!/^[a-zA-Z][a-zA-Z0-9+\-.]*$/.test(protocol[1])) {
+    return null;
+  } // Lowercase the protocol
+
+
+  return protocol[1].toLowerCase();
 };
 var utils = {
   contains,
@@ -509,7 +531,13 @@ class Settings {
 
   isTrusted(context) {
     if (context.url && !context.protocol) {
-      context.protocol = utils.protocolFromUrl(context.url);
+      var protocol = utils.protocolFromUrl(context.url);
+
+      if (protocol == null) {
+        return false;
+      }
+
+      context.protocol = protocol;
     }
 
     var trust = typeof this.trust === "function" ? this.trust(context) : this.trust;
@@ -3232,7 +3260,7 @@ var sigmasAndXis = {
   sqrtRuleThickness: [0.04, 0.04, 0.04],
   // This value determines how large a pt is, for metrics which are defined
   // in terms of pts.
-  // This value is also used in katex.less; if you change it make sure the
+  // This value is also used in katex.scss; if you change it make sure the
   // values match.
   ptPerEm: [10.0, 10.0, 10.0],
   // The space between adjacent `|` columns in an array definition. From
@@ -4083,7 +4111,7 @@ class Img {
   }
 
   toMarkup() {
-    var markup = "<img  src='" + this.src + " 'alt='" + this.alt + "' "; // Add the styles, after hyphenation
+    var markup = "<img src=\"" + utils.escape(this.src) + "\"" + (" alt=\"" + utils.escape(this.alt) + "\""); // Add the styles, after hyphenation
 
     var styles = "";
 
@@ -4274,7 +4302,7 @@ class SvgNode {
 
     for (var attr in this.attributes) {
       if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
-        markup += " " + attr + "='" + this.attributes[attr] + "'";
+        markup += " " + attr + "=\"" + utils.escape(this.attributes[attr]) + "\"";
       }
     }
 
@@ -4312,9 +4340,9 @@ class PathNode {
 
   toMarkup() {
     if (this.alternate) {
-      return "<path d='" + this.alternate + "'/>";
+      return "<path d=\"" + utils.escape(this.alternate) + "\"/>";
     } else {
-      return "<path d='" + path[this.pathName] + "'/>";
+      return "<path d=\"" + utils.escape(path[this.pathName]) + "\"/>";
     }
   }
 
@@ -4343,7 +4371,7 @@ class LineNode {
 
     for (var attr in this.attributes) {
       if (Object.prototype.hasOwnProperty.call(this.attributes, attr)) {
-        markup += " " + attr + "='" + this.attributes[attr] + "'";
+        markup += " " + attr + "=\"" + utils.escape(this.attributes[attr]) + "\"";
       }
     }
 
@@ -4545,7 +4573,7 @@ defineSymbol(math, main, rel, "\u21c1", "\\rightharpoondown", true);
 defineSymbol(math, main, rel, "\u2196", "\\nwarrow", true);
 defineSymbol(math, main, rel, "\u21cc", "\\rightleftharpoons", true); // AMS Negated Binary Relations
 
-defineSymbol(math, ams, rel, "\u226e", "\\nless", true); // Symbol names preceeded by "@" each have a corresponding macro.
+defineSymbol(math, ams, rel, "\u226e", "\\nless", true); // Symbol names preceded by "@" each have a corresponding macro.
 
 defineSymbol(math, ams, rel, "\ue010", "\\@nleqslant");
 defineSymbol(math, ams, rel, "\ue011", "\\@nleqq");
@@ -5168,7 +5196,11 @@ for (var _i3 = 0; _i3 < letters.length; _i3++) {
 
   defineSymbol(math, main, mathord, _ch3, wideChar);
   defineSymbol(text, main, textord, _ch3, wideChar);
-  wideChar = String.fromCharCode(0xD835, 0xDD04 + _i3); // A-Z a-z Fractur
+  wideChar = String.fromCharCode(0xD835, 0xDD04 + _i3); // A-Z a-z Fraktur
+
+  defineSymbol(math, main, mathord, _ch3, wideChar);
+  defineSymbol(text, main, textord, _ch3, wideChar);
+  wideChar = String.fromCharCode(0xD835, 0xDD6C + _i3); // A-Z a-z bold Fraktur
 
   defineSymbol(math, main, mathord, _ch3, wideChar);
   defineSymbol(text, main, textord, _ch3, wideChar);
@@ -5277,8 +5309,9 @@ var wideLatinLetterData = [["mathbf", "textbf", "Main-Bold"], // A-Z bold uprigh
 ["mathfrak", "textfrak", "Fraktur-Regular"], // a-z Fraktur
 ["mathbb", "textbb", "AMS-Regular"], // A-Z double-struck
 ["mathbb", "textbb", "AMS-Regular"], // k double-struck
-["", "", ""], // A-Z bold Fraktur No font metrics
-["", "", ""], // a-z bold Fraktur.   No font.
+// Note that we are using a bold font, but font metrics for regular Fraktur.
+["mathboldfrak", "textboldfrak", "Fraktur-Regular"], // A-Z bold Fraktur
+["mathboldfrak", "textboldfrak", "Fraktur-Regular"], // a-z bold Fraktur
 ["mathsf", "textsf", "SansSerif-Regular"], // A-Z sans-serif
 ["mathsf", "textsf", "SansSerif-Regular"], // a-z sans-serif
 ["mathboldsf", "textboldsf", "SansSerif-Bold"], // A-Z bold sans-serif
@@ -5454,10 +5487,15 @@ var makeOrd = function makeOrd(group, options, type) {
 
   var isFont = mode === "math" || mode === "text" && options.font;
   var fontOrFamily = isFont ? options.font : options.fontFamily;
+  var wideFontName = "";
+  var wideFontClass = "";
 
   if (text.charCodeAt(0) === 0xD835) {
+    [wideFontName, wideFontClass] = wideCharacterFont(text, mode);
+  }
+
+  if (wideFontName.length > 0) {
     // surrogate pairs get special treatment
-    var [wideFontName, wideFontClass] = wideCharacterFont(text, mode);
     return makeSymbol(text, wideFontName, mode, options, classes.concat(wideFontClass));
   } else if (fontOrFamily) {
     var fontName;
@@ -14641,9 +14679,11 @@ var optionsWithFont = (group, options) => {
     return options.withTextFontFamily(textFontFamilies[font]);
   } else if (textFontWeights[font]) {
     return options.withTextFontWeight(textFontWeights[font]);
-  } else {
-    return options.withTextFontShape(textFontShapes[font]);
+  } else if (font === "\\emph") {
+    return options.fontShape === "textit" ? options.withTextFontShape("textup") : options.withTextFontShape("textit");
   }
+
+  return options.withTextFontShape(textFontShapes[font]);
 };
 
 defineFunction({
@@ -14651,7 +14691,7 @@ defineFunction({
   names: [// Font families
   "\\text", "\\textrm", "\\textsf", "\\texttt", "\\textnormal", // Font weights
   "\\textbf", "\\textmd", // Font Shapes
-  "\\textit", "\\textup"],
+  "\\textit", "\\textup", "\\emph"],
   props: {
     numArgs: 1,
     argTypes: ["text"],
@@ -16325,6 +16365,19 @@ class MacroExpander {
     return args;
   }
   /**
+   * Increment `expansionCount` by the specified amount.
+   * Throw an error if it exceeds `maxExpand`.
+   */
+
+
+  countExpansion(amount) {
+    this.expansionCount += amount;
+
+    if (this.expansionCount > this.settings.maxExpand) {
+      throw new ParseError("Too many expansions: infinite loop or " + "need to increase maxExpand setting");
+    }
+  }
+  /**
    * Expand the next token only once if possible.
    *
    * If the token is expanded, the resulting tokens will be pushed onto
@@ -16359,12 +16412,7 @@ class MacroExpander {
       return false;
     }
 
-    this.expansionCount++;
-
-    if (this.expansionCount > this.settings.maxExpand) {
-      throw new ParseError("Too many expansions: infinite loop or " + "need to increase maxExpand setting");
-    }
-
+    this.countExpansion(1);
     var tokens = expansion.tokens;
     var args = this.consumeArgs(expansion.numArgs, expansion.delimiters);
 
@@ -16470,8 +16518,11 @@ class MacroExpander {
 
         output.push(token);
       }
-    }
+    } // Count all of these tokens as additional expansions, to prevent
+    // exponential blowup from linearly many \edef's.
 
+
+    this.countExpansion(output.length);
     return output;
   }
   /**
@@ -17479,8 +17530,9 @@ class Parser {
         // We treat these similarly to the unicode-math package.
         // So we render a string of Unicode (sub|super)scripts the
         // same as a (sub|super)script of regular characters.
-        var str = uSubsAndSups[lex.text];
         var isSub = unicodeSubRegEx.test(lex.text);
+        var subsupTokens = [];
+        subsupTokens.push(new Token(uSubsAndSups[lex.text]));
         this.consume(); // Continue fetching tokens to fill out the string.
 
         while (true) {
@@ -17494,12 +17546,12 @@ class Parser {
             break;
           }
 
+          subsupTokens.unshift(new Token(uSubsAndSups[token]));
           this.consume();
-          str += uSubsAndSups[token];
         } // Now create a (sub|super)script.
 
 
-        var body = new Parser(str, this.settings).parse();
+        var body = this.subparse(subsupTokens);
 
         if (isSub) {
           subscript = {
@@ -18309,7 +18361,7 @@ var katex = {
   /**
    * Current KaTeX version
    */
-  version: "0.16.8",
+  version: "0.16.11",
 
   /**
    * Renders the given LaTeX into an HTML+MathML combination, and adds

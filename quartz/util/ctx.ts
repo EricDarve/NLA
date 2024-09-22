@@ -6,6 +6,7 @@ export interface Argv {
   verbose: boolean
   output: string
   serve: boolean
+  fastRebuild: boolean
   port: number
   wsPort: number
   remoteDevHost?: string
@@ -13,6 +14,7 @@ export interface Argv {
 }
 
 export interface BuildCtx {
+  buildId: string
   argv: Argv
   cfg: QuartzConfig
   allSlugs: FullSlug[]

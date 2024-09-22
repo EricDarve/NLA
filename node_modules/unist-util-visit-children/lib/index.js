@@ -13,7 +13,7 @@
  *   Position of `child` in parent.
  * @param {Kind} parent
  *   Parent node.
- * @returns {void}
+ * @returns {undefined}
  *   Nothing.
  */
 
@@ -24,7 +24,7 @@
  *   Function to call the bound `visitor` for each child in `parent`.
  * @param {Kind} node
  *   Parent node.
- * @returns {void}
+ * @returns {undefined}
  *   Nothing.
  */
 
