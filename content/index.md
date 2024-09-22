@@ -1,5 +1,5 @@
 ---
-title: CME 302 Numerical Linear Algebra 2024
+title: CME 302 Numerical Linear Algebra
 ---
 
 ### Class Notes 2024
