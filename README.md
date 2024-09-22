@@ -1,7 +1,7 @@
 # CME 302 Class Notes 2024
 
 - [GitHub Pages web site](https://ericdarve.github.io/NLA/)
-- Built using [Obsidian](https://obsidian.md/) and [Quartz](https://quartz.jzhao.xyz/), v4.3.1.
+- Built using [Obsidian](https://obsidian.md/) and [Quartz](https://quartz.jzhao.xyz/), v4.3.1, Quartz [github](https://github.com/jackyzha0/quartz) repo.
 
 ### How to generate the static web pages
 
