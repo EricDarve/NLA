@@ -63,7 +63,7 @@ The computational cost of computing the singular value decomposition is $O(n^3)$
 $$
 B = \begin{bmatrix} 0 & A \\ A^T & 0 \end{bmatrix}
 $$
-This matrix is symmetric and therefore is unitarily diagonalizable:
+This matrix is symmetric and therefore is [[Unitarily diagonalizable matrices|unitarily diagonalizable]]:
 $$
 B = Q \Lambda Q^T
 $$
