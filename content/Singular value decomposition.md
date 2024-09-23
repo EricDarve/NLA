@@ -98,7 +98,9 @@ $$
 = Q \Lambda Q^T
 $$
 we find that
-$$A = X \Sigma Y^T$$
+$$
+A = X \Sigma Y^T
+$$
 This is the SVD of $A$.
 
 $\square$
