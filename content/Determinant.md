@@ -6,6 +6,7 @@ The determinant is a function that maps square matrices to real (or complex) num
 4. Adding to a column a multiple of another column does not change the determinant.
 
 **Definition using the Leibniz formula**
+
 There are multiple other definitions. One of them uses the Leibniz formula:
 $$
 \det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma) 
