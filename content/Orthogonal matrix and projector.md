@@ -33,6 +33,7 @@ $$
 HQ = \begin{bmatrix} Q_{n-1} & 0 \\ 0 & 1 \end{bmatrix}
 $$
 The last row must have zeros otherwise $HQ$ cannot be orthogonal. By induction, the matrix $Q_{n-1}$ is orthogonal and can be written as a product of at most $n-1$ reflections. Since $H$ is a reflection, $Q$ can be written as a product of at most $n$ reflections. 
+
 $\square$
 
 The matrix $QQ^T$ is not equal to $I$ if $Q$ is rectangular (i.e., $m > n$). 
