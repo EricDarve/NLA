@@ -1,5 +1,7 @@
 - [[Vectors and matrices]]
 	- Introduces notations
+- [[Matrix block operations]]	
+    - Block operations will be very useful in many proofs and algorithms.
 - [[Subspace and linear independence]]
 	- Core concept in linear algebra
 	- Important when solving linear systems
