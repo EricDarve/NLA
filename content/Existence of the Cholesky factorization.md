@@ -34,6 +34,8 @@ a_{11} & 0 \\
 0 & I
 \end{pmatrix}
 $$
+See the section [[Matrix block operations]] for details on this type of block operations.
+
 Note that the first column of $L$ is equal to:
 $$
 l_{,1} = \frac{a_{,1}}{\sqrt{a_{11}}} =
@@ -50,7 +52,7 @@ We prove that $B - (1/a_{11}) c c^T$ is SPD.
 1. That matrix is symmetric.
 2. We now prove that $y^T (B - (1/a_{11}) c c^T) y > 0$ for any $y \neq 0.$
 
-Check that for any row vector $z$:
+Check that for any row vector $z$ (see the section [[Matrix block operations]] for relevant information):
 $$
 \begin{pmatrix}
     1 & z \\
@@ -132,7 +134,7 @@ $$
 B - (1/a_{11}) c c^T
 = L_1 L_1^T
 $$
-We get for $A$:
+We get for $A$ (using [[Matrix block operations|block notations]]):
 $$
 \begin{align}
 A & =
