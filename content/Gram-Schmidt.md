@@ -4,17 +4,23 @@ Summary of the different approaches:
 1. Householder/Givens: Find $Q$ such that $Q^T A = R$. Orthogonal triangularization.
 2. Gram-Schmidt: Find $R$ such that $A R^{-1} = Q$. **This is preferred when $A$ is tall and thin.** This is a triangular orthogonalization process.
 
+## Square matrix case
+
 Regular QR factorization with a square matrix:
 
 ![[Gram-Schmidt 2023-10-15 17.54.00.excalidraw.svg]]
 
-QR factorization of a thin matrix $A$. The matrix $Q$ is square. $R$ is thin. $R$ has 0 below the diagonal. This is a transformation typically obtained using Householder or Givens transformations.
+## Thin matrix case
+
+**QR factorization of a thin matrix $A$.** The matrix $Q$ is square. $R$ is thin. $R$ has 0 below the diagonal. This is a transformation typically obtained using Householder or Givens transformations.
 
 ![[Drawing 2023-10-15 18.35.05.excalidraw.svg]]
 
-QR factorization of a thin matrix. $Q$ is thin and has the same size as $A$. $R$ is upper triangular and square. This is a factorization that can be obtained using Gram-Schmidt.
+**Thin QR factorization.** $Q$ is thin and has the same size as $A$. $R$ is upper triangular and square. This is a factorization that can be obtained using Gram-Schmidt.
 
 ![[Drawing 2023-10-15 18.36.19.excalidraw.svg]]
+
+## Steps in the algorithm
 
 The computational strategy is similar to LU and Cholesky.
 
@@ -46,7 +52,9 @@ $A \leftarrow A - q_{,1} \, r_{1,}$
 
 The first column of $A$ is now zero. Repeat to get all the other columns.
 
-Summary: $A$ is $m \times n$.
+## Complete algorithm
+
+Assume $A$ is $m \times n$.
 
 Loop: $k$ from 1 to $n$
 - $r_{kk} = \|a_{,k}\|_2$
