@@ -54,8 +54,6 @@ Loop: $k$ from 1 to $n$
 - $r_{kj} = q_{,k}^T \, a_{,j}$, $j > k$.
 - $A \leftarrow A - q_{,k} \, r_{k,}$
 
-Each iteration requires $O(n^2)$ flops. So the total computational cost is $O(n^3)$ flops.
-
-If matrix $A$ is $m \times n$, the cost is $O(mn^2)$.
+Each iteration requires $O(mn)$ flops. So the total computational cost is $O(m n^2)$ flops.
 
 [[QR factorization]], [[QR using Householder transformations]], [[QR using Givens transformations]]
