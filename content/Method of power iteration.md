@@ -1,4 +1,12 @@
-This approach goes back to the fundamental motivation behind eigenvalue:
+**Intuition:**
+
+1. Stretching and shrinking: Imagine the matrix A as a transformation that stretches or shrinks space along different directions. The eigenvectors represent these special directions, and the eigenvalues represent the amount of stretching or shrinking.
+2. Dominant direction: The eigenvector corresponding to the largest eigenvalue represents the direction of maximum stretching.
+3. Repeated application: As we apply A repeatedly ($A^k$), the stretching along the dominant direction becomes more and more pronounced compared to other directions.
+
+**Derivation:**
+
+The approach goes back to the fundamental motivation behind eigenvalue:
 $$
 A^k = X \Lambda^k X^{-1} = X \Lambda^k Y^T
 $$
@@ -43,5 +51,11 @@ $$
 \boldsymbol{q}_k \to e^{ik \theta} \boldsymbol{x}_1
 $$
 So $e^{-i k \theta} \boldsymbol q_k$ converges to $\boldsymbol{x}_{1}$.
+
+**Intuitive analogy.** 
+- Each eigenvector is scaled by its corresponding eigenvalue when multiplied by A.
+- The largest eigenvalue causes the fastest growth.
+- Over many iterations, the component along the dominant eigenvector outgrows all others.
+- We can think of it like repeatedly sieving sand through increasingly fine meshes. Eventually, only the largest particles (analogous to the dominant eigenvector) remain.
 
 [[Eigenvalues]], [[Eigenvalues cannot be computed exactly]], [[Why eigenvalues]]
