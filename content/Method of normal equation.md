@@ -20,4 +20,10 @@ This method requires $A^TA$ to be non-singular. This is equivalent to saying tha
 
 The computational cost is $O(mn^2)$.
 
+**Intuitive explanation**
+- $A^T A$: This product represents the "correlation" of A's columns with each other. It captures how the columns of A interact and overlap.
+- $A^T b$: This term represents the "correlation" of A's columns with the target vector b. It tells us how much each column of A contributes to explaining b.
+- $(A^T A)^{-1}$: Inverting $A^T A$ is like "decorrelating" the columns of A. It accounts for any redundancy or overlap in A's columns.
+- Final multiplication: $(A^T A)^{-1} A^T b$ combines the decorrelated version of A with its correlation to b, giving us the optimal coefficients x.
+
 [[Least-squares problems]], [[Symmetric Positive Definite Matrices]], [[Cholesky factorization]], [[Conditioning of a linear system]], [[Stability of the Cholesky factorization]]
