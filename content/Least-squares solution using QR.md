@@ -40,4 +40,11 @@ Note that this method requires $R$ to be non-singular. This is equivalent to say
 
 The computational cost is $O(mn^2)$.
 
+**Summary**
+
+1. **Orthogonality simplifies the problem**: The orthonormality of $Q$ means that projecting onto $\text{span}(Q)$ (or $\text{span}(A)$) is straightforward. It turns complex geometric relationships into simple algebraic ones.
+2. **Upper triangular structure**: Solving systems with upper triangular matrices is simpler because you can solve for one variable at a time, starting from the last equation and moving upwards (back-substitution).
+3. **Avoiding squaring the condition number**: By not forming $A^T A$, we prevent the worsening of the condition number, leading to more accurate and stable solutions.
+4. **Geometric projection without distortion**: QR factorization allows us to project $b$ onto $\text{span}(A)$ without distorting the space (since $Q$ preserves lengths and angles due to its orthogonality).
+
 [[Least-squares problems]], [[QR factorization]], [[QR using Householder transformations]], [[QR using Givens transformations]], [[Method of normal equation]]
