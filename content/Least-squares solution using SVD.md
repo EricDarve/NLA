@@ -40,7 +40,7 @@ This is equivalent to:
 $$
 U^T (Ax - b) = U^T (U \Sigma V^T x - b) = 0
 $$
-[[Orthogonal matrix and projector|Since]] $U^T U = I$
+[[Orthogonal matrix and projector|Since]] $U^T U = I_r$
 $$
 \Sigma V^T x = U^T b
 $$
