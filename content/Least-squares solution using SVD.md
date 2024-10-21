@@ -68,4 +68,22 @@ x = V \, \Sigma^{-1} \, U^T \, b
 $$
 The computational cost to calculate the SVD is $O(mn^2)$.
 
+**Summary**
+
+- **Dimensionality reduction**: By using the thin SVD, we're effectively reducing the problem to a smaller subspace where $A$ behaves well (invertible scaling via $\Sigma$). This avoids issues that arise from attempting to invert a singular matrix directly.
+
+- **Orthogonal decomposition**: The SVD provides an orthogonal basis for both the row and column spaces of $A$. By projecting $b$ onto the column space via $U^T b$, we're capturing the component of $b$ that $A$ can "reach".
+
+- **Decoupling the problem**: The diagonal nature of $\Sigma$ means that each component of $y$ (and thus $x$) can be solved independently. This decoupling simplifies the problem from solving a potentially complex system of equations to handling straightforward, individual equations.
+
+- **Avoiding the null space**: By ensuring $x$ is in the span of $V$ (i.e., $x \perp N(A)$), we eliminate any arbitrary components that could exist in the null space of $A$. This is essential for finding the minimum-norm solution.
+
+In practical applications, especially when dealing with data that may be noisy or ill-conditioned, finding a stable and unique solution is critical. The SVD provides a robust framework for:
+
+- **Handling rank deficiency**: Even when $A$ lacks full rank, the SVD allows us to work within the subspace where $A$ is effective.
+
+- **Numerical stability**: By avoiding the inversion of $A^T A$ (which can be ill-conditioned or singular), we reduce numerical errors and improve the stability of our computations.
+
+- **Interpretability**: The SVD not only helps in solving the least-squares problem but also offers insights into the underlying structure of $A$, such as its rank and the significance of its singular values.
+
 [[Least-squares problems]], [[Singular value decomposition]], [[Method of normal equation]], [[Least-squares solution using QR]]
