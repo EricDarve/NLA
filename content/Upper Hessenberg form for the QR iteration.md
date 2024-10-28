@@ -4,7 +4,7 @@ This can be made more efficient if $A$ is in [[QR using Givens transformations|u
 
 ![[2022-10-22-16-30-53.png]]
 
-This transformation is of the form:
+We need a transformation of the form:
 $$
 Q^T A Q = H
 $$
