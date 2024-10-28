@@ -18,7 +18,7 @@ $$
 $$
 $\square$
 
-**Proposition 1: Convergence of the Ritz eigenvalues**
+**Proposition 2: Convergence of the Ritz eigenvalues**
 
 Assume that we start with a random $Q_0$ with $r$ columns. In that case, $T_k$ has dimension $r \times r$. The eigenvalues of $T_k$ are called Ritz eigenvalues. The $i$th Ritz eigenvalue converges to $\lambda_i$ with rate
 $$
