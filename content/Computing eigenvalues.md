@@ -2,7 +2,7 @@
 	- We give some examples of operations that become very simple to compute when we use eigenvalues.
 - [[Eigenvalues cannot be computed exactly]]
 	- We show that computing eigenvalues is difficult and cannot be done exactly.
-	- However, we do have approximate but very fast and accurate algorithms that will give us excellent approximations, with errors down to the [[Floating point arithmetic and unit roundoff error|unit roundoff error]] $u$.
+	- However, we do have approximate but very fast and accurate algorithms that will give us excellent approximations, with errors down to the [[Floating point arithmetic and unit roundoff error|unit roundoff error]] $u.$
 - [[Method of power iteration]]
 	- Forms the basis of advanced methods: orthogonal and QR iterations.
 	- Simple but only works marginally well.
@@ -24,30 +24,30 @@
 	- Pseudo-algorithm for the [[Orthogonal iteration|orthogonal iteration]] process.
 - [[Computing eigenvectors using the Schur decomposition]]
 	- The previous algorithms lead to the [[Schur decomposition|Schur decomposition.]]
-	- The eigenvalues are on the [[Schur decomposition|diagonal]] of $T$.
+	- The eigenvalues are on the [[Schur decomposition|diagonal]] of $T.$
 	- How can compute the eigenvectors from the [[Schur decomposition]]?
 - [[Convergence of the orthogonal iteration]]
 	- Understanding convergence is key to accelerating the algorithm.
-	- Generally speaking, the rate of convergence is related to ratios of the form $|\lambda_{i+1}|/|\lambda_i|$.
+	- Generally speaking, the rate of convergence is related to ratios of the form $|\lambda_{i+1}|/|\lambda_i|.$
 - [[Accelerating convergence using a shift]]
 	- Shifting with $A - \lambda I$ is key to accelerating convergence.
 	- We briefly explain the idea here and will come back to it later.
-	- From now on, the focus will be on computing $T_k$ rather than $Q_k$.
+	- From now on, the focus will be on computing $T_k$ rather than $Q_k.$
 - [[QR iteration]]
 	- This iteration is in fact similar to the [[Orthogonal iteration|orthogonal iteration]]. The sequence of matrices is the same.
-	- However, the key difference is that the [[QR iteration]] works with $T_k$ directly. As a result, it allows us to very easily perform a shift $A - \lambda I$.
+	- However, the key difference is that the [[QR iteration]] works with $T_k$ directly. As a result, it allows us to very easily perform a shift $A - \lambda I.$
 	- [[QR iteration]] is the foundation for eigenvalue computation algorithms.
 - [[Upper Hessenberg form for the QR iteration]]
 	- We can accelerate the [[QR iteration]] by using two tricks: upper [[Upper Hessenberg form for the QR iteration|Hessenberg form]], and applying a [[Accelerating convergence using a shift|shift]].
 	- $A$ can be turned into a matrix in upper Hessenberg form using $Q^T A Q = H$ where $Q$ is orthogonal.
-	- Performing a [[QR iteration]] with $H$ is much faster than with $A$.
+	- Performing a [[QR iteration]] with $H$ is much faster than with $A.$
 - [[QR iteration for upper Hessenberg matrices]]
-	- Once the matrix is in [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]], the cost of the [[QR iteration]] is reduced from $O(n^3)$ to $O(n^2)$.
+	- Once the matrix is in [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]], the cost of the [[QR iteration]] is reduced from $O(n^3)$ to $O(n^2).$
 	- This is a huge reduction in computational cost.
 	- This makes the QR iteration much more tractable for large matrices.
 - [[Symmetric and unsymmetric QR iteration]]
 	- We compare the computational cost of the [[QR iteration]] for [[Hermitian and symmetric matrices|symmetric]] and unsymmetric matrices.
-	-  The cost of the [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]] is the same: $O(n^3)$.
+	-  The cost of the [[Upper Hessenberg form for the QR iteration|upper Hessenberg form]] is the same: $O(n^3).$
 	- However, once the matrix is in [[QR iteration for upper Hessenberg matrices|upper Hessenberg form,]] the cost per iteration is $O(n^2)$ for unsymmetric matrices, and $O(n)$ only for [[Hermitian and symmetric matrices|symmetric]] matrices.
 	- See `QR iteration` animations and movies.
 - [[Deflation in the QR iteration]]
@@ -56,11 +56,11 @@
 	- This is how all the [[Eigenvalues|eigenvalues]] can be obtained.
 - [[QR iteration with shift]]
 	- We explain how the idea of [[Accelerating convergence using a shift|shifting]] can be used to accelerate the convergence of QR.
-	- This allows reducing $A$ very quickly to an upper block triangular form. At this point, [[Deflation in the QR iteration|deflation]] can be used to reduce the size of the matrix. The [[QR iteration]] process is then repeated with a matrix of size $(n-1) \times (n-1)$.
+	- This allows reducing $A$ very quickly to an upper block triangular form. At this point, [[Deflation in the QR iteration|deflation]] can be used to reduce the size of the matrix. The [[QR iteration]] process is then repeated with a matrix of size $(n-1) \times (n-1).$
 - [[Algorithm for QR iteration with shift]]
 	- This is the practical implementation of the [[QR iteration with shift]].
 - [[Exact shift]]
-	- We investigate what happens if we use an [[QR iteration with shift|exact shift]], that is, we shift using an exact eigenvalue of $A$.
+	- We investigate what happens if we use an [[QR iteration with shift|exact shift]], that is, we shift using an exact eigenvalue of $A.$
 	- In that case, as can be expected, matrix $A$ becomes exactly [[Deflation in the QR iteration|block upper triangular]], and we recover the exact eigenvalue.
 - [[QR iteration 2x2 example]]
 	- This example illustrates the [[QR iteration with shift]].
