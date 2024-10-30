@@ -26,6 +26,12 @@ This is much less than the $O(n^3)$ for the original [[QR iteration]].
 - The time cost per iteration in upper Hessenberg form is $O(n^2)$. 
 - The total time cost is $O(n^3)$.
 
+## Geometric interpretation
+
+- Each QR step can be seen as a refined rotation of our coordinate system.
+- We are gradually aligning our axes with the eigenvectors, but doing so through a series of small, precise adjustments.
+- The Hessenberg form allows these adjustments to be made much more efficiently.
+
 ### Algorithm:
 
 ```julia
