@@ -23,7 +23,7 @@ We get column $j$ of $h$
 $$
 h_{kj} = q_k^T A q_j, \quad k \le j
 $$
-Let's [[Gram-Schmidt|project]] $A q_j$ on $q_k$:
+Let's [[Gram-Schmidt|remove]] the components of $A q_j$ in span($q_1$, ..., $q_j$):
 $$
 h_{j+1,j} \, q_{j+1} = A q_j - \sum_{k=1}^j h_{kj} \, q_k
 $$
