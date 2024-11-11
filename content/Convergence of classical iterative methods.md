@@ -29,9 +29,7 @@ Denote by $G = M^{-1}N$.
 
 $\rho(G) \ge 1$ implies no convergence when $e^{(0)} =$ eigenvector associated with the eigenvalue that is greater than 1.
 
-Assume that $\rho(G) < 1$
-
-If $G$ is diagonalizable, then
+Assume that $\rho(G) < 1.$ If $G$ is diagonalizable, then
 $$
 G^k e_0 = X \Lambda^k X^{-1} e_0
 $$
