@@ -79,18 +79,18 @@ where $\lambda$ represents an eigenvalue of $A$.
 **Convergence proof using Gershgorin's Theorem.** $G = D^{-1} (L+U)$ is the iteration matrix in Jacobi. For the Jacobi method to converge, the spectral radius $\rho(G)$ must be less than 1.
 
 **Applying Gershgorin's Theorem.** The diagonal elements of $G$ are zero, and the off-diagonal elements are $-\frac{a_{ij}}{a_{ii}}$. The sum of the absolute values of the off-diagonal elements in the $i$-th row is:
-
-   $$ \sum_{j \neq i} \left| -\frac{a_{ij}}{a_{ii}} \right| = \frac{1}{|a_{ii}|} \sum_{j \neq i} |a_{ij}| $$
-
-   If $A$ is strictly diagonally dominant, then:
-
-   $$ |a_{ii}| > \sum_{j \neq i} |a_{ij}| $$
-
-   This implies:
-
-   $$ \frac{1}{|a_{ii}|} \sum_{j \neq i} |a_{ij}| < 1 $$
-
-   Therefore, each Gershgorin disc for $G$ is centered at zero with a radius less than 1. Consequently, all eigenvalues of $G$ lie within the unit circle.
+$$
+\sum_{j \neq i} \left| -\frac{a_{ij}}{a_{ii}} \right| = \frac{1}{|a_{ii}|} \sum_{j \neq i} |a_{ij}|
+$$
+If $A$ is strictly diagonally dominant, then:
+$$
+|a_{ii}| > \sum_{j \neq i} |a_{ij}|
+$$
+This implies:
+$$
+\frac{1}{|a_{ii}|} \sum_{j \neq i} |a_{ij}| < 1
+$$
+Therefore, each Gershgorin disc for $G$ is centered at zero with a radius less than 1. Consequently, all eigenvalues of $G$ lie within the unit circle.
 
 Since all eigenvalues of $G$ have magnitudes less than 1, the spectral radius $\rho(G) < 1$. This ensures that the Jacobi iteration converges for any initial guess $x^{(0)}$. 
 
