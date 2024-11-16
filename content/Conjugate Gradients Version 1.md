@@ -42,6 +42,7 @@ $$Q_k^T A^{1/2} ( A^{1/2} x - A^{1/2} Q_k y_k) = 0$$
 $$Q_k^T A x - Q^T A Q_k y_k = 0$$
 
 $$(Q_k^T A Q_k) y_k = Q_k^T b$$
+
 $\square$
 
 The final equation is:
