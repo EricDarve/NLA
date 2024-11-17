@@ -340,3 +340,13 @@ $$
 The new direction $p_{k+1}$ is the optimal direction to update $x_{k+1}$. This equation means that $p_{k+1}$ is a linear combination of the gradient at $x_k$ and the previous direction $p_k.$
 
 This is why the CG algorithm is called the Conjugate Gradient algorithm.
+
+**Connection to the Lanczos process.** Recall that the Lanczos process generates the orthogonal vectors $q_k$ and the tridiagonal matrix $T_k$. How is $T_k$ related to CG? We showed above that $r_k = b - A x_k$ is orthogonal to $K_k$. This means that:
+$$
+Q_k^T (b - A x_k) = 0
+$$
+Since $x_k = Q_k y,$ we have
+$$
+Q_k^T A Q_k y = T_k \, y = Q_k^T b = \|b\|_2 e_1
+$$
+We recover the Lanczos matrix $T_k$!
