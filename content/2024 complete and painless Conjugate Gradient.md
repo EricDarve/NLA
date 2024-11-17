@@ -232,10 +232,11 @@ At this point, we have not yet chosen the normalization for $p_k$. To simplify, 
 $$
 u_{k+1,k+1} = 1, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k.
 $$
+**This is the key three-term recurrence relation to update $p_{k+1}$ in CG.**
 
 With this normalization, the $p_k$ are not normalized to have unit $A$-norm. But this normalization turns out to be computationally more efficient. 
 
-With this choice, **$U$ is unit upper bi-diagonal.** This means that $u_{kk} = 1.$ We will show below that $u_{k,k+1} < 0$. All other entries in $U$ are zero.
+With this choice, $U$ is unit upper bi-diagonal. This means that $u_{kk} = 1.$ We will show below that $u_{k,k+1} < 0$. All other entries in $U$ are zero.
 
 **Updating the residual vectors.** We are now almost done with the complete CG algorithm. We have formulas to update $x_{k+1}$ and $p_{k+1}$. The formula to update $r_{k+1}$ can be derived from $x_{k+1}$:
 $$
