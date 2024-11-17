@@ -250,6 +250,7 @@ Multiply by $-A$ and simplify to get:
 $$
 r_{k+1} = r_k - \mu_{k+1} \, A p_{k+1}
 $$
+**This is the equation CG uses to update the residual vectors.**
 
 **The residual $r_k$ vectors are orthogonal to each other.** There are a few more simplifications needed to make the method as computationally efficient as possible. We have already seen that $R = PU$ and $P^T R = L$. Now, we prove that the residuals $r_k$ are orthogonal to each other.
 
