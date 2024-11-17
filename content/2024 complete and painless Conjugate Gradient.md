@@ -25,11 +25,15 @@ $$
 x = P \mu
 $$
 we have
-$$P^T x = P^T P \mu = \mu$$
+$$
+P^T x = P^T P \mu = \mu
+$$
 In principle this works well but we do not know $x$! So even if we can calculate the sequence $p_i$, there is no obvious way to calculate $\mu_i$.
 
 **Attempt 2.** However there is another equation that we can use. Replace $P^Tx$ by
-$$P^T A x = P^T b$$
+$$
+P^T A x = P^T b
+$$
 This is the starting point of the entire CG algorithm! We know $b$. So if we know $P$, we can calculate $P^T b$. From there, the entire algorithm can be derived.
 
 Recall that $x = P\mu$. If we multiply to the left by $P^T A$, we get
@@ -41,9 +45,13 @@ $$P^T A P = D$$
 where $D$ is diagonal. We will denote by $d_i$ the diagonal entries. Note that, since $A$ is SPD, we have $d_i > 0$.
 
 What does $P^T A P$ diagonal mean? When looking at $P^T A P$, we are looking at a special dot product that uses matrix $A$. For example, the $(i,j)$ entry of $P^T A P$ is
-$$p_i^T A p_j = \langle p_i, p_j \rangle_A $$
+$$
+p_i^T A p_j = \langle p_i, p_j \rangle_A
+$$
 This dot product has the following interpretation. Recall that $A$ is SPD. So
-$$A = Q \Lambda Q^T$$
+$$
+A = Q \Lambda Q^T
+$$
 where $Q$ is orthogonal and $\Lambda$ is diagonal with $\lambda_i > 0$. So
 $$
 \langle y, z \rangle_A =
@@ -58,11 +66,15 @@ This dot product has three steps:
 So, essentially, the main thing we are doing is applying a rescaling using $\Lambda^{1/2}$.
 
 When we say
-$$P^T A P = D$$
+$$
+P^T A P = D
+$$
 we simply mean that the sequence $p_i$ is orthogonal with respect to the dot product defined by $A$. This is a very natural choice.
 
 Note that we could require that
-$$p_i^T A p_i = 1$$
+$$
+p_i^T A p_i = 1
+$$
 But, for computational reasons, another normalization of $p_i$ will be used.
 
 This new dot product allows us to define a new norm, the $A$-norm:
