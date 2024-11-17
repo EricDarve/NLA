@@ -13,7 +13,7 @@ $$
 $$
 We can expand our solution $x$ in that basis:
 $$
-x = \sum_{i=1}^n \mu_i \, p_i
+x = \sum_{i=1}^n \mu_i \, p_i, \quad {\rm with } \quad x_k = \sum_{i=1}^k \mu_i \, p_i
 $$
 If we have a method to calculate $p_i$ and $\mu_i$, then our iterative solution update is very simple:
 $$
