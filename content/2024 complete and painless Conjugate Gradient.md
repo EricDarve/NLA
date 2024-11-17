@@ -132,11 +132,11 @@ $$
 K_k = {\rm span}(q_1, A q_1, \dots, A^{k-1} q_1).
 $$
 
-Using this, since $x_{k-1} \in K_{k-1}$, we have $A x_{k-1} \in K_k$. Thus, $r_{k-1} = b - A x_{k-1} \in K_k$. By definition,
+Using this, since $x_{k-1} \in K_{k-1}$, we have $A x_{k-1} \in K_k$. Thus, $r_{k-1} = b - A x_{k-1} \in K_k$. Since
 $$
 K_k = {\rm span}(p_1, \dots, p_k),
 $$
-and we can derive the following important connection between the residuals and the vectors $p_k$:
+we can derive the following important connection between the residuals and the vectors $p_k$:
 $$
 {\rm span}(r_0, \dots, r_{k-1}) = {\rm span}(p_1, \dots, p_k).
 $$
