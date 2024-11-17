@@ -43,7 +43,9 @@ $$
 Although we can compute $P^T b$, we now have to deal with $P^T A P$ if we want to calculate $\mu$.
 
 In attempt 1, we had chosen $p_i = q_i$. However, other choices are possible. In attempt 2, we choose $p_i$ such that
-$$P^T A P = D$$
+$$
+P^T A P = D
+$$
 where $D$ is diagonal. We will denote by $d_i$ the diagonal entries. Note that, since $A$ is SPD, we have $d_i > 0$.
 
 What does $P^T A P$ diagonal mean? When looking at $P^T A P$, we are looking at a special dot product that uses matrix $A$. For example, the $(i,j)$ entry of $P^T A P$ is
