@@ -30,7 +30,7 @@ P^T x = P^T P \mu = \mu
 $$
 In principle this works well but we do not know $x$! So even if we can calculate the sequence $p_i$, there is no obvious way to calculate $\mu_i$.
 
-**Attempt 2.** However there is another equation that we can use. Replace $P^Tx$ by
+**Attempt 2.** However there is another equation that we can use. Replace $P^Tx$ by $P^T A x$:
 $$
 P^T A x = P^T b
 $$
@@ -48,7 +48,12 @@ P^T A P = D
 $$
 where $D$ is diagonal. We will denote by $d_i$ the diagonal entries. Note that, since $A$ is SPD, we have $d_i > 0$.
 
-What does $P^T A P$ diagonal mean? When looking at $P^T A P$, we are looking at a special dot product that uses matrix $A$. For example, the $(i,j)$ entry of $P^T A P$ is
+Let us denote by $P_k$ the first $k$ columns of $P$ and by $D_k$ the diagonal matrix with the first $k$ entries of $D$. The solution $x_k = P_k \mu_k$ is then given by:
+$$
+\mu_k = D_k^{-1} \, P_k^T \, b, \quad x_k = P_k \, D_k^{-1} \, P_k^T \, b
+$$
+
+What does $D = P^T A P$ diagonal mean? When looking at $P^T A P$, we are looking at a special dot product that uses matrix $A$. For example, the $(i,j)$ entry of $P^T A P$ is
 $$
 p_i^T A p_j = \langle p_i, p_j \rangle_A
 $$
@@ -107,43 +112,36 @@ $$
 x_{k+1} = x_k + \mu_{k+1} \, p_{k+1}
 $$
 
-**Least-squares problem and projection.** We can further interpret the solution in a least-squares sense. From the $A$-orthogonality of $P$, we get that $x - x_k = e^{(k)}$ is $A$-orthogonal to $K_k$.
-
-Proof:
+**Least-squares problem and projection.** We can further interpret the solution in a least-squares sense. From the $A$-orthogonality of $P$, we deduce that $x - x_k = e^{(k)}$ is $A$-orthogonal to $K_k$. This can be also verified from
 $$
-x - x_k = 
-\sum_{i>k} \mu_i \, p_i
+P_k^T A (x - x_k) = P_k^T A (x - P_k \mu_k) = P_k^T b - D_k \mu_k = 0
 $$
-Then use the fact that the $p_i$ are $A$-orthogonal.
-
-$\square$
-
-So in fact we are solving a least-squares problem using the $A$-norm:
+We recognize that we are solving a least-squares problem using the $A$-norm:
 $$
-y_k = {\rm argmin}_{y} \| P_k \, y - x \|_A, \quad
-x_k = P_k \, y_k.
+\mu_k = {\rm argmin}_{y} \| P_k \, y - x \|_A, \quad
+x_k = P_k \, \mu_k.
 $$
-where $P_k$ are the first $k$ columns of $P$.
 **CG produces the approximation in the Krylov subspace $K_k$  that is closest to the true solution $x$ in the $A$-norm.**
 
-**Computing the sequence $p_k$.** In principle, using the Lanczos process, we can compute the sequence $p_k$. However, there is a more efficient approach which uses the sequence of residual vectors:
+**Computing the sequence $p_k$.** In principle, using the Lanczos process, we can compute the sequence $p_k$. However, there is a more efficient approach that uses the sequence of residual vectors:
 $$
 r_k = b - A x_k, \quad r_0 = b.
 $$
 Recall the definition of the subspace $K_k$:
 $$
-K_k = {\rm span}(q_1, A q_1, \dots, A^{k-1} q_1)
-$$
-Using this, since $x_{k-1} \in K_{k-1},$ we have $A x_{k-1} \in K_k$. So $r_{k-1} = b - A x_{k-1} \in K_k.$ Since by definition
-$$
-K_k = {\rm span}(p_1, \dots, p_k)
-$$
-we have the following important connection between the residuals and the vectors $p_k$:
-$$
-{\rm span}(r_0, \dots, r_{k-1}) = {\rm span}(p_1, \dots, p_k)
+K_k = {\rm span}(q_1, A q_1, \dots, A^{k-1} q_1).
 $$
 
-Below we prove some important results involving the residuals $r_k$.
+Using this, since $x_{k-1} \in K_{k-1}$, we have $A x_{k-1} \in K_k$. Thus, $r_{k-1} = b - A x_{k-1} \in K_k$. By definition,
+$$
+K_k = {\rm span}(p_1, \dots, p_k),
+$$
+and we can derive the following important connection between the residuals and the vectors $p_k$:
+$$
+{\rm span}(r_0, \dots, r_{k-1}) = {\rm span}(p_1, \dots, p_k).
+$$
+
+Below, we prove some important results involving the residuals $r_k$.
 
 **The residual $r_k$ is orthogonal to $K_k$.** We now prove a key result: $r_k \perp K_k$.
 
@@ -170,7 +168,7 @@ P^T R = L
 $$
 where $L$ is lower triangular, and $l_{ij} = d_i \, \mu_i$ for $i \ge j$. (Recall that column $j$ of $R$ is $r_{j-1}$.)
 
-Note that since
+In addition, since
 $$
 {\rm span}(r_0, \dots, r_{k-1}) = {\rm span}(p_1, \dots, p_k)
 $$
@@ -180,27 +178,30 @@ R = P U.
 $$
 The matrix $U$ is very important and we will come back to it later.
 
-**Three-term recurrence.** We now prove that $r_k$ is a linear combination of $p_k$ and $p_{k+1}$. From this result, we will get a short and computationally efficient recurrence formula for $p_{k+1}$.
+**Three-term recurrence.** We now prove that $r_k$ is a linear combination of $p_k$ and $p_{k+1}$. From this result, we derive a short and computationally efficient recurrence formula for $p_{k+1}$.
 
-Proof. From $R = P U$ and $P^T A P = D$, we get:
+**Proof.** From $R = P U$ and $P^T A P = D$, we have:
 $$
-(P^T A) R = (P^T A) P U = D U
+(P^T A) R = (P^T A) P U = D U.
 $$
-Since
+
+Since 
 $$
-{\rm span}(p_1, \dots, p_k) = K_k
+{\rm span}(p_1, \dots, p_k) = K_k,
 $$
-we get that $Ap_k \in K_{k+1}$. We can express this result using matrix notations:
+it follows that $A p_k \in K_{k+1}$. This can be expressed using matrix notation:
 $$
-AP = PH
+A P = P H,
 $$
-where $H$ is upper Hessenberg. Let's consider again the matrix $(P^T A) R$ from above:
+where $H$ is an upper Hessenberg matrix. 
+
+Next, consider the matrix $(P^T A) R$:
 $$
-P^T A R = (AP)^T R = (PH)^T R
+P^T A R = (A P)^T R = (P H)^T R
 = H^T P^T R
-= H^T L = W
+= H^T L = W,
 $$
-since $P^T R = L$. $H^T$ is lower Hessenberg (that is, the entries are zero for $i+2 \le j$) and $L$ is lower triangular. So $W = H^T L$ is lower Hessenberg.
+where $P^T R = L$. Since $L$ is lower triangular and $H^T$ is lower Hessenberg (i.e., all entries below the first subdiagonal are zero for $i+2 \leq j$), their product $W = H^T L$ is lower Hessenberg as well.
 
 Proof. Here is a more detailed proof. Consider:
 $$
@@ -210,23 +211,27 @@ $h_{ki} = 0$ if $i+2 \le k$ and $l_{kj} = 0$ if $k \le j-1.$ So $w_{ij} = 0$ if 
 
 $\square$
 
-In conclusion, $W = DU$ is both lower Hessenberg and upper triangular. So it has only two non-zero diagonals in its upper triangular part. Since $R = PU$, we have proved that (recall that column $k+1$ of $R$ is $r_k$):
+In conclusion, $W = DU$ is both lower Hessenberg and upper triangular. Therefore, it has only two non-zero diagonals in its upper triangular part. Since $R = PU$, we have proved that (recall that column $k+1$ of $R$ is $r_k$):
 $$
-r_k = u_{k,k+1} \ p_k + u_{k+1,k+1} \, p_{k+1}
+r_k = u_{k,k+1} \, p_k + u_{k+1,k+1} \, p_{k+1}.
 $$
+
 Moreover, since $P^T A R = DU$, we have:
 $$
-u_{k,k+1} = \frac{p_k^T A r_k}{d_k}
+u_{k,k+1} = \frac{p_k^T A r_k}{d_k}.
 $$
-We now have a short recurrence relation for $p_{k+1}$:
+
+We now derive a short recurrence relation for $p_{k+1}$:
 $$
-u_{k+1,k+1} \, p_{k+1} = r_k - u_{k,k+1} \, p_k
+u_{k+1,k+1} \, p_{k+1} = r_k - u_{k,k+1} \, p_k.
 $$
-So far, we have not decided on the normalization of $p_k$ yet. We now choose the simplest normalization:
+
+At this point, we have not yet chosen the normalization for $p_k$. To simplify, we choose the following normalization:
 $$
-u_{k+1,k+1} = 1, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k
+u_{k+1,k+1} = 1, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k.
 $$
-The $p_k$ are not normalized to have unit $A$-norm. Instead, we choose a different normalization that is computationally more efficient. With this choice **$U$ is unit upper bi-diagonal.** This means that $u_{kk} = 1$. We will show below that $u_{k,k+1} < 0$. All the other entries are 0.
+
+With this normalization, the $p_k$ are not normalized to have unit $A$-norm. But this normalization turns out to be computationally more efficient. With this choice, **$U$ is unit upper bi-diagonal.** This means that $u_{kk} = 1.$ We will show below that $u_{k,k+1} < 0$. All other entries in $U$ are zero.
 
 **Updating the residual vectors.** We are now almost done with the complete CG algorithm. We have formulas to update $x_{k+1}$ and $p_{k+1}$. The formula to update $r_{k+1}$ can be derived from $x_{k+1}$:
 $$
@@ -241,44 +246,49 @@ $$
 r_{k+1} = r_k - \mu_{k+1} \, A p_{k+1}
 $$
 
-**The residual $r_k$ vectors are orthogonal to each other.** There are a few more simplifications we need to make the method as computationally efficient as possible. We have seen that $R = PU$ and $P^T R = L$. We now prove that the residuals $r_k$ are orthogonal to each other.
+**The residual $r_k$ vectors are orthogonal to each other.** There are a few more simplifications needed to make the method as computationally efficient as possible. We have already seen that $R = PU$ and $P^T R = L$. Now, we prove that the residuals $r_k$ are orthogonal to each other.
 
 We have:
 $$
-R^T R = (PU)^T R = U^T P^T R = U^T (P^T R) = U^T L
+R^T R = (PU)^T R = U^T P^T R = U^T (P^T R) = U^T L.
 $$
-Since $U^T$ and $L$ are lower triangular matrices, $R^T R$ is also lower triangular. But $R^T R$ is symmetric (and also positive definite). So $R^T R = U^T L$ is triangular and symmetric. It must be diagonal. We proved that **the residuals $r_k$ are orthogonal to each other.**
+Since $U^T$ and $L$ are lower triangular matrices, $R^T R$ is also lower triangular. However, $R^T R$ is symmetric (and also positive definite). A matrix that is both triangular and symmetric must be diagonal. 
 
-**Final simplifications.** We can now derive the final formulas for the CG algorithm. Recall that:
+Therefore, $R^T R = U^T L$ is diagonal, and we have proved that **the residuals $r_k$ are orthogonal to each other.**
+
+**Final simplifications.** We now derive the final formulas for the CG algorithm. Recall that:
 $$
-\mu_k = \frac{p_k^T b}{d_k}
+\mu_k = \frac{p_k^T b}{d_k}.
 $$
-But $p_k^T b = p_k^T (b - Ax_{k-1}),$ since $x_{k-1} \in K_{k-1}$ and $p_k$ is $A$-orthogonal to $K_{k-1}$. So
+However, $p_k^T b = p_k^T (b - Ax_{k-1})$, since $x_{k-1} \in K_{k-1}$ and $p_k$ is $A$-orthogonal to $K_{k-1}$. Thus:
 $$
 p_k^T b = p_k^T (b - Ax_{k-1}) = p_k^T r_{k-1}
 = (r_{k-1} - u_{k-1,k} \, p_{k-1})^T r_{k-1}
-= r_{k-1}^T r_{k-1}
+= r_{k-1}^T r_{k-1},
 $$
-since $p_{k-1}^T r_{k-1} = 0$. So we have:
+where we used $p_{k-1}^T r_{k-1} = 0$. Hence, we obtain:
 $$
-\mu_k = \frac{\|r_{k-1}\|_2^2}{d_k}
+\mu_k = \frac{\|r_{k-1}\|_2^2}{d_k}.
 $$
-Similarly, we can simplify
+Similarly, we simplify:
 $$
-u_{k,k+1} = \frac{p_k^T A r_k}{d_k}
+u_{k,k+1} = \frac{p_k^T A r_k}{d_k}.
 $$
-From the previous relations, we have
+From previous relations, we know:
 $$
-A p_k = \mu_k^{-1} (r_{k-1} - r_k)
+A p_k = \mu_k^{-1} (r_{k-1} - r_k).
 $$
-And $\mu_k d_k = \|r_{k-1}\|_2^2$. So using the orthogonality of $r_k$
+Since $\mu_k d_k = \|r_{k-1}\|_2^2$, and using the orthogonality of $r_k$, we compute:
 $$
 u_{k,k+1} = \frac{p_k^T A r_k}{d_k}
 = \frac{(Ap_k)^T r_k}{d_k}
 = \frac{(r_{k-1} - r_k)^T r_k}{\mu_k d_k}
-= - \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2} < 0
+= -\frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2} < 0.
 $$
-This is an amazingly simple expression! Below we will denote by $\tau_k = - u_{k,k+1}$.
+This is an amazingly simple expression! Below, we denote by $\tau_k$:
+$$
+\tau_k = - u_{k,k+1}.
+$$
 
 **The Conjugate Gradient Algorithm.** The complete CG algorithm is as follows. Start with
 $$
@@ -323,30 +333,32 @@ Key optimality relation:
 
 - The CG algorithm produces the approximation $x_k$ in the Krylov subspace $K_k$ that is closest to the true solution $x$ in the $A$-norm.
 
-**Why is it called the Conjugate Gradient algorithm?** The name comes from the fact that the directions $p_k$ are $A$-orthogonal or **conjugate** to each other. 
+**Why is it called the Conjugate Gradient algorithm?** The name comes from the fact that the directions $p_k$ are $A$-orthogonal, or **conjugate**, to each other.
 
-Moreover consider the loss function
+Moreover, consider the loss function:
 $$
-L(y) = \| x - y \|_A^2 = (x-y)^T A (x-y)
+L(y) = \|x - y\|_A^2 = (x-y)^T A (x-y).
 $$
-Let's calculate the gradient with respect to $y$:
+The gradient of $L(y)$ with respect to $y$ is:
 $$
-\nabla L(y) = 2 A (y - x) = -2 (b - A y) = -2 r(y)
+\nabla L(y) = 2A(y - x) = -2(b - Ay) = -2 \, r(y).
 $$
-Our residual $r_k = b - A x_k$ is parallel to the gradient of the loss function at $x_k$. Recall our update equation
+This shows that the residual $r_k = b - A x_k$ is parallel to the gradient of the loss function at $x_k$. Recall the update equation:
 $$
-p_{k+1} = r_k + \tau_k \, p_k
+p_{k+1} = r_k + \tau_k \, p_k.
 $$
-The new direction $p_{k+1}$ is the optimal direction to update $x_{k+1}$. This equation means that $p_{k+1}$ is a linear combination of the gradient at $x_k$ and the previous direction $p_k.$
+The new direction $p_{k+1}$ is the optimal direction to update $x_{k+1}$. This equation shows that $p_{k+1}$ is a linear combination of the gradient at $x_k$ and the previous direction $p_k$.
 
 This is why the CG algorithm is called the Conjugate Gradient algorithm.
 
-**Connection to the Lanczos process.** Recall that the Lanczos process generates the orthogonal vectors $q_k$ and the tridiagonal matrix $T_k$. How is $T_k$ related to CG? We showed above that $r_k = b - A x_k$ is orthogonal to $K_k$. This means that:
+**Connection to the Lanczos process.** Recall that the Lanczos process generates the orthogonal vectors $q_k$ and the tridiagonal matrix $T_k$. How is $T_k$ related to CG? 
+
+We showed above that $r_k = b - A x_k$ is orthogonal to $K_k$. This implies:
 $$
-Q_k^T (b - A x_k) = 0
+Q_k^T (b - A x_k) = 0.
 $$
-Since $x_k = Q_k y,$ we have
+Since $x_k = Q_k y$, we substitute and obtain:
 $$
-Q_k^T A Q_k y = T_k \, y = Q_k^T b = \|b\|_2 e_1
+Q_k^T A Q_k y = T_k \, y = Q_k^T b = \|b\|_2 \, e_1.
 $$
-We recover the Lanczos matrix $T_k$!
+Thus, we recover the Lanczos matrix $T_k$!
