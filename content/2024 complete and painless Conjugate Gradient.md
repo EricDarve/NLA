@@ -211,7 +211,9 @@ $h_{ki} = 0$ if $i+2 \le k$ and $l_{kj} = 0$ if $k \le j-1.$ So $w_{ij} = 0$ if 
 
 $\square$
 
-In conclusion, $W = DU$ is both lower Hessenberg and upper triangular. Therefore, it has only two non-zero diagonals in its upper triangular part. Since $R = PU$, we have proved that (recall that column $k+1$ of $R$ is $r_k$):
+In conclusion, $W = DU$ is both lower Hessenberg and upper triangular. Since $D$ is diagonal, this implies that $W$ and $U$ have only two non-zero diagonals in their upper triangular part. We say that these matrices are upper bi-diagonal.
+
+Since $R = PU$, we have proved that (recall that column $k+1$ of $R$ is $r_k$):
 $$
 r_k = u_{k,k+1} \, p_k + u_{k+1,k+1} \, p_{k+1}.
 $$
@@ -231,7 +233,9 @@ $$
 u_{k+1,k+1} = 1, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k.
 $$
 
-With this normalization, the $p_k$ are not normalized to have unit $A$-norm. But this normalization turns out to be computationally more efficient. With this choice, **$U$ is unit upper bi-diagonal.** This means that $u_{kk} = 1.$ We will show below that $u_{k,k+1} < 0$. All other entries in $U$ are zero.
+With this normalization, the $p_k$ are not normalized to have unit $A$-norm. But this normalization turns out to be computationally more efficient. 
+
+With this choice, **$U$ is unit upper bi-diagonal.** This means that $u_{kk} = 1.$ We will show below that $u_{k,k+1} < 0$. All other entries in $U$ are zero.
 
 **Updating the residual vectors.** We are now almost done with the complete CG algorithm. We have formulas to update $x_{k+1}$ and $p_{k+1}$. The formula to update $r_{k+1}$ can be derived from $x_{k+1}$:
 $$
