@@ -130,15 +130,15 @@ where $P_k$ are the first $k$ columns of $P$.
 $$
 r_k = b - A x_k, \quad r_0 = b.
 $$
-By definition, $x_k \in K_k$. From the definition of the subspace $K_k$:
+Recall the definition of the subspace $K_k$:
 $$
 K_k = {\rm span}(q_1, A q_1, \dots, A^{k-1} q_1)
 $$
-we have that $A x_k \in K_{k+1}$. Since by definition
+Using this, since $x_{k-1} \in K_{k-1},$ we have $A x_{k-1} \in K_k$. So $r_{k-1} = b - A x_{k-1} \in K_k.$ Since by definition
 $$
 K_k = {\rm span}(p_1, \dots, p_k)
 $$
-and $r_{k-1} = b - A x_{k-1},$ we have
+we have the following important connection between the residuals and the vectors $p_k$:
 $$
 {\rm span}(r_0, \dots, r_{k-1}) = {\rm span}(p_1, \dots, p_k)
 $$
