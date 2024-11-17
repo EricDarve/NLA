@@ -36,6 +36,11 @@
 	- We give an estimate for the convergence of CG.
 	- In some sense, this convergence can be considered to be optimal.
 - [[Rajat's painless Conjugate Gradients]]
+	- Rajat's own derivation of the CG algorithm.
+- [[2024 complete and painless Conjugate Gradient]]
+	- Another standalone derivation of the CG algorithm based on Rajat's derivation.
+	- This derivation contains all the key results.
+	- This is the recommended reading for understanding CG.
 - [[GMRES]]
 	- [[Conjugate Gradients algorithm|CG]] applies when the matrix is [[Symmetric Positive Definite Matrices|symmetric positive definite]].
 	- GMRES applies to general unsymmetric matrices.
