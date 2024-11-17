@@ -180,7 +180,7 @@ The matrix $U$ is very important and we will come back to it later.
 
 **Three-term recurrence.** We now prove that $r_k$ is a linear combination of $p_k$ and $p_{k+1}$. From this result, we derive a short and computationally efficient recurrence formula for $p_{k+1}$.
 
-**Proof.** From $R = P U$ and $P^T A P = D$, we have:
+From $R = P U$ and $P^T A P = D$, we have:
 $$
 (P^T A) R = (P^T A) P U = D U.
 $$
