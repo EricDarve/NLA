@@ -37,7 +37,9 @@ $$
 This is the starting point of the entire CG algorithm! We know $b$. So if we know $P$, we can calculate $P^T b$. From there, the entire algorithm can be derived.
 
 Recall that $x = P\mu$. If we multiply to the left by $P^T A$, we get
-$$(P^T A) x = P^T (Ax) = P^T b = (P^T A) P \mu$$
+$$
+(P^T A) x = P^T (Ax) = P^T b = (P^T A) P \mu
+$$
 Although we can compute $P^T b$, we now have to deal with $P^T A P$ if we want to calculate $\mu$.
 
 In attempt 1, we had chosen $p_i = q_i$. However, other choices are possible. In attempt 2, we choose $p_i$ such that
