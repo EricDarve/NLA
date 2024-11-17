@@ -78,7 +78,7 @@ When we say
 $$
 P^T A P = D
 $$
-we simply mean that the sequence $p_i$ is orthogonal with respect to the dot product defined by $A$. This is a very natural choice.
+we simply mean that the sequence $p_i$ is orthogonal with respect to the dot product defined by $A.$ This is a very natural choice.
 
 Note that we could require that
 $$
