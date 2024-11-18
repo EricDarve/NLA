@@ -160,7 +160,7 @@ p_l^T r_k = p_l^T b - p_l^T A x_k
 $$
 In summary, define
 $$
-R = \begin{bmatrix} r_0 \; r_1 \; \cdots \; r_{k-1} \; \cdots \; r_{n-1} \end{bmatrix}
+R = \begin{bmatrix} r_0 \; r_1 \; \cdots \; r_{n-1} \end{bmatrix}
 $$
 We can write:
 $$
