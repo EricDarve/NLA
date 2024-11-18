@@ -228,7 +228,7 @@ $$
 u_{k+1,k+1} \, p_{k+1} = r_k - u_{k,k+1} \, p_k.
 $$
 
-At this point, we have not yet chosen the normalization for $p_k$. To simplify, we choose the following normalization:
+At this point, we have not yet chosen the normalization for $p_{k+1}$. To simplify, we choose the following normalization:
 $$
 u_{k+1,k+1} = 1, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k.
 $$
