@@ -339,6 +339,25 @@ Key optimality relation:
 
 - The CG algorithm produces the approximation $x_k$ in the Krylov subspace $K_k$ that is closest to the true solution $x$ in the $A$-norm.
 
+**Orthogonality relations using matrix notations.** We can formalize some of these relations using matrix notations.
+
+First, observe the following result: the vector $q_k \in K_k$ is orthogonal to $K_{k-1}$. Similarly, $r_{k-1} \in K_k$ is orthogonal to $K_{k-1}$. This implies that $q_k$ and $r_{k-1}$ are parallel:
+$$
+{\rm span}(q_k) = {\rm span}(r_{k-1}).
+$$
+
+From the Lanczos process, we know that $T = Q^T A Q$ is symmetric tri-diagonal. This follows from the construction of the sequence $q_k$. By definition, $Q^T A Q$ is expected to be upper Hessenberg. Since it is symmetric, it must be tri-diagonal.
+
+Using the relationship above, we also deduce that $R^T A R$ is symmetric tri-diagonal. This further implies that $r_i$ and $r_j$ are $A$-orthogonal if $|i-j| \geq 2$.
+
+Additionally, we previously showed that $P^T A P$ is diagonal and that $P^T A R$ is upper bi-diagonal.
+
+**In summary:**
+
+- **Diagonal:** $P^T A P$
+- **Symmetric tri-diagonal:** $Q^T A Q$, $R^T A R$
+- **Upper bi-diagonal:** $P^T A R$
+
 **Why is it called the Conjugate Gradient algorithm?** The name comes from the fact that the directions $p_k$ are $A$-orthogonal, or **conjugate**, to each other.
 
 Moreover, consider the loss function:
