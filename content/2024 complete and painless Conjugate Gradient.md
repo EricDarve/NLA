@@ -352,7 +352,7 @@ Using the relationship above, we also deduce that $R^T A R$ is symmetric tri-dia
 
 Additionally, we previously showed that $P^T A P$ is diagonal and that $P^T A R$ is upper bi-diagonal.
 
-**In summary:**
+In summary:
 
 - **Diagonal:** $P^T A P$
 - **Symmetric tri-diagonal:** $Q^T A Q$, $R^T A R$
