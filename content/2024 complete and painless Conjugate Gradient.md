@@ -48,9 +48,9 @@ P^T A P = D
 $$
 where $D$ is diagonal. We will denote by $d_i$ the diagonal entries. Note that, since $A$ is SPD, we have $d_i > 0$.
 
-Let us denote by $P_k$ the first $k$ columns of $P$ and by $D_k$ the diagonal matrix with the first $k$ entries of $D$. The solution $x_k = P_k \mu_k$ is then given by:
+Let us denote by $P_k$ the first $k$ columns of $P$ and by $D_k$ the diagonal matrix with the first $k$ entries of $D$. The solution $x_k = P_k \mu^{(k)}$ is then given by:
 $$
-\mu_k = D_k^{-1} \, P_k^T \, b, \quad x_k = P_k \, D_k^{-1} \, P_k^T \, b
+\mu^{(k)} = D_k^{-1} \, P_k^T \, b, \quad x_k = P_k \, D_k^{-1} \, P_k^T \, b
 $$
 
 What does $D = P^T A P$ diagonal mean? When looking at $P^T A P$, we are looking at a special dot product that uses matrix $A$. For example, the $(i,j)$ entry of $P^T A P$ is
@@ -114,12 +114,12 @@ $$
 
 **Least-squares problem and projection.** We can further interpret the solution in a least-squares sense. From the $A$-orthogonality of $P$, we deduce that $x - x_k = e^{(k)}$ is $A$-orthogonal to $K_k$. This can be also verified from
 $$
-P_k^T A (x - x_k) = P_k^T A (x - P_k \mu_k) = P_k^T b - D_k \mu_k = 0
+P_k^T A (x - x_k) = P_k^T A (x - P_k \mu^{(k)}) = P_k^T b - D_k \mu^{(k)} = 0
 $$
 We recognize that we are solving a least-squares problem using the $A$-norm:
 $$
-\mu_k = {\rm argmin}_{y} \| P_k \, y - x \|_A, \quad
-x_k = P_k \, \mu_k.
+\mu^{(k)} = {\rm argmin}_{y} \| P_k \, y - x \|_A, \quad
+x_k = P_k \, \mu^{(k)}.
 $$
 **CG produces the approximation in the Krylov subspace $K_k$  that is closest to the true solution $x$ in the $A$-norm.**
 
