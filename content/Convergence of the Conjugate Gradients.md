@@ -2,8 +2,8 @@ Like the [[Lanczos process]], the convergence of [[Conjugate Gradients algorithm
 
 The convergence is very fast and, to some extent, “optimal.” We can prove that:
 $$
-\| x - x^{(k)} \|_2 \le 
-2 \, \| r^{(0)} \|_{A^{-1}} \; \Big( \frac{1 - \kappa^{-1/2}}{1 + \kappa^{-1/2}} \Big)^k
+\| x - x^{(k)} \|_A \le 
+2 \, \| x - x^{(0)} \|_A \; \Big( \frac{1 - \kappa^{-1/2}}{1 + \kappa^{-1/2}} \Big)^k
 $$
 where $\kappa$ is the condition number of $A$.
 

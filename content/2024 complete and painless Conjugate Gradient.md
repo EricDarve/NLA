@@ -339,6 +339,12 @@ Key optimality relation:
 
 - The CG algorithm produces the approximation $x_k$ in the Krylov subspace $K_k$ that is closest to the true solution $x$ in the $A$-norm.
 
+**Convergence of CG.** The CG algorithm converges in at most $n$ iterations. The convergence is faster for well-conditioned matrices. The following error bound holds:
+$$
+\|x - x_k\|_A \leq 2 \; \left( \frac{1 - \kappa(A)^{-1/2}}{1 + \kappa(A)^{-1/2}} \right)^k \|x - x_0\|_A
+$$
+where $\kappa(A) = \|A\|_2 \; \|A^{-1}\|_2$ is the condition number of $A$.
+
 **Orthogonality relations using matrix notations.** We can formalize some of these relations using matrix notations.
 
 First, observe the following result: the vector $q_k \in K_k$ is orthogonal to $K_{k-1}$. Similarly, $r_{k-1} \in K_k$ is orthogonal to $K_{k-1}$. This implies that $q_k$ and $r_{k-1}$ are parallel:
