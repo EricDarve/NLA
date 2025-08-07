@@ -5,3 +5,4 @@ chapters:
 - file: content/bootcamp
   sections:
   - file: content/vector_space.md
+- file: content/LICENSE.md

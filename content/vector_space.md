@@ -70,14 +70,14 @@ Vectors in $\mathbb{C}^n$ are defined the same way, with scalars $\alpha \in \ma
 
 A **vector space** $V$ over a field $\mathbb{F}$ (such as $\mathbb{R}$ or $\mathbb{C}$) is a set equipped with addition $(x,y)\mapsto x+y$ and scalar multiplication $(\alpha,x)\mapsto \alpha x$ satisfying, for all $x,y,z\in V$ and $\alpha,\beta\in\mathbb{F}$:
 
-1. $x+(y+z)=(x+y)+z$
-2. $x+y=y+x$
-3. There exists $0\in V$ with $x+0=x$
-4. For each $x$ there exists $-x$ with $x+(-x)=0$
-5. $\alpha(\beta x)=(\alpha\beta)x$
-6. $1x=x$
-7. $\alpha(x+y)=\alpha x+\alpha y$
-8. $(\alpha+\beta)x=\alpha x+\beta x$
+1. $x+(y+z)=(x+y)+z$  (Associativity of addition)
+2. $x+y=y+x$  (Commutativity of addition)
+3. There exists $0\in V$ with $x+0=x$  (Additive identity)
+4. For each $x$ there exists $-x$ with $x+(-x)=0$  (Additive inverse)
+5. $\alpha(\beta x)=(\alpha\beta)x$  (Associativity of scalar multiplication / compatibility with field multiplication)
+6. $1x=x$  (Multiplicative identity of the field acts as identity on vectors)
+7. $\alpha(x+y)=\alpha x+\alpha y$  (Left distributivity of scalar over vector addition)
+8. $(\alpha+\beta)x=\alpha x+\beta x$  (Right distributivity of scalar addition over scalar multiplication)
 
 ---
 
@@ -159,7 +159,7 @@ $$
 =
 \left\{
 \begin{pmatrix}
-\alpha+\beta\\
+\alpha\\
 \beta\\
 0
 \end{pmatrix}
@@ -168,3 +168,15 @@ $$
 $$
 
 which is the $x_1$-$x_2$ plane in $\mathbb{R}^3$. Therefore $\dim(\operatorname{span}\{a_1,a_2\})=2$.
+
+--
+
+## Direct sum
+
+If $U$ and $V$ are subspaces, then $U+V$ is a subspace. We say that $W=U \oplus V$ is the direct sum of $U$ and $V$ if $U \cap V = \{0\}$. The direct sum means that if a vector is decomposed into its $U$ and $V$ components, this decomposition is unique.
+
+Example: verify that if $x_1$, ..., $x_k$ are linearly independent, then
+
+$$
+S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
+$$
