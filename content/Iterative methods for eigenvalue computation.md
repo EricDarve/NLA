@@ -1,0 +1,37 @@
+- [[Motivation of iterative methods for eigenvalue computation]]
+	- We briefly highlight why a different type of method is required for sparse matrices.
+- [[Key idea of iterative methods for eigenvalue computation]]
+	- The key idea goes back to the previous section, where we learned how to transform a matrix to the [[Upper Hessenberg form for the QR iteration|upper Hessenberg]] form.
+	- We can calculate the columns of $H$ one by one by following a process similar to [[Gram-Schmidt]].
+- [[Brief introduction to Conjugate Gradients]]
+	- We use the approach from the [[Key idea of iterative methods for eigenvalue computation|previous section]] to find an approximate solution for sparse linear systems $Ax = b$.
+- [[Arnoldi process]]
+	- We use the algorithm from the [[Key idea of iterative methods for eigenvalue computation|section above]] to approximate the eigenvalues of $A$.
+	- Only simple vector operations and sparse matrix-vector products are required. So this approach is computationally very efficient for small $k$.
+- [[Algorithm for the Arnoldi process]]
+	- We provide the details of the algorithm using pseudo-code.
+	- See movies of convergence and `Arnoldi convergence.key`
+	- Understanding convergence is not an easy task and is a complex topic.
+- [[Krylov subspace]]
+	- This will form the foundation of all the advanced iterative methods in this class
+- [[Connection between Krylov subspace and Arnoldi]]
+	- The $Q_k$ orthogonal basis in [[Key idea of iterative methods for eigenvalue computation|Arnoldi]] (see [[Arnoldi process|Arnoldi process]]) spans the sequence of nested Krylov subspaces ${\mathcal K}(A,q_1,k).$
+- [[Connection between Arnoldi and polynomials of A]]
+	- Using polynomials of $A$, we provide some arguments as to why the [[Arnoldi process|Arnoldi process]] typically provides a good approximation of some of the eigenvalues of $A$.
+- [[Lanczos process]]
+	- We outline the [[Arnoldi process]] specialized for symmetric matrices. This is called the [[Lanczos process]].
+	- Several steps simplify and the computational cost is reduced.
+- [[Algorithm for the Lanczos process]]
+	- Pseudo-code for the Lanczos process for symmetric matrices.
+- [[Computational cost of Arnoldi and Lanczos]]
+	- As expected, Lanczos is computationally cheaper than Arnoldi.
+- [[Convergence of Lanczos eigenvalues for symmetric matrices]]
+	- For symmetric matrices, we can prove relatively sharp bounds on the error using Lanczos.
+	- They involve Chebyshev polynomials and the Krylov subspace.
+	- Results for unsymmetric matrices are much more difficult to derive.
+- [[Convergence of Lanczos inner eigenvalues]]
+	- We can prove theoretical results for the convergence of inner eigenvalues.
+	- Inner eigenvalues tend to converge slower than the [[Convergence of Lanczos eigenvalues for symmetric matrices|extremal eigenvalues.]]
+- [[Ghost eigenvalues in the Lanczos process]]
+	- Because of the short recurrence used in Lanczos, some eigenvalues may fail to converge properly because of roundoff errors.
+	- These are called "ghost eigenvalues."
