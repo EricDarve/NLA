@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vector space &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Vector spaces &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -62,6 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/vector_space';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dot Product and Vector Norms" href="dot_product_and_norms.html" />
     <link rel="prev" title="Linear Algebra Bootcamp" href="bootcamp.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -176,9 +177,13 @@
         </ul>
         <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Vector space</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
 </ul>
 
     </div>
@@ -317,7 +322,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Vector space</h1>
+    <h1>Vector spaces</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -334,6 +339,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-combinations-and-span">Linear combinations and span</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-independence">Linear independence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bases-and-dimension">Bases and dimension</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a></li>
 </ul>
             </nav>
         </div>
@@ -345,8 +351,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="vector-space">
-<h1>Vector space<a class="headerlink" href="#vector-space" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="vector-spaces">
+<h1>Vector spaces<a class="headerlink" href="#vector-spaces" title="Link to this heading">#</a></h1>
 <p>We will primarily work with vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> and occasionally <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>.</p>
 <p>An element of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is a column vector</p>
 <div class="math notranslate nohighlight">
@@ -413,14 +419,14 @@ x_n
 <h2>Definition: Vector space<a class="headerlink" href="#definition-vector-space" title="Link to this heading">#</a></h2>
 <p>A <strong>vector space</strong> <span class="math notranslate nohighlight">\(V\)</span> over a field <span class="math notranslate nohighlight">\(\mathbb{F}\)</span> (such as <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>) is a set equipped with addition <span class="math notranslate nohighlight">\((x,y)\mapsto x+y\)</span> and scalar multiplication <span class="math notranslate nohighlight">\((\alpha,x)\mapsto \alpha x\)</span> satisfying, for all <span class="math notranslate nohighlight">\(x,y,z\in V\)</span> and <span class="math notranslate nohighlight">\(\alpha,\beta\in\mathbb{F}\)</span>:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(x+(y+z)=(x+y)+z\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(x+y=y+x\)</span></p></li>
-<li><p>There exists <span class="math notranslate nohighlight">\(0\in V\)</span> with <span class="math notranslate nohighlight">\(x+0=x\)</span></p></li>
-<li><p>For each <span class="math notranslate nohighlight">\(x\)</span> there exists <span class="math notranslate nohighlight">\(-x\)</span> with <span class="math notranslate nohighlight">\(x+(-x)=0\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha(\beta x)=(\alpha\beta)x\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(1x=x\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha(x+y)=\alpha x+\alpha y\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\((\alpha+\beta)x=\alpha x+\beta x\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(x+(y+z)=(x+y)+z\)</span>  (Associativity of addition)</p></li>
+<li><p><span class="math notranslate nohighlight">\(x+y=y+x\)</span>  (Commutativity of addition)</p></li>
+<li><p>There exists <span class="math notranslate nohighlight">\(0\in V\)</span> with <span class="math notranslate nohighlight">\(x+0=x\)</span>  (Additive identity)</p></li>
+<li><p>For each <span class="math notranslate nohighlight">\(x\)</span> there exists <span class="math notranslate nohighlight">\(-x\)</span> with <span class="math notranslate nohighlight">\(x+(-x)=0\)</span>  (Additive inverse)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha(\beta x)=(\alpha\beta)x\)</span>  (Associativity of scalar multiplication / compatibility with field multiplication)</p></li>
+<li><p><span class="math notranslate nohighlight">\(1x=x\)</span>  (Multiplicative identity of the field acts as identity on vectors)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha(x+y)=\alpha x+\alpha y\)</span>  (Left distributivity of scalar over vector addition)</p></li>
+<li><p><span class="math notranslate nohighlight">\((\alpha+\beta)x=\alpha x+\beta x\)</span>  (Right distributivity of scalar addition over scalar multiplication)</p></li>
 </ol>
 </section>
 <hr class="docutils" />
@@ -492,7 +498,7 @@ a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
 =
 \left\{
 \begin{pmatrix}
-\alpha+\beta\\
+\alpha\\
 \beta\\
 0
 \end{pmatrix}
@@ -500,6 +506,16 @@ a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
 \right\},
 \end{split}\]</div>
 <p>which is the <span class="math notranslate nohighlight">\(x_1\)</span>-<span class="math notranslate nohighlight">\(x_2\)</span> plane in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>. Therefore <span class="math notranslate nohighlight">\(\dim(\operatorname{span}\{a_1,a_2\})=2\)</span>.</p>
+</section>
+<hr class="docutils" />
+<section id="direct-sum">
+<h2>Direct sum<a class="headerlink" href="#direct-sum" title="Link to this heading">#</a></h2>
+<p>If <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are subspaces, then <span class="math notranslate nohighlight">\(U+V\)</span> is a subspace. We say that <span class="math notranslate nohighlight">\(W=U \oplus V\)</span> is the direct sum of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> if <span class="math notranslate nohighlight">\(U \cap V = \{0\}\)</span>. The direct sum means that if a vector is decomposed into its <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> components, this decomposition is unique.</p>
+<p>Example: verify that if <span class="math notranslate nohighlight">\(x_1\)</span>, …, <span class="math notranslate nohighlight">\(x_k\)</span> are linearly independent, then the space <span class="math notranslate nohighlight">\(S\)</span> spanned by these vectors is the direct sum of their individual spans:</p>
+<div class="math notranslate nohighlight">
+\[
+S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
+\]</div>
 </section>
 </section>
 
@@ -542,6 +558,15 @@ a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
         <p class="prev-next-title">Linear Algebra Bootcamp</p>
       </div>
     </a>
+    <a class="right-next"
+       href="dot_product_and_norms.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Dot Product and Vector Norms</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -565,6 +590,7 @@ a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-combinations-and-span">Linear combinations and span</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-independence">Linear independence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bases-and-dimension">Bases and dimension</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a></li>
 </ul>
   </nav></div>
 

@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Linear Transformations and Matrices &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/linear_transformations';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Matrix-Matrix Multiplication" href="matrix_matrix_multiplication.html" />
+    <link rel="prev" title="Dot Product and Vector Norms" href="dot_product_and_norms.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/linear_transformations.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Linear Transformations and Matrices</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations">Linear Transformations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations-as-matrices">Linear Transformations as Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-vector-product">Matrix-Vector Product</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose-and-conjugate-transpose">Transpose and Conjugate Transpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-matrices">Special Matrices</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="linear-transformations-and-matrices">
+<h1>Linear Transformations and Matrices<a class="headerlink" href="#linear-transformations-and-matrices" title="Link to this heading">#</a></h1>
+<section id="linear-transformations">
+<h2>Linear Transformations<a class="headerlink" href="#linear-transformations" title="Link to this heading">#</a></h2>
+<p>A <strong>linear transformation</strong> from <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span> is a map<br />
+<span class="math notranslate nohighlight">\(T: \mathbb{R}^n \to \mathbb{R}^m\)</span> that satisfies <strong>linearity</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+T(x + \alpha y) = T(x) + \alpha T(y)
+\]</div>
+<p>for all <span class="math notranslate nohighlight">\(x, y \in \mathbb{R}^n\)</span> and scalars <span class="math notranslate nohighlight">\(\alpha \in \mathbb{R}\)</span>.</p>
+<p>A linear transformation is completely determined by its action on a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.<br />
+If <span class="math notranslate nohighlight">\(\{v_1, \dots, v_n\}\)</span> is a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, and any vector <span class="math notranslate nohighlight">\(x\)</span> can be written as</p>
+<div class="math notranslate nohighlight">
+\[
+x = \sum_{i=1}^n \alpha_i v_i
+\]</div>
+<p>then</p>
+<div class="math notranslate nohighlight">
+\[
+T(x) = \sum_{i=1}^n \alpha_i T(v_i).
+\]</div>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R}^2 \to \mathbb{R}^2\)</span><br />
+<span class="math notranslate nohighlight">\((1, 0) \mapsto (2, 0)\)</span>, <span class="math notranslate nohighlight">\((0, 1) \mapsto (0, -1)\)</span><br />
+Stretches the <span class="math notranslate nohighlight">\(x\)</span>-direction by a factor of <span class="math notranslate nohighlight">\(2\)</span> and flips the <span class="math notranslate nohighlight">\(y\)</span>-direction.</p></li>
+</ol>
+<video controls width="640">
+  <source src="../_static/GridDeformationScene.mp4" type="video/mp4">
+</video>   
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R}^2 \to \mathbb{R}^2\)</span><br />
+<span class="math notranslate nohighlight">\((1, 0) \mapsto \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\)</span>,<br />
+<span class="math notranslate nohighlight">\((0, 1) \mapsto \left(-\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\)</span><br />
+Rotates the plane by <span class="math notranslate nohighlight">\(\pi/4\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R}^2 \to \mathbb{R}\)</span><br />
+<span class="math notranslate nohighlight">\((1, 0) \mapsto 1\)</span>, <span class="math notranslate nohighlight">\((0, 1) \mapsto 0\)</span><br />
+Orthogonal projection onto the <span class="math notranslate nohighlight">\(x\)</span>-axis.</p></li>
+<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R} \to \mathbb{R}^2\)</span><br />
+<span class="math notranslate nohighlight">\(1 \mapsto (1, 1)\)</span><br />
+Maps <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> onto the line <span class="math notranslate nohighlight">\(y = x\)</span>.</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="linear-transformations-as-matrices">
+<h2>Linear Transformations as Matrices<a class="headerlink" href="#linear-transformations-as-matrices" title="Link to this heading">#</a></h2>
+<p>A particularly useful basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is the <strong>standard basis</strong>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+e_i =
+\begin{pmatrix}
+0 \\ \vdots \\ 1 \\ \vdots \\ 0
+\end{pmatrix}
+\end{split}\]</div>
+<p>with the <span class="math notranslate nohighlight">\(1\)</span> in the <span class="math notranslate nohighlight">\(i\)</span>-th position.</p>
+<p>Any vector <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> can be written as:</p>
+<div class="math notranslate nohighlight">
+\[
+x = \sum_{i=1}^n x_i e_i.
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(T(e_i) = a_i \in \mathbb{R}^m\)</span>, we can write <span class="math notranslate nohighlight">\(a_i\)</span> in the standard basis as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+a_i =
+\begin{pmatrix}
+a_{1i} \\ a_{2i} \\ \vdots \\ a_{mi}
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Placing these column vectors <span class="math notranslate nohighlight">\(a_i\)</span> side-by-side forms the <strong>matrix representation</strong> of <span class="math notranslate nohighlight">\(T\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
+a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{m1} &amp; a_{m2} &amp; \cdots &amp; a_{mn}
+\end{pmatrix}.
+\end{split}\]</div>
+</section>
+<hr class="docutils" />
+<section id="matrix-vector-product">
+<h2>Matrix-Vector Product<a class="headerlink" href="#matrix-vector-product" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>, we have:</p>
+<div class="math notranslate nohighlight">
+\[
+T(x) = \sum_{i=1}^n x_i a_i.
+\]</div>
+<p>This is a <strong>linear combination of the columns of <span class="math notranslate nohighlight">\(A\)</span></strong>, with coefficients given by the entries of <span class="math notranslate nohighlight">\(x\)</span>.<br />
+The formula for the <strong>matrix-vector product</strong> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Ax =
+\begin{pmatrix}
+\sum_{j=1}^n a_{1j} x_j \\
+\sum_{j=1}^n a_{2j} x_j \\
+\vdots \\
+\sum_{j=1}^n a_{mj} x_j
+\end{pmatrix}.
+\end{split}\]</div>
+</section>
+<hr class="docutils" />
+<section id="transpose-and-conjugate-transpose">
+<h2>Transpose and Conjugate Transpose<a class="headerlink" href="#transpose-and-conjugate-transpose" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Transpose</strong> <span class="math notranslate nohighlight">\(A^T\)</span>: <span class="math notranslate nohighlight">\((i, j)\)</span> entry of <span class="math notranslate nohighlight">\(A^T\)</span> is <span class="math notranslate nohighlight">\(a_{ji}\)</span>.</p></li>
+<li><p><strong>Conjugate transpose</strong> <span class="math notranslate nohighlight">\(A^H\)</span>: Take complex conjugate of each entry of <span class="math notranslate nohighlight">\(A^T\)</span>.</p></li>
+</ul>
+<p>Key property for real matrices:</p>
+<div class="math notranslate nohighlight">
+\[
+(Ax)^T y = x^T (A^T y).
+\]</div>
+<p>For complex matrices:</p>
+<div class="math notranslate nohighlight">
+\[
+(Ax)^H y = x^H (A^H y).
+\]</div>
+</section>
+<hr class="docutils" />
+<section id="special-matrices">
+<h2>Special Matrices<a class="headerlink" href="#special-matrices" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Symmetric</strong>: <span class="math notranslate nohighlight">\(A^T = A\)</span></p></li>
+<li><p><strong>Skew-symmetric</strong>: <span class="math notranslate nohighlight">\(A^T = -A\)</span></p></li>
+<li><p><strong>Hermitian</strong>: <span class="math notranslate nohighlight">\(A^H = A\)</span></p></li>
+<li><p><strong>Skew-Hermitian</strong>: <span class="math notranslate nohighlight">\(A^H = -A\)</span></p></li>
+</ul>
+<p>Vectors are treated as column vectors (<span class="math notranslate nohighlight">\(n \times 1\)</span> matrices). Their transposes are row vectors (<span class="math notranslate nohighlight">\(1 \times n\)</span> matrices).</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="dot_product_and_norms.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Dot Product and Vector Norms</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="matrix_matrix_multiplication.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Matrix-Matrix Multiplication</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations">Linear Transformations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations-as-matrices">Linear Transformations as Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-vector-product">Matrix-Vector Product</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose-and-conjugate-transpose">Transpose and Conjugate Transpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-matrices">Special Matrices</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
