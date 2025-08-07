@@ -1,15 +1,7 @@
 # Linear Algebra Bootcamp
 
-Notation:
-- Vector $x \in \mathbb R^n$ and components: $x = (x_1, \dots, x_n)$.
-- Matrix $A \in \mathbb R^{m \times n}$. Entry: $a_{ij}$ in lower case.
+This chapter provides a quick overview of linear algebra, focusing on the mathematical ideas and definitions that are foundational for the rest of the book. For convenience, some of the notation used throughout the book is listed in Table 1.
 
-$$
-A = \begin{pmatrix} a_{11} & a_{12} & \dots & a_{1n} \\
-a_{21} & \dots \\
-\vdots \\
-a_{m1} & \dots && a_{mn}
-\end{pmatrix}
-$$
+We are assuming that the reader has seen some linear algebra before. If that's the case, this chapter will be a great review. If not, this chapter will get you up to speed on the core ideas, and we additionally recommend taking a look at a linear algebra textbook like (there are many excellent ones).
 
-We will also consider situations where $\mathbb R$ is replaced by $\mathbb C$.
+Let's get started!

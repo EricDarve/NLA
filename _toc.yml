@@ -3,3 +3,5 @@ format: jb-book
 root: content/intro
 chapters:
 - file: content/bootcamp
+  sections:
+  - file: content/vector_space.md
