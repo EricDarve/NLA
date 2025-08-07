@@ -1,5 +1,2 @@
 .DS_Store
-node_modules
-public
-.obsidian
-.quartz-cache
+_build
