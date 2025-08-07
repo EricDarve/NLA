@@ -1,4 +1,4 @@
-# Vector space
+# Vector spaces
 
 We will primarily work with vectors in $\mathbb{R}^n$ and occasionally $\mathbb{C}^n$.
 
@@ -169,13 +169,13 @@ $$
 
 which is the $x_1$-$x_2$ plane in $\mathbb{R}^3$. Therefore $\dim(\operatorname{span}\{a_1,a_2\})=2$.
 
---
+---
 
 ## Direct sum
 
 If $U$ and $V$ are subspaces, then $U+V$ is a subspace. We say that $W=U \oplus V$ is the direct sum of $U$ and $V$ if $U \cap V = \{0\}$. The direct sum means that if a vector is decomposed into its $U$ and $V$ components, this decomposition is unique.
 
-Example: verify that if $x_1$, ..., $x_k$ are linearly independent, then
+Example: verify that if $x_1$, ..., $x_k$ are linearly independent, then the space $S$ spanned by these vectors is the direct sum of their individual spans:
 
 $$
 S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}

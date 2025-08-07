@@ -5,4 +5,7 @@ chapters:
 - file: content/bootcamp
   sections:
   - file: content/vector_space.md
+  - file: content/dot_product_and_norms.md
+  - file: content/linear_transformations.md
+  - file: content/matrix_matrix_multiplication.md
 - file: content/LICENSE.md
