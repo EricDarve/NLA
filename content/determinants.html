@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Matrix-Matrix Multiplication &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Determinant &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/matrix_matrix_multiplication';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/determinants';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Orthogonal Matrices" href="orthogonal_matrices.html" />
-    <link rel="prev" title="Linear Transformations and Matrices" href="linear_transformations.html" />
+    <link rel="next" title="The Trace of a Matrix" href="trace.html" />
+    <link rel="prev" title="Orthogonal Matrices" href="orthogonal_matrices.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -181,8 +181,10 @@
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Matrix-Matrix Multiplication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -240,7 +242,7 @@
       
       
       
-      <li><a href="../_sources/content/matrix_matrix_multiplication.md" target="_blank"
+      <li><a href="../_sources/content/determinants.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -324,7 +326,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Matrix-Matrix Multiplication</h1>
+    <h1>The Determinant</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -334,9 +336,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composition-of-linear-transformations">Composition of Linear Transformations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-and-inverse-matrices">Identity and Inverse Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#change-of-basis">Change of Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
 </ul>
             </nav>
         </div>
@@ -348,69 +350,43 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="matrix-matrix-multiplication">
-<h1>Matrix-Matrix Multiplication<a class="headerlink" href="#matrix-matrix-multiplication" title="Link to this heading">#</a></h1>
-<section id="composition-of-linear-transformations">
-<h2>Composition of Linear Transformations<a class="headerlink" href="#composition-of-linear-transformations" title="Link to this heading">#</a></h2>
-<p>If <span class="math notranslate nohighlight">\(T_1: \mathbb{R}^n \to \mathbb{R}^m\)</span> has matrix <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(T_2: \mathbb{R}^m \to \mathbb{R}^\ell\)</span> has matrix <span class="math notranslate nohighlight">\(A\)</span>,<br />
-then the composition <span class="math notranslate nohighlight">\(T_2 \circ T_1\)</span> has matrix <span class="math notranslate nohighlight">\(AB\)</span>, where:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-determinant">
+<h1>The Determinant<a class="headerlink" href="#the-determinant" title="Link to this heading">#</a></h1>
+<p>The <strong>determinant</strong> is a fundamental concept in linear algebra that associates a single scalar value with every square matrix. This value, denoted as <span class="math notranslate nohighlight">\(\det(A)\)</span> or <span class="math notranslate nohighlight">\(|A|\)</span>, encapsulates important properties of the matrix and the linear transformation it represents. It can be uniquely defined by four key properties.</p>
+<ol class="arabic simple">
+<li><p><strong>Identity Matrix</strong>: The determinant of the identity matrix is 1, i.e., <span class="math notranslate nohighlight">\(\det(I) = 1\)</span>.</p></li>
+<li><p><strong>Column Swaps</strong>: Exchanging two columns of a matrix multiplies its determinant by -1.</p></li>
+<li><p><strong>Scalar Multiplication</strong>: Multiplying a single column by a scalar <span class="math notranslate nohighlight">\(\alpha\)</span> multiplies the entire determinant by <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><strong>Column Operations</strong>: Adding a multiple of one column to another column does not change the determinant.</p></li>
+</ol>
+<section id="the-leibniz-formula">
+<h2>The Leibniz Formula<a class="headerlink" href="#the-leibniz-formula" title="Link to this heading">#</a></h2>
+<p>While the properties above define the determinant, it can be calculated explicitly using the <strong>Leibniz formula</strong>. This formula sums over all possible permutations of the matrix’s column indices.</p>
 <div class="math notranslate nohighlight">
 \[
-(AB)x = A(Bx).
+\det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma)
+a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
 \]</div>
-<p>The formula for <strong>matrix-matrix multiplication</strong> is:</p>
-<div class="math notranslate nohighlight">
-\[
-c_{ij} = \sum_{k} a_{ik} b_{kj}
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(C = AB\)</span>.</p>
-<p><strong>Properties:</strong></p>
+<p>Here, <span class="math notranslate nohighlight">\(S_n\)</span> is the set of all permutations of the numbers <span class="math notranslate nohighlight">\(\{1, 2, \dots, n\}\)</span>, and <span class="math notranslate nohighlight">\(\text{sgn}(\sigma)\)</span> is the <strong>signature</strong> of the permutation <span class="math notranslate nohighlight">\(\sigma\)</span>. The signature is +1 if the permutation can be formed by an even number of swaps and -1 if it requires an odd number of swaps.</p>
+</section>
+<section id="key-properties">
+<h2>Key Properties<a class="headerlink" href="#key-properties" title="Link to this heading">#</a></h2>
+<p>The determinant has several crucial properties that are used throughout mathematics and its applications.</p>
 <ul class="simple">
-<li><p>Defined only if the number of columns of <span class="math notranslate nohighlight">\(A\)</span> equals the number of rows of <span class="math notranslate nohighlight">\(B\)</span>.</p></li>
-<li><p><strong>Associative:</strong> <span class="math notranslate nohighlight">\((AB)C = A(BC)\)</span>.</p></li>
-<li><p><strong>Not commutative:</strong> <span class="math notranslate nohighlight">\(AB \ne BA\)</span> in general.</p></li>
-<li><p><strong>Transpose rule:</strong> <span class="math notranslate nohighlight">\((AB)^T = B^T A^T\)</span>.</p></li>
+<li><p><strong>Transpose</strong>: The determinant of a matrix is equal to the determinant of its transpose: <span class="math notranslate nohighlight">\(\det(A) = \det(A^T)\)</span>.</p></li>
+<li><p><strong>Multiplicativity</strong>: The determinant of a product of matrices is the product of their determinants: <span class="math notranslate nohighlight">\(\det(AB) = \det(A)\det(B)\)</span>.</p></li>
+<li><p><strong>Inverse</strong>: The determinant of an inverse matrix is the reciprocal of the original determinant: <span class="math notranslate nohighlight">\(\det(A^{-1}) = \det(A)^{-1}\)</span>.</p></li>
+<li><p><strong>Singularity</strong>: A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>singular</strong> (i.e., not invertible) if and only if its determinant is zero: <span class="math notranslate nohighlight">\(\det(A) = 0\)</span>.</p></li>
+<li><p><strong>Triangular Matrices</strong>: If <span class="math notranslate nohighlight">\(A\)</span> is a triangular (upper or lower) matrix, its determinant is simply the product of its diagonal entries: <span class="math notranslate nohighlight">\(\det(A) = \prod_{i=1}^n a_{ii}\)</span>.</p></li>
 </ul>
 </section>
-<hr class="docutils" />
-<section id="identity-and-inverse-matrices">
-<h2>Identity and Inverse Matrices<a class="headerlink" href="#identity-and-inverse-matrices" title="Link to this heading">#</a></h2>
-<p>The <strong>identity matrix</strong> <span class="math notranslate nohighlight">\(I_n\)</span> has <span class="math notranslate nohighlight">\(1\)</span> on the diagonal and <span class="math notranslate nohighlight">\(0\)</span> elsewhere, and satisfies:</p>
-<div class="math notranslate nohighlight">
-\[
-I_n x = x
-\]</div>
-<p>for all <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>.</p>
-<p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>invertible</strong> if there exists <span class="math notranslate nohighlight">\(A^{-1}\)</span> such that:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{-1}A = AA^{-1} = I_n.
-\]</div>
-<div class="admonition-fact admonition">
-<p class="admonition-title">Fact</p>
-<p><span class="math notranslate nohighlight">\(A\)</span> is invertible if and only if its columns are linearly independent.</p>
-</div>
-</section>
-<hr class="docutils" />
-<section id="change-of-basis">
-<h2>Change of Basis<a class="headerlink" href="#change-of-basis" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(\{v_1, \dots, v_n\}\)</span> be a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Any <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> can be written as:</p>
-<div class="math notranslate nohighlight">
-\[
-x = \sum_{i=1}^n \alpha_i v_i
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\alpha = (\alpha_1, \dots, \alpha_n)^T\)</span> are the <strong>coordinates of <span class="math notranslate nohighlight">\(x\)</span> in this basis</strong>.</p>
-<p>If <span class="math notranslate nohighlight">\(V\)</span> is the matrix with <span class="math notranslate nohighlight">\(v_i\)</span> as columns, then:</p>
-<div class="math notranslate nohighlight">
-\[
-x = V\alpha, \quad \alpha = V^{-1}x.
-\]</div>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is the matrix of <span class="math notranslate nohighlight">\(T\)</span> in the standard basis and <span class="math notranslate nohighlight">\(B\)</span> is the matrix in the basis <span class="math notranslate nohighlight">\(\{v_i\}\)</span>, then:</p>
-<div class="math notranslate nohighlight">
-\[
-A = V B V^{-1}.
-\]</div>
-<p>This is the <strong>change of basis formula</strong>.</p>
+<section id="geometric-interpretation">
+<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
+<p>Geometrically, the determinant represents the <strong>signed volume</strong> of the <span class="math notranslate nohighlight">\(n\)</span>-dimensional parallelepiped formed by the column vectors of the matrix.</p>
+<ul class="simple">
+<li><p>The <strong>absolute value</strong> of the determinant, <span class="math notranslate nohighlight">\(|\det(A)|\)</span>, gives the scaling factor of the transformation. For instance, in 2D, it’s the area of the parallelogram formed by the column vectors. In 3D, it’s the volume of the parallelepiped.</p></li>
+<li><p>The <strong>sign</strong> of the determinant indicates whether the transformation preserves or reverses the orientation of space. A positive determinant preserves orientation (like a rotation), while a negative determinant reverses it (like a reflection).</p></li>
+</ul>
 </section>
 </section>
 
@@ -445,20 +421,20 @@ A = V B V^{-1}.
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="linear_transformations.html"
+       href="orthogonal_matrices.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Linear Transformations and Matrices</p>
+        <p class="prev-next-title">Orthogonal Matrices</p>
       </div>
     </a>
     <a class="right-next"
-       href="orthogonal_matrices.html"
+       href="trace.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Orthogonal Matrices</p>
+        <p class="prev-next-title">The Trace of a Matrix</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -478,9 +454,9 @@ A = V B V^{-1}.
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composition-of-linear-transformations">Composition of Linear Transformations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-and-inverse-matrices">Identity and Inverse Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#change-of-basis">Change of Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
 </ul>
   </nav></div>
 

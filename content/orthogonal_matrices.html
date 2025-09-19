@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Matrix-Matrix Multiplication &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Orthogonal Matrices &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/matrix_matrix_multiplication';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/orthogonal_matrices';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Orthogonal Matrices" href="orthogonal_matrices.html" />
-    <link rel="prev" title="Linear Transformations and Matrices" href="linear_transformations.html" />
+    <link rel="next" title="The Determinant" href="determinants.html" />
+    <link rel="prev" title="Matrix-Matrix Multiplication" href="matrix_matrix_multiplication.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -181,8 +181,9 @@
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Matrix-Matrix Multiplication</a></li>
-<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -240,7 +241,7 @@
       
       
       
-      <li><a href="../_sources/content/matrix_matrix_multiplication.md" target="_blank"
+      <li><a href="../_sources/content/orthogonal_matrices.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -324,7 +325,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Matrix-Matrix Multiplication</h1>
+    <h1>Orthogonal Matrices</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -334,9 +335,16 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composition-of-linear-transformations">Composition of Linear Transformations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-and-inverse-matrices">Identity and Inverse Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#change-of-basis">Change of Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-core-properties">Definition and Core Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-mathematical-formulas">Key Results and Mathematical Formulas</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isometry-length-and-angle-preservation">Isometry (Length and Angle Preservation)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant">Determinant</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cartandieudonne-theorem">The Cartan–Dieudonné Theorem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-by-induction">Proof by Induction</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -348,69 +356,105 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="matrix-matrix-multiplication">
-<h1>Matrix-Matrix Multiplication<a class="headerlink" href="#matrix-matrix-multiplication" title="Link to this heading">#</a></h1>
-<section id="composition-of-linear-transformations">
-<h2>Composition of Linear Transformations<a class="headerlink" href="#composition-of-linear-transformations" title="Link to this heading">#</a></h2>
-<p>If <span class="math notranslate nohighlight">\(T_1: \mathbb{R}^n \to \mathbb{R}^m\)</span> has matrix <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(T_2: \mathbb{R}^m \to \mathbb{R}^\ell\)</span> has matrix <span class="math notranslate nohighlight">\(A\)</span>,<br />
-then the composition <span class="math notranslate nohighlight">\(T_2 \circ T_1\)</span> has matrix <span class="math notranslate nohighlight">\(AB\)</span>, where:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="orthogonal-matrices">
+<h1>Orthogonal Matrices<a class="headerlink" href="#orthogonal-matrices" title="Link to this heading">#</a></h1>
+<p>An <strong>orthogonal matrix</strong> is a square matrix whose columns and rows are orthonormal vectors. These matrices represent rigid transformations, like rotations and reflections, that preserve lengths and angles. They are fundamental in many areas of mathematics and computer science, especially in numerical linear algebra, where they contribute to the stability and accuracy of algorithms.</p>
+<section id="definition-and-core-properties">
+<h2>Definition and Core Properties<a class="headerlink" href="#definition-and-core-properties" title="Link to this heading">#</a></h2>
+<p>A real square matrix <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{n \times n}\)</span> is <strong>orthogonal</strong> if its transpose is equal to its inverse:</p>
 <div class="math notranslate nohighlight">
 \[
-(AB)x = A(Bx).
+Q^T = Q^{-1}
 \]</div>
-<p>The formula for <strong>matrix-matrix multiplication</strong> is:</p>
+<p>This leads to the more common definition:</p>
 <div class="math notranslate nohighlight">
 \[
-c_{ij} = \sum_{k} a_{ik} b_{kj}
+Q^T Q = Q Q^T = I
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(C = AB\)</span>.</p>
-<p><strong>Properties:</strong></p>
+<p>where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p>
+<p>This defining property implies that the columns (and rows) of <span class="math notranslate nohighlight">\(Q\)</span> form an <strong>orthonormal set</strong>. This means:</p>
+<ol class="arabic simple">
+<li><p><strong>Orthogonality</strong>: The dot product of any two distinct columns (or rows) is zero.</p></li>
+<li><p><strong>Unit Norm</strong>: The length (Euclidean norm) of each column (or row) is one.</p></li>
+</ol>
+<p>A non-square matrix <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{m \times n}\)</span> with <span class="math notranslate nohighlight">\(m &gt; n\)</span> is also called orthogonal if its columns are orthonormal, satisfying <span class="math notranslate nohighlight">\(Q^T Q = I_n\)</span>. However, in this case, <span class="math notranslate nohighlight">\(Q Q^T \neq I_m\)</span>.</p>
+<p><strong>Unitary Matrix</strong>: The equivalent concept for complex matrices is a <strong>unitary matrix</strong>, which satisfies <span class="math notranslate nohighlight">\(Q^H Q = I\)</span>, where <span class="math notranslate nohighlight">\(Q^H\)</span> is the conjugate transpose of <span class="math notranslate nohighlight">\(Q\)</span>.</p>
+</section>
+<section id="key-results-and-mathematical-formulas">
+<h2>Key Results and Mathematical Formulas<a class="headerlink" href="#key-results-and-mathematical-formulas" title="Link to this heading">#</a></h2>
+<p>Orthogonal matrices have several important properties that make them incredibly useful.</p>
+<section id="isometry-length-and-angle-preservation">
+<h3>Isometry (Length and Angle Preservation)<a class="headerlink" href="#isometry-length-and-angle-preservation" title="Link to this heading">#</a></h3>
+<p>Orthogonal transformations are <strong>isometries</strong>, meaning they preserve the Euclidean norm (length) of a vector.</p>
+<div class="math notranslate nohighlight">
+\[
+\|Qx\|_2^2 = (Qx)^T(Qx) = x^T Q^T Q x = x^T I x = x^T x = \|x\|_2^2
+\]</div>
+<p>Therefore, <span class="math notranslate nohighlight">\(\|Qx\|_2 = \|x\|_2\)</span>. They also preserve the dot product, and thus the angles between vectors:</p>
+<div class="math notranslate nohighlight">
+\[
+(Qx) \cdot (Qy) = (Qx)^T(Qy) = x^T Q^T Q y = x^T y = x \cdot y
+\]</div>
+</section>
+<section id="determinant">
+<h3>Determinant<a class="headerlink" href="#determinant" title="Link to this heading">#</a></h3>
+<p>The determinant of an orthogonal matrix is always either <strong>+1</strong> or <strong>-1</strong>.</p>
+<div class="math notranslate nohighlight">
+\[
+\det(Q^T Q) = \det(Q^T)\det(Q) = (\det(Q))^2 = \det(I) = 1 \implies \det(Q) = \pm 1
+\]</div>
 <ul class="simple">
-<li><p>Defined only if the number of columns of <span class="math notranslate nohighlight">\(A\)</span> equals the number of rows of <span class="math notranslate nohighlight">\(B\)</span>.</p></li>
-<li><p><strong>Associative:</strong> <span class="math notranslate nohighlight">\((AB)C = A(BC)\)</span>.</p></li>
-<li><p><strong>Not commutative:</strong> <span class="math notranslate nohighlight">\(AB \ne BA\)</span> in general.</p></li>
-<li><p><strong>Transpose rule:</strong> <span class="math notranslate nohighlight">\((AB)^T = B^T A^T\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\det(Q) = +1\)</span>: The transformation is a <strong>rotation</strong> (a proper rotation). It preserves the orientation of the space. The set of these matrices forms the <strong>special orthogonal group SO(n)</strong>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\det(Q) = -1\)</span>: The transformation is a <strong>reflection</strong> or an <strong>improper rotation</strong> (e.g., a reflection followed by a rotation). It reverses the orientation of the space.</p></li>
 </ul>
 </section>
-<hr class="docutils" />
-<section id="identity-and-inverse-matrices">
-<h2>Identity and Inverse Matrices<a class="headerlink" href="#identity-and-inverse-matrices" title="Link to this heading">#</a></h2>
-<p>The <strong>identity matrix</strong> <span class="math notranslate nohighlight">\(I_n\)</span> has <span class="math notranslate nohighlight">\(1\)</span> on the diagonal and <span class="math notranslate nohighlight">\(0\)</span> elsewhere, and satisfies:</p>
+</section>
+<section id="the-cartandieudonne-theorem">
+<h2>The Cartan–Dieudonné Theorem<a class="headerlink" href="#the-cartandieudonne-theorem" title="Link to this heading">#</a></h2>
+<p>The <strong>Cartan–Dieudonné theorem</strong> is a fundamental result in geometry that provides a simple, constructive way to think about orthogonal transformations. It states that any orthogonal transformation can be broken down into a series of simpler reflections.</p>
+<div class="proof theorem admonition" id="theorem-0">
+<p class="admonition-title"><span class="caption-number">Theorem 1 </span> (Cartan–Dieudonné theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>Every orthogonal transformation in an <span class="math notranslate nohighlight">\(n\)</span>-dimensional Euclidean space (<span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>) can be described as the composition of at most <strong>n</strong> reflections.</p>
+</section>
+</div><p>This means for any orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>, we can write:</p>
 <div class="math notranslate nohighlight">
 \[
-I_n x = x
+Q = H_1 H_2 \cdots H_k
 \]</div>
-<p>for all <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>.</p>
-<p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>invertible</strong> if there exists <span class="math notranslate nohighlight">\(A^{-1}\)</span> such that:</p>
+<p>where each <span class="math notranslate nohighlight">\(H_i\)</span> is a reflection matrix (like a Householder matrix) and <span class="math notranslate nohighlight">\(k \le n\)</span>. If <span class="math notranslate nohighlight">\(k=0\)</span>, <span class="math notranslate nohighlight">\(Q\)</span> is the identity matrix.</p>
+<section id="proof-by-induction">
+<h3>Proof by Induction<a class="headerlink" href="#proof-by-induction" title="Link to this heading">#</a></h3>
+<div class="proof admonition" id="proof">
+<p>Proof. The proof works by showing that we can use one reflection to simplify the problem to a lower-dimensional space.</p>
+<ul>
+<li><p><strong>Base Case (n=1)</strong>: In a 1-dimensional space (<span class="math notranslate nohighlight">\(\mathbb{R}\)</span>), an orthogonal transformation is either <span class="math notranslate nohighlight">\(x \mapsto x\)</span> (the identity, 0 reflections) or <span class="math notranslate nohighlight">\(x \mapsto -x\)</span> (a reflection, 1 reflection). The theorem holds.</p></li>
+<li><p><strong>Inductive Step</strong>: Assume the theorem is true for transformations in <span class="math notranslate nohighlight">\(\mathbb{R}^{n-1}\)</span>. Let <span class="math notranslate nohighlight">\(Q\)</span> be an orthogonal transformation in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
+<ol class="arabic">
+<li><p>Consider the first basis vector <span class="math notranslate nohighlight">\(e_1 = (1, 0, \dots, 0)^T\)</span>. Let <span class="math notranslate nohighlight">\(v = Qe_1\)</span>.</p></li>
+<li><p><strong>Case 1</strong>: If <span class="math notranslate nohighlight">\(v = e_1\)</span>, then <span class="math notranslate nohighlight">\(Q\)</span> fixes the first basis vector. This means that the <span class="math notranslate nohighlight">\((n-1)\)</span>-dimensional subspace <span class="math notranslate nohighlight">\(S\)</span> orthogonal to <span class="math notranslate nohighlight">\(e_1\)</span> is invariant under <span class="math notranslate nohighlight">\(Q\)</span>. By our induction hypothesis, this transformation on <span class="math notranslate nohighlight">\(S\)</span> can be achieved with at most <span class="math notranslate nohighlight">\(n-1\)</span> reflections. So, the theorem holds for <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
+<li><p><strong>Case 2</strong>: If <span class="math notranslate nohighlight">\(v \neq e_1\)</span>, we can find a reflection <span class="math notranslate nohighlight">\(H_1\)</span> that maps <span class="math notranslate nohighlight">\(v\)</span> back to <span class="math notranslate nohighlight">\(e_1\)</span>. The specific reflection is the one across the hyperplane that is orthogonal to the vector <span class="math notranslate nohighlight">\((v - e_1)\)</span>. This gives us <span class="math notranslate nohighlight">\(H_1 v = e_1\)</span>.</p></li>
+<li><p>Now consider the new transformation <span class="math notranslate nohighlight">\(Q' = H_1 Q\)</span>. It is also orthogonal since it’s a product of two orthogonal transformations. And importantly, it fixes the vector <span class="math notranslate nohighlight">\(e_1\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-A^{-1}A = AA^{-1} = I_n.
-\]</div>
-<div class="admonition-fact admonition">
-<p class="admonition-title">Fact</p>
-<p><span class="math notranslate nohighlight">\(A\)</span> is invertible if and only if its columns are linearly independent.</p>
+        Q'e_1 = (H_1 Q)e_1 = H_1(Qe_1) = H_1 v = e_1
+        \]</div>
+</li>
+<li><p>Since <span class="math notranslate nohighlight">\(Q'\)</span> fixes <span class="math notranslate nohighlight">\(e_1\)</span>, it behaves like an <span class="math notranslate nohighlight">\((n-1)\)</span>-dimensional orthogonal transformation on the subspace orthogonal to <span class="math notranslate nohighlight">\(e_1\)</span>. By the induction hypothesis, <span class="math notranslate nohighlight">\(Q'\)</span> can be written as the composition of at most <span class="math notranslate nohighlight">\(n-1\)</span> reflections, say <span class="math notranslate nohighlight">\(Q' = H_2 H_3 \cdots H_k\)</span> where <span class="math notranslate nohighlight">\(k-1 \le n-1\)</span>.</p></li>
+<li><p>Substituting back, we get <span class="math notranslate nohighlight">\(H_1 Q = H_2 H_3 \cdots H_k\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(H_1\)</span> is a reflection, its inverse is itself (<span class="math notranslate nohighlight">\(H_1^{-1} = H_1\)</span>). We can solve for <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+        Q = H_1^{-1} (H_2 H_3 \cdots H_k) = H_1 H_2 H_3 \cdots H_k
+        \]</div>
+</li>
+<li><p>This expresses <span class="math notranslate nohighlight">\(Q\)</span> as a product of <span class="math notranslate nohighlight">\(k\)</span> reflections, where <span class="math notranslate nohighlight">\(k \le (n-1)+1 = n\)</span>.</p></li>
+</ol>
+</li>
+</ul>
+<p>Thus, the theorem is proven.</p>
 </div>
 </section>
-<hr class="docutils" />
-<section id="change-of-basis">
-<h2>Change of Basis<a class="headerlink" href="#change-of-basis" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(\{v_1, \dots, v_n\}\)</span> be a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Any <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> can be written as:</p>
-<div class="math notranslate nohighlight">
-\[
-x = \sum_{i=1}^n \alpha_i v_i
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\alpha = (\alpha_1, \dots, \alpha_n)^T\)</span> are the <strong>coordinates of <span class="math notranslate nohighlight">\(x\)</span> in this basis</strong>.</p>
-<p>If <span class="math notranslate nohighlight">\(V\)</span> is the matrix with <span class="math notranslate nohighlight">\(v_i\)</span> as columns, then:</p>
-<div class="math notranslate nohighlight">
-\[
-x = V\alpha, \quad \alpha = V^{-1}x.
-\]</div>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is the matrix of <span class="math notranslate nohighlight">\(T\)</span> in the standard basis and <span class="math notranslate nohighlight">\(B\)</span> is the matrix in the basis <span class="math notranslate nohighlight">\(\{v_i\}\)</span>, then:</p>
-<div class="math notranslate nohighlight">
-\[
-A = V B V^{-1}.
-\]</div>
-<p>This is the <strong>change of basis formula</strong>.</p>
 </section>
 </section>
 
@@ -445,20 +489,20 @@ A = V B V^{-1}.
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="linear_transformations.html"
+       href="matrix_matrix_multiplication.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Linear Transformations and Matrices</p>
+        <p class="prev-next-title">Matrix-Matrix Multiplication</p>
       </div>
     </a>
     <a class="right-next"
-       href="orthogonal_matrices.html"
+       href="determinants.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Orthogonal Matrices</p>
+        <p class="prev-next-title">The Determinant</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -478,9 +522,16 @@ A = V B V^{-1}.
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composition-of-linear-transformations">Composition of Linear Transformations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-and-inverse-matrices">Identity and Inverse Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#change-of-basis">Change of Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-core-properties">Definition and Core Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-mathematical-formulas">Key Results and Mathematical Formulas</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isometry-length-and-angle-preservation">Isometry (Length and Angle Preservation)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant">Determinant</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cartandieudonne-theorem">The Cartan–Dieudonné Theorem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-by-induction">Proof by Induction</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
