@@ -17,10 +17,6 @@ $$
 
 where $C = AB$.
 
-<video controls width="640">
-  <source src="../_static/CompositionScene.mp4" type="video/mp4">
-</video> 
-
 **Properties:**
 - Defined only if the number of columns of $A$ equals the number of rows of $B$.
 - **Associative:** $(AB)C = A(BC)$.

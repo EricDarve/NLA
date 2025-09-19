@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Matrix-Matrix Multiplication &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Markdown Files &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -57,13 +57,9 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/matrix_matrix_multiplication';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'NLAbook/markdown';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License for this book" href="LICENSE.html" />
-    <link rel="prev" title="Linear Transformations and Matrices" href="linear_transformations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,6 +122,8 @@
       
       
       
+        
+      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -144,7 +142,7 @@
     
   
 
-<a class="navbar-brand logo" href="intro.html">
+<a class="navbar-brand logo" href="../content/intro.html">
   
   
   
@@ -170,20 +168,20 @@
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
-                <a class="reference internal" href="intro.html">
+                <a class="reference internal" href="../content/intro.html">
                     Class Notes 2025
                 </a>
             </li>
         </ul>
-        <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Matrix-Matrix Multiplication</a></li>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../content/bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../content/vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../content/dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../content/linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../content/matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../content/LICENSE.html">License for this book</a></li>
 </ul>
 
     </div>
@@ -238,7 +236,7 @@
       
       
       
-      <li><a href="../_sources/content/matrix_matrix_multiplication.md" target="_blank"
+      <li><a href="../_sources/NLAbook/markdown.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -322,7 +320,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Matrix-Matrix Multiplication</h1>
+    <h1>Markdown Files</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -332,9 +330,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composition-of-linear-transformations">Composition of Linear Transformations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-and-inverse-matrices">Identity and Inverse Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#change-of-basis">Change of Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-myst">What is MyST?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sample-roles-and-directives">Sample Roles and Directives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citations">Citations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learn-more">Learn more</a></li>
 </ul>
             </nav>
         </div>
@@ -346,69 +345,51 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="matrix-matrix-multiplication">
-<h1>Matrix-Matrix Multiplication<a class="headerlink" href="#matrix-matrix-multiplication" title="Link to this heading">#</a></h1>
-<section id="composition-of-linear-transformations">
-<h2>Composition of Linear Transformations<a class="headerlink" href="#composition-of-linear-transformations" title="Link to this heading">#</a></h2>
-<p>If <span class="math notranslate nohighlight">\(T_1: \mathbb{R}^n \to \mathbb{R}^m\)</span> has matrix <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(T_2: \mathbb{R}^m \to \mathbb{R}^\ell\)</span> has matrix <span class="math notranslate nohighlight">\(A\)</span>,<br />
-then the composition <span class="math notranslate nohighlight">\(T_2 \circ T_1\)</span> has matrix <span class="math notranslate nohighlight">\(AB\)</span>, where:</p>
-<div class="math notranslate nohighlight">
-\[
-(AB)x = A(Bx).
-\]</div>
-<p>The formula for <strong>matrix-matrix multiplication</strong> is:</p>
-<div class="math notranslate nohighlight">
-\[
-c_{ij} = \sum_{k} a_{ik} b_{kj}
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(C = AB\)</span>.</p>
-<p><strong>Properties:</strong></p>
-<ul class="simple">
-<li><p>Defined only if the number of columns of <span class="math notranslate nohighlight">\(A\)</span> equals the number of rows of <span class="math notranslate nohighlight">\(B\)</span>.</p></li>
-<li><p><strong>Associative:</strong> <span class="math notranslate nohighlight">\((AB)C = A(BC)\)</span>.</p></li>
-<li><p><strong>Not commutative:</strong> <span class="math notranslate nohighlight">\(AB \ne BA\)</span> in general.</p></li>
-<li><p><strong>Transpose rule:</strong> <span class="math notranslate nohighlight">\((AB)^T = B^T A^T\)</span>.</p></li>
-</ul>
+  <section class="tex2jax_ignore mathjax_ignore" id="markdown-files">
+<h1>Markdown Files<a class="headerlink" href="#markdown-files" title="Link to this heading">#</a></h1>
+<p>Whether you write your book’s content in Jupyter Notebooks (<code class="docutils literal notranslate"><span class="pre">.ipynb</span></code>) or
+in regular markdown files (<code class="docutils literal notranslate"><span class="pre">.md</span></code>), you’ll write in the same flavor of markdown
+called <strong>MyST Markdown</strong>.
+This is a simple file to help you get started and show off some syntax.</p>
+<section id="what-is-myst">
+<h2>What is MyST?<a class="headerlink" href="#what-is-myst" title="Link to this heading">#</a></h2>
+<p>MyST stands for “Markedly Structured Text”. It
+is a slight variation on a flavor of markdown called “CommonMark” markdown,
+with small syntax extensions to allow you to write <strong>roles</strong> and <strong>directives</strong>
+in the Sphinx ecosystem.</p>
+<p>For more about MyST, see <a class="reference external" href="https://jupyterbook.org/content/myst.html">the MyST Markdown Overview</a>.</p>
 </section>
-<hr class="docutils" />
-<section id="identity-and-inverse-matrices">
-<h2>Identity and Inverse Matrices<a class="headerlink" href="#identity-and-inverse-matrices" title="Link to this heading">#</a></h2>
-<p>The <strong>identity matrix</strong> <span class="math notranslate nohighlight">\(I_n\)</span> has <span class="math notranslate nohighlight">\(1\)</span> on the diagonal and <span class="math notranslate nohighlight">\(0\)</span> elsewhere, and satisfies:</p>
-<div class="math notranslate nohighlight">
-\[
-I_n x = x
-\]</div>
-<p>for all <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>.</p>
-<p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>invertible</strong> if there exists <span class="math notranslate nohighlight">\(A^{-1}\)</span> such that:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{-1}A = AA^{-1} = I_n.
-\]</div>
-<div class="admonition-fact admonition">
-<p class="admonition-title">Fact</p>
-<p><span class="math notranslate nohighlight">\(A\)</span> is invertible if and only if its columns are linearly independent.</p>
+<section id="sample-roles-and-directives">
+<h2>Sample Roles and Directives<a class="headerlink" href="#sample-roles-and-directives" title="Link to this heading">#</a></h2>
+<p>Roles and directives are two of the most powerful tools in Jupyter Book. They
+are like functions, but written in a markup language. They both
+serve a similar purpose, but <strong>roles are written in one line</strong>, whereas
+<strong>directives span many lines</strong>. They both accept different kinds of inputs,
+and what they do with those inputs depends on the specific role or directive
+that is being called.</p>
+<p>Here is a “note” directive:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Here is a note</p>
 </div>
+<p>It will be rendered in a special box when you build your book.</p>
+<p>Here is an inline directive to refer to a document: <a class="reference internal" href="markdown-notebooks.html"><span class="doc">Notebooks with MyST Markdown</span></a>.</p>
 </section>
-<hr class="docutils" />
-<section id="change-of-basis">
-<h2>Change of Basis<a class="headerlink" href="#change-of-basis" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(\{v_1, \dots, v_n\}\)</span> be a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Any <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> can be written as:</p>
-<div class="math notranslate nohighlight">
-\[
-x = \sum_{i=1}^n \alpha_i v_i
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\alpha = (\alpha_1, \dots, \alpha_n)^T\)</span> are the <strong>coordinates of <span class="math notranslate nohighlight">\(x\)</span> in this basis</strong>.</p>
-<p>If <span class="math notranslate nohighlight">\(V\)</span> is the matrix with <span class="math notranslate nohighlight">\(v_i\)</span> as columns, then:</p>
-<div class="math notranslate nohighlight">
-\[
-x = V\alpha, \quad \alpha = V^{-1}x.
-\]</div>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is the matrix of <span class="math notranslate nohighlight">\(T\)</span> in the standard basis and <span class="math notranslate nohighlight">\(B\)</span> is the matrix in the basis <span class="math notranslate nohighlight">\(\{v_i\}\)</span>, then:</p>
-<div class="math notranslate nohighlight">
-\[
-A = V B V^{-1}.
-\]</div>
-<p>This is the <strong>change of basis formula</strong>.</p>
+<section id="citations">
+<h2>Citations<a class="headerlink" href="#citations" title="Link to this heading">#</a></h2>
+<p>You can also cite references that are stored in a <code class="docutils literal notranslate"><span class="pre">bibtex</span></code> file. For example,
+the following syntax: <code class="docutils literal notranslate"><span class="pre">{cite}`holdgraf_evidence_2014`</span></code> will render like
+this: .</p>
+<p>Moreover, you can insert a bibliography into your page with this syntax:
+The <code class="docutils literal notranslate"><span class="pre">{bibliography}</span></code> directive must be used for all the <code class="docutils literal notranslate"><span class="pre">{cite}</span></code> roles to
+render properly.
+For example, if the references for your book are stored in <code class="docutils literal notranslate"><span class="pre">references.bib</span></code>,
+then the bibliography is inserted with:</p>
+</section>
+<section id="learn-more">
+<h2>Learn more<a class="headerlink" href="#learn-more" title="Link to this heading">#</a></h2>
+<p>This is just a simple starter to get you started.
+You can learn a lot more at <a class="reference external" href="https://jupyterbook.org">jupyterbook.org</a>.</p>
 </section>
 </section>
 
@@ -425,7 +406,7 @@ A = V B V^{-1}.
         },
         kernelOptions: {
             name: "python3",
-            path: "./content"
+            path: "./NLAbook"
         },
         predefinedOutput: true
     }
@@ -442,24 +423,6 @@ A = V B V^{-1}.
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="linear_transformations.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Linear Transformations and Matrices</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="LICENSE.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">License for this book</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div>
                 </footer>
               
@@ -476,9 +439,10 @@ A = V B V^{-1}.
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composition-of-linear-transformations">Composition of Linear Transformations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-and-inverse-matrices">Identity and Inverse Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#change-of-basis">Change of Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-myst">What is MyST?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sample-roles-and-directives">Sample Roles and Directives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#citations">Citations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learn-more">Learn more</a></li>
 </ul>
   </nav></div>
 
