@@ -30,20 +30,16 @@ $$
    $(1, 0) \mapsto (2, 0)$, $(0, 1) \mapsto (0, -1)$  
    Stretches the $x$-direction by a factor of $2$ and flips the $y$-direction.
 
-<video controls width="640">
-  <source src="../_static/GridDeformationScene.mp4" type="video/mp4">
-</video>   
-
-1. $T: \mathbb{R}^2 \to \mathbb{R}^2$  
+2. $T: \mathbb{R}^2 \to \mathbb{R}^2$  
    $(1, 0) \mapsto \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)$,  
    $(0, 1) \mapsto \left(-\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)$  
    Rotates the plane by $\pi/4$.
 
-2. $T: \mathbb{R}^2 \to \mathbb{R}$  
+3. $T: \mathbb{R}^2 \to \mathbb{R}$  
    $(1, 0) \mapsto 1$, $(0, 1) \mapsto 0$  
    Orthogonal projection onto the $x$-axis.
 
-3. $T: \mathbb{R} \to \mathbb{R}^2$  
+4. $T: \mathbb{R} \to \mathbb{R}^2$  
    $1 \mapsto (1, 1)$  
    Maps $\mathbb{R}$ onto the line $y = x$.
 

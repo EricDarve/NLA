@@ -1,4 +1,4 @@
-# Matrix-Matrix Multiplication
+# Matrix-Matrix Multiplications
 
 ## Composition of Linear Transformations
 
@@ -16,10 +16,6 @@ c_{ij} = \sum_{k} a_{ik} b_{kj}
 $$
 
 where $C = AB$.
-
-<video controls width="640">
-  <source src="../_static/CompositionScene.mp4" type="video/mp4">
-</video> 
 
 **Properties:**
 - Defined only if the number of columns of $A$ equals the number of rows of $B$.

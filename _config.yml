@@ -63,6 +63,10 @@ number_equations: true                 # Whether to automatically number all blo
 scholar:
   style: apa
 
+sphinx:
+  extra_extensions:
+    - sphinx_proof  
+
 #######################################################################################
 # Jupyter book settings you probably don't need to change
 

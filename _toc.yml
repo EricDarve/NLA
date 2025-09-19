@@ -8,4 +8,12 @@ chapters:
   - file: content/dot_product_and_norms.md
   - file: content/linear_transformations.md
   - file: content/matrix_matrix_multiplication.md
+  - file: content/operator_norms.md
+  - file: content/sherman_morrison_woodbury.md
+  - file: content/determinants.md
+  - file: content/trace.md
+  - file: content/orthogonal_matrices.md  
+  - file: content/projections.md
+  - file: content/block_matrices.md
+  - file: content/four_fundamental_subspaces.md
 - file: content/LICENSE.md
