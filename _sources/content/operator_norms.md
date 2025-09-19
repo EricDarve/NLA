@@ -1,4 +1,4 @@
-# Matrix Norms: Measuring the Size of a Matrix
+# Operator and Matrix Norms
 
 A **matrix norm** is a function that assigns a strictly positive number to a matrix, providing a measure of its "size" or "magnitude". Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.
 

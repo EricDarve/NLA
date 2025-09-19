@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Matrix Norms: Measuring the Size of a Matrix &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Operator and Matrix Norms &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -63,8 +63,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/operator_norms';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Determinant" href="determinants.html" />
-    <link rel="prev" title="Matrix-Matrix Multiplication" href="matrix_matrix_multiplication.html" />
+    <link rel="next" title="The Sherman-Morrison-Woodbury Formula" href="sherman_morrison_woodbury.html" />
+    <link rel="prev" title="Matrix-Matrix Multiplications" href="matrix_matrix_multiplication.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -181,11 +181,14 @@
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Matrix Norms: Measuring the Size of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
 <li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -327,7 +330,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Matrix Norms: Measuring the Size of a Matrix</h1>
+    <h1>Operator and Matrix Norms</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -351,8 +354,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="matrix-norms-measuring-the-size-of-a-matrix">
-<h1>Matrix Norms: Measuring the Size of a Matrix<a class="headerlink" href="#matrix-norms-measuring-the-size-of-a-matrix" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="operator-and-matrix-norms">
+<h1>Operator and Matrix Norms<a class="headerlink" href="#operator-and-matrix-norms" title="Link to this heading">#</a></h1>
 <p>A <strong>matrix norm</strong> is a function that assigns a strictly positive number to a matrix, providing a measure of its “size” or “magnitude”. Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.</p>
 <section id="the-operator-norm-induced-p-norm">
 <h2>The Operator Norm (Induced p-Norm)<a class="headerlink" href="#the-operator-norm-induced-p-norm" title="Link to this heading">#</a></h2>
@@ -431,15 +434,15 @@ document.write(`
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Matrix-Matrix Multiplication</p>
+        <p class="prev-next-title">Matrix-Matrix Multiplications</p>
       </div>
     </a>
     <a class="right-next"
-       href="determinants.html"
+       href="sherman_morrison_woodbury.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Determinant</p>
+        <p class="prev-next-title">The Sherman-Morrison-Woodbury Formula</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

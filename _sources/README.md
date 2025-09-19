@@ -10,10 +10,3 @@ The book was written using Markdown and [Jupyter Book](https://jupyterbook.org/e
 $ jupyter-book build ./
 $ ghp-import -n -p -f _build/html
 ```
-
-
-Explain orthogonal matrices, projections in linear algebra, orthogonal projections, oblique projections, relevant mathematical formulas and key results.
-
-Discuss the projection of a vector $y$ unto a vector $x$. Explain and define orthogonal matrices. Discuss orthogonal projections using orthogonal matrices.
-
-Write your response using Markdown. 
