@@ -1,4 +1,4 @@
-# Matrix-Matrix Multiplication
+# Matrix-Matrix Multiplications
 
 ## Composition of Linear Transformations
 

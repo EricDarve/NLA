@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Class Notes 2025 &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Block Matrix Operations &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,10 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/intro';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/block_matrices';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Linear Algebra Bootcamp" href="bootcamp.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Projections" href="projections.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,8 +127,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -146,7 +145,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -171,14 +170,14 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
                     Class Notes 2025
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -189,7 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Block Matrix Operations</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -247,7 +246,7 @@
       
       
       
-      <li><a href="../_sources/content/intro.md" target="_blank"
+      <li><a href="../_sources/content/block_matrices.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -318,7 +317,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -329,11 +330,22 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Class Notes 2025</h1>
+    <h1>Block Matrix Operations</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -343,18 +355,65 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="class-notes-2025">
-<h1>Class Notes 2025<a class="headerlink" href="#class-notes-2025" title="Link to this heading">#</a></h1>
-<p>These are class notes for the Numerical Linear Algebra course at Stanford University, Spring 2025. The course is taught by <a class="reference external" href="https://profiles.stanford.edu/eric-darve">Eric Darve</a>.</p>
-<!-- - [[QR factorization and least-squares]]
-- [[Computing eigenvalues]]
-- [[Iterative methods for eigenvalue computation]]
-- [[Classical iterative methods to solve sparse linear systems]]
-- [[Krylov iterative methods to solve sparse linear systems]] -->
-<p>Book: <a class="reference external" href="https://epubs.siam.org/doi/book/10.1137/1.9781611976557">Numerical Linear Algebra with Julia</a>, Darve and Wootters; <a class="reference external" href="https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545">Amazon</a>, <a class="reference external" href="https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ">Google Books</a></p>
-<p><a href="https://github.com/EricDarve/NLA">Edit on GitHub</a></p>
-<div class="toctree-wrapper compound">
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="block-matrix-operations">
+<h1>Block Matrix Operations<a class="headerlink" href="#block-matrix-operations" title="Link to this heading">#</a></h1>
+<p>A <strong>block matrix</strong>, or a partitioned matrix, is a matrix that has been divided into smaller rectangular matrices called <strong>blocks</strong>. This approach allows us to perform matrix operations by treating these blocks as if they were individual elements, which can greatly simplify complex calculations and reveal underlying structures. 🧱</p>
+<p>Let’s consider a matrix <span class="math notranslate nohighlight">\(A\)</span> partitioned into a <span class="math notranslate nohighlight">\(2 \times 2\)</span> block structure:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A = \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix}\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(A_{11}\)</span>, <span class="math notranslate nohighlight">\(A_{12}\)</span>, <span class="math notranslate nohighlight">\(A_{21}\)</span>, and <span class="math notranslate nohighlight">\(A_{22}\)</span> are matrices themselves.</p>
+<section id="addition-and-scalar-multiplication">
+<h2>Addition and Scalar Multiplication<a class="headerlink" href="#addition-and-scalar-multiplication" title="Link to this heading">#</a></h2>
+<p>Operating on block matrices is highly intuitive for linear operations.</p>
+<ul>
+<li><p><strong>Addition</strong>: To add two block matrices, you add their corresponding blocks. The matrices must have the same dimensions and be partitioned in the same way, so that corresponding blocks <span class="math notranslate nohighlight">\(A_{ij}\)</span> and <span class="math notranslate nohighlight">\(B_{ij}\)</span> are of the same size.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} + \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11} + B_{11} &amp; A_{12} + B_{12} \\ A_{21} + B_{21} &amp; A_{22} + B_{22} \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Scalar Multiplication</strong>: To multiply a block matrix by a scalar, you simply multiply each block by that scalar.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    c \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} = \begin{pmatrix} cA_{11} &amp; cA_{12} \\ cA_{21} &amp; cA_{22} \end{pmatrix}
+    \end{split}\]</div>
+</li>
+</ul>
+</section>
+<section id="block-matrix-multiplication">
+<h2>Block Matrix Multiplication<a class="headerlink" href="#block-matrix-multiplication" title="Link to this heading">#</a></h2>
+<p>Block multiplication follows the same row-by-column rule as standard matrix multiplication, but with matrix operations inside. For this to work, the partitioning of the matrices must be compatible. For a product <span class="math notranslate nohighlight">\(AB\)</span>, the <strong>column partitioning of <span class="math notranslate nohighlight">\(A\)</span> must match the row partitioning of <span class="math notranslate nohighlight">\(B\)</span></strong>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11}B_{11} + A_{12}B_{21} &amp; A_{11}B_{12} + A_{12}B_{22} \\ A_{21}B_{11} + A_{22}B_{21} &amp; A_{21}B_{12} + A_{22}B_{22} \end{pmatrix}\end{split}\]</div>
+<p>It’s crucial to remember that matrix multiplication is not commutative, so the order of the products within each block element (e.g., <span class="math notranslate nohighlight">\(A_{11}B_{11}\)</span>) must be maintained. The result of block multiplication is identical to what you would get with standard element-wise multiplication.</p>
+</section>
+<section id="special-structures-and-inversion">
+<h2>Special Structures and Inversion<a class="headerlink" href="#special-structures-and-inversion" title="Link to this heading">#</a></h2>
+<p>Partitioning is especially powerful for matrices with special structures.</p>
+<ul>
+<li><p><strong>Block Diagonal Matrices</strong>: These are matrices where the off-diagonal blocks are zero matrices.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    A = \begin{pmatrix} A_{1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n} \end{pmatrix}
+    \end{split}\]</div>
+<p>For a block diagonal matrix, the determinant is the product of the determinants of the diagonal blocks: <span class="math notranslate nohighlight">\(\det(A) = \det(A_1)\det(A_2)\cdots\det(A_n)\)</span>. Its inverse is also a block diagonal matrix composed of the inverses of the diagonal blocks:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    A^{-1} = \begin{pmatrix} A_{1}^{-1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2}^{-1} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n}^{-1} \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Block Matrix Inversion</strong>: The inverse of a general <span class="math notranslate nohighlight">\(2 \times 2\)</span> block matrix can also be expressed in block form, although the formula is more complex and involves the <strong>Schur complement</strong> of a block (e.g., <span class="math notranslate nohighlight">\(D - CA^{-1}B\)</span>).</p></li>
+</ul>
+</section>
+<section id="advantages-of-block-matrices">
+<h2>Advantages of Block Matrices<a class="headerlink" href="#advantages-of-block-matrices" title="Link to this heading">#</a></h2>
+<p>Using block notation is more than a convenience; it’s a powerful conceptual and computational tool.</p>
+<ol class="arabic simple">
+<li><p><strong>Simplifies Proofs</strong>: It allows for cleaner and more intuitive algebraic manipulations in theoretical proofs and derivations.</p></li>
+<li><p><strong>Reveals Structure</strong>: Partitioning can expose the underlying structure of a problem, such as how different subsystems in a larger system interact.</p></li>
+<li><p><strong>Computational Efficiency</strong>: It is the foundation for many efficient “divide and conquer” algorithms. Operations on structured matrices (like block diagonal or sparse matrices) can be performed much faster by operating on the smaller blocks. This is critical in parallel computing, where different blocks can be processed simultaneously on different processors.</p></li>
+</ol>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -387,12 +446,21 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="projections.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Projections</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="bootcamp.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Linear Algebra Bootcamp</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -402,6 +470,24 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
