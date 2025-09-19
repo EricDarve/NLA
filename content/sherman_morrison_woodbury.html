@@ -64,7 +64,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="The Determinant" href="determinants.html" />
-    <link rel="prev" title="Matrix Norms: Measuring the Size of a Matrix" href="operator_norms.html" />
+    <link rel="prev" title="Operator and Matrix Norms" href="operator_norms.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -181,12 +181,15 @@
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
-<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Matrix Norms: Measuring the Size of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The Sherman-Morrison-Woodbury Formula</a></li>
 <li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -381,10 +384,53 @@ document.write(`
 </section>
 <section id="the-woodbury-matrix-identity-generalization">
 <h2>The Woodbury Matrix Identity (Generalization)<a class="headerlink" href="#the-woodbury-matrix-identity-generalization" title="Link to this heading">#</a></h2>
-<p>The Sherman-Morrison formula is a special case of the more general <strong>Woodbury matrix identity</strong>, which handles updates of a higher rank. The formula is stated as:</p>
+<p>The Sherman-Morrison formula is a special case of the more general <strong>Woodbury matrix identity</strong>, which handles updates of a higher rank.</p>
+<div class="proof theorem admonition" id="theorem-0">
+<p class="admonition-title"><span class="caption-number">Theorem 1 </span> (The Woodbury Matrix Identity)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be an invertible <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, <span class="math notranslate nohighlight">\(U\)</span> be an <span class="math notranslate nohighlight">\(n \times k\)</span> matrix, <span class="math notranslate nohighlight">\(C\)</span> be an invertible <span class="math notranslate nohighlight">\(k \times k\)</span> matrix, and <span class="math notranslate nohighlight">\(V\)</span> be a <span class="math notranslate nohighlight">\(k \times n\)</span> matrix. The Woodbury matrix identity states:</p>
 <div class="math notranslate nohighlight">
 \[(A + UCV)^{-1} = A^{-1} - A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}\]</div>
-<p>Here, the update is <span class="math notranslate nohighlight">\(UCV\)</span>, where <span class="math notranslate nohighlight">\(U\)</span> is an <span class="math notranslate nohighlight">\(n \times k\)</span> matrix, <span class="math notranslate nohighlight">\(C\)</span> is a <span class="math notranslate nohighlight">\(k \times k\)</span> matrix, and <span class="math notranslate nohighlight">\(V\)</span> is a <span class="math notranslate nohighlight">\(k \times n\)</span> matrix. The key advantage is that instead of inverting the large <span class="math notranslate nohighlight">\(n \times n\)</span> matrix on the left, we only need to invert the much smaller <span class="math notranslate nohighlight">\(k \times k\)</span> matrix <span class="math notranslate nohighlight">\((C^{-1} + VA^{-1}U)\)</span> on the right. This is extremely beneficial when <span class="math notranslate nohighlight">\(k\)</span> is much smaller than <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<p>This identity holds provided that the matrix <span class="math notranslate nohighlight">\((C^{-1} + VA^{-1}U)\)</span> is invertible.</p>
+</section>
+</div><p>Here, the update is <span class="math notranslate nohighlight">\(UCV\)</span>, where <span class="math notranslate nohighlight">\(U\)</span> is an <span class="math notranslate nohighlight">\(n \times k\)</span> matrix, <span class="math notranslate nohighlight">\(C\)</span> is a <span class="math notranslate nohighlight">\(k \times k\)</span> matrix, and <span class="math notranslate nohighlight">\(V\)</span> is a <span class="math notranslate nohighlight">\(k \times n\)</span> matrix. The key advantage is that instead of inverting the large <span class="math notranslate nohighlight">\(n \times n\)</span> matrix on the left, we only need to invert the much smaller <span class="math notranslate nohighlight">\(k \times k\)</span> matrix <span class="math notranslate nohighlight">\((C^{-1} + VA^{-1}U)\)</span> on the right. This is extremely beneficial when <span class="math notranslate nohighlight">\(k\)</span> is much smaller than <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Woodbury Matrix Identity</p>
+<p>The most straightforward way to prove the identity is to show that the product of the original matrix <span class="math notranslate nohighlight">\((A + UCV)\)</span> and its proposed inverse from the formula results in the identity matrix, <span class="math notranslate nohighlight">\(I\)</span>.</p>
+<p>Let’s multiply <span class="math notranslate nohighlight">\((A + UCV)\)</span> by the proposed inverse:</p>
+<div class="math notranslate nohighlight">
+\[(A + UCV) \left( A^{-1} - A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)\]</div>
+<p>We can expand this product using the distributive property:</p>
+<div class="math notranslate nohighlight">
+\[= A(A^{-1}) - A(A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}) + UCV(A^{-1}) - UCV(A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1})\]</div>
+<p>Now, let’s simplify each term:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A(A^{-1}) = I\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(A(A^{-1}U \dots) = U(\dots)\)</span></p></li>
+</ul>
+<p>This simplifies the expression to:</p>
+<div class="math notranslate nohighlight">
+\[= I - U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} + UCVA^{-1} - UCVA^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}\]</div>
+<p>Now, let’s factor out the common term <span class="math notranslate nohighlight">\(U\)</span> on the left side of the last three terms:</p>
+<div class="math notranslate nohighlight">
+\[= I + U \left( - (C^{-1} + VA^{-1}U)^{-1}VA^{-1} + CVA^{-1} - CVA^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)\]</div>
+<p>Let’s focus on the expression inside the parentheses. We can factor out the term <span class="math notranslate nohighlight">\((C^{-1} + VA^{-1}U)^{-1}VA^{-1}\)</span> from the first and third parts:</p>
+<div class="math notranslate nohighlight">
+\[= I + U \left( CVA^{-1} - (I + CVA^{-1}U)(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)\]</div>
+<p>The key step is to simplify the term <span class="math notranslate nohighlight">\((I + CVA^{-1}U)\)</span>. We can factor out <span class="math notranslate nohighlight">\(C\)</span> on the left:</p>
+<div class="math notranslate nohighlight">
+\[I + CVA^{-1}U = C(C^{-1} + VA^{-1}U)\]</div>
+<p>Now, we substitute this back into our main expression:</p>
+<div class="math notranslate nohighlight">
+\[= I + U \left( CVA^{-1} - C(C^{-1} + VA^{-1}U)(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\((C^{-1} + VA^{-1}U)\)</span> and its inverse <span class="math notranslate nohighlight">\((C^{-1} + VA^{-1}U)^{-1}\)</span> cancel out to become the identity matrix:</p>
+<div class="math notranslate nohighlight">
+\[= I + U \left( CVA^{-1} - C(I)VA^{-1} \right)\]</div>
+<p>This simplifies to:</p>
+<div class="math notranslate nohighlight">
+\[= I + U \left( CVA^{-1} - CVA^{-1} \right) = I + U(0) = I\]</div>
+<p>Since the product of the matrix and its proposed inverse is the identity matrix, the formula is correct.</p>
+</div>
 </section>
 </section>
 
@@ -424,7 +470,7 @@ document.write(`
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Matrix Norms: Measuring the Size of a Matrix</p>
+        <p class="prev-next-title">Operator and Matrix Norms</p>
       </div>
     </a>
     <a class="right-next"
