@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>&lt;no title&gt; &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Matrix Norms: Measuring the Size of a Matrix &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -34,6 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -57,9 +58,13 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'manimations/README';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/operator_norms';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Determinant" href="determinants.html" />
+    <link rel="prev" title="Matrix-Matrix Multiplication" href="matrix_matrix_multiplication.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -122,8 +127,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -142,7 +145,7 @@
     
   
 
-<a class="navbar-brand logo" href="../content/intro.html">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -168,20 +171,24 @@
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
-                <a class="reference internal" href="../content/intro.html">
+                <a class="reference internal" href="intro.html">
                     Class Notes 2025
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../content/bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../content/vector_space.html">Vector spaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../content/dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../content/linear_transformations.html">Linear Transformations and Matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../content/matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplication</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Matrix Norms: Measuring the Size of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="../content/LICENSE.html">License for this book</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
 </ul>
 
     </div>
@@ -236,7 +243,7 @@
       
       
       
-      <li><a href="../_sources/manimations/README.md" target="_blank"
+      <li><a href="../_sources/content/operator_norms.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -320,7 +327,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1><no title></h1>
+    <h1>Matrix Norms: Measuring the Size of a Matrix</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -329,9 +336,11 @@ document.write(`
                 <h2> Contents </h2>
             </div>
             <nav aria-label="Page">
-                <ul class="simple visible nav section-nav flex-column">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-operator-norm-induced-p-norm">The Operator Norm (Induced p-Norm)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-and-inequalities">Key Properties and Inequalities</a></li>
 </ul>
-
             </nav>
         </div>
     </div>
@@ -342,7 +351,50 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  
+  <section class="tex2jax_ignore mathjax_ignore" id="matrix-norms-measuring-the-size-of-a-matrix">
+<h1>Matrix Norms: Measuring the Size of a Matrix<a class="headerlink" href="#matrix-norms-measuring-the-size-of-a-matrix" title="Link to this heading">#</a></h1>
+<p>A <strong>matrix norm</strong> is a function that assigns a strictly positive number to a matrix, providing a measure of its “size” or “magnitude”. Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.</p>
+<section id="the-operator-norm-induced-p-norm">
+<h2>The Operator Norm (Induced p-Norm)<a class="headerlink" href="#the-operator-norm-induced-p-norm" title="Link to this heading">#</a></h2>
+<p>The most common family of matrix norms are <strong>operator norms</strong>, also known as <strong>induced norms</strong>. These norms are derived directly from vector p-norms and are defined by how much a matrix can “stretch” a vector.</p>
+<p>The operator norm is defined as the maximum possible ratio of <span class="math notranslate nohighlight">\(\|Ax\|_p\)</span> to <span class="math notranslate nohighlight">\(\|x\|_p\)</span> for any non-zero vector <span class="math notranslate nohighlight">\(x\)</span>. This is equivalent to finding the maximum length of the vector <span class="math notranslate nohighlight">\(Ax\)</span> for any vector <span class="math notranslate nohighlight">\(x\)</span> with a length of 1.</p>
+<div class="math notranslate nohighlight">
+\[\| A \|_p = \sup_{x \neq 0} \frac{\|A x\|_p}{\|x\|_p} = \max_{\|x\|_p = 1} \| Ax \|_p\]</div>
+<p>Geometrically, if you apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to all the vectors on the unit circle (or unit sphere in higher dimensions), you’ll get an ellipse (or ellipsoid). The p-norm <span class="math notranslate nohighlight">\(\|A\|_p\)</span> is the length of the longest vector from the origin to a point on that resulting shape.</p>
+<p>The three most widely used operator norms are:</p>
+<ul class="simple">
+<li><p><strong>1-Norm</strong>: The maximum absolute column sum. It is computed as <span class="math notranslate nohighlight">\(\|A\|_1 = \max_j \sum_i |a_{ij}|\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(\infty\)</span>-Norm</strong>: The maximum absolute row sum. It is computed as <span class="math notranslate nohighlight">\(\|A\|_\infty = \max_i \sum_j |a_{ij}|\)</span>.</p></li>
+<li><p><strong>2-Norm (Spectral Norm)</strong>: This norm is equal to the largest <strong>singular value</strong> of the matrix, denoted <span class="math notranslate nohighlight">\(\sigma_{\max}(A)\)</span>. While it corresponds to the true geometric “maximum stretch,” it is generally more computationally intensive than the 1-norm or <span class="math notranslate nohighlight">\(\infty\)</span>-norm.</p></li>
+</ul>
+</section>
+<section id="the-frobenius-norm">
+<h2>The Frobenius Norm<a class="headerlink" href="#the-frobenius-norm" title="Link to this heading">#</a></h2>
+<p>Another useful and easy-to-compute norm is the <strong>Frobenius norm</strong>. Unlike the operator norms, it is not induced by a vector norm. Instead, it treats the matrix as a single long vector and calculates its standard Euclidean norm (the square root of the sum of the squares of all its elements).</p>
+<div class="math notranslate nohighlight">
+\[\|A\|_F = \left( \sum_{i=1}^m \sum_{j=1}^n |a_{ij}|^2 \right)^{1/2}\]</div>
+<p>The Frobenius norm is very convenient for analyzing matrices that can be decomposed into blocks.</p>
+</section>
+<section id="key-properties-and-inequalities">
+<h2>Key Properties and Inequalities<a class="headerlink" href="#key-properties-and-inequalities" title="Link to this heading">#</a></h2>
+<p>Matrix norms are essential for proofs and for bounding errors in numerical algorithms. Two of the most important inequalities are:</p>
+<ol class="arabic">
+<li><p><strong>Consistency with Vector Norms</strong>: This property relates the matrix norm to the vector norm and follows directly from the definition of the operator norm. It shows how the norm of a transformed vector is bounded.</p>
+<div class="math notranslate nohighlight">
+\[
+    \|A x \|_p \le \|A\|_p \|x\|_p
+    \]</div>
+</li>
+<li><p><strong>Sub-multiplicativity</strong>: Both the operator norms and the Frobenius norm are <strong>sub-multiplicative</strong>. This property provides a crucial upper bound on the norm of a matrix product.</p>
+<div class="math notranslate nohighlight">
+\[
+    \| AB \| \le \|A\| \|B\|
+    \]</div>
+</li>
+</ol>
+</section>
+</section>
+
     <script type="text/x-thebe-config">
     {
         requestKernel: true,
@@ -356,7 +408,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./manimations"
+            path: "./content"
         },
         predefinedOutput: true
     }
@@ -373,6 +425,24 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="matrix_matrix_multiplication.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Matrix-Matrix Multiplication</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="determinants.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The Determinant</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -388,9 +458,11 @@ document.write(`
     <i class="fa-solid fa-list"></i> Contents
   </div>
   <nav class="bd-toc-nav page-toc">
-    <ul class="simple visible nav section-nav flex-column">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-operator-norm-induced-p-norm">The Operator Norm (Induced p-Norm)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-and-inequalities">Key Properties and Inequalities</a></li>
 </ul>
-
   </nav></div>
 
 </div></div>
