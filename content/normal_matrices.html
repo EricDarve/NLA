@@ -1,0 +1,631 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Normal matrices &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/normal_matrices';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Applications of Eigenvalues" href="applications_of_eigenvalues.html" />
+    <link rel="prev" title="Eigenvalues and Eigenvectors" href="eigenvalues_and_eigenvectors.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schur_decomposition.html">Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalues_and_eigenvectors.html">Eigenvalues and Eigenvectors</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/normal_matrices.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Normal matrices</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-normal-matrix">What is a Normal Matrix?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-normal-matrices">Examples of Normal Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-normal-matrices">The Spectral Theorem for Normal Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-real-symmetric-matrices">The Spectral Theorem for Real Symmetric Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-of-symmetric-matrices">Key Properties of Symmetric Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalues-of-a-symmetric-matrix-are-always-real">1. Eigenvalues of a Symmetric Matrix are Always Real</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvectors-for-distinct-eigenvalues-are-orthogonal">2. Eigenvectors for Distinct Eigenvalues are Orthogonal</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="normal-matrices">
+<h1>Normal matrices<a class="headerlink" href="#normal-matrices" title="Link to this heading">#</a></h1>
+<p>A normal matrix is unitarily diagonalizable because the algebraic condition of being normal is precisely what guarantees that the matrix has a complete set of orthogonal eigenvectors. This fundamental result is known as the <strong>Spectral Theorem</strong>.</p>
+<section id="what-is-a-normal-matrix">
+<h2>What is a Normal Matrix?<a class="headerlink" href="#what-is-a-normal-matrix" title="Link to this heading">#</a></h2>
+<p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>normal</strong> if it commutes with its conjugate transpose, <span class="math notranslate nohighlight">\(A^H\)</span>. The conjugate transpose is the result of taking the transpose of the matrix and then taking the complex conjugate of each entry.</p>
+<p>The defining property of a normal matrix is:</p>
+<div class="math notranslate nohighlight">
+\[A A^H = A^H A\]</div>
+<p>While this definition seems purely algebraic, it has a profound geometric meaning: the linear transformation represented by <span class="math notranslate nohighlight">\(A\)</span> does not “shear” space in a way that misaligns its eigenvectors.</p>
+<section id="examples-of-normal-matrices">
+<h3>Examples of Normal Matrices<a class="headerlink" href="#examples-of-normal-matrices" title="Link to this heading">#</a></h3>
+<p>Several important families of matrices are normal, which is why this property is so useful.</p>
+<ul class="simple">
+<li><p><strong>Hermitian matrices</strong>: These are the complex equivalent of real symmetric matrices and satisfy <span class="math notranslate nohighlight">\(A^H = A\)</span>. They are clearly normal since <span class="math notranslate nohighlight">\(A \cdot A = A \cdot A\)</span>. Their eigenvalues are always real.</p></li>
+<li><p><strong>Unitary matrices</strong>: These matrices represent rotations and reflections in complex space and satisfy <span class="math notranslate nohighlight">\(Q^H Q = I\)</span>. Since <span class="math notranslate nohighlight">\(Q^{-1} = Q^H\)</span>, they also satisfy <span class="math notranslate nohighlight">\(Q Q^H = I\)</span>, so <span class="math notranslate nohighlight">\(Q Q^H = Q^H Q\)</span>.</p></li>
+<li><p><strong>Skew-Hermitian matrices</strong>: These satisfy <span class="math notranslate nohighlight">\(A^H = -A\)</span>. They are normal because <span class="math notranslate nohighlight">\(A(-A) = (-A)A = -A^2\)</span>. Their eigenvalues are purely imaginary.</p></li>
+<li><p><strong>Diagonal matrices</strong>: Any diagonal matrix is normal because diagonal matrices always commute with each other, and the conjugate transpose of a diagonal matrix is also diagonal.</p></li>
+</ul>
+</section>
+</section>
+<section id="the-spectral-theorem-for-normal-matrices">
+<h2>The Spectral Theorem for Normal Matrices<a class="headerlink" href="#the-spectral-theorem-for-normal-matrices" title="Link to this heading">#</a></h2>
+<p>The <strong>Spectral Theorem</strong> provides the crucial link between the algebraic property of normality and the geometric property of its eigenvectors.</p>
+<div class="proof theorem admonition" id="theorem-0">
+<p class="admonition-title"><span class="caption-number">Theorem 6 </span> (Spectral Theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>A complex square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>unitarily diagonalizable</strong> if and only if it is <strong>normal</strong>.</p>
+</section>
+</div><p>To be <strong>unitarily diagonalizable</strong> means that <span class="math notranslate nohighlight">\(A\)</span> can be decomposed into the form:</p>
+<div class="math notranslate nohighlight">
+\[A = Q \Lambda Q^H\]</div>
+<p>This decomposition has a beautiful interpretation:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\Lambda\)</span> is a <strong>diagonal matrix</strong> whose entries are the <strong>eigenvalues</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>unitary matrix</strong> whose columns are the corresponding <strong>eigenvectors</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p>The fact that <span class="math notranslate nohighlight">\(Q\)</span> is unitary means its columns form an <strong>orthonormal basis</strong> for the vector space <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>.</p></li>
+</ul>
+<p>In short, the Spectral Theorem guarantees that for any normal matrix, we can find a set of perpendicular axes (the eigenvectors) along which the transformation acts simply as a stretch or compression (the eigenvalues).</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Spectral Theorem</p>
+<p>The proof of the Spectral Theorem has two parts.</p>
+<p><em>Unitarily Diagonalizable <span class="math notranslate nohighlight">\(\implies\)</span> Normal.</em> This is the straightforward direction. Assume <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span>. We check if it commutes with its conjugate transpose:</p>
+<div class="math notranslate nohighlight">
+\[A^H = (Q \Lambda Q^H)^H = Q \Lambda^H Q^H\]</div>
+<p>Now we compute the two products:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A A^H = (Q \Lambda Q^H)(Q \Lambda^H Q^H) = Q \Lambda (Q^H Q) \Lambda^H Q^H = Q (\Lambda \Lambda^H) Q^H\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(A^H A = (Q \Lambda^H Q^H)(Q \Lambda Q^H) = Q \Lambda^H (Q^H Q) \Lambda Q^H = Q (\Lambda^H \Lambda) Q^H\)</span></p></li>
+</ul>
+<p>Since diagonal matrices always commute (<span class="math notranslate nohighlight">\(\Lambda \Lambda^H = \Lambda^H \Lambda\)</span>), the two results are identical. Thus, <span class="math notranslate nohighlight">\(A\)</span> is normal.</p>
+<p><strong>Normal <span class="math notranslate nohighlight">\(\implies\)</span> Unitarily Diagonalizable.</strong> This direction is more involved but reveals the core of the theorem.</p>
+<ol class="arabic simple">
+<li><p>Start with the <strong>Schur Decomposition</strong>, which states that <em>any</em> square matrix <span class="math notranslate nohighlight">\(A\)</span> can be written as <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular.</p></li>
+<li><p>Now, we use the fact that <span class="math notranslate nohighlight">\(A\)</span> is normal. As shown in the first part, if <span class="math notranslate nohighlight">\(A\)</span> is normal, then <span class="math notranslate nohighlight">\(T\)</span> must also be normal, meaning <span class="math notranslate nohighlight">\(T T^H = T^H T\)</span>.</p></li>
+<li><p>The final step is to prove that an <strong>upper triangular matrix that is also normal must be a diagonal matrix</strong>. We can show this by comparing the diagonal entries of the product <span class="math notranslate nohighlight">\(T T^H\)</span> and <span class="math notranslate nohighlight">\(T^H T\)</span>. For the first entry on the diagonal, <span class="math notranslate nohighlight">\((1,1)\)</span>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\((T^H T)_{11} = |T_{11}|^2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\((T T^H)_{11} = |T_{11}|^2 + |T_{12}|^2 + \dots + |T_{1n}|^2\)</span></p></li>
+</ul>
+</li>
+<li><p>For these to be equal, the sum of the squares of the off-diagonal elements in the first row (<span class="math notranslate nohighlight">\(|T_{12}|^2 + \dots\)</span>) must be zero. This forces all those elements to be zero.</p></li>
+<li><p>By continuing this process down the diagonal, we can prove that all off-diagonal elements of <span class="math notranslate nohighlight">\(T\)</span> must be zero.</p></li>
+<li><p>Therefore, <span class="math notranslate nohighlight">\(T\)</span> is a diagonal matrix (we’ll call it <span class="math notranslate nohighlight">\(\Lambda\)</span>), and the Schur decomposition becomes <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span>. This shows that <span class="math notranslate nohighlight">\(A\)</span> is unitarily diagonalizable.</p></li>
+</ol>
+</div>
+</section>
+<section id="the-spectral-theorem-for-real-symmetric-matrices">
+<h2>The Spectral Theorem for Real Symmetric Matrices<a class="headerlink" href="#the-spectral-theorem-for-real-symmetric-matrices" title="Link to this heading">#</a></h2>
+<p>The Spectral Theorem for real symmetric matrices is a more specific and powerful version of the general theorem for normal matrices. It guarantees that any real symmetric matrix can be diagonalized by a real orthogonal matrix, which has a profound geometric meaning.</p>
+<div class="proof theorem admonition" id="theorem-1">
+<p class="admonition-title"><span class="caption-number">Theorem 7 </span> (Spectral Theorem for Real Symmetric Matrices)</p>
+<section class="theorem-content" id="proof-content">
+<p>The theorem states that a real matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>orthogonally diagonalizable</strong> if and only if it is <strong>symmetric</strong>.</p>
+</section>
+</div><p>This means that for any real symmetric matrix <span class="math notranslate nohighlight">\(A\)</span> (where <span class="math notranslate nohighlight">\(A^T = A\)</span>), there exists a decomposition:</p>
+<div class="math notranslate nohighlight">
+\[A = Q \Lambda Q^T\]</div>
+<p>Here, the components have special real-valued properties:</p>
+<ul class="simple">
+<li><p><strong><span class="math notranslate nohighlight">\(A\)</span></strong> is an <span class="math notranslate nohighlight">\(n \times n\)</span> real symmetric matrix.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(Q\)</span></strong> is an <span class="math notranslate nohighlight">\(n \times n\)</span> <strong>real orthogonal matrix</strong>. This means its columns are a set of <span class="math notranslate nohighlight">\(n\)</span> mutually perpendicular unit vectors (an orthonormal basis), and its inverse is simply its transpose (<span class="math notranslate nohighlight">\(Q^{-1} = Q^T\)</span>). The columns of <span class="math notranslate nohighlight">\(Q\)</span> are the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong> is an <span class="math notranslate nohighlight">\(n \times n\)</span> <strong>real diagonal matrix</strong>. Its diagonal entries are the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+</ul>
+</section>
+<section id="key-properties-of-symmetric-matrices">
+<h2>Key Properties of Symmetric Matrices<a class="headerlink" href="#key-properties-of-symmetric-matrices" title="Link to this heading">#</a></h2>
+<p>This special result emerges from two crucial properties that all real symmetric matrices possess.</p>
+<section id="eigenvalues-of-a-symmetric-matrix-are-always-real">
+<h3>1. Eigenvalues of a Symmetric Matrix are Always Real<a class="headerlink" href="#eigenvalues-of-a-symmetric-matrix-are-always-real" title="Link to this heading">#</a></h3>
+<p>A symmetric matrix, even if it has complex entries in theory, will always have purely real eigenvalues.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Real Eigenvalues</p>
+<p>Start with the eigenvalue equation, <span class="math notranslate nohighlight">\(Ax = \lambda x\)</span>. Taking the conjugate transpose of both sides gives <span class="math notranslate nohighlight">\(x^H A^H = \bar{\lambda} x^H\)</span>. Since <span class="math notranslate nohighlight">\(A\)</span> is real and symmetric, <span class="math notranslate nohighlight">\(A^H = A\)</span>. Thus, <span class="math notranslate nohighlight">\(x^H A = \bar{\lambda} x^H\)</span>. Right-multiplying by <span class="math notranslate nohighlight">\(x\)</span> gives:</p>
+<div class="math notranslate nohighlight">
+\[x^H A x = \bar{\lambda} x^H x = \bar{\lambda} \|x\|^2\]</div>
+<p>Now, if we left-multiply the original equation <span class="math notranslate nohighlight">\(Ax = \lambda x\)</span> by <span class="math notranslate nohighlight">\(x^H\)</span>, we get:</p>
+<div class="math notranslate nohighlight">
+\[x^H A x = \lambda x^H x = \lambda \|x\|^2\]</div>
+<p>Equating the two expressions shows that <span class="math notranslate nohighlight">\(\lambda \|x\|^2 = \bar{\lambda} \|x\|^2\)</span>. Since eigenvectors are non-zero, we can conclude that <span class="math notranslate nohighlight">\(\lambda = \bar{\lambda}\)</span>, meaning the eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> must be a real number.</p>
+</div>
+</section>
+<section id="eigenvectors-for-distinct-eigenvalues-are-orthogonal">
+<h3>2. Eigenvectors for Distinct Eigenvalues are Orthogonal<a class="headerlink" href="#eigenvectors-for-distinct-eigenvalues-are-orthogonal" title="Link to this heading">#</a></h3>
+<p>For a symmetric matrix, eigenvectors corresponding to different eigenvalues are always perpendicular to each other.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Orthogonal Eigenvectors</p>
+<p>Let <span class="math notranslate nohighlight">\(\lambda_1 \neq \lambda_2\)</span> be two distinct eigenvalues with corresponding eigenvectors <span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span>. We start with the expression <span class="math notranslate nohighlight">\(\lambda_1(x_1^T x_2)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\lambda_1(x_1^T x_2) = (\lambda_1 x_1)^T x_2 = (Ax_1)^T x_2 = x_1^T A^T x_2\]</div>
+<p>Since <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A^T = A\)</span>), this becomes:</p>
+<div class="math notranslate nohighlight">
+\[x_1^T A x_2 = x_1^T (\lambda_2 x_2) = \lambda_2 (x_1^T x_2)\]</div>
+<p>So, we have <span class="math notranslate nohighlight">\(\lambda_1 (x_1^T x_2) = \lambda_2 (x_1^T x_2)\)</span>, which rearranges to <span class="math notranslate nohighlight">\((\lambda_1 - \lambda_2) (x_1^T x_2) = 0\)</span>. Because the eigenvalues are distinct, <span class="math notranslate nohighlight">\(\lambda_1 - \lambda_2 \neq 0\)</span>, which forces the dot product <span class="math notranslate nohighlight">\(x_1^T x_2\)</span> to be zero. Thus, the eigenvectors are orthogonal.</p>
+</div>
+<p>Even if eigenvalues are repeated, it is always possible to find an orthonormal basis for the corresponding eigenspace.</p>
+</section>
+</section>
+<section id="geometric-interpretation">
+<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
+<p>The decomposition <span class="math notranslate nohighlight">\(A = Q \Lambda Q^T\)</span> describes the action of a symmetric matrix as a sequence of three simple geometric steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Rotation (<span class="math notranslate nohighlight">\(Q^T x\)</span>)</strong>: The space is rotated by the orthogonal matrix <span class="math notranslate nohighlight">\(Q^T\)</span> so that the standard axes align with the orthogonal eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>Scaling (<span class="math notranslate nohighlight">\(\Lambda (Q^T x)\)</span>)</strong>: In this new, rotated orientation, the transformation is a simple scaling along each axis. The scaling factors are the real eigenvalues on the diagonal of <span class="math notranslate nohighlight">\(\Lambda\)</span>. There is no “shear” or rotation in this step.</p></li>
+<li><p><strong>Rotation Back (<span class="math notranslate nohighlight">\(Q (\Lambda Q^T x)\)</span>)</strong>: The space is rotated back to its original orientation by <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
+</ol>
+<p>This means that any transformation by a symmetric matrix can be thought of as a pure stretch or compression along a set of perpendicular axes. The eigenvectors define these <strong>principal axes</strong>, and the eigenvalues define the amount of stretching along them.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="eigenvalues_and_eigenvectors.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Eigenvalues and Eigenvectors</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="applications_of_eigenvalues.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Applications of Eigenvalues</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-normal-matrix">What is a Normal Matrix?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-normal-matrices">Examples of Normal Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-normal-matrices">The Spectral Theorem for Normal Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-real-symmetric-matrices">The Spectral Theorem for Real Symmetric Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-of-symmetric-matrices">Key Properties of Symmetric Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalues-of-a-symmetric-matrix-are-always-real">1. Eigenvalues of a Symmetric Matrix are Always Real</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvectors-for-distinct-eigenvalues-are-orthogonal">2. Eigenvectors for Distinct Eigenvalues are Orthogonal</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

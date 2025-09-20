@@ -1,0 +1,659 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Schur Decomposition &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/schur_decomposition';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Eigenvalues and Eigenvectors" href="eigenvalues_and_eigenvectors.html" />
+    <link rel="prev" title="The Four Fundamental Subspaces" href="four_fundamental_subspaces.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigenvalues_and_eigenvectors.html">Eigenvalues and Eigenvectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/schur_decomposition.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Schur Decomposition</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-schur-decomposition">The (Complex) Schur Decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-schur-decomposition">The Real Schur Decomposition</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="schur-decomposition">
+<h1>Schur Decomposition<a class="headerlink" href="#schur-decomposition" title="Link to this heading">#</a></h1>
+<p>The Schur decomposition is a fundamental result in linear algebra that guarantees that any square matrix can be represented as the product of a unitary matrix and an upper triangular matrix. Unlike eigendecomposition, which only works for diagonalizable matrices, the Schur decomposition exists for <em>every</em> square matrix, making it a more general and numerically reliable tool.</p>
+<section id="the-complex-schur-decomposition">
+<h2>The (Complex) Schur Decomposition<a class="headerlink" href="#the-complex-schur-decomposition" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="theorem-0">
+<p class="admonition-title"><span class="caption-number">Theorem 3 </span> (Schur Decomposition)</p>
+<section class="theorem-content" id="proof-content">
+<p>The theorem states that for any <span class="math notranslate nohighlight">\(n \times n\)</span> square matrix <span class="math notranslate nohighlight">\(A\)</span> with complex entries, there exists a <strong>unitary matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span> and an <strong>upper triangular matrix</strong> <span class="math notranslate nohighlight">\(T\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[A = Q T Q^H\]</div>
+</section>
+</div><p>This decomposition has two key components:</p>
+<ul class="simple">
+<li><p><strong><span class="math notranslate nohighlight">\(T\)</span></strong>: An upper triangular matrix whose diagonal entries are the <strong>eigenvalues</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(Q\)</span></strong>: A unitary matrix (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>), which means its columns form an orthonormal basis for the space <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>.</p></li>
+</ul>
+<p>The Schur decomposition is incredibly useful because it reveals the eigenvalues of a matrix while using unitary transformations. These transformations are numerically stable (they preserve lengths and do not amplify errors), making the Schur decomposition one of the most reliable methods for computing eigenvalues in practice.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Existence of the Schur Decomposition</p>
+<p>The existence of the Schur decomposition can be proven by induction on the size of the matrix, <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<ul>
+<li><p><strong>Base Case (n=1)</strong>: The result is trivially true, as a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix is already in upper triangular form.</p></li>
+<li><p><strong>Inductive Step</strong>: Assume the decomposition exists for all matrices of size <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span>.</p>
+<ol class="arabic">
+<li><p>We know every <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> has at least one eigenvalue, <span class="math notranslate nohighlight">\(\lambda_1\)</span>, with a corresponding unit eigenvector, <span class="math notranslate nohighlight">\(x_1\)</span>.</p></li>
+<li><p>We can extend this vector <span class="math notranslate nohighlight">\(x_1\)</span> to form an orthonormal basis for <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>. Let the matrix with these basis vectors as its columns be <span class="math notranslate nohighlight">\(Q_1 = [x_1, v_2, \dots, v_n]\)</span>. By construction, <span class="math notranslate nohighlight">\(Q_1\)</span> is unitary.</p></li>
+<li><p>Consider the transformation <span class="math notranslate nohighlight">\(Q_1^H A Q_1\)</span>. Its first column is <span class="math notranslate nohighlight">\(Q_1^H A x_1 = Q_1^H (\lambda_1 x_1) = \lambda_1 (Q_1^H x_1)\)</span>. Since <span class="math notranslate nohighlight">\(x_1\)</span> is the first column of <span class="math notranslate nohighlight">\(Q_1\)</span>, <span class="math notranslate nohighlight">\(Q_1^H x_1\)</span> is the vector <span class="math notranslate nohighlight">\((1, 0, \dots, 0)^T\)</span>.</p></li>
+<li><p>This means the transformed matrix has a block structure:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+        Q_1^H A Q_1 = \begin{pmatrix}
+        \lambda_1 &amp; \mathbf{w}^H \\
+        \mathbf{0} &amp; A_2
+        \end{pmatrix}
+        \end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_2\)</span> is an <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> matrix.</p>
+</li>
+<li><p>By our induction hypothesis, the smaller matrix <span class="math notranslate nohighlight">\(A_2\)</span> has its own Schur decomposition, <span class="math notranslate nohighlight">\(A_2 = Q_2 T_2 Q_2^H\)</span>.</p></li>
+<li><p>We can now “embed” this smaller decomposition back into the larger matrix structure. Define a new unitary matrix <span class="math notranslate nohighlight">\(Q\)</span> as <span class="math notranslate nohighlight">\(Q = Q_1 \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2 \end{pmatrix}\)</span>.</p></li>
+<li><p>This choice of <span class="math notranslate nohighlight">\(Q\)</span> transforms <span class="math notranslate nohighlight">\(A\)</span> into an upper triangular matrix, completing the induction:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+        Q^H A Q = \begin{pmatrix}
+        \lambda_1 &amp; \mathbf{w}^H Q_2 \\
+        \mathbf{0} &amp; Q_2^H A_2 Q_2
+        \end{pmatrix} = \begin{pmatrix}
+        \lambda_1 &amp; \mathbf{w}^H Q_2 \\
+        \mathbf{0} &amp; T_2
+        \end{pmatrix}
+        \end{split}\]</div>
+</li>
+</ol>
+</li>
+</ul>
+</div>
+</section>
+<section id="the-real-schur-decomposition">
+<h2>The Real Schur Decomposition<a class="headerlink" href="#the-real-schur-decomposition" title="Link to this heading">#</a></h2>
+<p>A complication arises when working with real matrices. If a real matrix <span class="math notranslate nohighlight">\(A\)</span> has complex eigenvalues (which must appear in conjugate pairs), it is impossible to make the matrix <span class="math notranslate nohighlight">\(T\)</span> in the decomposition <span class="math notranslate nohighlight">\(A = Q T Q^T\)</span> both real and triangular, as its diagonal would have to contain the complex eigenvalues.</p>
+<p>The <strong>real Schur decomposition</strong> provides a clever workaround.</p>
+<div class="proof theorem admonition" id="theorem-1">
+<p class="admonition-title"><span class="caption-number">Theorem 4 </span> (Real Schur Decomposition)</p>
+<section class="theorem-content" id="proof-content">
+<p>It states that for any real square matrix <span class="math notranslate nohighlight">\(A\)</span>, there exists a <strong>real orthogonal matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span> (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>) such that:</p>
+<div class="math notranslate nohighlight">
+\[A = Q S Q^T\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(S\)</span> is a <strong>real block upper triangular matrix</strong>, also known as a <strong>quasi-triangular matrix</strong>.</p>
+<p>The structure of <span class="math notranslate nohighlight">\(S\)</span> is upper triangular, but its diagonal may contain both:</p>
+<ul class="simple">
+<li><p><strong><span class="math notranslate nohighlight">\(1 \times 1\)</span> blocks</strong>: These are the real eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(2 \times 2\)</span> blocks</strong>: These correspond to pairs of complex conjugate eigenvalues. A block of the form <span class="math notranslate nohighlight">\(\begin{pmatrix} a &amp; b \\ -b &amp; a \end{pmatrix}\)</span> represents the complex conjugate pair of eigenvalues <span class="math notranslate nohighlight">\(a \pm ib\)</span>.</p></li>
+</ul>
+</section>
+</div><p>For example, a <span class="math notranslate nohighlight">\(5 \times 5\)</span> real matrix with one real eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span> and two pairs of complex conjugate eigenvalues (<span class="math notranslate nohighlight">\(a \pm ib\)</span> and <span class="math notranslate nohighlight">\(c \pm id\)</span>) would have a real Schur form like this:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+S = \begin{pmatrix}
+\lambda_1 &amp; * &amp; * &amp; * &amp; * \\
+0 &amp; a &amp; b &amp; * &amp; * \\
+0 &amp; -b &amp; a &amp; * &amp; * \\
+0 &amp; 0 &amp; 0 &amp; c &amp; d \\
+0 &amp; 0 &amp; 0 &amp; -d &amp; c
+\end{pmatrix}
+\end{split}\]</div>
+<p>This form allows the entire decomposition to remain within the real numbers, which is often highly advantageous for computational algorithms.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Real Schur Decomposition</p>
+<p><strong>Proof by Induction.</strong> We prove the theorem by induction on the dimension <span class="math notranslate nohighlight">\(n\)</span> of the matrix.</p>
+<h3 class="rubric" id="base-case-n-1">Base Case (n=1)</h3>
+<p>For <span class="math notranslate nohighlight">\(n=1\)</span>, the matrix <span class="math notranslate nohighlight">\(A = [a]\)</span> is a scalar. The decomposition is trivial: <span class="math notranslate nohighlight">\(A = [1][a][1]^T\)</span>, where <span class="math notranslate nohighlight">\(Q = [1]\)</span> is orthogonal and <span class="math notranslate nohighlight">\(S = [a]\)</span> is quasi-upper triangular. The theorem holds.</p>
+<h3 class="rubric" id="inductive-hypothesis">Inductive Hypothesis</h3>
+<p>Assume that the Real Schur Decomposition exists for all real matrices of size <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> or smaller.</p>
+<h3 class="rubric" id="inductive-step">Inductive Step</h3>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be an <span class="math notranslate nohighlight">\(n \times n\)</span> real matrix. The characteristic polynomial of <span class="math notranslate nohighlight">\(A\)</span> has real coefficients. Therefore, its roots (the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>) are either real or appear in complex conjugate pairs. We consider two cases.</p>
+<h4 class="rubric" id="case-1-a-has-a-real-eigenvalue">Case 1: <span class="math notranslate nohighlight">\(A\)</span> has a real eigenvalue</h4>
+<p>Let <span class="math notranslate nohighlight">\(\lambda_1\)</span> be a real eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>, and let <span class="math notranslate nohighlight">\(q_1\)</span> be a corresponding real eigenvector with unit norm (<span class="math notranslate nohighlight">\(\|q_1\|_2 = 1\)</span>).</p>
+<ol class="arabic">
+<li><p>We can extend this single vector <span class="math notranslate nohighlight">\(q_1\)</span> to form a full orthonormal basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Let the matrix containing these basis vectors as its columns be <span class="math notranslate nohighlight">\(Q_1 = [q_1, v_2, \dots, v_n]\)</span>. By construction, <span class="math notranslate nohighlight">\(Q_1\)</span> is a real orthogonal matrix.</p></li>
+<li><p>Now, consider the similarity transformation <span class="math notranslate nohighlight">\(Q_1^T A Q_1\)</span>. The first column of this new matrix is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q_1^T A q_1 = Q_1^T (\lambda_1 q_1) = \lambda_1 (Q_1^T q_1) = \lambda_1 \begin{pmatrix} 1 \\ 0 \\ \vdots \\ 0 \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p>This means the transformation results in a block upper triangular matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q_1^T A Q_1 = \begin{pmatrix}
+    \lambda_1 &amp; \mathbf{w}^T \\
+    \mathbf{0} &amp; A_2
+    \end{pmatrix}
+    \end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A_2\)</span> is a real matrix of size <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span>.</p>
+</li>
+<li><p>By the inductive hypothesis, there exists a real orthogonal matrix <span class="math notranslate nohighlight">\(Q_2\)</span> and a quasi-upper triangular matrix <span class="math notranslate nohighlight">\(S_2\)</span> such that <span class="math notranslate nohighlight">\(A_2 = Q_2 S_2 Q_2^T\)</span>.</p></li>
+<li><p>Define a new <span class="math notranslate nohighlight">\(n \times n\)</span> orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q = Q_1 \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2 \end{pmatrix}
+    \end{split}\]</div>
+<p>This matrix is orthogonal as it is the product of two orthogonal matrices.</p>
+</li>
+<li><p>Finally, applying this transformation to <span class="math notranslate nohighlight">\(A\)</span> yields the desired form:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q^T A Q = \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2^T \end{pmatrix} (Q_1^T A Q_1) \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2 \end{pmatrix} = \begin{pmatrix} \lambda_1 &amp; \mathbf{w}^T Q_2 \\ \mathbf{0} &amp; Q_2^T A_2 Q_2 \end{pmatrix} = \begin{pmatrix} \lambda_1 &amp; \mathbf{w}^T Q_2 \\ \mathbf{0} &amp; S_2 \end{pmatrix}
+    \end{split}\]</div>
+<p>This matrix, which we call <span class="math notranslate nohighlight">\(S\)</span>, is quasi-upper triangular. Thus, <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span>.</p>
+</li>
+</ol>
+<h4 class="rubric" id="case-2-a-has-no-real-eigenvalues">Case 2: <span class="math notranslate nohighlight">\(A\)</span> has no real eigenvalues</h4>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> has no real eigenvalues, it must have a pair of complex conjugate eigenvalues, <span class="math notranslate nohighlight">\(\lambda = a + ib\)</span> and <span class="math notranslate nohighlight">\(\bar{\lambda} = a - ib\)</span>, where <span class="math notranslate nohighlight">\(b \neq 0\)</span>.</p>
+<ol class="arabic">
+<li><p>Let the complex eigenvector for <span class="math notranslate nohighlight">\(\lambda\)</span> be <span class="math notranslate nohighlight">\(z = x + iy\)</span>, where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> are real vectors. From <span class="math notranslate nohighlight">\(Az = \lambda z\)</span>, we get:</p>
+<div class="math notranslate nohighlight">
+\[
+    A(x+iy) = (a+ib)(x+iy) = (ax - by) + i(bx + ay)
+    \]</div>
+</li>
+<li><p>Equating the real and imaginary parts gives two real vector equations:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Ax = ax - by\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(Ay = bx + ay\)</span></p></li>
+</ul>
+</li>
+<li><p>These equations show that the subspace <span class="math notranslate nohighlight">\(W = \text{span}\{x, y\}\)</span> is a two-dimensional invariant subspace under <span class="math notranslate nohighlight">\(A\)</span>. (The vectors <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> must be linearly independent, otherwise <span class="math notranslate nohighlight">\(\lambda\)</span> would be real).</p></li>
+<li><p>Use the Gram-Schmidt process (this will be covered later, please accept this result for now) to find an orthonormal basis <span class="math notranslate nohighlight">\(\{q_1, q_2\}\)</span> for the subspace <span class="math notranslate nohighlight">\(W\)</span>. Extend this to a full orthonormal basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> and form the real orthogonal matrix <span class="math notranslate nohighlight">\(Q_1 = [q_1, q_2, \dots, q_n]\)</span>.</p></li>
+<li><p>Because <span class="math notranslate nohighlight">\(W\)</span> is an invariant subspace, <span class="math notranslate nohighlight">\(Aq_1\)</span> and <span class="math notranslate nohighlight">\(Aq_2\)</span> are linear combinations of only <span class="math notranslate nohighlight">\(q_1\)</span> and <span class="math notranslate nohighlight">\(q_2\)</span>. This means that the transformation <span class="math notranslate nohighlight">\(Q_1^T A Q_1\)</span> will have a block structure:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q_1^T A Q_1 = \begin{pmatrix}
+    B &amp; C \\
+    0 &amp; D
+    \end{pmatrix}
+    \end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(B\)</span> is a <span class="math notranslate nohighlight">\(2 \times 2\)</span> real matrix whose eigenvalues are the pair <span class="math notranslate nohighlight">\(\lambda, \bar{\lambda}\)</span>, and <span class="math notranslate nohighlight">\(D\)</span> is a real matrix of size <span class="math notranslate nohighlight">\((n-2) \times (n-2)\)</span>.</p>
+</li>
+<li><p>By the inductive hypothesis, there is a real Schur decomposition for <span class="math notranslate nohighlight">\(D\)</span>, so <span class="math notranslate nohighlight">\(D = Q_2 S_2 Q_2^T\)</span>.</p></li>
+<li><p>Define a new orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q = Q_1 \begin{pmatrix} I_2 &amp; 0 \\ 0 &amp; Q_2 \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p>This transformation yields the final quasi-upper triangular form:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q^T A Q = \begin{pmatrix} B &amp; C Q_2 \\ 0 &amp; S_2 \end{pmatrix}
+    \end{split}\]</div>
+<p>This matrix <span class="math notranslate nohighlight">\(S\)</span> has a <span class="math notranslate nohighlight">\(2 \times 2\)</span> block and a quasi-upper triangular block on its diagonal, and is therefore itself quasi-upper triangular.</p>
+</li>
+</ol>
+<p>Since both cases lead to the desired decomposition, the proof is complete by induction.</p>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="four_fundamental_subspaces.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Four Fundamental Subspaces</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="eigenvalues_and_eigenvectors.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Eigenvalues and Eigenvectors</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-schur-decomposition">The (Complex) Schur Decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-schur-decomposition">The Real Schur Decomposition</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

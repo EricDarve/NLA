@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Linear Transformations and Matrices &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Eigenvalues and Eigenvectors &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/linear_transformations';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/eigenvalues_and_eigenvectors';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Matrix-Matrix Multiplications" href="matrix_matrix_multiplication.html" />
-    <link rel="prev" title="Dot Product and Vector Norms" href="dot_product_and_norms.html" />
+    <link rel="next" title="Normal matrices" href="normal_matrices.html" />
+    <link rel="prev" title="Schur Decomposition" href="schur_decomposition.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -180,7 +180,7 @@
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
@@ -191,7 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schur_decomposition.html">Schur Decomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="eigenvalues_and_eigenvectors.html">Eigenvalues and Eigenvectors</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Eigenvalues and Eigenvectors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 </ul>
@@ -251,7 +251,7 @@
       
       
       
-      <li><a href="../_sources/content/linear_transformations.md" target="_blank"
+      <li><a href="../_sources/content/eigenvalues_and_eigenvectors.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -335,7 +335,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Linear Transformations and Matrices</h1>
+    <h1>Eigenvalues and Eigenvectors</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -345,14 +345,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations">Linear Transformations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations-as-matrices">Linear Transformations as Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-vector-product">Matrix-Vector Product</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose-and-conjugate-transpose">Transpose and Conjugate Transpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-matrices">Special Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-of-eigenvalues">Existence of Eigenvalues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-eigendecomposition-and-schur-form">The Eigendecomposition and Schur Form</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonalization-a-special-case">Diagonalization: A Special Case</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigendecomposition-and-dynamics-the-dimension-of-time">Eigendecomposition and Dynamics: The Dimension of “Time” ⏳</a></li>
 </ul>
             </nav>
         </div>
@@ -364,133 +360,107 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="linear-transformations-and-matrices">
-<h1>Linear Transformations and Matrices<a class="headerlink" href="#linear-transformations-and-matrices" title="Link to this heading">#</a></h1>
-<section id="linear-transformations">
-<h2>Linear Transformations<a class="headerlink" href="#linear-transformations" title="Link to this heading">#</a></h2>
-<p>A <strong>linear transformation</strong> from <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span> is a map<br />
-<span class="math notranslate nohighlight">\(T: \mathbb{R}^n \to \mathbb{R}^m\)</span> that satisfies <strong>linearity</strong>:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="eigenvalues-and-eigenvectors">
+<h1>Eigenvalues and Eigenvectors<a class="headerlink" href="#eigenvalues-and-eigenvectors" title="Link to this heading">#</a></h1>
+<p>The <strong>eigendecomposition</strong> is a way of breaking down a square matrix into its most fundamental parts: its eigenvalues and eigenvectors. This decomposition reveals the core properties of the linear transformation the matrix represents, especially how it behaves when applied repeatedly over time.</p>
+<p>For any square matrix <span class="math notranslate nohighlight">\(A\)</span>, a non-zero vector <span class="math notranslate nohighlight">\(x\)</span> is an <strong>eigenvector</strong> if applying <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(x\)</span> simply scales <span class="math notranslate nohighlight">\(x\)</span> by a factor <span class="math notranslate nohighlight">\(\lambda\)</span>, which is called the <strong>eigenvalue</strong>. This relationship is captured by the key equation:</p>
 <div class="math notranslate nohighlight">
-\[
-T(x + \alpha y) = T(x) + \alpha T(y)
-\]</div>
-<p>for all <span class="math notranslate nohighlight">\(x, y \in \mathbb{R}^n\)</span> and scalars <span class="math notranslate nohighlight">\(\alpha \in \mathbb{R}\)</span>.</p>
-<p>A linear transformation is completely determined by its action on a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.<br />
-If <span class="math notranslate nohighlight">\(\{v_1, \dots, v_n\}\)</span> is a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, and any vector <span class="math notranslate nohighlight">\(x\)</span> can be written as</p>
+\[Ax = \lambda x\]</div>
+<p>In essence, eigenvectors are the special directions that aren’t changed by the transformation, only stretched, compressed, or flipped.</p>
+<section id="existence-of-eigenvalues">
+<h2>Existence of Eigenvalues<a class="headerlink" href="#existence-of-eigenvalues" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="theorem-0">
+<p class="admonition-title"><span class="caption-number">Theorem 5 </span> (Existence of Eigenvalues)</p>
+<section class="theorem-content" id="proof-content">
+<p>A cornerstone of linear algebra is that every <span class="math notranslate nohighlight">\(n \times n\)</span> matrix with complex entries has at least one eigenvalue and its corresponding eigenvector.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Using the Characteristic Polynomial</p>
+<p>This is the most common proof and relies on the determinant and the Fundamental Theorem of Algebra.</p>
+<ol class="arabic">
+<li><p>The defining equation for an eigenvalue is <span class="math notranslate nohighlight">\(Ax = \lambda x\)</span>, which can be rewritten as:</p>
 <div class="math notranslate nohighlight">
-\[
-x = \sum_{i=1}^n \alpha_i v_i
-\]</div>
-<p>then</p>
+\[(A - \lambda I)x = 0\]</div>
+<p>where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p>
+</li>
+<li><p>For this equation to have a non-zero solution for <span class="math notranslate nohighlight">\(x\)</span>, the matrix <span class="math notranslate nohighlight">\((A - \lambda I)\)</span> must be <strong>singular</strong>. A square matrix is singular if and only if its determinant is zero.</p>
 <div class="math notranslate nohighlight">
-\[
-T(x) = \sum_{i=1}^n \alpha_i T(v_i).
-\]</div>
-<section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R}^2 \to \mathbb{R}^2\)</span><br />
-<span class="math notranslate nohighlight">\((1, 0) \mapsto (2, 0)\)</span>, <span class="math notranslate nohighlight">\((0, 1) \mapsto (0, -1)\)</span><br />
-Stretches the <span class="math notranslate nohighlight">\(x\)</span>-direction by a factor of <span class="math notranslate nohighlight">\(2\)</span> and flips the <span class="math notranslate nohighlight">\(y\)</span>-direction.</p></li>
-<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R}^2 \to \mathbb{R}^2\)</span><br />
-<span class="math notranslate nohighlight">\((1, 0) \mapsto \left(\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\)</span>,<br />
-<span class="math notranslate nohighlight">\((0, 1) \mapsto \left(-\frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}}\right)\)</span><br />
-Rotates the plane by <span class="math notranslate nohighlight">\(\pi/4\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R}^2 \to \mathbb{R}\)</span><br />
-<span class="math notranslate nohighlight">\((1, 0) \mapsto 1\)</span>, <span class="math notranslate nohighlight">\((0, 1) \mapsto 0\)</span><br />
-Orthogonal projection onto the <span class="math notranslate nohighlight">\(x\)</span>-axis.</p></li>
-<li><p><span class="math notranslate nohighlight">\(T: \mathbb{R} \to \mathbb{R}^2\)</span><br />
-<span class="math notranslate nohighlight">\(1 \mapsto (1, 1)\)</span><br />
-Maps <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> onto the line <span class="math notranslate nohighlight">\(y = x\)</span>.</p></li>
+\[\det(A - \lambda I) = 0\]</div>
+</li>
+<li><p>The expression <span class="math notranslate nohighlight">\(p(\lambda) = \det(A - \lambda I)\)</span> is a polynomial in the variable <span class="math notranslate nohighlight">\(\lambda\)</span>. If <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, this <strong>characteristic polynomial</strong> has degree <span class="math notranslate nohighlight">\(n\)</span>. For example, if <span class="math notranslate nohighlight">\(A = \begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}\)</span>, then:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \det(A - \lambda I) = \det\begin{pmatrix} a-\lambda &amp; b \\ c &amp; d-\lambda \end{pmatrix} = (a-\lambda)(d-\lambda) - bc = \lambda^2 - (a+d)\lambda + (ad-bc)
+    \end{split}\]</div>
+</li>
+<li><p>The <strong>Fundamental Theorem of Algebra</strong> states that any non-constant polynomial with complex coefficients has at least one root in the complex numbers.</p></li>
+<li><p>Since the characteristic polynomial <span class="math notranslate nohighlight">\(p(\lambda)\)</span> is a polynomial of degree <span class="math notranslate nohighlight">\(n \ge 1\)</span>, it must have at least one complex root. Any such root <span class="math notranslate nohighlight">\(\lambda_0\)</span> satisfies <span class="math notranslate nohighlight">\(\det(A - \lambda_0 I) = 0\)</span>, which by definition makes <span class="math notranslate nohighlight">\(\lambda_0\)</span> an eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
 </ol>
+</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Using Linear Dependence</p>
+<p>This algebraic proof avoids the use of determinants.</p>
+<ol class="arabic">
+<li><p>Take any non-zero vector <span class="math notranslate nohighlight">\(x \in \mathbb{C}^n\)</span>. Consider the following set of <span class="math notranslate nohighlight">\(n+1\)</span> vectors:</p>
+<div class="math notranslate nohighlight">
+\[\{x, Ax, A^2x, \dots, A^nx\}\]</div>
+</li>
+<li><p>Since these <span class="math notranslate nohighlight">\(n+1\)</span> vectors reside in an <span class="math notranslate nohighlight">\(n\)</span>-dimensional space, they must be <strong>linearly dependent</strong>. Therefore, there exist complex scalars <span class="math notranslate nohighlight">\(c_0, c_1, \dots, c_n\)</span>, not all zero, such that:</p>
+<div class="math notranslate nohighlight">
+\[c_0 x + c_1 Ax + c_2 A^2x + \dots + c_n A^nx = 0\]</div>
+</li>
+<li><p>This equation can be written as a polynomial in the matrix <span class="math notranslate nohighlight">\(A\)</span> acting on the vector <span class="math notranslate nohighlight">\(x\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[P(A)x = 0 \quad \text{where} \quad P(z) = c_0 + c_1 z + \dots + c_n z^n\]</div>
+</li>
+<li><p>By the Fundamental Theorem of Algebra, we can factor the polynomial <span class="math notranslate nohighlight">\(P(z)\)</span> in terms of its roots <span class="math notranslate nohighlight">\(\lambda_1, \dots, \lambda_k\)</span> (where <span class="math notranslate nohighlight">\(k \le n\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[P(z) = c_n(z - \lambda_1)(z - \lambda_2)\cdots(z - \lambda_k)\]</div>
+</li>
+<li><p>Substituting the matrix <span class="math notranslate nohighlight">\(A\)</span> back into this factored form gives:</p>
+<div class="math notranslate nohighlight">
+\[c_n(A - \lambda_1 I)(A - \lambda_2 I)\cdots(A - \lambda_k I)x = 0\]</div>
+</li>
+<li><p>Let’s read this expression from right to left. Let <span class="math notranslate nohighlight">\(v_k = x\)</span>, <span class="math notranslate nohighlight">\(v_{k-1} = (A - \lambda_k I)v_k\)</span>, <span class="math notranslate nohighlight">\(v_{k-2} = (A - \lambda_{k-1} I)v_{k-1}\)</span>, and so on. Since the final result is the zero vector, and we started with a non-zero vector <span class="math notranslate nohighlight">\(x\)</span>, there must be some step where a non-zero vector was transformed into the zero vector.</p></li>
+<li><p>That is, there must be some index <span class="math notranslate nohighlight">\(i\)</span> and some non-zero vector <span class="math notranslate nohighlight">\(v_i\)</span> such that <span class="math notranslate nohighlight">\((A - \lambda_i I)v_i = 0\)</span>. This is the definition of <span class="math notranslate nohighlight">\(\lambda_i\)</span> being an eigenvalue with corresponding eigenvector <span class="math notranslate nohighlight">\(v_i\)</span>. If no such step existed, all the matrices <span class="math notranslate nohighlight">\((A-\lambda_i I)\)</span> would be invertible, and their product would also be invertible, which contradicts the fact that it maps the non-zero vector <span class="math notranslate nohighlight">\(x\)</span> to zero.</p></li>
+</ol>
+</div>
 </section>
-</section>
-<hr class="docutils" />
-<section id="linear-transformations-as-matrices">
-<h2>Linear Transformations as Matrices<a class="headerlink" href="#linear-transformations-as-matrices" title="Link to this heading">#</a></h2>
-<p>A particularly useful basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is the <strong>standard basis</strong>:</p>
+<section id="the-eigendecomposition-and-schur-form">
+<h2>The Eigendecomposition and Schur Form<a class="headerlink" href="#the-eigendecomposition-and-schur-form" title="Link to this heading">#</a></h2>
+<p>The existence of one eigenvalue leads to a more powerful result: any square matrix <span class="math notranslate nohighlight">\(A\)</span> can be decomposed into the form:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-e_i =
-\begin{pmatrix}
-0 \\ \vdots \\ 1 \\ \vdots \\ 0
-\end{pmatrix}
-\end{split}\]</div>
-<p>with the <span class="math notranslate nohighlight">\(1\)</span> in the <span class="math notranslate nohighlight">\(i\)</span>-th position.</p>
-<p>Any vector <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span> can be written as:</p>
-<div class="math notranslate nohighlight">
-\[
-x = \sum_{i=1}^n x_i e_i.
-\]</div>
-<p>If <span class="math notranslate nohighlight">\(T(e_i) = a_i \in \mathbb{R}^m\)</span>, we can write <span class="math notranslate nohighlight">\(a_i\)</span> in the standard basis as:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-a_i =
-\begin{pmatrix}
-a_{1i} \\ a_{2i} \\ \vdots \\ a_{mi}
-\end{pmatrix}.
-\end{split}\]</div>
-<p>Placing these column vectors <span class="math notranslate nohighlight">\(a_i\)</span> side-by-side forms the <strong>matrix representation</strong> of <span class="math notranslate nohighlight">\(T\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A =
-\begin{pmatrix}
-a_{11} &amp; a_{12} &amp; \cdots &amp; a_{1n} \\
-a_{21} &amp; a_{22} &amp; \cdots &amp; a_{2n} \\
-\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-a_{m1} &amp; a_{m2} &amp; \cdots &amp; a_{mn}
-\end{pmatrix}.
-\end{split}\]</div>
-</section>
-<hr class="docutils" />
-<section id="matrix-vector-product">
-<h2>Matrix-Vector Product<a class="headerlink" href="#matrix-vector-product" title="Link to this heading">#</a></h2>
-<p>For <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>, we have:</p>
-<div class="math notranslate nohighlight">
-\[
-T(x) = \sum_{i=1}^n x_i a_i.
-\]</div>
-<p>This is a <strong>linear combination of the columns of <span class="math notranslate nohighlight">\(A\)</span></strong>, with coefficients given by the entries of <span class="math notranslate nohighlight">\(x\)</span>.<br />
-The formula for the <strong>matrix-vector product</strong> is:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-Ax =
-\begin{pmatrix}
-\sum_{j=1}^n a_{1j} x_j \\
-\sum_{j=1}^n a_{2j} x_j \\
-\vdots \\
-\sum_{j=1}^n a_{mj} x_j
-\end{pmatrix}.
-\end{split}\]</div>
-</section>
-<hr class="docutils" />
-<section id="transpose-and-conjugate-transpose">
-<h2>Transpose and Conjugate Transpose<a class="headerlink" href="#transpose-and-conjugate-transpose" title="Link to this heading">#</a></h2>
+\[A = Q T Q^{-1}\]</div>
+<p>This is known as the <strong>Schur Decomposition</strong>. In this form:</p>
 <ul class="simple">
-<li><p><strong>Transpose</strong> <span class="math notranslate nohighlight">\(A^T\)</span>: <span class="math notranslate nohighlight">\((i, j)\)</span> entry of <span class="math notranslate nohighlight">\(A^T\)</span> is <span class="math notranslate nohighlight">\(a_{ji}\)</span>.</p></li>
-<li><p><strong>Conjugate transpose</strong> <span class="math notranslate nohighlight">\(A^H\)</span>: Take complex conjugate of each entry of <span class="math notranslate nohighlight">\(A^T\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(T\)</span> is an <strong>upper triangular matrix</strong>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>unitary matrix</strong> (meaning <span class="math notranslate nohighlight">\(Q^{-1} = Q^H\)</span>, its conjugate transpose), which acts as a change-of-basis matrix.</p></li>
 </ul>
-<p>Key property for real matrices:</p>
-<div class="math notranslate nohighlight">
-\[
-(Ax)^T y = x^T (A^T y).
-\]</div>
-<p>For complex matrices:</p>
-<div class="math notranslate nohighlight">
-\[
-(Ax)^H y = x^H (A^H y).
-\]</div>
+<p>The crucial insight here is that the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are exactly the diagonal entries of the triangular matrix <span class="math notranslate nohighlight">\(T\)</span>. This decomposition proves that an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix has exactly <span class="math notranslate nohighlight">\(n\)</span> eigenvalues in the complex plane, counted with multiplicity.</p>
 </section>
-<hr class="docutils" />
-<section id="special-matrices">
-<h2>Special Matrices<a class="headerlink" href="#special-matrices" title="Link to this heading">#</a></h2>
+<section id="diagonalization-a-special-case">
+<h2>Diagonalization: A Special Case<a class="headerlink" href="#diagonalization-a-special-case" title="Link to this heading">#</a></h2>
+<p>The most useful form of eigendecomposition happens when a matrix is <strong>diagonalizable</strong>, which occurs if it has a full set of <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors.</p>
+<p>In this case, the matrix <span class="math notranslate nohighlight">\(T\)</span> becomes a diagonal matrix, often written as <span class="math notranslate nohighlight">\(\Lambda\)</span>, and the change-of-basis matrix <span class="math notranslate nohighlight">\(Q\)</span> becomes the matrix <span class="math notranslate nohighlight">\(X\)</span> whose columns are the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>. The decomposition takes the famous form:</p>
+<div class="math notranslate nohighlight">
+\[A = X \Lambda X^{-1}\]</div>
+</section>
+<section id="eigendecomposition-and-dynamics-the-dimension-of-time">
+<h2>Eigendecomposition and Dynamics: The Dimension of “Time” ⏳<a class="headerlink" href="#eigendecomposition-and-dynamics-the-dimension-of-time" title="Link to this heading">#</a></h2>
+<p>The true power of eigendecomposition is revealed when we analyze dynamical systems—systems that evolve over time. This is why eigendecomposition is conceptually associated with <strong>“Time”</strong>, while the Singular Value Decomposition (SVD) is often associated with <strong>“Space”</strong> (as it describes the geometry of a transformation).</p>
+<p>Consider a system where the state at time <span class="math notranslate nohighlight">\(k+1\)</span> is found from the state at time <span class="math notranslate nohighlight">\(k\)</span> by the rule <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>. To find the state after many steps, we need to compute <span class="math notranslate nohighlight">\(x_k = A^k x_0\)</span>.</p>
+<p>Calculating powers of a matrix, <span class="math notranslate nohighlight">\(A^k\)</span>, is often difficult. However, if <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, the task becomes simple:</p>
+<div class="math notranslate nohighlight">
+\[A^k = (X \Lambda X^{-1})^k = (X \Lambda X^{-1})(X \Lambda X^{-1})\cdots(X \Lambda X^{-1}) = X \Lambda^k X^{-1}\]</div>
+<p>Calculating <span class="math notranslate nohighlight">\(\Lambda^k\)</span> is incredibly easy, as it’s a diagonal matrix. We just raise its diagonal entries (the eigenvalues) to the <span class="math notranslate nohighlight">\(k\)</span>-th power:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Lambda^k = \begin{pmatrix} \lambda_1^k &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; \lambda_2^k &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; \lambda_n^k \end{pmatrix}\end{split}\]</div>
+<p>This direct link means the long-term behavior of the system is governed entirely by the magnitudes of its eigenvalues:</p>
 <ul class="simple">
-<li><p><strong>Symmetric</strong>: <span class="math notranslate nohighlight">\(A^T = A\)</span></p></li>
-<li><p><strong>Skew-symmetric</strong>: <span class="math notranslate nohighlight">\(A^T = -A\)</span></p></li>
-<li><p><strong>Hermitian</strong>: <span class="math notranslate nohighlight">\(A^H = A\)</span></p></li>
-<li><p><strong>Skew-Hermitian</strong>: <span class="math notranslate nohighlight">\(A^H = -A\)</span></p></li>
+<li><p>If all <span class="math notranslate nohighlight">\(|\lambda_i| &lt; 1\)</span>, the system is <strong>stable</strong> and goes to zero as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p></li>
+<li><p>If any <span class="math notranslate nohighlight">\(|\lambda_i| &gt; 1\)</span>, the system is <strong>unstable</strong> and will diverge.</p></li>
 </ul>
-<p>Vectors are treated as column vectors (<span class="math notranslate nohighlight">\(n \times 1\)</span> matrices). Their transposes are row vectors (<span class="math notranslate nohighlight">\(1 \times n\)</span> matrices).</p>
+<p>This same principle applies to continuous systems described by differential equations like <span class="math notranslate nohighlight">\(\frac{d\vec{u}}{dt} = A\vec{u}\)</span>. The solution involves the matrix exponential <span class="math notranslate nohighlight">\(e^{At}\)</span>, which is readily computed using the eigendecomposition, showing how the eigenvalues control the exponential growth or decay of the system’s modes over time.</p>
 </section>
 </section>
 
@@ -525,20 +495,20 @@ Ax =
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dot_product_and_norms.html"
+       href="schur_decomposition.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Dot Product and Vector Norms</p>
+        <p class="prev-next-title">Schur Decomposition</p>
       </div>
     </a>
     <a class="right-next"
-       href="matrix_matrix_multiplication.html"
+       href="normal_matrices.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Matrix-Matrix Multiplications</p>
+        <p class="prev-next-title">Normal matrices</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -558,14 +528,10 @@ Ax =
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations">Linear Transformations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-transformations-as-matrices">Linear Transformations as Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-vector-product">Matrix-Vector Product</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose-and-conjugate-transpose">Transpose and Conjugate Transpose</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-matrices">Special Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-of-eigenvalues">Existence of Eigenvalues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-eigendecomposition-and-schur-form">The Eigendecomposition and Schur Form</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonalization-a-special-case">Diagonalization: A Special Case</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigendecomposition-and-dynamics-the-dimension-of-time">Eigendecomposition and Dynamics: The Dimension of “Time” ⏳</a></li>
 </ul>
   </nav></div>
 

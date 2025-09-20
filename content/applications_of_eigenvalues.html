@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Linear Algebra Bootcamp &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Applications of Eigenvalues &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/bootcamp';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/applications_of_eigenvalues';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Vector spaces" href="vector_space.html" />
-    <link rel="prev" title="Class Notes 2025" href="intro.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Normal matrices" href="normal_matrices.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -193,7 +193,7 @@
 <li class="toctree-l2"><a class="reference internal" href="schur_decomposition.html">Schur Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigenvalues_and_eigenvectors.html">Eigenvalues and Eigenvectors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Applications of Eigenvalues</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -251,7 +251,7 @@
       
       
       
-      <li><a href="../_sources/content/bootcamp.md" target="_blank"
+      <li><a href="../_sources/content/applications_of_eigenvalues.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -322,7 +322,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -333,11 +335,27 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Linear Algebra Bootcamp</h1>
+    <h1>Applications of Eigenvalues</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-determinant-and-trace">Computing Determinant and Trace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-applications-of-eigenvalues">Other Applications of Eigenvalues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-of-dynamical-systems">Stability of Dynamical Systems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-component-analysis-pca">Principal Component Analysis (PCA)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vibrational-analysis-and-resonance">Vibrational Analysis and Resonance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-mechanics">Quantum Mechanics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#google-s-pagerank-algorithm">Google’s PageRank Algorithm</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -347,13 +365,49 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="linear-algebra-bootcamp">
-<h1>Linear Algebra Bootcamp<a class="headerlink" href="#linear-algebra-bootcamp" title="Link to this heading">#</a></h1>
-<p>This chapter provides a quick overview of linear algebra, focusing on the mathematical ideas and definitions that are foundational for the rest of the book. For convenience, some of the notation used throughout the book is listed in Table 1.</p>
-<p>We are assuming that the reader has seen some linear algebra before. If that’s the case, this chapter will be a great review. If not, this chapter will get you up to speed on the core ideas, and we additionally recommend taking a look at a linear algebra textbook like (there are many excellent ones).</p>
-<p>Let’s get started!</p>
-<div class="toctree-wrapper compound">
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="applications-of-eigenvalues">
+<h1>Applications of Eigenvalues<a class="headerlink" href="#applications-of-eigenvalues" title="Link to this heading">#</a></h1>
+<p>The determinant of a matrix is the product of its eigenvalues, and the trace is the sum of its eigenvalues. This relationship provides a powerful theoretical and computational shortcut, connecting a matrix’s overall properties to its fundamental modes of action.</p>
+<section id="computing-determinant-and-trace">
+<h2>Computing Determinant and Trace<a class="headerlink" href="#computing-determinant-and-trace" title="Link to this heading">#</a></h2>
+<p>For any <span class="math notranslate nohighlight">\(n \times n\)</span> square matrix <span class="math notranslate nohighlight">\(A\)</span> with eigenvalues <span class="math notranslate nohighlight">\(\lambda_1, \lambda_2, \dots, \lambda_n\)</span> (counted with multiplicity), the following relationships hold:</p>
+<ul class="simple">
+<li><p><strong>Determinant</strong>: The determinant is the product of the eigenvalues.
+$<span class="math notranslate nohighlight">\(
+  \det(A) = \prod_{i=1}^n \lambda_i = \lambda_1 \cdot \lambda_2 \cdots \lambda_n
+  \)</span>$</p></li>
+<li><p><strong>Trace</strong>: The trace is the sum of the eigenvalues.
+$<span class="math notranslate nohighlight">\(
+  \text{tr}(A) = \sum_{i=1}^n \lambda_i = \lambda_1 + \lambda_2 + \cdots + \lambda_n
+  \)</span>$</p></li>
+</ul>
+<p>These formulas follow from the <strong>Schur decomposition</strong> (<span class="math notranslate nohighlight">\(A = QTQ^H\)</span>), where <span class="math notranslate nohighlight">\(T\)</span> is an upper triangular matrix with the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> on its diagonal. The determinant of <span class="math notranslate nohighlight">\(A\)</span> is equal to the determinant of <span class="math notranslate nohighlight">\(T\)</span>, which is simply the product of its diagonal entries. Similarly, the trace of <span class="math notranslate nohighlight">\(A\)</span> is equal to the trace of <span class="math notranslate nohighlight">\(T\)</span>, which is the sum of its diagonal entries.</p>
+</section>
+<hr class="docutils" />
+<section id="other-applications-of-eigenvalues">
+<h2>Other Applications of Eigenvalues<a class="headerlink" href="#other-applications-of-eigenvalues" title="Link to this heading">#</a></h2>
+<p>Eigenvalues and their corresponding eigenvectors are among the most important concepts in applied mathematics, revealing the deep structure of linear transformations. 🗺️</p>
+<section id="stability-of-dynamical-systems">
+<h3>Stability of Dynamical Systems<a class="headerlink" href="#stability-of-dynamical-systems" title="Link to this heading">#</a></h3>
+<p>For systems that evolve over time, such as <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>, the magnitudes of the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> determine the system’s long-term behavior. If all eigenvalues have a magnitude less than 1, the system is stable and converges to zero. If any eigenvalue has a magnitude greater than 1, the system is unstable and diverges.</p>
+</section>
+<section id="principal-component-analysis-pca">
+<h3>Principal Component Analysis (PCA)<a class="headerlink" href="#principal-component-analysis-pca" title="Link to this heading">#</a></h3>
+<p>In data science and statistics, PCA is a technique used to reduce the dimensionality of data. It works by finding the eigenvalues and eigenvectors of the data’s covariance matrix. The eigenvectors (principal components) define the directions of greatest variance in the data, and the corresponding eigenvalues measure how much variance lies along each of those directions. By keeping only the components with the largest eigenvalues, one can simplify the data with minimal loss of information.</p>
+</section>
+<section id="vibrational-analysis-and-resonance">
+<h3>Vibrational Analysis and Resonance<a class="headerlink" href="#vibrational-analysis-and-resonance" title="Link to this heading">#</a></h3>
+<p>In physics and engineering, eigenvalues determine the natural vibrational frequencies of a mechanical structure, like a bridge or an airplane wing. When an external force is applied at a frequency matching one of these eigenvalues, <strong>resonance</strong> occurs, leading to potentially catastrophic vibrations. This is why engineers design structures to avoid these natural frequencies.</p>
+</section>
+<section id="quantum-mechanics">
+<h3>Quantum Mechanics<a class="headerlink" href="#quantum-mechanics" title="Link to this heading">#</a></h3>
+<p>In quantum mechanics, physical properties like energy, momentum, and spin are represented by mathematical operators (matrices). The <strong>eigenvalues</strong> of these operators correspond to the possible, measurable values of that property. For example, the eigenvalues of the Hamiltonian operator give the discrete energy levels of an atom.</p>
+</section>
+<section id="google-s-pagerank-algorithm">
+<h3>Google’s PageRank Algorithm<a class="headerlink" href="#google-s-pagerank-algorithm" title="Link to this heading">#</a></h3>
+<p>The original algorithm that powered Google’s search engine uses the concept of eigenvectors. The entire World Wide Web is modeled as a massive matrix, where an entry <span class="math notranslate nohighlight">\(A_{ij}\)</span> is non-zero if page <span class="math notranslate nohighlight">\(j\)</span> links to page <span class="math notranslate nohighlight">\(i\)</span>. The eigenvector corresponding to the largest eigenvalue of this matrix is the <strong>PageRank vector</strong>. The entries of this vector assign an importance score to every page on the web, which is then used to rank search results.</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -387,20 +441,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="intro.html"
+       href="normal_matrices.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Class Notes 2025</p>
+        <p class="prev-next-title">Normal matrices</p>
       </div>
     </a>
     <a class="right-next"
-       href="vector_space.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Vector spaces</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -410,6 +464,29 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-determinant-and-trace">Computing Determinant and Trace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-applications-of-eigenvalues">Other Applications of Eigenvalues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-of-dynamical-systems">Stability of Dynamical Systems</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-component-analysis-pca">Principal Component Analysis (PCA)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vibrational-analysis-and-resonance">Vibrational Analysis and Resonance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-mechanics">Quantum Mechanics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#google-s-pagerank-algorithm">Google’s PageRank Algorithm</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
