@@ -193,6 +193,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Eigendecomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -637,6 +638,19 @@ A = X \Lambda X^{-1}
 <h3>Application: Calculating Powers of a Matrix<a class="headerlink" href="#application-calculating-powers-of-a-matrix" title="Link to this heading">#</a></h3>
 <p>Consider a system whose state at time <span class="math notranslate nohighlight">\(k+1\)</span>, denoted <span class="math notranslate nohighlight">\(x_{k+1}\)</span>, is derived from its state at time <span class="math notranslate nohighlight">\(k\)</span>, <span class="math notranslate nohighlight">\(x_k\)</span>, by the linear rule <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>. To find the state after <span class="math notranslate nohighlight">\(k\)</span> steps, we must calculate <span class="math notranslate nohighlight">\(x_k = A^k x_0\)</span>.</p>
 <p>Calculating <span class="math notranslate nohighlight">\(A^k\)</span> directly is often computationally complex. However, if <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, the computation simplifies immensely:</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Computing Matrix Powers <span class="math notranslate nohighlight">\(A^k\)</span></p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable such that <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span>, then calculating the <span class="math notranslate nohighlight">\(k\)</span>-th power of <span class="math notranslate nohighlight">\(A\)</span> involves a simple simplification due to the telescoping nature of the product:</p>
+<div class="math notranslate nohighlight">
+\[
+A^k = (X \Lambda X^{-1})^k = (X \Lambda X^{-1})(X \Lambda X^{-1})\cdots(X \Lambda X^{-1}) = X \Lambda^k X^{-1}
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\Lambda\)</span> is a diagonal matrix, calculating <span class="math notranslate nohighlight">\(\Lambda^k\)</span> only requires raising its diagonal entries (the eigenvalues) to the <span class="math notranslate nohighlight">\(k\)</span>-th power:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\Lambda^k = \begin{pmatrix} \lambda_1^k &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; \lambda_2^k &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; \lambda_n^k \end{pmatrix}
+\end{split}\]</div>
+</div>
 </section>
 <section id="interpretation-dynamics-and-stability">
 <h3>Interpretation: Dynamics and Stability<a class="headerlink" href="#interpretation-dynamics-and-stability" title="Link to this heading">#</a></h3>

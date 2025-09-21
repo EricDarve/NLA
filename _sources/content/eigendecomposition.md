@@ -272,7 +272,8 @@ Consider a system whose state at time $k+1$, denoted $x_{k+1}$, is derived from 
 
 Calculating $A^k$ directly is often computationally complex. However, if $A$ is diagonalizable, the computation simplifies immensely:
 
-```{proof} Computing Matrix Powers $A^k$
+```{prf:proof} Computing Matrix Powers $A^k$
+
 If $A$ is diagonalizable such that $A = X \Lambda X^{-1}$, then calculating the $k$-th power of $A$ involves a simple simplification due to the telescoping nature of the product:
 
 $$

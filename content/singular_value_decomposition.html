@@ -1,0 +1,784 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Singular Value Decomposition &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/singular_value_decomposition';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Applications of Eigenvalues" href="applications_of_eigenvalues.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Singular Value Decomposition</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/singular_value_decomposition.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Singular Value Decomposition</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explanation-of-singular-value-decomposition-svd">Explanation of Singular Value Decomposition (SVD)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#svd-and-the-association-with-space-scales-of-the-matrix">SVD and the Association with “Space” (Scales of the Matrix)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-between-svd-and-the-four-fundamental-spaces">Connection between SVD and the Four Fundamental Spaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-with-rank-and-the-rank-nullity-theorem">Connection with Rank and the Rank-Nullity Theorem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-the-existence-of-the-svd">Proof of the Existence of the SVD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relation-of-svd-with-eigendecomposition-of-symmetric-matrices">Relation of SVD with Eigendecomposition of Symmetric Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thin-or-truncated-svd">Thin or Truncated SVD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-eckart-young-mirsky-theorem-optimal-low-rank-approximation">The Eckart-Young-Mirsky Theorem: Optimal Low-Rank Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-with-matrix-norms-and-the-determinant-of-a-matrix">Connection with Matrix Norms and the Determinant of a Matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-norms-frobenius-norm">Matrix Norms (Frobenius Norm)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-schatten-p-norms">Connection to Schatten <span class="math notranslate nohighlight">\(p\)</span>-Norms</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant-and-singular-values">Determinant and Singular Values</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="singular-value-decomposition">
+<h1>Singular Value Decomposition<a class="headerlink" href="#singular-value-decomposition" title="Link to this heading">#</a></h1>
+<p>The Singular Value Decomposition (SVD) is one of the most important matrix factorizations used in data science and machine learning. It is a vital tool used in methods like Principal Component Analysis (PCA) and Latent Semantic Analysis (LSA).</p>
+<section id="explanation-of-singular-value-decomposition-svd">
+<h2>Explanation of Singular Value Decomposition (SVD)<a class="headerlink" href="#explanation-of-singular-value-decomposition-svd" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="thm:svd">
+<p class="admonition-title"><span class="caption-number">Theorem 6 </span></p>
+<section class="theorem-content" id="proof-content">
+<p>The SVD expresses any <span class="math notranslate nohighlight">\(m \times n\)</span> real matrix <span class="math notranslate nohighlight">\(A\)</span> as the product of three specific matrices:</p>
+<div class="math notranslate nohighlight">
+\[ A = U \Sigma V^T \]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix.</p></li>
+<li><p><span class="math notranslate nohighlight">\(U\)</span> is an orthogonal matrix (<span class="math notranslate nohighlight">\(m \times m\)</span>), whose columns are the <strong>left singular vectors</strong>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(V\)</span> is an orthogonal matrix (<span class="math notranslate nohighlight">\(n \times n\)</span>), whose columns are the <strong>right singular vectors</strong>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Sigma\)</span> (or <span class="math notranslate nohighlight">\(\Lambda\)</span>) is an <span class="math notranslate nohighlight">\(m \times n\)</span> rectangular diagonal matrix. Its diagonal elements, <span class="math notranslate nohighlight">\(\sigma_i\)</span>, are real, non-negative numbers called <strong>singular values</strong>. These singular values are arranged in descending order: <span class="math notranslate nohighlight">\(\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_p \geq 0\)</span>, where <span class="math notranslate nohighlight">\(p = \min(m, n)\)</span>.</p></li>
+</ul>
+</section>
+</div><p>The SVD exists for any real matrix, even if it is not a square matrix. It can be regarded as a generalization of the diagonalization of a square matrix.</p>
+</section>
+<section id="svd-and-the-association-with-space-scales-of-the-matrix">
+<h2>SVD and the Association with “Space” (Scales of the Matrix)<a class="headerlink" href="#svd-and-the-association-with-space-scales-of-the-matrix" title="Link to this heading">#</a></h2>
+<p>SVD is conceptually associated with <strong>“Space”</strong> because it describes the geometry of a transformation, unlike eigendecomposition, which is associated with “Time”. SVD systematically represents the <strong>multiple scales</strong> involved when the matrix <span class="math notranslate nohighlight">\(A\)</span> is applied to a vector.</p>
+<p>Geometrically, an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> represents a linear transformation from the <span class="math notranslate nohighlight">\(n\)</span>-dimensional space <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> to the <span class="math notranslate nohighlight">\(m\)</span>-dimensional space <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>. The SVD decomposes this complex transformation into three simple, sequential transformations:</p>
+<ol class="arabic simple">
+<li><p><strong>Rotation/Reflection (<span class="math notranslate nohighlight">\(V^T\)</span>):</strong> A rotation or reflection transformation of the orthogonal coordinate system in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p></li>
+<li><p><strong>Scaling (<span class="math notranslate nohighlight">\(\Sigma\)</span>):</strong> A scaling transformation of the coordinate axes by the factors <span class="math notranslate nohighlight">\(\sigma_1, \sigma_2, \ldots\)</span>. These singular values (<span class="math notranslate nohighlight">\(\sigma_i\)</span>) represent the pure scaling applied by the matrix.</p></li>
+<li><p><strong>Rotation/Reflection (<span class="math notranslate nohighlight">\(U\)</span>):</strong> A final rotation or reflection transformation of the coordinate system in <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p></li>
+</ol>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> transforms a unit ball in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> into an ellipsoid, <strong>the lengths of the axes of this ellipsoid are the singular values of <span class="math notranslate nohighlight">\(A\)</span></strong>.</p>
+</section>
+<section id="connection-between-svd-and-the-four-fundamental-spaces">
+<h2>Connection between SVD and the Four Fundamental Spaces<a class="headerlink" href="#connection-between-svd-and-the-four-fundamental-spaces" title="Link to this heading">#</a></h2>
+<p>The vectors composing the orthogonal matrices <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> provide orthonormal bases for the four fundamental subspaces associated with matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<p>Let <span class="math notranslate nohighlight">\(r\)</span> be the rank of matrix <span class="math notranslate nohighlight">\(A\)</span>, which is equal to the number of non-zero singular values (<span class="math notranslate nohighlight">\(\sigma_r &gt; 0\)</span>, <span class="math notranslate nohighlight">\(\sigma_{r+1} = 0\)</span>, etc.).</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Subspace</p></th>
+<th class="head text-left"><p>Basis Vectors (Dimension <span class="math notranslate nohighlight">\(r\)</span>)</p></th>
+<th class="head text-left"><p>Orthonormal Bases Constituted by SVD Vectors</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Row Space</strong> (<span class="math notranslate nohighlight">\(R(A^T)\)</span>)</p></td>
+<td class="text-left"><p>Subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td class="text-left"><p>The first <span class="math notranslate nohighlight">\(r\)</span> right singular vectors: <span class="math notranslate nohighlight">\(v_1, \ldots, v_r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Null Space</strong> (<span class="math notranslate nohighlight">\(N(A)\)</span>)</p></td>
+<td class="text-left"><p>Subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td class="text-left"><p>The remaining <span class="math notranslate nohighlight">\(n-r\)</span> right singular vectors: <span class="math notranslate nohighlight">\(v_{r+1}, \ldots, v_n\)</span></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Column Space</strong> (<span class="math notranslate nohighlight">\(R(A)\)</span>)</p></td>
+<td class="text-left"><p>Subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span></p></td>
+<td class="text-left"><p>The first <span class="math notranslate nohighlight">\(r\)</span> left singular vectors: <span class="math notranslate nohighlight">\(u_1, \ldots, u_r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Left Null Space</strong> (<span class="math notranslate nohighlight">\(N(A^T)\)</span>)</p></td>
+<td class="text-left"><p>Subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span></p></td>
+<td class="text-left"><p>The remaining <span class="math notranslate nohighlight">\(m-r\)</span> left singular vectors: <span class="math notranslate nohighlight">\(u_{r+1}, \ldots, u_m\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The SVD bases demonstrate that the row space (<span class="math notranslate nohighlight">\(R(A^T)\)</span>) and the null space (<span class="math notranslate nohighlight">\(N(A)\)</span>) are orthogonal complements in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, while the column space (<span class="math notranslate nohighlight">\(R(A)\)</span>) and the left null space (<span class="math notranslate nohighlight">\(N(A^T)\)</span>) are orthogonal complements in <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p>
+</section>
+<section id="connection-with-rank-and-the-rank-nullity-theorem">
+<h2>Connection with Rank and the Rank-Nullity Theorem<a class="headerlink" href="#connection-with-rank-and-the-rank-nullity-theorem" title="Link to this heading">#</a></h2>
+<p>The <strong>rank</strong> of matrix <span class="math notranslate nohighlight">\(A\)</span> is precisely equal to <span class="math notranslate nohighlight">\(r\)</span>, the number of positive singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
+<p>The SVD provides orthonormal bases that explicitly recover the <strong>Rank-Nullity Theorem</strong>, which states that the dimension of the column space (rank) plus the dimension of the null space (nullity) equals the number of columns (<span class="math notranslate nohighlight">\(n\)</span>).</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\text{dim}(R(A^T)) = r\)</span> (Rank).</p></li>
+<li><p><span class="math notranslate nohighlight">\(\text{dim}(N(A)) = n - r\)</span> (Nullity).</p></li>
+<li><p><span class="math notranslate nohighlight">\(r + (n-r) = n\)</span>.</p></li>
+</ul>
+</section>
+<section id="proof-of-the-existence-of-the-svd">
+<h2>Proof of the Existence of the SVD<a class="headerlink" href="#proof-of-the-existence-of-the-svd" title="Link to this heading">#</a></h2>
+<p>The existence of the SVD for any <span class="math notranslate nohighlight">\(m \times n\)</span> real matrix <span class="math notranslate nohighlight">\(A\)</span> is guaranteed by a basic theorem (Theorem 15.1). A constructive proof can be derived by analyzing the related symmetric matrices. Another approach involves diagonalizing a related symmetric matrix:</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Let <span class="math notranslate nohighlight">\(A\)</span> be an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix. Define the symmetric matrix <span class="math notranslate nohighlight">\(B\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} B = \begin{bmatrix} 0 &amp; A \\ A^T &amp; 0 \end{bmatrix} \end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(B\)</span> is symmetric, it is unitarily diagonalizable:</p>
+<div class="math notranslate nohighlight">
+\[ B = Q \Lambda Q^T \]</div>
+<p>where <span class="math notranslate nohighlight">\(\Lambda\)</span> is a diagonal matrix of eigenvalues and <span class="math notranslate nohighlight">\(Q\)</span> is an orthogonal matrix of eigenvectors.
+We consider an eigenvector <span class="math notranslate nohighlight">\([x; y]\)</span> of <span class="math notranslate nohighlight">\(B\)</span> corresponding to a non-zero eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span>. The definition of the eigenvalue/eigenvector relationship <span class="math notranslate nohighlight">\(B [x; y] = \lambda [x; y]\)</span> yields the equations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{gather}
+A y = \lambda x \\
+A^T x = \lambda y
+\end{gather}
+\end{split}\]</div>
+<p>Applying <span class="math notranslate nohighlight">\(A^T\)</span> to the first equation and <span class="math notranslate nohighlight">\(A\)</span> to the second, we find:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{gather}
+A^T A y = \lambda (A^T x) = \lambda (\lambda y) = \lambda^2 y \\
+A A^T x = \lambda (A y) = \lambda (\lambda x) = \lambda^2 x
+\end{gather}
+\end{split}\]</div>
+<p>This shows that <span class="math notranslate nohighlight">\(\lambda^2\)</span> is an eigenvalue of both <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>. We define the singular values <span class="math notranslate nohighlight">\(\Sigma\)</span> such that the diagonal elements are the positive square roots of these eigenvalues: <span class="math notranslate nohighlight">\(\sigma_i = \sqrt{\lambda_i^2}\)</span>.</p>
+<p>It can also be shown that <span class="math notranslate nohighlight">\([x; -y]\)</span> is an eigenvector corresponding to the eigenvalue <span class="math notranslate nohighlight">\(-\lambda\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(X\)</span> denotes the eigenvectors of <span class="math notranslate nohighlight">\(A A^T\)</span> and <span class="math notranslate nohighlight">\(Y\)</span> denotes the eigenvectors of <span class="math notranslate nohighlight">\(A^T A\)</span> (corresponding to non-zero <span class="math notranslate nohighlight">\(\lambda^2\)</span>), we can structure the matrices <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(\Lambda\)</span> related to <span class="math notranslate nohighlight">\(B\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} Q = \frac{1}{\sqrt{2}} \begin{bmatrix} X &amp; X \\ Y &amp; -Y \end{bmatrix}, \quad \Lambda = \begin{bmatrix} \Sigma &amp; 0 \\ 0 &amp; -\Sigma \end{bmatrix} \end{split}\]</div>
+<p>By substitution into <span class="math notranslate nohighlight">\(B = Q \Lambda Q^T\)</span>, the decomposition <span class="math notranslate nohighlight">\(A = X \Sigma Y^T\)</span> is recovered. If we identify <span class="math notranslate nohighlight">\(U=X\)</span> and <span class="math notranslate nohighlight">\(V=Y\)</span>, the SVD <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span> is established.</p>
+</div>
+</section>
+<section id="relation-of-svd-with-eigendecomposition-of-symmetric-matrices">
+<h2>Relation of SVD with Eigendecomposition of Symmetric Matrices<a class="headerlink" href="#relation-of-svd-with-eigendecomposition-of-symmetric-matrices" title="Link to this heading">#</a></h2>
+<p>The SVD is intimately linked to the eigendecomposition of the symmetric matrices <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Right Singular Vectors (<span class="math notranslate nohighlight">\(V\)</span>):</strong> The columns of <span class="math notranslate nohighlight">\(V\)</span> (the right singular vectors) are the <strong>eigenvectors of <span class="math notranslate nohighlight">\(A^T A\)</span></strong>. The diagonalization of <span class="math notranslate nohighlight">\(A^T A\)</span> is given by:</p></li>
+<li><div class="math notranslate nohighlight">
+\[ A^T A = V \Sigma^T \Sigma V^T = V \Sigma^2 V^T \]</div>
+</li>
+<li><p><strong>Left Singular Vectors (<span class="math notranslate nohighlight">\(U\)</span>):</strong> The columns of <span class="math notranslate nohighlight">\(U\)</span> (the left singular vectors) are the <strong>eigenvectors of <span class="math notranslate nohighlight">\(A A^T\)</span></strong>. The diagonalization of <span class="math notranslate nohighlight">\(A A^T\)</span> is given by:</p></li>
+<li><div class="math notranslate nohighlight">
+\[ A A^T = U \Sigma \Sigma^T U^T = U \Sigma^2 U^T \]</div>
+</li>
+<li><p><strong>Singular Values (<span class="math notranslate nohighlight">\(\Sigma\)</span>):</strong> The squares of the singular values (<span class="math notranslate nohighlight">\(\sigma_i^2\)</span>) are the <strong>eigenvalues of both <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span></strong>. Thus, the singular values <span class="math notranslate nohighlight">\(\sigma_j\)</span> are the square roots of these eigenvalues: <span class="math notranslate nohighlight">\(\sigma_j = \sqrt{\lambda_j}\)</span>.</p></li>
+</ol>
+</section>
+<section id="thin-or-truncated-svd">
+<h2>Thin or Truncated SVD<a class="headerlink" href="#thin-or-truncated-svd" title="Link to this heading">#</a></h2>
+<p>The full SVD, <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span>, is sometimes referred to as the full Singular Value Decomposition. In practice, <strong>compact</strong> and <strong>truncated</strong> forms are commonly used.</p>
+<ol class="arabic simple">
+<li><p><strong>Compact SVD (Thin SVD):</strong></p>
+<ul class="simple">
+<li><p>This form is obtained when the SVD has a rank equal to the rank <span class="math notranslate nohighlight">\(r\)</span> of the original matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p>It is represented as <span class="math notranslate nohighlight">\(A = U_r \Sigma_r V_r^T\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Sigma_r\)</span> is an <span class="math notranslate nohighlight">\(r\)</span>-order diagonal matrix containing only the <span class="math notranslate nohighlight">\(r\)</span> positive singular values. <span class="math notranslate nohighlight">\(U_r\)</span> contains the first <span class="math notranslate nohighlight">\(r\)</span> columns of <span class="math notranslate nohighlight">\(U\)</span> (the orthonormal bases for <span class="math notranslate nohighlight">\(R(A)\)</span>), and <span class="math notranslate nohighlight">\(V_r\)</span> contains the first <span class="math notranslate nohighlight">\(r\)</span> columns of <span class="math notranslate nohighlight">\(V\)</span> (the orthonormal bases for <span class="math notranslate nohighlight">\(R(A^T)\)</span>).</p></li>
+<li><p>Compact SVD corresponds to <strong>lossless compression</strong> of the data.</p></li>
+</ul>
+</li>
+<li><p><strong>Truncated SVD:</strong></p>
+<ul class="simple">
+<li><p>This is the form typically referred to in practical applications.</p></li>
+<li><p>It is obtained by taking only the part corresponding to the largest <span class="math notranslate nohighlight">\(k\)</span> singular values, where <span class="math notranslate nohighlight">\(k &lt; r\)</span> (the rank of <span class="math notranslate nohighlight">\(A\)</span>).</p></li>
+<li><p>The approximation is <span class="math notranslate nohighlight">\(A \approx U_k \Sigma_k V_k^T\)</span>.</p></li>
+<li><p>The matrix <span class="math notranslate nohighlight">\(A_k = U_k \Sigma_k V_k^T\)</span> has a rank of <span class="math notranslate nohighlight">\(k\)</span>, which is lower than the rank of the original matrix. This decomposition provides an optimal low-rank approximation of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p>Truncated SVD corresponds to <strong>lossy compression</strong>.</p></li>
+</ul>
+</li>
+</ol>
+<p>We discuss this result further in the next section with the Eckart-Young-Mirsky Theorem.</p>
+</section>
+<section id="the-eckart-young-mirsky-theorem-optimal-low-rank-approximation">
+<h2>The Eckart-Young-Mirsky Theorem: Optimal Low-Rank Approximation<a class="headerlink" href="#the-eckart-young-mirsky-theorem-optimal-low-rank-approximation" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="thm:eckart-young-mirsky">
+<p class="admonition-title"><span class="caption-number">Theorem 7 </span> (The Eckart-Young-Mirsky Theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let the SVD of a matrix <span class="math notranslate nohighlight">\(A\)</span> be <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span>. Let <span class="math notranslate nohighlight">\(A_k\)</span> be the truncated SVD matrix of rank <span class="math notranslate nohighlight">\(k\)</span> obtained by keeping only the <span class="math notranslate nohighlight">\(k\)</span> largest singular values:</p>
+<div class="math notranslate nohighlight">
+\[
+A_k = U_k \Sigma_k V_k^T
+\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(A_k\)</span> is the best rank-<span class="math notranslate nohighlight">\(k\)</span> approximation of <span class="math notranslate nohighlight">\(A\)</span> in both the spectral norm and the Frobenius norm. That is, for any matrix <span class="math notranslate nohighlight">\(B\)</span> with <span class="math notranslate nohighlight">\(\text{rank}(B) = k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\|A - A_k\|_2 \le \|A - B\|_2 \quad \text{and} \quad \|A - A_k\|_F \le \|A - B\|_F
+\]</div>
+<p>The approximation error is given by the first neglected singular value: <span class="math notranslate nohighlight">\(\|A - A_k\|_2 = \sigma_{k+1}\)</span>.</p>
+</section>
+</div><p>This theorem is the theoretical bedrock for using SVD in data compression, noise reduction, and machine learning. It guarantees that truncating the SVD is not just a heuristic but the mathematically optimal way to reduce the dimensionality (rank) of your data while minimizing the error in these important norms.</p>
+</section>
+<section id="connection-with-matrix-norms-and-the-determinant-of-a-matrix">
+<h2>Connection with Matrix Norms and the Determinant of a Matrix<a class="headerlink" href="#connection-with-matrix-norms-and-the-determinant-of-a-matrix" title="Link to this heading">#</a></h2>
+<section id="matrix-norms-frobenius-norm">
+<h3>Matrix Norms (Frobenius Norm)<a class="headerlink" href="#matrix-norms-frobenius-norm" title="Link to this heading">#</a></h3>
+<p>The SVD provides an optimal method of matrix approximation in the sense of the <strong>Frobenius norm</strong>. The Frobenius norm (<span class="math notranslate nohighlight">\(\|A\|_F\)</span>) is a generalization of the <span class="math notranslate nohighlight">\(L_2\)</span> norm of a vector.</p>
+<p>The Frobenius norm of a matrix <span class="math notranslate nohighlight">\(A\)</span> is related directly to its singular values:</p>
+<div class="math notranslate nohighlight">
+\[ \|A\|_F = \left( \sigma_1^2 + \sigma_2^2 + \cdots + \sigma_n^2 \right)^{1/2} \]</div>
+<p>Furthermore, the truncated SVD with rank <span class="math notranslate nohighlight">\(k\)</span> yields the optimal <span class="math notranslate nohighlight">\(k\)</span>-rank approximation <span class="math notranslate nohighlight">\(X=A_k\)</span> in the sense of the Frobenius norm. The error of this optimal approximation is given by the neglected singular values:</p>
+<div class="math notranslate nohighlight">
+\[ \|A - X\|_F = \left( \sigma_{k+1}^2 + \sigma_{k+2}^2 + \cdots + \sigma_n^2 \right)^{1/2} \]</div>
+<p>The spectral norm (operator 2-norm) of <span class="math notranslate nohighlight">\(A\)</span> is equal to the largest singular value, <span class="math notranslate nohighlight">\(\sigma_1(A)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[ \|A\|_2 = \sigma_1(A) \]</div>
+<p>A key conceptual link exists between the Singular Value Decomposition (SVD) and the definition of various <strong>matrix norms</strong>, especially those used in analyzing low-rank approximations.</p>
+<p>While the Frobenius norm is mentioned as the metric for optimal approximation, SVD is also crucial for defining the <strong>Schatten <span class="math notranslate nohighlight">\(p\)</span>-norms</strong>.</p>
+</section>
+<section id="connection-to-schatten-p-norms">
+<h3>Connection to Schatten <span class="math notranslate nohighlight">\(p\)</span>-Norms<a class="headerlink" href="#connection-to-schatten-p-norms" title="Link to this heading">#</a></h3>
+<p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norm is a generalization that uses the singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span> in a manner analogous to how the <span class="math notranslate nohighlight">\(L_p\)</span> vector norm uses vector elements.</p>
+<p>The <strong>Schatten <span class="math notranslate nohighlight">\(p\)</span>-norm</strong> of a matrix <span class="math notranslate nohighlight">\(A\)</span>, denoted as <span class="math notranslate nohighlight">\(\|A\|_p\)</span>, is defined using its singular values (<span class="math notranslate nohighlight">\(\sigma_i\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[ \|A\|_p = \left( \sum_{i=1}^r \sigma_i^p \right)^{1/p} \]</div>
+<p>where <span class="math notranslate nohighlight">\(r\)</span> is the rank of the matrix <span class="math notranslate nohighlight">\(A\)</span> (the number of non-zero singular values).</p>
+<p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norms are derived by treating the singular values as a vector and calculating the vector <span class="math notranslate nohighlight">\(p\)</span>-norm of that vector.</p>
+<p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norms generalize three highly important matrix norms derived from SVD:</p>
+<ol class="arabic">
+<li><p><strong>Schatten 2-Norm (Frobenius Norm):</strong>
+When <span class="math notranslate nohighlight">\(p=2\)</span>, the Schatten norm is equivalent to the <strong>Frobenius norm</strong>.</p>
+<div class="math notranslate nohighlight">
+\[ \|A\|_F = \|A\|_2 = \left( \sum_{i=1}^r \sigma_i^2 \right)^{1/2} \]</div>
+<p>The Frobenius norm is used to quantify the “square loss” in matrix approximation. The SVD provides the optimal rank-<span class="math notranslate nohighlight">\(k\)</span> approximation regarding this norm.</p>
+</li>
+<li><p><strong>Schatten 1-Norm (Nuclear Norm or Trace Norm):</strong>
+When <span class="math notranslate nohighlight">\(p=1\)</span>, the Schatten norm is called the <strong>Nuclear Norm</strong> (or Trace Norm).</p>
+<div class="math notranslate nohighlight">
+\[ \|A\|_* = \|A\|_1 = \sum_{i=1}^r \sigma_i \]</div>
+<p>This norm is widely used in machine learning for promoting low-rank solutions (known as matrix completion or sparse PCA).</p>
+</li>
+<li><p><strong>Schatten <span class="math notranslate nohighlight">\(\infty\)</span>-Norm (Spectral Norm or Operator 2-Norm):</strong>
+When <span class="math notranslate nohighlight">\(p \to \infty\)</span>, the Schatten norm converges to the <strong>Spectral Norm</strong> (also known as the Operator 2-norm, or <span class="math notranslate nohighlight">\(\|A\|_2\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[ \|A\|_2 = \sigma_1(A) \]</div>
+<p>The spectral norm is equal to the largest singular value, <span class="math notranslate nohighlight">\(\sigma_1(A)\)</span>. This norm is crucial as it measures the maximum stretching factor of the matrix transformation.</p>
+</li>
+</ol>
+</section>
+</section>
+<section id="determinant-and-singular-values">
+<h2>Determinant and Singular Values<a class="headerlink" href="#determinant-and-singular-values" title="Link to this heading">#</a></h2>
+<p>The absolute value of the determinant of a square matrix is equal to the product of its singular values.</p>
+<div class="proof theorem admonition" id="thm:det-svd">
+<p class="admonition-title"><span class="caption-number">Theorem 8 </span></p>
+<section class="theorem-content" id="proof-content">
+<p>For any square matrix <span class="math notranslate nohighlight">\(A \in \mathbb{C}^{n \times n}\)</span> with singular values <span class="math notranslate nohighlight">\(\sigma_1, \sigma_2, \dots, \sigma_n\)</span>, the following relationship holds:</p>
+<div class="math notranslate nohighlight">
+\[
+|\det(A)| = \prod_{i=1}^n \sigma_i
+\]</div>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Start with the <strong>Singular Value Decomposition (SVD)</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A = U \Sigma V^H
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are unitary matrices, and <span class="math notranslate nohighlight">\(\Sigma\)</span> is a diagonal matrix containing the singular values <span class="math notranslate nohighlight">\(\sigma_i\)</span> on its diagonal.</p>
+<p>Take the determinant of both sides of the equation:</p>
+<div class="math notranslate nohighlight">
+\[
+\det(A) = \det(U \Sigma V^H)
+\]</div>
+<p>Using the multiplicative property of determinants, <span class="math notranslate nohighlight">\(\det(XYZ) = \det(X)\det(Y)\det(Z)\)</span>, we can separate the terms:</p>
+<div class="math notranslate nohighlight">
+\[
+\det(A) = \det(U) \det(\Sigma) \det(V^H)
+\]</div>
+<p>The determinant of a diagonal matrix is the product of its diagonal entries. The diagonal entries of <span class="math notranslate nohighlight">\(\Sigma\)</span> are the singular values:</p>
+<div class="math notranslate nohighlight">
+\[
+\det(\Sigma) = \prod_{i=1}^n \sigma_i
+\]</div>
+<p>For any unitary matrix <span class="math notranslate nohighlight">\(Q\)</span>, its determinant has a magnitude of one, i.e., <span class="math notranslate nohighlight">\(|\det(Q)|=1\)</span>. Therefore, <span class="math notranslate nohighlight">\(|\det(U)| = 1\)</span> and <span class="math notranslate nohighlight">\(|\det(V^H)| = 1\)</span>.</p>
+<p>Now, take the absolute value of the entire determinant equation:</p>
+<div class="math notranslate nohighlight">
+\[
+|\det(A)| = |\det(U)| \cdot |\det(\Sigma)| \cdot |\det(V^H)|
+\]</div>
+<p>Substituting the known values gives:</p>
+<div class="math notranslate nohighlight">
+\[
+|\det(A)| = 1 \cdot \left(\prod_{i=1}^n \sigma_i\right) \cdot 1
+\]</div>
+<p>This simplifies to the final result:</p>
+<div class="math notranslate nohighlight">
+\[
+|\det(A)| = \prod_{i=1}^n \sigma_i
+\]</div>
+</div>
+<section id="geometric-interpretation">
+<h3>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h3>
+<p>This relationship has a clear geometric meaning. The <strong>singular values</strong> (<span class="math notranslate nohighlight">\(\sigma_i\)</span>) represent the scaling factors that the matrix applies along its principal axes (the directions of maximum stretch). The <strong>determinant</strong> represents the total volume scaling factor of the transformation. This theorem shows that the total change in volume is simply the product of the individual stretches along these principal, orthogonal directions.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="applications_of_eigenvalues.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Applications of Eigenvalues</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#explanation-of-singular-value-decomposition-svd">Explanation of Singular Value Decomposition (SVD)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#svd-and-the-association-with-space-scales-of-the-matrix">SVD and the Association with “Space” (Scales of the Matrix)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-between-svd-and-the-four-fundamental-spaces">Connection between SVD and the Four Fundamental Spaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-with-rank-and-the-rank-nullity-theorem">Connection with Rank and the Rank-Nullity Theorem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-the-existence-of-the-svd">Proof of the Existence of the SVD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relation-of-svd-with-eigendecomposition-of-symmetric-matrices">Relation of SVD with Eigendecomposition of Symmetric Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thin-or-truncated-svd">Thin or Truncated SVD</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-eckart-young-mirsky-theorem-optimal-low-rank-approximation">The Eckart-Young-Mirsky Theorem: Optimal Low-Rank Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-with-matrix-norms-and-the-determinant-of-a-matrix">Connection with Matrix Norms and the Determinant of a Matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-norms-frobenius-norm">Matrix Norms (Frobenius Norm)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-schatten-p-norms">Connection to Schatten <span class="math notranslate nohighlight">\(p\)</span>-Norms</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant-and-singular-values">Determinant and Singular Values</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
