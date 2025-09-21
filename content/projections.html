@@ -190,8 +190,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Projections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schur_decomposition.html">Schur Decomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="eigenvalues_and_eigenvectors.html">Eigenvalues and Eigenvectors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 </ul>
@@ -417,10 +416,12 @@ document.write(`
 </section>
 <section id="oblique-projection-formula">
 <h3>Oblique Projection Formula<a class="headerlink" href="#oblique-projection-formula" title="Link to this heading">#</a></h3>
-<p>For an oblique projection, you must specify both the subspace to project <strong>onto</strong> (the range, spanned by the columns of matrix <span class="math notranslate nohighlight">\(A\)</span>) and the direction to project <strong>along</strong> (the null space, which can be defined by a matrix <span class="math notranslate nohighlight">\(B\)</span>). The projection matrix is:</p>
+<p>For an oblique projection, you must specify both the subspace to project <strong>onto</strong> (the range) and the direction to project <strong>along</strong> (the null space).</p>
+<p>Let the range be spanned by the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span>. The direction of projection is defined as the subspace orthogonal to the columns of another matrix, <span class="math notranslate nohighlight">\(B\)</span>. The projection matrix <span class="math notranslate nohighlight">\(P\)</span> is then given by:</p>
 <div class="math notranslate nohighlight">
 \[P = A(B^T A)^{-1} B^T\]</div>
-<p>Notice that if you choose <span class="math notranslate nohighlight">\(B = A\)</span>, the projection direction becomes orthogonal to the range, and this formula reduces to the orthogonal projection formula.</p>
+<p>Here, the null space of the projection <span class="math notranslate nohighlight">\(P\)</span> (the direction of projection) is the set of all vectors orthogonal to the column space of <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<p>Notice that if you choose <span class="math notranslate nohighlight">\(B = A\)</span>, the direction of projection becomes orthogonal to the range (since it’s orthogonal to the columns of <span class="math notranslate nohighlight">\(A\)</span>). This makes the projection orthogonal, and the formula reduces to the standard orthogonal projection formula: <span class="math notranslate nohighlight">\(P = A(A^T A)^{-1} A^T\)</span>.</p>
 </section>
 </section>
 <section id="key-results-and-properties">
