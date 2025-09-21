@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Four Fundamental Subspaces &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Summary of Matrix Decompositions &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/four_fundamental_subspaces';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/summary_of_matrix_decompositions';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Eigendecomposition" href="eigendecomposition.html" />
-    <link rel="prev" title="Block Matrix Operations" href="block_matrices.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Singular Value Decomposition" href="singular_value_decomposition.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -189,12 +189,12 @@
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -252,7 +252,7 @@
       
       
       
-      <li><a href="../_sources/content/four_fundamental_subspaces.md" target="_blank"
+      <li><a href="../_sources/content/summary_of_matrix_decompositions.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -323,9 +323,7 @@ document.write(`
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
+
 </div></div>
       
     </div>
@@ -336,27 +334,11 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Four Fundamental Subspaces</h1>
+    <h1>Summary of Matrix Decompositions</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-column-space-range">1. The Column Space (Range)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-null-space-kernel">2. The Null Space (Kernel)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-row-space">3. The Row Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-left-null-space">4. The Left Null Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fundamental-theorem-of-linear-algebra">The Fundamental Theorem of Linear Algebra</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-nullity-theorem">The Rank-Nullity Theorem</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-complements">Orthogonal Complements</a></li>
-</ul>
-</li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -366,57 +348,52 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="the-four-fundamental-subspaces">
-<h1>The Four Fundamental Subspaces<a class="headerlink" href="#the-four-fundamental-subspaces" title="Link to this heading">#</a></h1>
-<p>Every <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> defines a linear transformation and is associated with four fundamental vector subspaces. These spaces provide a complete geometric understanding of the matrix’s behavior, revealing what happens to vectors when they are transformed by <span class="math notranslate nohighlight">\(A\)</span>. 🗺️</p>
-<section id="the-column-space-range">
-<h2>1. The Column Space (Range)<a class="headerlink" href="#the-column-space-range" title="Link to this heading">#</a></h2>
-<p>The <strong>column space</strong>, also known as the <strong>range</strong>, is the set of all possible output vectors of the transformation. It consists of all vectors that can be formed by multiplying the matrix <span class="math notranslate nohighlight">\(A\)</span> by an input vector <span class="math notranslate nohighlight">\(x\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[R(A) = \{y \in \mathbb{R}^m \,|\, y = Ax \text{ for some } x \in \mathbb{R}^n\}\]</div>
-<p>Geometrically, the column space is the <strong>span of the column vectors</strong> of <span class="math notranslate nohighlight">\(A\)</span>. It is a subspace of the output space, <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>. The dimension of the column space is the <strong>rank</strong> of the matrix, denoted by <span class="math notranslate nohighlight">\(r\)</span>. The rank represents the number of linearly independent columns in the matrix.</p>
-</section>
-<section id="the-null-space-kernel">
-<h2>2. The Null Space (Kernel)<a class="headerlink" href="#the-null-space-kernel" title="Link to this heading">#</a></h2>
-<p>The <strong>null space</strong>, also known as the <strong>kernel</strong>, is the set of all input vectors that are mapped to the zero vector by the transformation.</p>
-<div class="math notranslate nohighlight">
-\[N(A) = \{x \in \mathbb{R}^n \,|\, Ax = 0\}\]</div>
-<p>The null space is a subspace of the input space, <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. If the null space contains vectors other than the zero vector, it means the transformation is “many-to-one”—multiple different input vectors are “squashed” onto the same output vector (zero). The dimension of the null space is called the <strong>nullity</strong>.</p>
-</section>
-<section id="the-row-space">
-<h2>3. The Row Space<a class="headerlink" href="#the-row-space" title="Link to this heading">#</a></h2>
-<p>The <strong>row space</strong> is the set of all linear combinations of the row vectors of <span class="math notranslate nohighlight">\(A\)</span>. It is equivalent to the column space of the transpose of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[R(A^T)\]</div>
-<p>The row space is a subspace of the input space, <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. A fundamental result in linear algebra is that the dimension of the row space is also equal to the <strong>rank</strong> (<span class="math notranslate nohighlight">\(r\)</span>) of the matrix. This means a matrix always has the same number of linearly independent rows as it does linearly independent columns.</p>
-</section>
-<section id="the-left-null-space">
-<h2>4. The Left Null Space<a class="headerlink" href="#the-left-null-space" title="Link to this heading">#</a></h2>
-<p>The <strong>left null space</strong> is the null space of the transpose of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[N(A^T) = \{y \in \mathbb{R}^m \,|\, A^T y = 0\}\]</div>
-<p>It is called the “left” null space because the equation can be transposed to <span class="math notranslate nohighlight">\(y^T A = 0^T\)</span>, showing that the vectors <span class="math notranslate nohighlight">\(y\)</span> act on <span class="math notranslate nohighlight">\(A\)</span> from the left. The left null space is a subspace of the output space, <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p>
-</section>
-<section id="the-fundamental-theorem-of-linear-algebra">
-<h2>The Fundamental Theorem of Linear Algebra<a class="headerlink" href="#the-fundamental-theorem-of-linear-algebra" title="Link to this heading">#</a></h2>
-<p>This theorem connects the dimensions and relationships of the four subspaces.</p>
-<section id="the-rank-nullity-theorem">
-<h3>The Rank-Nullity Theorem<a class="headerlink" href="#the-rank-nullity-theorem" title="Link to this heading">#</a></h3>
-<p>This theorem relates the dimensions of the column space and the null space. It states that the rank of a matrix plus its nullity is equal to the number of columns in the matrix.</p>
-<div class="math notranslate nohighlight">
-\[\text{dim}(R(A)) + \text{dim}(N(A)) = n\]</div>
-<p>Or more simply: <strong>rank + nullity = number of columns</strong>.</p>
-<p>This theorem provides a beautiful intuition: the dimension of the input space (<span class="math notranslate nohighlight">\(n\)</span>) is split. Part of it is preserved and forms the output image (the rank), and the other part is collapsed to zero (the nullity).</p>
-</section>
-<section id="orthogonal-complements">
-<h3>Orthogonal Complements<a class="headerlink" href="#orthogonal-complements" title="Link to this heading">#</a></h3>
-<p>The subspaces come in orthogonal pairs:</p>
-<ul class="simple">
-<li><p>The <strong>row space</strong> and the <strong>null space</strong> are orthogonal complements in the input space <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. This means every vector in the row space is perpendicular to every vector in the null space.</p></li>
-<li><p>The <strong>column space</strong> and the <strong>left null space</strong> are orthogonal complements in the output space <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p></li>
-</ul>
-</section>
-</section>
+  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-matrix-decompositions">
+<h1>Summary of Matrix Decompositions<a class="headerlink" href="#summary-of-matrix-decompositions" title="Link to this heading">#</a></h1>
+<p>Here is a comparison of the key matrix decompositions related to eigenvalues and singular values.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Decomposition</p></th>
+<th class="head text-left"><p>Requirements for Existence</p></th>
+<th class="head text-left"><p>Components &amp; Properties</p></th>
+<th class="head text-left"><p>Interpretation &amp; Applications</p></th>
+<th class="head text-left"><p>Relation to Others</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span></p></td>
+<td class="text-left"><p>Exists for <strong>any</strong> square complex matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
+<td class="text-left"><p><strong>Q</strong>: Unitary (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>). <br> <strong>T</strong>: Upper triangular. <br> Diagonal of T contains the eigenvalues of A.</p></td>
+<td class="text-left"><p><strong>Interpretation</strong>: Any linear transformation is unitarily similar to a triangular one. <br> <strong>Applications</strong>: Numerically stable computation of all eigenvalues.</p></td>
+<td class="text-left"><p>This is the general form from which eigendecomposition is a special case.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Real Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span></p></td>
+<td class="text-left"><p>Exists for <strong>any</strong> square real matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
+<td class="text-left"><p><strong>Q</strong>: Real orthogonal (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>). <br> <strong>S</strong>: Real quasi-triangular (block upper triangular). <br> 1x1 diagonal blocks are real eigenvalues; 2x2 blocks correspond to complex conjugate eigenvalues.</p></td>
+<td class="text-left"><p><strong>Interpretation</strong>: Represents any real transformation in a basis that makes it “as triangular as possible” using only real numbers. <br> <strong>Applications</strong>: Stable eigenvalue computation in real arithmetic.</p></td>
+<td class="text-left"><p>The real-valued equivalent of the complex Schur decomposition.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Eigendecomposition</strong> <br> <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span></p></td>
+<td class="text-left"><p>Exists only for <strong>diagonalizable</strong> matrices (those with <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors).</p></td>
+<td class="text-left"><p><strong>X</strong>: Invertible matrix whose columns are the eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues. <br> <span class="math notranslate nohighlight">\(X\)</span> is not guaranteed to be unitary.</p></td>
+<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along the eigenvector axes. Associated with “Time” and the evolution of dynamical systems (<span class="math notranslate nohighlight">\(A^k\)</span>). <br> <strong>Applications</strong>: Solving linear differential equations, analyzing stability, computing matrix powers.</p></td>
+<td class="text-left"><p>A special case of the Schur decomposition where the triangular matrix <span class="math notranslate nohighlight">\(T\)</span> is diagonal.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Unitary Diagonalization</strong> <br> <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span></p></td>
+<td class="text-left"><p>Exists only for <strong>normal</strong> matrices (<span class="math notranslate nohighlight">\(A A^H = A^H A\)</span>).</p></td>
+<td class="text-left"><p><strong>Q</strong>: Unitary matrix whose columns are an orthonormal basis of eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues.</p></td>
+<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along a set of <em>orthogonal</em> axes. <br> <strong>Applications</strong>: Quantum mechanics, signal processing.</p></td>
+<td class="text-left"><p>The ideal form of both the Schur and eigendecomposition. Occurs when the matrix is normal.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Singular Value Decomposition (SVD)</strong> <br> <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></td>
+<td class="text-left"><p>Exists for <strong>any</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, real or complex.</p></td>
+<td class="text-left"><p><strong>U</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(m \times m\)</span>) of left singular vectors. <br> <strong>V</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(n \times n\)</span>) of right singular vectors. <br> <strong><span class="math notranslate nohighlight">\(\Sigma\)</span></strong>: Rectangular diagonal matrix of non-negative singular values.</p></td>
+<td class="text-left"><p><strong>Interpretation</strong>: Decomposes any transformation into rotation, scaling, and another rotation. Associated with “Space” and the geometry of the transformation. <br> <strong>Applications</strong>: PCA, low-rank approximation, computing pseudoinverses, determining rank and condition number.</p></td>
+<td class="text-left"><p>Generalizes eigendecomposition to any matrix. The singular values of A are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -450,20 +427,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="block_matrices.html"
+       href="singular_value_decomposition.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Block Matrix Operations</p>
+        <p class="prev-next-title">Singular Value Decomposition</p>
       </div>
     </a>
     <a class="right-next"
-       href="eigendecomposition.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Eigendecomposition</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -473,29 +450,6 @@ document.write(`
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-column-space-range">1. The Column Space (Range)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-null-space-kernel">2. The Null Space (Kernel)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-row-space">3. The Row Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-left-null-space">4. The Left Null Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fundamental-theorem-of-linear-algebra">The Fundamental Theorem of Linear Algebra</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-nullity-theorem">The Rank-Nullity Theorem</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-complements">Orthogonal Complements</a></li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>
