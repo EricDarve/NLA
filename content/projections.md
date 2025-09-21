@@ -41,11 +41,16 @@ $$p = \left(\frac{a \cdot b}{\|a\|^2}\right) a$$
 This formula has a clear geometric meaning: it scales the direction vector $a$ by a factor determined by the dot product of $a$ and $b$.
 
 ### Oblique Projection Formula
-For an oblique projection, you must specify both the subspace to project **onto** (the range, spanned by the columns of matrix $A$) and the direction to project **along** (the null space, which can be defined by a matrix $B$). The projection matrix is:
+
+For an oblique projection, you must specify both the subspace to project **onto** (the range) and the direction to project **along** (the null space).
+
+Let the range be spanned by the columns of a matrix $A$. The direction of projection is defined as the subspace orthogonal to the columns of another matrix, $B$. The projection matrix $P$ is then given by:
 
 $$P = A(B^T A)^{-1} B^T$$
 
-Notice that if you choose $B = A$, the projection direction becomes orthogonal to the range, and this formula reduces to the orthogonal projection formula.
+Here, the null space of the projection $P$ (the direction of projection) is the set of all vectors orthogonal to the column space of $B$.
+
+Notice that if you choose $B = A$, the direction of projection becomes orthogonal to the range (since it's orthogonal to the columns of $A$). This makes the projection orthogonal, and the formula reduces to the standard orthogonal projection formula: $P = A(A^T A)^{-1} A^T$.
 
 ## Key Results and Properties
 

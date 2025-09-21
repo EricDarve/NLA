@@ -58,6 +58,7 @@ $$
 The **Cartan–Dieudonné theorem** is a fundamental result in geometry that provides a simple, constructive way to think about orthogonal transformations. It states that any orthogonal transformation can be broken down into a series of simpler reflections.
 
 ````{prf:theorem} Cartan–Dieudonné theorem
+:label: thm:cartan_dieudonne
 Every orthogonal transformation in an $n$-dimensional Euclidean space ($\mathbb{R}^n$) can be described as the composition of at most **n** reflections.
 ````
 
