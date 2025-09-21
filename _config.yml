@@ -25,10 +25,10 @@ description: >-
 baseurl: /  # the subpath of your site, e.g. /blog. If there is no subpath for your site, use an empty string ""
 url: YOUR URL                  # the base hostname & protocol for your site, e.g. http://example.com
 
-
+exclude_patterns:
 exclude_patterns:
 - manimations/*
-
+- README.md
 
 #######################################################################################
 # Jupyter Book settings

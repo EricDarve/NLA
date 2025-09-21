@@ -1,7 +1,9 @@
 # Linear Algebra Bootcamp
 
-This chapter provides a quick overview of linear algebra, focusing on the mathematical ideas and definitions that are foundational for the rest of the book. For convenience, some of the notation used throughout the book is listed in Table 1.
+Welcome to the Linear Algebra Bootcamp! 🚀
 
-We are assuming that the reader has seen some linear algebra before. If that's the case, this chapter will be a great review. If not, this chapter will get you up to speed on the core ideas, and we additionally recommend taking a look at a linear algebra textbook like (there are many excellent ones).
+This chapter is your high-speed training ground for the essential concepts of linear algebra that power everything from data science to quantum mechanics. We'll start with a rapid tour of the fundamentals—vector spaces, norms, and dot products—before diving into the core of the action.
 
-Let's get started!
+You'll get reacquainted with matrices and the powerful stories they tell through their four fundamental subspaces. Then, we'll unlock the secrets of a matrix's "DNA" with two of the most important tools in mathematics: the **Eigendecomposition**, which explains how systems evolve, and the **Singular Value Decomposition (SVD)**, which reveals the pure geometry of transformations.
+
+Whether you need a quick refresher or are building your foundation from scratch, this bootcamp will get you geared up for the exciting world of numerical linear algebra. Let's get started!

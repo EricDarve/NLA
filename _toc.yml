@@ -16,8 +16,9 @@ chapters:
   - file: content/projections.md
   - file: content/block_matrices.md
   - file: content/four_fundamental_subspaces.md
-  - file: content/schur_decomposition.md
-  - file: content/eigenvalues_and_eigenvectors.md
+  - file: content/eigendecomposition.md
   - file: content/normal_matrices.md
-  - file: content/applications_of_eigenvalues.md  
+  - file: content/applications_of_eigenvalues.md
+  - file: content/singular_value_decomposition.md
+  - file: content/summary_of_matrix_decompositions.md
 - file: content/LICENSE.md
