@@ -17,8 +17,6 @@ where $\overline{x}_i$ denotes the complex conjugate of $x_i$.
 
 The computational cost of computing a dot product is $O(n)$.
 
----
-
 ## Orthogonality
 
 Two vectors $x$ and $y$ are **orthogonal** if
@@ -29,8 +27,6 @@ $$
 (in the complex case, $x^H y = 0$).
 
 This definition naturally extends to subspaces.
-
----
 
 ### Orthogonal Complements
 
@@ -50,8 +46,6 @@ $$
 \dim(S) + \dim(S^\perp) = n.
 $$
 
----
-
 ## Vector Norms
 
 The dot product allows us to define the **Euclidean norm** (or **2-norm**) of a vector $x$:
@@ -67,8 +61,6 @@ A **norm** is a function $\|\cdot\|$ mapping vectors to non-negative real number
 1. **Positive definiteness:** $\|x\| = 0 \iff x = 0$.
 2. **Homogeneity:** $\|\alpha x\| = |\alpha| \, \|x\|$ for all scalars $\alpha$.
 3. **Triangle inequality:** $\|x + y\| \leq \|x\| + \|y\|$.
-
----
 
 ### Common Vector Norms
 
@@ -98,9 +90,15 @@ $$
 
 **Convention:** In this book, $\|x\|$ means $\|x\|_2$ unless otherwise stated.
 
----
+## Equivalence Between Norms
 
-### Inequalities Between Norms
+In a finite-dimensional vector space like $\mathbb{R}^n$, all norms are **equivalent**. This means that for any two vector norms $\|\cdot\|_a$ and $\|\cdot\|_b$, there exist positive constants $c_1$ and $c_2$ such that for every vector $\mathbf{x}$:
+
+$$c_1 \|\mathbf{x}\|_b \le \|\mathbf{x}\|_a \le c_2 \|\mathbf{x}\|_b$$
+
+This property is powerful because it guarantees that if a sequence of vectors converges in one norm, it converges in all norms. 📐
+
+### Specific Inequalities Between 1, 2, and Infinity Norms
 
 For any $x \in \mathbb{R}^n$:
 
@@ -118,7 +116,28 @@ $$
 
 These follow from the **Cauchy–Schwarz inequality** (see below) and basic properties of maxima and sums.
 
----
+To illustrate why the dimension $n$ is critical, consider the vector $\mathbf{x} = [1, 1, \dots, 1]^T \in \mathbb{R}^n$.
+* $\|\mathbf{x}\|_\infty = 1$
+* $\|\mathbf{x}\|_2 = \sqrt{1^2 + \dots + 1^2} = \sqrt{n}$
+* $\|\mathbf{x}\|_1 = 1 + \dots + 1 = n$
+
+These values exactly match the scaling factors in the inequalities.
+
+### General Ordering of p-Norms
+
+For any vector $\mathbf{x}$, the value of its $p$-norm is a non-increasing function of $p$. This provides a simple and elegant ordering.
+
+For any $p > q \ge 1$:
+
+$$\|\mathbf{x}\|_p \le \|\mathbf{x}\|_q$$
+
+This leads to the most frequently cited chain of inequalities:
+
+$$\cdots \le \|\mathbf{x}\|_3 \le \|\mathbf{x}\|_2 \le \|\mathbf{x}\|_1$$
+
+The $\infty$-norm is the limit of the $p$-norm as $p \to \infty$, making it the smallest of all $p$-norms:
+
+$$\|\mathbf{x}\|_\infty \le \cdots \le \|\mathbf{x}\|_2 \le \|\mathbf{x}\|_1$$
 
 ## Geometric Interpretation
 
@@ -133,8 +152,6 @@ $$
 - For the infinity norm, the unit ball is a square in $\mathbb{R}^2$.
 
 As $p \to \infty$, the $p$-norm unit ball transitions from “diamond-like” (near $p=1$) to “square-like” (as $p \to \infty$).
-
----
 
 ## Cauchy–Schwarz and Hölder Inequalities
 
@@ -152,8 +169,6 @@ $$
 |x^T y| \le \|x\|_2 \, \|y\|_2.
 $$
 
----
-
 ## Application: Pythagorean Theorem
 
 If $x, y \in \mathbb{R}^n$ are orthogonal ($x^T y = 0$), then:
@@ -162,8 +177,6 @@ $$
 \|x + y\|_2^2 = \|x\|_2^2 + \|y\|_2^2.
 $$
 This follows immediately from expanding $\|x+y\|_2^2$ using the dot product definition.
-
----
 
 **Summary Table:**
 

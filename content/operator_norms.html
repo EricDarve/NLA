@@ -347,7 +347,16 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-operator-norm-induced-p-norm">The Operator Norm (Induced p-Norm)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-and-inequalities">Key Properties and Inequalities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-inequalities-for-operator-norms">Key Inequalities for Operator Norms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sub-multiplicative-property">Sub-multiplicative Property</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consistency-with-vector-norms">Consistency with Vector Norms</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-between-norms">Equivalence Between Norms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fundamental-properties">Other Fundamental Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
 </ul>
             </nav>
         </div>
@@ -382,24 +391,78 @@ document.write(`
 <div class="math notranslate nohighlight">
 \[\|A\|_F = \left( \sum_{i=1}^m \sum_{j=1}^n |a_{ij}|^2 \right)^{1/2}\]</div>
 <p>The Frobenius norm is very convenient for analyzing matrices that can be decomposed into blocks.</p>
+<p>The two most fundamental inequalities for matrix operator norms are the <strong>sub-multiplicative</strong> inequality, <span class="math notranslate nohighlight">\(\|AB\| \le \|A\| \|B\|\)</span>, and the <strong>consistency</strong> inequality, <span class="math notranslate nohighlight">\(\|Ax\| \le \|A\| \|x\|\)</span>.</p>
 </section>
-<section id="key-properties-and-inequalities">
-<h2>Key Properties and Inequalities<a class="headerlink" href="#key-properties-and-inequalities" title="Link to this heading">#</a></h2>
-<p>Matrix norms are essential for proofs and for bounding errors in numerical algorithms. Two of the most important inequalities are:</p>
-<ol class="arabic">
-<li><p><strong>Consistency with Vector Norms</strong>: This property relates the matrix norm to the vector norm and follows directly from the definition of the operator norm. It shows how the norm of a transformed vector is bounded.</p>
+<section id="key-inequalities-for-operator-norms">
+<h2>Key Inequalities for Operator Norms<a class="headerlink" href="#key-inequalities-for-operator-norms" title="Link to this heading">#</a></h2>
+<p>While many inequalities exist, they primarily fall into a few key categories that define how matrix norms behave with respect to multiplication and each other.</p>
+<section id="sub-multiplicative-property">
+<h3>Sub-multiplicative Property<a class="headerlink" href="#sub-multiplicative-property" title="Link to this heading">#</a></h3>
+<p>This is the most important property for analyzing products of matrices. For any two matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> whose product is defined, the operator and Frobenius norms satisfy:</p>
 <div class="math notranslate nohighlight">
-\[
-    \|A x \|_p \le \|A\|_p \|x\|_p
-    \]</div>
-</li>
-<li><p><strong>Sub-multiplicativity</strong>: Both the operator norms and the Frobenius norm are <strong>sub-multiplicative</strong>. This property provides a crucial upper bound on the norm of a matrix product.</p>
+\[\|AB\| \le \|A\| \|B\|\]</div>
+<p>This inequality is crucial for bounding errors in matrix computations and for proving the convergence of iterative methods, such as in solving systems of linear equations.</p>
+</section>
+<section id="consistency-with-vector-norms">
+<h3>Consistency with Vector Norms<a class="headerlink" href="#consistency-with-vector-norms" title="Link to this heading">#</a></h3>
+<p>The consistency property for the operator norm connects the matrix norm back to the vector norm it’s based on. For any matrix <span class="math notranslate nohighlight">\(A\)</span> and vector <span class="math notranslate nohighlight">\(x\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[
-    \| AB \| \le \|A\| \|B\|
-    \]</div>
-</li>
+\[\|Ax\| \le \|A\| \|x\|\]</div>
+<p>This inequality states that the norm of a matrix tells you the maximum factor by which it can stretch any vector.</p>
+</section>
+</section>
+<section id="equivalence-between-norms">
+<h2>Equivalence Between Norms<a class="headerlink" href="#equivalence-between-norms" title="Link to this heading">#</a></h2>
+<p>Just like vector norms, all matrix norms on a finite-dimensional space are <strong>equivalent</strong>. This means that for any two matrix norms <span class="math notranslate nohighlight">\(\|\cdot\|_a\)</span> and <span class="math notranslate nohighlight">\(\|\cdot\|_b\)</span>, there exist positive constants <span class="math notranslate nohighlight">\(c_1\)</span> and <span class="math notranslate nohighlight">\(c_2\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[c_1 \|A\|_b \le \|A\|_a \le c_2 \|A\|_b\]</div>
+<p>The most useful specific inequalities relate the common operator norms (<span class="math notranslate nohighlight">\(1\)</span>-norm, <span class="math notranslate nohighlight">\(2\)</span>-norm, <span class="math notranslate nohighlight">\(\infty\)</span>-norm) and the Frobenius norm (<span class="math notranslate nohighlight">\(F\)</span>) for any <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>. 📐</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\|A\|_2 \le \|A\|_F \le \sqrt{n}\|A\|_2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\frac{1}{\sqrt{n}}\|A\|_\infty \le \|A\|_2 \le \sqrt{n}\|A\|_\infty\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\frac{1}{\sqrt{n}}\|A\|_1 \le \|A\|_2 \le \sqrt{n}\|A\|_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\frac{1}{n}\|A\|_\infty \le \|A\|_1 \le n\|A\|_\infty\)</span></p></li>
+</ul>
+</section>
+<section id="other-fundamental-properties">
+<h2>Other Fundamental Properties<a class="headerlink" href="#other-fundamental-properties" title="Link to this heading">#</a></h2>
+<p>All matrix norms must also satisfy the standard properties of a norm:</p>
+<ol class="arabic simple">
+<li><p><strong>Triangle Inequality</strong>: <span class="math notranslate nohighlight">\(\|A+B\| \le \|A\| + \|B\|\)</span></p></li>
+<li><p><strong>Absolute Homogeneity</strong>: <span class="math notranslate nohighlight">\(\|\alpha A\| = |\alpha| \|A\|\)</span> for any scalar <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
+<li><p><strong>Positive Definiteness</strong>: <span class="math notranslate nohighlight">\(\|A\| \ge 0\)</span>, and <span class="math notranslate nohighlight">\(\|A\|=0\)</span> if and only if <span class="math notranslate nohighlight">\(A=0\)</span>.</p></li>
 </ol>
+</section>
+<section id="other-matrix-norms">
+<h2>Other Matrix Norms<a class="headerlink" href="#other-matrix-norms" title="Link to this heading">#</a></h2>
+<p>While the operator and Frobenius norms are the most common, other specialized norms are valuable in various applications. We introduce two such examples: the simple but non-sub-multiplicative <strong>max norm</strong>, and the more general family of <strong>Schatten norms</strong>, which are based on a matrix’s singular values.</p>
+</section>
+<section id="max-norm">
+<h2>Max Norm<a class="headerlink" href="#max-norm" title="Link to this heading">#</a></h2>
+<p>The largest element in the matrix by magnitude. Note that this norm is <strong>not</strong> sub-multiplicative (<span class="math notranslate nohighlight">\(\|AB\| \le \|A\|\|B\|\)</span> does not hold).</p>
+<div class="math notranslate nohighlight">
+\[\|A\|_{\text{max}} = \max_{ij} |a_{ij}|\]</div>
+</section>
+<section id="schatten-norms-based-on-singular-values">
+<h2>Schatten Norms (based on singular values)<a class="headerlink" href="#schatten-norms-based-on-singular-values" title="Link to this heading">#</a></h2>
+<p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norm is defined by applying the vector <span class="math notranslate nohighlight">\(p\)</span>-norm to the vector of the matrix’s singular values, <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\|A\|_p = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}\]</div>
+<p>This family generalizes several important norms:</p>
+<ul>
+<li><p><strong>Schatten 1-Norm (Nuclear Norm or Trace Norm)</strong>: The sum of the singular values. It’s widely used in machine learning for matrix completion and rank minimization problems.</p>
+<div class="math notranslate nohighlight">
+\[\|A\|_* = \sum_{i=1}^{\min(m,n)} \sigma_i\]</div>
+</li>
+<li><p><strong>Schatten 2-Norm</strong>: The square root of the sum of the squares of the singular values. This is exactly the same as the <strong>Frobenius norm</strong>.</p>
+<div class="math notranslate nohighlight">
+\[\|A\|_2 = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^2 \right)^{1/2} = \|A\|_F\]</div>
+</li>
+<li><p><strong>Schatten <span class="math notranslate nohighlight">\(\infty\)</span>-Norm</strong>: The limit as <span class="math notranslate nohighlight">\(p \to \infty\)</span>, which is simply the largest singular value. This is exactly the same as the <strong>spectral norm (operator 2-norm)</strong>.</p>
+<div class="math notranslate nohighlight">
+\[\|A\|_\infty = \max_i \sigma_i = \|A\|_2\]</div>
+</li>
+</ul>
 </section>
 </section>
 
@@ -469,7 +532,16 @@ document.write(`
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-operator-norm-induced-p-norm">The Operator Norm (Induced p-Norm)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-and-inequalities">Key Properties and Inequalities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-inequalities-for-operator-norms">Key Inequalities for Operator Norms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sub-multiplicative-property">Sub-multiplicative Property</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consistency-with-vector-norms">Consistency with Vector Norms</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-between-norms">Equivalence Between Norms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fundamental-properties">Other Fundamental Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
 </ul>
   </nav></div>
 
