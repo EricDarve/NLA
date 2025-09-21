@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -363,7 +363,7 @@ document.write(`
 <p>The Schur decomposition is a fundamental result in linear algebra that guarantees that any square matrix can be represented as the product of a unitary matrix and an upper triangular matrix. Unlike eigendecomposition, which only works for diagonalizable matrices, the Schur decomposition exists for <em>every</em> square matrix, making it a more general and numerically reliable tool.</p>
 <section id="the-complex-schur-decomposition">
 <h2>The (Complex) Schur Decomposition<a class="headerlink" href="#the-complex-schur-decomposition" title="Link to this heading">#</a></h2>
-<div class="proof theorem admonition" id="theorem-0">
+<div class="proof theorem admonition" id="thm:schur_decomposition">
 <p class="admonition-title"><span class="caption-number">Theorem 3 </span> (Schur Decomposition)</p>
 <section class="theorem-content" id="proof-content">
 <p>The theorem states that for any <span class="math notranslate nohighlight">\(n \times n\)</span> square matrix <span class="math notranslate nohighlight">\(A\)</span> with complex entries, there exists a <strong>unitary matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span> and an <strong>upper triangular matrix</strong> <span class="math notranslate nohighlight">\(T\)</span> such that:</p>
@@ -419,7 +419,7 @@ document.write(`
 <h2>The Real Schur Decomposition<a class="headerlink" href="#the-real-schur-decomposition" title="Link to this heading">#</a></h2>
 <p>A complication arises when working with real matrices. If a real matrix <span class="math notranslate nohighlight">\(A\)</span> has complex eigenvalues (which must appear in conjugate pairs), it is impossible to make the matrix <span class="math notranslate nohighlight">\(T\)</span> in the decomposition <span class="math notranslate nohighlight">\(A = Q T Q^T\)</span> both real and triangular, as its diagonal would have to contain the complex eigenvalues.</p>
 <p>The <strong>real Schur decomposition</strong> provides a clever workaround.</p>
-<div class="proof theorem admonition" id="theorem-1">
+<div class="proof theorem admonition" id="thm:real_schur_decomposition">
 <p class="admonition-title"><span class="caption-number">Theorem 4 </span> (Real Schur Decomposition)</p>
 <section class="theorem-content" id="proof-content">
 <p>It states that for any real square matrix <span class="math notranslate nohighlight">\(A\)</span>, there exists a <strong>real orthogonal matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span> (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>) such that:</p>

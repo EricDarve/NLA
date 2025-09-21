@@ -11,6 +11,7 @@ In essence, eigenvectors are the special directions that aren't changed by the t
 ## Existence of Eigenvalues
 
 ````{prf:theorem} Existence of Eigenvalues
+:label: thm:eigenvalue_existence
 A cornerstone of linear algebra is that every $n \times n$ matrix with complex entries has at least one eigenvalue and its corresponding eigenvector.
 ````
 

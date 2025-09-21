@@ -7,18 +7,19 @@ The determinant of a matrix is the product of its eigenvalues, and the trace is 
 For any $n \times n$ square matrix $A$ with eigenvalues $\lambda_1, \lambda_2, \dots, \lambda_n$ (counted with multiplicity), the following relationships hold:
 
 * **Determinant**: The determinant is the product of the eigenvalues.
+
     $$
     \det(A) = \prod_{i=1}^n \lambda_i = \lambda_1 \cdot \lambda_2 \cdots \lambda_n
     $$
 
 * **Trace**: The trace is the sum of the eigenvalues.
+
     $$
     \text{tr}(A) = \sum_{i=1}^n \lambda_i = \lambda_1 + \lambda_2 + \cdots + \lambda_n
     $$
 
 These formulas follow from the **Schur decomposition** ($A = QTQ^H$), where $T$ is an upper triangular matrix with the eigenvalues of $A$ on its diagonal. The determinant of $A$ is equal to the determinant of $T$, which is simply the product of its diagonal entries. Similarly, the trace of $A$ is equal to the trace of $T$, which is the sum of its diagonal entries.
 
-***
 ## Other Applications of Eigenvalues
 
 Eigenvalues and their corresponding eigenvectors are among the most important concepts in applied mathematics, revealing the deep structure of linear transformations. 🗺️

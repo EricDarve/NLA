@@ -14,7 +14,7 @@ x_n
 \quad x_i \in \mathbb{R}.
 $$
 
-### Vector addition
+## Vector addition
 
 Given $x,y \in \mathbb{R}^n$,
 
@@ -41,7 +41,7 @@ x_n+y_n
 \end{pmatrix}.
 $$
 
-### Scalar multiplication
+## Scalar multiplication
 
 For $\alpha \in \mathbb{R}$ and $x \in \mathbb{R}^n$,
 
@@ -64,9 +64,7 @@ $$
 
 Vectors in $\mathbb{C}^n$ are defined the same way, with scalars $\alpha \in \mathbb{C}$.
 
----
-
-### Definition: Vector space
+## Definition: Vector space
 
 A **vector space** $V$ over a field $\mathbb{F}$ (such as $\mathbb{R}$ or $\mathbb{C}$) is a set equipped with addition $(x,y)\mapsto x+y$ and scalar multiplication $(\alpha,x)\mapsto \alpha x$ satisfying, for all $x,y,z\in V$ and $\alpha,\beta\in\mathbb{F}$:
 
@@ -79,8 +77,6 @@ A **vector space** $V$ over a field $\mathbb{F}$ (such as $\mathbb{R}$ or $\math
 7. $\alpha(x+y)=\alpha x+\alpha y$  (Left distributivity of scalar over vector addition)
 8. $(\alpha+\beta)x=\alpha x+\beta x$  (Right distributivity of scalar addition over scalar multiplication)
 
----
-
 ## Subspaces
 
 A **subspace** $S \subset \mathbb{R}^n$ is a nonempty set closed under linear combinations. Equivalently, for any $x,y \in S$ and $\alpha,\beta \in \mathbb{R}$,
@@ -90,8 +86,6 @@ $$
 $$
 
 Every subspace of $\mathbb{R}^n$ is itself a vector space under the same operations.
-
----
 
 ## Linear combinations and span
 
@@ -114,8 +108,6 @@ $$
 
 The span is always a subspace of $\mathbb{R}^n$.
 
----
-
 ## Linear independence
 
 Vectors $x_1,\dots,x_k$ are **linearly independent** if the only solution to the homogeneous combination equaling zero is the trivial one:
@@ -127,8 +119,6 @@ $$
 $$
 
 If there exists a nontrivial choice of coefficients yielding zero, the vectors are **linearly dependent**.
-
----
 
 ## Bases and dimension
 
@@ -168,8 +158,6 @@ $$
 $$
 
 which is the $x_1$-$x_2$ plane in $\mathbb{R}^3$. Therefore $\dim(\operatorname{span}\{a_1,a_2\})=2$.
-
----
 
 ## Direct sum
 

@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -371,19 +371,22 @@ document.write(`
 <section id="computing-determinant-and-trace">
 <h2>Computing Determinant and Trace<a class="headerlink" href="#computing-determinant-and-trace" title="Link to this heading">#</a></h2>
 <p>For any <span class="math notranslate nohighlight">\(n \times n\)</span> square matrix <span class="math notranslate nohighlight">\(A\)</span> with eigenvalues <span class="math notranslate nohighlight">\(\lambda_1, \lambda_2, \dots, \lambda_n\)</span> (counted with multiplicity), the following relationships hold:</p>
-<ul class="simple">
-<li><p><strong>Determinant</strong>: The determinant is the product of the eigenvalues.
-$<span class="math notranslate nohighlight">\(
-  \det(A) = \prod_{i=1}^n \lambda_i = \lambda_1 \cdot \lambda_2 \cdots \lambda_n
-  \)</span>$</p></li>
-<li><p><strong>Trace</strong>: The trace is the sum of the eigenvalues.
-$<span class="math notranslate nohighlight">\(
-  \text{tr}(A) = \sum_{i=1}^n \lambda_i = \lambda_1 + \lambda_2 + \cdots + \lambda_n
-  \)</span>$</p></li>
+<ul>
+<li><p><strong>Determinant</strong>: The determinant is the product of the eigenvalues.</p>
+<div class="math notranslate nohighlight">
+\[
+    \det(A) = \prod_{i=1}^n \lambda_i = \lambda_1 \cdot \lambda_2 \cdots \lambda_n
+    \]</div>
+</li>
+<li><p><strong>Trace</strong>: The trace is the sum of the eigenvalues.</p>
+<div class="math notranslate nohighlight">
+\[
+    \text{tr}(A) = \sum_{i=1}^n \lambda_i = \lambda_1 + \lambda_2 + \cdots + \lambda_n
+    \]</div>
+</li>
 </ul>
 <p>These formulas follow from the <strong>Schur decomposition</strong> (<span class="math notranslate nohighlight">\(A = QTQ^H\)</span>), where <span class="math notranslate nohighlight">\(T\)</span> is an upper triangular matrix with the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> on its diagonal. The determinant of <span class="math notranslate nohighlight">\(A\)</span> is equal to the determinant of <span class="math notranslate nohighlight">\(T\)</span>, which is simply the product of its diagonal entries. Similarly, the trace of <span class="math notranslate nohighlight">\(A\)</span> is equal to the trace of <span class="math notranslate nohighlight">\(T\)</span>, which is the sum of its diagonal entries.</p>
 </section>
-<hr class="docutils" />
 <section id="other-applications-of-eigenvalues">
 <h2>Other Applications of Eigenvalues<a class="headerlink" href="#other-applications-of-eigenvalues" title="Link to this heading">#</a></h2>
 <p>Eigenvalues and their corresponding eigenvectors are among the most important concepts in applied mathematics, revealing the deep structure of linear transformations. 🗺️</p>

@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -426,7 +426,6 @@ x_n
 \end{pmatrix}.
 \end{split}\]</div>
 <p>Vectors in <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> are defined the same way, with scalars <span class="math notranslate nohighlight">\(\alpha \in \mathbb{C}\)</span>.</p>
-<hr class="docutils" />
 </section>
 <section id="definition-vector-space">
 <h2>Definition: Vector space<a class="headerlink" href="#definition-vector-space" title="Link to this heading">#</a></h2>
@@ -442,7 +441,6 @@ x_n
 <li><p><span class="math notranslate nohighlight">\((\alpha+\beta)x=\alpha x+\beta x\)</span>  (Right distributivity of scalar addition over scalar multiplication)</p></li>
 </ol>
 </section>
-<hr class="docutils" />
 <section id="subspaces">
 <h2>Subspaces<a class="headerlink" href="#subspaces" title="Link to this heading">#</a></h2>
 <p>A <strong>subspace</strong> <span class="math notranslate nohighlight">\(S \subset \mathbb{R}^n\)</span> is a nonempty set closed under linear combinations. Equivalently, for any <span class="math notranslate nohighlight">\(x,y \in S\)</span> and <span class="math notranslate nohighlight">\(\alpha,\beta \in \mathbb{R}\)</span>,</p>
@@ -452,7 +450,6 @@ x_n
 \]</div>
 <p>Every subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is itself a vector space under the same operations.</p>
 </section>
-<hr class="docutils" />
 <section id="linear-combinations-and-span">
 <h2>Linear combinations and span<a class="headerlink" href="#linear-combinations-and-span" title="Link to this heading">#</a></h2>
 <p>Given vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k \in \mathbb{R}^n\)</span>, a <strong>linear combination</strong> has the form</p>
@@ -472,7 +469,6 @@ x_n
 \]</div>
 <p>The span is always a subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
 </section>
-<hr class="docutils" />
 <section id="linear-independence">
 <h2>Linear independence<a class="headerlink" href="#linear-independence" title="Link to this heading">#</a></h2>
 <p>Vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> are <strong>linearly independent</strong> if the only solution to the homogeneous combination equaling zero is the trivial one:</p>
@@ -484,7 +480,6 @@ x_n
 \]</div>
 <p>If there exists a nontrivial choice of coefficients yielding zero, the vectors are <strong>linearly dependent</strong>.</p>
 </section>
-<hr class="docutils" />
 <section id="bases-and-dimension">
 <h2>Bases and dimension<a class="headerlink" href="#bases-and-dimension" title="Link to this heading">#</a></h2>
 <p>A set of vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> is a <strong>basis</strong> for a subspace <span class="math notranslate nohighlight">\(S\)</span> if:</p>
@@ -520,7 +515,6 @@ a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
 \end{split}\]</div>
 <p>which is the <span class="math notranslate nohighlight">\(x_1\)</span>-<span class="math notranslate nohighlight">\(x_2\)</span> plane in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>. Therefore <span class="math notranslate nohighlight">\(\dim(\operatorname{span}\{a_1,a_2\})=2\)</span>.</p>
 </section>
-<hr class="docutils" />
 <section id="direct-sum">
 <h2>Direct sum<a class="headerlink" href="#direct-sum" title="Link to this heading">#</a></h2>
 <p>If <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are subspaces, then <span class="math notranslate nohighlight">\(U+V\)</span> is a subspace. We say that <span class="math notranslate nohighlight">\(W=U \oplus V\)</span> is the direct sum of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> if <span class="math notranslate nohighlight">\(U \cap V = \{0\}\)</span>. The direct sum means that if a vector is decomposed into its <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> components, this decomposition is unique.</p>

@@ -26,6 +26,7 @@ Several important families of matrices are normal, which is why this property is
 The **Spectral Theorem** provides the crucial link between the algebraic property of normality and the geometric property of its eigenvectors.
 
 ````{prf:theorem} Spectral Theorem
+:label: thm:spectral_theorem
 A complex square matrix $A$ is **unitarily diagonalizable** if and only if it is **normal**.
 ````
 
@@ -71,6 +72,7 @@ Since diagonal matrices always commute ($\Lambda \Lambda^H = \Lambda^H \Lambda$)
 The Spectral Theorem for real symmetric matrices is a more specific and powerful version of the general theorem for normal matrices. It guarantees that any real symmetric matrix can be diagonalized by a real orthogonal matrix, which has a profound geometric meaning.
 
 ````{prf:theorem} Spectral Theorem for Real Symmetric Matrices
+:label: thm:spectral_theorem_real
 The theorem states that a real matrix $A$ is **orthogonally diagonalizable** if and only if it is **symmetric**.
 ````
 

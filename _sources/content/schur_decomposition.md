@@ -5,7 +5,7 @@ The Schur decomposition is a fundamental result in linear algebra that guarantee
 ## The (Complex) Schur Decomposition
 
 ````{prf:theorem} Schur Decomposition
-
+:label: thm:schur_decomposition
 The theorem states that for any $n \times n$ square matrix $A$ with complex entries, there exists a **unitary matrix** $Q$ and an **upper triangular matrix** $T$ such that:
 
 $$A = Q T Q^H$$
@@ -61,6 +61,7 @@ A complication arises when working with real matrices. If a real matrix $A$ has 
 The **real Schur decomposition** provides a clever workaround. 
 
 ````{prf:theorem} Real Schur Decomposition
+:label: thm:real_schur_decomposition
 It states that for any real square matrix $A$, there exists a **real orthogonal matrix** $Q$ ($Q^T Q = I$) such that:
 
 $$A = Q S Q^T$$
@@ -172,7 +173,7 @@ If $A$ has no real eigenvalues, it must have a pair of complex conjugate eigenva
     $$
     Q^T A Q = \begin{pmatrix} B & C Q_2 \\ 0 & S_2 \end{pmatrix}
     $$
-    
+
     This matrix $S$ has a $2 \times 2$ block and a quasi-upper triangular block on its diagonal, and is therefore itself quasi-upper triangular.
 
 Since both cases lead to the desired decomposition, the proof is complete by induction.

@@ -34,6 +34,7 @@ This procedure replaces a full $O(n^3)$ matrix inversion with a few matrix-vecto
 The Sherman-Morrison formula is a special case of the more general **Woodbury matrix identity**, which handles updates of a higher rank. 
 
 ````{prf:theorem} The Woodbury Matrix Identity
+:label: thm:woodbury_matrix_identity
 Let $A$ be an invertible $n \times n$ matrix, $U$ be an $n \times k$ matrix, $C$ be an invertible $k \times k$ matrix, and $V$ be a $k \times n$ matrix. The Woodbury matrix identity states:
 
 $$(A + UCV)^{-1} = A^{-1} - A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}$$
