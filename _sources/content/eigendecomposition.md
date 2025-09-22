@@ -136,6 +136,12 @@ The existence of the Schur decomposition can be proven by induction on the size 
 
 ````
 
+### Why It's So Important for Computation
+
+* **It's How We Actually Find Eigenvalues:** State-of-the-art numerical methods (like the famous QR algorithm) do not try to compute the eigendecomposition directly. Instead, they are designed to reliably and stably compute the **Schur decomposition**.
+* **A Stable Pathway:** Once the Schur form is found, the eigenvalues can be simply read off the diagonal of $T$. If the eigenvectors are also needed, they can be calculated from $Q$ and $T$. The Schur decomposition is the practical and stable **pathway** to finding eigenvalues and eigenvectors.
+* **The Power of $Q$:** The reason this approach works so well is the presence of the orthogonal matrix $Q$. Because orthogonal transformations preserve length, they don't amplify rounding errors during computation. This makes the entire process **numerically stable** and trustworthy.
+
 ## The Real Schur Decomposition
 
 When dealing exclusively with real matrices, a complication arises if the matrix $A$ possesses complex eigenvalues. Since complex eigenvalues of real matrices always occur in conjugate pairs, it is impossible for the matrix $T$ in the decomposition $A = Q T Q^T$ to be both real and triangular, because its diagonal must contain the complex eigenvalues.

@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -352,6 +352,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-of-the-schur-decomposition">Components of the Schur Decomposition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#relationship-to-eigenvalues">Relationship to Eigenvalues</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-existence">Proof of Existence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-it-s-so-important-for-computation">Why It’s So Important for Computation</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-schur-decomposition">The Real Schur Decomposition</a></li>
@@ -509,6 +510,14 @@ A = Q T Q^{-1}
 </li>
 </ul>
 </div>
+</section>
+<section id="why-it-s-so-important-for-computation">
+<h3>Why It’s So Important for Computation<a class="headerlink" href="#why-it-s-so-important-for-computation" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>It’s How We Actually Find Eigenvalues:</strong> State-of-the-art numerical methods (like the famous QR algorithm) do not try to compute the eigendecomposition directly. Instead, they are designed to reliably and stably compute the <strong>Schur decomposition</strong>.</p></li>
+<li><p><strong>A Stable Pathway:</strong> Once the Schur form is found, the eigenvalues can be simply read off the diagonal of <span class="math notranslate nohighlight">\(T\)</span>. If the eigenvectors are also needed, they can be calculated from <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(T\)</span>. The Schur decomposition is the practical and stable <strong>pathway</strong> to finding eigenvalues and eigenvectors.</p></li>
+<li><p><strong>The Power of <span class="math notranslate nohighlight">\(Q\)</span>:</strong> The reason this approach works so well is the presence of the orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>. Because orthogonal transformations preserve length, they don’t amplify rounding errors during computation. This makes the entire process <strong>numerically stable</strong> and trustworthy.</p></li>
+</ul>
 </section>
 </section>
 <section id="the-real-schur-decomposition">
@@ -735,6 +744,7 @@ A^k = (X \Lambda X^{-1})^k = (X \Lambda X^{-1})(X \Lambda X^{-1})\cdots(X \Lambd
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-of-the-schur-decomposition">Components of the Schur Decomposition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#relationship-to-eigenvalues">Relationship to Eigenvalues</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-existence">Proof of Existence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-it-s-so-important-for-computation">Why It’s So Important for Computation</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-schur-decomposition">The Real Schur Decomposition</a></li>
