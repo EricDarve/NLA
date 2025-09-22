@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -417,6 +417,12 @@ Q^T Q = Q Q^T = I
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(\det(Q) = +1\)</span>: The transformation is a <strong>rotation</strong> (a proper rotation). It preserves the orientation of the space. The set of these matrices forms the <strong>special orthogonal group SO(n)</strong>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(\det(Q) = -1\)</span>: The transformation is a <strong>reflection</strong> or an <strong>improper rotation</strong> (e.g., a reflection followed by a rotation). It reverses the orientation of the space.</p></li>
+</ul>
+<p><strong>Why They Are So Important in NLA</strong></p>
+<ul class="simple">
+<li><p><strong>Numerical Stability:</strong> This is their most critical application. Because orthogonal matrices don’t amplify the magnitude of vectors, they also don’t amplify numerical rounding errors that occur during computations. Algorithms built with orthogonal matrices (like QR factorization and SVD) are exceptionally stable and reliable.</p></li>
+<li><p><strong>Computational Efficiency:</strong> As mentioned, finding the inverse is trivial. This makes any algorithm that would otherwise require a matrix inversion much faster if orthogonal matrices are involved.</p></li>
+<li><p><strong>Problem Simplification:</strong> They are the perfect tool for rotating a coordinate system to simplify a problem. In NLA, they are used to transform complex matrices into simpler (e.g., triangular or diagonal) forms while preserving essential properties like eigenvalues, which is a core strategy for solving many difficult problems.</p></li>
 </ul>
 </section>
 </section>
