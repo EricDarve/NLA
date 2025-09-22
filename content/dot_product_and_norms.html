@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -362,6 +362,7 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-different-norms-matter">Why Different Norms Matter</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cauchyschwarz-and-holder-inequalities">Cauchy–Schwarz and Hölder Inequalities</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#application-pythagorean-theorem">Application: Pythagorean Theorem</a></li>
 </ul>
@@ -527,6 +528,27 @@ S^\perp = \{ y \in \mathbb{R}^n \;|\; \forall x \in S,\; x^T y = 0 \}.
 </ul>
 <p>As <span class="math notranslate nohighlight">\(p \to \infty\)</span>, the <span class="math notranslate nohighlight">\(p\)</span>-norm unit ball transitions from “diamond-like” (near <span class="math notranslate nohighlight">\(p=1\)</span>) to “square-like” (as <span class="math notranslate nohighlight">\(p \to \infty\)</span>).</p>
 </section>
+<section id="why-different-norms-matter">
+<h2>Why Different Norms Matter<a class="headerlink" href="#why-different-norms-matter" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Geometric Interpretation in Optimization:</strong> The choice of norm is critical in optimization and machine learning, as it defines the geometry of the “constraint region” for your solution. In many problems, we minimize a loss function subject to a constraint that the solution vector’s norm must be small (<span class="math notranslate nohighlight">\(
+\|x\|_p \le C\)</span>). The optimal solution is often found where the level curves of the loss function first touch the boundary of this constraint region (the “norm ball”).</p></li>
+<li><p><strong>Inducing Sparsity (<span class="math notranslate nohighlight">\(p \le 1\)</span>):</strong></p>
+<ul>
+<li><p>The L1-norm (<span class="math notranslate nohighlight">\(\|x\|_1\)</span>) constraint region is shaped like a diamond (or hyper-diamond in higher dimensions), with sharp corners that lie on the axes.</p></li>
+<li><p>Because of these corners, the expanding level curves of the loss function are most likely to make contact at a point on an axis.</p></li>
+<li><p>A point on an axis means that the other components of the vector are zero. This is why L1 regularization (used in LASSO) produces <strong>sparse solutions</strong>, which is useful for feature selection.</p></li>
+</ul>
+</li>
+<li><p><strong>Encouraging Small, Non-Zero Values (<span class="math notranslate nohighlight">\(p \ge 2\)</span>):</strong></p>
+<ul>
+<li><p>The L2-norm (<span class="math notranslate nohighlight">\(\|x\|_2\)</span>) constraint region is a circle (or hypersphere), which is perfectly round and has no corners. The solution can occur anywhere on its surface.</p></li>
+<li><p>This norm penalizes large values heavily (<span class="math notranslate nohighlight">\(x_i^2\)</span>), so it tends to find solutions where all components are small and non-zero rather than forcing some to be exactly zero. This is the basis for Ridge Regression.</p></li>
+<li><p>For norms with <span class="math notranslate nohighlight">\(p&gt;2\)</span>, the penalty on large components is even more severe, further encouraging solutions where all entries have similar, non-zero magnitudes.</p></li>
+</ul>
+</li>
+</ul>
+</section>
 <section id="cauchyschwarz-and-holder-inequalities">
 <h2>Cauchy–Schwarz and Hölder Inequalities<a class="headerlink" href="#cauchyschwarz-and-holder-inequalities" title="Link to this heading">#</a></h2>
 <p><strong>Hölder’s inequality:</strong><br />
@@ -541,6 +563,11 @@ Special case <span class="math notranslate nohighlight">\(p = q = 2\)</span>:</p
 \[
 |x^T y| \le \|x\|_2 \, \|y\|_2.
 \]</div>
+<p><strong>Why is This Bound Important?</strong></p>
+<ul class="simple">
+<li><p><strong>Proving Algorithm Convergence:</strong> Many iterative algorithms in NLA work by generating a sequence of vectors that get progressively closer to a solution. The Cauchy-Schwarz inequality is often used to prove that the <strong>error</strong> at each step is decreasing, guaranteeing that the algorithm will eventually converge.</p></li>
+<li><p><strong>Geometric Insight:</strong> The inequality has a clear geometric meaning. The dot product is maximized when the vectors are perfectly aligned (<span class="math notranslate nohighlight">\(\theta = 0\)</span> or <span class="math notranslate nohighlight">\(\pi\)</span>) and is zero when they are orthogonal. This intuition is invaluable when developing new algorithms.</p></li>
+</ul>
 </section>
 <section id="application-pythagorean-theorem">
 <h2>Application: Pythagorean Theorem<a class="headerlink" href="#application-pythagorean-theorem" title="Link to this heading">#</a></h2>
@@ -661,6 +688,7 @@ Special case <span class="math notranslate nohighlight">\(p = q = 2\)</span>:</p
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-different-norms-matter">Why Different Norms Matter</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cauchyschwarz-and-holder-inequalities">Cauchy–Schwarz and Hölder Inequalities</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#application-pythagorean-theorem">Application: Pythagorean Theorem</a></li>
 </ul>
