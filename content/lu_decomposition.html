@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Linear Algebra Bootcamp &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The LU Decomposition Algorithm &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/bootcamp';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/lu_decomposition';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Vector spaces" href="vector_space.html" />
-    <link rel="prev" title="Class Notes 2025" href="intro.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Solving Linear Systems" href="solving_linear_systems.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -197,8 +197,8 @@
 <li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The LU Decomposition Algorithm</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -256,7 +256,7 @@
       
       
       
-      <li><a href="../_sources/content/bootcamp.md" target="_blank"
+      <li><a href="../_sources/content/lu_decomposition.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -327,7 +327,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -338,11 +340,24 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Linear Algebra Bootcamp</h1>
+    <h1>The LU Decomposition Algorithm</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-triangular-systems-the-building-block">Solving Triangular Systems: The Building Block</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lower-triangular-systems-forward-substitution">Lower Triangular Systems: Forward Substitution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#upper-triangular-systems-backward-substitution">Upper Triangular Systems: Backward Substitution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost 💰</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -352,14 +367,104 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="linear-algebra-bootcamp">
-<h1>Linear Algebra Bootcamp<a class="headerlink" href="#linear-algebra-bootcamp" title="Link to this heading">#</a></h1>
-<p>Welcome to the Linear Algebra Bootcamp! 🚀</p>
-<p>This chapter is your high-speed training ground for the essential concepts of linear algebra that power everything from data science to quantum mechanics. We’ll start with a rapid tour of the fundamentals—vector spaces, norms, and dot products—before diving into the core of the action.</p>
-<p>You’ll get reacquainted with matrices and the powerful stories they tell through their four fundamental subspaces. Then, we’ll unlock the secrets of a matrix’s “DNA” with two of the most important tools in mathematics: the <strong>Eigendecomposition</strong>, which explains how systems evolve, and the <strong>Singular Value Decomposition (SVD)</strong>, which reveals the pure geometry of transformations.</p>
-<p>Whether you need a quick refresher or are building your foundation from scratch, this bootcamp will get you geared up for the exciting world of numerical linear algebra. Let’s get started!</p>
-<div class="toctree-wrapper compound">
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-lu-decomposition-algorithm">
+<h1>The LU Decomposition Algorithm<a class="headerlink" href="#the-lu-decomposition-algorithm" title="Link to this heading">#</a></h1>
+<section id="solving-triangular-systems-the-building-block">
+<h2>Solving Triangular Systems: The Building Block<a class="headerlink" href="#solving-triangular-systems-the-building-block" title="Link to this heading">#</a></h2>
+<p>The strategy of solving <span class="math notranslate nohighlight">\(Ax = b\)</span> by factoring <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(LU\)</span> is only useful if solving the resulting triangular systems, <span class="math notranslate nohighlight">\(Ly = b\)</span> and <span class="math notranslate nohighlight">\(Ux = y\)</span>, is significantly easier than solving the original problem. Fortunately, it is. The unique structure of triangular matrices—with zeros on one side of the diagonal—allows us to solve for the unknown variables one by one in a straightforward process.</p>
+<section id="lower-triangular-systems-forward-substitution">
+<h3>Lower Triangular Systems: Forward Substitution<a class="headerlink" href="#lower-triangular-systems-forward-substitution" title="Link to this heading">#</a></h3>
+<p>Consider a lower triangular system <span class="math notranslate nohighlight">\(Lx = b\)</span>. Let’s write it out for a small <span class="math notranslate nohighlight">\(3 \times 3\)</span> case to see the structure:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}
+l_{11} &amp; 0 &amp; 0 \\
+l_{21} &amp; l_{22} &amp; 0 \\
+l_{31} &amp; l_{32} &amp; l_{33}
+\end{pmatrix}
+\begin{pmatrix}
+x_1 \\
+x_2 \\
+x_3
+\end{pmatrix}
+=
+\begin{pmatrix}
+b_1 \\
+b_2 \\
+b_3
+\end{pmatrix}
+\end{split}\]</div>
+<p>Written as a system of equations, this is:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(l_{11}x_1 = b_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(l_{21}x_1 + l_{22}x_2 = b_2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(l_{31}x_1 + l_{32}x_2 + l_{33}x_3 = b_3\)</span></p></li>
+</ol>
+<p>The solution process unfolds naturally:</p>
+<ul class="simple">
+<li><p>From the first equation, we can immediately solve for <span class="math notranslate nohighlight">\(x_1\)</span>, as it’s the only unknown: <span class="math notranslate nohighlight">\(x_1 = b_1 / l_{11}\)</span>.</p></li>
+<li><p>Now that we know <span class="math notranslate nohighlight">\(x_1\)</span>, we can substitute it into the second equation, which now only has one unknown, <span class="math notranslate nohighlight">\(x_2\)</span>. We can solve for it: <span class="math notranslate nohighlight">\(x_2 = (b_2 - l_{21}x_1) / l_{22}\)</span>.</p></li>
+<li><p>Finally, knowing <span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span>, we substitute them into the third equation to find <span class="math notranslate nohighlight">\(x_3\)</span>.</p></li>
+</ul>
+<p>This sequential process is called <strong>forward substitution</strong> because we solve for the variables in the forward order: <span class="math notranslate nohighlight">\(x_1, x_2, \dots, x_n\)</span>. The general formula for <span class="math notranslate nohighlight">\(x_i\)</span>, assuming we have already computed <span class="math notranslate nohighlight">\(x_1, \dots, x_{i-1}\)</span>, is:</p>
+<div class="math notranslate nohighlight">
+\[x_i = \frac{1}{l_{ii}} \Big( b_i - \sum_{j=1}^{i-1} l_{ij} x_j \Big)\]</div>
+<p>This process is well-defined as long as all diagonal entries <span class="math notranslate nohighlight">\(l_{ii}\)</span> are non-zero, which is guaranteed if <span class="math notranslate nohighlight">\(L\)</span> is invertible.</p>
+</section>
+<section id="upper-triangular-systems-backward-substitution">
+<h3>Upper Triangular Systems: Backward Substitution<a class="headerlink" href="#upper-triangular-systems-backward-substitution" title="Link to this heading">#</a></h3>
+<p>The exact same logic applies to upper triangular systems of the form <span class="math notranslate nohighlight">\(Ux = b\)</span>, but the solution is found in the reverse order. Let’s look at the <span class="math notranslate nohighlight">\(3 \times 3\)</span> case:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}
+u_{11} &amp; u_{12} &amp; u_{13} \\
+0 &amp; u_{22} &amp; u_{23} \\
+0 &amp; 0 &amp; u_{33}
+\end{pmatrix}
+\begin{pmatrix}
+x_1 \\
+x_2 \\
+x_3
+\end{pmatrix}
+=
+\begin{pmatrix}
+b_1 \\
+b_2 \\
+b_3
+\end{pmatrix}
+\end{split}\]</div>
+<p>The system of equations is:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(u_{11}x_1 + u_{12}x_2 + u_{13}x_3 = b_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(u_{22}x_2 + u_{23}x_3 = b_2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(u_{33}x_3 = b_3\)</span></p></li>
+</ol>
+<p>Here, we start from the bottom and work our way up:</p>
+<ul class="simple">
+<li><p>The last equation has only one unknown, <span class="math notranslate nohighlight">\(x_3\)</span>, which we can solve for immediately: <span class="math notranslate nohighlight">\(x_3 = b_3 / u_{33}\)</span>.</p></li>
+<li><p>Knowing <span class="math notranslate nohighlight">\(x_3\)</span>, we can plug it into the second-to-last equation to solve for <span class="math notranslate nohighlight">\(x_2\)</span>.</p></li>
+<li><p>And so on, until we find <span class="math notranslate nohighlight">\(x_1\)</span>.</p></li>
+</ul>
+<p>This process is called <strong>backward substitution</strong>. The general formula for computing <span class="math notranslate nohighlight">\(x_i\)</span>, assuming we have already found <span class="math notranslate nohighlight">\(x_{n}, x_{n-1}, \dots, x_{i+1}\)</span>, is:</p>
+<div class="math notranslate nohighlight">
+\[x_i = \frac{1}{u_{ii}} \left( b_i - \sum_{j=i+1}^{n} u_{ij} x_j \right)\]</div>
+</section>
+<section id="computational-cost">
+<h3>Computational Cost 💰<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h3>
+<p>Let’s analyze the cost of forward substitution. To compute each <span class="math notranslate nohighlight">\(x_i\)</span>, the formula requires:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(i-1\)</span> multiplications (<span class="math notranslate nohighlight">\(l_{ij} x_j\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(i-1\)</span> subtractions</p></li>
+<li><p><span class="math notranslate nohighlight">\(1\)</span> division</p></li>
+</ul>
+<p>In numerical linear algebra, we often count a fused multiplication and addition/subtraction as a single <strong>floating-point operation</strong>, or <strong>flop</strong>. Thus, computing <span class="math notranslate nohighlight">\(x_i\)</span> takes approximately <span class="math notranslate nohighlight">\(i-1\)</span> flops for the sum and one flop for the division, for a total of <span class="math notranslate nohighlight">\(i\)</span> flops. To find the total cost for solving the entire system, we sum this over all <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\text{Total Flops} = \sum_{i=1}^{n} (i-1) \approx \sum_{i=1}^{n} i = \frac{n(n+1)}{2} = \frac{1}{2}n^2 + O(n)\]</div>
+<p><em>Note: A more precise count yields approximately <span class="math notranslate nohighlight">\(n^2\)</span> flops.</em></p>
+<p>The cost for backward substitution is identical. The key takeaway is that solving a triangular system of size <span class="math notranslate nohighlight">\(n\)</span> costs approximately <span class="math notranslate nohighlight">\(n^2\)</span> floating-point operations. We say the complexity is <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong>.</p>
+<p>This is remarkably efficient. As we will see, general methods for solving <span class="math notranslate nohighlight">\(Ax=b\)</span> (like the LU factorization itself) cost <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops. For a large matrix, the difference between <span class="math notranslate nohighlight">\(n^2\)</span> and <span class="math notranslate nohighlight">\(n^3\)</span> is enormous. The cost of the two triangular solves is so low that it’s considered negligible compared to the cost of the initial factorization. This is what makes factorization-based methods so powerful.</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -393,20 +498,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="intro.html"
+       href="solving_linear_systems.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Class Notes 2025</p>
+        <p class="prev-next-title">Solving Linear Systems</p>
       </div>
     </a>
     <a class="right-next"
-       href="vector_space.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Vector spaces</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -416,6 +521,26 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-triangular-systems-the-building-block">Solving Triangular Systems: The Building Block</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lower-triangular-systems-forward-substitution">Lower Triangular Systems: Forward Substitution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#upper-triangular-systems-backward-substitution">Upper Triangular Systems: Backward Substitution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost 💰</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
