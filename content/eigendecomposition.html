@@ -443,11 +443,11 @@ Ax = \lambda x
 </li>
 <li><p>By the Fundamental Theorem of Algebra, we can factor the polynomial <span class="math notranslate nohighlight">\(P(z)\)</span> in terms of its roots <span class="math notranslate nohighlight">\(\lambda_1, \dots, \lambda_k\)</span> (where <span class="math notranslate nohighlight">\(k \le n\)</span>):</p>
 <div class="math notranslate nohighlight">
-\[P(z) = c_n(z - \lambda_1)(z - \lambda_2)\cdots(z - \lambda_k)\]</div>
+\[P(z) = c_k(z - \lambda_1)(z - \lambda_2)\cdots(z - \lambda_k)\]</div>
 </li>
 <li><p>Substituting the matrix <span class="math notranslate nohighlight">\(A\)</span> back into this factored form gives:</p>
 <div class="math notranslate nohighlight">
-\[c_n(A - \lambda_1 I)(A - \lambda_2 I)\cdots(A - \lambda_k I)x = 0\]</div>
+\[c_k(A - \lambda_1 I)(A - \lambda_2 I)\cdots(A - \lambda_k I)x = 0\]</div>
 </li>
 <li><p>Let’s read this expression from right to left. Let <span class="math notranslate nohighlight">\(v_k = x\)</span>, <span class="math notranslate nohighlight">\(v_{k-1} = (A - \lambda_k I)v_k\)</span>, <span class="math notranslate nohighlight">\(v_{k-2} = (A - \lambda_{k-1} I)v_{k-1}\)</span>, and so on. Since the final result is the zero vector, and we started with a non-zero vector <span class="math notranslate nohighlight">\(x\)</span>, there must be some step where a non-zero vector was transformed into the zero vector.</p></li>
 <li><p>That is, there must be some index <span class="math notranslate nohighlight">\(i\)</span> and some non-zero vector <span class="math notranslate nohighlight">\(v_i\)</span> such that <span class="math notranslate nohighlight">\((A - \lambda_i I)v_i = 0\)</span>. This is the definition of <span class="math notranslate nohighlight">\(\lambda_i\)</span> being an eigenvalue with corresponding eigenvector <span class="math notranslate nohighlight">\(v_i\)</span>. If no such step existed, all the matrices <span class="math notranslate nohighlight">\((A-\lambda_i I)\)</span> would be invertible, and their product would also be invertible, which contradicts the fact that it maps the non-zero vector <span class="math notranslate nohighlight">\(x\)</span> to zero.</p></li>
