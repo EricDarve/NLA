@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Class Notes 2025 &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Eigenvalues and Singular Values &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,10 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/intro';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/eigen_vs_singular_values';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Linear Algebra Bootcamp" href="bootcamp.html" />
+    <link rel="next" title="Summary of Matrix Decompositions" href="summary_of_matrix_decompositions.html" />
+    <link rel="prev" title="Singular Value Decomposition" href="singular_value_decomposition.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,8 +127,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -146,7 +145,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -171,14 +170,14 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
                     Class Notes 2025
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -195,7 +194,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Eigenvalues and Singular Values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
@@ -258,7 +257,7 @@
       
       
       
-      <li><a href="../_sources/content/intro.md" target="_blank"
+      <li><a href="../_sources/content/eigen_vs_singular_values.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -329,7 +328,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -340,11 +341,22 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Class Notes 2025</h1>
+    <h1>Eigenvalues and Singular Values</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-setup-an-illustrative-example">The Setup: An Illustrative Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-analysis">Eigenvalue Analysis 🔬</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singular-value-analysis">Singular Value Analysis 🧐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-takeaway-normality-is-key">The Takeaway: Normality is Key</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -354,18 +366,85 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="class-notes-2025">
-<h1>Class Notes 2025<a class="headerlink" href="#class-notes-2025" title="Link to this heading">#</a></h1>
-<p>These are class notes for the Numerical Linear Algebra course at Stanford University, Spring 2025. The course is taught by <a class="reference external" href="https://profiles.stanford.edu/eric-darve">Eric Darve</a>.</p>
-<!-- - [[QR factorization and least-squares]]
-- [[Computing eigenvalues]]
-- [[Iterative methods for eigenvalue computation]]
-- [[Classical iterative methods to solve sparse linear systems]]
-- [[Krylov iterative methods to solve sparse linear systems]] -->
-<p>Book: <a class="reference external" href="https://epubs.siam.org/doi/book/10.1137/1.9781611976557">Numerical Linear Algebra with Julia</a>, Darve and Wootters; <a class="reference external" href="https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545">Amazon</a>, <a class="reference external" href="https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ">Google Books</a></p>
-<p><a href="https://github.com/EricDarve/NLA">Edit on GitHub</a></p>
-<div class="toctree-wrapper compound">
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="eigenvalues-and-singular-values">
+<h1>Eigenvalues and Singular Values<a class="headerlink" href="#eigenvalues-and-singular-values" title="Link to this heading">#</a></h1>
+<p>The fundamental difference between eigenvalues and singular values is this: <strong>eigenvalues</strong> tell you about the long-term behavior of a system (<span class="math notranslate nohighlight">\(A^n\)</span>), while <strong>singular values</strong> tell you about the immediate, one-time amplification or “stretching” of a matrix. A matrix can have small, stable eigenvalues but produce enormous transient growth, a phenomenon captured by its singular values.</p>
+<section id="the-setup-an-illustrative-example">
+<h2>The Setup: An Illustrative Example<a class="headerlink" href="#the-setup-an-illustrative-example" title="Link to this heading">#</a></h2>
+<p>Let’s construct a matrix <span class="math notranslate nohighlight">\(A\)</span> whose eigenvalues are well-behaved, but whose singular values indicate a potential for massive amplification.</p>
+<ol class="arabic">
+<li><p><strong>Start with two nearly-aligned vectors</strong>, where <span class="math notranslate nohighlight">\(\epsilon\)</span> is a small positive number:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    u = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix}, \quad v = \begin{bmatrix} 1 \\ -\epsilon \end{bmatrix}
+    \end{split}\]</div>
+<p>We use these to form the matrix <span class="math notranslate nohighlight">\(X = [u, v]\)</span>. As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the columns become nearly parallel, making <span class="math notranslate nohighlight">\(X\)</span> very <strong>ill-conditioned</strong>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    X = \begin{bmatrix} 1 &amp; 1 \\ \epsilon &amp; -\epsilon \end{bmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Define a simple diagonal matrix</strong> <span class="math notranslate nohighlight">\(D\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    D = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Construct our matrix</strong> <span class="math notranslate nohighlight">\(A\)</span> using a similarity transform: <span class="math notranslate nohighlight">\(A = XDX^{-1}\)</span>. Let’s compute this explicitly. The inverse of <span class="math notranslate nohighlight">\(X\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    X^{-1} = \frac{1}{\det(X)} \begin{bmatrix} -\epsilon &amp; -1 \\ -\epsilon &amp; 1 \end{bmatrix} = \frac{1}{-2\epsilon} \begin{bmatrix} -\epsilon &amp; -1 \\ -\epsilon &amp; 1 \end{bmatrix} = \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix}
+    \end{split}\]</div>
+<p>Notice that as <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the entries of <span class="math notranslate nohighlight">\(X^{-1}\)</span> blow up. Now, we find <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{gathered}
+    A = \begin{bmatrix} 1 &amp; 1 \\ \epsilon &amp; -\epsilon \end{bmatrix} \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix} \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix} = \begin{bmatrix} 1 &amp; -1 \\ \epsilon &amp; \epsilon \end{bmatrix} \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix} \\[1em]
+    A = \begin{bmatrix} 0 &amp; 1/\epsilon \\ \epsilon &amp; 0 \end{bmatrix}
+    \end{gathered}
+    \end{split}\]</div>
+</li>
+</ol>
+<p>Now we have a simple matrix <span class="math notranslate nohighlight">\(A\)</span> that depends on our small parameter <span class="math notranslate nohighlight">\(\epsilon\)</span>. Let’s analyze its eigenvalues and singular values.</p>
+</section>
+<section id="eigenvalue-analysis">
+<h2>Eigenvalue Analysis 🔬<a class="headerlink" href="#eigenvalue-analysis" title="Link to this heading">#</a></h2>
+<p>By construction (<span class="math notranslate nohighlight">\(A = XDX^{-1}\)</span>), the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are the diagonal entries of <span class="math notranslate nohighlight">\(D\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\lambda_1 = 1, \quad \lambda_2 = -1\]</div>
+<p>The eigenvalues are perfectly stable and have a magnitude of 1, regardless of how small <span class="math notranslate nohighlight">\(\epsilon\)</span> gets. From an eigenvalue perspective, this matrix looks completely harmless. If we consider the discrete dynamical system <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>, the magnitudes of the eigenvalues (<span class="math notranslate nohighlight">\(|\lambda_i|=1\)</span>) suggest that the system will not blow up over time. In fact, <span class="math notranslate nohighlight">\(A^2=I\)</span>, so the system is <strong>stable and periodic.</strong></p>
+</section>
+<section id="singular-value-analysis">
+<h2>Singular Value Analysis 🧐<a class="headerlink" href="#singular-value-analysis" title="Link to this heading">#</a></h2>
+<p>The singular values (<span class="math notranslate nohighlight">\(\sigma_i\)</span>) are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A^T A = \begin{bmatrix} 0 &amp; \epsilon \\ 1/\epsilon &amp; 0 \end{bmatrix} \begin{bmatrix} 0 &amp; 1/\epsilon \\ \epsilon &amp; 0 \end{bmatrix} = \begin{bmatrix} \epsilon^2 &amp; 0 \\ 0 &amp; 1/\epsilon^2 \end{bmatrix}\end{split}\]</div>
+<p>The eigenvalues of this diagonal matrix are clearly <span class="math notranslate nohighlight">\(\epsilon^2\)</span> and <span class="math notranslate nohighlight">\(1/\epsilon^2\)</span>. The singular values of <span class="math notranslate nohighlight">\(A\)</span> are their square roots:</p>
+<div class="math notranslate nohighlight">
+\[\sigma_1 = \sqrt{1/\epsilon^2} = 1/\epsilon, \quad \sigma_2 = \sqrt{\epsilon^2} = \epsilon\]</div>
+<p>As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the largest singular value <strong><span class="math notranslate nohighlight">\(\sigma_1 \to \infty\)</span></strong>.</p>
+<p>The largest singular value is the 2-norm of the matrix, <span class="math notranslate nohighlight">\(\|A\|_2 = \sigma_{max}\)</span>. So, even though the eigenvalues are 1 and -1, the norm of the matrix is huge! This tells us that applying the matrix <span class="math notranslate nohighlight">\(A\)</span> just <em>once</em> can stretch a vector by an enormous factor of <span class="math notranslate nohighlight">\(1/\epsilon\)</span>.</p>
+</section>
+<section id="the-takeaway-normality-is-key">
+<h2>The Takeaway: Normality is Key<a class="headerlink" href="#the-takeaway-normality-is-key" title="Link to this heading">#</a></h2>
+<p>So, why the dramatic difference? The answer lies in the <strong>non-normality</strong> of matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<ul>
+<li><p>A matrix is <strong>normal</strong> if <span class="math notranslate nohighlight">\(A^T A = AA^T\)</span>. For normal matrices, the singular values are simply the absolute values of the eigenvalues (<span class="math notranslate nohighlight">\(\sigma_i = |\lambda_i|\)</span>), and their eigenvectors are orthogonal.</p></li>
+<li><p>Our matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>not normal</strong>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    A^T A = \begin{bmatrix} \epsilon^2 &amp; 0 \\ 0 &amp; 1/\epsilon^2 \end{bmatrix} \quad \neq \quad AA^T = \begin{bmatrix} 1/\epsilon^2 &amp; 0 \\ 0 &amp; \epsilon^2 \end{bmatrix}
+    \end{split}\]</div>
+</li>
+</ul>
+<p>This non-normality has a critical geometric consequence: the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span> (the columns of <span class="math notranslate nohighlight">\(X\)</span>) are <strong>not orthogonal</strong>. As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, they become nearly parallel. In contrast, the singular vectors of <span class="math notranslate nohighlight">\(A\)</span> form an orthogonal basis.</p>
+<p><strong>In summary:</strong></p>
+<ul class="simple">
+<li><p><strong>Eigenvalues</strong> describe the behavior of <span class="math notranslate nohighlight">\(A\)</span> with respect to its (possibly non-orthogonal) eigenvectors. They reveal long-term, asymptotic behavior but can hide short-term transient effects.</p></li>
+<li><p><strong>Singular values</strong> describe the behavior of <span class="math notranslate nohighlight">\(A\)</span> with respect to an optimal, orthonormal basis. They reveal the maximum possible amplification the matrix can produce in a single application, defining its norm and its potential for creating large transient growth.</p></li>
+</ul>
+<p>This example starkly illustrates that for non-normal matrices, the eigenvalues alone give an incomplete and potentially misleading picture of the matrix’s behavior. You must also consider the singular values to understand the full story.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -398,12 +477,21 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="singular_value_decomposition.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Singular Value Decomposition</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="bootcamp.html"
+       href="summary_of_matrix_decompositions.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Linear Algebra Bootcamp</p>
+        <p class="prev-next-title">Summary of Matrix Decompositions</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -413,6 +501,24 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-setup-an-illustrative-example">The Setup: An Illustrative Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-analysis">Eigenvalue Analysis 🔬</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singular-value-analysis">Singular Value Analysis 🧐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-takeaway-normality-is-key">The Takeaway: Normality is Key</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
