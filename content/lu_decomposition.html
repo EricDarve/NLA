@@ -356,6 +356,26 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost 💰</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-two-step-solution-process">The Two-Step Solution Process</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Computational Cost 💰</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-views-of-matrix-multiplication">Two Views of Matrix Multiplication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-concrete-example">A Concrete Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-is-this-view-important">Why is This View Important? 🤔</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-algorithm-via-outer-products">Deriving the Algorithm via Outer Products</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-determining-l-1-and-u-1">Step 1: Determining <span class="math notranslate nohighlight">\(l_{:,1}\)</span> and <span class="math notranslate nohighlight">\(u_{1,:}\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-the-rank-one-update">Step 2: The Rank-One Update</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-algorithm">The General Algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Computational Cost 💰</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-step-by-step">The Algorithm Step-by-Step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pivot-problem-when-things-go-wrong">The Pivot Problem: When Things Go Wrong 🚧</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -463,6 +483,175 @@ b_3
 <p><em>Note: A more precise count yields approximately <span class="math notranslate nohighlight">\(n^2\)</span> flops.</em></p>
 <p>The cost for backward substitution is identical. The key takeaway is that solving a triangular system of size <span class="math notranslate nohighlight">\(n\)</span> costs approximately <span class="math notranslate nohighlight">\(n^2\)</span> floating-point operations. We say the complexity is <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong>.</p>
 <p>This is remarkably efficient. As we will see, general methods for solving <span class="math notranslate nohighlight">\(Ax=b\)</span> (like the LU factorization itself) cost <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops. For a large matrix, the difference between <span class="math notranslate nohighlight">\(n^2\)</span> and <span class="math notranslate nohighlight">\(n^3\)</span> is enormous. The cost of the two triangular solves is so low that it’s considered negligible compared to the cost of the initial factorization. This is what makes factorization-based methods so powerful.</p>
+<p>Once you have the LU factorization of a matrix <span class="math notranslate nohighlight">\(A\)</span>, solving the linear system <span class="math notranslate nohighlight">\(Ax=b\)</span> becomes a straightforward and efficient two-step process involving only triangular solves.</p>
+<p>This method transforms one difficult problem into two simple ones.</p>
+</section>
+</section>
+<section id="the-two-step-solution-process">
+<h2>The Two-Step Solution Process<a class="headerlink" href="#the-two-step-solution-process" title="Link to this heading">#</a></h2>
+<p>The core idea is to substitute the factorization <span class="math notranslate nohighlight">\(A=LU\)</span> into the original equation and strategically group the terms.</p>
+<ol class="arabic">
+<li><p><strong>Start with the original system:</strong></p>
+<div class="math notranslate nohighlight">
+\[Ax = b\]</div>
+</li>
+<li><p><strong>Substitute the factorization:</strong></p>
+<div class="math notranslate nohighlight">
+\[(LU)x = b\]</div>
+</li>
+<li><p><strong>Group the terms.</strong> Using the associative property of matrix multiplication, we can write:</p>
+<div class="math notranslate nohighlight">
+\[L(Ux) = b\]</div>
+</li>
+<li><p><strong>Introduce an intermediate vector.</strong> Let’s define a temporary vector <span class="math notranslate nohighlight">\(z\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[z = Ux\]</div>
+<p>Substituting <span class="math notranslate nohighlight">\(z\)</span> into the equation from step 3 gives us our first problem:</p>
+<div class="math notranslate nohighlight">
+\[Lz = b\]</div>
+</li>
+</ol>
+<p>This decouples the original system into two manageable triangular systems:</p>
+<p><strong>Step 1: Solve for <span class="math notranslate nohighlight">\(z\)</span> using Forward Substitution</strong></p>
+<p>First, we solve the lower triangular system <span class="math notranslate nohighlight">\(Lz = b\)</span> for the intermediate vector <span class="math notranslate nohighlight">\(z\)</span>. As we’ve seen, this is computationally inexpensive.</p>
+<p><strong>Step 2: Solve for <span class="math notranslate nohighlight">\(x\)</span> using Backward Substitution</strong></p>
+<p>Once we have computed <span class="math notranslate nohighlight">\(z\)</span>, we solve the upper triangular system <span class="math notranslate nohighlight">\(Ux = z\)</span> for our final solution vector <span class="math notranslate nohighlight">\(x\)</span>. This is also computationally inexpensive.</p>
+<p>This two-stage process—forward substitution followed by backward substitution—is the standard method for solving a linear system once its LU factorization is known.</p>
+<section id="id1">
+<h3>Computational Cost 💰<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>The efficiency of this approach is its main advantage. Assuming the LU factorization is already available:</p>
+<ul class="simple">
+<li><p><strong>Cost of Step 1 (Forward Substitution):</strong> Solving <span class="math notranslate nohighlight">\(Lz=b\)</span> takes <strong><span class="math notranslate nohighlight">\(n^2\)</span></strong> flops.</p></li>
+<li><p><strong>Cost of Step 2 (Backward Substitution):</strong> Solving <span class="math notranslate nohighlight">\(Ux=z\)</span> also takes <strong><span class="math notranslate nohighlight">\(n^2\)</span></strong> flops.</p></li>
+</ul>
+<p>The <strong>total computational cost</strong> to solve the system is the sum of these two steps: <span class="math notranslate nohighlight">\(n^2 + n^2 = \mathbf{2n^2}\)</span> flops. Therefore, the overall complexity is <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p>
+<p>This provides the core motivation for LU factorization. While finding the factors <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> is an expensive <span class="math notranslate nohighlight">\(O(n^3)\)</span> operation, once you have them, you can solve for any right-hand side <span class="math notranslate nohighlight">\(b\)</span> very quickly. This is a massive advantage in applications where the same matrix <span class="math notranslate nohighlight">\(A\)</span> must be used with many different <span class="math notranslate nohighlight">\(b\)</span> vectors.</p>
+</section>
+</section>
+<section id="two-views-of-matrix-multiplication">
+<h2>Two Views of Matrix Multiplication<a class="headerlink" href="#two-views-of-matrix-multiplication" title="Link to this heading">#</a></h2>
+<p>The product of two matrices can be viewed as a sum of <strong>outer products</strong>. This perspective is a powerful tool for developing and understanding matrix factorization algorithms.</p>
+<p>Let’s consider the product of two <span class="math notranslate nohighlight">\(n \times n\)</span> matrices, <span class="math notranslate nohighlight">\(A = BC\)</span>.</p>
+<p><strong>1. The Inner Product View (The Standard Method)</strong></p>
+<p>You’re likely most familiar with the “inner product” or “dot product” view. To find the entry <span class="math notranslate nohighlight">\(a_{ij}\)</span>, you take the dot product of the <strong><span class="math notranslate nohighlight">\(i\)</span>-th row</strong> of <span class="math notranslate nohighlight">\(B\)</span> with the <strong><span class="math notranslate nohighlight">\(j\)</span>-th column</strong> of <span class="math notranslate nohighlight">\(C\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[a_{ij} = (\text{row } i \text{ of } B) \cdot (\text{column } j \text{ of } C) = \sum_{k=1}^n b_{ik}c_{kj}\]</div>
+<p>Here, we compute the final matrix <span class="math notranslate nohighlight">\(A\)</span> one scalar entry at a time.</p>
+<p><strong>2. The Outer Product View</strong></p>
+<p>The outer product view reframes the entire calculation. Instead of a sum of scalars, we see the matrix <span class="math notranslate nohighlight">\(A\)</span> as a <strong>sum of matrices</strong>. Specifically, it’s the sum of the outer products of the columns of <span class="math notranslate nohighlight">\(B\)</span> with the corresponding rows of <span class="math notranslate nohighlight">\(C\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[A = \sum_{k=1}^n (\text{column } k \text{ of } B) (\text{row } k \text{ of } C) = \sum_{k=1}^n b_{:,k} c_{k,:}\]</div>
+<p>Each term in this sum, <span class="math notranslate nohighlight">\(b_{:,k} c_{k,:}\)</span>, is an outer product between a column vector (size <span class="math notranslate nohighlight">\(n \times 1\)</span>) and a row vector (size <span class="math notranslate nohighlight">\(1 \times n\)</span>). The result of each outer product is a full <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, often called a <strong>rank-one matrix</strong>. The final matrix <span class="math notranslate nohighlight">\(A\)</span> is constructed by adding these rank-one matrices together.</p>
+<section id="a-concrete-example">
+<h3>A Concrete Example<a class="headerlink" href="#a-concrete-example" title="Link to this heading">#</a></h3>
+<p>Let’s see this in action for a simple <span class="math notranslate nohighlight">\(2 \times 2\)</span> case where <span class="math notranslate nohighlight">\(A = BC\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A = \underbrace{\begin{pmatrix} b_{11} \\ b_{21} \end{pmatrix}}_{b_{:,1}} \underbrace{\begin{pmatrix} c_{11} &amp; c_{12} \end{pmatrix}}_{c_{1,:}} + \underbrace{\begin{pmatrix} b_{12} \\ b_{22} \end{pmatrix}}_{b_{:,2}} \underbrace{\begin{pmatrix} c_{21} &amp; c_{22} \end{pmatrix}}_{c_{2,:}}\end{split}\]</div>
+<p>First, compute the two rank-one matrices:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix} b_{11}c_{11} &amp; b_{11}c_{12} \\ b_{21}c_{11} &amp; b_{21}c_{12} \end{pmatrix} + \begin{pmatrix} b_{12}c_{21} &amp; b_{12}c_{22} \\ b_{22}c_{21} &amp; b_{22}c_{22} \end{pmatrix}\end{split}\]</div>
+<p>Then, sum them to get the final result:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A = \begin{pmatrix} b_{11}c_{11} + b_{12}c_{21} &amp; b_{11}c_{12} + b_{12}c_{22} \\ b_{21}c_{11} + b_{22}c_{21} &amp; b_{21}c_{12} + b_{22}c_{22} \end{pmatrix}\end{split}\]</div>
+<p>As you can see, each entry matches the result from the standard inner product definition.</p>
+</section>
+<section id="why-is-this-view-important">
+<h3>Why is This View Important? 🤔<a class="headerlink" href="#why-is-this-view-important" title="Link to this heading">#</a></h3>
+<p>While it might seem more complex, the outer product perspective is crucial for algorithm design. It shows us how a matrix can be built up iteratively. Many factorization algorithms, including LU, are based on the idea of “peeling off” or subtracting these rank-one components from the original matrix one at a time to reveal its underlying structure. We will use this exact idea to derive the LU factorization algorithm.</p>
+</section>
+</section>
+<section id="deriving-the-algorithm-via-outer-products">
+<h2>Deriving the Algorithm via Outer Products<a class="headerlink" href="#deriving-the-algorithm-via-outer-products" title="Link to this heading">#</a></h2>
+<p>The LU factorization algorithm elegantly computes the factors <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> by systematically eliminating entries in the matrix <span class="math notranslate nohighlight">\(A\)</span>. The outer product perspective provides a clear way to understand this process as a sequence of <strong>rank-one updates</strong>.</p>
+<p>The core idea is to build <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> iteratively. We start with the outer product formulation of the factorization:</p>
+<div class="math notranslate nohighlight">
+\[A = \sum_{k=1}^n l_{:,k} u_{k,:} = l_{:,1} u_{1,:} + l_{:,2} u_{2,:} + \dots + l_{:,n} u_{n,:}\]</div>
+<p>This expresses the matrix <span class="math notranslate nohighlight">\(A\)</span> as a sum of rank-one matrices. Our goal is to determine one pair of vectors—a column of <span class="math notranslate nohighlight">\(L\)</span> and a row of <span class="math notranslate nohighlight">\(U\)</span>—at each step.</p>
+<section id="step-1-determining-l-1-and-u-1">
+<h3>Step 1: Determining <span class="math notranslate nohighlight">\(l_{:,1}\)</span> and <span class="math notranslate nohighlight">\(u_{1,:}\)</span><a class="headerlink" href="#step-1-determining-l-1-and-u-1" title="Link to this heading">#</a></h3>
+<p>Let’s isolate the first term (<span class="math notranslate nohighlight">\(k=1\)</span>). Due to the triangular structures of <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span>:</p>
+<ul class="simple">
+<li><p>The first column of <span class="math notranslate nohighlight">\(U\)</span> is <span class="math notranslate nohighlight">\((u_{11}, 0, \dots, 0)^T\)</span>.</p></li>
+<li><p>The first row of <span class="math notranslate nohighlight">\(L\)</span> is <span class="math notranslate nohighlight">\((l_{11}, 0, \dots, 0)\)</span>.</p></li>
+</ul>
+<p>This structure simplifies the first column and first row of the product <span class="math notranslate nohighlight">\(LU\)</span>:</p>
+<ul class="simple">
+<li><p><strong>First Column:</strong> <span class="math notranslate nohighlight">\(a_{:,1} = (LU)_{:,1} = L u_{:,1} = l_{:,1}u_{11}\)</span>.</p></li>
+<li><p><strong>First Row:</strong> <span class="math notranslate nohighlight">\(a_{1,:} = (LU)_{1,:} = l_{1,:} U = l_{11}u_{1,:}\)</span>.</p></li>
+</ul>
+<p>We now have two equations, but more unknowns than constraints. To get a unique solution, we must impose a condition. The standard convention is to require the diagonal entries of <span class="math notranslate nohighlight">\(L\)</span> to be 1. This is known as a <strong>Doolittle factorization</strong>.</p>
+<p>Setting <span class="math notranslate nohighlight">\(l_{11} = 1\)</span>:</p>
+<ol class="arabic">
+<li><p>From <span class="math notranslate nohighlight">\(a_{1,:} = l_{11}u_{1,:} = 1 \cdot u_{1,:}\)</span>, we immediately get the first row of <span class="math notranslate nohighlight">\(U\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[u_{1,:} = a_{1,:}\]</div>
+</li>
+<li><p>From <span class="math notranslate nohighlight">\(u_{1,:}\)</span>, we know that its first element is <span class="math notranslate nohighlight">\(u_{11} = a_{11}\)</span>. Substituting this into the column equation <span class="math notranslate nohighlight">\(a_{:,1} = l_{:,1} u_{11}\)</span>, we can solve for the first column of <span class="math notranslate nohighlight">\(L\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[l_{:,1} = \frac{a_{:,1}}{u_{11}} = \frac{a_{:,1}}{a_{11}}\]</div>
+</li>
+</ol>
+<p>This step completely determines the first column of <span class="math notranslate nohighlight">\(L\)</span> and the first row of <span class="math notranslate nohighlight">\(U\)</span>. This is only possible if our pivot element <span class="math notranslate nohighlight">\(a_{11} \neq 0\)</span>, an assumption we will revisit later.</p>
+</section>
+<section id="step-2-the-rank-one-update">
+<h3>Step 2: The Rank-One Update<a class="headerlink" href="#step-2-the-rank-one-update" title="Link to this heading">#</a></h3>
+<p>We have now successfully “peeled off” the first term of the outer product sum. We can define an updated matrix, <span class="math notranslate nohighlight">\(A^{(1)}\)</span>, which represents the remainder of the sum:</p>
+<div class="math notranslate nohighlight">
+\[A^{(1)} = A - l_{:,1} u_{1,:} = \sum_{k=2}^n l_{:,k} u_{k,:}\]</div>
+<p>By construction, the first row and first column of the matrix <span class="math notranslate nohighlight">\(l_{:,1}u_{1,:}\)</span> are identical to the first row and column of <span class="math notranslate nohighlight">\(A\)</span>. Therefore, the first row and column of <span class="math notranslate nohighlight">\(A^{(1)}\)</span> are zero.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A^{(1)} = 
+\begin{pmatrix}
+0 &amp; 0 &amp; \dots &amp; 0 \\
+0 &amp; &amp; &amp; \\
+\vdots &amp; &amp; A' &amp; \\
+0 &amp; &amp; &amp; 
+\end{pmatrix}
+\end{split}\]</div>
+<p>The problem now reduces to finding the LU factorization of the smaller <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> submatrix <span class="math notranslate nohighlight">\(A'\)</span> in the lower-right corner.</p>
+</section>
+<section id="the-general-algorithm">
+<h3>The General Algorithm<a class="headerlink" href="#the-general-algorithm" title="Link to this heading">#</a></h3>
+<p>We can repeat this process iteratively. At each step <span class="math notranslate nohighlight">\(k\)</span> (from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(n-1\)</span>), we:</p>
+<ol class="arabic simple">
+<li><p><strong>Identify</strong> the <span class="math notranslate nohighlight">\(k\)</span>-th column of <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(k\)</span>-th row of <span class="math notranslate nohighlight">\(U\)</span> using the current updated matrix <span class="math notranslate nohighlight">\(A^{(k-1)}\)</span>.</p></li>
+<li><p><strong>Perform</strong> a rank-one update to compute the next matrix: <span class="math notranslate nohighlight">\(A^{(k)} = A^{(k-1)} - l_{:,k} u_{k,:}\)</span>.</p></li>
+</ol>
+<p>This process continues until all columns of <span class="math notranslate nohighlight">\(L\)</span> and rows of <span class="math notranslate nohighlight">\(U\)</span> have been determined.</p>
+</section>
+<section id="id2">
+<h3>Computational Cost 💰<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>Let’s analyze the cost. At each step <span class="math notranslate nohighlight">\(k\)</span>, the main work is the rank-one update of the lower-right submatrix of size <span class="math notranslate nohighlight">\((n-k) \times (n-k)\)</span>. This update requires approximately <span class="math notranslate nohighlight">\(2(n-k)^2\)</span> floating-point operations.</p>
+<p>To find the total cost, we sum this over all steps:</p>
+<div class="math notranslate nohighlight">
+\[\text{Total Flops} \approx \sum_{k=1}^{n-1} 2(n-k)^2 = 2 \sum_{j=1}^{n-1} j^2 \approx 2 \frac{(n-1)^3}{3} \approx \frac{2}{3}n^3\]</div>
+<p>The computational cost of computing the LU factorization is <strong><span class="math notranslate nohighlight">\(O(n^3)\)</span></strong>. This is significantly more expensive than the <span class="math notranslate nohighlight">\(O(n^2)\)</span> triangular solves that follow, which is why we separate the factorization and solving stages.</p>
+</section>
+</section>
+<section id="the-algorithm-step-by-step">
+<h2>The Algorithm Step-by-Step<a class="headerlink" href="#the-algorithm-step-by-step" title="Link to this heading">#</a></h2>
+<p>The algorithm constructs the columns of <span class="math notranslate nohighlight">\(L\)</span> and the rows of <span class="math notranslate nohighlight">\(U\)</span> iteratively, from <span class="math notranslate nohighlight">\(k=1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>. Let’s walk through the process for a general step <span class="math notranslate nohighlight">\(k\)</span>, assuming the first <span class="math notranslate nohighlight">\(k-1\)</span> steps are complete. At this point, the first <span class="math notranslate nohighlight">\(k-1\)</span> columns of <span class="math notranslate nohighlight">\(L\)</span> and rows of <span class="math notranslate nohighlight">\(U\)</span> are finalized.</p>
+<ol class="arabic">
+<li><p><strong>Determine Row <span class="math notranslate nohighlight">\(k\)</span> of <span class="math notranslate nohighlight">\(U\)</span></strong>: The <span class="math notranslate nohighlight">\(k\)</span>-th row of <span class="math notranslate nohighlight">\(U\)</span> is simply the <span class="math notranslate nohighlight">\(k\)</span>-th row of the <em>current</em>, modified matrix <span class="math notranslate nohighlight">\(A\)</span>. The elements <span class="math notranslate nohighlight">\(u_{kj}\)</span> for <span class="math notranslate nohighlight">\(j &lt; k\)</span> are zero because <span class="math notranslate nohighlight">\(U\)</span> is upper triangular.</p>
+<div class="math notranslate nohighlight">
+\[u_{k, k:n} = a_{k, k:n}\]</div>
+</li>
+<li><p><strong>Determine Column <span class="math notranslate nohighlight">\(k\)</span> of <span class="math notranslate nohighlight">\(L\)</span></strong>: The <span class="math notranslate nohighlight">\(k\)</span>-th column of <span class="math notranslate nohighlight">\(L\)</span> is found by taking the <span class="math notranslate nohighlight">\(k\)</span>-th column of the current matrix <span class="math notranslate nohighlight">\(A\)</span> and scaling it by the diagonal element <span class="math notranslate nohighlight">\(a_{kk}\)</span>, which we call the <strong>pivot</strong>. By convention, we set <span class="math notranslate nohighlight">\(l_{kk}=1\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[l_{k:n, k} = \frac{a_{k:n, k}}{a_{kk}}\]</div>
+</li>
+<li><p><strong>Update the Submatrix (Schur Complement)</strong>: This is the core of the algorithm. We form the outer product of the just-computed vectors (<span class="math notranslate nohighlight">\(l_{:,k}\)</span> and <span class="math notranslate nohighlight">\(u_{k,:}\)</span>) and subtract it from the matrix <span class="math notranslate nohighlight">\(A\)</span>. This update effectively zeroes out the <span class="math notranslate nohighlight">\(k\)</span>-th row and column’s influence on the rest of the matrix, leaving a smaller problem to solve in the next iteration.</p>
+<div class="math notranslate nohighlight">
+\[A \leftarrow A - l_{:,k} u_{k,:}\]</div>
+<p>Specifically, this update only affects the submatrix to the lower right of the pivot, from row and column <span class="math notranslate nohighlight">\(k+1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>.</p>
+</li>
+</ol>
+<p>This loop continues until all columns of <span class="math notranslate nohighlight">\(L\)</span> and rows of <span class="math notranslate nohighlight">\(U\)</span> are determined. In a typical implementation, the computed values for <span class="math notranslate nohighlight">\(L\)</span> (below the diagonal) and <span class="math notranslate nohighlight">\(U\)</span> (on and above the diagonal) are stored directly in the matrix <span class="math notranslate nohighlight">\(A\)</span> to save space.</p>
+<section id="the-pivot-problem-when-things-go-wrong">
+<h3>The Pivot Problem: When Things Go Wrong 🚧<a class="headerlink" href="#the-pivot-problem-when-things-go-wrong" title="Link to this heading">#</a></h3>
+<p>The algorithm has a critical weak point: the division by the pivot element <span class="math notranslate nohighlight">\(a_{kk}\)</span> in step 2.</p>
+<p>The algorithm <strong>fails</strong> if at any step <span class="math notranslate nohighlight">\(k\)</span>, the pivot element <span class="math notranslate nohighlight">\(a_{kk}\)</span> of the <em>current</em> matrix is zero. This would require division by zero, bringing the entire process to a halt.</p>
 </section>
 </section>
 </section>
@@ -535,6 +724,26 @@ b_3
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lower-triangular-systems-forward-substitution">Lower Triangular Systems: Forward Substitution</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#upper-triangular-systems-backward-substitution">Upper Triangular Systems: Backward Substitution</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost 💰</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-two-step-solution-process">The Two-Step Solution Process</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Computational Cost 💰</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-views-of-matrix-multiplication">Two Views of Matrix Multiplication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-concrete-example">A Concrete Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-is-this-view-important">Why is This View Important? 🤔</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-algorithm-via-outer-products">Deriving the Algorithm via Outer Products</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-determining-l-1-and-u-1">Step 1: Determining <span class="math notranslate nohighlight">\(l_{:,1}\)</span> and <span class="math notranslate nohighlight">\(u_{1,:}\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-the-rank-one-update">Step 2: The Rank-One Update</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-algorithm">The General Algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Computational Cost 💰</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-step-by-step">The Algorithm Step-by-Step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pivot-problem-when-things-go-wrong">The Pivot Problem: When Things Go Wrong 🚧</a></li>
 </ul>
 </li>
 </ul>
