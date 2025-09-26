@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Eigenvalues and Singular Values &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Existence and Uniqueness of LU Factorization &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/eigen_vs_singular_values';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/existence_lu';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Summary of Matrix Decompositions" href="summary_of_matrix_decompositions.html" />
-    <link rel="prev" title="Singular Value Decomposition" href="singular_value_decomposition.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="The LU Decomposition Algorithm" href="lu_decomposition.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -194,13 +194,13 @@
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Existence and Uniqueness of LU Factorization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -258,7 +258,7 @@
       
       
       
-      <li><a href="../_sources/content/eigen_vs_singular_values.md" target="_blank"
+      <li><a href="../_sources/content/existence_lu.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -342,7 +342,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Eigenvalues and Singular Values</h1>
+    <h1>Existence and Uniqueness of LU Factorization</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -352,10 +352,18 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-setup-an-illustrative-example">The Setup: An Illustrative Example</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-analysis">Eigenvalue Analysis 🔬</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singular-value-analysis">Singular Value Analysis 🧐</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-takeaway-normality-is-key">The Takeaway: Normality is Key</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-breakdown-a-zero-pivot-emerges">Tracing the Breakdown: A Zero Pivot Emerges 🕵️‍♀️</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lu-and-determinants">LU and Determinants</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-for-existence-leading-principal-minors">The Condition for Existence: Leading Principal Minors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#theorem-existence-and-uniqueness-of-lu"><strong>Theorem: Existence and Uniqueness of LU</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-theorem-to-the-example">Applying the Theorem to the Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalizations">Generalizations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-if-a-matrix-is-singular">What if a matrix is singular?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -367,84 +375,114 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="eigenvalues-and-singular-values">
-<h1>Eigenvalues and Singular Values<a class="headerlink" href="#eigenvalues-and-singular-values" title="Link to this heading">#</a></h1>
-<p>The fundamental difference between eigenvalues and singular values is this: <strong>eigenvalues</strong> tell you about the long-term behavior of a system (<span class="math notranslate nohighlight">\(A^n\)</span>), while <strong>singular values</strong> tell you about the immediate, one-time amplification or “stretching” of a matrix. A matrix can have small, stable eigenvalues but produce enormous transient growth, a phenomenon captured by its singular values.</p>
-<section id="the-setup-an-illustrative-example">
-<h2>The Setup: An Illustrative Example<a class="headerlink" href="#the-setup-an-illustrative-example" title="Link to this heading">#</a></h2>
-<p>Let’s construct a matrix <span class="math notranslate nohighlight">\(A\)</span> whose eigenvalues are well-behaved, but whose singular values indicate a potential for massive amplification.</p>
-<ol class="arabic">
-<li><p><strong>Start with two nearly-aligned vectors</strong>, where <span class="math notranslate nohighlight">\(\epsilon\)</span> is a small positive number:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="existence-and-uniqueness-of-lu-factorization">
+<h1>Existence and Uniqueness of LU Factorization<a class="headerlink" href="#existence-and-uniqueness-of-lu-factorization" title="Link to this heading">#</a></h1>
+<p>The LU factorization for a matrix <span class="math notranslate nohighlight">\(A\)</span> can break down if the third <strong>leading principal minor</strong> is zero. This mathematical property directly causes a zero to appear on the diagonal (a zero <strong>pivot</strong>) during the elimination process, which halts the standard algorithm because it would require division by zero.</p>
+<p>This process can be explored step-by-step.</p>
+<section id="tracing-the-breakdown-a-zero-pivot-emerges">
+<h2>Tracing the Breakdown: A Zero Pivot Emerges 🕵️‍♀️<a class="headerlink" href="#tracing-the-breakdown-a-zero-pivot-emerges" title="Link to this heading">#</a></h2>
+<p>The LU factorization algorithm proceeds step-by-step, using the diagonal element at step <span class="math notranslate nohighlight">\(k\)</span>, known as the <strong>pivot</strong>, to eliminate all the entries below it. The algorithm fails if it encounters a zero pivot.</p>
+<p>Consider performing elimination on the following example matrix:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    u = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix}, \quad v = \begin{bmatrix} 1 \\ -\epsilon \end{bmatrix}
-    \end{split}\]</div>
-<p>We use these to form the matrix <span class="math notranslate nohighlight">\(X = [u, v]\)</span>. As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the columns become nearly parallel, making <span class="math notranslate nohighlight">\(X\)</span> very <strong>ill-conditioned</strong>.</p>
+A = \begin{pmatrix}
+1 &amp; 6 &amp; 1 &amp; 0 \\
+0 &amp; 1 &amp; 9 &amp; 3 \\
+1 &amp; 6 &amp; 1 &amp; 1 \\
+0 &amp; 0 &amp; 1 &amp; 9
+\end{pmatrix}
+\end{split}\]</div>
+<p><strong>Step 1 (<span class="math notranslate nohighlight">\(k=1\)</span>):</strong>
+The first pivot is <span class="math notranslate nohighlight">\(a_{11} = 1\)</span>. It’s non-zero, so the process can proceed. The <span class="math notranslate nohighlight">\(a_{31}\)</span> entry needs to be eliminated. The multiplier is <span class="math notranslate nohighlight">\(l_{31} = a_{31}/a_{11} = 1/1 = 1\)</span>. The computation is: (Row 3) <span class="math notranslate nohighlight">\(\leftarrow\)</span> (Row 3) - <span class="math notranslate nohighlight">\(1 \times\)</span> (Row 1).</p>
+<p>This gives the matrix <span class="math notranslate nohighlight">\(A^{(1)}\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    X = \begin{bmatrix} 1 &amp; 1 \\ \epsilon &amp; -\epsilon \end{bmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Define a simple diagonal matrix</strong> <span class="math notranslate nohighlight">\(D\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    D = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Construct our matrix</strong> <span class="math notranslate nohighlight">\(A\)</span> using a similarity transform: <span class="math notranslate nohighlight">\(A = XDX^{-1}\)</span>. Let’s compute this explicitly. The inverse of <span class="math notranslate nohighlight">\(X\)</span> is:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    X^{-1} = \frac{1}{\det(X)} \begin{bmatrix} -\epsilon &amp; -1 \\ -\epsilon &amp; 1 \end{bmatrix} = \frac{1}{-2\epsilon} \begin{bmatrix} -\epsilon &amp; -1 \\ -\epsilon &amp; 1 \end{bmatrix} = \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix}
-    \end{split}\]</div>
-<p>Notice that as <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the entries of <span class="math notranslate nohighlight">\(X^{-1}\)</span> blow up. Now, we find <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{gathered}
-    A = \begin{bmatrix} 1 &amp; 1 \\ \epsilon &amp; -\epsilon \end{bmatrix} \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix} \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix} = \begin{bmatrix} 1 &amp; -1 \\ \epsilon &amp; \epsilon \end{bmatrix} \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix} \\[1em]
-    A = \begin{bmatrix} 0 &amp; 1/\epsilon \\ \epsilon &amp; 0 \end{bmatrix}
-    \end{gathered}
-    \end{split}\]</div>
-</li>
-</ol>
-<p>Now we have a simple matrix <span class="math notranslate nohighlight">\(A\)</span> that depends on our small parameter <span class="math notranslate nohighlight">\(\epsilon\)</span>. Let’s analyze its eigenvalues and singular values.</p>
+A^{(1)} = \begin{pmatrix}
+\mathbf{1} &amp; 6 &amp; 1 &amp; 0 \\
+0 &amp; \mathbf{1} &amp; 9 &amp; 3 \\
+0 &amp; 0 &amp; 0 &amp; 1 \\
+0 &amp; 0 &amp; 1 &amp; 9
+\end{pmatrix}
+\end{split}\]</div>
+<p><strong>Step 2 (<span class="math notranslate nohighlight">\(k=2\)</span>):</strong>
+The second pivot is <span class="math notranslate nohighlight">\(a_{22}^{(1)} = 1\)</span>. It’s also non-zero. The entries below it in the second column are already zero, so no elimination is needed.</p>
+<p><strong>Step 3 (<span class="math notranslate nohighlight">\(k=3\)</span>):</strong>
+The third pivot is <span class="math notranslate nohighlight">\(a_{33}^{(2)} = \mathbf{0}\)</span>. To continue, this pivot would be used to eliminate the entry <span class="math notranslate nohighlight">\(a_{43}^{(2)} = 1\)</span>. This would require calculating the multiplier <span class="math notranslate nohighlight">\(l_{43} = a_{43}^{(2)}/a_{33}^{(2)} = 1/0\)</span>.</p>
+<p>This is an undefined operation. The algorithm cannot proceed. The matrix <span class="math notranslate nohighlight">\(U\)</span> would have a zero on its diagonal (<span class="math notranslate nohighlight">\(u_{33}=0\)</span>), and it cannot be used to complete the elimination.</p>
 </section>
-<section id="eigenvalue-analysis">
-<h2>Eigenvalue Analysis 🔬<a class="headerlink" href="#eigenvalue-analysis" title="Link to this heading">#</a></h2>
-<p>By construction (<span class="math notranslate nohighlight">\(A = XDX^{-1}\)</span>), the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are the diagonal entries of <span class="math notranslate nohighlight">\(D\)</span>.</p>
+<section id="lu-and-determinants">
+<h2>LU and Determinants<a class="headerlink" href="#lu-and-determinants" title="Link to this heading">#</a></h2>
+<p>We will need the following fact in the proof of the theorem below.</p>
+<p>One of the most elegant applications of LU factorization is computing the determinant. Given <span class="math notranslate nohighlight">\(A=LU\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\lambda_1 = 1, \quad \lambda_2 = -1\]</div>
-<p>The eigenvalues are perfectly stable and have a magnitude of 1, regardless of how small <span class="math notranslate nohighlight">\(\epsilon\)</span> gets. From an eigenvalue perspective, this matrix looks completely harmless. If we consider the discrete dynamical system <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>, the magnitudes of the eigenvalues (<span class="math notranslate nohighlight">\(|\lambda_i|=1\)</span>) suggest that the system will not blow up over time. In fact, <span class="math notranslate nohighlight">\(A^2=I\)</span>, so the system is <strong>stable and periodic.</strong></p>
-</section>
-<section id="singular-value-analysis">
-<h2>Singular Value Analysis 🧐<a class="headerlink" href="#singular-value-analysis" title="Link to this heading">#</a></h2>
-<p>The singular values (<span class="math notranslate nohighlight">\(\sigma_i\)</span>) are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}A^T A = \begin{bmatrix} 0 &amp; \epsilon \\ 1/\epsilon &amp; 0 \end{bmatrix} \begin{bmatrix} 0 &amp; 1/\epsilon \\ \epsilon &amp; 0 \end{bmatrix} = \begin{bmatrix} \epsilon^2 &amp; 0 \\ 0 &amp; 1/\epsilon^2 \end{bmatrix}\end{split}\]</div>
-<p>The eigenvalues of this diagonal matrix are clearly <span class="math notranslate nohighlight">\(\epsilon^2\)</span> and <span class="math notranslate nohighlight">\(1/\epsilon^2\)</span>. The singular values of <span class="math notranslate nohighlight">\(A\)</span> are their square roots:</p>
-<div class="math notranslate nohighlight">
-\[\sigma_1 = \sqrt{1/\epsilon^2} = 1/\epsilon, \quad \sigma_2 = \sqrt{\epsilon^2} = \epsilon\]</div>
-<p>As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the largest singular value <strong><span class="math notranslate nohighlight">\(\sigma_1 \to \infty\)</span></strong>.</p>
-<p>The largest singular value is the 2-norm of the matrix, <span class="math notranslate nohighlight">\(\|A\|_2 = \sigma_{max}\)</span>. So, even though the eigenvalues are 1 and -1, the norm of the matrix is huge! This tells us that applying the matrix <span class="math notranslate nohighlight">\(A\)</span> just <em>once</em> can stretch a vector by an enormous factor of <span class="math notranslate nohighlight">\(1/\epsilon\)</span>.</p>
-</section>
-<section id="the-takeaway-normality-is-key">
-<h2>The Takeaway: Normality is Key<a class="headerlink" href="#the-takeaway-normality-is-key" title="Link to this heading">#</a></h2>
-<p>So, why the dramatic difference? The answer lies in the <strong>non-normality</strong> of matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<ul>
-<li><p>A matrix is <strong>normal</strong> if <span class="math notranslate nohighlight">\(A^T A = AA^T\)</span>. For normal matrices, the singular values are simply the absolute values of the eigenvalues (<span class="math notranslate nohighlight">\(\sigma_i = |\lambda_i|\)</span>), and their eigenvectors are orthogonal.</p></li>
-<li><p>Our matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>not normal</strong>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    A^T A = \begin{bmatrix} \epsilon^2 &amp; 0 \\ 0 &amp; 1/\epsilon^2 \end{bmatrix} \quad \neq \quad AA^T = \begin{bmatrix} 1/\epsilon^2 &amp; 0 \\ 0 &amp; \epsilon^2 \end{bmatrix}
-    \end{split}\]</div>
-</li>
-</ul>
-<p>This non-normality has a critical geometric consequence: the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span> (the columns of <span class="math notranslate nohighlight">\(X\)</span>) are <strong>not orthogonal</strong>. As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, they become nearly parallel. In contrast, the singular vectors of <span class="math notranslate nohighlight">\(A\)</span> form an orthogonal basis.</p>
-<p><strong>In summary:</strong></p>
+\[\det(A) = \det(L)\det(U)\]</div>
 <ul class="simple">
-<li><p><strong>Eigenvalues</strong> describe the behavior of <span class="math notranslate nohighlight">\(A\)</span> with respect to its (possibly non-orthogonal) eigenvectors. They reveal long-term, asymptotic behavior but can hide short-term transient effects.</p></li>
-<li><p><strong>Singular values</strong> describe the behavior of <span class="math notranslate nohighlight">\(A\)</span> with respect to an optimal, orthonormal basis. They reveal the maximum possible amplification the matrix can produce in a single application, defining its norm and its potential for creating large transient growth.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(L\)</span> is unit lower triangular, <span class="math notranslate nohighlight">\(\det(L) = 1\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(U\)</span> is upper triangular, its determinant is the product of its diagonal entries (the pivots).</p></li>
 </ul>
-<p>This example starkly illustrates that for non-normal matrices, the eigenvalues alone give an incomplete and potentially misleading picture of the matrix’s behavior. You must also consider the singular values to understand the full story.</p>
+<p>Therefore:</p>
+<div class="math notranslate nohighlight">
+\[\det(A) = \prod_{i=1}^n u_{ii}\]</div>
+<p>This reduces the computationally expensive task of calculating a determinant to the cost of performing an LU factorization and then multiplying <span class="math notranslate nohighlight">\(n\)</span> numbers.</p>
+</section>
+<section id="the-condition-for-existence-leading-principal-minors">
+<h2>The Condition for Existence: Leading Principal Minors<a class="headerlink" href="#the-condition-for-existence-leading-principal-minors" title="Link to this heading">#</a></h2>
+<p>The breakdown is not a coincidence; it is a direct consequence of a fundamental property of the matrix <span class="math notranslate nohighlight">\(A\)</span>. The existence of a standard LU factorization is completely determined by the <strong>leading principal submatrices</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>The <span class="math notranslate nohighlight">\(k\)</span>-th leading principal submatrix, denoted as <span class="math notranslate nohighlight">\(A_k\)</span>, is the <span class="math notranslate nohighlight">\(k \times k\)</span> matrix in the upper-left corner of <span class="math notranslate nohighlight">\(A\)</span>. Its determinant, <span class="math notranslate nohighlight">\(\det(A_k)\)</span>, is the <span class="math notranslate nohighlight">\(k\)</span>-th <strong>leading principal minor</strong>.</p>
+<section id="theorem-existence-and-uniqueness-of-lu">
+<h3><strong>Theorem: Existence and Uniqueness of LU</strong><a class="headerlink" href="#theorem-existence-and-uniqueness-of-lu" title="Link to this heading">#</a></h3>
+<div class="proof theorem admonition" id="thm:existence_lu">
+<p class="admonition-title"><span class="caption-number">Theorem 9 </span> (Uniqueness and Existence of LU Factorization)</p>
+<section class="theorem-content" id="proof-content">
+<p>An <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> has a <strong>unique</strong> LU factorization (where <span class="math notranslate nohighlight">\(L\)</span> has 1s on its diagonal) if and only if all its leading principal minors are non-zero.</p>
+<div class="math notranslate nohighlight">
+\[\det(A_k) \neq 0 \quad \text{for } k = 1, 2, \dots, n-1.\]</div>
+</section>
+</div><p>Why is this true? The proof reveals a beautiful connection between the pivots and these minors. From the matrix partition <span class="math notranslate nohighlight">\(A_k = L_k U_k\)</span>, we can take the determinant:</p>
+<div class="math notranslate nohighlight">
+\[\det(A_k) = \det(L_k) \det(U_k)\]</div>
+<p>Since <span class="math notranslate nohighlight">\(L_k\)</span> is unit triangular, its determinant is 1. The determinant of the upper triangular <span class="math notranslate nohighlight">\(U_k\)</span> is the product of its diagonal entries:</p>
+<div class="math notranslate nohighlight">
+\[\det(A_k) = 1 \cdot (u_{11} u_{22} \cdots u_{kk})\]</div>
+<p>From this, any pivot <span class="math notranslate nohighlight">\(u_{kk}\)</span> can be isolated:</p>
+<div class="math notranslate nohighlight">
+\[u_{kk} = \frac{u_{11} u_{22} \cdots u_{kk}}{u_{11} u_{22} \cdots u_{k-1,k-1}} = \frac{\det(A_k)}{\det(A_{k-1})} \quad (\text{defining } \det(A_0) = 1)\]</div>
+<p>This formula is the key! It shows that the <span class="math notranslate nohighlight">\(k\)</span>-th pivot, <span class="math notranslate nohighlight">\(u_{kk}\)</span>, is determined entirely by the ratio of two consecutive leading principal minors. The pivot will be well-defined and non-zero if and only if <span class="math notranslate nohighlight">\(\det(A_{k-1})\)</span> and <span class="math notranslate nohighlight">\(\det(A_k)\)</span> are both non-zero. For the entire algorithm to succeed (at least up to the last step), it is required that <span class="math notranslate nohighlight">\(\det(A_k) \neq 0\)</span> for <span class="math notranslate nohighlight">\(k=1, \dots, n-1\)</span>.</p>
+</section>
+<section id="applying-the-theorem-to-the-example">
+<h3>Applying the Theorem to the Example<a class="headerlink" href="#applying-the-theorem-to-the-example" title="Link to this heading">#</a></h3>
+<p>Let’s compute the leading principal minors of the example matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<ul class="simple">
+<li><p><strong><span class="math notranslate nohighlight">\(k=1\)</span></strong>: <span class="math notranslate nohighlight">\(\det(A_1) = \det(1) = 1 \neq 0\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(k=2\)</span></strong>: <span class="math notranslate nohighlight">\(\det(A_2) = \det \begin{pmatrix} 1 &amp; 6 \\ 0 &amp; 1 \end{pmatrix} = 1 \neq 0\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(k=3\)</span></strong>: <span class="math notranslate nohighlight">\(\det(A_3) = \det \begin{pmatrix} 1 &amp; 6 &amp; 1 \\ 0 &amp; 1 &amp; 9 \\ 1 &amp; 6 &amp; 1 \end{pmatrix} = 0\)</span>. (Note: subtract Row 1 from Row 3, which gives a row of zeros, making the determinant clearly 0).</p></li>
+</ul>
+<p>The theorem predicts the factorization will fail when computing the third pivot, since <span class="math notranslate nohighlight">\(\det(A_3)=0\)</span>. Using the formula:</p>
+<div class="math notranslate nohighlight">
+\[u_{33} = \frac{\det(A_3)}{\det(A_2)} = \frac{0}{1} = 0\]</div>
+<p>This confirms precisely what was observed during the elimination process.</p>
+</section>
+</section>
+<section id="generalizations">
+<h2>Generalizations<a class="headerlink" href="#generalizations" title="Link to this heading">#</a></h2>
+<section id="what-if-a-matrix-is-singular">
+<h3>What if a matrix is singular?<a class="headerlink" href="#what-if-a-matrix-is-singular" title="Link to this heading">#</a></h3>
+<p>Notice the theorem only requires the minors to be non-zero up to <span class="math notranslate nohighlight">\(k=n-1\)</span>. What if <span class="math notranslate nohighlight">\(\det(A_n) = \det(A) = 0\)</span>? The matrix is singular. The factorization can still exist, but the final pivot, <span class="math notranslate nohighlight">\(u_{nn} = \det(A_n)/\det(A_{n-1})\)</span>, will be zero. This is perfectly fine, as no further eliminations depend on <span class="math notranslate nohighlight">\(u_{nn}\)</span>.</p>
+</section>
+<section id="existence">
+<h3>Existence<a class="headerlink" href="#existence" title="Link to this heading">#</a></h3>
+<p>Here is a more precise existence statement:</p>
+<div class="proof theorem admonition" id="thm:existence_lu_existence">
+<p class="admonition-title"><span class="caption-number">Theorem 10 </span> (Existence of LU)</p>
+<section class="theorem-content" id="proof-content">
+<p>The LU factorization <strong>exists</strong> if and only if</p>
+<div class="math notranslate nohighlight">
+\[
+{\rm rank}(A[1:k,1:k]) = {\rm rank}(A[1:n,1:k])
+\]</div>
+<p>for all <span class="math notranslate nohighlight">\(1 \le k \le n-1\)</span>.</p>
+</section>
+</div></section>
 </section>
 </section>
 
@@ -479,20 +517,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="singular_value_decomposition.html"
+       href="lu_decomposition.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Singular Value Decomposition</p>
+        <p class="prev-next-title">The LU Decomposition Algorithm</p>
       </div>
     </a>
     <a class="right-next"
-       href="summary_of_matrix_decompositions.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Summary of Matrix Decompositions</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -512,10 +550,18 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-setup-an-illustrative-example">The Setup: An Illustrative Example</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-analysis">Eigenvalue Analysis 🔬</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singular-value-analysis">Singular Value Analysis 🧐</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-takeaway-normality-is-key">The Takeaway: Normality is Key</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-breakdown-a-zero-pivot-emerges">Tracing the Breakdown: A Zero Pivot Emerges 🕵️‍♀️</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lu-and-determinants">LU and Determinants</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-for-existence-leading-principal-minors">The Condition for Existence: Leading Principal Minors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#theorem-existence-and-uniqueness-of-lu"><strong>Theorem: Existence and Uniqueness of LU</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-theorem-to-the-example">Applying the Theorem to the Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalizations">Generalizations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-if-a-matrix-is-singular">What if a matrix is singular?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
