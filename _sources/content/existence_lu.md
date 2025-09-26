@@ -122,3 +122,97 @@ $$
 
 for all $1 \le k \le n-1$.
 ````
+
+## Numerical Instability 📉
+
+Small pivots in LU factorization are numerically disastrous because they introduce massive numbers into the $L$ and $U$ factors. In finite-precision computer arithmetic, these large numbers can completely erase the original, smaller-scale information in the matrix, a phenomenon known as **catastrophic cancellation**. This leads to a computed factorization that is wildly inaccurate.
+
+A core principle in numerical analysis is that if an algorithm fails for a specific input, it will often produce large errors for inputs that are *close* to that failure point.
+
+We've already seen that the LU algorithm fails when a pivot is exactly zero (e.g., $a_{11}=0$). This leads us to a crucial question: what happens if a pivot is not exactly zero, but just very small?
+
+Let's investigate with your example. The matrix
+
+$$
+A =
+\begin{pmatrix}
+0 & 1 \\
+1 & \pi
+\end{pmatrix}
+$$
+
+has no LU factorization because $a_{11}=0$. Now, consider a matrix that is nearly identical by letting the top-left entry be a very small, non-zero number $\epsilon$.
+
+### The Small Pivot Problem in Action 🔬
+
+Let's analyze the LU factorization of the perturbed matrix:
+
+$$
+A =
+\begin{pmatrix}
+    \epsilon & 1 \\
+    1 & \pi
+\end{pmatrix}
+$$
+
+The exact factorization is:
+
+$$
+L = \begin{pmatrix}
+    1 & 0 \\ 1/\epsilon & 1
+\end{pmatrix}, \quad
+U = \begin{pmatrix}
+    \epsilon & 1 \\ 0 & \pi - 1/\epsilon
+\end{pmatrix}
+$$
+
+The first sign of trouble is immediate: a very small number, $\epsilon$, in the original matrix $A$ has created very large numbers, $1/\epsilon$, in the factors $L$ and $U$. This amplification of magnitudes is a classic red flag for numerical instability.
+
+### Catastrophic Cancellation in Floating-Point Arithmetic
+
+Computers cannot store real numbers with infinite precision. They use **floating-point arithmetic**, which typically keeps about 16 significant decimal digits for any number (this is the IEEE 754 double-precision standard).
+
+Now, let's examine the term $u_{22} = \pi - 1/\epsilon$.
+
+If $\epsilon$ is very small, say $\epsilon = 10^{-18}$, then $1/\epsilon = 10^{18}$. The computer must calculate:
+
+$$3.1415926535... - 1,000,000,000,000,000,000$$
+
+To perform this subtraction, the computer must align the decimal points. All the significant digits of $\pi$ are shifted so far to the right that they fall outside the 16-digit precision window. The smaller number is completely overwhelmed by the larger one.
+
+This effect is called **swamping** or **catastrophic cancellation**. The information contained in $\pi$ is completely lost. The computer effectively calculates:
+
+$$\pi - 1/\epsilon \approx -1/\epsilon$$
+
+### The Corrupted Result
+
+This single roundoff error corrupts the entire factorization. The computed upper triangular matrix, let's call it $\tilde{U}$, becomes:
+
+$$
+\tilde{U} = \begin{pmatrix}
+\epsilon & 1 \\ 0 & -1/\epsilon
+\end{pmatrix}
+$$
+
+If we now multiply our computed factors $\tilde{L}$ (which is just $L$) and $\tilde{U}$ back together, we don't get our original matrix $A$:
+
+$$
+\tilde{L}\tilde{U} =
+\begin{pmatrix}
+    1 & 0 \\ 1/\epsilon & 1
+\end{pmatrix}
+\begin{pmatrix}
+    \epsilon & 1 \\ 0 & -1/\epsilon
+\end{pmatrix}
+=
+\begin{pmatrix}
+    \epsilon & 1 \\ 1 & 0
+\end{pmatrix}
+\neq
+\begin{pmatrix}
+    \epsilon & 1 \\
+    1 & \pi
+\end{pmatrix}
+$$
+
+The original $\pi$ in the matrix has vanished and been replaced by a 0. Any solution to a linear system $Ax=b$ based on this incorrect factorization will be completely wrong.

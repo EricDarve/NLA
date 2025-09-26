@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -364,6 +364,12 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-instability">Numerical Instability 📉</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-small-pivot-problem-in-action">The Small Pivot Problem in Action 🔬</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#catastrophic-cancellation-in-floating-point-arithmetic">Catastrophic Cancellation in Floating-Point Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-corrupted-result">The Corrupted Result</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -484,6 +490,88 @@ The third pivot is <span class="math notranslate nohighlight">\(a_{33}^{(2)} = \
 </section>
 </div></section>
 </section>
+<section id="numerical-instability">
+<h2>Numerical Instability 📉<a class="headerlink" href="#numerical-instability" title="Link to this heading">#</a></h2>
+<p>Small pivots in LU factorization are numerically disastrous because they introduce massive numbers into the <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> factors. In finite-precision computer arithmetic, these large numbers can completely erase the original, smaller-scale information in the matrix, a phenomenon known as <strong>catastrophic cancellation</strong>. This leads to a computed factorization that is wildly inaccurate.</p>
+<p>A core principle in numerical analysis is that if an algorithm fails for a specific input, it will often produce large errors for inputs that are <em>close</em> to that failure point.</p>
+<p>We’ve already seen that the LU algorithm fails when a pivot is exactly zero (e.g., <span class="math notranslate nohighlight">\(a_{11}=0\)</span>). This leads us to a crucial question: what happens if a pivot is not exactly zero, but just very small?</p>
+<p>Let’s investigate with your example. The matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+0 &amp; 1 \\
+1 &amp; \pi
+\end{pmatrix}
+\end{split}\]</div>
+<p>has no LU factorization because <span class="math notranslate nohighlight">\(a_{11}=0\)</span>. Now, consider a matrix that is nearly identical by letting the top-left entry be a very small, non-zero number <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
+<section id="the-small-pivot-problem-in-action">
+<h3>The Small Pivot Problem in Action 🔬<a class="headerlink" href="#the-small-pivot-problem-in-action" title="Link to this heading">#</a></h3>
+<p>Let’s analyze the LU factorization of the perturbed matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+    \epsilon &amp; 1 \\
+    1 &amp; \pi
+\end{pmatrix}
+\end{split}\]</div>
+<p>The exact factorization is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L = \begin{pmatrix}
+    1 &amp; 0 \\ 1/\epsilon &amp; 1
+\end{pmatrix}, \quad
+U = \begin{pmatrix}
+    \epsilon &amp; 1 \\ 0 &amp; \pi - 1/\epsilon
+\end{pmatrix}
+\end{split}\]</div>
+<p>The first sign of trouble is immediate: a very small number, <span class="math notranslate nohighlight">\(\epsilon\)</span>, in the original matrix <span class="math notranslate nohighlight">\(A\)</span> has created very large numbers, <span class="math notranslate nohighlight">\(1/\epsilon\)</span>, in the factors <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span>. This amplification of magnitudes is a classic red flag for numerical instability.</p>
+</section>
+<section id="catastrophic-cancellation-in-floating-point-arithmetic">
+<h3>Catastrophic Cancellation in Floating-Point Arithmetic<a class="headerlink" href="#catastrophic-cancellation-in-floating-point-arithmetic" title="Link to this heading">#</a></h3>
+<p>Computers cannot store real numbers with infinite precision. They use <strong>floating-point arithmetic</strong>, which typically keeps about 16 significant decimal digits for any number (this is the IEEE 754 double-precision standard).</p>
+<p>Now, let’s examine the term <span class="math notranslate nohighlight">\(u_{22} = \pi - 1/\epsilon\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(\epsilon\)</span> is very small, say <span class="math notranslate nohighlight">\(\epsilon = 10^{-18}\)</span>, then <span class="math notranslate nohighlight">\(1/\epsilon = 10^{18}\)</span>. The computer must calculate:</p>
+<div class="math notranslate nohighlight">
+\[3.1415926535... - 1,000,000,000,000,000,000\]</div>
+<p>To perform this subtraction, the computer must align the decimal points. All the significant digits of <span class="math notranslate nohighlight">\(\pi\)</span> are shifted so far to the right that they fall outside the 16-digit precision window. The smaller number is completely overwhelmed by the larger one.</p>
+<p>This effect is called <strong>swamping</strong> or <strong>catastrophic cancellation</strong>. The information contained in <span class="math notranslate nohighlight">\(\pi\)</span> is completely lost. The computer effectively calculates:</p>
+<div class="math notranslate nohighlight">
+\[\pi - 1/\epsilon \approx -1/\epsilon\]</div>
+</section>
+<section id="the-corrupted-result">
+<h3>The Corrupted Result<a class="headerlink" href="#the-corrupted-result" title="Link to this heading">#</a></h3>
+<p>This single roundoff error corrupts the entire factorization. The computed upper triangular matrix, let’s call it <span class="math notranslate nohighlight">\(\tilde{U}\)</span>, becomes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\tilde{U} = \begin{pmatrix}
+\epsilon &amp; 1 \\ 0 &amp; -1/\epsilon
+\end{pmatrix}
+\end{split}\]</div>
+<p>If we now multiply our computed factors <span class="math notranslate nohighlight">\(\tilde{L}\)</span> (which is just <span class="math notranslate nohighlight">\(L\)</span>) and <span class="math notranslate nohighlight">\(\tilde{U}\)</span> back together, we don’t get our original matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\tilde{L}\tilde{U} =
+\begin{pmatrix}
+    1 &amp; 0 \\ 1/\epsilon &amp; 1
+\end{pmatrix}
+\begin{pmatrix}
+    \epsilon &amp; 1 \\ 0 &amp; -1/\epsilon
+\end{pmatrix}
+=
+\begin{pmatrix}
+    \epsilon &amp; 1 \\ 1 &amp; 0
+\end{pmatrix}
+\neq
+\begin{pmatrix}
+    \epsilon &amp; 1 \\
+    1 &amp; \pi
+\end{pmatrix}
+\end{split}\]</div>
+<p>The original <span class="math notranslate nohighlight">\(\pi\)</span> in the matrix has vanished and been replaced by a 0. Any solution to a linear system <span class="math notranslate nohighlight">\(Ax=b\)</span> based on this incorrect factorization will be completely wrong.</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -560,6 +648,12 @@ The third pivot is <span class="math notranslate nohighlight">\(a_{33}^{(2)} = \
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalizations">Generalizations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-if-a-matrix-is-singular">What if a matrix is singular?</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-instability">Numerical Instability 📉</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-small-pivot-problem-in-action">The Small Pivot Problem in Action 🔬</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#catastrophic-cancellation-in-floating-point-arithmetic">Catastrophic Cancellation in Floating-Point Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-corrupted-result">The Corrupted Result</a></li>
 </ul>
 </li>
 </ul>
