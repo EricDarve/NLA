@@ -1,0 +1,959 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Floating-Point Numbers &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/floating_point';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Existence and Uniqueness of LU Factorization" href="existence_lu.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Floating-Point Numbers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/floating_point.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Floating-Point Numbers</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-idea-scientific-notation-for-computers">The Big Idea: Scientific Notation for Computers 🖥️</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-parts-of-a-floating-point-number">The Three Parts of a Floating-Point Number</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-decoded-3-140625">An Example Decoded: 3.140625</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inevitable-trade-off-range-vs-precision">The Inevitable Trade-Off: Range vs. Precision</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fundamental-rule-round-to-nearest">The Fundamental Rule: Round to Nearest 🎯</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-surprising-consequences-of-rounding">The Surprising Consequences of Rounding</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equality-is-not-what-it-seems-0-1-0-2-0-3">1. Equality Is Not What It Seems (<code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span> <span class="pre">≠</span> <span class="pre">0.3</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rules-of-arithmetic-are-bent">2. The Rules of Arithmetic Are Bent</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numbers-are-not-evenly-spaced">3. Numbers Are Not Evenly Spaced</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-explorations-understanding-roundoff-errors">Numerical Explorations: Understanding Roundoff Errors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modeling-finite-precision">Modeling Finite Precision</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dangers-of-addition-and-subtraction">The Dangers of Addition and Subtraction</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#case-1-adding-numbers-of-drastically-different-magnitudes"><strong>Case 1: Adding Numbers of Drastically Different Magnitudes</strong></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#case-2-subtracting-nearly-equal-numbers"><strong>Case 2: Subtracting Nearly Equal Numbers</strong></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relative-safety-of-multiplication">The Relative Safety of Multiplication</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-accumulation-of-error-in-summation">The Accumulation of Error in Summation 📈</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pathological-example-the-taylor-series-for-e-x">Pathological Example: The Taylor Series for <span class="math notranslate nohighlight">\(e^{-x}\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-more-subtle-case-evaluating-polynomials">A More Subtle Case: Evaluating Polynomials</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#even-simpler-case-a-quadratic-polynomial">Even Simpler Case: A Quadratic Polynomial</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="floating-point-numbers">
+<h1>Floating-Point Numbers<a class="headerlink" href="#floating-point-numbers" title="Link to this heading">#</a></h1>
+<p>A floating-point number is the computer’s way of representing a real number using a binary version of scientific notation. It balances the need to store numbers of vast a range (from the infinitesimally small to the astronomically large) with a fixed, finite number of bits.</p>
+<p>This system is composed of three parts: a sign, a significand (the significant digits), and an exponent.</p>
+<section id="the-big-idea-scientific-notation-for-computers">
+<h2>The Big Idea: Scientific Notation for Computers 🖥️<a class="headerlink" href="#the-big-idea-scientific-notation-for-computers" title="Link to this heading">#</a></h2>
+<p>You’re likely familiar with scientific notation in base 10. For instance, we can write the Avogadro constant as approximately <span class="math notranslate nohighlight">\(6.022 \times 10^{23}\)</span>. This representation has three key pieces:</p>
+<ul class="simple">
+<li><p><strong>Sign:</strong> Positive (+)</p></li>
+<li><p><strong>Significand:</strong> 6.022 (the core digits)</p></li>
+<li><p><strong>Exponent:</strong> 23 (how far to shift the decimal point)</p></li>
+</ul>
+<p>Floating-point numbers apply this exact same concept, but in <strong>base 2 (binary)</strong>, the native language of computers. By storing numbers in this format, the binary point can “float” to whatever position is needed, controlled by the exponent.</p>
+</section>
+<section id="the-three-parts-of-a-floating-point-number">
+<h2>The Three Parts of a Floating-Point Number<a class="headerlink" href="#the-three-parts-of-a-floating-point-number" title="Link to this heading">#</a></h2>
+<p>A binary floating-point number is formally defined as:</p>
+<div class="math notranslate nohighlight">
+\[\pm (1 + \sum_{i=1}^{p-1} d_i 2^{-i} )\; 2^e\]</div>
+<p>Let’s break this down into its three components.</p>
+<ol class="arabic simple">
+<li><p><strong>The Sign (S):</strong> This is the simplest part, represented by a single bit. It’s 0 for positive (+) and 1 for negative (-).</p></li>
+<li><p><strong>The Exponent (E):</strong> This component, <span class="math notranslate nohighlight">\(e\)</span>, determines the number’s magnitude (its size). A large positive exponent means a large number, and a large negative exponent means a very small number close to zero.</p></li>
+<li><p><strong>The Significand (or Mantissa):</strong> This part contains the number’s significant digits, which determines its <strong>precision</strong>. It’s represented by the term <span class="math notranslate nohighlight">\((1 + \sum_{i=1}^{p-1} d_i 2^{-i} )\)</span>.</p>
+<ul class="simple">
+<li><p><strong>The Hidden Bit:</strong> In binary scientific notation, any non-zero number can be written with a leading “1” before the binary point (e.g., <span class="math notranslate nohighlight">\(1.01101 \times 2^5\)</span>). Since this leading digit is <em>always</em> 1, there’s no need to waste a bit storing it. This is known as the “hidden bit.” The <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">...</span></code> in the formula reflects this.</p></li>
+<li><p><strong>The Fraction:</strong> The summation term, <span class="math notranslate nohighlight">\(\sum d_i 2^{-i}\)</span>, represents the fractional part of the significand, which is what’s actually stored in memory. The <span class="math notranslate nohighlight">\(d_i\)</span> are the bits (0 or 1).</p></li>
+</ul>
+</li>
+</ol>
+<section id="an-example-decoded-3-140625">
+<h3>An Example Decoded: 3.140625<a class="headerlink" href="#an-example-decoded-3-140625" title="Link to this heading">#</a></h3>
+<p>Let’s trace how the number <code class="docutils literal notranslate"><span class="pre">3.140625</span></code> is stored.</p>
+<p><strong>1. Sign:</strong> The number is positive, so the sign bit is <strong>0 (+)</strong>.</p>
+<p><strong>2. Find the Exponent:</strong> We locate the number between powers of 2.</p>
+<div class="math notranslate nohighlight">
+\[2^1 \le 3.140625 &lt; 2^2\]</div>
+<p>Since it falls in the range of <span class="math notranslate nohighlight">\(2^1\)</span>, the exponent <span class="math notranslate nohighlight">\(e\)</span> is <strong>1</strong>.</p>
+<p><strong>3. Find the Significand:</strong> To find the significand, we scale the number down by its exponent power:</p>
+<div class="math notranslate nohighlight">
+\[\frac{3.140625}{2^1} = 1.5703125\]</div>
+<p>So, the significand is <strong>1.5703125</strong>.</p>
+<p><strong>4. Decompose the Significand:</strong> Now, we break the significand into the <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">fraction</span></code> format required by the formula:</p>
+<div class="math notranslate nohighlight">
+\[1.5703125 = 1 + 0.5703125\]</div>
+<p>The fractional part, <code class="docutils literal notranslate"><span class="pre">0.5703125</span></code>, is what we need to represent as a sum of negative powers of 2.</p>
+<div class="math notranslate nohighlight">
+\[0.5703125 = 0.5 + 0.0625 + 0.0078125 = \frac{1}{2} + \frac{1}{16} + \frac{1}{128} = 2^{-1} + 2^{-4} + 2^{-7}\]</div>
+<p>This tells us that the bits for the fractional part are <span class="math notranslate nohighlight">\(d_1=1, d_4=1, d_7=1\)</span>, and the others in between are 0.</p>
+<p>Putting it all together, the number <code class="docutils literal notranslate"><span class="pre">3.140625</span></code> is represented by these three components.</p>
+</section>
+</section>
+<section id="the-inevitable-trade-off-range-vs-precision">
+<h2>The Inevitable Trade-Off: Range vs. Precision<a class="headerlink" href="#the-inevitable-trade-off-range-vs-precision" title="Link to this heading">#</a></h2>
+<p>This system is an elegant compromise. With a fixed number of bits (e.g., 32 or 64), you must decide how many to allocate to the exponent versus the significand.</p>
+<ul class="simple">
+<li><p>More bits for the <strong>exponent</strong> gives you a larger <strong>range</strong> of numbers.</p></li>
+<li><p>More bits for the <strong>significand</strong> gives you higher <strong>precision</strong>.</p></li>
+</ul>
+<p>You can’t have unlimited of both. This limitation is why computers must round numbers, leading to the small but potentially consequential errors that are central to the study of numerical stability.</p>
+</section>
+<section id="the-fundamental-rule-round-to-nearest">
+<h2>The Fundamental Rule: Round to Nearest 🎯<a class="headerlink" href="#the-fundamental-rule-round-to-nearest" title="Link to this heading">#</a></h2>
+<p>Floating-point arithmetic is the set of rules computers use to perform calculations on real numbers. Because computers have finite memory, they can’t store numbers with infinite precision. Consequently, every operation can introduce a tiny <strong>rounding error</strong>. While these errors are small, they cause floating-point arithmetic to behave differently from the perfect arithmetic you learn in math class.</p>
+<p>The core principle of floating-point arithmetic is that after every operation (like addition or multiplication), if the true mathematical result isn’t a number that can be stored exactly, the computer must <strong>round it to the nearest representable floating-point number</strong>.</p>
+<p>This can be expressed with a simple formula:</p>
+<div class="math notranslate nohighlight">
+\[fl(a \text{ op } b) = (a \text{ op } b)(1+\epsilon)\]</div>
+<p>Here:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">op</span> <span class="pre">b</span></code> is the exact mathematical result.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fl(...)</span></code> is the final result the computer stores.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\epsilon\)</span> (<code class="docutils literal notranslate"><span class="pre">epsilon</span></code>) is the small <strong>relative error</strong> introduced by rounding.</p></li>
+</ul>
+<p>The maximum possible size of this error for any single operation is called the <strong>unit roundoff</strong>, denoted by <span class="math notranslate nohighlight">\(u\)</span>. For standard 64-bit “double precision” numbers, this value is incredibly small, around <span class="math notranslate nohighlight">\(10^{-16}\)</span>, which means you can expect about 15-16 correct decimal digits for any single calculation.</p>
+</section>
+<section id="the-surprising-consequences-of-rounding">
+<h2>The Surprising Consequences of Rounding<a class="headerlink" href="#the-surprising-consequences-of-rounding" title="Link to this heading">#</a></h2>
+<p>These small, seemingly harmless rounding errors lead to several counter-intuitive results.</p>
+<section id="equality-is-not-what-it-seems-0-1-0-2-0-3">
+<h3>1. Equality Is Not What It Seems (<code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span> <span class="pre">≠</span> <span class="pre">0.3</span></code>)<a class="headerlink" href="#equality-is-not-what-it-seems-0-1-0-2-0-3" title="Link to this heading">#</a></h3>
+<p>One of the most famous quirks is that in nearly all programming languages, <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span></code> is not equal to <code class="docutils literal notranslate"><span class="pre">0.3</span></code>. This is because numbers like 0.1 and 0.2, which are simple in base 10, are infinitely repeating fractions in base 2, much like 1/3 is repeating in base 10 (0.333…).</p>
+<ul class="simple">
+<li><p>The computer stores the closest binary approximation of 0.1 and 0.2.</p></li>
+<li><p>It adds these two approximations together.</p></li>
+<li><p>The result is a number that is extremely close to, but not <em>exactly</em> the same as, the computer’s approximation for 0.3.</p></li>
+</ul>
+<p>Let’s see this in action with Python.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># The sum looks correct when printed with default precision</span>
+<span class="n">sum_ab</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The sum of </span><span class="si">{</span><span class="n">a</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">b</span><span class="si">}</span><span class="s2"> is: </span><span class="si">{</span><span class="n">sum_ab</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Is the sum equal to </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">? </span><span class="si">{</span><span class="n">sum_ab</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">c</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># To see the true stored values, let&#39;s print with more digits</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- Print more digits ---&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value of sum_ab: </span><span class="si">{</span><span class="n">sum_ab</span><span class="si">:</span><span class="s2">.20f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value of c:      </span><span class="si">{</span><span class="n">c</span><span class="si">:</span><span class="s2">.20f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The sum of 0.1 and 0.2 is: 0.30000000000000004
+Is the sum equal to 0.3? False
+
+--- Print more digits ---
+Value of sum_ab: 0.30000000000000004441
+Value of c:      0.29999999999999998890
+</pre></div>
+</div>
+</div>
+</div>
+<p>The output clearly shows that the stored value for <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span></code> is a number slightly larger than 0.3, while the stored value for <code class="docutils literal notranslate"><span class="pre">0.3</span></code> is slightly smaller.</p>
+<p>This is why you should <strong>never use a direct equality check <code class="docutils literal notranslate"><span class="pre">==</span></code> with floating-point numbers.</strong> Instead, you should check if they are close enough: <code class="docutils literal notranslate"><span class="pre">abs(a</span> <span class="pre">-</span> <span class="pre">b)</span> <span class="pre">&lt;</span> <span class="pre">tolerance</span></code>.</p>
+</section>
+<section id="the-rules-of-arithmetic-are-bent">
+<h3>2. The Rules of Arithmetic Are Bent<a class="headerlink" href="#the-rules-of-arithmetic-are-bent" title="Link to this heading">#</a></h3>
+<p>While floating-point addition is <strong>commutative</strong> (<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> is the same as <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">+</span> <span class="pre">a</span></code>), it is not always <strong>associative</strong>. This means the order of operations can change the final answer.</p>
+<div class="math notranslate nohighlight">
+\[(a + b) + c \neq a + (b + c)\]</div>
+<p>This happens because the rounding error at each step depends on the magnitude of the numbers involved. Adding two small numbers together first and then adding a large one can produce a different result than adding a small number to a large one, where its precision might be lost.</p>
+</section>
+<section id="numbers-are-not-evenly-spaced">
+<h3>3. Numbers Are Not Evenly Spaced<a class="headerlink" href="#numbers-are-not-evenly-spaced" title="Link to this heading">#</a></h3>
+<p>Floating-point numbers are not distributed uniformly on the real number line. They are densest around zero and become progressively sparser as their magnitude increases.</p>
+<p>Think of it like a ruler where the tick marks get farther apart the further you move from zero. The gap between 1 and the next representable number is tiny (this gap defines the unit roundoff <span class="math notranslate nohighlight">\(u\)</span>). However, the gap between 1,000,000,000 and the next representable number is much larger. This means you have far more precision for small numbers than for very large ones.</p>
+</section>
+</section>
+<section id="numerical-explorations-understanding-roundoff-errors">
+<h2>Numerical Explorations: Understanding Roundoff Errors<a class="headerlink" href="#numerical-explorations-understanding-roundoff-errors" title="Link to this heading">#</a></h2>
+<p>The behavior of floating-point arithmetic is fundamental to everything we do in this course. An algorithm that is perfectly sound in exact arithmetic can produce meaningless results if it’s unstable in the face of the small, inevitable errors introduced by computation.</p>
+<p>To explore this, let’s use Python’s <code class="docutils literal notranslate"><span class="pre">Decimal</span></code> library. This is a powerful tool because it allows us to simulate a computer with a precision that we can define, letting us see these errors in a controlled and exaggerated way.</p>
+<section id="modeling-finite-precision">
+<h3>Modeling Finite Precision<a class="headerlink" href="#modeling-finite-precision" title="Link to this heading">#</a></h3>
+<p>Let’s begin by configuring our environment to operate with a very low precision of just four significant digits. This will make the effects of roundoff error obvious.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span><span class="p">,</span> <span class="n">getcontext</span>
+<span class="c1"># Set the precision to 4 significant digits</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">4</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Every number and every result of an operation will now be rounded to fit within these four digits.</p>
+<p>The first type of error is <strong>representation error</strong>. Most real numbers cannot be stored perfectly. For example, even with our low precision, let’s see what happens to <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># The true value of pi cannot be stored, so it&#39;s rounded.</span>
+<span class="n">pi_approx</span> <span class="o">=</span> <span class="o">+</span><span class="n">Decimal</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="c1"># + needed to apply the context precision</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Approximation of pi: </span><span class="si">{</span><span class="n">pi_approx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Approximation of pi: 3.142
+</pre></div>
+</div>
+</div>
+</div>
+<p>The value is immediately rounded to <code class="docutils literal notranslate"><span class="pre">3.142</span></code>. This initial error is the starting point for all subsequent numerical inaccuracies.</p>
+</section>
+<section id="the-dangers-of-addition-and-subtraction">
+<h3>The Dangers of Addition and Subtraction<a class="headerlink" href="#the-dangers-of-addition-and-subtraction" title="Link to this heading">#</a></h3>
+<p>Addition and subtraction are the primary sources of significant roundoff error, but they manifest in different ways depending on the numbers involved.</p>
+<section id="case-1-adding-numbers-of-drastically-different-magnitudes">
+<h4><strong>Case 1: Adding Numbers of Drastically Different Magnitudes</strong><a class="headerlink" href="#case-1-adding-numbers-of-drastically-different-magnitudes" title="Link to this heading">#</a></h4>
+<p>When you add a very large number to a very small one, the smaller number’s information can be completely lost. This is called <strong>swamping</strong>.</p>
+<p>Consider adding a large number to our <code class="docutils literal notranslate"><span class="pre">pi_approx</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">large_number</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1234&#39;</span><span class="p">)</span>
+<span class="n">small_number</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;3.142&#39;</span><span class="p">)</span> <span class="c1"># Our 4-digit pi</span>
+
+<span class="c1"># The true sum is 1237.142</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">large_number</span> <span class="o">+</span> <span class="n">small_number</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">large_number</span><span class="si">}</span><span class="s2">&#39; + &#39;</span><span class="si">{</span><span class="n">small_number</span><span class="si">}</span><span class="s2">&#39; = &#39;</span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;1234&#39; + &#39;3.142&#39; = &#39;1237&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>To perform the addition, the computer must align the decimal points. The sum <code class="docutils literal notranslate"><span class="pre">1237.142</span></code> requires seven significant digits to store. Our machine, with a precision of four, must round it, resulting in <code class="docutils literal notranslate"><span class="pre">1237</span></code>. The entire contribution of <span class="math notranslate nohighlight">\(\pi\)</span> has vanished.</p>
+</section>
+<section id="case-2-subtracting-nearly-equal-numbers">
+<h4><strong>Case 2: Subtracting Nearly Equal Numbers</strong><a class="headerlink" href="#case-2-subtracting-nearly-equal-numbers" title="Link to this heading">#</a></h4>
+<p>The most insidious error is <strong>catastrophic cancellation</strong>, which occurs when subtracting two numbers that are very close to each other. The operation itself may be exact, but the result loses a massive amount of relative precision.</p>
+<p>Let’s define two numbers that differ only in their fourth significant digit.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1.234&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1.233&#39;</span><span class="p">)</span>
+
+<span class="c1"># The subtraction itself is simple and the result is exact.</span>
+<span class="n">difference</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&#39; - &#39;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&#39; = &#39;</span><span class="si">{</span><span class="n">difference</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exponent of the result&#39;s leading digit: </span><span class="si">{</span><span class="n">difference</span><span class="o">.</span><span class="n">adjusted</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;1.234&#39; - &#39;1.233&#39; = &#39;0.001&#39;
+Exponent of the result&#39;s leading digit: -3
+</pre></div>
+</div>
+</div>
+</div>
+<p>Observe what has happened. The <code class="docutils literal notranslate"><span class="pre">.adjusted()</span></code> method returns the exponent of the number’s most significant digit, which tells us its magnitude. For our inputs <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, this value would be <code class="docutils literal notranslate"><span class="pre">0</span></code> (since their leading digit is in the <span class="math notranslate nohighlight">\(10^0\)</span> place). However, for the <code class="docutils literal notranslate"><span class="pre">difference</span></code>, the exponent is <code class="docutils literal notranslate"><span class="pre">-3</span></code>. This dramatic drop in magnitude is the signature of catastrophic cancellation.</p>
+<p>We started with two numbers, <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, each containing four significant digits of information. The leading digits <code class="docutils literal notranslate"><span class="pre">1.23</span></code> cancelled each other out, leaving a result of <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p>
+<p>While this result is stored exactly as <code class="docutils literal notranslate"><span class="pre">1.000E-3</span></code> in our 4-digit system, we have gone from four figures of precision to just <strong>one</strong>. The trailing zeros in <code class="docutils literal notranslate"><span class="pre">1.000</span></code> are meaningless; they are artifacts of the arithmetic, not real information from our original numbers. We have lost 75% of our information in a single operation. This is why it is called “catastrophic.”</p>
+</section>
+</section>
+<section id="the-relative-safety-of-multiplication">
+<h3>The Relative Safety of Multiplication<a class="headerlink" href="#the-relative-safety-of-multiplication" title="Link to this heading">#</a></h3>
+<p>In contrast, multiplication is a far more benign operation, especially when dealing with numbers of different magnitudes. Where addition would “swamp” a small number, multiplication preserves its contribution.</p>
+<p>Let’s use the same large and small numbers from our addition example to see the difference.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">large_number</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1234&#39;</span><span class="p">)</span>
+<span class="n">small_number</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;3.142&#39;</span><span class="p">)</span> <span class="c1"># Our 4-digit pi</span>
+
+<span class="c1"># The true product is 3877.228</span>
+<span class="n">product</span> <span class="o">=</span> <span class="n">large_number</span> <span class="o">*</span> <span class="n">small_number</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">large_number</span><span class="si">}</span><span class="s2">&#39; * &#39;</span><span class="si">{</span><span class="n">small_number</span><span class="si">}</span><span class="s2">&#39; = &#39;</span><span class="si">{</span><span class="n">product</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;1234&#39; * &#39;3.142&#39; = &#39;3877&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>The exact answer, <code class="docutils literal notranslate"><span class="pre">3877.228</span></code>, was rounded to <code class="docutils literal notranslate"><span class="pre">3877</span></code>. Notice the crucial difference: the information from the <code class="docutils literal notranslate"><span class="pre">small_number</span></code> was not lost. Its value was essential in determining the final result. We began with two numbers, each with four significant digits, and our result still has four meaningful significant digits. A small amount of information was lost to rounding, but there was no catastrophic loss of precision.</p>
+<p>Understanding these different error modes is critical. A stable algorithm must be structured to avoid subtractions of nearly equal quantities whenever possible, as this is the primary mechanism by which numerical error grows uncontrollably.</p>
+</section>
+</section>
+<section id="the-accumulation-of-error-in-summation">
+<h2>The Accumulation of Error in Summation 📈<a class="headerlink" href="#the-accumulation-of-error-in-summation" title="Link to this heading">#</a></h2>
+<p>Let’s build on our understanding of roundoff error. A single rounding error is typically harmless, but the central problem in numerical computation is how these small errors <strong>accumulate</strong> over the course of millions or billions of operations. In some cases, this accumulation can lead to a complete loss of accuracy in the final result.</p>
+<p>A classic scenario where this occurs is the summation of a long sequence of numbers.</p>
+<p>Consider the computation of a sum, <span class="math notranslate nohighlight">\(S_n = \sum_{i=1}^n x_i\)</span>. In exact arithmetic, the order of summation does not matter. In floating-point arithmetic, it does. The standard algorithm computes a sequence of partial sums:</p>
+<p><span class="math notranslate nohighlight">\(\tilde{S}_1 = x_1\)</span></p>
+<p><span class="math notranslate nohighlight">\(\tilde{S}_2 = fl(\tilde{S}_1 + x_2)\)</span></p>
+<p>…</p>
+<p><span class="math notranslate nohighlight">\(\tilde{S}_k = fl(\tilde{S}_{k-1} + x_k)\)</span></p>
+<p>Each step introduces a small roundoff error. A rigorous analysis shows that the error in the final computed sum, <span class="math notranslate nohighlight">\(\Delta S_n = |S_n - \tilde{S}_n|\)</span>, is bounded by approximately:</p>
+<div class="math notranslate nohighlight">
+\[|\Delta S_n| \le n u \sum_{i=1}^n |x_i| + O(u^2)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff of the machine. Let us dissect this formula. It tells us that the absolute error of the computed sum depends on:</p>
+<ol class="arabic simple">
+<li><p><strong><span class="math notranslate nohighlight">\(n\)</span></strong>: The number of terms. The error grows, at worst, linearly with the length of the sum.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(u\)</span></strong>: The machine precision. A more precise machine reduces the error.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(\sum_{i=1}^n |x_i|\)</span></strong>: The sum of the <em>magnitudes</em> of the terms.</p></li>
+</ol>
+<p>This last point is the most critical. The error bound does not depend on the magnitude of the final sum, <span class="math notranslate nohighlight">\(|S_n|\)</span>, but on the sum of the absolute values of the terms that created it. This implies that if we compute a sum where the intermediate partial sums are large but the final answer is small (due to cancellation), the <strong>relative error</strong> can be enormous.</p>
+<section id="pathological-example-the-taylor-series-for-e-x">
+<h3>Pathological Example: The Taylor Series for <span class="math notranslate nohighlight">\(e^{-x}\)</span><a class="headerlink" href="#pathological-example-the-taylor-series-for-e-x" title="Link to this heading">#</a></h3>
+<p>A perfect illustration of this principle is the evaluation of the Taylor series for <span class="math notranslate nohighlight">\(e^{-x}\)</span> for a large, positive <span class="math notranslate nohighlight">\(x\)</span>. The series is an alternating sum:</p>
+<div class="math notranslate nohighlight">
+\[e^{-x} = \sum_{k=0}^{\infty} \frac{(-x)^k}{k!} = 1 - x + \frac{x^2}{2!} - \frac{x^3}{3!} + \dots\]</div>
+<p>Let’s attempt to calculate <span class="math notranslate nohighlight">\(e^{-20}\)</span>. The true answer is very small, approximately <span class="math notranslate nohighlight">\(2.06 \times 10^{-9}\)</span>. However, the individual terms in the series first become enormous before decaying. For instance, the term for <span class="math notranslate nohighlight">\(k=19\)</span> is <span class="math notranslate nohighlight">\(\frac{20^{19}}{19!} \approx 4.3 \times 10^{8}\)</span>.</p>
+<p>We are adding and subtracting gigantic numbers to produce a tiny one. This is the exact scenario where our error bound predicts a catastrophic loss of precision.</p>
+<p>Let’s observe this using a simulated machine with 10-digit precision.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="c1"># Set precision to 10 significant digits</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">exp_taylor_unstable</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes e^(-x) using the standard Taylor series.&quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">term</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">current_sum</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># Sum until the terms are too small to matter</span>
+    <span class="k">while</span> <span class="nb">abs</span><span class="p">(</span><span class="n">term</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-15</span><span class="p">:</span>
+        <span class="n">term</span> <span class="o">=</span> <span class="n">term</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">x</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+        <span class="n">current_sum</span> <span class="o">+=</span> <span class="n">term</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Stop if terms get huge to prevent infinite loop</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span> <span class="k">break</span>
+    <span class="k">return</span> <span class="n">current_sum</span>
+
+<span class="c1"># The value to test</span>
+<span class="n">x_val</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># Calculate with our unstable algorithm</span>
+<span class="n">computed_val</span> <span class="o">=</span> <span class="n">exp_taylor_unstable</span><span class="p">(</span><span class="n">x_val</span><span class="p">)</span>
+
+<span class="c1"># For comparison, calculate a &quot;true&quot; value with high precision</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">true_val</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="o">-</span><span class="n">x_val</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Precision: </span><span class="si">{</span><span class="mi">10</span><span class="si">}</span><span class="s2"> digits&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Computed e^(</span><span class="si">{</span><span class="o">-</span><span class="n">x_val</span><span class="si">}</span><span class="s2">):           </span><span class="si">{</span><span class="n">computed_val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extended precision e^(</span><span class="si">{</span><span class="o">-</span><span class="n">x_val</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">true_val</span><span class="si">:</span><span class="s2">.10e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Math library e^(</span><span class="si">{</span><span class="o">-</span><span class="n">x_val</span><span class="si">}</span><span class="s2">):       </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x_val</span><span class="p">)</span><span class="si">:</span><span class="s2">.10e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Precision: 10 digits
+Computed e^(-20):           0.01061516573
+Extended precision e^(-20): 2.0611536224e-9
+Math library e^(-20):       2.0611536224e-09
+</pre></div>
+</div>
+</div>
+</div>
+<p>The result is completely wrong. This is a direct consequence of the catastrophic cancellation among the large intermediate terms, where the accumulated roundoff error is larger than the final true sum.</p>
+</section>
+<section id="a-more-subtle-case-evaluating-polynomials">
+<h3>A More Subtle Case: Evaluating Polynomials<a class="headerlink" href="#a-more-subtle-case-evaluating-polynomials" title="Link to this heading">#</a></h3>
+<p>This same issue arises when evaluating a polynomial in its standard form, <span class="math notranslate nohighlight">\(P(x) = \sum a_i x^i\)</span>, particularly near a root.</p>
+<p>Consider the polynomial <span class="math notranslate nohighlight">\(P(x) = (x-1)^{10}\)</span>. Clearly, <span class="math notranslate nohighlight">\(P(1)=0\)</span>. Let’s evaluate it at <span class="math notranslate nohighlight">\(x=1.001\)</span>.</p>
+<p>The numerically stable way is to compute <span class="math notranslate nohighlight">\((1.001-1)^{10} = (0.001)^{10} = 10^{-30}\)</span>.</p>
+<p>The unstable way is to first expand the polynomial via the binomial theorem and then sum the resulting terms. The expanded form is <span class="math notranslate nohighlight">\(P(x) = x^{10} - 10x^9 + 45x^8 - \dots + 1\)</span>. When <span class="math notranslate nohighlight">\(x\)</span> is close to 1, this involves summing large, alternating terms.</p>
+<p>Let’s observe the failure with 8-digit precision.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">comb</span>
+<span class="c1"># Set precision to 8 significant digits</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># The value to test, close to the root at x=1</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1.001&#39;</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Method 1: The stable calculation</span>
+<span class="n">stable_result</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">n</span>
+
+<span class="c1"># Method 2: The unstable summation of the expanded form</span>
+<span class="n">unstable_result</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Binomial expansion: C(n,k) * x^k * (-1)^(n-k)</span>
+    <span class="n">term</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">))</span>
+    <span class="n">unstable_result</span> <span class="o">+=</span> <span class="n">term</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Precision: </span><span class="si">{</span><span class="mi">8</span><span class="si">}</span><span class="s2"> digits&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stable calculation (x-1)^10:   </span><span class="si">{</span><span class="n">stable_result</span><span class="si">:</span><span class="s2">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unstable sum of terms:        </span><span class="si">{</span><span class="n">unstable_result</span><span class="si">:</span><span class="s2">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Precision: 8 digits
+Stable calculation (x-1)^10:   1e-30
+Unstable sum of terms:        -1.9e-6
+</pre></div>
+</div>
+</div>
+</div>
+<p>The result from the expanded sum is incorrect. Again, this is a classic case of catastrophic cancellation. The lesson here is profound: two formulas that are mathematically identical can have vastly different numerical properties. A key task for a numerical analyst is to identify and implement the stable formulation.</p>
+</section>
+<section id="even-simpler-case-a-quadratic-polynomial">
+<h3>Even Simpler Case: A Quadratic Polynomial<a class="headerlink" href="#even-simpler-case-a-quadratic-polynomial" title="Link to this heading">#</a></h3>
+<p>The issue is not limited to high-degree polynomials. It can appear even in a simple quadratic. Consider the two equivalent forms of the polynomial <span class="math notranslate nohighlight">\(P(x) = (x-1)^2 = x^2 - 2x + 1\)</span>.</p>
+<p>Let’s evaluate this for a value of <span class="math notranslate nohighlight">\(x\)</span> extremely close to 1, using a precision of 16 digits, which is typical for standard 64-bit “double” floating-point numbers. The true answer should be <span class="math notranslate nohighlight">\(((1+10^{-13})-1)^2 = (10^{-13})^2 = 10^{-26}\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set precision to 16 significant digits (like double precision)</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="c1"># Define x very close to 1</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;1e-13&#39;</span><span class="p">)</span>
+
+<span class="c1"># Method 1: The stable, factored form</span>
+<span class="n">stable_result</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># Method 2: The unstable, expanded form</span>
+<span class="n">unstable_result</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;x = </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;True Answer:                  1.000000000000000e-26&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stable calculation (x-1)^2:   </span><span class="si">{</span><span class="n">stable_result</span><span class="si">:</span><span class="s2">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unstable sum x^2 - 2x + 1:    </span><span class="si">{</span><span class="n">unstable_result</span><span class="si">:</span><span class="s2">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x = 1.0000000000001
+----------------------------------------
+True Answer:                  1.000000000000000e-26
+Stable calculation (x-1)^2:   1e-26
+Unstable sum x^2 - 2x + 1:    0e-15
+</pre></div>
+</div>
+</div>
+</div>
+<p>The stable form gives the correct answer, but the expanded form is completely wrong! It’s equal to <code class="docutils literal notranslate"><span class="pre">0</span></code> in our 16-digit precision system.</p>
+<p>The failure happens because the calculation of <code class="docutils literal notranslate"><span class="pre">x**2</span> <span class="pre">-</span> <span class="pre">2*x</span></code> involves subtracting two numbers that differ by exactly 1:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">x**2</span></code> is <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">2e-13</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">2*x</span></code> is <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">+</span> <span class="pre">2e-13</span></code>.</p></li>
+</ul>
+<p>When <code class="docutils literal notranslate"><span class="pre">x**2</span></code> is computed, the term <span class="math notranslate nohighlight">\((10^{-13})^2 = 10^{-26}\)</span> is too small to be represented in the 16 available digits of <code class="docutils literal notranslate"><span class="pre">1.000...</span></code> and is lost to rounding. The subsequent subtraction <code class="docutils literal notranslate"><span class="pre">(x**2</span> <span class="pre">-</span> <span class="pre">2*x)</span></code> then suffers from catastrophic cancellation, destroying the accuracy of the result. This simple example powerfully demonstrates that the mathematical form of an expression is critically important in numerical computation.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="existence_lu.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Existence and Uniqueness of LU Factorization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-idea-scientific-notation-for-computers">The Big Idea: Scientific Notation for Computers 🖥️</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-parts-of-a-floating-point-number">The Three Parts of a Floating-Point Number</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-decoded-3-140625">An Example Decoded: 3.140625</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inevitable-trade-off-range-vs-precision">The Inevitable Trade-Off: Range vs. Precision</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fundamental-rule-round-to-nearest">The Fundamental Rule: Round to Nearest 🎯</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-surprising-consequences-of-rounding">The Surprising Consequences of Rounding</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equality-is-not-what-it-seems-0-1-0-2-0-3">1. Equality Is Not What It Seems (<code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.2</span> <span class="pre">≠</span> <span class="pre">0.3</span></code>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rules-of-arithmetic-are-bent">2. The Rules of Arithmetic Are Bent</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numbers-are-not-evenly-spaced">3. Numbers Are Not Evenly Spaced</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-explorations-understanding-roundoff-errors">Numerical Explorations: Understanding Roundoff Errors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modeling-finite-precision">Modeling Finite Precision</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dangers-of-addition-and-subtraction">The Dangers of Addition and Subtraction</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#case-1-adding-numbers-of-drastically-different-magnitudes"><strong>Case 1: Adding Numbers of Drastically Different Magnitudes</strong></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#case-2-subtracting-nearly-equal-numbers"><strong>Case 2: Subtracting Nearly Equal Numbers</strong></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relative-safety-of-multiplication">The Relative Safety of Multiplication</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-accumulation-of-error-in-summation">The Accumulation of Error in Summation 📈</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pathological-example-the-taylor-series-for-e-x">Pathological Example: The Taylor Series for <span class="math notranslate nohighlight">\(e^{-x}\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-more-subtle-case-evaluating-polynomials">A More Subtle Case: Evaluating Polynomials</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#even-simpler-case-a-quadratic-polynomial">Even Simpler Case: A Quadratic Polynomial</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
