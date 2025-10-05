@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Cholesky Factorization &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/cholesky';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="LU Factorization with Row Pivoting" href="lu_pivoting.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/cholesky.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cholesky Factorization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-positive-definite-matrices">Symmetric Positive Definite Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-lu-to-cholesky">From LU to Cholesky</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cholesky-algorithm">The Cholesky Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-properties">Algorithm Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-and-uniqueness">Existence and Uniqueness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formal-proof">Formal proof</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-remarkable-stability-of-cholesky-factorization">The Remarkable Stability of Cholesky Factorization</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="cholesky-factorization">
+<h1>Cholesky Factorization<a class="headerlink" href="#cholesky-factorization" title="Link to this heading">#</a></h1>
+<p>For symmetric positive definite (SPD) matrices, the LU factorization simplifies to the Cholesky factorization. It is twice as fast as LU, uses half the memory, and is numerically stable without pivoting.</p>
+<section id="symmetric-positive-definite-matrices">
+<h2>Symmetric Positive Definite Matrices<a class="headerlink" href="#symmetric-positive-definite-matrices" title="Link to this heading">#</a></h2>
+<div class="proof definition admonition" id="definition-0">
+<p class="admonition-title"><span class="caption-number">Definition 1 </span> (Symmetric Positive Definite Matrix (SPD))</p>
+<section class="definition-content" id="proof-content">
+<p><span class="math notranslate nohighlight">\(A\)</span> real, square matrix <span class="math notranslate nohighlight">\(A ∈ \mathbb R^{n×n}\)</span> is SPD if it satisfies:</p>
+<ul class="simple">
+<li><p>Symmetry: <span class="math notranslate nohighlight">\(A^T = A\)</span></p></li>
+<li><p>Positive definiteness: <span class="math notranslate nohighlight">\(x^T A x &gt; 0\)</span> for all nonzero <span class="math notranslate nohighlight">\(x ∈ R^n\)</span></p></li>
+</ul>
+</section>
+</div><p>For symmetric <span class="math notranslate nohighlight">\(A\)</span>, there is an orthogonal eigendecomposition <span class="math notranslate nohighlight">\(A = Q \Lambda Q^T\)</span> with real eigenvalues.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is SPD, then all eigenvalues <span class="math notranslate nohighlight">\(\lambda_i &gt; 0\)</span>. Proof: let <span class="math notranslate nohighlight">\(q_i\)</span> be an eigenvector associated with <span class="math notranslate nohighlight">\(\lambda_i\)</span>; then</p>
+<div class="math notranslate nohighlight">
+\[
+x = q_i \implies x^T A x = q_i^T (\lambda_i q_i) = \lambda_i \|q_i\|^2 &gt; 0 \Rightarrow \lambda_i &gt; 0.
+\]</div>
+</section>
+<section id="from-lu-to-cholesky">
+<h2>From LU to Cholesky<a class="headerlink" href="#from-lu-to-cholesky" title="Link to this heading">#</a></h2>
+<p>We start with a hand-wavey argument for why the Cholesky factorization exists for SPD matrices. The details are in the next section.</p>
+<p>The hand-wavey justification is based on the <strong>uniqueness</strong> of the LU factorization without pivoting. For a matrix where LU factorization exists without pivoting, the Doolittle factorization (<span class="math notranslate nohighlight">\(L\)</span> has ones on the diagonal) is unique. Since <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A=A^T\)</span>), its factorization must honor that symmetry. If we factor <span class="math notranslate nohighlight">\(A\)</span> to get <span class="math notranslate nohighlight">\(LU\)</span>, we could also factor <span class="math notranslate nohighlight">\(A^T\)</span> to get <span class="math notranslate nohighlight">\(U^T L^T\)</span>. But since <span class="math notranslate nohighlight">\(A = A^T\)</span>, their unique factorizations must be one and the same. This implies that the factors <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> can’t be independent entities; they must be related through a transpose operation, leading us toward a symmetric factorization like <span class="math notranslate nohighlight">\(LL^T\)</span>.</p>
+<p>One consequence is that in <span class="math notranslate nohighlight">\(LL^T\)</span>, the diagonal of <span class="math notranslate nohighlight">\(L\)</span> will no longer be all ones. Instead, we will require the diagonal entries of <span class="math notranslate nohighlight">\(L\)</span> to be positive to ensure uniqueness.</p>
+<p>Let’s now derive the Cholesky factorization from LU. For SPD matrices, we seek a lower triangular L with positive diagonal such that:</p>
+<div class="math notranslate nohighlight">
+\[
+A = L L^T.
+\]</div>
+<p>As for the LU factorization, we use the outer-product approach. This means that we compute <span class="math notranslate nohighlight">\(L\)</span> one column at a time, updating the trailing submatrix at each step.</p>
+<p>A convenient derivation uses block matrices. Let’s partition</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+a_{11} &amp; \mathbf{a}_{21}^T \\
+\mathbf{a}_{21} &amp; A_{22}
+\end{pmatrix}, \quad
+L =
+\begin{pmatrix}
+l_{11} &amp; \mathbf{0}^T \\
+\mathbf{l}_{21} &amp; L_{22}
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L L^T =
+\begin{pmatrix}
+l_{11}^2 &amp; l_{11}\mathbf{l}_{21}^T \\
+l_{11}\mathbf{l}_{21} &amp; \mathbf{l}_{21}\mathbf{l}_{21}^T + L_{22} L_{22}^T
+\end{pmatrix}
+=
+\begin{pmatrix}
+a_{11} &amp; \mathbf{a}_{21}^T \\
+\mathbf{a}_{21} &amp; A_{22}
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Equating blocks gives:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+l_{11} &amp;= \sqrt{a_{11}},\\
+\mathbf{l}_{21} &amp;= \frac{1}{l_{11}}\,\mathbf{a}_{21},\\
+L_{22} L_{22}^T &amp;= A_{22} - \mathbf{l}_{21}\mathbf{l}_{21}^T.
+\end{aligned}
+\end{split}\]</div>
+<p>This yields a recursive algorithm: compute the first column of L, update the trailing submatrix, and repeat on the (n−1)×(n−1) subproblem.</p>
+</section>
+<section id="the-cholesky-algorithm">
+<h2>The Cholesky Algorithm<a class="headerlink" href="#the-cholesky-algorithm" title="Link to this heading">#</a></h2>
+<p>Below is the complete algorithm for the Cholesky factorization. It overwrites the lower triangle of <span class="math notranslate nohighlight">\(A\)</span> with <span class="math notranslate nohighlight">\(L\)</span>. This is the in-place outer-product version.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cholesky_in_place</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In-place, outer-product Cholesky factorization.</span>
+<span class="sd">    Overwrites the lower triangle of A with L such that A_original = L @ L.T.</span>
+<span class="sd">    A: symmetric positive definite matrix (n × n). Only the lower triangle is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Compute the diagonal element</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+        
+        <span class="c1"># Compute column k below the diagonal</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">/=</span> <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="c1"># Rank-1 update of the trailing submatrix</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="n">k</span><span class="p">],</span> <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:,</span> <span class="n">k</span><span class="p">])</span>
+
+    <span class="c1"># Last diagonal element    </span>
+    <span class="n">A</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="algorithm-properties">
+<h2>Algorithm Properties<a class="headerlink" href="#algorithm-properties" title="Link to this heading">#</a></h2>
+<p><strong>Computational Cost</strong></p>
+<p>The cost of the Cholesky factorization is dominated by the rank-1 update of the trailing submatrix inside the main loop. In step <span class="math notranslate nohighlight">\(k\)</span>, this update operates on a matrix of size <span class="math notranslate nohighlight">\((n-k-1) \times (n-k-1)\)</span> and costs approximately <span class="math notranslate nohighlight">\((n-k-1)^2\)</span> multiplications and <span class="math notranslate nohighlight">\((n-k-1)^2\)</span> additions. Summing over <span class="math notranslate nohighlight">\(k\)</span> from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(n-2\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Flops} \approx \sum_{k=0}^{n-2} (n-k-1)^2 = \sum_{j=1}^{n-1} j^2 \approx \frac{n^3}{3}
+\]</div>
+<p>This is half the computational cost of LU factorization, which requires approximately <span class="math notranslate nohighlight">\(2n^3/3\)</span> floating-point operations.</p>
+<p><strong>Storage Requirements</strong></p>
+<p>Since the input matrix <span class="math notranslate nohighlight">\(A\)</span> is symmetric, only its lower (or upper) triangular part needs to be stored, which amounts to <span class="math notranslate nohighlight">\(\frac{n(n+1)}{2}\)</span> elements. The algorithm can be implemented in-place, overwriting the lower triangle of <span class="math notranslate nohighlight">\(A\)</span> with the Cholesky factor <span class="math notranslate nohighlight">\(L\)</span>. This means no significant additional storage is required, making the method highly memory-efficient.</p>
+<p><strong>Numerical Stability</strong></p>
+<p>The Cholesky factorization is numerically stable for SPD matrices without any need for pivoting. As shown in the final section, the elements of <span class="math notranslate nohighlight">\(L\)</span> are bounded: <span class="math notranslate nohighlight">\(|l_{ik}| ≤ \sqrt{a_{ii}}\)</span>. This lack of element growth prevents the amplification of rounding errors, which is a key advantage over LU factorization where pivoting is generally necessary for stability.</p>
+</section>
+<section id="existence-and-uniqueness">
+<h2>Existence and Uniqueness<a class="headerlink" href="#existence-and-uniqueness" title="Link to this heading">#</a></h2>
+<p>The previous derivation assumed that all the pivots are positive. This is true for SPD matrices, as we now prove.</p>
+<div class="proof theorem admonition" id="theorem-1">
+<p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Existence and Uniqueness of Cholesky Factorization)</p>
+<section class="theorem-content" id="proof-content">
+<p>If <span class="math notranslate nohighlight">\(A ∈ \mathbb R^{n×n}\)</span> is SPD, then there exists a unique lower triangular matrix <span class="math notranslate nohighlight">\(L\)</span> with positive diagonal such that <span class="math notranslate nohighlight">\(A = LL^T\)</span>.</p>
+</section>
+</div><section id="formal-proof">
+<h3>Formal proof<a class="headerlink" href="#formal-proof" title="Link to this heading">#</a></h3>
+<p>Now we arrive at the formal proof. It’s a beautiful argument that uses induction to show that the recursive algorithm we just derived will always succeed for any SPD matrix.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. The proof proceeds by induction on the dimension <span class="math notranslate nohighlight">\(n\)</span> of the matrix.</p>
+<p><strong>Existence</strong></p>
+<p>Base Case (<span class="math notranslate nohighlight">\(n=1\)</span>):</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is a <span class="math notranslate nohighlight">\(1 \times 1\)</span> SPD matrix, then <span class="math notranslate nohighlight">\(A = [a_{11}]\)</span>. By the definition of positive definiteness (with <span class="math notranslate nohighlight">\(x=e_1=[1]\)</span>), we have</p>
+<div class="math notranslate nohighlight">
+\[a_{11} = e_1^T A e_1 &gt; 0.\]</div>
+<p>We can therefore set <span class="math notranslate nohighlight">\(l_{11} = \sqrt{a_{11}}\)</span>, which is lower triangular and has a positive diagonal. The factorization <span class="math notranslate nohighlight">\(A=LL^T\)</span> holds trivially.</p>
+<p>Inductive Step:</p>
+<p>Assume that every <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> SPD matrix has a unique Cholesky factorization. Now, let’s consider an <span class="math notranslate nohighlight">\(n \times n\)</span> SPD matrix <span class="math notranslate nohighlight">\(A\)</span>. We partition <span class="math notranslate nohighlight">\(A\)</span> into a block form, separating out the first row and column:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+a_{11} &amp; \mathbf{c}^T \\
+\mathbf{c} &amp; B
+\end{pmatrix}
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(a_{11}\)</span> is a scalar, <span class="math notranslate nohighlight">\(\mathbf{c} \in \mathbb{R}^{n-1}\)</span>, and <span class="math notranslate nohighlight">\(B\)</span> is an <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> symmetric matrix. As in the base case, <span class="math notranslate nohighlight">\(a_{11} = \mathbf{e}_1^T A \mathbf{e}_1 &gt; 0\)</span>.</p>
+<p>The crux of the proof is to show that the trailing submatrix after one step of factorization, the <strong>Schur complement</strong> of <span class="math notranslate nohighlight">\(a_{11}\)</span>, is also SPD. It is equal to:</p>
+<div class="math notranslate nohighlight">
+\[S = B - \frac{1}{a_{11}} \mathbf{c}\mathbf{c}^T\]</div>
+<p>First, <span class="math notranslate nohighlight">\(S\)</span> is clearly symmetric since <span class="math notranslate nohighlight">\(B\)</span> is symmetric.</p>
+<p>To prove <span class="math notranslate nohighlight">\(S\)</span> is positive definite, we use the following construction. For any non-zero vector <span class="math notranslate nohighlight">\(\mathbf{y} \in \mathbb{R}^{n-1}\)</span>, we want to show that <span class="math notranslate nohighlight">\(\mathbf{y}^T S \mathbf{y} &gt; 0\)</span>. Let’s construct a special vector <span class="math notranslate nohighlight">\(\mathbf{x} \in \mathbb{R}^n\)</span> of the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbf{x} = \begin{pmatrix} x_1 \\ \mathbf{y} \end{pmatrix}.\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(A\)</span> is SPD, we know <span class="math notranslate nohighlight">\(\mathbf{x}^T A \mathbf{x} &gt; 0\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbf{x}^T A \mathbf{x} = \begin{pmatrix} x_1 &amp; \mathbf{y}^T \end{pmatrix} \begin{pmatrix} a_{11} &amp; \mathbf{c}^T \\ \mathbf{c} &amp; B \end{pmatrix} \begin{pmatrix} x_1 \\ \mathbf{y} \end{pmatrix} = a_{11} x_1^2 + 2 x_1 (\mathbf{c}^T \mathbf{y}) + \mathbf{y}^T B \mathbf{y}\end{split}\]</div>
+<p>The magic happens when we choose <span class="math notranslate nohighlight">\(x_1\)</span> specifically to simplify this expression. To do that, we need to develop some intuition. The expression is a quadratic form in <span class="math notranslate nohighlight">\(x_1\)</span>. This suggests completing the square to see what happens when we vary <span class="math notranslate nohighlight">\(x_1\)</span>.</p>
+<p>Factor out <span class="math notranslate nohighlight">\(a_{11}\)</span> from the first part:</p>
+<div class="math notranslate nohighlight">
+\[= a_{11} \left( x_1^2 + 2 x_1 \frac{\mathbf{c}^T \mathbf{y}}{a_{11}} \right) + \mathbf{y}^T B \mathbf{y}\]</div>
+<p>Now, let’s complete the square inside the parenthesis. We get:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{x}^T A \mathbf{x} = a_{11} \left( x_1 + \frac{\mathbf{c}^T \mathbf{y}}{a_{11}} \right)^2 + \mathbf{y}^T \left( B - \frac{1}{a_{11}}\mathbf{c}\mathbf{c}^T \right) \mathbf{y}\]</div>
+<p>This beautifully decomposes the quadratic form. Our goal is to relate <span class="math notranslate nohighlight">\(\mathbf{x}^T A \mathbf{x}\)</span> to the Schur complement term. The most direct way to do that is to make the first term disappear. The first term, being a scaled square, is zero if and only if:</p>
+<div class="math notranslate nohighlight">
+\[x_1 + \frac{\mathbf{c}^T \mathbf{y}}{a_{11}} = 0 \implies x_1 = -\frac{\mathbf{c}^T \mathbf{y}}{a_{11}}\]</div>
+<p>With this choice of <span class="math notranslate nohighlight">\(x_1\)</span>, we have:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{x}^T A \mathbf{x} = \mathbf{y}^T \left( B - \frac{1}{a_{11}}\mathbf{c}\mathbf{c}^T \right) \mathbf{y} = \mathbf{y}^T S \mathbf{y}.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\mathbf{y} \neq \mathbf{0}\)</span>, our constructed vector <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is also non-zero, which means <span class="math notranslate nohighlight">\(\mathbf{x}^T A \mathbf{x} &gt; 0\)</span>. Therefore, we have shown that <span class="math notranslate nohighlight">\(\mathbf{y}^T S \mathbf{y} &gt; 0\)</span> for any non-zero <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>, so <span class="math notranslate nohighlight">\(S\)</span> is SPD.</p>
+<p>By our inductive hypothesis, the <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> SPD matrix <span class="math notranslate nohighlight">\(S\)</span> has a Cholesky factorization <span class="math notranslate nohighlight">\(S = L_S L_S^T\)</span>. We can now construct the Cholesky factor for <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L =
+\begin{pmatrix}
+\sqrt{a_{11}} &amp; \mathbf{0}^T \\
+\frac{1}{\sqrt{a_{11}}}\mathbf{c} &amp; L_S
+\end{pmatrix}
+\end{split}\]</div>
+<p>This matrix is lower triangular with a positive diagonal. Let’s verify that it works:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+LL^T =
+\begin{pmatrix}
+\sqrt{a_{11}} &amp; \mathbf{0}^T \\
+\frac{1}{\sqrt{a_{11}}}\mathbf{c} &amp; L_S
+\end{pmatrix}
+\begin{pmatrix}
+\sqrt{a_{11}} &amp; \frac{1}{\sqrt{a_{11}}}\mathbf{c}^T \\
+\mathbf{0} &amp; L_S^T
+\end{pmatrix}
+=
+\begin{pmatrix}
+a_{11} &amp; \mathbf{c}^T \\
+\mathbf{c} &amp; \frac{1}{a_{11}}\mathbf{c}\mathbf{c}^T + L_S L_S^T
+\end{pmatrix}
+\end{split}\]</div>
+<p>Since</p>
+<div class="math notranslate nohighlight">
+\[L_S L_S^T = S = B - \frac{1}{a_{11}}\mathbf{c}\mathbf{c}^T,\]</div>
+<p>the bottom-right block becomes</p>
+<div class="math notranslate nohighlight">
+\[\frac{1}{a_{11}}\mathbf{c}\mathbf{c}^T + \left(B - \frac{1}{a_{11}}\mathbf{c}\mathbf{c}^T\right) = B.\]</div>
+<p>Thus, <span class="math notranslate nohighlight">\(LL^T = A\)</span>, and the existence is proven.</p>
+<p><strong>Uniqueness</strong></p>
+<p>Suppose we have two Cholesky factorizations <span class="math notranslate nohighlight">\(A = L_1 L_1^T\)</span> and <span class="math notranslate nohighlight">\(A = L_2 L_2^T\)</span>, where <span class="math notranslate nohighlight">\(L_1\)</span> and <span class="math notranslate nohighlight">\(L_2\)</span> are lower triangular with positive diagonals.</p>
+<div class="math notranslate nohighlight">
+\[L_1 L_1^T = L_2 L_2^T\]</div>
+<p>Since <span class="math notranslate nohighlight">\(L_2\)</span> has a positive diagonal, its determinant is non-zero, so it is invertible. We can write:</p>
+<div class="math notranslate nohighlight">
+\[L_2^{-1} L_1 = L_2^T (L_1^T)^{-1} = (L_1^{-1} L_2)^T\]</div>
+<p>Let’s analyze the matrix <span class="math notranslate nohighlight">\(M = L_2^{-1} L_1\)</span>.</p>
+<ul class="simple">
+<li><p>The inverse of a lower triangular matrix is lower triangular. The product of two lower triangular matrices is also lower triangular. Therefore, <span class="math notranslate nohighlight">\(M\)</span> is <strong>lower triangular</strong>.</p></li>
+<li><p>The right-hand side, <span class="math notranslate nohighlight">\((L_1^{-1} L_2)^T\)</span>, is the transpose of a lower triangular matrix, making it <strong>upper triangular</strong>.</p></li>
+</ul>
+<p>The only way a matrix can be both lower and upper triangular is if it is a <strong>diagonal matrix</strong>. Let’s call it <span class="math notranslate nohighlight">\(D.\)</span> So, <span class="math notranslate nohighlight">\(M=D\)</span>. This implies <span class="math notranslate nohighlight">\(L_1 = L_2 D\)</span>.</p>
+<p>Substituting this back into the original equality:</p>
+<div class="math notranslate nohighlight">
+\[(L_2 D)(L_2 D)^T = L_2 L_2^T \implies L_2 D D^T L_2^T = L_2 L_2^T\]</div>
+<p>Since <span class="math notranslate nohighlight">\(D\)</span> is diagonal, <span class="math notranslate nohighlight">\(D=D^T\)</span>, so we have</p>
+<div class="math notranslate nohighlight">
+\[L_2 D^2 L_2^T = L_2 L_2^T.\]</div>
+<p>We can left-multiply by <span class="math notranslate nohighlight">\(L_2^{-1}\)</span> and right-multiply by <span class="math notranslate nohighlight">\((L_2^T)^{-1}\)</span> to get:</p>
+<div class="math notranslate nohighlight">
+\[D^2 = I\]</div>
+<p>This means the diagonal entries of <span class="math notranslate nohighlight">\(D\)</span> must satisfy <span class="math notranslate nohighlight">\(d_{ii}^2=1\)</span>, so <span class="math notranslate nohighlight">\(d_{ii} = \pm 1\)</span>. However, the diagonal entries of <span class="math notranslate nohighlight">\(L_1\)</span> and <span class="math notranslate nohighlight">\(L_2\)</span> are both positive by definition. The diagonal entries of <span class="math notranslate nohighlight">\(D\)</span> are given by <span class="math notranslate nohighlight">\(d_{ii} = [L_1]_{ii} / [L_2]_{ii}\)</span>. Since both are positive, their ratio must be positive.</p>
+<div class="math notranslate nohighlight">
+\[d_{ii} = +1\]</div>
+<p>Therefore, <span class="math notranslate nohighlight">\(D\)</span> must be the identity matrix <span class="math notranslate nohighlight">\(I\)</span>. From <span class="math notranslate nohighlight">\(L_1 = L_2 D\)</span>, we conclude that <span class="math notranslate nohighlight">\(L_1=L_2\)</span>, proving uniqueness.</p>
+</div>
+</section>
+</section>
+<section id="the-remarkable-stability-of-cholesky-factorization">
+<h2>The Remarkable Stability of Cholesky Factorization<a class="headerlink" href="#the-remarkable-stability-of-cholesky-factorization" title="Link to this heading">#</a></h2>
+<p>One of the most powerful and celebrated features of the Cholesky factorization is its unconditional numerical stability. For general matrices, we saw that LU factorization can be disastrously unstable without a proper pivoting strategy. For SPD matrices, the Cholesky factorization requires no pivoting at all and is guaranteed to be stable. This is a remarkable property.</p>
+<p>The reason for this stability is beautifully simple and can be seen directly from the factorization equation itself.</p>
+<p>From the relation <span class="math notranslate nohighlight">\(A = LL^T\)</span>, the formula for the <span class="math notranslate nohighlight">\(i\)</span>-th diagonal entry of <span class="math notranslate nohighlight">\(A\)</span> is the dot product of the <span class="math notranslate nohighlight">\(i\)</span>-th row of <span class="math notranslate nohighlight">\(L\)</span> with itself:</p>
+<div class="math notranslate nohighlight">
+\[a_{ii} = \sum_{k=1}^{n} l_{ik} (L^T)_{ki} = \sum_{k=1}^{i} l_{ik}^2 = l_{i1}^2 + l_{i2}^2 + \dots + l_{ii}^2\]</div>
+<p>The sum only goes up to <span class="math notranslate nohighlight">\(k=i\)</span> because <span class="math notranslate nohighlight">\(L\)</span> is lower triangular.</p>
+<p>This simple equation tells us something profound. Since every term in the sum, <span class="math notranslate nohighlight">\(l_{ik}^2\)</span>, is non-negative, the sum must be greater than or equal to any of its individual terms.</p>
+<div class="math notranslate nohighlight">
+\[l_{ik}^2 \le \sum_{j=1}^{i} l_{ij}^2 = a_{ii} \quad \text{for any } k \le i\]</div>
+<p>Taking the square root gives us a tight bound on the magnitude of every element in the Cholesky factor <span class="math notranslate nohighlight">\(L\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[|l_{ik}| \le \sqrt{a_{ii}}\]</div>
+<p>This is a powerful result. It guarantees that the elements of <span class="math notranslate nohighlight">\(L\)</span> can never grow large. The magnitude of any entry in <span class="math notranslate nohighlight">\(L\)</span> is bounded by the square root of the corresponding diagonal entry of the original matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>In numerical analysis, an algorithm is considered stable if it does not amplify the rounding errors that are inherent in floating-point arithmetic. The absence of element growth is the hallmark of a stable factorization. See for example our previous section (<a class="reference internal" href="lu_pivoting.html#thm:backward_error_lu">Theorem 13</a>) on the stability of the LU decomposition.</p>
+<p>Because the entries of <span class="math notranslate nohighlight">\(L\)</span> remain controlled, the algorithm is not susceptible to catastrophic cancellation or error amplification.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="lu_pivoting.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">LU Factorization with Row Pivoting</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-positive-definite-matrices">Symmetric Positive Definite Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-lu-to-cholesky">From LU to Cholesky</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cholesky-algorithm">The Cholesky Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-properties">Algorithm Properties</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-and-uniqueness">Existence and Uniqueness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formal-proof">Formal proof</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-remarkable-stability-of-cholesky-factorization">The Remarkable Stability of Cholesky Factorization</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

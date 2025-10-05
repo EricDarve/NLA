@@ -203,6 +203,7 @@
 <li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -377,6 +378,7 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-step-by-step">The Algorithm Step-by-Step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#in-place-lu-factorization-no-pivoting">In-Place LU Factorization (no pivoting)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pivot-problem-when-things-go-wrong">The Pivot Problem: When Things Go Wrong 🚧</a></li>
 </ul>
 </li>
@@ -434,6 +436,19 @@ b_3
 <div class="math notranslate nohighlight">
 \[x_i = \frac{1}{l_{ii}} \Big( b_i - \sum_{j=1}^{i-1} l_{ij} x_j \Big)\]</div>
 <p>This process is well-defined as long as all diagonal entries <span class="math notranslate nohighlight">\(l_{ii}\)</span> are non-zero, which is guaranteed if <span class="math notranslate nohighlight">\(L\)</span> is invertible.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">forward_substitution</span><span class="p">(</span><span class="n">L</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solves the lower triangular system Lx = b using forward substitution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
 </section>
 <section id="upper-triangular-systems-backward-substitution">
 <h3>Upper Triangular Systems: Backward Substitution<a class="headerlink" href="#upper-triangular-systems-backward-substitution" title="Link to this heading">#</a></h3>
@@ -652,6 +667,29 @@ A^{(1)} =
 </li>
 </ol>
 <p>This loop continues until all columns of <span class="math notranslate nohighlight">\(L\)</span> and rows of <span class="math notranslate nohighlight">\(U\)</span> are determined. In a typical implementation, the computed values for <span class="math notranslate nohighlight">\(L\)</span> (below the diagonal) and <span class="math notranslate nohighlight">\(U\)</span> (on and above the diagonal) are stored directly in the matrix <span class="math notranslate nohighlight">\(A\)</span> to save space.</p>
+<section id="in-place-lu-factorization-no-pivoting">
+<h3>In-Place LU Factorization (no pivoting)<a class="headerlink" href="#in-place-lu-factorization-no-pivoting" title="Link to this heading">#</a></h3>
+<p>The factors are stored in A: the strict lower triangle holds L (with unit diagonal), and the upper triangle holds U.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lu_inplace</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs in-place LU factorization (Doolittle, no pivoting) and overwrites the input matrix A.</span>
+<span class="sd">    On exit:</span>
+<span class="sd">      - L is in the strict lower triangle with implicit unit diagonal</span>
+<span class="sd">      - U is in the upper triangle (including diagonal)</span>
+<span class="sd">    Assumes:</span>
+<span class="sd">      - All pivots are nonzero</span>
+<span class="sd">      - No pivoting is performed (numerically unstable for some matrices)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Update the k-th column of L</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">/=</span> <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="c1"># Rank-one update of the trailing submatrix</span>
+        <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">]</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">n</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
 <section id="the-pivot-problem-when-things-go-wrong">
 <h3>The Pivot Problem: When Things Go Wrong 🚧<a class="headerlink" href="#the-pivot-problem-when-things-go-wrong" title="Link to this heading">#</a></h3>
 <p>The algorithm has a critical weak point: the division by the pivot element <span class="math notranslate nohighlight">\(a_{kk}\)</span> in step 2.</p>
@@ -747,6 +785,7 @@ A^{(1)} =
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-step-by-step">The Algorithm Step-by-Step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#in-place-lu-factorization-no-pivoting">In-Place LU Factorization (no pivoting)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pivot-problem-when-things-go-wrong">The Pivot Problem: When Things Go Wrong 🚧</a></li>
 </ul>
 </li>
