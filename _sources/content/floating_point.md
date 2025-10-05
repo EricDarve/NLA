@@ -260,9 +260,16 @@ $\tilde{S}_k = fl(\tilde{S}_{k-1} + x_k)$
 
 Each step introduces a small roundoff error. A rigorous analysis shows that the error in the final computed sum, $\Delta S_n = |S_n - \tilde{S}_n|$, is bounded by approximately:
 
+````{prf:theorem} Error Bound for Summation
+:label: thm:summation_error
+The absolute error in the computed sum of $n$ numbers using the standard algorithm is bounded by
+
 $$|\Delta S_n| \le n u \sum_{i=1}^n |x_i| + O(u^2)$$
 
-Here, $u$ is the unit roundoff of the machine. Let us dissect this formula. It tells us that the absolute error of the computed sum depends on:
+Here, $u$ is the unit roundoff of the machine. 
+````
+
+Let us dissect this formula. It tells us that the absolute error of the computed sum depends on:
 
 1.  **$n$**: The number of terms. The error grows, at worst, linearly with the length of the sum.
 2.  **$u$**: The machine precision. A more precise machine reduces the error.

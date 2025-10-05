@@ -1,0 +1,949 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LU Factorization with Row Pivoting &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/lu_pivoting';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Floating-Point Numbers" href="floating_point.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">LU Factorization with Row Pivoting</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/lu_pivoting.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>LU Factorization with Row Pivoting</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-analysis-of-numerical-error-forward-and-backward-perspectives">The Analysis of Numerical Error: Forward and Backward Perspectives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-error-analysis-a-direct-but-impractical-question">Forward Error Analysis: A Direct but Impractical Question</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-analysis-the-easy-path-of-verifying">Backward Error Analysis: The Easy Path of ‘Verifying’</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sensitivity-analysis-bridging-backward-and-forward-error">Sensitivity Analysis: Bridging Backward and Forward Error</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formalizing-sensitivity">Formalizing Sensitivity</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condition-number-sensitivity-for-linear-systems">Condition Number: Sensitivity for Linear Systems</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perturbation-of-the-right-hand-side-b">Perturbation of the Right-Hand Side <code class="docutils literal notranslate"><span class="pre">b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perturbation-of-the-matrix-a">Perturbation of the Matrix <code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-number">The Condition Number</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-perturbation-theorem">The General Perturbation Theorem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation">Interpretation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-aside-the-banach-lemma-and-neumann-series">Mathematical Aside: The Banach Lemma and Neumann Series</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-analysis-of-lu-factorization">Backward Error Analysis of LU Factorization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-backward-error-bound">The Backward Error Bound</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-mechanism-of-instability-small-pivots">The Mechanism of Instability: Small Pivots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-intuitive-parallel-with-summation-error">An Intuitive Parallel with Summation Error</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-partial-pivoting">The Solution: LU Factorization with Partial Pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-pivoting">Partial Pivoting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-final-word-on-stability">A Final Word on Stability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-of-element-growth">An Example of Element Growth</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-worst-case-growth-factor">The Worst-Case Growth Factor</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="lu-factorization-with-row-pivoting">
+<h1>LU Factorization with Row Pivoting<a class="headerlink" href="#lu-factorization-with-row-pivoting" title="Link to this heading">#</a></h1>
+<section id="the-analysis-of-numerical-error-forward-and-backward-perspectives">
+<h2>The Analysis of Numerical Error: Forward and Backward Perspectives<a class="headerlink" href="#the-analysis-of-numerical-error-forward-and-backward-perspectives" title="Link to this heading">#</a></h2>
+<p>When we analyze a numerical algorithm, our central concern is the nature of the error. Because we operate in finite-precision arithmetic, the computed solution will almost never be the exact solution. The critical question is how we should quantify this discrepancy. There are two fundamental ways to approach this inquiry: <strong>forward error analysis</strong> and <strong>backward error analysis</strong>.</p>
+<p>Let us represent a general numerical problem as the computation of an output <span class="math notranslate nohighlight">\(x\)</span> from some input data <span class="math notranslate nohighlight">\(d\)</span>. We can model this as the application of a function <span class="math notranslate nohighlight">\(f\)</span> to the data, such that <span class="math notranslate nohighlight">\(x = f(d)\)</span>. For the problem of solving a linear system, our data is the pair <span class="math notranslate nohighlight">\((A, b)\)</span>, and our solution is <span class="math notranslate nohighlight">\(x\)</span>, so we may write <span class="math notranslate nohighlight">\(x=f(A,b)\)</span>.</p>
+<p>Due to the accumulation of rounding errors at each step of a computation, any practical algorithm computes not <span class="math notranslate nohighlight">\(f\)</span>, but an approximation we might call <span class="math notranslate nohighlight">\(\tilde{f}\)</span>. The result we obtain is the computed solution <span class="math notranslate nohighlight">\(\tilde{x} = \tilde{f}(A,b)\)</span>.</p>
+<section id="forward-error-analysis-a-direct-but-impractical-question">
+<h3>Forward Error Analysis: A Direct but Impractical Question<a class="headerlink" href="#forward-error-analysis-a-direct-but-impractical-question" title="Link to this heading">#</a></h3>
+<p>The most natural question one can ask is: <strong>“How close is the computed answer to the true answer?”</strong></p>
+<p>This is the very essence of <strong>forward error analysis</strong>. We seek to establish a bound on the difference between the computed solution <span class="math notranslate nohighlight">\(\tilde{x}\)</span> and the true solution <span class="math notranslate nohighlight">\(x\)</span>. We can measure this <strong>forward error</strong> in either absolute or relative terms:</p>
+<div class="math notranslate nohighlight">
+\[\text{Absolute Forward Error} = \|\tilde{x} - x\| \quad \text{or} \quad \text{Relative Forward Error} = \frac{\|\tilde{x} - x\|}{\|x\|}\]</div>
+<p>While this is the quantity we ultimately wish to understand, determining it directly is often impractical. The principal difficulty is that <strong>it requires knowledge of the true solution <span class="math notranslate nohighlight">\(x\)</span></strong>. To compute the forward error <span class="math notranslate nohighlight">\(\|\tilde{x} - x\|\)</span>, one must first find <span class="math notranslate nohighlight">\(x\)</span> by solving the original problem <span class="math notranslate nohighlight">\(Ax=b\)</span>. This is a computationally intensive task, typically requiring <span class="math notranslate nohighlight">\(\mathcal{O}(n^3)\)</span> operations. To analyze the error in our solution, we would have to solve the problem again, perhaps with much higher precision, which defeats the purpose of an efficient analysis.</p>
+<p>Moreover, a direct forward error analysis would demand that we meticulously track the propagation of every rounding error through the entirety of the algorithm—a hopelessly complex endeavor.</p>
+</section>
+<section id="backward-error-analysis-the-easy-path-of-verifying">
+<h3>Backward Error Analysis: The Easy Path of ‘Verifying’<a class="headerlink" href="#backward-error-analysis-the-easy-path-of-verifying" title="Link to this heading">#</a></h3>
+<p>Backward error analysis takes a profoundly different and more insightful approach. Instead of asking how incorrect our answer is for the original problem, it asks: <strong>“Is our computed answer the <em>exact</em> solution to a slightly different problem?”</strong></p>
+<p>This approach shifts our perspective from the computational difficulty of <em>solving</em> to the relative ease of <em>verifying</em>. Given a computed solution <span class="math notranslate nohighlight">\(\tilde{x}\)</span>, it is computationally inexpensive to assess how well it satisfies the original equation by computing the <strong>residual vector</strong> <span class="math notranslate nohighlight">\(r\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[r = b - A\tilde{x}\]</div>
+<p>This requires only a matrix-vector multiplication and a vector subtraction, an <span class="math notranslate nohighlight">\(\mathcal{O}(n^2)\)</span> operation—far cheaper than the original <span class="math notranslate nohighlight">\(\mathcal{O}(n^3)\)</span> solve. The residual <span class="math notranslate nohighlight">\(r\)</span> is of paramount importance because it tells us precisely which nearby problem our algorithm has solved. A simple rearrangement of the equation reveals that:</p>
+<div class="math notranslate nohighlight">
+\[A\tilde{x} = b - r\]</div>
+<p>This means our computed solution <span class="math notranslate nohighlight">\(\tilde{x}\)</span> is the <strong>exact</strong> solution to the perturbed problem where the right-hand side is <span class="math notranslate nohighlight">\(\tilde{b} = b-r\)</span>.</p>
+<p>The objective of <strong>backward error analysis</strong> is to demonstrate that this perturbation—in this case, the residual <span class="math notranslate nohighlight">\(r\)</span>—is small relative to the original data. If we can prove that <span class="math notranslate nohighlight">\(\|r\|\)</span> is small, we have shown that our algorithm is <strong>backward stable</strong>. A backward stable algorithm produces an answer that is, in a sense, as good as the input data deserves. It has found the exact solution to a problem that differs from the original by a very small amount, and we are able to establish this with a simple verification step, entirely avoiding the need to compute the true solution <span class="math notranslate nohighlight">\(x\)</span>. This makes backward error analysis the preferred tool for analyzing the stability of algorithms in numerical linear algebra.</p>
+</section>
+</section>
+<section id="sensitivity-analysis-bridging-backward-and-forward-error">
+<h2>Sensitivity Analysis: Bridging Backward and Forward Error<a class="headerlink" href="#sensitivity-analysis-bridging-backward-and-forward-error" title="Link to this heading">#</a></h2>
+<p>We have now established a powerful framework: backward error analysis allows us to prove that our algorithm found the <em>exact</em> solution to a <em>nearby</em> problem. This is an elegant and practical method for assessing an algorithm’s stability.</p>
+<p>However, our ultimate goal remains to bound the <strong>forward error</strong>. The missing component is an understanding of how errors in the input data affect the output solution. This is the domain of <strong>sensitivity analysis</strong>.</p>
+<p>The central question of sensitivity analysis is:</p>
+<blockquote>
+<div><p>If we introduce a small perturbation to the input of a problem, how large is the corresponding perturbation in the output?</p>
+</div></blockquote>
+<p>This is an intrinsic property of the <strong>problem itself</strong>, wholly independent of the algorithm used for its solution. A problem is <strong>sensitive</strong> or <strong>ill-conditioned</strong> if small perturbations in the input can induce large changes in the output. Conversely, a problem is <strong>insensitive</strong> or <strong>well-conditioned</strong> if small input perturbations lead to proportionally small output changes.</p>
+<section id="formalizing-sensitivity">
+<h3>Formalizing Sensitivity<a class="headerlink" href="#formalizing-sensitivity" title="Link to this heading">#</a></h3>
+<p>Let us return to our abstract problem <span class="math notranslate nohighlight">\(x = f(d)\)</span>. Backward error analysis informs us that our computed solution, <span class="math notranslate nohighlight">\(\tilde{x}\)</span>, is the exact solution for a perturbed input, <span class="math notranslate nohighlight">\(\tilde{d}\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\tilde{x} = f(\tilde{d})\]</div>
+<p>We have the <strong>backward error</strong>, <span class="math notranslate nohighlight">\(\|d - \tilde{d}\|\)</span>, which a good algorithm ensures is small. We want to bound the <strong>forward error</strong>, <span class="math notranslate nohighlight">\(\|x - \tilde{x}\| = \|f(d) - f(\tilde{d})\|\)</span>.</p>
+<p>Sensitivity is the factor that connects them. The <strong>absolute sensitivity</strong> can be defined as the limit of the ratio of the change in output to a small change in input:</p>
+<div class="math notranslate nohighlight">
+\[\text{Sensitivity} = \lim_{\varepsilon \to 0} \;\, \sup_{\|\delta d\| \le \varepsilon} \,\frac{\|f(d + \delta d) - f(d)\|}{\|\delta d\|}\]</div>
+<p>For small perturbations, this definition gives rise to the fundamental relationship:</p>
+<div class="math notranslate nohighlight">
+\[\|f(d) - f(\tilde{d})\| \approx (\text{Sensitivity}) \times \|d - \tilde{d}\|\]</div>
+<p>Or, stated more simply:</p>
+<div class="math notranslate nohighlight">
+\[\text{Forward Error} \approx (\text{Sensitivity}) \times (\text{Backward Error})\]</div>
+<p>This equation is the key. It reveals that the forward error is governed by two independent factors:</p>
+<ol class="arabic simple">
+<li><p>The <strong>Backward Error</strong>: This is a property of the <strong>algorithm’s stability</strong>. A backward stable algorithm yields a small backward error.</p></li>
+<li><p>The <strong>Sensitivity</strong>: This is a property of the <strong>problem itself</strong>. It acts as an amplification factor.</p></li>
+</ol>
+<p>If a problem has high sensitivity (i.e., it is ill-conditioned), then even a perfectly backward-stable algorithm can produce a solution with a large forward error. The algorithm has performed its task flawlessly—it found an exact solution to a nearby problem—but the nature of the problem itself dictates that even “nearby” is not close enough to guarantee an accurate solution.</p>
+</section>
+</section>
+<section id="condition-number-sensitivity-for-linear-systems">
+<h2>Condition Number: Sensitivity for Linear Systems<a class="headerlink" href="#condition-number-sensitivity-for-linear-systems" title="Link to this heading">#</a></h2>
+<p>With the general framework of sensitivity established, let us apply it to our core problem: solving the linear system <span class="math notranslate nohighlight">\(Ax=b\)</span>. This will lead us directly to one of the most important concepts in numerical linear algebra: the <strong>condition number</strong> of a matrix.</p>
+<p>Our objective is to understand how small perturbations in the input data, <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>, affect the solution, <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<section id="perturbation-of-the-right-hand-side-b">
+<h3>Perturbation of the Right-Hand Side <code class="docutils literal notranslate"><span class="pre">b</span></code><a class="headerlink" href="#perturbation-of-the-right-hand-side-b" title="Link to this heading">#</a></h3>
+<p>Let us begin with the simplest case. Assume the matrix <span class="math notranslate nohighlight">\(A\)</span> is known exactly, but we introduce a small error <span class="math notranslate nohighlight">\(\delta b\)</span> into the right-hand side vector <span class="math notranslate nohighlight">\(b\)</span>. Our original system is <span class="math notranslate nohighlight">\(Ax=b\)</span>, and the perturbed system is:</p>
+<div class="math notranslate nohighlight">
+\[A(x+\delta x) = b + \delta b\]</div>
+<p>where <span class="math notranslate nohighlight">\(\delta x\)</span> is the resulting perturbation in the solution. Since <span class="math notranslate nohighlight">\(Ax = b\)</span>, we may subtract the original equation to find the relationship governing the error:</p>
+<div class="math notranslate nohighlight">
+\[A\delta x = \delta b \quad \implies \quad \delta x = A^{-1}\delta b\]</div>
+<p>To measure the magnitude of this error, we take vector norms:</p>
+<div class="math notranslate nohighlight">
+\[\|\delta x\| \le \|A^{-1}\| \|\delta b\|\]</div>
+<p>While this absolute error bound is useful, a <strong>relative error</strong> bound is often more insightful. To obtain the relative error in the solution, <span class="math notranslate nohighlight">\(\|\delta x\|/\|x\|\)</span>, we use the inequality derived from the original system, <span class="math notranslate nohighlight">\(\|b\| = \|Ax\| \le \|A\|\|x\|\)</span>, which implies <span class="math notranslate nohighlight">\(1/\|x\| \le \|A\|/\|b\|\)</span>.</p>
+<p>Combining these inequalities provides our measure of sensitivity:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\|\delta x\|}{\|x\|} \le \|A^{-1}\| \frac{\|\delta b\|}{\|x\|} \le \|A^{-1}\| \left( \frac{\|A\|}{\|b\|} \right) \|\delta b\| = (\|A\|\|A^{-1}\|) \frac{\|\delta b\|}{\|b\|}\]</div>
+<p>This derivation has naturally revealed the amplification factor that relates the relative error in the input <span class="math notranslate nohighlight">\(b\)</span> to the relative error in the output <span class="math notranslate nohighlight">\(x\)</span>. This factor is the <strong>condition number of A</strong>.</p>
+</section>
+<section id="perturbation-of-the-matrix-a">
+<h3>Perturbation of the Matrix <code class="docutils literal notranslate"><span class="pre">A</span></code><a class="headerlink" href="#perturbation-of-the-matrix-a" title="Link to this heading">#</a></h3>
+<p>Next, let us consider the case where <span class="math notranslate nohighlight">\(b\)</span> is known exactly, but the matrix <span class="math notranslate nohighlight">\(A\)</span> contains a small error <span class="math notranslate nohighlight">\(\delta A\)</span>. The perturbed system is:</p>
+<div class="math notranslate nohighlight">
+\[(A+\delta A)(x+\delta x) = b\]</div>
+<p>The analysis is slightly more complex. Assuming the perturbations <span class="math notranslate nohighlight">\(\delta A\)</span> and <span class="math notranslate nohighlight">\(\delta x\)</span> are small, we can neglect their product <span class="math notranslate nohighlight">\((\delta A)(\delta x)\)</span> as a second-order term. Expanding the equation yields:</p>
+<div class="math notranslate nohighlight">
+\[Ax + A\delta x + (\delta A)x + \mathcal{O}(\|\delta A\|\|\delta x\|) \approx b\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Ax=b\)</span>, this simplifies to <span class="math notranslate nohighlight">\(A\delta x \approx -(\delta A)x\)</span>, which gives <span class="math notranslate nohighlight">\(\delta x \approx -A^{-1}(\delta A)x\)</span>. Taking norms, we find:</p>
+<div class="math notranslate nohighlight">
+\[\|\delta x\| \le \|A^{-1}\| \|\delta A\| \|x\|\]</div>
+<p>To obtain the relative error, we divide by <span class="math notranslate nohighlight">\(\|x\|\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\|\delta x\|}{\|x\|} \le \|A^{-1}\|\|\delta A\| = (\|A\|\|A^{-1}\|) \frac{\|\delta A\|}{\|A\|}\]</div>
+<p>It is a remarkable result that the exact same amplification factor, <span class="math notranslate nohighlight">\(\|A\|\|A^{-1}\|\)</span>, appears again.</p>
+</section>
+<section id="the-condition-number">
+<h3>The Condition Number<a class="headerlink" href="#the-condition-number" title="Link to this heading">#</a></h3>
+<p>These derivations demonstrate that for the problem of solving <span class="math notranslate nohighlight">\(Ax=b\)</span>, the sensitivity to perturbations in both <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> is governed by the same quantity. We define this as the <strong>condition number of the matrix A</strong>, denoted <span class="math notranslate nohighlight">\(\kappa(A)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\kappa(A) = \|A\| \|A^{-1}\|\]</div>
+<p>The condition number is the formal measure of sensitivity for a linear system. It quantifies the maximum extent to which relative errors in the input data can be magnified in the solution.</p>
+<ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is small (close to 1), the matrix is <strong>well-conditioned</strong>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is large, the matrix is <strong>ill-conditioned</strong>.</p></li>
+</ul>
+<p>A fundamental property is that <span class="math notranslate nohighlight">\(\kappa(A) \ge 1\)</span> for any matrix <span class="math notranslate nohighlight">\(A\)</span> and any induced matrix norm.</p>
+<p>Geometrically, the condition number indicates how severely the linear transformation represented by <span class="math notranslate nohighlight">\(A\)</span> distorts the space. A well-conditioned matrix transforms a sphere into a mildly eccentric ellipsoid. An ill-conditioned matrix transforms a sphere into a highly elongated, “cigar-shaped” ellipsoid. For such a matrix, a small change in the vector <span class="math notranslate nohighlight">\(b\)</span> can result in a large displacement of the solution <span class="math notranslate nohighlight">\(x\)</span>, as one attempts to pinpoint a location on this extremely stretched object.</p>
+<p>This is why the condition number is of such deep importance. It is an intrinsic property of the problem matrix <span class="math notranslate nohighlight">\(A\)</span>. Regardless of the stability of our algorithm, if <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is large, we must anticipate the possibility of an inaccurate solution.</p>
+</section>
+</section>
+<section id="the-general-perturbation-theorem">
+<h2>The General Perturbation Theorem<a class="headerlink" href="#the-general-perturbation-theorem" title="Link to this heading">#</a></h2>
+<p>We have now explored the individual concepts of forward error, backward error, and the condition number. The following theorem synthesizes these ideas into a single, powerful bound that is a cornerstone of numerical linear algebra. It provides a worst-case bound on the forward error of a computed solution as a function of the backward error and the problem’s conditioning.</p>
+<div class="proof theorem admonition" id="thm:perturbation_bound">
+<p class="admonition-title"><span class="caption-number">Theorem 12 </span> (Perturbation Bound for Linear Systems)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(x\)</span> be the solution to <span class="math notranslate nohighlight">\(Ax=b\)</span> and <span class="math notranslate nohighlight">\(\tilde{x}\)</span> be the solution to the perturbed system <span class="math notranslate nohighlight">\((A+E)\tilde{x} = b+e\)</span>. Assume <span class="math notranslate nohighlight">\(A\)</span> is invertible and that <span class="math notranslate nohighlight">\(\|A^{-1}\|\|E\| &lt; 1\)</span>. Then the relative forward error is bounded by:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\| \tilde{x} - x \|}{\|x\|} \le
+\frac{\kappa(A)}{1 - \kappa(A) \frac{\|E\|}{\|A\|}}
+\left( \frac{\|E\|}{\|A\|} + \frac{\|e\|}{\|b\|} \right)
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\kappa(A) = \|A\|\|A^{-1}\|\)</span> is the condition number of the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. The proof systematically derives an expression for the error <span class="math notranslate nohighlight">\(\delta x = \tilde{x}-x\)</span> and then bounds its norm.</p>
+<ol class="arabic">
+<li><p>Start with the perturbed system:
+<span class="math notranslate nohighlight">\((A+E)\tilde{x} = b+e\)</span></p></li>
+<li><p>Isolate terms involving the true matrix A:
+<span class="math notranslate nohighlight">\(A\tilde{x} = b+e - E\tilde{x}\)</span></p></li>
+<li><p>Introduce the true solution by substituting <span class="math notranslate nohighlight">\(b = Ax\)</span>:
+<span class="math notranslate nohighlight">\(A\tilde{x} = Ax + e - E\tilde{x}\)</span></p></li>
+<li><p>Rearrange to find an expression for the error:
+<span class="math notranslate nohighlight">\(A(\tilde{x}-x) = e - E\tilde{x}\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(\delta x = \tilde{x}-x\)</span>. We can write <span class="math notranslate nohighlight">\(\tilde{x} = x + \delta x\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[A\delta x = e - E(x + \delta x) = e - Ex - E\delta x\]</div>
+</li>
+<li><p>Solve for the error term <span class="math notranslate nohighlight">\(\delta x\)</span>: <span class="math notranslate nohighlight">\((A+E)\delta x = e - Ex.\)</span> Hence,</p>
+<div class="math notranslate nohighlight">
+\[\delta x = (A+E)^{-1} (e - Ex)\]</div>
+<p>This requires <span class="math notranslate nohighlight">\((A+E)\)</span> to be invertible. The condition <span class="math notranslate nohighlight">\(\|A^{-1}\|\|E\| &lt; 1\)</span> guarantees this, via the Banach lemma (see note below).</p>
+</li>
+<li><p>Take norms to bound the error:</p>
+<div class="math notranslate nohighlight">
+\[\|\delta x\| \le \|(A+E)^{-1}\| (\|e\| + \|E\|\|x\|)\]</div>
+<p>We can write</p>
+<div class="math notranslate nohighlight">
+\[(A+E)^{-1} = (A(I+A^{-1}E))^{-1} = (I+A^{-1}E)^{-1}A^{-1}.\]</div>
+<p>Using the inequality <span class="math notranslate nohighlight">\(\|(I+X)^{-1}\| \le \frac{1}{1-\|X\|}\)</span> for <span class="math notranslate nohighlight">\(\|X\|&lt;1\)</span> (see note below), we get:</p>
+<div class="math notranslate nohighlight">
+\[\|\delta x\| \le \frac{\|A^{-1}\|}{1-\|A^{-1}E\|} (\|e\| + \|E\|\|x\|)\]</div>
+</li>
+<li><p>Simplify and introduce relative errors:
+Since <span class="math notranslate nohighlight">\(\|A^{-1}E\| \le \|A^{-1}\|\|E\|\)</span>, we can weaken the bound slightly to simplify:</p>
+<div class="math notranslate nohighlight">
+\[\|\delta x\| \le \frac{\|A^{-1}\|}{1 - \|A^{-1}\|\|E\|} (\|e\| + \|E\|\|x\|)\]</div>
+<p>Now, divide by <span class="math notranslate nohighlight">\(\|x\|\)</span> to get the relative forward error:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\|\delta x\|}{\|x\|} \le \frac{\|A^{-1}\|}{1 - \|A^{-1}\|\|E\|} \left( \frac{\|e\|}{\|x\|} + \|E\| \right)\]</div>
+</li>
+<li><p>Introduce <span class="math notranslate nohighlight">\(\kappa(A)\)</span> and relative backward errors.
+We use the fact that</p>
+<div class="math notranslate nohighlight">
+\[\|b\| \le \|A\|\|x\| \implies \frac{1}{\|x\|} \le \frac{\|A\|}{\|b\|}.\]</div>
+<p>Thus, we have</p>
+<div class="math notranslate nohighlight">
+\[\frac{\|\delta x\|}{\|x\|} \le \frac{\|A^{-1}\|}{1 - \|A^{-1}\|\|E\|} \left( \frac{\|e\|}{\|b\|}\|A\| + \|E\| \right)\]</div>
+<p>Finally, multiply the numerator and denominator of the fraction by <span class="math notranslate nohighlight">\(\|A\|\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\frac{\|\delta x\|}{\|x\|} \le \frac{\|A\|\|A^{-1}\|}{1 - \|A\|\|A^{-1}\|\frac{\|E\|}{\|A\|}} \left( \frac{\|e\|}{\|b\|} + \frac{\|E\|}{\|A\|} \right)\]</div>
+</li>
+</ol>
+<p>This completes the proof.</p>
+</div>
+<section id="interpretation">
+<h3>Interpretation<a class="headerlink" href="#interpretation" title="Link to this heading">#</a></h3>
+<p>This theorem is the culmination of our analysis. It demonstrates that the relative forward error is bounded by the product of the condition number and the sum of the relative backward errors, adjusted by a factor in the denominator.</p>
+<p>If an algorithm is <strong>backward stable</strong>, the relative backward errors <span class="math notranslate nohighlight">\(\|E\|/\|A\|\)</span> and <span class="math notranslate nohighlight">\(\|e\|/\|b\|\)</span> will be on the order of the machine unit roundoff, <span class="math notranslate nohighlight">\(u\)</span>. In such cases, the term <span class="math notranslate nohighlight">\(\kappa(A)\frac{\|E\|}{\|A\|}\)</span> in the denominator is typically negligible compared to 1, and the bound simplifies to our essential rule of thumb:</p>
+<div class="math notranslate nohighlight">
+\[\text{Relative Forward Error} \lesssim \kappa(A) \times (\text{Relative Backward Error})\]</div>
+</section>
+<section id="mathematical-aside-the-banach-lemma-and-neumann-series">
+<h3>Mathematical Aside: The Banach Lemma and Neumann Series<a class="headerlink" href="#mathematical-aside-the-banach-lemma-and-neumann-series" title="Link to this heading">#</a></h3>
+<p>The inequality used in the proof, <span class="math notranslate nohighlight">\(\|(I+X)^{-1}\| \le \frac{1}{1-\|X\|}\)</span>, is a direct consequence of a result known as the <strong>Banach lemma</strong>.</p>
+<div class="proof lemma admonition" id="lem:banach">
+<p class="admonition-title"><span class="caption-number">Lemma 1 </span> (Banach Lemma)</p>
+<section class="lemma-content" id="proof-content">
+<p>The Banach lemma states that if <span class="math notranslate nohighlight">\(\|X\| &lt; 1\)</span> for some submultiplicative matrix norm, then <span class="math notranslate nohighlight">\((I+X)\)</span> is invertible.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. The intuition comes from the familiar geometric series for scalars: if <span class="math notranslate nohighlight">\(|r|&lt;1\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[(1+r)^{-1} = 1 - r + r^2 - r^3 + \dots.\]</div>
+<p>We can propose a similar series for the matrix inverse, called the Neumann series:</p>
+<div class="math notranslate nohighlight">
+\[(I+X)^{-1} = I - X + X^2 - X^3 + \dots = \sum_{k=0}^{\infty} (-X)^k\]</div>
+<p>This series converges precisely because we assume <span class="math notranslate nohighlight">\(\|X\| &lt; 1\)</span>. Now, we can take the norm of this series to derive the inequality:</p>
+<ol class="arabic">
+<li><p>Take the norm of the series:</p>
+<div class="math notranslate nohighlight">
+\[\|(I+X)^{-1}\| = \left\| \sum_{k=0}^{\infty} (-X)^k \right\|\]</div>
+</li>
+<li><p>Apply the triangle inequality: The norm of a sum is less than or equal to the sum of the norms.</p>
+<div class="math notranslate nohighlight">
+\[\left\| \sum_{k=0}^{\infty} (-X)^k \right\| \le \sum_{k=0}^{\infty} \|(-X)^k\| = \sum_{k=0}^{\infty} \|X\|^k\]</div>
+</li>
+<li><p>Sum the geometric series: The final term is a standard scalar geometric series with ratio <span class="math notranslate nohighlight">\(\|X\| &lt; 1\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\sum_{k=0}^{\infty} \|X\|^k = 1 + \|X\| + \|X\|^2 + \dots = \frac{1}{1-\|X\|}\]</div>
+</li>
+</ol>
+<p>This gives us the desired result:</p>
+<div class="math notranslate nohighlight">
+\[\|(I+X)^{-1}\| \le \frac{1}{1-\|X\|}\]</div>
+</div>
+<p>This lemma is a fundamental tool for perturbation theory, as it allows us to guarantee the invertibility of a perturbed matrix and to bound the norm of its inverse.</p>
+</section>
+</section>
+<section id="backward-error-analysis-of-lu-factorization">
+<h2>Backward Error Analysis of LU Factorization<a class="headerlink" href="#backward-error-analysis-of-lu-factorization" title="Link to this heading">#</a></h2>
+<p>Having established a robust framework for analyzing algorithms, we now apply it to our primary algorithm for solving dense linear systems: <strong>LU factorization</strong>. The process of solving <span class="math notranslate nohighlight">\(Ax=b\)</span> via LU involves two main stages: first, the factorization <span class="math notranslate nohighlight">\(A \approx \tilde{L}\tilde{U}\)</span>, and second, the solution of two triangular systems, <span class="math notranslate nohighlight">\(\tilde{L}y=b\)</span> and <span class="math notranslate nohighlight">\(\tilde{U}\tilde{x}=y\)</span>.</p>
+<p>A detailed analysis, which we will not reproduce here, consolidates the rounding errors from all of these steps into a single backward error result. The computed solution <span class="math notranslate nohighlight">\(\tilde{x}\)</span> is shown to be the exact solution of a nearby system <span class="math notranslate nohighlight">\((A+E)\tilde{x} = b\)</span>. The crucial question is: how large is the backward error matrix <span class="math notranslate nohighlight">\(E\)</span>?</p>
+<section id="the-backward-error-bound">
+<h3>The Backward Error Bound<a class="headerlink" href="#the-backward-error-bound" title="Link to this heading">#</a></h3>
+<div class="proof theorem admonition" id="thm:backward_error_lu">
+<p class="admonition-title"><span class="caption-number">Theorem 13 </span> (Backward Error of LU Factorization)</p>
+<section class="theorem-content" id="proof-content">
+<p>The result of a careful backward error analysis of the LU factorization is the following component-wise bound on the error matrix <span class="math notranslate nohighlight">\(E\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[|E| \le n u (2|A| + 4 |\tilde{L}| |\tilde{U}|) + \mathcal{O}(u^2)\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(|\cdot|\)</span> denotes the matrix of absolute values of the entries, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, and <span class="math notranslate nohighlight">\(\tilde{L}\)</span> and <span class="math notranslate nohighlight">\(\tilde{U}\)</span> are the computed LU factors of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</section>
+</div><p>At first glance, this bound appears complex, but its message is clear. The stability of the algorithm depends entirely on the magnitude of the entries in the computed factors <span class="math notranslate nohighlight">\(\tilde{L}\)</span> and <span class="math notranslate nohighlight">\(\tilde{U}\)</span>. If the entries in <span class="math notranslate nohighlight">\(|\tilde{L}|\)</span> and <span class="math notranslate nohighlight">\(|\tilde{U}|\)</span> are of the same order of magnitude as the entries in <span class="math notranslate nohighlight">\(|A|\)</span>, then <span class="math notranslate nohighlight">\(|E|\)</span> will be on the order of <span class="math notranslate nohighlight">\(u|A|\)</span>, and the algorithm is <strong>backward stable</strong>.</p>
+<p>However, if significant element growth occurs, and the entries of <span class="math notranslate nohighlight">\(|\tilde{L}||\tilde{U}|\)</span> become much larger than those of <span class="math notranslate nohighlight">\(|A|\)</span>, the backward error <span class="math notranslate nohighlight">\(|E|\)</span> can become arbitrarily large. This leads to a critical conclusion:</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Stability of LU Factorization
+LU factorization without a proper pivoting strategy is <strong>not</strong> a backward stable algorithm.</p>
+</div>
+</section>
+<section id="the-mechanism-of-instability-small-pivots">
+<h3>The Mechanism of Instability: Small Pivots<a class="headerlink" href="#the-mechanism-of-instability-small-pivots" title="Link to this heading">#</a></h3>
+<p>This instability is not merely a theoretical concern. Consider the matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+\epsilon &amp; 1 \\
+1 &amp; \pi
+\end{pmatrix}
+\end{split}\]</div>
+<p>The exact LU factors are:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L = \begin{pmatrix}
+1 &amp; 0 \\ \epsilon^{-1} &amp; 1
+\end{pmatrix}, \qquad
+U = \begin{pmatrix}
+\epsilon &amp; 1 \\ 0 &amp; \pi - \epsilon^{-1}
+\end{pmatrix}
+\end{split}\]</div>
+<p>For any small <span class="math notranslate nohighlight">\(\epsilon &gt; 0\)</span>, the entry <span class="math notranslate nohighlight">\(\epsilon^{-1}\)</span> in the <span class="math notranslate nohighlight">\(L\)</span> factor becomes enormous. When this is substituted into our error bound, the term <span class="math notranslate nohighlight">\(|\tilde{L}||\tilde{U}|\)</span> will be dominated by this large element, implying the backward error <span class="math notranslate nohighlight">\(\|E\|\)</span> will be on the order of <span class="math notranslate nohighlight">\(u \cdot \epsilon^{-1}\)</span>. By choosing <span class="math notranslate nohighlight">\(\epsilon\)</span> to be very small (e.g., on the order of machine precision), we can make the backward error arbitrarily large. An algorithm that produces an <span class="math notranslate nohighlight">\(\mathcal{O}(1)\)</span> backward error for a well-conditioned problem is numerically useless.</p>
+<p>The source of these large entries is evident from the mechanics of Gaussian elimination. At each step <span class="math notranslate nohighlight">\(k\)</span>, we compute multipliers by dividing by the pivot element <span class="math notranslate nohighlight">\(a_{kk}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[l_{ik} = \frac{a_{ik}}{a_{kk}}, \quad \text{for } i &gt; k\]</div>
+<p>If a pivot <span class="math notranslate nohighlight">\(a_{kk}\)</span> is very small compared to the entries below it in the same column, the resulting multipliers in <span class="math notranslate nohighlight">\(L\)</span> will be very large, leading directly to the instability captured in the error bound. This is precisely the issue that pivoting strategies are designed to prevent.</p>
+</section>
+<section id="an-intuitive-parallel-with-summation-error">
+<h3>An Intuitive Parallel with Summation Error<a class="headerlink" href="#an-intuitive-parallel-with-summation-error" title="Link to this heading">#</a></h3>
+<p>This result for the backward error of LU factorization should feel familiar. It’s a direct reflection of our earlier analysis of roundoff errors in simple summation, where we found the error bound (see <a class="reference internal" href="floating_point.html#thm:summation_error">Theorem 11</a>):</p>
+<div class="math notranslate nohighlight">
+\[|\Delta S_n| \le n u \sum_{i=1}^n |x_i| + \mathcal{O}(u^2)\]</div>
+<p>This bound taught us a crucial lesson: the accuracy of a sum depends on the <strong>magnitude of the numbers being added</strong>, not just the magnitude of the final result.</p>
+<p>We can see the exact same principle at play in the LU factorization. The process of factorization and, conversely, the reconstruction of the matrix <span class="math notranslate nohighlight">\(A\)</span> from its factors, relies on inner products:</p>
+<div class="math notranslate nohighlight">
+\[a_{ij} = \sum_{k=1}^n l_{ik} u_{kj}\]</div>
+<p>Each entry of <span class="math notranslate nohighlight">\(A\)</span> is the result of a sum. If the entries of <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> are large, then the individual terms <span class="math notranslate nohighlight">\(l_{ik}u_{kj}\)</span> in this sum will be large. Our summation error bound tells us that computing this sum will likely incur a large absolute error.</p>
+<p>The term <span class="math notranslate nohighlight">\(|\tilde{L}||\tilde{U}|\)</span> in the backward error bound for <span class="math notranslate nohighlight">\(E\)</span> is precisely the matrix-level consequence of this fundamental observation. Its entries,</p>
+<div class="math notranslate nohighlight">
+\[(|\tilde{L}||\tilde{U}|)_{ij} = \sum_k |\tilde{l}_{ik}||\tilde{u}_{kj}|,\]</div>
+<p>represent the worst-case sum of magnitudes for the terms that form <span class="math notranslate nohighlight">\(a_{ij}\)</span>. Therefore, the instability we observe when element growth occurs is perfectly consistent with our understanding of basic floating-point operations. Large intermediate numbers are a universal sign of potential numerical instability.</p>
+</section>
+</section>
+<section id="the-solution-lu-factorization-with-partial-pivoting">
+<h2>The Solution: LU Factorization with Partial Pivoting<a class="headerlink" href="#the-solution-lu-factorization-with-partial-pivoting" title="Link to this heading">#</a></h2>
+<p>Now that we have identified the cause of instability in the basic LU algorithm, we can introduce the standard remedy.</p>
+<section id="partial-pivoting">
+<h3>Partial Pivoting<a class="headerlink" href="#partial-pivoting" title="Link to this heading">#</a></h3>
+<p>The instability in Gaussian elimination arises when a pivot element <span class="math notranslate nohighlight">\(a_{kk}\)</span> is small relative to the entries below it. The solution is both simple and elegant: at each step, we must ensure that the pivot is as large as possible.</p>
+<p>This strategy is called <strong>partial pivoting</strong> (or row pivoting). At each step <span class="math notranslate nohighlight">\(k\)</span> of the elimination, the algorithm is modified as follows:</p>
+<ol class="arabic simple">
+<li><p><strong>Search for the largest pivot:</strong> Before performing elimination for column <span class="math notranslate nohighlight">\(k\)</span>, find the entry in that column with the largest absolute value, on or below the diagonal. Let this be <span class="math notranslate nohighlight">\(a_{pk}\)</span>, where <span class="math notranslate nohighlight">\(p \ge k\)</span>.</p></li>
+<li><p><strong>Swap rows:</strong> Interchange row <span class="math notranslate nohighlight">\(p\)</span> with the current pivot row, row <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><strong>Eliminate:</strong> Proceed with elimination as usual, now using the largest possible pivot for that column.</p></li>
+</ol>
+<p>By construction, this strategy guarantees that the pivot <span class="math notranslate nohighlight">\(a_{kk}\)</span> is the largest entry (in magnitude) in its column among all rows not yet used as pivot rows. This has a crucial consequence for the multipliers:</p>
+<div class="math notranslate nohighlight">
+\[|l_{ik}| = \frac{|a_{ik}|}{|a_{kk}|} \le 1 \quad \text{for } i &gt; k\]</div>
+<p>This simple change prevents the uncontrolled growth of elements in the <span class="math notranslate nohighlight">\(L\)</span> factor.</p>
+</section>
+<section id="the-pa-lu-factorization">
+<h3>The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization<a class="headerlink" href="#the-pa-lu-factorization" title="Link to this heading">#</a></h3>
+<p>The systematic swapping of rows can be represented mathematically by a <strong>permutation matrix</strong> <span class="math notranslate nohighlight">\(P\)</span>. A permutation matrix is an identity matrix with its rows reordered. Pre-multiplying a matrix <span class="math notranslate nohighlight">\(A\)</span> by <span class="math notranslate nohighlight">\(P\)</span> (i.e., forming <span class="math notranslate nohighlight">\(PA\)</span>) has the effect of applying those same row permutations to <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>Therefore, LU factorization with partial pivoting does not compute the factors of <span class="math notranslate nohighlight">\(A\)</span> itself, but rather of a row-permuted version of <span class="math notranslate nohighlight">\(A\)</span>. The resulting factorization is:</p>
+<div class="math notranslate nohighlight">
+\[PA = LU\]</div>
+<p>This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the <span class="math notranslate nohighlight">\(PA=LU\)</span> factorization <strong>exists for any square matrix A</strong>, singular or not.</p>
+</section>
+<section id="the-unstable-example-stabilized">
+<h3>The Unstable Example, Stabilized<a class="headerlink" href="#the-unstable-example-stabilized" title="Link to this heading">#</a></h3>
+<p>Let us apply this strategy to the matrix that previously demonstrated instability:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+\epsilon &amp; 1 \\
+1 &amp; \pi
+\end{pmatrix}
+\end{split}\]</div>
+<p>At the first step, the pivot candidates in the first column are <span class="math notranslate nohighlight">\(\epsilon\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Since <span class="math notranslate nohighlight">\(|1| &gt; |\epsilon|\)</span>, the partial pivoting strategy mandates a swap of row 1 and row 2. The permutation matrix and the resulting permuted matrix are:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P = \begin{pmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{pmatrix}, \qquad PA = \begin{pmatrix} 1 &amp; \pi \\ \epsilon &amp; 1 \end{pmatrix}\end{split}\]</div>
+<p>Now, we perform LU factorization on <span class="math notranslate nohighlight">\(PA\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+L = \begin{pmatrix}
+1 &amp; 0 \\ \epsilon &amp; 1
+\end{pmatrix}, \qquad
+U = \begin{pmatrix}
+1 &amp; \pi \\ 0 &amp; 1 - \epsilon \pi
+\end{pmatrix}
+\end{split}\]</div>
+<p>The enormous <span class="math notranslate nohighlight">\(\epsilon^{-1}\)</span> term has vanished. All entries in <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> are of moderate size. The backward error is now proportional to <span class="math notranslate nohighlight">\(u\)</span>, rendering the algorithm <strong>backward stable</strong> for this problem.</p>
+</section>
+<section id="a-final-word-on-stability">
+<h3>A Final Word on Stability<a class="headerlink" href="#a-final-word-on-stability" title="Link to this heading">#</a></h3>
+<p>It is crucial to note that while partial pivoting guarantees <span class="math notranslate nohighlight">\(|l_{ik}| \le 1\)</span>, it does <em>not</em> offer a mathematical guarantee that the entries of the <span class="math notranslate nohighlight">\(U\)</span> factor will not grow large. It is possible to construct matrices where significant element growth still occurs in <span class="math notranslate nohighlight">\(U\)</span>.</p>
+<p>An example of a matrix that can cause large element growth is provided below, along with a discussion of the theoretical worst-case growth factor.</p>
+<p>However, decades of practical experience have shown that such cases are exceptionally rare. For the vast majority of problems encountered in science and engineering, LU with partial pivoting is a remarkably robust and accurate algorithm. It is the gold standard for solving dense linear systems directly.</p>
+</section>
+<section id="an-example-of-element-growth">
+<h3>An Example of Element Growth<a class="headerlink" href="#an-example-of-element-growth" title="Link to this heading">#</a></h3>
+<p>A classic example of a matrix that exhibits significant element growth in its <span class="math notranslate nohighlight">\(U\)</span> factor, even with partial pivoting, is one with 1s on the diagonal, -1s in the lower triangle, and 1s in the last column.</p>
+<p>The theoretical worst-case growth factor for an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix is <span class="math notranslate nohighlight">\(2^{n-1}\)</span>.</p>
+<p>Consider the following <span class="math notranslate nohighlight">\(4 \times 4\)</span> matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A =
+\begin{pmatrix}
+\phantom{-}1 &amp; \phantom{-}0 &amp; \phantom{-}0 &amp; 1 \\
+-1 &amp; \phantom{-}1 &amp; \phantom{-}0 &amp; 1 \\
+-1 &amp; -1 &amp; \phantom{-}1 &amp; 1 \\
+-1 &amp; -1 &amp; -1 &amp; 1
+\end{pmatrix}
+\end{split}\]</div>
+<p>When you apply LU factorization with <strong>row pivoting</strong> to this matrix, the pivoting strategy does nothing. At each step, the largest element in the column is already on the diagonal (its magnitude is 1), so no row swaps occur.</p>
+<p>However, the elimination steps cause the entries in the last column to double at each stage. The resulting upper triangular matrix <span class="math notranslate nohighlight">\(U\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+U =
+\begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 1 \\
+0 &amp; 1 &amp; 0 &amp; 2 \\
+0 &amp; 0 &amp; 1 &amp; 4 \\
+0 &amp; 0 &amp; 0 &amp; 8
+\end{pmatrix}
+\end{split}\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} L = \begin{pmatrix} \phantom{-}1 &amp; \phantom{-}0 &amp; \phantom{-}0 &amp; 0 \\ -1 &amp; \phantom{-}1 &amp; \phantom{-}0 &amp; 0 \\ -1 &amp; -1 &amp; \phantom{-}1 &amp; 0 \\ -1 &amp; -1 &amp; -1 &amp; 1 \end{pmatrix}\end{split}\]</div>
+<p>The largest element in the original matrix <span class="math notranslate nohighlight">\(A\)</span> was 1, but the largest element in the computed factor <span class="math notranslate nohighlight">\(U\)</span> has grown to 8. This demonstrates significant element growth despite the use of row pivoting.</p>
+</section>
+<section id="the-worst-case-growth-factor">
+<h3>The Worst-Case Growth Factor<a class="headerlink" href="#the-worst-case-growth-factor" title="Link to this heading">#</a></h3>
+<p>The example above illustrates the general worst-case scenario. For an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix of this type, the bottom-right element of the matrix <span class="math notranslate nohighlight">\(U\)</span> will grow to <span class="math notranslate nohighlight">\(2^{n-1}\)</span>.</p>
+<p>The <strong>growth factor</strong> is defined as the ratio of the largest element (in magnitude) in the computed factors to the largest element in the original matrix:</p>
+<div class="math notranslate nohighlight">
+\[\rho_n = \frac{\max_{i,j} |u_{ij}|}{\max_{i,j} |a_{ij}|}\]</div>
+<p>For LU with row pivoting, the proven worst-case bound for this growth factor is:</p>
+<div class="math notranslate nohighlight">
+\[\rho_n = 2^{n-1}\]</div>
+<p>This exponential growth is a sobering theoretical result. It implies that for a large matrix (e.g., <span class="math notranslate nohighlight">\(n=50\)</span>), the entries could theoretically become larger by a factor of <span class="math notranslate nohighlight">\(2^{49}\)</span>, leading to a catastrophic loss of accuracy.</p>
+<p>Fortunately, this worst-case behavior is almost never seen in practice. Matrices that exhibit this exponential growth are highly contrived and do not typically arise from real-world problems. For most practical applications, the growth factor remains small, making LU with row pivoting a very reliable and stable algorithm.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="floating_point.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Floating-Point Numbers</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-analysis-of-numerical-error-forward-and-backward-perspectives">The Analysis of Numerical Error: Forward and Backward Perspectives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-error-analysis-a-direct-but-impractical-question">Forward Error Analysis: A Direct but Impractical Question</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-analysis-the-easy-path-of-verifying">Backward Error Analysis: The Easy Path of ‘Verifying’</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sensitivity-analysis-bridging-backward-and-forward-error">Sensitivity Analysis: Bridging Backward and Forward Error</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formalizing-sensitivity">Formalizing Sensitivity</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#condition-number-sensitivity-for-linear-systems">Condition Number: Sensitivity for Linear Systems</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perturbation-of-the-right-hand-side-b">Perturbation of the Right-Hand Side <code class="docutils literal notranslate"><span class="pre">b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#perturbation-of-the-matrix-a">Perturbation of the Matrix <code class="docutils literal notranslate"><span class="pre">A</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-number">The Condition Number</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-perturbation-theorem">The General Perturbation Theorem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation">Interpretation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-aside-the-banach-lemma-and-neumann-series">Mathematical Aside: The Banach Lemma and Neumann Series</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-analysis-of-lu-factorization">Backward Error Analysis of LU Factorization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-backward-error-bound">The Backward Error Bound</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-mechanism-of-instability-small-pivots">The Mechanism of Instability: Small Pivots</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-intuitive-parallel-with-summation-error">An Intuitive Parallel with Summation Error</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-partial-pivoting">The Solution: LU Factorization with Partial Pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-pivoting">Partial Pivoting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-final-word-on-stability">A Final Word on Stability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-of-element-growth">An Example of Element Growth</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-worst-case-growth-factor">The Worst-Case Growth Factor</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

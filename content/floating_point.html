@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -63,7 +63,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/floating_point';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="next" title="LU Factorization with Row Pivoting" href="lu_pivoting.html" />
     <link rel="prev" title="Existence and Uniqueness of LU Factorization" href="existence_lu.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -202,6 +202,7 @@
 <li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -653,9 +654,15 @@ Exponent of the result&#39;s leading digit: -3
 <p>…</p>
 <p><span class="math notranslate nohighlight">\(\tilde{S}_k = fl(\tilde{S}_{k-1} + x_k)\)</span></p>
 <p>Each step introduces a small roundoff error. A rigorous analysis shows that the error in the final computed sum, <span class="math notranslate nohighlight">\(\Delta S_n = |S_n - \tilde{S}_n|\)</span>, is bounded by approximately:</p>
+<div class="proof theorem admonition" id="thm:summation_error">
+<p class="admonition-title"><span class="caption-number">Theorem 11 </span> (Error Bound for Summation)</p>
+<section class="theorem-content" id="proof-content">
+<p>The absolute error in the computed sum of <span class="math notranslate nohighlight">\(n\)</span> numbers using the standard algorithm is bounded by</p>
 <div class="math notranslate nohighlight">
 \[|\Delta S_n| \le n u \sum_{i=1}^n |x_i| + O(u^2)\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff of the machine. Let us dissect this formula. It tells us that the absolute error of the computed sum depends on:</p>
+<p>Here, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff of the machine.</p>
+</section>
+</div><p>Let us dissect this formula. It tells us that the absolute error of the computed sum depends on:</p>
 <ol class="arabic simple">
 <li><p><strong><span class="math notranslate nohighlight">\(n\)</span></strong>: The number of terms. The error grows, at worst, linearly with the length of the sum.</p></li>
 <li><p><strong><span class="math notranslate nohighlight">\(u\)</span></strong>: The machine precision. A more precise machine reduces the error.</p></li>
@@ -849,11 +856,11 @@ Unstable sum x^2 - 2x + 1:    0e-15
       </div>
     </a>
     <a class="right-next"
-       href="LICENSE.html"
+       href="lu_pivoting.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">License for this book</p>
+        <p class="prev-next-title">LU Factorization with Row Pivoting</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
