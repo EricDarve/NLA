@@ -53,6 +53,12 @@ $$
 * $\det(Q) = +1$: The transformation is a **rotation** (a proper rotation). It preserves the orientation of the space. The set of these matrices forms the **special orthogonal group SO(n)**.
 * $\det(Q) = -1$: The transformation is a **reflection** or an **improper rotation** (e.g., a reflection followed by a rotation). It reverses the orientation of the space.
 
+**Why They Are So Important in NLA**
+
+* **Numerical Stability:** This is their most critical application. Because orthogonal matrices don't amplify the magnitude of vectors, they also don't amplify numerical rounding errors that occur during computations. Algorithms built with orthogonal matrices (like QR factorization and SVD) are exceptionally stable and reliable.
+* **Computational Efficiency:** As mentioned, finding the inverse is trivial. This makes any algorithm that would otherwise require a matrix inversion much faster if orthogonal matrices are involved.
+* **Problem Simplification:** They are the perfect tool for rotating a coordinate system to simplify a problem. In NLA, they are used to transform complex matrices into simpler (e.g., triangular or diagonal) forms while preserving essential properties like eigenvalues, which is a core strategy for solving many difficult problems.
+
 ## The Cartan–Dieudonné Theorem
 
 The **Cartan–Dieudonné theorem** is a fundamental result in geometry that provides a simple, constructive way to think about orthogonal transformations. It states that any orthogonal transformation can be broken down into a series of simpler reflections.

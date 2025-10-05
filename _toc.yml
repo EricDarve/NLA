@@ -20,5 +20,12 @@ chapters:
   - file: content/normal_matrices.md
   - file: content/applications_of_eigenvalues.md
   - file: content/singular_value_decomposition.md
+  - file: content/eigen_vs_singular_values.md
   - file: content/summary_of_matrix_decompositions.md
+- file: content/solving_linear_systems
+  sections:
+  - file: content/lu_decomposition.md
+  - file: content/existence_lu.md
+  - file: content/floating_point.md
+  - file: content/lu_pivoting.md
 - file: content/LICENSE.md

@@ -153,6 +153,21 @@ $$
 
 As $p \to \infty$, the $p$-norm unit ball transitions from “diamond-like” (near $p=1$) to “square-like” (as $p \to \infty$).
 
+## Why Different Norms Matter
+
+- **Geometric Interpretation in Optimization:** The choice of norm is critical in optimization and machine learning, as it defines the geometry of the "constraint region" for your solution. In many problems, we minimize a loss function subject to a constraint that the solution vector's norm must be small ($
+\|x\|_p \le C$). The optimal solution is often found where the level curves of the loss function first touch the boundary of this constraint region (the "norm ball").
+
+- **Inducing Sparsity ($p \le 1$):**
+    * The L1-norm ($\|x\|_1$) constraint region is shaped like a diamond (or hyper-diamond in higher dimensions), with sharp corners that lie on the axes.     
+    * Because of these corners, the expanding level curves of the loss function are most likely to make contact at a point on an axis.
+    * A point on an axis means that the other components of the vector are zero. This is why L1 regularization (used in LASSO) produces **sparse solutions**, which is useful for feature selection.
+
+- **Encouraging Small, Non-Zero Values ($p \ge 2$):**
+    * The L2-norm ($\|x\|_2$) constraint region is a circle (or hypersphere), which is perfectly round and has no corners. The solution can occur anywhere on its surface.
+    * This norm penalizes large values heavily ($x_i^2$), so it tends to find solutions where all components are small and non-zero rather than forcing some to be exactly zero. This is the basis for Ridge Regression.
+    * For norms with $p>2$, the penalty on large components is even more severe, further encouraging solutions where all entries have similar, non-zero magnitudes.
+
 ## Cauchy–Schwarz and Hölder Inequalities
 
 **Hölder’s inequality:**  
@@ -168,6 +183,11 @@ Special case $p = q = 2$:
 $$
 |x^T y| \le \|x\|_2 \, \|y\|_2.
 $$
+
+**Why is This Bound Important?**
+
+- **Proving Algorithm Convergence:** Many iterative algorithms in NLA work by generating a sequence of vectors that get progressively closer to a solution. The Cauchy-Schwarz inequality is often used to prove that the **error** at each step is decreasing, guaranteeing that the algorithm will eventually converge.
+- **Geometric Insight:** The inequality has a clear geometric meaning. The dot product is maximized when the vectors are perfectly aligned ($\theta = 0$ or $\pi$) and is zero when they are orthogonal. This intuition is invaluable when developing new algorithms. 
 
 ## Application: Pythagorean Theorem
 

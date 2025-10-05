@@ -64,11 +64,11 @@ This algebraic proof avoids the use of determinants.
 
 4.  By the Fundamental Theorem of Algebra, we can factor the polynomial $P(z)$ in terms of its roots $\lambda_1, \dots, \lambda_k$ (where $k \le n$):
 
-    $$P(z) = c_n(z - \lambda_1)(z - \lambda_2)\cdots(z - \lambda_k)$$
+    $$P(z) = c_k(z - \lambda_1)(z - \lambda_2)\cdots(z - \lambda_k)$$
 
 5.  Substituting the matrix $A$ back into this factored form gives:
 
-    $$c_n(A - \lambda_1 I)(A - \lambda_2 I)\cdots(A - \lambda_k I)x = 0$$
+    $$c_k(A - \lambda_1 I)(A - \lambda_2 I)\cdots(A - \lambda_k I)x = 0$$
 
 6.  Let's read this expression from right to left. Let $v_k = x$, $v_{k-1} = (A - \lambda_k I)v_k$, $v_{k-2} = (A - \lambda_{k-1} I)v_{k-1}$, and so on. Since the final result is the zero vector, and we started with a non-zero vector $x$, there must be some step where a non-zero vector was transformed into the zero vector.
 
@@ -135,6 +135,12 @@ The existence of the Schur decomposition can be proven by induction on the size 
         $$
 
 ````
+
+### Why It's So Important for Computation
+
+* **It's How We Actually Find Eigenvalues:** State-of-the-art numerical methods (like the famous QR algorithm) do not try to compute the eigendecomposition directly. Instead, they are designed to reliably and stably compute the **Schur decomposition**.
+* **A Stable Pathway:** Once the Schur form is found, the eigenvalues can be simply read off the diagonal of $T$. If the eigenvectors are also needed, they can be calculated from $Q$ and $T$. The Schur decomposition is the practical and stable **pathway** to finding eigenvalues and eigenvectors.
+* **The Power of $Q$:** The reason this approach works so well is the presence of the orthogonal matrix $Q$. Because orthogonal transformations preserve length, they don't amplify rounding errors during computation. This makes the entire process **numerically stable** and trustworthy.
 
 ## The Real Schur Decomposition
 
