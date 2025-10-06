@@ -44,6 +44,20 @@ $$x_i = \frac{1}{l_{ii}} \Big( b_i - \sum_{j=1}^{i-1} l_{ij} x_j \Big)$$
 
 This process is well-defined as long as all diagonal entries $l_{ii}$ are non-zero, which is guaranteed if $L$ is invertible.
 
+```python
+import numpy as np
+
+def forward_substitution(L: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """
+    Solves the lower triangular system Lx = b using forward substitution.
+    """
+    n = L.shape[0]
+    x = np.zeros_like(b)
+    for i in range(n):
+        x[i] = (b[i] - L[i, :i] @ x[:i]) / L[i, i]
+    return x
+```
+
 
 ### Upper Triangular Systems: Backward Substitution
 
@@ -287,6 +301,30 @@ The algorithm constructs the columns of $L$ and the rows of $U$ iteratively, fro
     Specifically, this update only affects the submatrix to the lower right of the pivot, from row and column $k+1$ to $n$.
 
 This loop continues until all columns of $L$ and rows of $U$ are determined. In a typical implementation, the computed values for $L$ (below the diagonal) and $U$ (on and above the diagonal) are stored directly in the matrix $A$ to save space.
+
+### In-Place LU Factorization (no pivoting)
+
+The factors are stored in A: the strict lower triangle holds L (with unit diagonal), and the upper triangle holds U.
+
+```python
+import numpy as np
+def lu_inplace(A: np.ndarray) -> np.ndarray:
+    """
+    Performs in-place LU factorization (Doolittle, no pivoting) and overwrites the input matrix A.
+    On exit:
+      - L is in the strict lower triangle with implicit unit diagonal
+      - U is in the upper triangle (including diagonal)
+    Assumes:
+      - All pivots are nonzero
+      - No pivoting is performed (numerically unstable for some matrices)
+    """
+    n = A.shape[0]
+    for k in range(n-1):
+        # Update the k-th column of L
+        A[k+1:n, k] /= A[k, k]
+        # Rank-one update of the trailing submatrix
+        A[k+1:n, k+1:n] -= np.outer(A[k+1:n, k], A[k, k+1:n])
+```
 
 ### The Pivot Problem: When Things Go Wrong 🚧
 

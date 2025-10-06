@@ -375,6 +375,41 @@ $$PA = LU$$
 
 This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the $PA=LU$ factorization **exists for any square matrix A**, singular or not.
 
+### Implementing LU with Partial Pivoting
+
+Below is a simple implementation of LU factorization with partial pivoting in Python. The function modifies the input matrix `A` in place to store the factors `L` and `U`, and returns the permutation matrix `P`.
+
+```python
+import numpy as np
+
+def lu_factorization_with_row_pivoting(A):
+    """
+    Perform LU factorization with row (partial) pivoting in place.
+    On exit, A stores L (unit lower, diagonal = 1 implicit) in its strictly 
+    lower triangle and U in its upper triangle. 
+    Returns P such that P @ A_orig = L @ U.
+    """
+    n = A.shape[0]
+    P = np.eye(n, dtype=A.dtype)
+
+    for k in range(n - 1):
+        # Pivot: index of max |A[i,k]| for i >= k
+        p = k + np.argmax(np.abs(A[k:, k]))
+        if p != k:
+            A[[k, p], :] = A[[p, k], :]
+            P[[k, p], :] = P[[p, k], :]
+
+        if A[k, k] == 0:
+            continue # Skip elimination
+
+        # Update the k-th column of L
+        A[k+1:n, k] /= A[k, k]
+        # Rank-one update of the trailing submatrix
+        A[k+1:n, k+1:n] -= np.outer(A[k+1:n, k], A[k, k+1:n])
+
+    return P
+```
+
 ### The Unstable Example, Stabilized
 
 Let us apply this strategy to the matrix that previously demonstrated instability:
