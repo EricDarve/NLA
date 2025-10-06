@@ -28,4 +28,5 @@ chapters:
   - file: content/existence_lu.md
   - file: content/floating_point.md
   - file: content/lu_pivoting.md
+  - file: content/cholesky.md
 - file: content/LICENSE.md
