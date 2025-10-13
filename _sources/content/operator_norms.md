@@ -81,18 +81,18 @@ $$\|A\|_{\text{max}} = \max_{ij} |a_{ij}|$$
 
 The Schatten $p$-norm is defined by applying the vector $p$-norm to the vector of the matrix's singular values, $\sigma_i$.
 
-$$\|A\|_p = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}$$
+$$\|A\|_{S,p} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}$$
 
 This family generalizes several important norms:
 
 * **Schatten 1-Norm (Nuclear Norm or Trace Norm)**: The sum of the singular values. It's widely used in machine learning for matrix completion and rank minimization problems.
 
-    $$\|A\|_* = \sum_{i=1}^{\min(m,n)} \sigma_i$$
+    $$\|A\|_{S,1} = \sum_{i=1}^{\min(m,n)} \sigma_i$$
 
 * **Schatten 2-Norm**: The square root of the sum of the squares of the singular values. This is exactly the same as the **Frobenius norm**.
 
-    $$\|A\|_2 = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^2 \right)^{1/2} = \|A\|_F$$
+    $$\|A\|_{S,2} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^2 \right)^{1/2} = \|A\|_F$$
 
 * **Schatten $\infty$-Norm**: The limit as $p \to \infty$, which is simply the largest singular value. This is exactly the same as the **spectral norm (operator 2-norm)**.
 
-    $$\|A\|_\infty = \max_i \sigma_i = \|A\|_2$$
+    $$\|A\|_{S,\infty} = \max_i \sigma_i = \|A\|_2$$

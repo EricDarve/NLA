@@ -206,6 +206,9 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
 </ul>
 
@@ -457,20 +460,20 @@ document.write(`
 <h2>Schatten Norms (based on singular values)<a class="headerlink" href="#schatten-norms-based-on-singular-values" title="Link to this heading">#</a></h2>
 <p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norm is defined by applying the vector <span class="math notranslate nohighlight">\(p\)</span>-norm to the vector of the matrix’s singular values, <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_p = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}\]</div>
+\[\|A\|_{S,p} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}\]</div>
 <p>This family generalizes several important norms:</p>
 <ul>
 <li><p><strong>Schatten 1-Norm (Nuclear Norm or Trace Norm)</strong>: The sum of the singular values. It’s widely used in machine learning for matrix completion and rank minimization problems.</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_* = \sum_{i=1}^{\min(m,n)} \sigma_i\]</div>
+\[\|A\|_{S,1} = \sum_{i=1}^{\min(m,n)} \sigma_i\]</div>
 </li>
 <li><p><strong>Schatten 2-Norm</strong>: The square root of the sum of the squares of the singular values. This is exactly the same as the <strong>Frobenius norm</strong>.</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_2 = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^2 \right)^{1/2} = \|A\|_F\]</div>
+\[\|A\|_{S,2} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^2 \right)^{1/2} = \|A\|_F\]</div>
 </li>
 <li><p><strong>Schatten <span class="math notranslate nohighlight">\(\infty\)</span>-Norm</strong>: The limit as <span class="math notranslate nohighlight">\(p \to \infty\)</span>, which is simply the largest singular value. This is exactly the same as the <strong>spectral norm (operator 2-norm)</strong>.</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_\infty = \max_i \sigma_i = \|A\|_2\]</div>
+\[\|A\|_{S,\infty} = \max_i \sigma_i = \|A\|_2\]</div>
 </li>
 </ul>
 </section>

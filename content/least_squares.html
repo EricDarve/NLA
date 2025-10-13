@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Determinant &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Least Squares Problems &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/determinants';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/least_squares';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Trace of a Matrix" href="trace.html" />
-    <link rel="prev" title="The Sherman-Morrison-Woodbury Formula" href="sherman_morrison_woodbury.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Cholesky Factorization" href="cholesky.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,14 +177,14 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -264,7 +264,7 @@
       
       
       
-      <li><a href="../_sources/content/determinants.md" target="_blank"
+      <li><a href="../_sources/content/least_squares.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -348,7 +348,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Determinant</h1>
+    <h1>Least Squares Problems</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -358,9 +358,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-overdetermined-systems">The Problem: Overdetermined Systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-paths-to-a-solution">Three Paths to a Solution</a></li>
 </ul>
             </nav>
         </div>
@@ -372,44 +371,37 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="the-determinant">
-<h1>The Determinant<a class="headerlink" href="#the-determinant" title="Link to this heading">#</a></h1>
-<p>The <strong>determinant</strong> is a fundamental concept in linear algebra that associates a single scalar value with every square matrix. This value, denoted as <span class="math notranslate nohighlight">\(\det(A)\)</span> or <span class="math notranslate nohighlight">\(|A|\)</span>, encapsulates important properties of the matrix and the linear transformation it represents. It can be uniquely defined by four key properties.</p>
-<ol class="arabic simple">
-<li><p><strong>Identity Matrix</strong>: The determinant of the identity matrix is 1, i.e., <span class="math notranslate nohighlight">\(\det(I) = 1\)</span>.</p></li>
-<li><p><strong>Column Swaps</strong>: Exchanging two columns of a matrix multiplies its determinant by -1.</p></li>
-<li><p><strong>Scalar Multiplication</strong>: Multiplying a single column by a scalar <span class="math notranslate nohighlight">\(\alpha\)</span> multiplies the entire determinant by <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
-<li><p><strong>Column Operations</strong>: Adding a multiple of one column to another column does not change the determinant.</p></li>
-</ol>
-<section id="the-leibniz-formula">
-<h2>The Leibniz Formula<a class="headerlink" href="#the-leibniz-formula" title="Link to this heading">#</a></h2>
-<p>While the properties above define the determinant, it can be calculated explicitly using the <strong>Leibniz formula</strong>. This formula sums over all possible permutations of the matrix’s column indices.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="least-squares-problems">
+<h1>Least Squares Problems<a class="headerlink" href="#least-squares-problems" title="Link to this heading">#</a></h1>
+<p>In this chapter, we’re diving into one of the most fundamental and widely applied problems in all of computational science and engineering: the <strong>linear least-squares problem</strong>. This problem arises whenever we have more data than parameters to describe it—a situation that’s incredibly common in data fitting, machine learning, and statistical modeling.</p>
+<section id="the-problem-overdetermined-systems">
+<h2>The Problem: Overdetermined Systems<a class="headerlink" href="#the-problem-overdetermined-systems" title="Link to this heading">#</a></h2>
+<p>Consider the familiar equation <span class="math notranslate nohighlight">\(Ax = b\)</span>. We’ve spent some time on cases where <span class="math notranslate nohighlight">\(A\)</span> is a square, invertible matrix, which guarantees a unique solution. But what happens when <span class="math notranslate nohighlight">\(A\)</span> is a “tall and skinny” matrix, meaning it’s an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with more rows than columns (<span class="math notranslate nohighlight">\(m &gt; n\)</span>)? This is called an <strong>overdetermined system</strong>.</p>
+<p>In this scenario, the vector <span class="math notranslate nohighlight">\(b\)</span> generally does not lie in the column space of <span class="math notranslate nohighlight">\(A\)</span>. As a result, there is <strong>no exact solution</strong> <span class="math notranslate nohighlight">\(x\)</span> that satisfies <span class="math notranslate nohighlight">\(Ax = b\)</span>. The system is inconsistent.</p>
+<p>So, what do we do? We find the next best thing. If we can’t find an <span class="math notranslate nohighlight">\(x\)</span> that makes the residual vector <span class="math notranslate nohighlight">\(r = b - Ax\)</span> exactly zero, we find an <span class="math notranslate nohighlight">\(x\)</span> that makes the residual as small as possible. We measure the “size” of the residual using its 2-norm, which leads to the formal definition of the least-squares problem:</p>
+<p>Find <span class="math notranslate nohighlight">\(x^*\)</span> such that</p>
 <div class="math notranslate nohighlight">
-\[
-\det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma)
-a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
-\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(S_n\)</span> is the set of all permutations of the numbers <span class="math notranslate nohighlight">\(\{1, 2, \dots, n\}\)</span>, and <span class="math notranslate nohighlight">\(\text{sgn}(\sigma)\)</span> is the <strong>signature</strong> of the permutation <span class="math notranslate nohighlight">\(\sigma\)</span>. The signature is +1 if the permutation can be formed by an even number of swaps and -1 if it requires an odd number of swaps.</p>
+\[\| Ax^* - b \|_2 = \min_{x \in \mathbb{R}^n} \| Ax - b \|_2.\]</div>
+<p>Geometrically, this means we are seeking the vector <span class="math notranslate nohighlight">\(Ax^*\)</span> in the column space of <span class="math notranslate nohighlight">\(A\)</span> that is closest to <span class="math notranslate nohighlight">\(b\)</span>. This vector is, in fact, the orthogonal projection of <span class="math notranslate nohighlight">\(b\)</span> onto the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 </section>
-<section id="key-properties">
-<h2>Key Properties<a class="headerlink" href="#key-properties" title="Link to this heading">#</a></h2>
-<p>The determinant has several crucial properties that are used throughout mathematics and its applications.</p>
+<section id="three-paths-to-a-solution">
+<h2>Three Paths to a Solution<a class="headerlink" href="#three-paths-to-a-solution" title="Link to this heading">#</a></h2>
+<p>In this section of the course, we will explore several powerful methods for solving this problem, each with its own strengths and trade-offs. We will cover three main approaches:</p>
+<ol class="arabic simple">
+<li><p><strong>The Normal Equations</strong>: Our first method is a classic one derived from calculus. By setting the gradient of the squared residual, <span class="math notranslate nohighlight">\(\|Ax - b\|_2^2\)</span>, to zero, we arrive at the square <span class="math notranslate nohighlight">\(n \times n\)</span> linear system <span class="math notranslate nohighlight">\((A^T A) x = A^T b\)</span>. These are the <strong>normal equations</strong>. While elegant and conceptually simple, this approach can suffer from numerical instability. The issue is that the condition number of <span class="math notranslate nohighlight">\(A^T A\)</span> is the square of the condition number of <span class="math notranslate nohighlight">\(A\)</span>, which can amplify rounding errors in our computations.</p></li>
+<li><p><strong>The QR Factorization</strong>: To develop a more numerically robust method, we will turn to orthogonal factorization. The core idea is to decompose our matrix <span class="math notranslate nohighlight">\(A\)</span> into the product of an <strong>orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span></strong> and an <strong>upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span></strong>, so that <span class="math notranslate nohighlight">\(A = QR\)</span>. This is an incredibly powerful approach. Since orthogonal matrices preserve the 2-norm, the least-squares problem is transformed into solving a simple and well-behaved triangular system <span class="math notranslate nohighlight">\(Rx = Q^T b\)</span>. We will learn three distinct algorithms to compute this factorization:</p>
 <ul class="simple">
-<li><p><strong>Transpose</strong>: The determinant of a matrix is equal to the determinant of its transpose: <span class="math notranslate nohighlight">\(\det(A) = \det(A^T)\)</span>.</p></li>
-<li><p><strong>Multiplicativity</strong>: The determinant of a product of matrices is the product of their determinants: <span class="math notranslate nohighlight">\(\det(AB) = \det(A)\det(B)\)</span>.</p></li>
-<li><p><strong>Inverse</strong>: The determinant of an inverse matrix is the reciprocal of the original determinant: <span class="math notranslate nohighlight">\(\det(A^{-1}) = \det(A)^{-1}\)</span>.</p></li>
-<li><p><strong>Singularity</strong>: A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>singular</strong> (i.e., not invertible) if and only if its determinant is zero: <span class="math notranslate nohighlight">\(\det(A) = 0\)</span>.</p></li>
-<li><p><strong>Triangular Matrices</strong>: If <span class="math notranslate nohighlight">\(A\)</span> is a triangular (upper or lower) matrix, its determinant is simply the product of its diagonal entries: <span class="math notranslate nohighlight">\(\det(A) = \prod_{i=1}^n a_{ii}\)</span>.</p></li>
+<li><p><strong>Householder Reflections</strong>: The stable, efficient workhorse algorithm for QR decomposition of dense matrices.</p></li>
+<li><p><strong>Givens Rotations</strong>: A tool for selectively introducing zeros, which is particularly useful for sparse matrices or parallel computing architectures.</p></li>
+<li><p><strong>Gram-Schmidt Orthogonalization</strong>: A conceptually straightforward method that builds the orthogonal basis step-by-step. It is most suitable for very thin matrices.</p></li>
 </ul>
+</li>
+<li><p><strong>The Singular Value Decomposition (SVD)</strong>: Our final approach is the most powerful and general of all. What if the columns of <span class="math notranslate nohighlight">\(A\)</span> are not linearly independent, making the matrix <strong>rank-deficient</strong>? In this case, there are infinitely many solutions to the least-squares problem. The SVD provides a definitive answer. It allows us to solve the least-squares problem for <em>any</em> matrix <span class="math notranslate nohighlight">\(A\)</span>, regardless of its shape or rank. This will lead us to the concept of the <strong>pseudo-inverse</strong>, which gives us the unique solution <span class="math notranslate nohighlight">\(x^*\)</span> that not only minimizes the residual but also has the smallest possible 2-norm.</p></li>
+</ol>
+<p>Mastering these techniques will provide you with essential tools used in countless modern applications, from GPS navigation and image processing to the foundations of data science and machine learning.</p>
 </section>
-<section id="geometric-interpretation">
-<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
-<p>Geometrically, the determinant represents the <strong>signed volume</strong> of the <span class="math notranslate nohighlight">\(n\)</span>-dimensional parallelepiped formed by the column vectors of the matrix.</p>
-<ul class="simple">
-<li><p>The <strong>absolute value</strong> of the determinant, <span class="math notranslate nohighlight">\(|\det(A)|\)</span>, gives the scaling factor of the transformation. For instance, in 2D, it’s the area of the parallelogram formed by the column vectors. In 3D, it’s the volume of the parallelepiped.</p></li>
-<li><p>The <strong>sign</strong> of the determinant indicates whether the transformation preserves or reverses the orientation of space. A positive determinant preserves orientation (like a rotation), while a negative determinant reverses it (like a reflection).</p></li>
-</ul>
-</section>
+<div class="toctree-wrapper compound">
+</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -443,20 +435,20 @@ a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sherman_morrison_woodbury.html"
+       href="cholesky.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Sherman-Morrison-Woodbury Formula</p>
+        <p class="prev-next-title">Cholesky Factorization</p>
       </div>
     </a>
     <a class="right-next"
-       href="trace.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Trace of a Matrix</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -476,9 +468,8 @@ a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-overdetermined-systems">The Problem: Overdetermined Systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-paths-to-a-solution">Three Paths to a Solution</a></li>
 </ul>
   </nav></div>
 
