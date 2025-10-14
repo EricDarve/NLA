@@ -1,4 +1,5 @@
 ```
 source .venv/bin/activate
-manim -pqh linear_transforms_manim.py ProjectionScene
+manim -pql linear_transforms_manim.py ProjectionScene
+manim -qh linear_transforms_manim.py ProjectionScene
 ```

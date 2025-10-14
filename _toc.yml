@@ -29,4 +29,17 @@ chapters:
   - file: content/floating_point.md
   - file: content/lu_pivoting.md
   - file: content/cholesky.md
+- file: content/least_squares
+  sections:
+  - file: content/householder_reflections.md
+  - file: content/givens_rotations.md
+  - file: content/modified_gram_schmidt.md
+  - file: content/summary.md
+  - file: content/existence_and_uniqueness_qr.md
+  - file: content/backward_stability.md
+  - file: content/qr_and_determinant.md
+  - file: content/lu_vs_qr.md
+  - file: content/normal_equations.md
+  - file: content/qr_factorization.md
+  - file: content/solving_least_squares_problems.md
 - file: content/LICENSE.md

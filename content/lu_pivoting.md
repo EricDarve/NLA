@@ -76,7 +76,6 @@ This equation is the key. It reveals that the forward error is governed by two i
 
 If a problem has high sensitivity (i.e., it is ill-conditioned), then even a perfectly backward-stable algorithm can produce a solution with a large forward error. The algorithm has performed its task flawlessly—it found an exact solution to a nearby problem—but the nature of the problem itself dictates that even "nearby" is not close enough to guarantee an accurate solution.
 
-
 ## Condition Number: Sensitivity for Linear Systems
 
 With the general framework of sensitivity established, let us apply it to our core problem: solving the linear system $Ax=b$. This will lead us directly to one of the most important concepts in numerical linear algebra: the **condition number** of a matrix.
