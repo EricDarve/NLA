@@ -1,0 +1,706 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Householder Reflections &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/householder_reflections';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Least Squares Problems" href="least_squares.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Householder Reflections</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/householder_reflections.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Householder Reflections</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-picture-orthogonal-triangularization">The Big Picture: Orthogonal Triangularization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tool-householder-reflections">The Tool: Householder Reflections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-a-reflection">Constructing a Reflection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-householder-qr-algorithm">The Householder QR Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-and-accuracy-a-crucial-detail">Stability and Accuracy: A Crucial Detail</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-practical-implementation-never-form-p-explicitly">A Note on Practical Implementation: Never Form <span class="math notranslate nohighlight">\(P\)</span> Explicitly</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-transformation-efficiently">Applying the Transformation Efficiently</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-the-factorization">Storing the Factorization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-the-qr-factorization">Cost of the QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-using-the-factors">Cost of Using the Factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-costs">Summary of Costs</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="householder-reflections">
+<h1>Householder Reflections<a class="headerlink" href="#householder-reflections" title="Link to this heading">#</a></h1>
+<p>We now explore methods to solve least-squares problems. The main technique is the <strong>QR factorization</strong>, which decomposes a matrix <span class="math notranslate nohighlight">\(A\)</span> into the product of an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> and an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>. The most widely used algorithm for computing the QR factorization for dense matrices is based on <strong>Householder transformations</strong>. This method is efficient, numerically stable, and provides a beautiful geometric interpretation of the factorization process.</p>
+<section id="the-big-picture-orthogonal-triangularization">
+<h2>The Big Picture: Orthogonal Triangularization<a class="headerlink" href="#the-big-picture-orthogonal-triangularization" title="Link to this heading">#</a></h2>
+<p>The goal of QR factorization is to decompose an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper triangular matrix.</p>
+<p>We can rewrite this as <span class="math notranslate nohighlight">\(Q^T A = R\)</span>. This gives us a new way to think about the process: we are looking for an orthogonal matrix, <span class="math notranslate nohighlight">\(Q^T\)</span>, that transforms <span class="math notranslate nohighlight">\(A\)</span> into an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>. We won’t find this <span class="math notranslate nohighlight">\(Q^T\)</span> all at once. Instead, we’ll build it as a sequence of simpler orthogonal transformations, <span class="math notranslate nohighlight">\(Q_k\)</span>, applied one after another.</p>
+<div class="math notranslate nohighlight">
+\[Q^T = Q_n \cdots Q_2 Q_1\]</div>
+<p>Each transformation <span class="math notranslate nohighlight">\(Q_k\)</span> is strategically designed to introduce zeros below the diagonal in the <span class="math notranslate nohighlight">\(k\)</span>-th column of the matrix, without disturbing the zeros we created in previous columns. The tool we’ll use to build these transformations is the Householder reflection.</p>
+</section>
+<section id="the-tool-householder-reflections">
+<h2>The Tool: Householder Reflections<a class="headerlink" href="#the-tool-householder-reflections" title="Link to this heading">#</a></h2>
+<p>A <strong>Householder transformation</strong> (or Householder reflector) is a matrix that represents a reflection across a hyperplane. 📐</p>
+<p>Geometrically, it’s a linear transformation that flips a vector space across a plane or hyperplane. The key properties for our purposes are:</p>
+<ol class="arabic simple">
+<li><p>It is <strong>orthogonal</strong>. A reflection preserves the lengths of vectors and the angles between them, just in a mirrored way.</p></li>
+<li><p>It is <strong>symmetric</strong> (<span class="math notranslate nohighlight">\(P^T = P\)</span>) and <strong>involutory</strong> (<span class="math notranslate nohighlight">\(P^2 = I\)</span>).</p></li>
+<li><p>It can transform any given vector <span class="math notranslate nohighlight">\(x\)</span> into another vector <span class="math notranslate nohighlight">\(y\)</span>, as long as they have the same Euclidean norm (<span class="math notranslate nohighlight">\(\|x\|_2 = \|y\|_2\)</span>).</p></li>
+</ol>
+<p>For QR factorization, we will use a Householder reflection to map a column vector from our matrix onto a standard basis vector, effectively zeroing out most of its components.</p>
+</section>
+<section id="constructing-a-reflection">
+<h2>Constructing a Reflection<a class="headerlink" href="#constructing-a-reflection" title="Link to this heading">#</a></h2>
+<p>Let’s focus on the first step: zeroing out the subdiagonal elements of the first column of <span class="math notranslate nohighlight">\(A\)</span>, which we’ll call <span class="math notranslate nohighlight">\(x = a_1\)</span>. Our goal is to find a reflection matrix <span class="math notranslate nohighlight">\(P_1\)</span> such that <span class="math notranslate nohighlight">\(P_1x\)</span> is a multiple of the first standard basis vector, <span class="math notranslate nohighlight">\(e_1\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P_1x = \begin{pmatrix} \sigma \\ 0 \\ \vdots \\ 0 \end{pmatrix} = \sigma e_1\end{split}\]</div>
+<p>Since reflections preserve length, we must have <span class="math notranslate nohighlight">\(|\sigma| = \|x\|_2\)</span>.</p>
+<p>The reflection is performed across a hyperplane. To define this hyperplane, we only need to specify a vector <span class="math notranslate nohighlight">\(v\)</span> that is normal to it. Geometrically, the vector normal to the reflection plane must be parallel to the difference between the original vector <span class="math notranslate nohighlight">\(x\)</span> and its reflected image <span class="math notranslate nohighlight">\(\sigma e_1\)</span>.</p>
+<p>We can therefore define this normal vector <span class="math notranslate nohighlight">\(v\)</span> as the difference between the starting vector and the target vector:</p>
+<div class="math notranslate nohighlight">
+\[
+v = x - \sigma e_1
+\]</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The vector that <strong>bisects the angle</strong> between <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(\sigma e_1\)</span> is <span class="math notranslate nohighlight">\(x + \sigma e_1\)</span>. This bisecting vector lies <em>within</em> the reflection hyperplane and is orthogonal to the normal vector <span class="math notranslate nohighlight">\(v\)</span>.</p>
+</div>
+<p>The Householder matrix that performs the reflection across the hyperplane orthogonal to <span class="math notranslate nohighlight">\(v\)</span> is given by the formula:</p>
+<div class="math notranslate nohighlight">
+\[
+P = I - 2 \frac{vv^T}{v^T v}
+\]</div>
+<p>This is the famous <strong>Householder transformation</strong>. We often write it as <span class="math notranslate nohighlight">\(P = I - \beta vv^T\)</span>, where <span class="math notranslate nohighlight">\(\beta = 2/\|v\|_2^2\)</span>.</p>
+</section>
+<section id="the-householder-qr-algorithm">
+<h2>The Householder QR Algorithm<a class="headerlink" href="#the-householder-qr-algorithm" title="Link to this heading">#</a></h2>
+<p>The algorithm proceeds column by column.</p>
+<ol class="arabic">
+<li><p><strong>Step 1:</strong> For the first column <span class="math notranslate nohighlight">\(x = a_1\)</span>, we compute its corresponding Householder vector <span class="math notranslate nohighlight">\(v_1\)</span> and form the matrix <span class="math notranslate nohighlight">\(Q_1 = I - \beta_1 v_1 v_1^T\)</span>. We then apply this transformation to the entire matrix <span class="math notranslate nohighlight">\(A\)</span>:
+<span class="math notranslate nohighlight">\(A^{(1)} = Q_1 A\)</span>.
+The result is a matrix where the first column is zero below the diagonal.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    A^{(1)} = \begin{pmatrix} r_{11} &amp; r_{12} &amp; \cdots &amp; r_{1n} \\ 0 &amp; &amp; &amp; \\ \vdots &amp; &amp; A' &amp; \\ 0 &amp; &amp; &amp; \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Step 2:</strong> Now, we leave the first row and column alone and repeat the process on the smaller submatrix <span class="math notranslate nohighlight">\(A'\)</span>. We find a Householder vector <span class="math notranslate nohighlight">\(v'_2\)</span> for the first column of <span class="math notranslate nohighlight">\(A'\)</span>. This defines a smaller reflection matrix <span class="math notranslate nohighlight">\(Q'_2\)</span>. We embed this into the full <span class="math notranslate nohighlight">\(m \times m\)</span> identity matrix to form our second transformation, <span class="math notranslate nohighlight">\(Q_2\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    Q_2 = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; Q'_2 \end{pmatrix}
+    \end{split}\]</div>
+<p>Applying this yields <span class="math notranslate nohighlight">\(A^{(2)} = Q_2 A^{(1)}\)</span>, which now has zeros below the diagonal in its first <em>two</em> columns.</p>
+</li>
+<li><p><strong>Repeat:</strong> We continue this process for <span class="math notranslate nohighlight">\(n\)</span> columns (or <span class="math notranslate nohighlight">\(m-1\)</span> if <span class="math notranslate nohighlight">\(m \le n\)</span>), successively creating zeros below the diagonal.</p></li>
+</ol>
+<p>After all steps, we have our upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>:
+<span class="math notranslate nohighlight">\(R = Q_n \cdots Q_2 Q_1 A\)</span></p>
+<p>The final orthogonal matrix is the product of all the individual reflections:
+<span class="math notranslate nohighlight">\(Q = Q_1 Q_2 \cdots Q_n\)</span></p>
+</section>
+<section id="stability-and-accuracy-a-crucial-detail">
+<h2>Stability and Accuracy: A Crucial Detail<a class="headerlink" href="#stability-and-accuracy-a-crucial-detail" title="Link to this heading">#</a></h2>
+<p>The numerical stability of the Householder method is one of its greatest strengths, but it hinges on a subtle choice in the definition of <span class="math notranslate nohighlight">\(v\)</span>.</p>
+<p>Recall our definition: <span class="math notranslate nohighlight">\(v = x - \sigma e_1\)</span>. We have two choices for <span class="math notranslate nohighlight">\(\sigma\)</span>: <span class="math notranslate nohighlight">\(\|x\|_2\)</span> or <span class="math notranslate nohighlight">\(-\|x\|_2\)</span>. If our vector <span class="math notranslate nohighlight">\(x\)</span> is already close to <span class="math notranslate nohighlight">\(\sigma e_1\)</span>, then this calculation involves subtracting two nearly identical numbers. This is a classic recipe for <strong>catastrophic cancellation</strong>, where we lose significant precision.</p>
+<p><strong>The Solution</strong>: We must choose the sign of <span class="math notranslate nohighlight">\(\sigma\)</span> to <em>avoid</em> this subtraction. We do this by choosing the sign of <span class="math notranslate nohighlight">\(\sigma\)</span> to be the opposite of the sign of <span class="math notranslate nohighlight">\(x_1\)</span>, the first element of <span class="math notranslate nohighlight">\(x\)</span>. A robust formula is:</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma = - \text{sign}(x_1) \|x\|_2
+\]</div>
+<p>With this choice, the first component of <span class="math notranslate nohighlight">\(v\)</span> becomes <span class="math notranslate nohighlight">\(v_1 = x_1 - \sigma = x_1 + \text{sign}(x_1)\|x\|_2\)</span>, which is an addition of two numbers of the same sign. This completely avoids the cancellation and makes the algorithm remarkably stable.</p>
+<p>Because of this property, Householder QR is <strong>backward stable</strong> and is the standard algorithm for solving dense least-squares problems in high-quality numerical software.</p>
+</section>
+<section id="a-note-on-practical-implementation-never-form-p-explicitly">
+<h2>A Note on Practical Implementation: Never Form <span class="math notranslate nohighlight">\(P\)</span> Explicitly<a class="headerlink" href="#a-note-on-practical-implementation-never-form-p-explicitly" title="Link to this heading">#</a></h2>
+<p>A crucial point for both performance and memory is that we <strong>never</strong> explicitly form the Householder matrix <span class="math notranslate nohighlight">\(P = I - \beta vv^T\)</span>. Forming this <span class="math notranslate nohighlight">\(m \times m\)</span> dense matrix would be computationally wasteful and require unnecessary memory storage. 💻</p>
+<p>Instead, we exploit its structure to apply the transformation directly.</p>
+<section id="applying-the-transformation-efficiently">
+<h3>Applying the Transformation Efficiently<a class="headerlink" href="#applying-the-transformation-efficiently" title="Link to this heading">#</a></h3>
+<p>To apply the transformation <span class="math notranslate nohighlight">\(P\)</span> to a matrix <span class="math notranslate nohighlight">\(A\)</span>, we compute <span class="math notranslate nohighlight">\(PA\)</span> not as a full matrix-matrix product, but as a rank-1 update.</p>
+<p>Notice that:</p>
+<div class="math notranslate nohighlight">
+\[
+PA = (I - \beta vv^T)A = A - \beta v(v^T A)
+\]</div>
+<p>This expression gives us a much cheaper way to compute the result:</p>
+<ol class="arabic simple">
+<li><p><strong>Compute the vector-matrix product</strong>: First, calculate the row vector <span class="math notranslate nohighlight">\(w^T = v^T A\)</span>.</p></li>
+<li><p><strong>Compute the outer product</strong>: Then, form the rank-1 matrix <span class="math notranslate nohighlight">\(vw^T\)</span>.</p></li>
+<li><p><strong>Update</strong>: Finally, scale the result by <span class="math notranslate nohighlight">\(\beta\)</span> and subtract it from <span class="math notranslate nohighlight">\(A\)</span>: <span class="math notranslate nohighlight">\(A_{new} = A - \beta vw^T\)</span>.</p></li>
+</ol>
+<p>This procedure is far more efficient than forming <span class="math notranslate nohighlight">\(P\)</span> and then multiplying. For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, this update costs approximately <span class="math notranslate nohighlight">\(2mn\)</span> floating-point operations, whereas forming <span class="math notranslate nohighlight">\(P\)</span> and multiplying would cost <span class="math notranslate nohighlight">\(O(m^2n)\)</span>.</p>
+</section>
+<section id="storing-the-factorization">
+<h3>Storing the Factorization<a class="headerlink" href="#storing-the-factorization" title="Link to this heading">#</a></h3>
+<p>The full orthogonal matrix <span class="math notranslate nohighlight">\(Q = Q_1 Q_2 \dots Q_n\)</span> is also typically not formed explicitly. It’s an <span class="math notranslate nohighlight">\(m \times m\)</span> dense matrix, and we often don’t need it. For solving the least-squares problem <span class="math notranslate nohighlight">\(Rx = Q^T b\)</span>, we only need to compute the product <span class="math notranslate nohighlight">\(Q^T b\)</span>.</p>
+<p>We can do this efficiently by applying the transformations sequentially:</p>
+<div class="math notranslate nohighlight">
+\[
+Q^T b = (Q_n \dots Q_2 Q_1)b
+\]</div>
+<p>This is just a sequence of cheap Householder updates applied to the vector <span class="math notranslate nohighlight">\(b\)</span>.</p>
+<p>To do this, we only need to store the essential information for each transformation <span class="math notranslate nohighlight">\(Q_k\)</span>: the <strong>Householder vector <span class="math notranslate nohighlight">\(v_k\)</span></strong> and the scalar <span class="math notranslate nohighlight">\(\beta_k\)</span>. Conveniently, the vector <span class="math notranslate nohighlight">\(v_k\)</span> for each step can be stored in the column of <span class="math notranslate nohighlight">\(A\)</span> that it is designed to zero out. Since we are creating zeros below the diagonal, this lower-triangular part of <span class="math notranslate nohighlight">\(A\)</span> becomes free real estate for storing the Householder vectors. The <span class="math notranslate nohighlight">\(\beta_k\)</span> values can be stored in a separate small array.</p>
+</section>
+</section>
+<section id="computational-cost">
+<h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
+<p>Let’s analyze in more details the computational cost of the Householder QR algorithm. Understanding the cost, measured in floating-point operations (flops), is essential for comparing algorithms and predicting their performance. We’ll consider an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, typically with <span class="math notranslate nohighlight">\(m \ge n\)</span>.</p>
+<p>A “flop” here refers to one addition and one multiplication.</p>
+<section id="cost-of-the-qr-factorization">
+<h3>Cost of the QR Factorization<a class="headerlink" href="#cost-of-the-qr-factorization" title="Link to this heading">#</a></h3>
+<p>The factorization process involves applying <span class="math notranslate nohighlight">\(n\)</span> successive Householder transformations, <span class="math notranslate nohighlight">\(Q_1, Q_2, \dots, Q_n\)</span>, to the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[A \rightarrow Q_1 A \rightarrow Q_2 (Q_1 A) \rightarrow \dots \rightarrow R\]</div>
+<p>Let’s look at the cost of a single step, say step <span class="math notranslate nohighlight">\(k\)</span>. At this stage, we have already introduced zeros in the first <span class="math notranslate nohighlight">\(k-1\)</span> columns. We are now working on an <span class="math notranslate nohighlight">\((m-k+1) \times (n-k+1)\)</span> submatrix. Applying the Householder transformation <span class="math notranslate nohighlight">\(Q_k\)</span> to this submatrix requires approximately: <span class="math notranslate nohighlight">\(2(m-k+1)(n-k+1)\)</span> flops.</p>
+<p>To find the total cost, we sum this from <span class="math notranslate nohighlight">\(k=1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Total Cost} \approx \sum_{k=1}^{n} 2(m-k+1)(n-k+1) \text{ flops}
+\]</div>
+<p>We can approximate this sum with an integral for large <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span>, which gives the following result:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Cost}(A=QR) \approx 2mn^2 - \frac{2}{3}n^3 \text{ flops}
+\]</div>
+<p><strong>Two important special cases emerge from this formula:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Square Matrix (<span class="math notranslate nohighlight">\(m=n\)</span>)</strong>: The cost is <span class="math notranslate nohighlight">\(\approx 2n^3 - \frac{2}{3}n^3 = \frac{4}{3}n^3\)</span> flops. This is about twice the cost of performing an LU factorization, which is <span class="math notranslate nohighlight">\(\frac{2}{3}n^3\)</span>. Stability comes at a price! 💰</p></li>
+<li><p><strong>Tall and Skinny Matrix (<span class="math notranslate nohighlight">\(m \gg n\)</span>)</strong>: The <span class="math notranslate nohighlight">\(2mn^2\)</span> term dominates, and the cost is approximately <span class="math notranslate nohighlight">\(2mn^2\)</span> flops. This is the most common scenario in data analysis and least-squares problems.</p></li>
+</ol>
+</section>
+<section id="cost-of-using-the-factors">
+<h3>Cost of Using the Factors<a class="headerlink" href="#cost-of-using-the-factors" title="Link to this heading">#</a></h3>
+<p>Once we have the factorization, we use the stored Householder vectors to apply <span class="math notranslate nohighlight">\(Q\)</span> or <span class="math notranslate nohighlight">\(Q^T\)</span> as needed.</p>
+<p><strong>Applying <span class="math notranslate nohighlight">\(Q^T\)</span> to a vector (e.g., forming <span class="math notranslate nohighlight">\(Q^T b\)</span>).</strong> This is the most critical operation for solving the least-squares problem. We need to compute <span class="math notranslate nohighlight">\(y = Q^T b\)</span>. We do this by applying the transformations sequentially: <span class="math notranslate nohighlight">\(y = Q_n \dots Q_2 Q_1 b\)</span>.</p>
+<ul class="simple">
+<li><p>Applying <span class="math notranslate nohighlight">\(Q_1\)</span> to <span class="math notranslate nohighlight">\(b\)</span> costs <span class="math notranslate nohighlight">\(\approx 2m\)</span> flops.</p></li>
+<li><p>Applying <span class="math notranslate nohighlight">\(Q_2\)</span> to the result costs <span class="math notranslate nohighlight">\(\approx 2(m-1)\)</span> flops.</p></li>
+<li><p>…and so on, down to <span class="math notranslate nohighlight">\(Q_n\)</span>, which costs <span class="math notranslate nohighlight">\(\approx 2(m-n+1)\)</span> flops.</p></li>
+</ul>
+<p>The total cost is the sum of an arithmetic series:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Cost}(Q^T b) \approx \sum_{k=1}^{n} 2(m-k+1) \approx 2mn - n^2 \text{ flops}
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(m \ge n\)</span>, this is an <span class="math notranslate nohighlight">\(O(mn)\)</span> operation. This is significantly cheaper than the factorization itself, which is <span class="math notranslate nohighlight">\(O(mn^2)\)</span>.</p>
+</section>
+<section id="summary-of-costs">
+<h3>Summary of Costs<a class="headerlink" href="#summary-of-costs" title="Link to this heading">#</a></h3>
+<p>Here is a quick reference for an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with <span class="math notranslate nohighlight">\(m \ge n\)</span>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operation</p></th>
+<th class="head"><p>Leading Term Flop Count</p></th>
+<th class="head"><p>Big O Notation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Factorization (<span class="math notranslate nohighlight">\(A \rightarrow Q, R\)</span>)</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(2mn^2 - \frac{2}{3}n^3\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Apply <span class="math notranslate nohighlight">\(Q^T\)</span> to vector <span class="math notranslate nohighlight">\(b\)</span> (<span class="math notranslate nohighlight">\(Q^T b\)</span>)</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(2mn - n^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(mn)\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="least_squares.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Least Squares Problems</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-picture-orthogonal-triangularization">The Big Picture: Orthogonal Triangularization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tool-householder-reflections">The Tool: Householder Reflections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-a-reflection">Constructing a Reflection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-householder-qr-algorithm">The Householder QR Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-and-accuracy-a-crucial-detail">Stability and Accuracy: A Crucial Detail</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-practical-implementation-never-form-p-explicitly">A Note on Practical Implementation: Never Form <span class="math notranslate nohighlight">\(P\)</span> Explicitly</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-transformation-efficiently">Applying the Transformation Efficiently</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-the-factorization">Storing the Factorization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-the-qr-factorization">Cost of the QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-using-the-factors">Cost of Using the Factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-costs">Summary of Costs</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
