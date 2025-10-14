@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary of Matrix Decompositions &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Modified Gram-Schmidt &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/summary_of_matrix_decompositions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/modified_gram_schmidt';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Solving Linear Systems" href="solving_linear_systems.html" />
-    <link rel="prev" title="Eigenvalues and Singular Values" href="eigen_vs_singular_values.html" />
+    <link rel="next" title="Summary" href="summary.html" />
+    <link rel="prev" title="Givens Rotations" href="givens_rotations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -195,7 +195,7 @@
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of Matrix Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -206,10 +206,10 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Modified Gram-Schmidt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summary.html">Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
@@ -271,7 +271,7 @@
       
       
       
-      <li><a href="../_sources/content/summary_of_matrix_decompositions.md" target="_blank"
+      <li><a href="../_sources/content/modified_gram_schmidt.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -342,7 +342,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -353,11 +355,27 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary of Matrix Decompositions</h1>
+    <h1>Modified Gram-Schmidt</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-modified-gram-schmidt-algorithm">The Modified Gram-Schmidt Algorithm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-outer-product-perspective">An Outer-Product Perspective</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-derivation">Algorithm Derivation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complete-algorithm">The Complete Algorithm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -367,52 +385,119 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-matrix-decompositions">
-<h1>Summary of Matrix Decompositions<a class="headerlink" href="#summary-of-matrix-decompositions" title="Link to this heading">#</a></h1>
-<p>Here is a comparison of the key matrix decompositions related to eigenvalues and singular values.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Decomposition</p></th>
-<th class="head text-left"><p>Requirements for Existence</p></th>
-<th class="head text-left"><p>Components &amp; Properties</p></th>
-<th class="head text-left"><p>Interpretation &amp; Applications</p></th>
-<th class="head text-left"><p>Relation to Others</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square complex matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>). <br> <strong>T</strong>: Upper triangular. <br> Diagonal of T contains the eigenvalues of A.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Any linear transformation is unitarily similar to a triangular one. <br> <strong>Applications</strong>: Numerically stable computation of all eigenvalues.</p></td>
-<td class="text-left"><p>This is the general form from which eigendecomposition is a special case.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Real Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square real matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Real orthogonal (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>). <br> <strong>S</strong>: Real quasi-triangular (block upper triangular). <br> 1x1 diagonal blocks are real eigenvalues; 2x2 blocks correspond to complex conjugate eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Represents any real transformation in a basis that makes it “as triangular as possible” using only real numbers. <br> <strong>Applications</strong>: Stable eigenvalue computation in real arithmetic.</p></td>
-<td class="text-left"><p>The real-valued equivalent of the complex Schur decomposition.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Eigendecomposition</strong> <br> <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>diagonalizable</strong> matrices (those with <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors).</p></td>
-<td class="text-left"><p><strong>X</strong>: Invertible matrix whose columns are the eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues. <br> <span class="math notranslate nohighlight">\(X\)</span> is not guaranteed to be unitary.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along the eigenvector axes. Associated with “Time” and the evolution of dynamical systems (<span class="math notranslate nohighlight">\(A^k\)</span>). <br> <strong>Applications</strong>: Solving linear differential equations, analyzing stability, computing matrix powers.</p></td>
-<td class="text-left"><p>A special case of the Schur decomposition where the triangular matrix <span class="math notranslate nohighlight">\(T\)</span> is diagonal.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Unitary Diagonalization</strong> <br> <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>normal</strong> matrices (<span class="math notranslate nohighlight">\(A A^H = A^H A\)</span>).</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary matrix whose columns are an orthonormal basis of eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along a set of <em>orthogonal</em> axes. <br> <strong>Applications</strong>: Quantum mechanics, signal processing.</p></td>
-<td class="text-left"><p>The ideal form of both the Schur and eigendecomposition. Occurs when the matrix is normal.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Singular Value Decomposition (SVD)</strong> <br> <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, real or complex.</p></td>
-<td class="text-left"><p><strong>U</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(m \times m\)</span>) of left singular vectors. <br> <strong>V</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(n \times n\)</span>) of right singular vectors. <br> <strong><span class="math notranslate nohighlight">\(\Sigma\)</span></strong>: Rectangular diagonal matrix of non-negative singular values.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Decomposes any transformation into rotation, scaling, and another rotation. Associated with “Space” and the geometry of the transformation. <br> <strong>Applications</strong>: PCA, low-rank approximation, computing pseudoinverses, determining rank and condition number.</p></td>
-<td class="text-left"><p>Generalizes eigendecomposition to any matrix. The singular values of A are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="modified-gram-schmidt">
+<h1>Modified Gram-Schmidt<a class="headerlink" href="#modified-gram-schmidt" title="Link to this heading">#</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
+<p>We previously covered the QR factorization using Householder and Givens transformations. These methods fall under the category of <strong>orthogonal triangularization</strong>, where we find an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> and apply it to <span class="math notranslate nohighlight">\(A\)</span> to produce an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>, such that <span class="math notranslate nohighlight">\(Q^T A = R\)</span>.</p>
+<p>Let’s examine a different approach: the <strong>Gram-Schmidt process</strong>. This method performs <strong>triangular orthogonalization</strong>. Instead of finding <span class="math notranslate nohighlight">\(Q\)</span> first, we find an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span> such that the columns of <span class="math notranslate nohighlight">\(A R^{-1}\)</span> form an orthonormal matrix <span class="math notranslate nohighlight">\(Q\)</span>. This can be rewritten as our familiar <span class="math notranslate nohighlight">\(A = QR\)</span>. The Gram-Schmidt process is particularly well-suited for matrices that are <strong>tall and thin</strong> (i.e., <span class="math notranslate nohighlight">\(m \gg n\)</span>).</p>
+<p>GS has an advantage in iterative methods. This is a crucial point of comparison with Householder transformations. While Householder methods are generally more stable, the Gram-Schmidt process produces the orthogonalized vectors sequentially. The j-th vector, <span class="math notranslate nohighlight">\(q_j\)</span>, is finalized at the j-th iteration. In contrast, Householder reflections produce the full orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> only at the very end. This sequential nature makes Gram-Schmidt suitable for <strong>iterative methods like the Arnoldi iteration,</strong> which is used for finding eigenvalues of large matrices.</p>
+<p>We will focus exclusively on the <strong>Modified Gram-Schmidt (MGS)</strong> algorithm, which is a numerically stable version of the classical process.</p>
+</section>
+<section id="the-modified-gram-schmidt-algorithm">
+<h2>The Modified Gram-Schmidt Algorithm<a class="headerlink" href="#the-modified-gram-schmidt-algorithm" title="Link to this heading">#</a></h2>
+<p>The core idea of MGS is to build the columns of <span class="math notranslate nohighlight">\(Q\)</span> one by one. At each step <span class="math notranslate nohighlight">\(k\)</span>, we generate the vector <span class="math notranslate nohighlight">\(q_k\)</span> by normalizing the current <span class="math notranslate nohighlight">\(k\)</span>-th column of our working matrix. Then, we immediately make all subsequent columns orthogonal to this new vector <span class="math notranslate nohighlight">\(q_k\)</span>.</p>
+<section id="an-outer-product-perspective">
+<h3>An Outer-Product Perspective<a class="headerlink" href="#an-outer-product-perspective" title="Link to this heading">#</a></h3>
+<p>We will develop MGS from an outer-product point of view. The computational strategy is quite similar to the methods we used for LU and Cholesky factorizations.</p>
+<p>We start by viewing the product <span class="math notranslate nohighlight">\(A=QR\)</span> as a sum of rank-one matrices:</p>
+<div class="math notranslate nohighlight">
+\[
+A = \sum_{k=1}^{n} q_k r_k^T
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(q_k\)</span> are the column vectors of <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(r_k^T\)</span> are the row vectors of <span class="math notranslate nohighlight">\(R\)</span>. Our goal is to find one component (<span class="math notranslate nohighlight">\(q_k r_k^T\)</span>) at each step, subtract it from our matrix, and then repeat the process on the remainder.</p>
+</section>
+<section id="algorithm-derivation">
+<h3>Algorithm Derivation<a class="headerlink" href="#algorithm-derivation" title="Link to this heading">#</a></h3>
+<p>Let’s begin with the first column (<span class="math notranslate nohighlight">\(k=1\)</span>). The first term in our sum is <span class="math notranslate nohighlight">\(q_1 r_1^T\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Find <span class="math notranslate nohighlight">\(q_1\)</span> and <span class="math notranslate nohighlight">\(r_{11}\)</span>.</strong>
+From the relationship <span class="math notranslate nohighlight">\(A=QR\)</span>, we know the first column of <span class="math notranslate nohighlight">\(A\)</span> is given by <span class="math notranslate nohighlight">\(a_1 = r_{11} q_1\)</span>. Since <span class="math notranslate nohighlight">\(q_1\)</span> must be a unit vector (<span class="math notranslate nohighlight">\({\|q_1\|}_2 = 1\)</span>), we can determine <span class="math notranslate nohighlight">\(r_{11}\)</span> and <span class="math notranslate nohighlight">\(q_1\)</span> directly by normalizing the first column of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    r_{11} = \|a_1\|_2, \qquad q_1 = \frac{a_1}{\|a_1\|_2}
+    \]</div>
+</li>
+<li><p><strong>Find the rest of the first row of R (<span class="math notranslate nohighlight">\(r_1^T\)</span>).</strong>
+To find the other elements of the first row of <span class="math notranslate nohighlight">\(R\)</span> (<span class="math notranslate nohighlight">\(r_{12}, r_{13}, \dots, r_{1n}\)</span>), we consider the equation for any column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    a_j = r_{1j} q_1 + r_{2j} q_2 + \cdots + r_{jj} q_j
+    \]</div>
+<p>By using the fact that the columns of <span class="math notranslate nohighlight">\(Q\)</span> are orthogonal (<span class="math notranslate nohighlight">\(q_k^T q_i = 0\)</span> for <span class="math notranslate nohighlight">\(k \ne i\)</span>), we can find <span class="math notranslate nohighlight">\(r_{1j}\)</span> by left-multiplying by <span class="math notranslate nohighlight">\(q_1^T\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    q_1^T a_j = q_1^T (r_{1j} q_1 + r_{2j} q_2 + \cdots) = r_{1j} (q_1^T q_1) + 0 + \cdots = r_{1j}
+    \]</div>
+<p>Thus, we find each element by <strong>projecting column <span class="math notranslate nohighlight">\(a_j\)</span> onto our new basis vector <span class="math notranslate nohighlight">\(q_1\)</span></strong>. This gives us the complete first row of <span class="math notranslate nohighlight">\(R\)</span>.</p>
+</li>
+<li><p><strong>Subtract the first component and repeat.</strong>
+Now that we have the full first component, <span class="math notranslate nohighlight">\(q_1 r_1^T\)</span>, we can subtract it from <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+    A^{(1)} = A - q_1 r_1^T
+    \]</div>
+<p>This update has a crucial effect: the <strong>first column of the new matrix <span class="math notranslate nohighlight">\(A^{(1)}\)</span> is now zero</strong>, and every subsequent column of <span class="math notranslate nohighlight">\(A^{(1)}\)</span> is now orthogonal to <span class="math notranslate nohighlight">\(q_1\)</span>. We can then <strong>repeat the entire process</strong> on <span class="math notranslate nohighlight">\(A^{(1)}\)</span> to find <span class="math notranslate nohighlight">\(q_2\)</span> and <span class="math notranslate nohighlight">\(r_2^T\)</span>, and so on.</p>
+</li>
+</ol>
+</section>
+<section id="the-complete-algorithm">
+<h3>The Complete Algorithm<a class="headerlink" href="#the-complete-algorithm" title="Link to this heading">#</a></h3>
+<p>This leads to a simple and elegant algorithm where we iteratively build <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span>.</p>
+<p>For <span class="math notranslate nohighlight">\(k = 1, \dots, n\)</span>:</p>
+<ol class="arabic">
+<li><p>Normalize the <span class="math notranslate nohighlight">\(k\)</span>-th column:</p>
+<div class="math notranslate nohighlight">
+\[
+    r_{kk} = \|a_k\|_2, \quad
+    q_k = a_k / r_{kk}
+    \]</div>
+</li>
+<li><p>Calculate the remaining elements of the <span class="math notranslate nohighlight">\(k\)</span>-th row of R:</p>
+<div class="math notranslate nohighlight">
+\[
+    r_{kj} = q_k^T a_j \quad (\text{for } j=k+1, \dots, n)
+    \]</div>
+</li>
+<li><p>Update the subsequent columns of the matrix:</p>
+<div class="math notranslate nohighlight">
+\[
+    a_j \leftarrow a_j - q_k r_{kj} \quad (\text{for } j=k+1, \dots, n)
+    \]</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="numerical-stability">
+<h2>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h2>
+<p>When implemented in finite-precision arithmetic, different algorithms can produce very different results due to rounding errors. The classical version of Gram-Schmidt is known to be <strong>numerically unstable</strong> because the computed vectors <span class="math notranslate nohighlight">\(q_k\)</span> can quickly lose their orthogonality.</p>
+<p>The modified version we have just discussed is significantly more stable. The crucial difference is that when we orthogonalize <span class="math notranslate nohighlight">\(a_j\)</span> against <span class="math notranslate nohighlight">\(q_k\)</span>, the vector <span class="math notranslate nohighlight">\(a_j\)</span> has <em>already</em> been made orthogonal to all previous vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_{k-1}\)</span>. By continuously “cleaning” the remaining vectors at each step, we prevent the accumulation of orthogonality errors that plague the classical method. This makes MGS a much more reliable tool for practical computation.</p>
+</section>
+<section id="computational-cost">
+<h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
+<p>Let’s analyze the cost of the MGS algorithm for an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix.</p>
+<ul class="simple">
+<li><p>The outer loop runs <span class="math notranslate nohighlight">\(n\)</span> times (for each column).</p></li>
+<li><p>Inside the loop for column <span class="math notranslate nohighlight">\(k\)</span>:</p>
+<ul>
+<li><p>Normalizing column <span class="math notranslate nohighlight">\(k\)</span> (a vector of length <span class="math notranslate nohighlight">\(m\)</span>) takes about <span class="math notranslate nohighlight">\(2m\)</span> flops.</p></li>
+<li><p>The inner loop runs for the remaining <span class="math notranslate nohighlight">\(n-k\)</span> columns. For each of these columns <span class="math notranslate nohighlight">\(j\)</span>:</p>
+<ul>
+<li><p>Calculating the dot product <span class="math notranslate nohighlight">\(q_k^T a_j\)</span> costs <span class="math notranslate nohighlight">\(O(m)\)</span> flops.</p></li>
+<li><p>The vector update <span class="math notranslate nohighlight">\(a_j - r_{kj} q_k\)</span> also costs <span class="math notranslate nohighlight">\(O(m)\)</span> flops.</p></li>
+</ul>
+</li>
+<li><p>The cost of the inner loop is roughly <span class="math notranslate nohighlight">\((n-k) \times O(m)\)</span> flops.</p></li>
+</ul>
+</li>
+</ul>
+<p>Summing over the outer loop, the total cost is approximately:</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{k=1}^{n} (2m + (n-k) \cdot 2m) \approx \sum_{k=1}^{n} 2m(n-k+1) \approx 2m \frac{n(n+1)}{2} \approx mn^2
+\]</div>
+<p>The total computational cost is <strong><span class="math notranslate nohighlight">\(O(mn^2)\)</span> flops</strong>. This is asymptotically the same as the Householder QR algorithm.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -446,20 +531,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="eigen_vs_singular_values.html"
+       href="givens_rotations.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Eigenvalues and Singular Values</p>
+        <p class="prev-next-title">Givens Rotations</p>
       </div>
     </a>
     <a class="right-next"
-       href="solving_linear_systems.html"
+       href="summary.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Solving Linear Systems</p>
+        <p class="prev-next-title">Summary</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -469,6 +554,29 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-modified-gram-schmidt-algorithm">The Modified Gram-Schmidt Algorithm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-outer-product-perspective">An Outer-Product Perspective</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-derivation">Algorithm Derivation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complete-algorithm">The Complete Algorithm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

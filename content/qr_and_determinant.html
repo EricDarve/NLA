@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary of Matrix Decompositions &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The QR Factorization and the Determinant &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/summary_of_matrix_decompositions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/qr_and_determinant';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Solving Linear Systems" href="solving_linear_systems.html" />
-    <link rel="prev" title="Eigenvalues and Singular Values" href="eigen_vs_singular_values.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Backward Stability of Householder and Givens QR" href="backward_stability.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -195,7 +195,7 @@
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of Matrix Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -206,14 +206,14 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summary.html">Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The QR Factorization and the Determinant</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -271,7 +271,7 @@
       
       
       
-      <li><a href="../_sources/content/summary_of_matrix_decompositions.md" target="_blank"
+      <li><a href="../_sources/content/qr_and_determinant.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -353,7 +353,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary of Matrix Decompositions</h1>
+    <h1>The QR Factorization and the Determinant</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -367,51 +367,31 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-matrix-decompositions">
-<h1>Summary of Matrix Decompositions<a class="headerlink" href="#summary-of-matrix-decompositions" title="Link to this heading">#</a></h1>
-<p>Here is a comparison of the key matrix decompositions related to eigenvalues and singular values.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Decomposition</p></th>
-<th class="head text-left"><p>Requirements for Existence</p></th>
-<th class="head text-left"><p>Components &amp; Properties</p></th>
-<th class="head text-left"><p>Interpretation &amp; Applications</p></th>
-<th class="head text-left"><p>Relation to Others</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square complex matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>). <br> <strong>T</strong>: Upper triangular. <br> Diagonal of T contains the eigenvalues of A.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Any linear transformation is unitarily similar to a triangular one. <br> <strong>Applications</strong>: Numerically stable computation of all eigenvalues.</p></td>
-<td class="text-left"><p>This is the general form from which eigendecomposition is a special case.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Real Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square real matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Real orthogonal (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>). <br> <strong>S</strong>: Real quasi-triangular (block upper triangular). <br> 1x1 diagonal blocks are real eigenvalues; 2x2 blocks correspond to complex conjugate eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Represents any real transformation in a basis that makes it “as triangular as possible” using only real numbers. <br> <strong>Applications</strong>: Stable eigenvalue computation in real arithmetic.</p></td>
-<td class="text-left"><p>The real-valued equivalent of the complex Schur decomposition.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Eigendecomposition</strong> <br> <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>diagonalizable</strong> matrices (those with <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors).</p></td>
-<td class="text-left"><p><strong>X</strong>: Invertible matrix whose columns are the eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues. <br> <span class="math notranslate nohighlight">\(X\)</span> is not guaranteed to be unitary.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along the eigenvector axes. Associated with “Time” and the evolution of dynamical systems (<span class="math notranslate nohighlight">\(A^k\)</span>). <br> <strong>Applications</strong>: Solving linear differential equations, analyzing stability, computing matrix powers.</p></td>
-<td class="text-left"><p>A special case of the Schur decomposition where the triangular matrix <span class="math notranslate nohighlight">\(T\)</span> is diagonal.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Unitary Diagonalization</strong> <br> <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>normal</strong> matrices (<span class="math notranslate nohighlight">\(A A^H = A^H A\)</span>).</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary matrix whose columns are an orthonormal basis of eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along a set of <em>orthogonal</em> axes. <br> <strong>Applications</strong>: Quantum mechanics, signal processing.</p></td>
-<td class="text-left"><p>The ideal form of both the Schur and eigendecomposition. Occurs when the matrix is normal.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Singular Value Decomposition (SVD)</strong> <br> <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, real or complex.</p></td>
-<td class="text-left"><p><strong>U</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(m \times m\)</span>) of left singular vectors. <br> <strong>V</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(n \times n\)</span>) of right singular vectors. <br> <strong><span class="math notranslate nohighlight">\(\Sigma\)</span></strong>: Rectangular diagonal matrix of non-negative singular values.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Decomposes any transformation into rotation, scaling, and another rotation. Associated with “Space” and the geometry of the transformation. <br> <strong>Applications</strong>: PCA, low-rank approximation, computing pseudoinverses, determining rank and condition number.</p></td>
-<td class="text-left"><p>Generalizes eigendecomposition to any matrix. The singular values of A are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>.</p></td>
-</tr>
-</tbody>
-</table>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-qr-factorization-and-the-determinant">
+<h1>The QR Factorization and the Determinant<a class="headerlink" href="#the-qr-factorization-and-the-determinant" title="Link to this heading">#</a></h1>
+<p>This is an elegant and useful theoretical result that connects QR factorization to another fundamental matrix property.</p>
+<div class="proof theorem admonition" id="thm:det_via_qr">
+<p class="admonition-title"><span class="caption-number">Theorem 18 </span> (Determinant via QR Factorization)</p>
+<section class="theorem-content" id="proof-content">
+<p>For any square matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times n}\)</span>, if <span class="math notranslate nohighlight">\(A=QR\)</span> is its QR decomposition, then:</p>
+<div class="math notranslate nohighlight">
+\[
+|\det(A)| = \left| \prod_{i=1}^{n} r_{ii} \right|
+\]</div>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Sketch of proof:</p>
+<ol class="arabic simple">
+<li><p>Start with the property <span class="math notranslate nohighlight">\(\det(AB) = \det(A)\det(B)\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\det(A) = \det(QR) = \det(Q)\det(R)\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(Q\)</span> is an orthogonal matrix, its determinant is always <span class="math notranslate nohighlight">\(\det(Q) = \pm 1\)</span>. Therefore, <span class="math notranslate nohighlight">\(|\det(A)| = |\det(R)|\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(R\)</span> is an upper triangular matrix, its determinant is simply the product of its diagonal entries, <span class="math notranslate nohighlight">\(\det(R) = \prod_{i=1}^{n} r_{ii}\)</span>.</p></li>
+<li><p>Combining these gives the result.</p></li>
+</ol>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>Why it’s important:</strong> This provides a very numerically stable way to compute the determinant of a matrix. The standard cofactor expansion is computationally infeasible for large matrices, and using LU factorization can suffer from overflow/underflow issues. The QR approach avoids these problems.</p>
 </div>
 </section>
 
@@ -446,20 +426,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="eigen_vs_singular_values.html"
+       href="backward_stability.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Eigenvalues and Singular Values</p>
+        <p class="prev-next-title">Backward Stability of Householder and Givens QR</p>
       </div>
     </a>
     <a class="right-next"
-       href="solving_linear_systems.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Solving Linear Systems</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

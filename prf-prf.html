@@ -31,9 +31,9 @@
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -213,6 +213,12 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="content/least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="content/householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/lu_vs_qr.html">LU vs. QR Decomposition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="content/LICENSE.html">License for this book</a></li>
@@ -326,17 +332,21 @@ document.write(`
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
    <a href="#cap-theorem-1"><strong>theorem-1</strong></a> | 
    <a href="#cap-thm:backward_error_lu"><strong>thm:backward_error_lu</strong></a> | 
+   <a href="#cap-thm:backward_stability_qr"><strong>thm:backward_stability_qr</strong></a> | 
    <a href="#cap-thm:cartan_dieudonne"><strong>thm:cartan_dieudonne</strong></a> | 
    <a href="#cap-thm:det-svd"><strong>thm:det-svd</strong></a> | 
+   <a href="#cap-thm:det_via_qr"><strong>thm:det_via_qr</strong></a> | 
    <a href="#cap-thm:eckart-young-mirsky"><strong>thm:eckart-young-mirsky</strong></a> | 
    <a href="#cap-thm:eigenvalue_existence"><strong>thm:eigenvalue_existence</strong></a> | 
    <a href="#cap-thm:existence_lu"><strong>thm:existence_lu</strong></a> | 
    <a href="#cap-thm:existence_lu_existence"><strong>thm:existence_lu_existence</strong></a> | 
+   <a href="#cap-thm:existence_qr"><strong>thm:existence_qr</strong></a> | 
    <a href="#cap-thm:perturbation_bound"><strong>thm:perturbation_bound</strong></a> | 
    <a href="#cap-thm:spectral_theorem"><strong>thm:spectral_theorem</strong></a> | 
    <a href="#cap-thm:spectral_theorem_real"><strong>thm:spectral_theorem_real</strong></a> | 
    <a href="#cap-thm:summation_error"><strong>thm:summation_error</strong></a> | 
    <a href="#cap-thm:svd"><strong>thm:svd</strong></a> | 
+   <a href="#cap-thm:unique_thin_qr"><strong>thm:unique_thin_qr</strong></a> | 
    <a href="#cap-thm:woodbury_matrix_identity"><strong>thm:woodbury_matrix_identity</strong></a>
    </div>
 
@@ -374,6 +384,14 @@ document.write(`
        <a href="content/lu_pivoting.html#thm:backward_error_lu"><code class="xref">thm:backward_error_lu</code></a> <em>(content/lu_pivoting)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:backward_stability_qr"><td></td><td>
+       <strong>thm:backward_stability_qr</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/backward_stability.html#thm:backward_stability_qr"><code class="xref">thm:backward_stability_qr</code></a> <em>(content/backward_stability)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:cartan_dieudonne"><td></td><td>
        <strong>thm:cartan_dieudonne</strong></td><td></td></tr>
      <tr>
@@ -388,6 +406,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/singular_value_decomposition.html#thm:det-svd"><code class="xref">thm:det-svd</code></a> <em>(content/singular_value_decomposition)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:det_via_qr"><td></td><td>
+       <strong>thm:det_via_qr</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/qr_and_determinant.html#thm:det_via_qr"><code class="xref">thm:det_via_qr</code></a> <em>(content/qr_and_determinant)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:eckart-young-mirsky"><td></td><td>
@@ -420,6 +446,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/existence_lu.html#thm:existence_lu_existence"><code class="xref">thm:existence_lu_existence</code></a> <em>(content/existence_lu)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:existence_qr"><td></td><td>
+       <strong>thm:existence_qr</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/existence_and_uniqueness_qr.html#thm:existence_qr"><code class="xref">thm:existence_qr</code></a> <em>(content/existence_and_uniqueness_qr)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:perturbation_bound"><td></td><td>
@@ -460,6 +494,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/singular_value_decomposition.html#thm:svd"><code class="xref">thm:svd</code></a> <em>(content/singular_value_decomposition)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:unique_thin_qr"><td></td><td>
+       <strong>thm:unique_thin_qr</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/existence_and_uniqueness_qr.html#thm:unique_thin_qr"><code class="xref">thm:unique_thin_qr</code></a> <em>(content/existence_and_uniqueness_qr)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:woodbury_matrix_identity"><td></td><td>

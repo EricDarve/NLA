@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary of Matrix Decompositions &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Existence and Uniqueness of QR Decomposition &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/summary_of_matrix_decompositions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/existence_and_uniqueness_qr';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Solving Linear Systems" href="solving_linear_systems.html" />
-    <link rel="prev" title="Eigenvalues and Singular Values" href="eigen_vs_singular_values.html" />
+    <link rel="next" title="Backward Stability of Householder and Givens QR" href="backward_stability.html" />
+    <link rel="prev" title="Summary" href="summary.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -195,7 +195,7 @@
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of Matrix Decompositions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -206,12 +206,12 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="summary.html">Summary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 </ul>
@@ -271,7 +271,7 @@
       
       
       
-      <li><a href="../_sources/content/summary_of_matrix_decompositions.md" target="_blank"
+      <li><a href="../_sources/content/existence_and_uniqueness_qr.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -342,7 +342,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -353,11 +355,24 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary of Matrix Decompositions</h1>
+    <h1>Existence and Uniqueness of QR Decomposition</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uniqueness">Uniqueness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-rank-case"><strong>The Full Rank Case</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-deficient-case"><strong>The Rank-Deficient Case</strong></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -367,52 +382,56 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-matrix-decompositions">
-<h1>Summary of Matrix Decompositions<a class="headerlink" href="#summary-of-matrix-decompositions" title="Link to this heading">#</a></h1>
-<p>Here is a comparison of the key matrix decompositions related to eigenvalues and singular values.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Decomposition</p></th>
-<th class="head text-left"><p>Requirements for Existence</p></th>
-<th class="head text-left"><p>Components &amp; Properties</p></th>
-<th class="head text-left"><p>Interpretation &amp; Applications</p></th>
-<th class="head text-left"><p>Relation to Others</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square complex matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>). <br> <strong>T</strong>: Upper triangular. <br> Diagonal of T contains the eigenvalues of A.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Any linear transformation is unitarily similar to a triangular one. <br> <strong>Applications</strong>: Numerically stable computation of all eigenvalues.</p></td>
-<td class="text-left"><p>This is the general form from which eigendecomposition is a special case.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Real Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square real matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Real orthogonal (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>). <br> <strong>S</strong>: Real quasi-triangular (block upper triangular). <br> 1x1 diagonal blocks are real eigenvalues; 2x2 blocks correspond to complex conjugate eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Represents any real transformation in a basis that makes it “as triangular as possible” using only real numbers. <br> <strong>Applications</strong>: Stable eigenvalue computation in real arithmetic.</p></td>
-<td class="text-left"><p>The real-valued equivalent of the complex Schur decomposition.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Eigendecomposition</strong> <br> <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>diagonalizable</strong> matrices (those with <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors).</p></td>
-<td class="text-left"><p><strong>X</strong>: Invertible matrix whose columns are the eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues. <br> <span class="math notranslate nohighlight">\(X\)</span> is not guaranteed to be unitary.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along the eigenvector axes. Associated with “Time” and the evolution of dynamical systems (<span class="math notranslate nohighlight">\(A^k\)</span>). <br> <strong>Applications</strong>: Solving linear differential equations, analyzing stability, computing matrix powers.</p></td>
-<td class="text-left"><p>A special case of the Schur decomposition where the triangular matrix <span class="math notranslate nohighlight">\(T\)</span> is diagonal.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Unitary Diagonalization</strong> <br> <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>normal</strong> matrices (<span class="math notranslate nohighlight">\(A A^H = A^H A\)</span>).</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary matrix whose columns are an orthonormal basis of eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along a set of <em>orthogonal</em> axes. <br> <strong>Applications</strong>: Quantum mechanics, signal processing.</p></td>
-<td class="text-left"><p>The ideal form of both the Schur and eigendecomposition. Occurs when the matrix is normal.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Singular Value Decomposition (SVD)</strong> <br> <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, real or complex.</p></td>
-<td class="text-left"><p><strong>U</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(m \times m\)</span>) of left singular vectors. <br> <strong>V</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(n \times n\)</span>) of right singular vectors. <br> <strong><span class="math notranslate nohighlight">\(\Sigma\)</span></strong>: Rectangular diagonal matrix of non-negative singular values.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Decomposes any transformation into rotation, scaling, and another rotation. Associated with “Space” and the geometry of the transformation. <br> <strong>Applications</strong>: PCA, low-rank approximation, computing pseudoinverses, determining rank and condition number.</p></td>
-<td class="text-left"><p>Generalizes eigendecomposition to any matrix. The singular values of A are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>.</p></td>
-</tr>
-</tbody>
-</table>
+  <section class="tex2jax_ignore mathjax_ignore" id="existence-and-uniqueness-of-qr-decomposition">
+<h1>Existence and Uniqueness of QR Decomposition<a class="headerlink" href="#existence-and-uniqueness-of-qr-decomposition" title="Link to this heading">#</a></h1>
+<p>We have now seen three different algorithms (Householder, Givens, and Modified Gram-Schmidt) for computing the QR decomposition of a matrix <span class="math notranslate nohighlight">\(A\)</span>. A natural question arises: does this factorization always exist, and if so, is it unique?</p>
+<section id="existence">
+<h2>Existence<a class="headerlink" href="#existence" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="thm:existence_qr">
+<p class="admonition-title"><span class="caption-number">Theorem 15 </span> (Existence of QR Decomposition)</p>
+<section class="theorem-content" id="proof-content">
+<p>For any real matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m \times n}\)</span>, there exists a QR decomposition such that <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an upper triangular (or upper trapezoidal) matrix.</p>
+</section>
+</div><p>The constructive nature of the algorithms we’ve studied is a proof of this.</p>
+<ul class="simple">
+<li><p><strong>Full QR</strong>: For any <span class="math notranslate nohighlight">\(A\)</span>, we can find an orthogonal matrix <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{m \times m}\)</span> and an upper trapezoidal matrix <span class="math notranslate nohighlight">\(R \in \mathbb{R}^{m \times n}\)</span> such that <span class="math notranslate nohighlight">\(A=QR\)</span>.</p></li>
+<li><p><strong>Thin QR</strong>: If <span class="math notranslate nohighlight">\(m \ge n\)</span>, we can find a matrix <span class="math notranslate nohighlight">\(Q_1 \in \mathbb{R}^{m \times n}\)</span> with orthonormal columns and an upper triangular matrix <span class="math notranslate nohighlight">\(R_1 \in \mathbb{R}^{n \times n}\)</span> such that <span class="math notranslate nohighlight">\(A=Q_1 R_1\)</span>.</p></li>
+</ul>
+<p>The algorithms we have discussed can always be carried out, guaranteeing existence.</p>
+</section>
+<section id="uniqueness">
+<h2>Uniqueness<a class="headerlink" href="#uniqueness" title="Link to this heading">#</a></h2>
+<p>The uniqueness of the QR decomposition is more nuanced and depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span> and any constraints we place on the matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
+<section id="the-full-rank-case">
+<h3><strong>The Full Rank Case</strong><a class="headerlink" href="#the-full-rank-case" title="Link to this heading">#</a></h3>
+<div class="proof theorem admonition" id="thm:unique_thin_qr">
+<p class="admonition-title"><span class="caption-number">Theorem 16 </span> (Unique Thin QR Decomposition for Full Column Rank Matrices)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let’s assume <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m \times n}\)</span> with <span class="math notranslate nohighlight">\(m \ge n\)</span> has <strong>full column rank</strong> (i.e., its columns are linearly independent).</p>
+<p>In this case, the <strong>thin QR decomposition</strong> <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span> is <strong>unique</strong> if we impose the condition that all the <strong>diagonal elements of <span class="math notranslate nohighlight">\(R_1\)</span> must be positive</strong> (<span class="math notranslate nohighlight">\(r_{ii} &gt; 0\)</span>).</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Consider the product <span class="math notranslate nohighlight">\(A^T A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^T A = (Q_1 R_1)^T (Q_1 R_1) = R_1^T Q_1^T Q_1 R_1
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Q_1\)</span> has orthonormal columns, <span class="math notranslate nohighlight">\(Q_1^T Q_1 = I\)</span> (the identity matrix). This simplifies the expression to:</p>
+<div class="math notranslate nohighlight">
+\[
+A^T A = R_1^T R_1
+\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(A^T A\)</span> is symmetric and positive definite (since <span class="math notranslate nohighlight">\(A\)</span> has full rank). The equation above is precisely the <strong>Cholesky decomposition</strong> of <span class="math notranslate nohighlight">\(A^T A\)</span>. The Cholesky decomposition is unique when we require the diagonal elements of the triangular factor (<span class="math notranslate nohighlight">\(R_1\)</span> in this case) to be positive. Therefore, <span class="math notranslate nohighlight">\(R_1\)</span> is uniquely determined.</p>
+<p>Once <span class="math notranslate nohighlight">\(R_1\)</span> is uniquely determined, we can find <span class="math notranslate nohighlight">\(Q_1\)</span> from the relation <span class="math notranslate nohighlight">\(Q_1 = A R_1^{-1}\)</span>. Since <span class="math notranslate nohighlight">\(A\)</span> has full rank and <span class="math notranslate nohighlight">\(R_1\)</span> is nonsingular, <span class="math notranslate nohighlight">\(Q_1\)</span> is also uniquely determined.</p>
 </div>
+<p><em>Note on Full QR</em>: Even in this full-rank case, the <strong>full QR decomposition is not unique</strong>. The first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> are the unique columns of <span class="math notranslate nohighlight">\(Q_1\)</span>, but the remaining <span class="math notranslate nohighlight">\(m-n\)</span> columns only need to form an orthonormal basis for the orthogonal complement of the column space of <span class="math notranslate nohighlight">\(A\)</span>. There are infinitely many ways to choose this basis.</p>
+</section>
+<section id="the-rank-deficient-case">
+<h3><strong>The Rank-Deficient Case</strong><a class="headerlink" href="#the-rank-deficient-case" title="Link to this heading">#</a></h3>
+<p>If the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>rank-deficient</strong> (its columns are linearly dependent), then the QR decomposition is <strong>not unique</strong>.</p>
+<p>In this case, at least one of the diagonal elements of <span class="math notranslate nohighlight">\(R\)</span> will be zero. This introduces degrees of freedom into the system <span class="math notranslate nohighlight">\(A^T A = R^T R\)</span>, and the Cholesky factorization is no longer unique. This lack of uniqueness in <span class="math notranslate nohighlight">\(R\)</span> carries over to <span class="math notranslate nohighlight">\(Q\)</span>.</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -446,20 +465,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="eigen_vs_singular_values.html"
+       href="summary.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Eigenvalues and Singular Values</p>
+        <p class="prev-next-title">Summary</p>
       </div>
     </a>
     <a class="right-next"
-       href="solving_linear_systems.html"
+       href="backward_stability.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Solving Linear Systems</p>
+        <p class="prev-next-title">Backward Stability of Householder and Givens QR</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -469,6 +488,26 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uniqueness">Uniqueness</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-rank-case"><strong>The Full Rank Case</strong></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-deficient-case"><strong>The Rank-Deficient Case</strong></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
