@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -653,10 +653,9 @@ We use the fact that</p>
 </section>
 </div><p>At first glance, this bound appears complex, but its message is clear. The stability of the algorithm depends entirely on the magnitude of the entries in the computed factors <span class="math notranslate nohighlight">\(\tilde{L}\)</span> and <span class="math notranslate nohighlight">\(\tilde{U}\)</span>. If the entries in <span class="math notranslate nohighlight">\(|\tilde{L}|\)</span> and <span class="math notranslate nohighlight">\(|\tilde{U}|\)</span> are of the same order of magnitude as the entries in <span class="math notranslate nohighlight">\(|A|\)</span>, then <span class="math notranslate nohighlight">\(|E|\)</span> will be on the order of <span class="math notranslate nohighlight">\(u|A|\)</span>, and the algorithm is <strong>backward stable</strong>.</p>
 <p>However, if significant element growth occurs, and the entries of <span class="math notranslate nohighlight">\(|\tilde{L}||\tilde{U}|\)</span> become much larger than those of <span class="math notranslate nohighlight">\(|A|\)</span>, the backward error <span class="math notranslate nohighlight">\(|E|\)</span> can become arbitrarily large. This leads to a critical conclusion:</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Stability of LU Factorization
-LU factorization without a proper pivoting strategy is <strong>not</strong> a backward stable algorithm.</p>
+<div class="important admonition">
+<p class="admonition-title">Stability of LU Factorization</p>
+<p>LU factorization without a proper pivoting strategy is <strong>not</strong> a backward stable algorithm.</p>
 </div>
 </section>
 <section id="the-mechanism-of-instability-small-pivots">
