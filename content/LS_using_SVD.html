@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SVD for Rank-Deficient Least-Squares &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_using_SVD';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Solving Least-Squares using QR Factorization" href="LS_using_QR.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">SVD for Rank-Deficient Least-Squares</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/LS_using_SVD.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>SVD for Rank-Deficient Least-Squares</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-solution">The Minimum Norm Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-svd">Derivation using SVD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-least-squares-condition">1. The Least-Squares Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-condition">2. The Minimum Norm Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-and-solving">3. Combining and Solving</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-with-the-normal-equations-solution-when-full-rank">Equivalence with the Normal Equations Solution when Full Rank</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="svd-for-rank-deficient-least-squares">
+<h1>SVD for Rank-Deficient Least-Squares<a class="headerlink" href="#svd-for-rank-deficient-least-squares" title="Link to this heading">#</a></h1>
+<p>In our previous discussions, we assumed <span class="math notranslate nohighlight">\(A\)</span> had full column rank. But what happens if it doesn’t?</p>
+<ul class="simple">
+<li><p>If rank<span class="math notranslate nohighlight">\((A) = r &lt; n\)</span>, the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>rank-deficient</strong>.</p></li>
+<li><p>This implies <span class="math notranslate nohighlight">\(A\)</span> has a non-trivial <strong>null space</strong>, <span class="math notranslate nohighlight">\(N(A)\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(x_p\)</span> is a solution to <span class="math notranslate nohighlight">\(\text{argmin}_x \|Ax - b\|_2\)</span>, then <span class="math notranslate nohighlight">\(x_p + z\)</span> is <em>also</em> a solution for <em>any</em> vector <span class="math notranslate nohighlight">\(z \in N(A)\)</span>, because <span class="math notranslate nohighlight">\(A(x_p + z) - b = (Ax_p - b) + Az = (Ax_p - b)\)</span>.</p></li>
+<li><p>This means the least-squares solution is <strong>not unique</strong>.</p></li>
+</ul>
+<p>Our previous methods fail. For example, in the QR factorization <span class="math notranslate nohighlight">\(A=QR\)</span>, the upper-triangular matrix <span class="math notranslate nohighlight">\(R\)</span> will have zeros on its diagonal, making it singular and not invertible.</p>
+<section id="the-minimum-norm-solution">
+<h2>The Minimum Norm Solution<a class="headerlink" href="#the-minimum-norm-solution" title="Link to this heading">#</a></h2>
+<p>When the solution is not unique, we must add a second criterion to select one of the many possible solutions. The standard choice is the <strong>minimum norm solution</strong>, which is the unique vector <span class="math notranslate nohighlight">\(x^*\)</span> that satisfies two conditions:</p>
+<ol class="arabic simple">
+<li><p><strong>It solves the LS problem:</strong> <span class="math notranslate nohighlight">\(x^* = \text{argmin}_x \|Ax - b\|_2\)</span>.</p></li>
+<li><p><strong>It has the minimum 2-norm:</strong> <span class="math notranslate nohighlight">\(\|x^*\|_2 \le \|x\|_2\)</span> for any other LS solution <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
+</ol>
+<p>This second condition is equivalent to requiring the solution to be orthogonal to the null space: <span class="math notranslate nohighlight">\(x^* \perp N(A)\)</span>. This unique solution can be found robustly using the Singular Value Decomposition (SVD).</p>
+<div class="proof admonition" id="proof">
+<p>Proof. We prove the fact that the minimum-norm least-squares solution <span class="math notranslate nohighlight">\(x^*\)</span> is orthogonal to the null space, <span class="math notranslate nohighlight">\(x^* \perp N(A)\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(S\)</span> be the set of all vectors <span class="math notranslate nohighlight">\(x\)</span> that solve the least-squares problem. We are looking for a unique vector <span class="math notranslate nohighlight">\(x^* \in S\)</span> such that <span class="math notranslate nohighlight">\(\|x^*\|_2\)</span> is minimized.</p>
+<ol class="arabic">
+<li><p><strong>Decompose any LS solution:</strong>
+Let <span class="math notranslate nohighlight">\(x_p\)</span> be <em>any</em> solution to the least-squares problem. As we’ve established, the set of all solutions <span class="math notranslate nohighlight">\(S\)</span> can be written as:</p>
+<div class="math notranslate nohighlight">
+\[
+    S = \{ x_p + z \mid z \in N(A) \}
+    \]</div>
+<p>where <span class="math notranslate nohighlight">\(N(A)\)</span> is the null space of <span class="math notranslate nohighlight">\(A\)</span>. Our goal is to find the vector in this set with the smallest 2-norm.</p>
+</li>
+<li><p><strong>Decompose <span class="math notranslate nohighlight">\(x_p\)</span> using Fundamental Subspaces:</strong>
+By the fundamental theorem of linear algebra, any vector in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> (like <span class="math notranslate nohighlight">\(x_p\)</span>) can be uniquely decomposed into a component in the <strong>row space</strong>, <span class="math notranslate nohighlight">\(\text{span}(A^T)\)</span>, and a component in the <strong>null space</strong>, <span class="math notranslate nohighlight">\(N(A)\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+    x_p = x_r + x_n
+    \]</div>
+<p>where <span class="math notranslate nohighlight">\(x_r \in \text{span}(A^T)\)</span> and <span class="math notranslate nohighlight">\(x_n \in N(A)\)</span>.</p>
+</li>
+<li><p><strong>Rewrite the set of all solutions:</strong>
+Let’s substitute this decomposition back into our set <span class="math notranslate nohighlight">\(S\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    S = \{ x_r + z \mid z \in N(A) \}
+    \]</div>
+<p>since <span class="math notranslate nohighlight">\(x_n\)</span> is also in <span class="math notranslate nohighlight">\(N(A)\)</span>, we can absorb it into the general <span class="math notranslate nohighlight">\(z\)</span> term.</p>
+</li>
+<li><p><strong>Minimize the Norm using Orthogonality:</strong>
+We want to find <span class="math notranslate nohighlight">\(\text{argmin}_{x \in S} \|x\|_2^2\)</span>, which is now:</p>
+<div class="math notranslate nohighlight">
+\[
+    \min_{z' \in N(A)} \|x_r + z'\|_2^2
+    \]</div>
+<p>A key part of the fundamental theorem is that the row space and the null space are <strong>orthogonal complements</strong>. This means that <span class="math notranslate nohighlight">\(x_r \perp z'\)</span> for any <span class="math notranslate nohighlight">\(z' \in N(A)\)</span>.
+By the Pythagorean theorem, the squared norm becomes:</p>
+<div class="math notranslate nohighlight">
+\[
+    \|x_r + z'\|_2^2 = \|x_r\|_2^2 + \|z'\|_2^2
+    \]</div>
+</li>
+<li><p><strong>Find the Minimum:</strong>
+Our minimization problem is now:</p>
+<div class="math notranslate nohighlight">
+\[
+    \min_{z' \in N(A)} \left( \|x_r\|_2^2 + \|z'\|_2^2 \right)
+    \]</div>
+<p>The smallest possible value for <span class="math notranslate nohighlight">\(\|z'\|_2^2\)</span> is 0, which is achieved when <span class="math notranslate nohighlight">\(z' = 0\)</span>.</p>
+</li>
+<li><p>The unique minimum-norm solution <span class="math notranslate nohighlight">\(x^*\)</span> occurs when <span class="math notranslate nohighlight">\(z' = 0\)</span>. This gives:</p>
+<div class="math notranslate nohighlight">
+\[
+    x^* = x_r + 0 = x_r
+    \]</div>
+<p>By definition, <span class="math notranslate nohighlight">\(x_r\)</span> is in the row space, <span class="math notranslate nohighlight">\(x_r \in \text{span}(A^T)\)</span>. Since the row space is the orthogonal complement of the null space (<span class="math notranslate nohighlight">\(\text{span}(A^T) = N(A)^\perp\)</span>), this proves that the minimum-norm solution <span class="math notranslate nohighlight">\(x^*\)</span> must be <strong>orthogonal to the null space <span class="math notranslate nohighlight">\(N(A)\)</span></strong>.</p>
+</li>
+</ol>
+</div>
+</section>
+<section id="derivation-using-svd">
+<h2>Derivation using SVD<a class="headerlink" href="#derivation-using-svd" title="Link to this heading">#</a></h2>
+<p>Let’s now use the <strong>thin SVD</strong> of <span class="math notranslate nohighlight">\(A\)</span>, which is a factorization <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span> where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(m \times n\)</span> with rank<span class="math notranslate nohighlight">\((A) = r &lt; n\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(U\)</span> is an <span class="math notranslate nohighlight">\(m \times r\)</span> matrix with orthonormal columns. Its columns form a basis for <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Sigma\)</span> is an <span class="math notranslate nohighlight">\(r \times r\)</span> diagonal matrix containing the <span class="math notranslate nohighlight">\(r\)</span> non-zero singular values, <span class="math notranslate nohighlight">\(\sigma_1 \ge \dots \ge \sigma_r &gt; 0\)</span>. It is invertible.</p></li>
+<li><p><span class="math notranslate nohighlight">\(V\)</span> is an <span class="math notranslate nohighlight">\(n \times r\)</span> matrix with orthonormal columns. Its columns form a basis for the <strong>row space</strong>, <span class="math notranslate nohighlight">\(\text{span}(A^T)\)</span>.</p></li>
+</ul>
+<p>We will now apply our two conditions.</p>
+<section id="the-least-squares-condition">
+<span id="ls-conditions"></span><h3>1. The Least-Squares Condition<a class="headerlink" href="#the-least-squares-condition" title="Link to this heading">#</a></h3>
+<p>The LS solution must make the residual <span class="math notranslate nohighlight">\(r = Ax - b\)</span> orthogonal to the column space, <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p>
+<ul>
+<li><p>Since <span class="math notranslate nohighlight">\(\text{span}(A) = \text{span}(U)\)</span>, this orthogonality condition is:</p>
+<div class="math notranslate nohighlight">
+\[
+    U^T (Ax - b) = 0
+    \]</div>
+</li>
+<li><p>Substitute <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    U^T ( (U \Sigma V^T)x - b ) = 0
+    \]</div>
+</li>
+<li><p>Distribute <span class="math notranslate nohighlight">\(U^T\)</span>. Since <span class="math notranslate nohighlight">\(U\)</span> has orthonormal columns, <span class="math notranslate nohighlight">\(U^T U = I_r\)</span> (the <span class="math notranslate nohighlight">\(r \times r\)</span> identity):</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{aligned}
+        (U^T U) \Sigma V^T x - U^T b &amp;= 0 \\
+        \Sigma V^T x &amp;= U^T b
+    \end{aligned}
+    \end{split}\]</div>
+<p>This equation defines all LS solutions. As <span class="math notranslate nohighlight">\(V^T\)</span> is a “wide” <span class="math notranslate nohighlight">\(r \times n\)</span> matrix, this system is underdetermined for <span class="math notranslate nohighlight">\(x\)</span> and has infinitely many solutions.</p>
+</li>
+</ul>
+</section>
+<section id="the-minimum-norm-condition">
+<h3>2. The Minimum Norm Condition<a class="headerlink" href="#the-minimum-norm-condition" title="Link to this heading">#</a></h3>
+<p>Now we apply our second condition: the solution <span class="math notranslate nohighlight">\(x\)</span> must be orthogonal to the null space, <span class="math notranslate nohighlight">\(x \perp N(A)\)</span>.</p>
+<ul>
+<li><p>From the SVD, we know the <strong>null space <span class="math notranslate nohighlight">\(N(A)\)</span> is the orthogonal complement of the row space <span class="math notranslate nohighlight">\(\text{span}(A^T)\)</span></strong>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(\text{span}(A^T) = \text{span}(V)\)</span>, the condition <span class="math notranslate nohighlight">\(x \perp N(A)\)</span> is <em>equivalent</em> to <span class="math notranslate nohighlight">\(x \in \text{span}(V)\)</span>.</p></li>
+<li><p>This means <span class="math notranslate nohighlight">\(x\)</span> must be a linear combination of the columns of <span class="math notranslate nohighlight">\(V\)</span>. We can express this by defining a new, unique vector <span class="math notranslate nohighlight">\(y \in \mathbb{R}^r\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[
+    x = V y
+    \]</div>
+</li>
+</ul>
+</section>
+<section id="combining-and-solving">
+<h3>3. Combining and Solving<a class="headerlink" href="#combining-and-solving" title="Link to this heading">#</a></h3>
+<p>We now substitute our “minimum norm” form <span class="math notranslate nohighlight">\(x = Vy\)</span> into our “least-squares” equation from <a class="reference internal" href="#ls-conditions">Step 1</a>:</p>
+<div class="math notranslate nohighlight">
+\[
+\Sigma V^T (Vy) = U^T b
+\]</div>
+<ul>
+<li><p>Since <span class="math notranslate nohighlight">\(V\)</span> has orthonormal columns, <span class="math notranslate nohighlight">\(V^T V = I_r\)</span>. We can simplify the equation:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{aligned}
+        \Sigma (V^T V) y &amp;= U^T b \\
+        \Sigma y &amp;= U^T b
+    \end{aligned}
+    \end{split}\]</div>
+</li>
+<li><p>This is now a simple <span class="math notranslate nohighlight">\(r \times r\)</span> diagonal system. Since <span class="math notranslate nohighlight">\(\Sigma\)</span> is invertible (it only contains non-zero singular values), we can solve for the unique <span class="math notranslate nohighlight">\(y\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    y = \Sigma^{-1} U^T b
+    \]</div>
+</li>
+<li><p>Finally, we substitute <span class="math notranslate nohighlight">\(y\)</span> back into <span class="math notranslate nohighlight">\(x = Vy\)</span> to get our unique, minimum-norm LS solution:</p>
+<div class="math notranslate nohighlight">
+\[
+    x = V y = V \Sigma^{-1} U^T b
+    \]</div>
+</li>
+</ul>
+<p>This solution</p>
+<div class="math notranslate nohighlight">
+\[
+x = \sum_{i=1}^r \frac{u_i^T b}{\sigma_i} \; v_i
+\]</div>
+<p>is the most robust and general solution to the linear least-squares problem.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>The Moore-Penrose Pseudoinverse</strong></p>
+<p>The matrix we constructed, <span class="math notranslate nohighlight">\(A^\dagger = V \Sigma^{-1} U^T\)</span>, is known as the <strong>Moore-Penrose Pseudoinverse</strong>.</p>
+<p>The minimum-norm least-squares solution to <span class="math notranslate nohighlight">\(Ax=b\)</span> is <em>always</em> given by:</p>
+<div class="math notranslate nohighlight">
+\[
+x = A^\dagger b
+\]</div>
+<p>The SVD provides the most general and numerically stable way to compute <span class="math notranslate nohighlight">\(A^\dagger\)</span>. It handles all cases:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is invertible: <span class="math notranslate nohighlight">\(A^\dagger = A^{-1}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is overdetermined (full rank): <span class="math notranslate nohighlight">\(A^\dagger = (A^T A)^{-1} A^T\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is rank-deficient (our case): <span class="math notranslate nohighlight">\(A^\dagger\)</span> gives the unique minimum-norm solution.</p></li>
+</ul>
+</div>
+</section>
+<section id="equivalence-with-the-normal-equations-solution-when-full-rank">
+<h3>Equivalence with the Normal Equations Solution when Full Rank<a class="headerlink" href="#equivalence-with-the-normal-equations-solution-when-full-rank" title="Link to this heading">#</a></h3>
+<p>We will now prove that the minimum-norm least-squares solution using the SVD given by <span class="math notranslate nohighlight">\(V \Sigma^{-1} U^T b\)</span> is the same as <span class="math notranslate nohighlight">\((A^T A)^{-1} A^T b\)</span> when <span class="math notranslate nohighlight">\(A\)</span> has full column rank.</p>
+<p>This proof is valid under the assumption that <span class="math notranslate nohighlight">\(A\)</span> has <strong>full column rank</strong> (rank<span class="math notranslate nohighlight">\((A) = n\)</span>), which is the same assumption required for <span class="math notranslate nohighlight">\((A^T A)^{-1}\)</span> to exist in the first place.</p>
+<p>We will use the <strong>thin SVD</strong>, where <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(m \times n\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(U\)</span> is <span class="math notranslate nohighlight">\(m \times n\)</span> with orthonormal columns, so <span class="math notranslate nohighlight">\(U^T U = I_n\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Sigma\)</span> is <span class="math notranslate nohighlight">\(n \times n\)</span>, diagonal, and invertible (since rank<span class="math notranslate nohighlight">\(=n\)</span>, all <span class="math notranslate nohighlight">\(n\)</span> singular values are non-zero).</p></li>
+<li><p><span class="math notranslate nohighlight">\(V\)</span> is <span class="math notranslate nohighlight">\(n \times n\)</span> and orthogonal, so <span class="math notranslate nohighlight">\(V^T V = V V^T = I_n\)</span> and <span class="math notranslate nohighlight">\(V^{-1} = V^T\)</span>.</p></li>
+</ul>
+<div class="proof admonition" id="proof">
+<p>Proof. We will start with the normal equations form <span class="math notranslate nohighlight">\(A^\dagger = (A^T A)^{-1} A^T\)</span> and substitute <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span> into it.</p>
+<p><strong>1. Substitute <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A^T A\)</span>:</strong>
+First, let’s find the expression for <span class="math notranslate nohighlight">\(A^T A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^T = (U \Sigma V^T)^T = V \Sigma^T U^T
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\Sigma\)</span> is a square diagonal matrix, <span class="math notranslate nohighlight">\(\Sigma^T = \Sigma\)</span>. So, <span class="math notranslate nohighlight">\(A^T = V \Sigma U^T\)</span>.
+Now, multiply <span class="math notranslate nohighlight">\(A^T\)</span> and <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^T A = (V \Sigma U^T) (U \Sigma V^T)
+\]</div>
+<p>Group the middle terms: <span class="math notranslate nohighlight">\(A^T A = V \Sigma (U^T U) \Sigma V^T\)</span>.
+Since <span class="math notranslate nohighlight">\(U^T U = I_n\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity), this simplifies to:</p>
+<div class="math notranslate nohighlight">
+\[
+A^T A = V \Sigma (I_n) \Sigma V^T = V \Sigma^2 V^T
+\]</div>
+<p><strong>2. Invert <span class="math notranslate nohighlight">\(A^T A\)</span>:</strong>
+Now we find the inverse of the expression from Step 1:</p>
+<div class="math notranslate nohighlight">
+\[
+(A^T A)^{-1} = (V \Sigma^2 V^T)^{-1}
+\]</div>
+<p>Using the inverse rule <span class="math notranslate nohighlight">\((XYZ)^{-1} = Z^{-1} Y^{-1} X^{-1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+(A^T A)^{-1} = (V^T)^{-1} (\Sigma^2)^{-1} V^{-1}
+\]</div>
+<ul class="simple">
+<li><p>Since <span class="math notranslate nohighlight">\(V\)</span> is orthogonal, <span class="math notranslate nohighlight">\(V^{-1} = V^T\)</span> and <span class="math notranslate nohighlight">\((V^T)^{-1} = V\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(\Sigma^2\)</span> is diagonal, <span class="math notranslate nohighlight">\((\Sigma^2)^{-1} = \Sigma^{-2}\)</span>.
+Substituting these in, we get:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+(A^T A)^{-1} = V \Sigma^{-2} V^T
+\]</div>
+<p><strong>3. Put It All Together:</strong>
+Now we go back to the original formula and substitute our results from Step 1 and Step 2:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+    A^\dagger &amp;= (A^T A)^{-1} A^T \\
+             &amp;= (V \Sigma^{-2} V^T) (V \Sigma U^T)
+\end{aligned}
+\end{split}\]</div>
+<p>Group the middle terms: <span class="math notranslate nohighlight">\(A^\dagger = V \Sigma^{-2} (V^T V) \Sigma U^T\)</span>.
+Since <span class="math notranslate nohighlight">\(V^T V = I_n\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^\dagger = V \Sigma^{-2} (I_n) \Sigma U^T = V (\Sigma^{-2} \Sigma) U^T
+\]</div>
+<p>Finally, simplify the diagonal matrices: <span class="math notranslate nohighlight">\(\Sigma^{-2} \Sigma = \Sigma^{-1}\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+A^\dagger = V \Sigma^{-1} U^T
+\]</div>
+<p>This completes the proof, showing the two expressions are identical.</p>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="LS_using_QR.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Solving Least-Squares using QR Factorization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-solution">The Minimum Norm Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-svd">Derivation using SVD</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-least-squares-condition">1. The Least-Squares Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-condition">2. The Minimum Norm Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-and-solving">3. Combining and Solving</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-with-the-normal-equations-solution-when-full-rank">Equivalence with the Normal Equations Solution when Full Rank</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

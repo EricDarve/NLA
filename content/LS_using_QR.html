@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Operator and Matrix Norms &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Solving Least-Squares using QR Factorization &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/operator_norms';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_using_QR';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Sherman-Morrison-Woodbury Formula" href="sherman_morrison_woodbury.html" />
-    <link rel="prev" title="Matrix-Matrix Multiplications" href="matrix_matrix_multiplication.html" />
+    <link rel="next" title="SVD for Rank-Deficient Least-Squares" href="LS_using_SVD.html" />
+    <link rel="prev" title="The Method of Normal Equations" href="normal_equations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,12 +177,12 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
 <li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
@@ -216,7 +216,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
 </ul>
 </details></li>
@@ -275,7 +275,7 @@
       
       
       
-      <li><a href="../_sources/content/operator_norms.md" target="_blank"
+      <li><a href="../_sources/content/LS_using_QR.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -359,7 +359,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Operator and Matrix Norms</h1>
+    <h1>Solving Least-Squares using QR Factorization</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -369,18 +369,23 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-operator-norm-induced-p-norm">The Operator Norm (Induced p-Norm)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-inequalities-for-operator-norms">Key Inequalities for Operator Norms</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sub-multiplicative-property">Sub-multiplicative Property</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consistency-with-vector-norms">Consistency with Vector Norms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-the-orthogonality-principle">Derivation from the Orthogonality Principle</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transformed-system">The Transformed System</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-between-norms">Equivalence Between Norms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fundamental-properties">Other Fundamental Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-summary">Algorithm Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-and-advantages">Analysis and Advantages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-the-normal-equations">Derivation using the Normal Equations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-vs-thin-qr-and-the-invertible-factor">Full vs. Thin QR and the Invertible Factor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-qr-factorization">1. Full QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduced-or-thin-qr-factorization">2. Reduced (or Thin) QR Factorization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-reduced-qr">Derivation using Reduced QR</a></li>
 </ul>
             </nav>
         </div>
@@ -392,101 +397,172 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="operator-and-matrix-norms">
-<h1>Operator and Matrix Norms<a class="headerlink" href="#operator-and-matrix-norms" title="Link to this heading">#</a></h1>
-<p>A <strong>matrix norm</strong> is a function that assigns a strictly positive number to a matrix, providing a measure of its “size” or “magnitude”. Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.</p>
-<section id="the-operator-norm-induced-p-norm">
-<h2>The Operator Norm (Induced p-Norm)<a class="headerlink" href="#the-operator-norm-induced-p-norm" title="Link to this heading">#</a></h2>
-<p>The most common family of matrix norms are <strong>operator norms</strong>, also known as <strong>induced norms</strong>. These norms are derived directly from vector p-norms and are defined by how much a matrix can “stretch” a vector.</p>
-<p>The operator norm is defined as the maximum possible ratio of <span class="math notranslate nohighlight">\(\|Ax\|_p\)</span> to <span class="math notranslate nohighlight">\(\|x\|_p\)</span> for any non-zero vector <span class="math notranslate nohighlight">\(x\)</span>. This is equivalent to finding the maximum length of the vector <span class="math notranslate nohighlight">\(Ax\)</span> for any vector <span class="math notranslate nohighlight">\(x\)</span> with a length of 1.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="solving-least-squares-using-qr-factorization">
+<h1>Solving Least-Squares using QR Factorization<a class="headerlink" href="#solving-least-squares-using-qr-factorization" title="Link to this heading">#</a></h1>
+<p>While the method of normal equations is straightforward, its numerical instability, caused by squaring the condition number, makes it unsuitable for many practical problems. A more robust and widely used approach is based on the <strong>QR factorization</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>. This method is generally the standard for solving dense linear least-squares problems.</p>
+<section id="derivation-from-the-orthogonality-principle">
+<h2>Derivation from the Orthogonality Principle<a class="headerlink" href="#derivation-from-the-orthogonality-principle" title="Link to this heading">#</a></h2>
+<p>We start from the same geometric principle as before: the residual vector <span class="math notranslate nohighlight">\(r = b - Ax\)</span> must be orthogonal to the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 <div class="math notranslate nohighlight">
-\[\| A \|_p = \sup_{x \neq 0} \frac{\|A x\|_p}{\|x\|_p} = \max_{\|x\|_p = 1} \| Ax \|_p\]</div>
-<p>Geometrically, if you apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to all the vectors on the unit circle (or unit sphere in higher dimensions), you’ll get an ellipse (or ellipsoid). The p-norm <span class="math notranslate nohighlight">\(\|A\|_p\)</span> is the length of the longest vector from the origin to a point on that resulting shape.</p>
-<p>The three most widely used operator norms are:</p>
-<ul class="simple">
-<li><p><strong>1-Norm</strong>: The maximum absolute column sum. It is computed as <span class="math notranslate nohighlight">\(\|A\|_1 = \max_j \sum_i |a_{ij}|\)</span>.</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(\infty\)</span>-Norm</strong>: The maximum absolute row sum. It is computed as <span class="math notranslate nohighlight">\(\|A\|_\infty = \max_i \sum_j |a_{ij}|\)</span>.</p></li>
-<li><p><strong>2-Norm (Spectral Norm)</strong>: This norm is equal to the largest <strong>singular value</strong> of the matrix, denoted <span class="math notranslate nohighlight">\(\sigma_{\max}(A)\)</span>. While it corresponds to the true geometric “maximum stretch,” it is generally more computationally intensive than the 1-norm or <span class="math notranslate nohighlight">\(\infty\)</span>-norm.</p></li>
-</ul>
-</section>
-<section id="the-frobenius-norm">
-<h2>The Frobenius Norm<a class="headerlink" href="#the-frobenius-norm" title="Link to this heading">#</a></h2>
-<p>Another useful and easy-to-compute norm is the <strong>Frobenius norm</strong>. Unlike the operator norms, it is not induced by a vector norm. Instead, it treats the matrix as a single long vector and calculates its standard Euclidean norm (the square root of the sum of the squares of all its elements).</p>
+\[
+A^T(Ax - b) = 0
+\]</div>
+<p>Now, let’s introduce the full QR factorization, <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. The key insight is that the columns of <span class="math notranslate nohighlight">\(A\)</span> and the columns of <span class="math notranslate nohighlight">\(Q\)</span> span the same spaces. Specifically, the first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> form an orthonormal basis for the column space of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p>
+<p>Therefore, the orthogonality condition can be restated as requiring the residual to be orthogonal to the basis vectors in <span class="math notranslate nohighlight">\(Q\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_F = \left( \sum_{i=1}^m \sum_{j=1}^n |a_{ij}|^2 \right)^{1/2}\]</div>
-<p>The Frobenius norm is very convenient for analyzing matrices that can be decomposed into blocks.</p>
-<p>The two most fundamental inequalities for matrix operator norms are the <strong>sub-multiplicative</strong> inequality, <span class="math notranslate nohighlight">\(\|AB\| \le \|A\| \|B\|\)</span>, and the <strong>consistency</strong> inequality, <span class="math notranslate nohighlight">\(\|Ax\| \le \|A\| \|x\|\)</span>.</p>
-</section>
-<section id="key-inequalities-for-operator-norms">
-<h2>Key Inequalities for Operator Norms<a class="headerlink" href="#key-inequalities-for-operator-norms" title="Link to this heading">#</a></h2>
-<p>While many inequalities exist, they primarily fall into a few key categories that define how matrix norms behave with respect to multiplication and each other.</p>
-<section id="sub-multiplicative-property">
-<h3>Sub-multiplicative Property<a class="headerlink" href="#sub-multiplicative-property" title="Link to this heading">#</a></h3>
-<p>This is the most important property for analyzing products of matrices. For any two matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> whose product is defined, the operator and Frobenius norms satisfy:</p>
+\[
+Q^T(Ax - b) = 0
+\]</div>
+<p>Now, we substitute <span class="math notranslate nohighlight">\(A=QR\)</span> into this equation:</p>
 <div class="math notranslate nohighlight">
-\[\|AB\| \le \|A\| \|B\|\]</div>
-<p>This inequality is crucial for bounding errors in matrix computations and for proving the convergence of iterative methods, such as in solving systems of linear equations.</p>
-</section>
-<section id="consistency-with-vector-norms">
-<h3>Consistency with Vector Norms<a class="headerlink" href="#consistency-with-vector-norms" title="Link to this heading">#</a></h3>
-<p>The consistency property for the operator norm connects the matrix norm back to the vector norm it’s based on. For any matrix <span class="math notranslate nohighlight">\(A\)</span> and vector <span class="math notranslate nohighlight">\(x\)</span>:</p>
+\[
+Q^T(QRx - b) = 0
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Q\)</span> is orthogonal, we know that <span class="math notranslate nohighlight">\(Q^T Q = I\)</span>. Applying this property, we get:</p>
 <div class="math notranslate nohighlight">
-\[\|Ax\| \le \|A\| \|x\|\]</div>
-<p>This inequality states that the norm of a matrix tells you the maximum factor by which it can stretch any vector.</p>
-</section>
-</section>
-<section id="equivalence-between-norms">
-<h2>Equivalence Between Norms<a class="headerlink" href="#equivalence-between-norms" title="Link to this heading">#</a></h2>
-<p>Just like vector norms, all matrix norms on a finite-dimensional space are <strong>equivalent</strong>. This means that for any two matrix norms <span class="math notranslate nohighlight">\(\|\cdot\|_a\)</span> and <span class="math notranslate nohighlight">\(\|\cdot\|_b\)</span>, there exist positive constants <span class="math notranslate nohighlight">\(c_1\)</span> and <span class="math notranslate nohighlight">\(c_2\)</span> such that:</p>
+\[\begin{split}
+\begin{aligned}
+(Q^T Q)Rx - Q^T b &amp;= 0 \\
+IRx - Q^T b &amp;= 0
+\end{aligned}
+\end{split}\]</div>
+<p>This simplifies the least-squares problem into a much nicer linear system.</p>
+<section id="the-transformed-system">
+<h3>The Transformed System<a class="headerlink" href="#the-transformed-system" title="Link to this heading">#</a></h3>
+<p>The equation becomes:</p>
 <div class="math notranslate nohighlight">
-\[c_1 \|A\|_b \le \|A\|_a \le c_2 \|A\|_b\]</div>
-<p>The most useful specific inequalities relate the common operator norms (<span class="math notranslate nohighlight">\(1\)</span>-norm, <span class="math notranslate nohighlight">\(2\)</span>-norm, <span class="math notranslate nohighlight">\(\infty\)</span>-norm) and the Frobenius norm (<span class="math notranslate nohighlight">\(F\)</span>) for any <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>. 📐</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\|A\|_2 \le \|A\|_F \le \sqrt{n}\|A\|_2\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\frac{1}{\sqrt{n}}\|A\|_\infty \le \|A\|_2 \le \sqrt{n}\|A\|_\infty\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\frac{1}{\sqrt{n}}\|A\|_1 \le \|A\|_2 \le \sqrt{n}\|A\|_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\frac{1}{n}\|A\|_\infty \le \|A\|_1 \le n\|A\|_\infty\)</span></p></li>
-</ul>
-</section>
-<section id="other-fundamental-properties">
-<h2>Other Fundamental Properties<a class="headerlink" href="#other-fundamental-properties" title="Link to this heading">#</a></h2>
-<p>All matrix norms must also satisfy the standard properties of a norm:</p>
+\[
+Rx = Q^T b
+\]</div>
+<p>This system is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal system. If we partition <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix and <span class="math notranslate nohighlight">\(b_1\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-vector, the system becomes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{bmatrix} R_1 \\ 0 \end{bmatrix} x = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
+\end{split}\]</div>
+<p>This gives us two equations:</p>
 <ol class="arabic simple">
-<li><p><strong>Triangle Inequality</strong>: <span class="math notranslate nohighlight">\(\|A+B\| \le \|A\| + \|B\|\)</span></p></li>
-<li><p><strong>Absolute Homogeneity</strong>: <span class="math notranslate nohighlight">\(\|\alpha A\| = |\alpha| \|A\|\)</span> for any scalar <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
-<li><p><strong>Positive Definiteness</strong>: <span class="math notranslate nohighlight">\(\|A\| \ge 0\)</span>, and <span class="math notranslate nohighlight">\(\|A\|=0\)</span> if and only if <span class="math notranslate nohighlight">\(A=0\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(R_1 x = b_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(0 \cdot x = b_2\)</span></p></li>
+</ol>
+<p>The solution <span class="math notranslate nohighlight">\(x\)</span> is found by solving the first equation. The norm of the residual is simply <span class="math notranslate nohighlight">\(\|b_2\|_2\)</span>.</p>
+<p>The solution to the least-squares problem is therefore found by solving the <strong>square, upper-triangular system</strong>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-qr-system">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-qr-system" title="Link to this equation">#</a></span>\[R_1 x = b_1\]</div>
+<p>This is easily solved using <strong>back-substitution</strong>.</p>
+</section>
+</section>
+<section id="algorithm-summary">
+<h2>Algorithm Summary<a class="headerlink" href="#algorithm-summary" title="Link to this heading">#</a></h2>
+<p>The QR method for solving <span class="math notranslate nohighlight">\(\|Ax - b\|_2\)</span> can be summarized in three steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Factorize:</strong> Compute the QR factorization of <span class="math notranslate nohighlight">\(A\)</span>, yielding <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span>.</p></li>
+<li><p><strong>Transform:</strong> Compute the vector <span class="math notranslate nohighlight">\(Q^T b\)</span>.</p></li>
+<li><p><strong>Solve:</strong> Solve the <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular system <span class="math notranslate nohighlight">\(R_1 x = b_1\)</span> for <span class="math notranslate nohighlight">\(x\)</span> using back-substitution, where <span class="math notranslate nohighlight">\(R_1\)</span> and <span class="math notranslate nohighlight">\(b_1\)</span> are the top <span class="math notranslate nohighlight">\(n\)</span> rows of <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>, respectively.</p></li>
 </ol>
 </section>
-<section id="other-matrix-norms">
-<h2>Other Matrix Norms<a class="headerlink" href="#other-matrix-norms" title="Link to this heading">#</a></h2>
-<p>While the operator and Frobenius norms are the most common, other specialized norms are valuable in various applications. We introduce two such examples: the simple but non-sub-multiplicative <strong>max norm</strong>, and the more general family of <strong>Schatten norms</strong>, which are based on a matrix’s singular values.</p>
-</section>
-<section id="max-norm">
-<h2>Max Norm<a class="headerlink" href="#max-norm" title="Link to this heading">#</a></h2>
-<p>The largest element in the matrix by magnitude. Note that this norm is <strong>not</strong> sub-multiplicative (<span class="math notranslate nohighlight">\(\|AB\| \le \|A\|\|B\|\)</span> does not hold).</p>
+<section id="analysis-and-advantages">
+<h2>Analysis and Advantages<a class="headerlink" href="#analysis-and-advantages" title="Link to this heading">#</a></h2>
+<section id="numerical-stability">
+<h3>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h3>
+<p>This is the <strong>primary advantage</strong> of the QR method. By avoiding the formation of the Gram matrix <span class="math notranslate nohighlight">\(A^T A\)</span>, we work with a system whose condition number is <span class="math notranslate nohighlight">\(\kappa_2(R_1) = \kappa_2(A)\)</span>, not <span class="math notranslate nohighlight">\(\kappa_2(A)^2\)</span>.</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_{\text{max}} = \max_{ij} |a_{ij}|\]</div>
+\[
+\kappa_2(\text{Normal Equations}) = \kappa_2(A)^2 \quad \text{vs.} \quad \kappa_2(\text{QR Method}) = \kappa_2(A)
+\]</div>
+<p>This dramatic improvement in conditioning means the solution is far less sensitive to perturbations and rounding errors. It’s the reason QR is the workhorse for least-squares problems. ✅</p>
 </section>
-<section id="schatten-norms-based-on-singular-values">
-<h2>Schatten Norms (based on singular values)<a class="headerlink" href="#schatten-norms-based-on-singular-values" title="Link to this heading">#</a></h2>
-<p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norm is defined by applying the vector <span class="math notranslate nohighlight">\(p\)</span>-norm to the vector of the matrix’s singular values, <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
+<section id="computational-cost">
+<h3>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h3>
+<p>The computational cost is dominated by the QR factorization step (e.g., using Householder transformations), which takes approximately <span class="math notranslate nohighlight">\(2mn^2 - \frac{2}{3}n^3\)</span> flops. The total cost is <span class="math notranslate nohighlight">\(O(mn^2)\)</span>, which is comparable to the normal equations method.</p>
+</section>
+</section>
+<section id="derivation-using-the-normal-equations">
+<h2>Derivation using the Normal Equations<a class="headerlink" href="#derivation-using-the-normal-equations" title="Link to this heading">#</a></h2>
+<p>For this derivation, we first need to discuss the full vs thin QR factorization. The previous derivation used the full QR factorization. But now it will be clearer if we use the thin QR factorization.</p>
+<section id="full-vs-thin-qr-and-the-invertible-factor">
+<h3>Full vs. Thin QR and the Invertible Factor<a class="headerlink" href="#full-vs-thin-qr-and-the-invertible-factor" title="Link to this heading">#</a></h3>
+</section>
+<section id="full-qr-factorization">
+<h3>1. Full QR Factorization<a class="headerlink" href="#full-qr-factorization" title="Link to this heading">#</a></h3>
+<p>For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> (with <span class="math notranslate nohighlight">\(m \ge n\)</span>), the <strong>full</strong> QR factorization is:</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_{S,p} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}\]</div>
-<p>This family generalizes several important norms:</p>
+\[
+A_{m \times n} = Q_{m \times m} R_{m \times n}
+\]</div>
 <ul>
-<li><p><strong>Schatten 1-Norm (Nuclear Norm or Trace Norm)</strong>: The sum of the singular values. It’s widely used in machine learning for matrix completion and rank minimization problems.</p>
+<li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix.</p></li>
+<li><p><span class="math notranslate nohighlight">\(R\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. It has the structure:</p>
 <div class="math notranslate nohighlight">
-\[\|A\|_{S,1} = \sum_{i=1}^{\min(m,n)} \sigma_i\]</div>
-</li>
-<li><p><strong>Schatten 2-Norm</strong>: The square root of the sum of the squares of the singular values. This is exactly the same as the <strong>Frobenius norm</strong>.</p>
-<div class="math notranslate nohighlight">
-\[\|A\|_{S,2} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^2 \right)^{1/2} = \|A\|_F\]</div>
-</li>
-<li><p><strong>Schatten <span class="math notranslate nohighlight">\(\infty\)</span>-Norm</strong>: The limit as <span class="math notranslate nohighlight">\(p \to \infty\)</span>, which is simply the largest singular value. This is exactly the same as the <strong>spectral norm (operator 2-norm)</strong>.</p>
-<div class="math notranslate nohighlight">
-\[\|A\|_{S,\infty} = \max_i \sigma_i = \|A\|_2\]</div>
+\[\begin{split}
+    R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}
+    \end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix, and the lower block is an <span class="math notranslate nohighlight">\((m-n) \times n\)</span> matrix of zeros.</p>
 </li>
 </ul>
+<p>In this form, <span class="math notranslate nohighlight">\(R\)</span> is rectangular and <strong>not invertible</strong>. The invertible part is its submatrix <span class="math notranslate nohighlight">\(R_1\)</span>.</p>
+</section>
+<section id="reduced-or-thin-qr-factorization">
+<h3>2. Reduced (or Thin) QR Factorization<a class="headerlink" href="#reduced-or-thin-qr-factorization" title="Link to this heading">#</a></h3>
+<p>The <strong>reduced</strong> QR factorization is a more compact version that is often more useful in practice:</p>
+<div class="math notranslate nohighlight">
+\[
+A_{m \times n} = Q_{1, m \times n} R_{1, n \times n}
+\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q_1\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with orthonormal columns. (It’s the first <span class="math notranslate nohighlight">\(n\)</span> columns of the full <span class="math notranslate nohighlight">\(Q\)</span>).</p></li>
+<li><p><span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix. (It is identical to the <span class="math notranslate nohighlight">\(R_1\)</span> submatrix from the full QR).</p></li>
+</ul>
+<p>The key takeaway is that <span class="math notranslate nohighlight">\(R_1\)</span> from the reduced factorization <strong>is square and invertible</strong> (assuming <span class="math notranslate nohighlight">\(A\)</span> has full column rank).</p>
+</section>
+</section>
+<section id="derivation-using-reduced-qr">
+<h2>Derivation using Reduced QR<a class="headerlink" href="#derivation-using-reduced-qr" title="Link to this heading">#</a></h2>
+<p>Let’s re-derive the solution starting from the normal equations using the <strong>reduced QR</strong> factorization, <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Start with the normal equations:</strong></p>
+<div class="math notranslate nohighlight">
+\[
+    A^T A x = A^T b
+    \]</div>
+</li>
+<li><p><strong>Substitute <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>:</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{aligned}
+    (Q_1 R_1)^T (Q_1 R_1) x &amp;= (Q_1 R_1)^T b \\
+    (R_1^T Q_1^T) (Q_1 R_1) x &amp;= R_1^T Q_1^T b
+    \end{aligned}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Simplify using orthogonality:</strong>
+The columns of <span class="math notranslate nohighlight">\(Q_1\)</span> are orthonormal, so <span class="math notranslate nohighlight">\(Q_1^T Q_1 = I_n\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity matrix). The equation simplifies:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{aligned}
+    (R_1^T I_n R_1) x &amp;= R_1^T Q_1^T b \\
+    R_1^T R_1 x &amp;= R_1^T Q_1^T b
+    \end{aligned}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Cancel the invertible term:</strong>
+Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> invertible matrix (assuming full rank), its transpose <span class="math notranslate nohighlight">\(R_1^T\)</span> is also invertible. We can now correctly left-multiply both sides by <span class="math notranslate nohighlight">\((R_1^T)^{-1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    (R_1^T)^{-1} R_1^T R_1 x = (R_1^T)^{-1} R_1^T Q_1^T b
+    \]</div>
+<p>This leaves us with the clean, square, upper-triangular system:</p>
+<div class="math notranslate nohighlight">
+\[
+    R_1 x = Q_1^T b = b_1
+    \]</div>
+<p>This is the same system we derived earlier using the orthogonality principle (see equation <a class="reference internal" href="#equation-eq-qr-system">(1)</a>).</p>
+</li>
+</ol>
 </section>
 </section>
 
@@ -521,20 +597,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="matrix_matrix_multiplication.html"
+       href="normal_equations.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Matrix-Matrix Multiplications</p>
+        <p class="prev-next-title">The Method of Normal Equations</p>
       </div>
     </a>
     <a class="right-next"
-       href="sherman_morrison_woodbury.html"
+       href="LS_using_SVD.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Sherman-Morrison-Woodbury Formula</p>
+        <p class="prev-next-title">SVD for Rank-Deficient Least-Squares</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -554,18 +630,23 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-operator-norm-induced-p-norm">The Operator Norm (Induced p-Norm)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-inequalities-for-operator-norms">Key Inequalities for Operator Norms</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sub-multiplicative-property">Sub-multiplicative Property</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consistency-with-vector-norms">Consistency with Vector Norms</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-the-orthogonality-principle">Derivation from the Orthogonality Principle</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transformed-system">The Transformed System</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-between-norms">Equivalence Between Norms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fundamental-properties">Other Fundamental Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-summary">Algorithm Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-and-advantages">Analysis and Advantages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-the-normal-equations">Derivation using the Normal Equations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-vs-thin-qr-and-the-invertible-factor">Full vs. Thin QR and the Invertible Factor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-qr-factorization">1. Full QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduced-or-thin-qr-factorization">2. Reduced (or Thin) QR Factorization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-reduced-qr">Derivation using Reduced QR</a></li>
 </ul>
   </nav></div>
 
