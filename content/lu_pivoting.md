@@ -289,9 +289,11 @@ At first glance, this bound appears complex, but its message is clear. The stabi
 
 However, if significant element growth occurs, and the entries of $|\tilde{L}||\tilde{U}|$ become much larger than those of $|A|$, the backward error $|E|$ can become arbitrarily large. This leads to a critical conclusion: 
 
-```{important} Stability of LU Factorization
+:::{admonition} Stability of LU Factorization
+:class: important
+
 LU factorization without a proper pivoting strategy is **not** a backward stable algorithm.
-```
+:::
 
 ### The Mechanism of Instability: Small Pivots
 

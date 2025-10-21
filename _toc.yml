@@ -40,6 +40,7 @@ chapters:
   - file: content/qr_and_determinant.md
   - file: content/lu_vs_qr.md
   - file: content/normal_equations.md
-  - file: content/qr_factorization.md
-  - file: content/solving_least_squares_problems.md
+  - file: content/LS_using_QR.md
+  - file: content/LS_using_SVD.md
+  - file: content/LS_summary.md
 - file: content/LICENSE.md
