@@ -110,3 +110,68 @@ $$
 $$
 
 The total computational cost is **$O(mn^2)$ flops**. This is asymptotically the same as the Householder QR algorithm.
+
+## Classical Gram-Schmidt (CGS)
+
+The **Classical Gram-Schmidt (CGS)** process is the standard textbook method for generating an orthonormal basis $\{q_1, \ldots, q_n\}$ from a set of linearly independent vectors $\{a_1, \ldots, a_n\}$.
+
+The core idea is to build the basis one vector at a time. For each new vector $a_k$, you make it orthogonal to all **previously computed basis vectors** $\{q_1, \ldots, q_{k-1}\}$.
+
+The algorithm proceeds as follows:
+
+For $k = 1, \ldots, n$:
+
+1.  **Orthogonalize:** Create an orthogonal vector $v_k$ by subtracting the projections of $a_k$ onto all previous basis vectors $q_j$.
+
+    $$v_k = a_k - (q_1^T a_k) q_1 - (q_2^T a_k) q_2 - \cdots - (q_{k-1}^T a_k) q_{k-1}$$
+
+2.  **Normalize:** Normalize this new vector to get the next basis vector $q_k$.
+
+    $$
+    \begin{aligned}
+    r_{kk} &= \|v_k\|_2 \\
+    q_k &= v_k / r_{kk}
+    \end{aligned}
+    $$
+
+### Difference from Modified Gram-Schmidt (MGS)
+
+The **Modified Gram-Schmidt (MGS)** algorithm (describe above), is mathematically equivalent to CGS in exact arithmetic but behaves very differently in practice.
+
+The key difference is the **order of operations**.
+
+* **CGS:** For each vector $a_k$, it computes all its projections onto the *final* $q_j$ vectors (for $j < k$) using the *original* $a_k$.
+* **MGS:** As soon as a new basis vector $q_k$ is computed, it is **immediately used to "clean" all subsequent vectors** $\{a_{k+1}, \ldots, a_n\}$.
+
+This is best seen in the MGS algorithm:
+
+For $k = 1, \ldots, n$:
+
+1.  **Normalize:**
+
+    $$
+    \begin{aligned}
+    r_{kk} &= \|a_k\|_2 \\
+    q_k &= \frac{a_k}{r_{kk}}
+    \end{aligned}
+    $$
+
+2.  **Orthogonalize remaining vectors:** For all subsequent vectors $j = k+1, \ldots, n$:
+    * Calculate the projection: $r_{kj} = q_k^T a_j$
+    * Update the vector: $a_j \leftarrow a_j - q_k r_{kj}$
+
+In MGS, when you're at step $k$, the vector $a_j$ (where $j > k$) has *already* been made orthogonal to $\{q_1, \ldots, q_{k-1}\}$. You are projecting out the $q_k$ component from an already-modified vector. In CGS, you always project the *original* $a_j$.
+
+### Numerical Stability
+
+This algorithmic difference has a profound effect on stability.
+
+* **Classical Gram-Schmidt (CGS) is numerically unstable.**
+    When using floating-point arithmetic, small rounding errors are introduced at each step. In CGS, the projections are all based on the original vectors. These small errors accumulate, and the resulting $q_k$ vectors quickly lose their orthogonality. The computed $Q$ matrix will not be truly orthogonal (i.e., $Q^T Q \neq I$).
+
+* **Modified Gram-Schmidt (MGS) is numerically stable.**
+    MGS is more stable because it continuously "cleans" the remaining vectors. By updating $a_j$ at every step $k$, it removes the component in the $q_k$ direction. This process prevents the accumulation of rounding errors that plague CGS, and the final $Q$ matrix is much closer to being perfectly orthogonal.
+
+### Computational Cost
+
+Both **Classical Gram-Schmidt** and **Modified Gram-Schmidt** have the same asymptotic computational cost. For an $m \times n$ matrix, both algorithms perform approximately $2mn^2$ floating-point operations (flops). Therefore, given that MGS is significantly more stable for the same computational cost, it is the preferred method in practice over CGS.

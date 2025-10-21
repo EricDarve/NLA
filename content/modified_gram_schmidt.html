@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -218,6 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -378,6 +379,12 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-gram-schmidt-cgs">Classical Gram-Schmidt (CGS)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#difference-from-modified-gram-schmidt-mgs">Difference from Modified Gram-Schmidt (MGS)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Numerical Stability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Computational Cost</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -502,6 +509,71 @@ Now that we have the full first component, <span class="math notranslate nohighl
 \]</div>
 <p>The total computational cost is <strong><span class="math notranslate nohighlight">\(O(mn^2)\)</span> flops</strong>. This is asymptotically the same as the Householder QR algorithm.</p>
 </section>
+<section id="classical-gram-schmidt-cgs">
+<h2>Classical Gram-Schmidt (CGS)<a class="headerlink" href="#classical-gram-schmidt-cgs" title="Link to this heading">#</a></h2>
+<p>The <strong>Classical Gram-Schmidt (CGS)</strong> process is the standard textbook method for generating an orthonormal basis <span class="math notranslate nohighlight">\(\{q_1, \ldots, q_n\}\)</span> from a set of linearly independent vectors <span class="math notranslate nohighlight">\(\{a_1, \ldots, a_n\}\)</span>.</p>
+<p>The core idea is to build the basis one vector at a time. For each new vector <span class="math notranslate nohighlight">\(a_k\)</span>, you make it orthogonal to all <strong>previously computed basis vectors</strong> <span class="math notranslate nohighlight">\(\{q_1, \ldots, q_{k-1}\}\)</span>.</p>
+<p>The algorithm proceeds as follows:</p>
+<p>For <span class="math notranslate nohighlight">\(k = 1, \ldots, n\)</span>:</p>
+<ol class="arabic">
+<li><p><strong>Orthogonalize:</strong> Create an orthogonal vector <span class="math notranslate nohighlight">\(v_k\)</span> by subtracting the projections of <span class="math notranslate nohighlight">\(a_k\)</span> onto all previous basis vectors <span class="math notranslate nohighlight">\(q_j\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[v_k = a_k - (q_1^T a_k) q_1 - (q_2^T a_k) q_2 - \cdots - (q_{k-1}^T a_k) q_{k-1}\]</div>
+</li>
+<li><p><strong>Normalize:</strong> Normalize this new vector to get the next basis vector <span class="math notranslate nohighlight">\(q_k\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{aligned}
+    r_{kk} &amp;= \|v_k\|_2 \\
+    q_k &amp;= v_k / r_{kk}
+    \end{aligned}
+    \end{split}\]</div>
+</li>
+</ol>
+<section id="difference-from-modified-gram-schmidt-mgs">
+<h3>Difference from Modified Gram-Schmidt (MGS)<a class="headerlink" href="#difference-from-modified-gram-schmidt-mgs" title="Link to this heading">#</a></h3>
+<p>The <strong>Modified Gram-Schmidt (MGS)</strong> algorithm (describe above), is mathematically equivalent to CGS in exact arithmetic but behaves very differently in practice.</p>
+<p>The key difference is the <strong>order of operations</strong>.</p>
+<ul class="simple">
+<li><p><strong>CGS:</strong> For each vector <span class="math notranslate nohighlight">\(a_k\)</span>, it computes all its projections onto the <em>final</em> <span class="math notranslate nohighlight">\(q_j\)</span> vectors (for <span class="math notranslate nohighlight">\(j &lt; k\)</span>) using the <em>original</em> <span class="math notranslate nohighlight">\(a_k\)</span>.</p></li>
+<li><p><strong>MGS:</strong> As soon as a new basis vector <span class="math notranslate nohighlight">\(q_k\)</span> is computed, it is <strong>immediately used to “clean” all subsequent vectors</strong> <span class="math notranslate nohighlight">\(\{a_{k+1}, \ldots, a_n\}\)</span>.</p></li>
+</ul>
+<p>This is best seen in the MGS algorithm:</p>
+<p>For <span class="math notranslate nohighlight">\(k = 1, \ldots, n\)</span>:</p>
+<ol class="arabic">
+<li><p><strong>Normalize:</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \begin{aligned}
+    r_{kk} &amp;= \|a_k\|_2 \\
+    q_k &amp;= \frac{a_k}{r_{kk}}
+    \end{aligned}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Orthogonalize remaining vectors:</strong> For all subsequent vectors <span class="math notranslate nohighlight">\(j = k+1, \ldots, n\)</span>:</p>
+<ul class="simple">
+<li><p>Calculate the projection: <span class="math notranslate nohighlight">\(r_{kj} = q_k^T a_j\)</span></p></li>
+<li><p>Update the vector: <span class="math notranslate nohighlight">\(a_j \leftarrow a_j - q_k r_{kj}\)</span></p></li>
+</ul>
+</li>
+</ol>
+<p>In MGS, when you’re at step <span class="math notranslate nohighlight">\(k\)</span>, the vector <span class="math notranslate nohighlight">\(a_j\)</span> (where <span class="math notranslate nohighlight">\(j &gt; k\)</span>) has <em>already</em> been made orthogonal to <span class="math notranslate nohighlight">\(\{q_1, \ldots, q_{k-1}\}\)</span>. You are projecting out the <span class="math notranslate nohighlight">\(q_k\)</span> component from an already-modified vector. In CGS, you always project the <em>original</em> <span class="math notranslate nohighlight">\(a_j\)</span>.</p>
+</section>
+<section id="id1">
+<h3>Numerical Stability<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>This algorithmic difference has a profound effect on stability.</p>
+<ul class="simple">
+<li><p><strong>Classical Gram-Schmidt (CGS) is numerically unstable.</strong>
+When using floating-point arithmetic, small rounding errors are introduced at each step. In CGS, the projections are all based on the original vectors. These small errors accumulate, and the resulting <span class="math notranslate nohighlight">\(q_k\)</span> vectors quickly lose their orthogonality. The computed <span class="math notranslate nohighlight">\(Q\)</span> matrix will not be truly orthogonal (i.e., <span class="math notranslate nohighlight">\(Q^T Q \neq I\)</span>).</p></li>
+<li><p><strong>Modified Gram-Schmidt (MGS) is numerically stable.</strong>
+MGS is more stable because it continuously “cleans” the remaining vectors. By updating <span class="math notranslate nohighlight">\(a_j\)</span> at every step <span class="math notranslate nohighlight">\(k\)</span>, it removes the component in the <span class="math notranslate nohighlight">\(q_k\)</span> direction. This process prevents the accumulation of rounding errors that plague CGS, and the final <span class="math notranslate nohighlight">\(Q\)</span> matrix is much closer to being perfectly orthogonal.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Computational Cost<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>Both <strong>Classical Gram-Schmidt</strong> and <strong>Modified Gram-Schmidt</strong> have the same asymptotic computational cost. For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix, both algorithms perform approximately <span class="math notranslate nohighlight">\(2mn^2\)</span> floating-point operations (flops). Therefore, given that MGS is significantly more stable for the same computational cost, it is the preferred method in practice over CGS.</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -577,6 +649,12 @@ Now that we have the full first component, <span class="math notranslate nohighl
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-gram-schmidt-cgs">Classical Gram-Schmidt (CGS)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#difference-from-modified-gram-schmidt-mgs">Difference from Modified Gram-Schmidt (MGS)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Numerical Stability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Computational Cost</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
