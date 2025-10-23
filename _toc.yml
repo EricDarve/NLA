@@ -43,4 +43,9 @@ chapters:
   - file: content/LS_using_QR.md
   - file: content/LS_using_SVD.md
   - file: content/LS_summary.md
+- file: content/eigenvalues
+  sections:
+  - file: content/power_method.md
+  - file: content/deflation.md
+  - file: content/orthogonal_iteration.md
 - file: content/LICENSE.md
