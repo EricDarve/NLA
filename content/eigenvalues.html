@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solving Least-Squares using QR Factorization &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Eigenvalue Computation &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_using_QR';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/eigenvalues';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="SVD for Rank-Deficient Least-Squares" href="LS_using_SVD.html" />
-    <link rel="prev" title="The Method of Normal Equations" href="normal_equations.html" />
+    <link rel="next" title="The Power Method" href="power_method.html" />
+    <link rel="prev" title="Summary of LS Solution Methods" href="LS_summary.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
@@ -216,12 +216,12 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 </ul>
 </details></li>
@@ -280,7 +280,7 @@
       
       
       
-      <li><a href="../_sources/content/LS_using_QR.md" target="_blank"
+      <li><a href="../_sources/content/eigenvalues.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -364,7 +364,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Solving Least-Squares using QR Factorization</h1>
+    <h1>Eigenvalue Computation</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -374,23 +374,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-the-orthogonality-principle">Derivation from the Orthogonality Principle</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transformed-system">The Transformed System</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-summary">Algorithm Summary</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-and-advantages">Analysis and Advantages</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-the-normal-equations">Derivation using the Normal Equations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-vs-thin-qr-and-the-invertible-factor">Full vs. Thin QR and the Invertible Factor</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-qr-factorization">1. Full QR Factorization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduced-or-thin-qr-factorization">2. Reduced (or Thin) QR Factorization</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-reduced-qr">Derivation using Reduced QR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-no-direct-solution">The Challenge: No Direct Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-to-polynomial-root-finding">Equivalence to Polynomial Root-Finding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterative-methods-are-a-necessity">Iterative Methods are a Necessity</a></li>
 </ul>
             </nav>
         </div>
@@ -402,173 +388,99 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="solving-least-squares-using-qr-factorization">
-<h1>Solving Least-Squares using QR Factorization<a class="headerlink" href="#solving-least-squares-using-qr-factorization" title="Link to this heading">#</a></h1>
-<p>While the method of normal equations is straightforward, its numerical instability, caused by squaring the condition number, makes it unsuitable for many practical problems. A more robust and widely used approach is based on the <strong>QR factorization</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>. This method is generally the standard for solving dense linear least-squares problems.</p>
-<section id="derivation-from-the-orthogonality-principle">
-<h2>Derivation from the Orthogonality Principle<a class="headerlink" href="#derivation-from-the-orthogonality-principle" title="Link to this heading">#</a></h2>
-<p>We start from the same geometric principle as before: the residual vector <span class="math notranslate nohighlight">\(r = b - Ax\)</span> must be orthogonal to the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="eigenvalue-computation">
+<h1>Eigenvalue Computation<a class="headerlink" href="#eigenvalue-computation" title="Link to this heading">#</a></h1>
+<p>Eigenvalues and eigenvectors are fundamental concepts in linear algebra. They provide deep insight into the behavior of a matrix <span class="math notranslate nohighlight">\(A\)</span> by revealing the directions <span class="math notranslate nohighlight">\(v\)</span> in which the matrix acts as a simple scalar <span class="math notranslate nohighlight">\(\lambda\)</span>, such that <span class="math notranslate nohighlight">\(A v = \lambda v\)</span>.</p>
+<p>This single property unlocks a wide range of powerful applications:</p>
+<ul class="simple">
+<li><p><strong>Diagonalization:</strong> For a diagonalizable matrix, the eigendecomposition <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span> provides a “canonical” representation of the linear transformation, simplifying its structure.</p></li>
+<li><p><strong>Matrix Operations:</strong> This decomposition makes complex operations computationally trivial. It turns matrix powers into scalar powers (<span class="math notranslate nohighlight">\(A^k = X \Lambda^k X^{-1}\)</span>) and enables the general computation of matrix functions:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[f(A) = X f(\Lambda) X^{-1}.\]</div>
+<ul class="simple">
+<li><p><strong>Dynamic Systems:</strong> Eigenvalues are essential for studying time-evolving systems. The solution to a system of linear differential equations, <span class="math notranslate nohighlight">\(\frac{dx}{dt} = M x\)</span>, is given by</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[x(t) = \exp(Mt) x_0.\]</div>
+<p>The stability and long-term behavior of this solution are dictated entirely by the eigenvalues of <span class="math notranslate nohighlight">\(M\)</span>, as the solution depends on terms of the form <span class="math notranslate nohighlight">\(\exp(\lambda_i t)\)</span>.</p>
+<p>Given their critical importance in physics, engineering, data analysis, and countless other scientific disciplines, the ability to <em>compute</em> eigenvalues and eigenvectors is a core practical problem. The theoretical definitions, such as solving the characteristic polynomial <span class="math notranslate nohighlight">\(\det(A - \lambda I) = 0\)</span>, do not lead to stable or efficient algorithms for general matrices.</p>
+<p>In this section, we shift our focus from the <em>theory</em> of eigenvalues to the <em>practice</em> of their numerical computation. We will develop the robust and scalable algorithms that are used in modern software to solve eigenvalue problems efficiently and accurately.</p>
+<section id="the-challenge-no-direct-solution">
+<h2>The Challenge: No Direct Solution<a class="headerlink" href="#the-challenge-no-direct-solution" title="Link to this heading">#</a></h2>
+<p>Unlike other problems we have studied, such as solving <span class="math notranslate nohighlight">\(Ax = b\)</span> using <span class="math notranslate nohighlight">\(LU\)</span> factorization, there is no “direct” method or finite formula to compute the eigenvalues of a general <span class="math notranslate nohighlight">\(n \times n\)</span> matrix for <span class="math notranslate nohighlight">\(n \ge 5\)</span>.</p>
+<p>The root of this difficulty lies in a deep, fundamental connection between finding eigenvalues and finding the roots of a polynomial.</p>
+</section>
+<section id="equivalence-to-polynomial-root-finding">
+<h2>Equivalence to Polynomial Root-Finding<a class="headerlink" href="#equivalence-to-polynomial-root-finding" title="Link to this heading">#</a></h2>
+<p>We know that the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are the roots of the <strong>characteristic polynomial</strong>, <span class="math notranslate nohighlight">\(p(\lambda) = \det(A - \lambda I)\)</span>. This shows that finding eigenvalues is <em>at least as hard</em> as finding polynomial roots.</p>
+<p>It turns out these two problems are mathematically <strong>equivalent</strong>. We can also prove that finding the roots of <em>any</em> polynomial <span class="math notranslate nohighlight">\(p(x)\)</span> is equivalent to finding the eigenvalues of a specific matrix.</p>
+<p>Consider a general monic polynomial of degree <span class="math notranslate nohighlight">\(n\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-A^T(Ax - b) = 0
+p(x) = x^n + a_{n-1} x^{n-1} + \cdots + a_1 x + a_0
 \]</div>
-<p>Now, let’s introduce the full QR factorization, <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. The key insight is that the columns of <span class="math notranslate nohighlight">\(A\)</span> and the columns of <span class="math notranslate nohighlight">\(Q\)</span> span the same spaces. Specifically, the first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> form an orthonormal basis for the column space of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p>
-<p>Therefore, the orthogonality condition can be restated as requiring the residual to be orthogonal to the basis vectors in <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<p>We can construct a special matrix <span class="math notranslate nohighlight">\(A\)</span>, known as the <strong>companion matrix</strong> of the polynomial <span class="math notranslate nohighlight">\(p(x)\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[
-Q^T(Ax - b) = 0
-\]</div>
-<p>Now, we substitute <span class="math notranslate nohighlight">\(A=QR\)</span> into this equation:</p>
-<div class="math notranslate nohighlight">
-\[
-Q^T(QRx - b) = 0
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(Q\)</span> is orthogonal, we know that <span class="math notranslate nohighlight">\(Q^T Q = I\)</span>. Applying this property, we get:</p>
+\[\begin{split}
+A =
+\begin{pmatrix}
+    0 &amp; 1 &amp; &amp; &amp; \\
+    &amp; 0 &amp; 1 &amp; &amp; \\
+    &amp; &amp; \ddots &amp; \ddots &amp; \\
+    &amp; &amp; &amp; 0 &amp; 1 \\
+    -a_0 &amp; -a_1 &amp; \cdots &amp; -a_{n-2} &amp; -a_{n-1}
+\end{pmatrix}
+\end{split}\]</div>
+<div class="proof theorem admonition" id="thm:companion_matrix">
+<p class="admonition-title"><span class="caption-number">Theorem 19 </span> (Eigenvalues of the Companion Matrix)</p>
+<section class="theorem-content" id="proof-content">
+<p>The eigenvalues of this matrix <span class="math notranslate nohighlight">\(A\)</span> are <em>exactly</em> the roots of the polynomial <span class="math notranslate nohighlight">\(p(x)\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Let <span class="math notranslate nohighlight">\(z \in \mathbb{C}\)</span> be an eigenvalue and <span class="math notranslate nohighlight">\(u = (u_1, \ldots, u_n)^T\)</span> be the corresponding eigenvector, so <span class="math notranslate nohighlight">\(A u = z u\)</span>. Let’s write out the first <span class="math notranslate nohighlight">\(n-1\)</span> equations from this system:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-(Q^T Q)Rx - Q^T b &amp;= 0 \\
-IRx - Q^T b &amp;= 0
+u_2 &amp;= z u_1 \\
+u_3 &amp;= z u_2 = z^2 u_1 \\
+&amp;\vdots \\
+u_n &amp;= z u_{n-1} = z^{n-1} u_1
 \end{aligned}
 \end{split}\]</div>
-<p>This simplifies the least-squares problem into a much nicer linear system.</p>
-<section id="the-transformed-system">
-<h3>The Transformed System<a class="headerlink" href="#the-transformed-system" title="Link to this heading">#</a></h3>
-<p>The equation becomes:</p>
+<p>This defines the structure of the eigenvector. If we set <span class="math notranslate nohighlight">\(u_1 = 1\)</span>, the eigenvector is <span class="math notranslate nohighlight">\(u = (1, z, z^2, \ldots, z^{n-1})^T\)</span>.</p>
+<p>Now, we look at the <span class="math notranslate nohighlight">\(n\)</span>-th and final equation from <span class="math notranslate nohighlight">\(A u = z u\)</span>, which corresponds to the last row of <span class="math notranslate nohighlight">\(A\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-Rx = Q^T b
+-a_0 u_1 - a_1 u_2 - \cdots - a_{n-1} u_n = z u_n
 \]</div>
-<p>This system is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal system. If we partition <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>:</p>
+<p>Substituting <span class="math notranslate nohighlight">\(u_k = z^{k-1}\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
-\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix and <span class="math notranslate nohighlight">\(b_1\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-vector, the system becomes:</p>
+\[
+-a_0 - a_1 z - \cdots - a_{n-1} z^{n-1} = z (z^{n-1})
+\]</div>
+<p>Finally, moving all terms to one side, we get:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{bmatrix} R_1 \\ 0 \end{bmatrix} x = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
-\end{split}\]</div>
-<p>This gives us two equations:</p>
+\[
+z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0 = 0
+\]</div>
+<p>This is precisely <span class="math notranslate nohighlight">\(p(z) = 0\)</span>. Therefore, <span class="math notranslate nohighlight">\(z\)</span> is an eigenvalue of <span class="math notranslate nohighlight">\(A\)</span> if and only if <span class="math notranslate nohighlight">\(z\)</span> is a root of <span class="math notranslate nohighlight">\(p(x)\)</span>.</p>
+</div>
+</section>
+<section id="iterative-methods-are-a-necessity">
+<h2>Iterative Methods are a Necessity<a class="headerlink" href="#iterative-methods-are-a-necessity" title="Link to this heading">#</a></h2>
+<p>This equivalence is profound. The <strong>Abel-Ruffini theorem</strong>, a landmark result from the 19th century, proves that there is <strong>no general formula in radicals</strong> (i.e., no equivalent of the quadratic formula) for the roots of polynomials of degree 5 or higher.</p>
+<p>Because of this:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(R_1 x = b_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(0 \cdot x = b_2\)</span></p></li>
+<li><p>If a direct, exact algorithm for eigenvalues existed, we could use it to find the roots of any polynomial exactly, via its companion matrix.</p></li>
+<li><p>The Abel-Ruffini theorem tells us such a root-finding algorithm is impossible.</p></li>
+<li><p>Therefore, <strong>no direct, exact algorithm for eigenvalues can exist</strong> for general <span class="math notranslate nohighlight">\(n \times n\)</span> matrices.</p></li>
 </ol>
-<p>The solution <span class="math notranslate nohighlight">\(x\)</span> is found by solving the first equation. The norm of the residual is simply <span class="math notranslate nohighlight">\(\|b_2\|_2\)</span>.</p>
-<p>The solution to the least-squares problem is therefore found by solving the <strong>square, upper-triangular system</strong>:</p>
-<div class="math notranslate nohighlight" id="equation-eq-qr-system">
-<span class="eqno">(1)<a class="headerlink" href="#equation-eq-qr-system" title="Link to this equation">#</a></span>\[R_1 x = b_1\]</div>
-<p>This is easily solved using <strong>back-substitution</strong>.</p>
+<p>This forces us to use a different approach. All general-purpose eigenvalue solvers are, by necessity, <strong>iterative</strong>. They do not compute the exact eigenvalues in a finite number of steps. Instead, they generate a sequence of approximate solutions that converge to the true eigenvalues.</p>
+<p>Fortunately, the algorithms we will study are so effective that this is not a practical limitation. They converge extremely fast (often quadratically or cubically) and are numerically stable, allowing us to compute eigenvalues to machine accuracy. For all practical purposes, the results are indistinguishable from an “exact” solution.</p>
 </section>
-</section>
-<section id="algorithm-summary">
-<h2>Algorithm Summary<a class="headerlink" href="#algorithm-summary" title="Link to this heading">#</a></h2>
-<p>The QR method for solving <span class="math notranslate nohighlight">\(\|Ax - b\|_2\)</span> can be summarized in three steps:</p>
-<ol class="arabic simple">
-<li><p><strong>Factorize:</strong> Compute the QR factorization of <span class="math notranslate nohighlight">\(A\)</span>, yielding <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span>.</p></li>
-<li><p><strong>Transform:</strong> Compute the vector <span class="math notranslate nohighlight">\(Q^T b\)</span>.</p></li>
-<li><p><strong>Solve:</strong> Solve the <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular system <span class="math notranslate nohighlight">\(R_1 x = b_1\)</span> for <span class="math notranslate nohighlight">\(x\)</span> using back-substitution, where <span class="math notranslate nohighlight">\(R_1\)</span> and <span class="math notranslate nohighlight">\(b_1\)</span> are the top <span class="math notranslate nohighlight">\(n\)</span> rows of <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>, respectively.</p></li>
-</ol>
-</section>
-<section id="analysis-and-advantages">
-<h2>Analysis and Advantages<a class="headerlink" href="#analysis-and-advantages" title="Link to this heading">#</a></h2>
-<section id="numerical-stability">
-<h3>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h3>
-<p>This is the <strong>primary advantage</strong> of the QR method. By avoiding the formation of the Gram matrix <span class="math notranslate nohighlight">\(A^T A\)</span>, we work with a system whose condition number is <span class="math notranslate nohighlight">\(\kappa_2(R_1) = \kappa_2(A)\)</span>, not <span class="math notranslate nohighlight">\(\kappa_2(A)^2\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-\kappa_2(\text{Normal Equations}) = \kappa_2(A)^2 \quad \text{vs.} \quad \kappa_2(\text{QR Method}) = \kappa_2(A)
-\]</div>
-<p>This dramatic improvement in conditioning means the solution is far less sensitive to perturbations and rounding errors. It’s the reason QR is the workhorse for least-squares problems. ✅</p>
-</section>
-<section id="computational-cost">
-<h3>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h3>
-<p>The computational cost is dominated by the QR factorization step (e.g., using Householder transformations), which takes approximately <span class="math notranslate nohighlight">\(2mn^2 - \frac{2}{3}n^3\)</span> flops. The total cost is <span class="math notranslate nohighlight">\(O(mn^2)\)</span>, which is comparable to the normal equations method.</p>
-</section>
-</section>
-<section id="derivation-using-the-normal-equations">
-<h2>Derivation using the Normal Equations<a class="headerlink" href="#derivation-using-the-normal-equations" title="Link to this heading">#</a></h2>
-<p>For this derivation, we first need to discuss the full vs thin QR factorization. The previous derivation used the full QR factorization. But now it will be clearer if we use the thin QR factorization.</p>
-<section id="full-vs-thin-qr-and-the-invertible-factor">
-<h3>Full vs. Thin QR and the Invertible Factor<a class="headerlink" href="#full-vs-thin-qr-and-the-invertible-factor" title="Link to this heading">#</a></h3>
-</section>
-<section id="full-qr-factorization">
-<h3>1. Full QR Factorization<a class="headerlink" href="#full-qr-factorization" title="Link to this heading">#</a></h3>
-<p>For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> (with <span class="math notranslate nohighlight">\(m \ge n\)</span>), the <strong>full</strong> QR factorization is:</p>
-<div class="math notranslate nohighlight">
-\[
-A_{m \times n} = Q_{m \times m} R_{m \times n}
-\]</div>
-<ul>
-<li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix.</p></li>
-<li><p><span class="math notranslate nohighlight">\(R\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. It has the structure:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}
-    \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix, and the lower block is an <span class="math notranslate nohighlight">\((m-n) \times n\)</span> matrix of zeros.</p>
-</li>
-</ul>
-<p>In this form, <span class="math notranslate nohighlight">\(R\)</span> is rectangular and <strong>not invertible</strong>. The invertible part is its submatrix <span class="math notranslate nohighlight">\(R_1\)</span>.</p>
-</section>
-<section id="reduced-or-thin-qr-factorization">
-<h3>2. Reduced (or Thin) QR Factorization<a class="headerlink" href="#reduced-or-thin-qr-factorization" title="Link to this heading">#</a></h3>
-<p>The <strong>reduced</strong> QR factorization is a more compact version that is often more useful in practice:</p>
-<div class="math notranslate nohighlight">
-\[
-A_{m \times n} = Q_{1, m \times n} R_{1, n \times n}
-\]</div>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(Q_1\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with orthonormal columns. (It’s the first <span class="math notranslate nohighlight">\(n\)</span> columns of the full <span class="math notranslate nohighlight">\(Q\)</span>).</p></li>
-<li><p><span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix. (It is identical to the <span class="math notranslate nohighlight">\(R_1\)</span> submatrix from the full QR).</p></li>
-</ul>
-<p>The key takeaway is that <span class="math notranslate nohighlight">\(R_1\)</span> from the reduced factorization <strong>is square and invertible</strong> (assuming <span class="math notranslate nohighlight">\(A\)</span> has full column rank).</p>
-</section>
-</section>
-<section id="derivation-using-reduced-qr">
-<h2>Derivation using Reduced QR<a class="headerlink" href="#derivation-using-reduced-qr" title="Link to this heading">#</a></h2>
-<p>Let’s re-derive the solution starting from the normal equations using the <strong>reduced QR</strong> factorization, <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Start with the normal equations:</strong></p>
-<div class="math notranslate nohighlight">
-\[
-    A^T A x = A^T b
-    \]</div>
-</li>
-<li><p><strong>Substitute <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>:</strong></p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-    (Q_1 R_1)^T (Q_1 R_1) x &amp;= (Q_1 R_1)^T b \\
-    (R_1^T Q_1^T) (Q_1 R_1) x &amp;= R_1^T Q_1^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Simplify using orthogonality:</strong>
-The columns of <span class="math notranslate nohighlight">\(Q_1\)</span> are orthonormal, so <span class="math notranslate nohighlight">\(Q_1^T Q_1 = I_n\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity matrix). The equation simplifies:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-    (R_1^T I_n R_1) x &amp;= R_1^T Q_1^T b \\
-    R_1^T R_1 x &amp;= R_1^T Q_1^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Cancel the invertible term:</strong>
-Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> invertible matrix (assuming full rank), its transpose <span class="math notranslate nohighlight">\(R_1^T\)</span> is also invertible. We can now correctly left-multiply both sides by <span class="math notranslate nohighlight">\((R_1^T)^{-1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-    (R_1^T)^{-1} R_1^T R_1 x = (R_1^T)^{-1} R_1^T Q_1^T b
-    \]</div>
-<p>This leaves us with the clean, square, upper-triangular system:</p>
-<div class="math notranslate nohighlight">
-\[
-    R_1 x = Q_1^T b = b_1
-    \]</div>
-<p>This is the same system we derived earlier using the orthogonality principle (see equation <a class="reference internal" href="#equation-eq-qr-system">(1)</a>).</p>
-</li>
-</ol>
-</section>
+<div class="toctree-wrapper compound">
+</div>
 </section>
 
     <script type="text/x-thebe-config">
@@ -602,20 +514,20 @@ Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span clas
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="normal_equations.html"
+       href="LS_summary.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Method of Normal Equations</p>
+        <p class="prev-next-title">Summary of LS Solution Methods</p>
       </div>
     </a>
     <a class="right-next"
-       href="LS_using_SVD.html"
+       href="power_method.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">SVD for Rank-Deficient Least-Squares</p>
+        <p class="prev-next-title">The Power Method</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -635,23 +547,9 @@ Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span clas
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-the-orthogonality-principle">Derivation from the Orthogonality Principle</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transformed-system">The Transformed System</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-summary">Algorithm Summary</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-and-advantages">Analysis and Advantages</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-the-normal-equations">Derivation using the Normal Equations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-vs-thin-qr-and-the-invertible-factor">Full vs. Thin QR and the Invertible Factor</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-qr-factorization">1. Full QR Factorization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduced-or-thin-qr-factorization">2. Reduced (or Thin) QR Factorization</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-reduced-qr">Derivation using Reduced QR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-no-direct-solution">The Challenge: No Direct Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-to-polynomial-root-finding">Equivalence to Polynomial Root-Finding</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterative-methods-are-a-necessity">Iterative Methods are a Necessity</a></li>
 </ul>
   </nav></div>
 

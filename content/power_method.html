@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solving Least-Squares using QR Factorization &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Power Method &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_using_QR';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/power_method';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="SVD for Rank-Deficient Least-Squares" href="LS_using_SVD.html" />
-    <link rel="prev" title="The Method of Normal Equations" href="normal_equations.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Eigenvalue Computation" href="eigenvalues.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
@@ -216,13 +216,13 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Power Method</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -280,7 +280,7 @@
       
       
       
-      <li><a href="../_sources/content/LS_using_QR.md" target="_blank"
+      <li><a href="../_sources/content/power_method.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -364,7 +364,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Solving Least-Squares using QR Factorization</h1>
+    <h1>The Power Method</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -374,23 +374,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-the-orthogonality-principle">Derivation from the Orthogonality Principle</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transformed-system">The Transformed System</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-summary">Algorithm Summary</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-and-advantages">Analysis and Advantages</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-the-normal-equations">Derivation using the Normal Equations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-vs-thin-qr-and-the-invertible-factor">Full vs. Thin QR and the Invertible Factor</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-qr-factorization">1. Full QR Factorization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduced-or-thin-qr-factorization">2. Reduced (or Thin) QR Factorization</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-reduced-qr">Derivation using Reduced QR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intuition-the-dominant-direction">Intuition: The Dominant Direction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation">Derivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-power-iteration">The Algorithm: Power Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-analysis">Convergence Analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">Limitations</a></li>
 </ul>
             </nav>
         </div>
@@ -402,172 +390,178 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="solving-least-squares-using-qr-factorization">
-<h1>Solving Least-Squares using QR Factorization<a class="headerlink" href="#solving-least-squares-using-qr-factorization" title="Link to this heading">#</a></h1>
-<p>While the method of normal equations is straightforward, its numerical instability, caused by squaring the condition number, makes it unsuitable for many practical problems. A more robust and widely used approach is based on the <strong>QR factorization</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>. This method is generally the standard for solving dense linear least-squares problems.</p>
-<section id="derivation-from-the-orthogonality-principle">
-<h2>Derivation from the Orthogonality Principle<a class="headerlink" href="#derivation-from-the-orthogonality-principle" title="Link to this heading">#</a></h2>
-<p>We start from the same geometric principle as before: the residual vector <span class="math notranslate nohighlight">\(r = b - Ax\)</span> must be orthogonal to the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-power-method">
+<h1>The Power Method<a class="headerlink" href="#the-power-method" title="Link to this heading">#</a></h1>
+<p>Our first and most fundamental iterative algorithm is the <strong>power method</strong> (or <em>power iteration</em>). It is a simple but surprisingly effective method for finding the single, strictly dominant eigenvalue—the one with the largest magnitude—and its corresponding eigenvector.</p>
+<p>While we will eventually move to more sophisticated methods, the power method provides the core intuition for many advanced algorithms, including the celebrated <span class="math notranslate nohighlight">\(QR\)</span> iteration.</p>
+<section id="intuition-the-dominant-direction">
+<h2>Intuition: The Dominant Direction<a class="headerlink" href="#intuition-the-dominant-direction" title="Link to this heading">#</a></h2>
+<p>Imagine the matrix <span class="math notranslate nohighlight">\(A\)</span> as a linear transformation. When it acts on a vector, it stretches or shrinks it. The eigenvectors are the special directions that are <em>not</em> rotated, only scaled.</p>
+<p>Now, consider what happens when we apply this transformation repeatedly to an arbitrary starting vector <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span>. We can think of <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> as a mixture of all the eigenvector components.</p>
 <div class="math notranslate nohighlight">
 \[
-A^T(Ax - b) = 0
+\boldsymbol{q} = c_1 \boldsymbol{x}_1 + c_2 \boldsymbol{x}_2 + \cdots + c_n \boldsymbol{x}_n
 \]</div>
-<p>Now, let’s introduce the full QR factorization, <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. The key insight is that the columns of <span class="math notranslate nohighlight">\(A\)</span> and the columns of <span class="math notranslate nohighlight">\(Q\)</span> span the same spaces. Specifically, the first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> form an orthonormal basis for the column space of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p>
-<p>Therefore, the orthogonality condition can be restated as requiring the residual to be orthogonal to the basis vectors in <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<p>Each time we apply <span class="math notranslate nohighlight">\(A\)</span>, each component <span class="math notranslate nohighlight">\(c_i \boldsymbol{x}_i\)</span> is scaled by its eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[
-Q^T(Ax - b) = 0
+A \boldsymbol{q} = c_1 \lambda_1 \boldsymbol{x}_1 + c_2 \lambda_2 \boldsymbol{x}_2 + \cdots + c_n \lambda_n \boldsymbol{x}_n
 \]</div>
-<p>Now, we substitute <span class="math notranslate nohighlight">\(A=QR\)</span> into this equation:</p>
+<p>If we apply <span class="math notranslate nohighlight">\(A\)</span> <span class="math notranslate nohighlight">\(k\)</span> times, we get:</p>
 <div class="math notranslate nohighlight">
 \[
-Q^T(QRx - b) = 0
+A^k \boldsymbol{q} = c_1 \lambda_1^k \boldsymbol{x}_1 + c_2 \lambda_2^k \boldsymbol{x}_2 + \cdots + c_n \lambda_n^k \boldsymbol{x}_n
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(Q\)</span> is orthogonal, we know that <span class="math notranslate nohighlight">\(Q^T Q = I\)</span>. Applying this property, we get:</p>
+<p>If one eigenvalue, say <span class="math notranslate nohighlight">\(\lambda_1\)</span>, is larger in magnitude than all others (<span class="math notranslate nohighlight">\(|\lambda_1| &gt; |\lambda_2| \ge \dots\)</span>), its <span class="math notranslate nohighlight">\(k\)</span>-th power <span class="math notranslate nohighlight">\(\lambda_1^k\)</span> will grow much faster than all other terms. After many iterations, the first term will dominate the sum, and all other components will become negligible in comparison.</p>
+<div class="math notranslate nohighlight">
+\[
+A^k \boldsymbol{q} \approx c_1 \lambda_1^k \boldsymbol{x}_1
+\]</div>
+<p>This means the resulting vector <span class="math notranslate nohighlight">\(A^k \boldsymbol{q}\)</span> will be almost perfectly aligned with the dominant eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>.</p>
+</section>
+<section id="derivation">
+<h2>Derivation<a class="headerlink" href="#derivation" title="Link to this heading">#</a></h2>
+<p>Let’s formalize this. We assume <span class="math notranslate nohighlight">\(A \in \mathbb{C}^{n \times n}\)</span> is diagonalizable and has a single, strictly dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_1| &gt; |\lambda_2| \ge |\lambda_3| \ge \cdots \ge |\lambda_n|
+\]</div>
+<p>Let <span class="math notranslate nohighlight">\(\boldsymbol{x}_1, \dots, \boldsymbol{x}_n\)</span> be the corresponding eigenvectors. We pick a starting vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_0\)</span> which we can express as a linear combination of these eigenvectors:</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{q}_0 = \sum_{i=1}^n c_i \boldsymbol{x}_i
+\]</div>
+<p>We must assume that <span class="math notranslate nohighlight">\(c_1 \neq 0\)</span>. That is, our starting vector must have some component in the direction of the dominant eigenvector. In practice, a randomly chosen <span class="math notranslate nohighlight">\(\boldsymbol{q}_0\)</span> makes this overwhelmingly likely.</p>
+<p>Now, let’s examine the vector <span class="math notranslate nohighlight">\(\boldsymbol{z}_k = A^k \boldsymbol{q}_0\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{z}_k = A^k \left( \sum_{i=1}^n c_i \boldsymbol{x}_i \right) = \sum_{i=1}^n c_i A^k \boldsymbol{x}_i = \sum_{i=1}^n c_i \lambda_i^k \boldsymbol{x}_i
+\]</div>
+<p>We factor out the dominant term <span class="math notranslate nohighlight">\(\lambda_1^k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{z}_k = \lambda_1^k \left( c_1 \boldsymbol{x}_1 + \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k \boldsymbol{x}_i \right)
+\]</div>
+<p>Because of our dominance assumption, <span class="math notranslate nohighlight">\(|\lambda_i / \lambda_1| &lt; 1\)</span> for all <span class="math notranslate nohighlight">\(i \ge 2\)</span>. Therefore, as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the summation term decays exponentially:</p>
+<div class="math notranslate nohighlight">
+\[
+\lim_{k \to \infty} \left[ \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k \boldsymbol{x}_i \right] = \boldsymbol{0}
+\]</div>
+<p>This leaves us with:</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{z}_k = A^k \boldsymbol{q}_0 \approx c_1 \lambda_1^k \boldsymbol{x}_1
+\]</div>
+<p>This shows that the sequence of vectors <span class="math notranslate nohighlight">\(\boldsymbol{z}_k\)</span> converges to the subspace spanned by the dominant eigenvector, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{x}_1\}\)</span>.</p>
+</section>
+<section id="the-algorithm-power-iteration">
+<h2>The Algorithm: Power Iteration<a class="headerlink" href="#the-algorithm-power-iteration" title="Link to this heading">#</a></h2>
+<p>In practice, computing <span class="math notranslate nohighlight">\(A^k \boldsymbol{q}_0\)</span> directly is numerically unstable. If <span class="math notranslate nohighlight">\(|\lambda_1| &gt; 1\)</span>, the vector <span class="math notranslate nohighlight">\(\boldsymbol{z}_k\)</span> will overflow, and if <span class="math notranslate nohighlight">\(|\lambda_1| &lt; 1\)</span>, it will underflow to zero.</p>
+<p>The solution is to <strong>normalize</strong> the vector at every single iteration. This keeps the vector’s norm at <span class="math notranslate nohighlight">\(1\)</span> and preserves only the directional information, which is what we care about. This leads to the <strong>Power Iteration</strong> algorithm.</p>
+<p><strong>Algorithm: Power Iteration</strong></p>
+<ol class="arabic simple">
+<li><p>Start with a random unit vector <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> (i.e., <span class="math notranslate nohighlight">\(\|\boldsymbol{q}\|_2 = 1\)</span>).</p></li>
+<li><p>Loop until convergence (e.g., until <span class="math notranslate nohighlight">\(\lambda\)</span> stops changing):</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(\boldsymbol{z} = A \boldsymbol{q}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda = \boldsymbol{q}^H \boldsymbol{z}\)</span> (Estimate eigenvalue using the <strong>Rayleigh quotient</strong>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\boldsymbol{q} = \boldsymbol{z} / \|\boldsymbol{z}\|_2\)</span> (Normalize for the next iteration)</p></li>
+</ol>
+</li>
+<li><p>Return <span class="math notranslate nohighlight">\(\lambda\)</span> (the dominant eigenvalue) and <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> (the dominant eigenvector).</p></li>
+</ol>
+</section>
+<section id="convergence-analysis">
+<h2>Convergence Analysis<a class="headerlink" href="#convergence-analysis" title="Link to this heading">#</a></h2>
+<ul>
+<li><p><strong>Eigenvector:</strong> The convergence of the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> is slightly subtle. From our derivation, the normalized vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k = \boldsymbol{z}_k / \|\boldsymbol{z}_k\|\)</span> behaves like:</p>
+<div class="math notranslate nohighlight">
+\[
+    \boldsymbol{q}_k \approx \frac{c_1 \lambda_1^k \boldsymbol{x}_1}{\|c_1 \lambda_1^k \boldsymbol{x}_1\|} = \left( \frac{\lambda_1}{|\lambda_1|} \right)^k \left( \frac{c_1}{|c_1|} \right) \left( \frac{\boldsymbol{x}_1}{\|\boldsymbol{x}_1\|} \right)
+    \]</div>
+<p>If <span class="math notranslate nohighlight">\(\lambda_1\)</span> is real and positive, <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> converges to <span class="math notranslate nohighlight">\(\pm \boldsymbol{x}_1\)</span>. However, if <span class="math notranslate nohighlight">\(\lambda_1 = \rho e^{i\theta}\)</span> is complex, the phase factor <span class="math notranslate nohighlight">\((e^{i\theta})^k\)</span> remains, and the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> “spins” in the complex plane.</p>
+<ul class="simple">
+<li><p>In all cases, the <em>subspace</em> <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_k\}\)</span> converges to <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{x}_1\}\)</span>.</p></li>
+<li><p>The <em>rate of convergence</em> is linear and depends on the ratio <span class="math notranslate nohighlight">\(|\lambda_2 / \lambda_1|\)</span>. If this ratio is close to 1 (i.e., the dominant eigenvalue is not very dominant), convergence can be very slow.</p></li>
+</ul>
+</li>
+<li><p><strong>Eigenvalue:</strong> The sequence of estimates <span class="math notranslate nohighlight">\(\lambda_k = \boldsymbol{q}_{k}^H A \boldsymbol{q}_{k}\)</span> converges to the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>. We prove this result below.</p></li>
+</ul>
+<div class="proof admonition" id="proof">
+<p>Proof. We prove that the sequence of eigenvalue estimates <span class="math notranslate nohighlight">\(\lambda_k = \boldsymbol{q}_k^H A \boldsymbol{q}_k\)</span> (the Rayleigh quotient) converges to the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>.</p>
+<p><strong>Recall Eigenvector Convergence:</strong></p>
+<p>From the analysis of the eigenvector, we know that as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> becomes almost perfectly aligned with the dominant eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>.</p>
+<p>Let’s assume <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> is normalized such that <span class="math notranslate nohighlight">\(\|\boldsymbol{x}_1\|_2 = 1\)</span>. As shown in the derivation, the sequence <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> can be written as:</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{q}_k = \phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k
+\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\phi_k = \left( \frac{\lambda_1}{|\lambda_1|} \right)^k \left( \frac{c_1}{|c_1|} \right)\)</span> is a complex phase factor. Note that <span class="math notranslate nohighlight">\(|\phi_k| = 1\)</span>, which means <span class="math notranslate nohighlight">\(\phi_k^H \phi_k = 1\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k\)</span> is the error vector, which contains all the non-dominant eigenvector components. From our derivation, we know that <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k \to \boldsymbol{0}\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p></li>
+</ul>
+<p><strong>Substitute into the Rayleigh Quotient:</strong></p>
+<p>Now, let’s examine the eigenvalue estimate <span class="math notranslate nohighlight">\(\lambda_k\)</span> using this expression for <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_k = \boldsymbol{q}_k^H A \boldsymbol{q}_k = (\phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k)^H A (\phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k)
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(A(\phi_k \boldsymbol{x}_1) = \phi_k (A \boldsymbol{x}_1) = \phi_k \lambda_1 \boldsymbol{x}_1\)</span>, we can write:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_k = (\phi_k^H \boldsymbol{x}_1^H + \boldsymbol{\epsilon}_k^H) (\phi_k \lambda_1 \boldsymbol{x}_1 + A \boldsymbol{\epsilon}_k)
+\]</div>
+<p><strong>Expand the Expression:</strong></p>
+<p>We multiply the terms:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_k = \underbrace{(\phi_k^H \boldsymbol{x}_1^H)(\phi_k \lambda_1 \boldsymbol{x}_1)}_{\text{Term 1}} + \underbrace{(\phi_k^H \boldsymbol{x}_1^H)(A \boldsymbol{\epsilon}_k)}_{\text{Term 2}} + \underbrace{(\boldsymbol{\epsilon}_k^H)(\phi_k \lambda_1 \boldsymbol{x}_1)}_{\text{Term 3}} + \underbrace{(\boldsymbol{\epsilon}_k^H A \boldsymbol{\epsilon}_k)}_{\text{Term 4}}
+\]</div>
+<p><strong>Analyze Each Term as <span class="math notranslate nohighlight">\(k \to \infty\)</span>:</strong></p>
+<ul>
+<li><p><strong>Term 1:</strong> We can regroup the scalars:</p>
+<div class="math notranslate nohighlight">
+\[
+    (\phi_k^H \phi_k) \lambda_1 (\boldsymbol{x}_1^H \boldsymbol{x}_1)
+    \]</div>
+<p>Since <span class="math notranslate nohighlight">\(\phi_k^H \phi_k = 1\)</span> (as <span class="math notranslate nohighlight">\(|\phi_k|=1\)</span>) and <span class="math notranslate nohighlight">\(\boldsymbol{x}_1^H \boldsymbol{x}_1 = 1\)</span> (as <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> is normalized), this term simplifies to:</p>
+<div class="math notranslate nohighlight">
+\[
+    \text{Term 1} = (1) \cdot \lambda_1 \cdot (1) = \lambda_1
+    \]</div>
+</li>
+<li><p><strong>Term 2:</strong> As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, we know <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k \to \boldsymbol{0}\)</span>. The entire term, which is a scalar inner product, must therefore go to 0.</p></li>
+<li><p><strong>Term 3:</strong> Similarly, as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, this inner product also goes to 0.</p></li>
+<li><p><strong>Term 4:</strong> This is a quadratic form <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k^H A \boldsymbol{\epsilon}_k\)</span>. This term goes to 0 even faster.</p></li>
+</ul>
+<p>By taking the limit of the expanded expression, we get:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-(Q^T Q)Rx - Q^T b &amp;= 0 \\
-IRx - Q^T b &amp;= 0
+\lim_{k\to\infty}\lambda_k
+&amp;= \lim_{k\to\infty}\big(\text{Term 1} + \text{Term 2} + \text{Term 3} + \text{Term 4}\big) \\
+&amp;= \lambda_1 + 0 + 0 + 0 \\
+&amp;= \lambda_1
 \end{aligned}
 \end{split}\]</div>
-<p>This simplifies the least-squares problem into a much nicer linear system.</p>
-<section id="the-transformed-system">
-<h3>The Transformed System<a class="headerlink" href="#the-transformed-system" title="Link to this heading">#</a></h3>
-<p>The equation becomes:</p>
+<p>Therefore,</p>
 <div class="math notranslate nohighlight">
 \[
-Rx = Q^T b
+\lim_{k \to \infty} \lambda_k = \lambda_1
 \]</div>
-<p>This system is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal system. If we partition <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
-\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix and <span class="math notranslate nohighlight">\(b_1\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-vector, the system becomes:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{bmatrix} R_1 \\ 0 \end{bmatrix} x = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
-\end{split}\]</div>
-<p>This gives us two equations:</p>
+<p>This proves that the sequence of Rayleigh quotients converges to the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>.</p>
+</div>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">#</a></h2>
+<p>The power method is fundamental, but it has significant limitations:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(R_1 x = b_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(0 \cdot x = b_2\)</span></p></li>
+<li><p>It only finds the <strong>single largest eigenvalue</strong>.</p></li>
+<li><p>It fails if there is no <em>single</em> dominant eigenvalue (e.g., a complex conjugate pair <span class="math notranslate nohighlight">\(|\lambda_1| = |\lambda_2|\)</span> or real eigenvalues <span class="math notranslate nohighlight">\(\lambda_1 = -\lambda_2\)</span>).</p></li>
+<li><p>Convergence can be unacceptably slow if <span class="math notranslate nohighlight">\(|\lambda_1| \approx |\lambda_2|\)</span>.</p></li>
 </ol>
-<p>The solution <span class="math notranslate nohighlight">\(x\)</span> is found by solving the first equation. The norm of the residual is simply <span class="math notranslate nohighlight">\(\|b_2\|_2\)</span>.</p>
-<p>The solution to the least-squares problem is therefore found by solving the <strong>square, upper-triangular system</strong>:</p>
-<div class="math notranslate nohighlight" id="equation-eq-qr-system">
-<span class="eqno">(1)<a class="headerlink" href="#equation-eq-qr-system" title="Link to this equation">#</a></span>\[R_1 x = b_1\]</div>
-<p>This is easily solved using <strong>back-substitution</strong>.</p>
-</section>
-</section>
-<section id="algorithm-summary">
-<h2>Algorithm Summary<a class="headerlink" href="#algorithm-summary" title="Link to this heading">#</a></h2>
-<p>The QR method for solving <span class="math notranslate nohighlight">\(\|Ax - b\|_2\)</span> can be summarized in three steps:</p>
-<ol class="arabic simple">
-<li><p><strong>Factorize:</strong> Compute the QR factorization of <span class="math notranslate nohighlight">\(A\)</span>, yielding <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span>.</p></li>
-<li><p><strong>Transform:</strong> Compute the vector <span class="math notranslate nohighlight">\(Q^T b\)</span>.</p></li>
-<li><p><strong>Solve:</strong> Solve the <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular system <span class="math notranslate nohighlight">\(R_1 x = b_1\)</span> for <span class="math notranslate nohighlight">\(x\)</span> using back-substitution, where <span class="math notranslate nohighlight">\(R_1\)</span> and <span class="math notranslate nohighlight">\(b_1\)</span> are the top <span class="math notranslate nohighlight">\(n\)</span> rows of <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>, respectively.</p></li>
-</ol>
-</section>
-<section id="analysis-and-advantages">
-<h2>Analysis and Advantages<a class="headerlink" href="#analysis-and-advantages" title="Link to this heading">#</a></h2>
-<section id="numerical-stability">
-<h3>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h3>
-<p>This is the <strong>primary advantage</strong> of the QR method. By avoiding the formation of the Gram matrix <span class="math notranslate nohighlight">\(A^T A\)</span>, we work with a system whose condition number is <span class="math notranslate nohighlight">\(\kappa_2(R_1) = \kappa_2(A)\)</span>, not <span class="math notranslate nohighlight">\(\kappa_2(A)^2\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-\kappa_2(\text{Normal Equations}) = \kappa_2(A)^2 \quad \text{vs.} \quad \kappa_2(\text{QR Method}) = \kappa_2(A)
-\]</div>
-<p>This dramatic improvement in conditioning means the solution is far less sensitive to perturbations and rounding errors. It’s the reason QR is the workhorse for least-squares problems. ✅</p>
-</section>
-<section id="computational-cost">
-<h3>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h3>
-<p>The computational cost is dominated by the QR factorization step (e.g., using Householder transformations), which takes approximately <span class="math notranslate nohighlight">\(2mn^2 - \frac{2}{3}n^3\)</span> flops. The total cost is <span class="math notranslate nohighlight">\(O(mn^2)\)</span>, which is comparable to the normal equations method.</p>
-</section>
-</section>
-<section id="derivation-using-the-normal-equations">
-<h2>Derivation using the Normal Equations<a class="headerlink" href="#derivation-using-the-normal-equations" title="Link to this heading">#</a></h2>
-<p>For this derivation, we first need to discuss the full vs thin QR factorization. The previous derivation used the full QR factorization. But now it will be clearer if we use the thin QR factorization.</p>
-<section id="full-vs-thin-qr-and-the-invertible-factor">
-<h3>Full vs. Thin QR and the Invertible Factor<a class="headerlink" href="#full-vs-thin-qr-and-the-invertible-factor" title="Link to this heading">#</a></h3>
-</section>
-<section id="full-qr-factorization">
-<h3>1. Full QR Factorization<a class="headerlink" href="#full-qr-factorization" title="Link to this heading">#</a></h3>
-<p>For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> (with <span class="math notranslate nohighlight">\(m \ge n\)</span>), the <strong>full</strong> QR factorization is:</p>
-<div class="math notranslate nohighlight">
-\[
-A_{m \times n} = Q_{m \times m} R_{m \times n}
-\]</div>
-<ul>
-<li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix.</p></li>
-<li><p><span class="math notranslate nohighlight">\(R\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. It has the structure:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}
-    \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix, and the lower block is an <span class="math notranslate nohighlight">\((m-n) \times n\)</span> matrix of zeros.</p>
-</li>
-</ul>
-<p>In this form, <span class="math notranslate nohighlight">\(R\)</span> is rectangular and <strong>not invertible</strong>. The invertible part is its submatrix <span class="math notranslate nohighlight">\(R_1\)</span>.</p>
-</section>
-<section id="reduced-or-thin-qr-factorization">
-<h3>2. Reduced (or Thin) QR Factorization<a class="headerlink" href="#reduced-or-thin-qr-factorization" title="Link to this heading">#</a></h3>
-<p>The <strong>reduced</strong> QR factorization is a more compact version that is often more useful in practice:</p>
-<div class="math notranslate nohighlight">
-\[
-A_{m \times n} = Q_{1, m \times n} R_{1, n \times n}
-\]</div>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(Q_1\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with orthonormal columns. (It’s the first <span class="math notranslate nohighlight">\(n\)</span> columns of the full <span class="math notranslate nohighlight">\(Q\)</span>).</p></li>
-<li><p><span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix. (It is identical to the <span class="math notranslate nohighlight">\(R_1\)</span> submatrix from the full QR).</p></li>
-</ul>
-<p>The key takeaway is that <span class="math notranslate nohighlight">\(R_1\)</span> from the reduced factorization <strong>is square and invertible</strong> (assuming <span class="math notranslate nohighlight">\(A\)</span> has full column rank).</p>
-</section>
-</section>
-<section id="derivation-using-reduced-qr">
-<h2>Derivation using Reduced QR<a class="headerlink" href="#derivation-using-reduced-qr" title="Link to this heading">#</a></h2>
-<p>Let’s re-derive the solution starting from the normal equations using the <strong>reduced QR</strong> factorization, <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Start with the normal equations:</strong></p>
-<div class="math notranslate nohighlight">
-\[
-    A^T A x = A^T b
-    \]</div>
-</li>
-<li><p><strong>Substitute <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>:</strong></p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-    (Q_1 R_1)^T (Q_1 R_1) x &amp;= (Q_1 R_1)^T b \\
-    (R_1^T Q_1^T) (Q_1 R_1) x &amp;= R_1^T Q_1^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Simplify using orthogonality:</strong>
-The columns of <span class="math notranslate nohighlight">\(Q_1\)</span> are orthonormal, so <span class="math notranslate nohighlight">\(Q_1^T Q_1 = I_n\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity matrix). The equation simplifies:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-    (R_1^T I_n R_1) x &amp;= R_1^T Q_1^T b \\
-    R_1^T R_1 x &amp;= R_1^T Q_1^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Cancel the invertible term:</strong>
-Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> invertible matrix (assuming full rank), its transpose <span class="math notranslate nohighlight">\(R_1^T\)</span> is also invertible. We can now correctly left-multiply both sides by <span class="math notranslate nohighlight">\((R_1^T)^{-1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-    (R_1^T)^{-1} R_1^T R_1 x = (R_1^T)^{-1} R_1^T Q_1^T b
-    \]</div>
-<p>This leaves us with the clean, square, upper-triangular system:</p>
-<div class="math notranslate nohighlight">
-\[
-    R_1 x = Q_1^T b = b_1
-    \]</div>
-<p>This is the same system we derived earlier using the orthogonality principle (see equation <a class="reference internal" href="#equation-eq-qr-system">(1)</a>).</p>
-</li>
-</ol>
+<p>Despite these limitations, this core idea of “repeated application and normalization” is the engine inside the much more robust algorithms we will study next.</p>
 </section>
 </section>
 
@@ -602,20 +596,20 @@ Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span clas
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="normal_equations.html"
+       href="eigenvalues.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Method of Normal Equations</p>
+        <p class="prev-next-title">Eigenvalue Computation</p>
       </div>
     </a>
     <a class="right-next"
-       href="LS_using_SVD.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">SVD for Rank-Deficient Least-Squares</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -635,23 +629,11 @@ Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span clas
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-the-orthogonality-principle">Derivation from the Orthogonality Principle</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-transformed-system">The Transformed System</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-summary">Algorithm Summary</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-and-advantages">Analysis and Advantages</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-the-normal-equations">Derivation using the Normal Equations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-vs-thin-qr-and-the-invertible-factor">Full vs. Thin QR and the Invertible Factor</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-qr-factorization">1. Full QR Factorization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduced-or-thin-qr-factorization">2. Reduced (or Thin) QR Factorization</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-reduced-qr">Derivation using Reduced QR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intuition-the-dominant-direction">Intuition: The Dominant Direction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation">Derivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-power-iteration">The Algorithm: Power Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-analysis">Convergence Analysis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">Limitations</a></li>
 </ul>
   </nav></div>
 
