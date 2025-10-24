@@ -25,3 +25,12 @@ Sequential Construction: Unlike the other two, which modify the existing matrix,
 Essential for Iterative Methods: This sequential nature is critical for advanced iterative algorithms like the Arnoldi iteration, which is used to find eigenvalues of very large, sparse matrices. Householder and Givens can't be used in the same way because they only produce the full orthogonal matrix at the end.
 
 A Lesson in Stability: The contrast between the unstable Classical Gram-Schmidt and the stable Modified Gram-Schmidt is a classic case study in numerical analysis, showing how a small change in the order of operations can dramatically impact the result due to rounding errors.
+
+## Summary Table
+
+| Method | Computational Cost (Flops) | Numerical Stability | Key Use Case |
+| :--- | :--- | :--- | :--- |
+| **Householder** | $\sim 2mn^2 - \frac{2}{3}n^3$ | **Excellent** (Backward Stable) | The "go-to" for dense matrices. |
+| **Givens** | $\sim 3mn^2 - n^3$ | **Excellent** (Backward Stable) | Parallel computing or sparse matrices. |
+| **Modified Gram-Schmidt** | $\sim 2mn^2$ | **Good** (Stable, but error can depend on $\kappa_2(A)$) | Iterative methods (e.g., Arnoldi). |
+| **Classical Gram-Schmidt** | $\sim 2mn^2$ | **Poor** (Unstable) | Pedagogical / illustrative. |

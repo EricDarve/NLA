@@ -34,7 +34,7 @@ chapters:
   - file: content/householder_reflections.md
   - file: content/givens_rotations.md
   - file: content/modified_gram_schmidt.md
-  - file: content/summary.md
+  - file: content/qr_summary.md
   - file: content/existence_and_uniqueness_qr.md
   - file: content/backward_stability.md
   - file: content/qr_and_determinant.md
