@@ -1,0 +1,1018 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Orthogonal Iteration Algorithm &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/orthogonal_iteration';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="The Method of Deflation" href="deflation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Orthogonal Iteration Algorithm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/orthogonal_iteration.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The Orthogonal Iteration Algorithm</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm">Algorithm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">Convergence</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-convergence">Proof of Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inductive-proof">The Inductive Proof</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-case-p-1">Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inductive-step-assume-p-i-holds-prove-p-i-1">Inductive Step: Assume <span class="math notranslate nohighlight">\(P(i)\)</span> holds, prove <span class="math notranslate nohighlight">\(P(i+1)\)</span></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#second-proof-of-convergence">Second Proof of Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-ordered-schur-form-and-the-iteration">Setup (ordered Schur form and the iteration)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-graph-map-and-the-core-recurrence">The graph map and the core recurrence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-linear-convergence">Local linear convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-convergence-and-rates">Global convergence and rates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-notes">Practical notes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-the-ritz-eigenvalues">Convergence rate of the Ritz eigenvalues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blockschur-view">Block–Schur view</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#takeaways">Takeaways</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-principal-angles">Definition of Principal Angles</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-orthogonal-iteration-algorithm">
+<h1>The Orthogonal Iteration Algorithm<a class="headerlink" href="#the-orthogonal-iteration-algorithm" title="Link to this heading">#</a></h1>
+<p>The process of finding one eigenvector, building a projector, and repeating is a great theoretical concept, but it’s complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the <strong>orthogonal iteration</strong>. This algorithm essentially performs the “power iteration with deflation” on all eigenvectors simultaneously.</p>
+<p>The iteration is defined by two simple steps:</p>
+<ol class="arabic">
+<li><p><strong>Multiply by <span class="math notranslate nohighlight">\(A\)</span>:</strong> Apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to the current set of orthonormal basis vectors <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+    Z = A Q_k
+    \]</div>
+</li>
+<li><p><strong>Re-orthogonalize:</strong> Use the <span class="math notranslate nohighlight">\(QR\)</span> factorization to create a new orthonormal basis <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> from the resulting vectors <span class="math notranslate nohighlight">\(Z\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+    Q_{k+1} R_{k+1} = Z
+    \]</div>
+<p>This step is what performs the implicit deflation.</p>
+</li>
+</ol>
+<ul class="simple">
+<li><p>The first column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is just the normalized <span class="math notranslate nohighlight">\(A \boldsymbol{q}_1\)</span>, which is the standard power method.</p></li>
+<li><p>The second column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is the normalized <span class="math notranslate nohighlight">\(A \boldsymbol{q}_2\)</span> made orthogonal to <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span>.</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is the normalized <span class="math notranslate nohighlight">\(A \boldsymbol{q}_j\)</span> made orthogonal to <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_1, \dots, \boldsymbol{q}_{j-1}\}\)</span>.</p></li>
+</ul>
+<p>This directly corresponds to our deflation idea. Column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(Q_k\)</span> is effectively converging as if it were part of a power iteration on the deflated matrix <span class="math notranslate nohighlight">\(P_{ \{\boldsymbol{q}_1, \dots, \boldsymbol{q}_{j-1}\}^\perp } A\)</span>.</p>
+<p>For simplicity, in this section we will assume that</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_1| &gt; \cdots &gt;|\lambda_n| &gt; 0.
+\]</div>
+<section id="algorithm">
+<h2>Algorithm<a class="headerlink" href="#algorithm" title="Link to this heading">#</a></h2>
+<p>Here is the complete algorithm, starting from a random orthogonal matrix <span class="math notranslate nohighlight">\(Q_0\)</span>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Let A be a square matrix of size n x n</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Start with a random n x n orthogonal matrix</span>
+<span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+<span class="c1"># Set the number of iterations</span>
+<span class="n">num_iterations</span> <span class="o">=</span> <span class="mi">1000</span> 
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
+    <span class="c1"># 1. Multiply by A (the &quot;power&quot; step)</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span>
+    
+    <span class="c1"># 2. Re-orthogonalize (the &quot;deflation&quot; step)</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+    
+<span class="c1"># After iterating, Q will approximate the Schur vectors.</span>
+<span class="c1"># The matrix T = Q.conj().T @ A @ Q will be approximately upper triangular.</span>
+</pre></div>
+</div>
+<section id="convergence">
+<h3>Convergence<a class="headerlink" href="#convergence" title="Link to this heading">#</a></h3>
+<p>As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, <span class="math notranslate nohighlight">\(Q_k\)</span> converges to a Schur basis up to diagonal unitary factors (see below for a technical clarification). Equivalently, the ordered one-dimensional subspaces <span class="math notranslate nohighlight">\(\operatorname{span}\{q_{k,j}\}\)</span> converge to <span class="math notranslate nohighlight">\(\operatorname{span}\{v_j\}\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(Q\)</span> in the Schur decomposition is not unique. If <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, we can define a new <span class="math notranslate nohighlight">\(Q' = Q D\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is any diagonal matrix with entries <span class="math notranslate nohighlight">\(e^{i \theta_j}\)</span> (<span class="math notranslate nohighlight">\(\theta_j \in \mathbb R\)</span>, <span class="math notranslate nohighlight">\(|e^{i \theta_j}|=1\)</span>). <span class="math notranslate nohighlight">\(Q'\)</span> is still unitary, and</p>
+<div class="math notranslate nohighlight">
+\[
+A = (QD) T (QD)^H = Q (DTD^H) Q^H.
+\]</div>
+<p>The new matrix <span class="math notranslate nohighlight">\(T' = DTD^H\)</span> is still upper triangular and has the same diagonal as <span class="math notranslate nohighlight">\(T\)</span>.</p>
+<p>Because of this, we cannot rigorously say that <span class="math notranslate nohighlight">\(Q_k\)</span> converges to a specific <span class="math notranslate nohighlight">\(Q\)</span>. Instead, we have to state the convergence more carefully:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q_k\)</span> converges to <span class="math notranslate nohighlight">\(Q\)</span> <em>up to a diagonal unitary matrix</em>.</p></li>
+<li><p>More simply, the <strong>subspaces converge</strong>. For each <span class="math notranslate nohighlight">\(j\)</span> from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>, the subspace spanned by column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the subspace spanned by the <span class="math notranslate nohighlight">\(j\)</span>th Schur vector.</p></li>
+</ul>
+<p>The angle between these two subspaces goes to 0. See below for a formal definition of the angle between subspaces.</p>
+</section>
+</section>
+<section id="proof-of-convergence">
+<h2>Proof of Convergence<a class="headerlink" href="#proof-of-convergence" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix with a Schur decomposition <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where <span class="math notranslate nohighlight">\(Q = [\boldsymbol{v}_1 | \dots | \boldsymbol{v}_n]\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. The diagonal entries of <span class="math notranslate nohighlight">\(T\)</span> are the eigenvalues <span class="math notranslate nohighlight">\(\lambda_i = T_{ii}\)</span>.</p>
+<p>Let</p>
+<div class="math notranslate nohighlight">
+\[
+Q_k = [\boldsymbol{q}_{k,1} | \dots | \boldsymbol{q}_{k,n}]
+\]</div>
+<p>be the <span class="math notranslate nohighlight">\(k\)</span>-th iterate of the algorithm. Let</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{V}_j = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_j\}
+\]</div>
+<p>be the <span class="math notranslate nohighlight">\(j\)</span>-dimensional dominant invariant subspace (spanned by the first <span class="math notranslate nohighlight">\(j\)</span> Schur vectors with largest moduli). Let</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{S}_{k,j} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,j}\}
+\]</div>
+<p>be the subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
+<p><strong>Goal:</strong> We will prove by induction that for each <span class="math notranslate nohighlight">\(j = 1, \dots, n\)</span>, the subspace <span class="math notranslate nohighlight">\(\mathcal{S}_{k,j}\)</span> converges to the subspace <span class="math notranslate nohighlight">\(\mathcal{V}_j\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p>
+<section id="the-inductive-proof">
+<h3>The Inductive Proof<a class="headerlink" href="#the-inductive-proof" title="Link to this heading">#</a></h3>
+<p><strong>Inductive Hypothesis <span class="math notranslate nohighlight">\(P(j)\)</span>:</strong> The subspace</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{S}_{k,j} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,j}\}
+\]</div>
+<p>converges to the invariant subspace</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{V}_j = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_j\}.
+\]</div>
+</section>
+<section id="base-case-p-1">
+<h3>Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span><a class="headerlink" href="#base-case-p-1" title="Link to this heading">#</a></h3>
+<p>We must show that <span class="math notranslate nohighlight">\(\mathcal{S}_{k,1} = \text{span}\{\boldsymbol{q}_{k,1}\}\)</span> converges to <span class="math notranslate nohighlight">\(\mathcal{V}_1 = \text{span}\{\boldsymbol{v}_1\}\)</span>. We will assume that the start has nonzero overlap with the target subspaces; in particular <span class="math notranslate nohighlight">\(\langle \boldsymbol q_{0,1},\boldsymbol v_1\rangle \neq 0\)</span>.</p>
+<p>Let’s analyze the first column of the iteration:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(\boldsymbol{z}_1 = A \boldsymbol{q}_{k,1}\)</span></p></li>
+<li><p>From <span class="math notranslate nohighlight">\(Q_{k+1} R_{k+1} = Z\)</span>, the first column gives <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1,1} R_{11} = \boldsymbol{z}_1\)</span>.</p></li>
+</ol>
+<p>Since <span class="math notranslate nohighlight">\(R_{11} = \|\boldsymbol{z}_1\|_2\)</span> (as <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1,1}\)</span> is a unit vector), the iteration for the first column is:</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{q}_{k+1, 1} = \frac{A \boldsymbol{q}_{k, 1}}{\|A \boldsymbol{q}_{k, 1}\|_2}
+\]</div>
+<p>This is precisely the <strong>standard power iteration</strong>. Given our assumption that <span class="math notranslate nohighlight">\(|\lambda_1| &gt; |\lambda_j|\)</span> for all <span class="math notranslate nohighlight">\(j &gt; 1\)</span>, the power iteration converges to the dominant eigenvector, which is the first Schur vector <span class="math notranslate nohighlight">\(\boldsymbol{v}_1\)</span>.</p>
+<p>So, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k,1}\} \to \text{span}\{\boldsymbol{v}_1\}\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>. The base case <span class="math notranslate nohighlight">\(P(1)\)</span> holds.</p>
+</section>
+<section id="inductive-step-assume-p-i-holds-prove-p-i-1">
+<h3>Inductive Step: Assume <span class="math notranslate nohighlight">\(P(i)\)</span> holds, prove <span class="math notranslate nohighlight">\(P(i+1)\)</span><a class="headerlink" href="#inductive-step-assume-p-i-holds-prove-p-i-1" title="Link to this heading">#</a></h3>
+<p><strong>Assumption <span class="math notranslate nohighlight">\(P(i)\)</span>:</strong> We assume that <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,i}\}\)</span> converges to <span class="math notranslate nohighlight">\(\mathcal{V}_i = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_i\}\)</span>.</p>
+<p><strong>Goal:</strong> We must show that <span class="math notranslate nohighlight">\(P(i+1)\)</span> holds, i.e., <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i+1} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,i+1}\}\)</span> converges to <span class="math notranslate nohighlight">\(\mathcal{V}_{i+1} = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_{i+1}\}\)</span>.</p>
+<p>Let’s analyze the <span class="math notranslate nohighlight">\((i+1)\)</span>-th column of the iteration, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, i+1}\)</span>. The <span class="math notranslate nohighlight">\(QR\)</span> factorization <span class="math notranslate nohighlight">\(Q_{k+1} R_{k+1} = Z\)</span> is equivalent to the Gram-Schmidt process. The vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, i+1}\)</span> is computed by taking <span class="math notranslate nohighlight">\(\boldsymbol{z}_{i+1} = A \boldsymbol{q}_{k, i+1}\)</span> and orthogonalizing it against the <em>preceding</em> vectors <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 1}, \dots, \boldsymbol{q}_{k+1, i}\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\boldsymbol{w} &amp;= A \boldsymbol{q}_{k, i+1} - \sum_{j=1}^{i} (\boldsymbol{q}_{k+1, j}^H (A \boldsymbol{q}_{k, i+1})) \boldsymbol{q}_{k+1, j} \\
+\boldsymbol{q}_{k+1, i+1} &amp;= \frac{\boldsymbol{w}}{\|\boldsymbol{w}\|_2}
+\end{aligned}
+\end{split}\]</div>
+<p>The vector <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> is the component of <span class="math notranslate nohighlight">\(A \boldsymbol{q}_{k, i+1}\)</span> that is orthogonal to <span class="math notranslate nohighlight">\(\mathcal{S}_{k+1, i}\)</span>.</p>
+<ol class="arabic">
+<li><p>Let <span class="math notranslate nohighlight">\(P^{(i)}\)</span> be the true projection onto the orthogonal complement of <span class="math notranslate nohighlight">\(\mathcal{V}_i\)</span>, i.e., <span class="math notranslate nohighlight">\(P^{(i)} = I - \sum_{j=1}^i \boldsymbol{v}_j \boldsymbol{v}_j^H\)</span>. Let <span class="math notranslate nohighlight">\(P_k^{(i)}\)</span> be the projection onto the orthogonal complement of <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i}\)</span>.</p></li>
+<li><p>From our inductive assumption <span class="math notranslate nohighlight">\(P(i)\)</span>, we know <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i} \to \mathcal{V}_i\)</span>. This means the projection <span class="math notranslate nohighlight">\(P_k^{(i)} \to P^{(i)}\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p></li>
+<li><p>Therefore, the iteration for the <span class="math notranslate nohighlight">\((i+1)\)</span>-th column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, i+1} \propto P_{k+1}^{(i)} (A \boldsymbol{q}_{k, i+1})\)</span>, becomes asymptotically equivalent to an iteration of the form:</p>
+<div class="math notranslate nohighlight">
+\[
+    \boldsymbol{v}^{(k+1)} \propto P^{(i)} (A \boldsymbol{v}^{(k)})
+    \]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{v}^{(k)}\)</span> represents the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k, i+1}\)</span>.</p>
+</li>
+</ol>
+<p>This is precisely the “power iteration with <span class="math notranslate nohighlight">\(PA\)</span>” that we previously discussed. We are performing a power iteration with the matrix <span class="math notranslate nohighlight">\(P^{(i)} A\)</span> on the subspace <span class="math notranslate nohighlight">\(\mathcal{V}_i^\perp\)</span>. And we previously established that it will converge to <span class="math notranslate nohighlight">\(\boldsymbol{v}_{i+1}\)</span> (with eigenvalue <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span>). Therefore, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k, i+1}\} \to \text{span}\{\boldsymbol{v}_{i+1}\}\)</span>.</p>
+<p>In summary, we have shown:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\mathcal{S}_{k,i} \to \mathcal{V}_i\)</span> (by assumption <span class="math notranslate nohighlight">\(P(i)\)</span>)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k, i+1}\} \to \text{span}\{\boldsymbol{v}_{i+1}\}\)</span> (by our new finding).</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i+1} = \mathcal{S}_{k,i} \oplus \text{span}\{\boldsymbol{q}_{k,i+1}\}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{V}_{i+1} = \mathcal{V}_i \oplus \text{span}\{\boldsymbol{v}_{i+1}\}\)</span> (due to orthogonality), the convergence of the component subspaces implies the convergence of the total subspace.</p></li>
+</ul>
+<p>Thus, <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i+1} \to \mathcal{V}_{i+1}\)</span>. This proves <span class="math notranslate nohighlight">\(P(i+1)\)</span>.</p>
+<p>By induction, the statement <span class="math notranslate nohighlight">\(P(j)\)</span> now holds for all <span class="math notranslate nohighlight">\(j=1, \dots, n\)</span>.</p>
+<p>This means that for each <span class="math notranslate nohighlight">\(j\)</span>, the subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the invariant subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> Schur vectors. This implies that the full matrix <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur vector matrix <span class="math notranslate nohighlight">\(Q\)</span> (up to a diagonal unitary matrix, as the phase of each vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k,j}\)</span> is not uniquely determined).</p>
+</section>
+</section>
+<section id="second-proof-of-convergence">
+<h2>Second Proof of Convergence<a class="headerlink" href="#second-proof-of-convergence" title="Link to this heading">#</a></h2>
+<p>We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation. This proof is more precise but also significantly more technical. It will give us a precise convergence rate for the method depending on the ratio <span class="math notranslate nohighlight">\(\lambda_{p+1} / \lambda_p\)</span>.</p>
+<div class="tip admonition">
+<p class="admonition-title">Summary of key ideas and results</p>
+<ul class="simple">
+<li><p><strong>Coordinates:</strong> Work in a Schur basis <span class="math notranslate nohighlight">\(A=UTU^H\)</span> and express the current iterate <span class="math notranslate nohighlight">\(U^H Q_k\)</span> (where <span class="math notranslate nohighlight">\(Q_k\)</span> is assumed to have <span class="math notranslate nohighlight">\(p\)</span> columns) as a graph</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathrm{span}\!\begin{bmatrix} C_k \\ S_k \end{bmatrix} = \mathrm{span}\!\begin{bmatrix}I\\E_k\end{bmatrix}\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(E_k=S_k C_k^{-1}\)</span>.</p>
+<ul class="simple">
+<li><p><strong>One-step update:</strong> The graph variable obeys</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+E_{k+1}=T_{22}\,E_k\,(T_{11}+T_{12}E_k)^{-1}.
+\]</div>
+<ul class="simple">
+<li><p><strong>Local convergence:</strong> If the target and unwanted spectra are separated (formally, <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span>) and the start has nonzero overlap with the target subspace (<span class="math notranslate nohighlight">\(C_0\)</span> invertible), then <span class="math notranslate nohighlight">\(E_k\to 0\)</span> <strong>linearly</strong>; asymptotically the factor is about <span class="math notranslate nohighlight">\(\rho(T_{22})\,\rho(T_{11}^{-1})\)</span>.</p></li>
+<li><p><strong>Global rate with a modulus gap:</strong> If <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span>, then the error decays roughly like</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+\|E_k\|\;\lesssim\; C\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
+\]</div>
+<p>up to constants.</p>
+<ul class="simple">
+<li><p><strong>What converges:</strong> The subspace <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> converges to the Schur subspace <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span> and the Ritz values of <span class="math notranslate nohighlight">\(B_k:=Q_k^H A Q_k\)</span> converge to the eigenvalues in <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p></li>
+<li><p><strong>How to measure error:</strong> <span class="math notranslate nohighlight">\(\|E_k\|=\|\tan\Theta_k\|\)</span>, where <span class="math notranslate nohighlight">\(\Theta_k\)</span> are the principal angles (see below for a definition of principal angles) between <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> and <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>; hence those angles go to <span class="math notranslate nohighlight">\(0\)</span> at the same rate.</p></li>
+</ul>
+</div>
+<section id="setup-ordered-schur-form-and-the-iteration">
+<h3>Setup (ordered Schur form and the iteration)<a class="headerlink" href="#setup-ordered-schur-form-and-the-iteration" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span>. Orthogonal iteration with block size <span class="math notranslate nohighlight">\(p\)</span> (i.e., <span class="math notranslate nohighlight">\(Q_k\)</span> has <span class="math notranslate nohighlight">\(p\)</span> columns) is</p>
+<div class="math notranslate nohighlight">
+\[
+Y_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Y_{k+1}),\quad Q_0^H Q_0=I_p.
+\]</div>
+<p>The notation <span class="math notranslate nohighlight">\(\operatorname{orth}(\cdot)\)</span> means to compute an orthonormal basis for the range (e.g., via <span class="math notranslate nohighlight">\(QR\)</span>).</p>
+<p>We will work with the (unitary) Schur form. Choose a unitary <span class="math notranslate nohighlight">\(U\)</span> so that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=U\begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix}U^H=:U T U^H,
+\end{split}\]</div>
+<p>where the <span class="math notranslate nohighlight">\(p\times p\)</span> block <span class="math notranslate nohighlight">\(T_{11}\)</span> holds the eigenvalues we want (e.g., the <span class="math notranslate nohighlight">\(p\)</span> largest in modulus, or any isolated cluster after a reordering), and <span class="math notranslate nohighlight">\(T_{22}\)</span> holds the rest. The convergence we wish to analyze is toward the Schur subspace <span class="math notranslate nohighlight">\(\mathcal{U}_1=\operatorname{span}(U_1)\)</span> (columns of <span class="math notranslate nohighlight">\(U\)</span> corresponding to <span class="math notranslate nohighlight">\(T_{11}\)</span>).</p>
+<p>Write the iterate in Schur coordinates as <span class="math notranslate nohighlight">\(Z_k:=U^H Q_k\)</span> and block it</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Z_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Z_k^H Z_k=I_p.
+\end{split}\]</div>
+<p>Subspace convergence can be studied through <span class="math notranslate nohighlight">\(Z_k\)</span>.</p>
+</section>
+<section id="the-graph-map-and-the-core-recurrence">
+<h3>The graph map and the core recurrence<a class="headerlink" href="#the-graph-map-and-the-core-recurrence" title="Link to this heading">#</a></h3>
+<p>As long as <span class="math notranslate nohighlight">\(C_k\)</span> is nonsingular (true once the iterate has nonzero overlap with <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>), define the graph variable <span class="math notranslate nohighlight">\(E_k:=S_k C_k^{-1}\)</span> so that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\operatorname{span}(Z_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
+\end{split}\]</div>
+<p>The name graph variable comes from functional analysis and corresponds to viewing the subspace as the graph of a linear operator from the “top” to the “bottom” space.</p>
+<p>One step of the (unnormalized) iteration in Schur coordinates is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+U^H Y_{k+1}=T Z_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
+\end{split}\]</div>
+<p>Since column spaces are what matter, the next subspace can be represented as a graph too:</p>
+<div class="math notranslate nohighlight">
+\[
+E_{k+1} = T_{22} S_k \bigl(T_{11} C_k + T_{12} S_k\bigr)^{-1} =
+T_{22}\,E_k\,\bigl(T_{11}+T_{12}E_k\bigr)^{-1}
+\]</div>
+<p>using <span class="math notranslate nohighlight">\(S_k=E_k C_k\)</span>.</p>
+<p>This “graph transform” is the standard invariant-subspace map for block-upper-triangular <span class="math notranslate nohighlight">\(T\)</span>; <span class="math notranslate nohighlight">\(E=0\)</span> is its fixed point (the exact invariant subspace <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>). Linearizing at <span class="math notranslate nohighlight">\(E=0\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+E_{k+1}=T_{22}\,E_k\,T_{11}^{-1}+ \mathcal{O}(\|E_k\|^2).
+\]</div>
+<p>Hence, locally the contraction factor is governed by <span class="math notranslate nohighlight">\(T_{22}\,(\cdot)\,T_{11}^{-1}\)</span>.</p>
+</section>
+<section id="local-linear-convergence">
+<h3>Local linear convergence<a class="headerlink" href="#local-linear-convergence" title="Link to this heading">#</a></h3>
+<p>From the graph recurrence and a Neumann-series bound,</p>
+<div class="math notranslate nohighlight">
+\[
+\|E_{k+1}\|\;\le\;\|T_{22}\|\,\|T_{11}^{-1}\|\;\frac{\|E_k\|}{\,1-\|T_{11}^{-1}\|\,\|T_{12}\|\,\|E_k\|\,}.
+\]</div>
+<p>Therefore, once <span class="math notranslate nohighlight">\(\|E_k\|\)</span> is small enough (in particular, <span class="math notranslate nohighlight">\(\|T_{11}^{-1}\|\,\|T_{12}\|\,\|E_k\|&lt;1\)</span>), you get linear contraction with asymptotic factor <span class="math notranslate nohighlight">\(\|T_{22}\|\,\|T_{11}^{-1}\|\)</span>. This is the standard local behavior around <span class="math notranslate nohighlight">\(E=0\)</span> in the non-Hermitian case.</p>
+</section>
+<section id="global-convergence-and-rates">
+<h3>Global convergence and rates<a class="headerlink" href="#global-convergence-and-rates" title="Link to this heading">#</a></h3>
+<p>Assume the initial subspace has a nonzero component in <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>. Then the orthogonal-iteration subspaces <span class="math notranslate nohighlight">\(\operatorname{span}(Q_k)\)</span> converge to <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span> (the Schur subspace for <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_p\)</span>). Moreover, the principal-angle (or projector) errors decay essentially like powers of the modulus gap; asymptotically, each column converges at a rate <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|\)</span> (for <span class="math notranslate nohighlight">\(i=1,\dots,p\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+\sin\angle\bigl(\mathcal{U}_1,\operatorname{span}(Q_k)\bigr)\;\lesssim\; \kappa \, \Bigl(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\Bigr)^{k}.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\kappa\)</span> reflects conditioning of the eigenbasis (departure from normality). This is the rate one gets from the linearized map <span class="math notranslate nohighlight">\(E_{k+1}\approx T_{22}E_k T_{11}^{-1}\)</span>.</p>
+<div class="proof theorem admonition" id="thm:orth-it-nh">
+<p class="admonition-title"><span class="caption-number">Theorem 20 </span> (Informal theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>If <span class="math notranslate nohighlight">\(\Lambda(T_{11})\)</span> and <span class="math notranslate nohighlight">\(\Lambda(T_{22})\)</span> are disjoint and <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span>, then for generic <span class="math notranslate nohighlight">\(Q_0\)</span> the iterates <span class="math notranslate nohighlight">\(\operatorname{span}(Q_k)\)</span> converge to <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>. Asymptotically, principal angles decay at a linear rate determined by <span class="math notranslate nohighlight">\(|\lambda_{p+1}/\lambda_p|\)</span>, and locally the graph error satisfies <span class="math notranslate nohighlight">\(\|E_{k+1}\|\le \|T_{22}\|\,\|T_{11}^{-1}\|\,\|E_k\|+o(\|E_k\|)\)</span>.</p>
+</section>
+</div><div class="proof theorem admonition" id="thm:orth-it-nh-rigorous">
+<p class="admonition-title"><span class="caption-number">Theorem 21 </span> (Convergence to a Schur invariant subspace)</p>
+<section class="theorem-content" id="proof-content">
+<p>(a) (Local convergence under spectral separation)<br />
+Assume the <strong>separation</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{sep}(T_{11},T_{22}) \;:=\; \min_{X\neq 0} \frac{\|T_{11}X - X T_{22}\|}{\|X\|} \;&gt;\; 0.
+\]</div>
+<p>Then there exists <span class="math notranslate nohighlight">\(\varepsilon&gt;0\)</span> such that if <span class="math notranslate nohighlight">\(\|E_0\|&lt;\varepsilon\)</span> the orthogonal iteration is well-defined for all <span class="math notranslate nohighlight">\(k\)</span> (meaning <span class="math notranslate nohighlight">\(C_k\)</span> is invertible so <span class="math notranslate nohighlight">\(E_k=S_k C_k^{-1}\)</span> exists, and <span class="math notranslate nohighlight">\(T_{11}+T_{12}E_k\)</span> is invertible so the update for <span class="math notranslate nohighlight">\(E_{k+1}\)</span> is valid) and the graph iterates satisfy the Riccati map</p>
+<div class="math notranslate nohighlight">
+\[
+E_{k+1} = T_{22}\,E_k\,(T_{11}+T_{12}E_k)^{-1}.
+\]</div>
+<p>Moreover, there are constants <span class="math notranslate nohighlight">\(c\)</span>, <span class="math notranslate nohighlight">\(\delta&gt;0\)</span> so that for all <span class="math notranslate nohighlight">\(\|E_k\|&lt;\delta\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|E_{k+1}\|\;\le\;\|T_{22}\|\,\|T_{11}^{-1}\|\,\|E_k\| \;+\; c\,\|E_k\|^2,
+\]</div>
+<p>hence <span class="math notranslate nohighlight">\(E_k\to 0\)</span> <strong>linearly</strong>. The asymptotic rate obeys</p>
+<div class="math notranslate nohighlight">
+\[
+\limsup_{k\to\infty}\frac{\|E_{k+1}\|}{\|E_k\|} \;\le\;
+\rho(T_{22})\,\rho(T_{11}^{-1}),
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\rho(\cdot)\)</span> is the spectral radius. Writing <span class="math notranslate nohighlight">\(\Theta_k\)</span> for the principal-angle matrix between <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> and <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>, we have <span class="math notranslate nohighlight">\(\|\tan\Theta_k\| = \|E_k\|\)</span> and <span class="math notranslate nohighlight">\(\|\sin\Theta_k\|\le \|E_k\|\)</span>, so the subspaces converge.</p>
+<p>(b) (Global rate under a modulus gap)<br />
+Assume the eigenvalues are ordered by modulus</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_1| &gt; \cdots &gt; |\lambda_p| \;&gt;\; |\lambda_{p+1}| &gt; \cdots &gt;|\lambda_n|.
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular, then the subspaces <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> converge to the Schur subspace <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>. There exist constants <span class="math notranslate nohighlight">\(c&gt;0\)</span> such that, for all sufficiently large <span class="math notranslate nohighlight">\(k\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|E_k\| \;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
+\]</div>
+<p>Consequently, the largest principal angle satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\sin\theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1))
+\;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
+\]</div>
+<p>Finally, the Ritz matrix <span class="math notranslate nohighlight">\(B_k:=Q_k^H A Q_k\)</span> has eigenvalues that converge to the eigenvalues of <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p>
+</section>
+</div></section>
+<section id="practical-notes">
+<h3>Practical notes<a class="headerlink" href="#practical-notes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Non-normality can slow convergence.</strong> Poorly conditioned eigenvectors (large departure from normality) can introduce substantial polynomial factors before the geometric rate dominates. It is one reason subspace iteration targets Schur vectors and/or uses accelerations.</p></li>
+<li><p><strong>Acceleration:</strong> shift-and-invert <span class="math notranslate nohighlight">\((A-\sigma I)^{-1}\)</span>, polynomial filters (Chebyshev), and locking/deflation are standard to isolate interior clusters and improve gaps; these plug directly into the subspace iteration framework.</p></li>
+<li><p><strong>Separation and Sylvester equations:</strong> the spectral separation <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> ensures a well-conditioned invariant-subspace problem and appears in error/conditioning bounds (e.g., Schur–Parlett/sign function analyses).</p></li>
+</ul>
+</section>
+</section>
+<section id="convergence-rate-of-the-ritz-eigenvalues">
+<h2>Convergence rate of the Ritz eigenvalues<a class="headerlink" href="#convergence-rate-of-the-ritz-eigenvalues" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(B_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}\)</span> be the Rayleigh–Ritz (Ritz) matrix at step <span class="math notranslate nohighlight">\(k\)</span>, and let its eigenvalues be <span class="math notranslate nohighlight">\(\{\mu_i^{(k)}\}_{i=1}^p\)</span>. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.</p>
+<section id="blockschur-view">
+<h3>Block–Schur view<a class="headerlink" href="#blockschur-view" title="Link to this heading">#</a></h3>
+<p>Work in a Schur basis</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A = U \begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix} U^H
+\end{split}\]</div>
+<p>with <span class="math notranslate nohighlight">\(T_{11}\in\mathbb{C}^{p\times p}\)</span>. With</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Z_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}\end{split}\]</div>
+<p>and <span class="math notranslate nohighlight">\(E_k := S_k C_k^{-1}\)</span> (when <span class="math notranslate nohighlight">\(C_k\)</span> is invertible), a short calculation gives</p>
+<div class="math notranslate nohighlight">
+\[
+B_k = Z_k^H T Z_k
+= (I+E_k^H E_k)^{-\tfrac12}
+\Big(T_{11} + T_{12}E_k + E_k^H T_{12}^H + E_k^H T_{22}E_k\Big)
+(I+E_k^H E_k)^{-\tfrac12}.
+\]</div>
+<p>Hence</p>
+<div class="math notranslate nohighlight">
+\[
+B_k \;=\; T_{11} + \Delta_k,
+\qquad
+\|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
+\]</div>
+<p>for some constants <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span> depending only on <span class="math notranslate nohighlight">\(\|T_{11}\|\)</span>, <span class="math notranslate nohighlight">\(\|T_{12}\|\)</span>, and <span class="math notranslate nohighlight">\(\|T_{22}\|\)</span>. Standard eigenvalue–perturbation then yields</p>
+<div class="proof theorem admonition" id="thm:ritz-rate-general">
+<p class="admonition-title"><span class="caption-number">Theorem 22 </span> (Ritz value rate)</p>
+<section class="theorem-content" id="proof-content">
+<p>Assume <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> so that the invariant subspace is well conditioned; assume <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular (the start has nonzero overlap with <span class="math notranslate nohighlight">\(\mathcal U_1\)</span>), and suppose <span class="math notranslate nohighlight">\(\|E_k\|\)</span> is sufficiently small. Then there exists <span class="math notranslate nohighlight">\(c&gt;0\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{dist}\big(\Lambda(B_k),\Lambda(T_{11})\big)
+\;\le\; c\,\|E_k\| \;+\; \mathcal{O}\!\big(\|E_k\|^2\big).
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\Lambda(X)\)</span> denotes the <strong>set of eigenvalues</strong> of <span class="math notranslate nohighlight">\(X\)</span>. The function <span class="math notranslate nohighlight">\(\mathrm{dist}\)</span> denotes the <strong>Hausdorff distance</strong> between (compact) subsets of <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{dist}\big(\Lambda(X),\Lambda(Y)\big)
+\;=\;
+\max\!\Big\{
+  \max_{\lambda\in\Lambda(X)} \min_{\mu\in\Lambda(Y)} |\lambda-\mu|\;,\;
+  \max_{\mu\in\Lambda(Y)} \min_{\lambda\in\Lambda(X)} |\lambda-\mu|
+\Big\}.
+\]</div>
+<p>In particular, if</p>
+<div class="math notranslate nohighlight">
+\[
+\|E_k\|\le C \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k
+\]</div>
+<p>(as proved above), then</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{dist}\big(\Lambda(B_k),\Lambda(T_{11})\big)
+\;\le\; C' \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
+\]</div>
+<p>for some constant <span class="math notranslate nohighlight">\(C'\)</span> independent of <span class="math notranslate nohighlight">\(k\)</span>.</p>
+</section>
+</div><div class="proof corollary admonition" id="cor:ritz-per-eig">
+<p class="admonition-title"><span class="caption-number">Corollary 1 </span> (Per–eigenvalue Ritz value convergence)</p>
+<section class="corollary-content" id="proof-content">
+<p>If the invariant subspace for <span class="math notranslate nohighlight">\(\Lambda(T_{11})=\{\lambda_1,\dots,\lambda_p\}\)</span> is separated from the rest (e.g., <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> in a Schur basis), and <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular, then the <span class="math notranslate nohighlight">\(i\)</span>-th column of <span class="math notranslate nohighlight">\(E_k\)</span> satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\|E_k[:,i]\| \le \tilde c_i\,(|\lambda_{p+1}|/|\lambda_i|)^k
+\]</div>
+<p>for large <span class="math notranslate nohighlight">\(k\)</span> (from the linearization <span class="math notranslate nohighlight">\(E_{k+1}\approx T_{22}E_kT_{11}^{-1}\)</span>). Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+|\mu_i^{(k)}-\lambda_i|\le c_i\Big(\tfrac{|\lambda_{p+1}|}{|\lambda_i|}\Big)^k,
+\]</div>
+<p>for <span class="math notranslate nohighlight">\(i \le p\)</span>. In particular, each leading Ritz value converges <strong>geometrically</strong>, and the <span class="math notranslate nohighlight">\(i\)</span>th one is controlled by the gap to the first unwanted eigenvalue <span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>.</p>
+</section>
+</div></section>
+<section id="takeaways">
+<h3>Takeaways<a class="headerlink" href="#takeaways" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>In general (non-Hermitian) problems, Ritz eigenvalues converge <strong>geometrically</strong> with the same factor that governs the subspace error <span class="math notranslate nohighlight">\(\|E_k\|\)</span>.</p></li>
+<li><p>Practically, once the principal angles are small, Ritz values stabilize very rapidly; locking/deflation then allows focusing the iteration on remaining eigenvalues.</p></li>
+</ul>
+</section>
+</section>
+<section id="definition-of-principal-angles">
+<h2>Definition of Principal Angles<a class="headerlink" href="#definition-of-principal-angles" title="Link to this heading">#</a></h2>
+<p>We define the concept of principal angles between two subspaces, which were used in the convergence analysis above.</p>
+<p>Let <span class="math notranslate nohighlight">\(\mathcal U\)</span> and <span class="math notranslate nohighlight">\(\mathcal V\)</span> be subspaces of <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> (or <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>) with dimensions <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span>, where <span class="math notranslate nohighlight">\(p \le q\)</span>.</p>
+<p>There exist orthonormal bases</p>
+<div class="math notranslate nohighlight">
+\[
+\{u_1, \dots, u_p\} \text{ for } \mathcal U,
+\qquad
+\{v_1, \dots, v_q\} \text{ for } \mathcal V,
+\]</div>
+<p>and real numbers</p>
+<div class="math notranslate nohighlight">
+\[
+0 \le \theta_1 \le \theta_2 \le \cdots \le \theta_p \le \tfrac{\pi}{2}
+\]</div>
+<p>such that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\langle u_i, v_j \rangle =
+\begin{cases}
+\cos(\theta_i), &amp; \text{if } i = j, \\
+0, &amp; \text{if } i \ne j.
+\end{cases}
+\end{split}\]</div>
+<p>The numbers <span class="math notranslate nohighlight">\(\theta_1, \dots, \theta_p\)</span> are called the <strong>principal angles</strong> (or <strong>canonical angles</strong>) between <span class="math notranslate nohighlight">\(\mathcal U\)</span> and <span class="math notranslate nohighlight">\(\mathcal V\)</span>.</p>
+<p>Alternatively, if <span class="math notranslate nohighlight">\(U \in \mathbb{C}^{n \times p}\)</span> and <span class="math notranslate nohighlight">\(V \in \mathbb{C}^{n \times q}\)</span> have orthonormal columns spanning <span class="math notranslate nohighlight">\(\mathcal U\)</span> and <span class="math notranslate nohighlight">\(\mathcal V\)</span>, then the cosines of the principal angles are the singular values of <span class="math notranslate nohighlight">\(U^* V\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\cos(\theta_i) = \sigma_i(U^*V), \quad i = 1, \dots, p.
+\]</div>
+<div class="proof lemma admonition" id="lemma-4">
+<p class="admonition-title"><span class="caption-number">Lemma 2 </span> (Relationship with projector norms)</p>
+<section class="lemma-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(P_{\mathcal U}\)</span> and <span class="math notranslate nohighlight">\(P_{\mathcal V}\)</span> be the orthogonal projectors and <span class="math notranslate nohighlight">\(\Theta=\mathrm{diag}(\theta_1,\dots,\theta_p)\)</span> the principal angles (with <span class="math notranslate nohighlight">\(p=\dim\mathcal U\le \dim\mathcal V\)</span>).</p>
+<p>Then</p>
+<div class="math notranslate nohighlight">
+\[
+\|\sin\Theta\|=\|P_{\mathcal U^\perp}P_{\mathcal V}\|.
+\]</div>
+<p>If in addition <span class="math notranslate nohighlight">\(\dim\mathcal U=\dim\mathcal V\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+\|P_{\mathcal U}-P_{\mathcal V}\|=\|\sin\Theta\|.
+\]</div>
+<p>Finally, if <span class="math notranslate nohighlight">\(\theta_{\max}&lt;\tfrac{\pi}{2}\)</span> (equivalently <span class="math notranslate nohighlight">\(U^*V\)</span> is invertible), then</p>
+<div class="math notranslate nohighlight">
+\[
+\|\tan\Theta\|=\|\,P_{\mathcal U^\perp}P_{\mathcal V}(P_{\mathcal U}P_{\mathcal V})^{-1}\|.
+\]</div>
+<p>In particular, <span class="math notranslate nohighlight">\(\sin \Theta\)</span> and <span class="math notranslate nohighlight">\(\tan \Theta\)</span> provide quantitative measures of the distance or “gap” between the two subspaces.</p>
+</section>
+</div><p><strong>Remarks</strong></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\theta_1=0\)</span> if and only if <span class="math notranslate nohighlight">\(\mathcal U \cap \mathcal V \neq \{0\}\)</span>.</p></li>
+<li><p>The largest principal angle <span class="math notranslate nohighlight">\(\theta_p\)</span> provides a measure of the worst‐alignment of <span class="math notranslate nohighlight">\(\mathcal U\)</span> with <span class="math notranslate nohighlight">\(\mathcal V\)</span>.</p></li>
+<li><p>In many numerical analyses (e.g., subspace iteration, perturbation bounds), one works with <span class="math notranslate nohighlight">\(\sin\theta_i\)</span> or <span class="math notranslate nohighlight">\(\tan\theta_i\)</span> rather than <span class="math notranslate nohighlight">\(\theta_i\)</span> itself.  ￼</p></li>
+<li><p>When <span class="math notranslate nohighlight">\(p=q=1\)</span> (lines), this notion reduces to the usual angle between two lines.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="deflation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Method of Deflation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm">Algorithm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">Convergence</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-convergence">Proof of Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inductive-proof">The Inductive Proof</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-case-p-1">Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inductive-step-assume-p-i-holds-prove-p-i-1">Inductive Step: Assume <span class="math notranslate nohighlight">\(P(i)\)</span> holds, prove <span class="math notranslate nohighlight">\(P(i+1)\)</span></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#second-proof-of-convergence">Second Proof of Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-ordered-schur-form-and-the-iteration">Setup (ordered Schur form and the iteration)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-graph-map-and-the-core-recurrence">The graph map and the core recurrence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-linear-convergence">Local linear convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-convergence-and-rates">Global convergence and rates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-notes">Practical notes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-the-ritz-eigenvalues">Convergence rate of the Ritz eigenvalues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blockschur-view">Block–Schur view</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#takeaways">Takeaways</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-principal-angles">Definition of Principal Angles</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

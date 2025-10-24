@@ -58,7 +58,9 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/summary';</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/qr_summary';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Existence and Uniqueness of QR Decomposition" href="existence_and_uniqueness_qr.html" />
@@ -221,6 +223,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -278,7 +282,7 @@
       
       
       
-      <li><a href="../_sources/content/summary.md" target="_blank"
+      <li><a href="../_sources/content/qr_summary.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -375,6 +379,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#householder-transformations-the-sledgehammer">Householder Transformations (The Sledgehammer)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#givens-rotations-the-scalpel">Givens Rotations (The Scalpel)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-schmidt-process-the-bricklayer">Gram-Schmidt Process (The Bricklayer)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-table">Summary Table</a></li>
 </ul>
             </nav>
         </div>
@@ -406,6 +411,41 @@ document.write(`
 <p>Sequential Construction: Unlike the other two, which modify the existing matrix, Gram-Schmidt builds the orthonormal basis (Q) one vector at a time. This “brick-by-brick” approach is its most important feature.</p>
 <p>Essential for Iterative Methods: This sequential nature is critical for advanced iterative algorithms like the Arnoldi iteration, which is used to find eigenvalues of very large, sparse matrices. Householder and Givens can’t be used in the same way because they only produce the full orthogonal matrix at the end.</p>
 <p>A Lesson in Stability: The contrast between the unstable Classical Gram-Schmidt and the stable Modified Gram-Schmidt is a classic case study in numerical analysis, showing how a small change in the order of operations can dramatically impact the result due to rounding errors.</p>
+</section>
+<section id="summary-table">
+<h2>Summary Table<a class="headerlink" href="#summary-table" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Method</p></th>
+<th class="head text-left"><p>Computational Cost (Flops)</p></th>
+<th class="head text-left"><p>Numerical Stability</p></th>
+<th class="head text-left"><p>Key Use Case</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Householder</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 2mn^2 - \frac{2}{3}n^3\)</span></p></td>
+<td class="text-left"><p><strong>Excellent</strong> (Backward Stable)</p></td>
+<td class="text-left"><p>The “go-to” for dense matrices.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Givens</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 3mn^2 - n^3\)</span></p></td>
+<td class="text-left"><p><strong>Excellent</strong> (Backward Stable)</p></td>
+<td class="text-left"><p>Parallel computing or sparse matrices.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Modified Gram-Schmidt</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 2mn^2\)</span></p></td>
+<td class="text-left"><p><strong>Good</strong> (Stable, but error can depend on <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>)</p></td>
+<td class="text-left"><p>Iterative methods (e.g., Arnoldi).</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Classical Gram-Schmidt</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 2mn^2\)</span></p></td>
+<td class="text-left"><p><strong>Poor</strong> (Unstable)</p></td>
+<td class="text-left"><p>Pedagogical / illustrative.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 </section>
 
@@ -476,6 +516,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#householder-transformations-the-sledgehammer">Householder Transformations (The Sledgehammer)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#givens-rotations-the-scalpel">Givens Rotations (The Scalpel)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-schmidt-process-the-bricklayer">Gram-Schmidt Process (The Bricklayer)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-table">Summary Table</a></li>
 </ul>
   </nav></div>
 

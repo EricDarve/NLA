@@ -214,7 +214,7 @@
 <li class="toctree-l2"><a class="reference internal" href="content/householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="content/summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/qr_summary.html">Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
@@ -227,6 +227,8 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="content/eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="content/power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="content/LICENSE.html">License for this book</a></li>
@@ -336,8 +338,10 @@ document.write(`
    <h1>Proof Index</h1>
 
    <div class="modindex-jumpbox">
+   <a href="#cap-cor:ritz-per-eig"><strong>cor:ritz-per-eig</strong></a> | 
    <a href="#cap-definition-0"><strong>definition-0</strong></a> | 
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
+   <a href="#cap-lemma-4"><strong>lemma-4</strong></a> | 
    <a href="#cap-theorem-1"><strong>theorem-1</strong></a> | 
    <a href="#cap-thm:backward_error_lu"><strong>thm:backward_error_lu</strong></a> | 
    <a href="#cap-thm:backward_stability_qr"><strong>thm:backward_stability_qr</strong></a> | 
@@ -350,7 +354,10 @@ document.write(`
    <a href="#cap-thm:existence_lu"><strong>thm:existence_lu</strong></a> | 
    <a href="#cap-thm:existence_lu_existence"><strong>thm:existence_lu_existence</strong></a> | 
    <a href="#cap-thm:existence_qr"><strong>thm:existence_qr</strong></a> | 
+   <a href="#cap-thm:orth-it-nh"><strong>thm:orth-it-nh</strong></a> | 
+   <a href="#cap-thm:orth-it-nh-rigorous"><strong>thm:orth-it-nh-rigorous</strong></a> | 
    <a href="#cap-thm:perturbation_bound"><strong>thm:perturbation_bound</strong></a> | 
+   <a href="#cap-thm:ritz-rate-general"><strong>thm:ritz-rate-general</strong></a> | 
    <a href="#cap-thm:spectral_theorem"><strong>thm:spectral_theorem</strong></a> | 
    <a href="#cap-thm:spectral_theorem_real"><strong>thm:spectral_theorem_real</strong></a> | 
    <a href="#cap-thm:summation_error"><strong>thm:summation_error</strong></a> | 
@@ -360,6 +367,14 @@ document.write(`
    </div>
 
    <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-cor:ritz-per-eig"><td></td><td>
+       <strong>cor:ritz-per-eig</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/orthogonal_iteration.html#cor:ritz-per-eig"><code class="xref">cor:ritz-per-eig</code></a> <em>(content/orthogonal_iteration)</em></td><td>
+       <em>corollary</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-definition-0"><td></td><td>
        <strong>definition-0</strong></td><td></td></tr>
@@ -375,6 +390,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/lu_pivoting.html#lem:banach"><code class="xref">lem:banach</code></a> <em>(content/lu_pivoting)</em></td><td>
+       <em>lemma</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-lemma-4"><td></td><td>
+       <strong>lemma-4</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/orthogonal_iteration.html#lemma-4"><code class="xref">lemma-4</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>lemma</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-theorem-1"><td></td><td>
@@ -473,12 +496,36 @@ document.write(`
        <a href="content/existence_and_uniqueness_qr.html#thm:existence_qr"><code class="xref">thm:existence_qr</code></a> <em>(content/existence_and_uniqueness_qr)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:orth-it-nh"><td></td><td>
+       <strong>thm:orth-it-nh</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/orthogonal_iteration.html#thm:orth-it-nh"><code class="xref">thm:orth-it-nh</code></a> <em>(content/orthogonal_iteration)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:orth-it-nh-rigorous"><td></td><td>
+       <strong>thm:orth-it-nh-rigorous</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/orthogonal_iteration.html#thm:orth-it-nh-rigorous"><code class="xref">thm:orth-it-nh-rigorous</code></a> <em>(content/orthogonal_iteration)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:perturbation_bound"><td></td><td>
        <strong>thm:perturbation_bound</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
        <a href="content/lu_pivoting.html#thm:perturbation_bound"><code class="xref">thm:perturbation_bound</code></a> <em>(content/lu_pivoting)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:ritz-rate-general"><td></td><td>
+       <strong>thm:ritz-rate-general</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/orthogonal_iteration.html#thm:ritz-rate-general"><code class="xref">thm:ritz-rate-general</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:spectral_theorem"><td></td><td>

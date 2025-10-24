@@ -1,0 +1,714 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Method of Deflation &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/deflation';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Orthogonal Iteration Algorithm" href="orthogonal_iteration.html" />
+    <link rel="prev" title="The Power Method" href="power_method.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/deflation.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The Method of Deflation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construct-the-deflation-projector">Construct the Deflation Projector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-deflated-matrix">Define the Deflated Matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyze-the-eigenvalues-of-m">Analyze the Eigenvalues of <span class="math notranslate nohighlight">\(M\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-the-power-method">Apply the Power Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deflation-a-general-step-for-lambda-i-1">Deflation: A General Step for <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construct-the-general-deflation-projector">Construct the General Deflation Projector</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Define the Deflated Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analyze-the-eigenvalues-of-m-i">Analyze the Eigenvalues of <span class="math notranslate nohighlight">\(M_i\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Apply the Power Method</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-method-of-deflation">
+<h1>The Method of Deflation<a class="headerlink" href="#the-method-of-deflation" title="Link to this heading">#</a></h1>
+<p>In this section, we will start using the Schur decomposition to compute multiple eigenvalues and eigenvectors of a matrix <span class="math notranslate nohighlight">\(A\)</span>. We will build on the power method introduced in the previous section. Recall that the Schur decomposition of <span class="math notranslate nohighlight">\(A\)</span> is:</p>
+<div class="math notranslate nohighlight">
+\[
+A = Q T Q^H,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. The diagonal entries of
+<span class="math notranslate nohighlight">\(T\)</span> are the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, and the columns of <span class="math notranslate nohighlight">\(Q\)</span> are the corresponding Schur vectors.</p>
+<p>Assume the power iteration has converged, yielding the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span> and a corresponding Schur vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span> (which is the same as the eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> of <span class="math notranslate nohighlight">\(A\)</span>). The goal is now to find the second largest eigenvalue, <span class="math notranslate nohighlight">\(\lambda_2\)</span>, and its corresponding Schur vector, <span class="math notranslate nohighlight">\(\boldsymbol{q}_2\)</span>. The key idea to find <span class="math notranslate nohighlight">\(\lambda_2\)</span> is to “deflate” the matrix <span class="math notranslate nohighlight">\(A\)</span>, removing the influence of <span class="math notranslate nohighlight">\(\lambda_1\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span>. We can then apply the power method to this new, deflated matrix, which will now have <span class="math notranslate nohighlight">\(\lambda_2\)</span> as its dominant eigenvalue.</p>
+<section id="construct-the-deflation-projector">
+<h2>Construct the Deflation Projector<a class="headerlink" href="#construct-the-deflation-projector" title="Link to this heading">#</a></h2>
+<p>We define an orthogonal projector <span class="math notranslate nohighlight">\(P\)</span> that maps any vector onto the subspace <em>orthogonal</em> to <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span>. Assuming we have normalized <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span> such that <span class="math notranslate nohighlight">\(\|\boldsymbol{q}_1\|_2 = 1\)</span>, this projector is:</p>
+<div class="math notranslate nohighlight">
+\[
+P = I - \boldsymbol{q}_1 \boldsymbol{q}_1^H
+\]</div>
+<p>This matrix has a simple action:</p>
+<ul class="simple">
+<li><p>For any vector <span class="math notranslate nohighlight">\(\boldsymbol{v}\)</span> parallel to <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span> (i.e., <span class="math notranslate nohighlight">\(\boldsymbol{v} = c \boldsymbol{q}_1\)</span>), <span class="math notranslate nohighlight">\(P \boldsymbol{v} = \boldsymbol{0}\)</span>.</p></li>
+<li><p>For any vector <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> orthogonal to <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span> (i.e., <span class="math notranslate nohighlight">\(\boldsymbol{q}_1^H \boldsymbol{w} = 0\)</span>), <span class="math notranslate nohighlight">\(P \boldsymbol{w} = \boldsymbol{w}\)</span>.</p></li>
+</ul>
+</section>
+<section id="define-the-deflated-matrix">
+<h2>Define the Deflated Matrix<a class="headerlink" href="#define-the-deflated-matrix" title="Link to this heading">#</a></h2>
+<p>We create a new matrix, <span class="math notranslate nohighlight">\(M\)</span>, by applying this projector:</p>
+<div class="math notranslate nohighlight">
+\[M = P A\]</div>
+<p>Our strategy is to run the power iteration on <span class="math notranslate nohighlight">\(M\)</span>. To understand why this works, we must find the eigenvalues of <span class="math notranslate nohighlight">\(M\)</span>.</p>
+</section>
+<section id="analyze-the-eigenvalues-of-m">
+<h2>Analyze the Eigenvalues of <span class="math notranslate nohighlight">\(M\)</span><a class="headerlink" href="#analyze-the-eigenvalues-of-m" title="Link to this heading">#</a></h2>
+<p>We will use the Schur decomposition of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where</p>
+<div class="math notranslate nohighlight">
+\[
+Q = [\boldsymbol{q}_1, \boldsymbol{q}_2, \dots, \boldsymbol{q}_n]
+\]</div>
+<p>is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. The diagonal of <span class="math notranslate nohighlight">\(T\)</span> contains the eigenvalues <span class="math notranslate nohighlight">\(\{\lambda_1, \lambda_2, \dots, \lambda_n\}\)</span>.</p>
+<p>Let’s look at the matrix <span class="math notranslate nohighlight">\(M\)</span> in the Schur basis by computing the similarity transformation <span class="math notranslate nohighlight">\(Q^H M Q\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+Q^H M Q = Q^H (P A) Q = (Q^H P Q) (Q^H A Q)
+\]</div>
+<p>Let’s analyze the two parts of this product:</p>
+<ol class="arabic simple">
+<li><p><strong><span class="math notranslate nohighlight">\(Q^H A Q\)</span></strong>: This is, by definition, the upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(Q^H P Q\)</span></strong>: Let’s substitute <span class="math notranslate nohighlight">\(P = I - \boldsymbol{q}_1 \boldsymbol{q}_1^H\)</span>:</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+Q^H P Q = Q^H (I - \boldsymbol{q}_1 \boldsymbol{q}_1^H) Q = Q^H I Q - (Q^H \boldsymbol{q}_1) (\boldsymbol{q}_1^H Q)
+\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q^H I Q = Q^H Q = I\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q^H \boldsymbol{q}_1\)</span> is the first column of <span class="math notranslate nohighlight">\(Q^H Q\)</span>, which is <span class="math notranslate nohighlight">\(\boldsymbol{e}_1 = (1, 0, \dots, 0)^T\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\boldsymbol{q}_1^H Q\)</span> is the first row of <span class="math notranslate nohighlight">\(Q^H Q\)</span>, which is <span class="math notranslate nohighlight">\(\boldsymbol{e}_1^T = (1, 0, \dots, 0)\)</span>.</p></li>
+<li><p>Therefore, <span class="math notranslate nohighlight">\((Q^H \boldsymbol{q}_1) (\boldsymbol{q}_1^H Q) = \boldsymbol{e}_1 \boldsymbol{e}_1^T = \text{diag}(1, 0, \dots, 0)\)</span>.</p></li>
+</ul>
+<p>This gives us <span class="math notranslate nohighlight">\(Q^H P Q = I - \text{diag}(1, 0, \dots, 0) = \text{diag}(0, 1, \dots, 1)\)</span>.</p>
+<p>Now, we can compute the full transformation:</p>
+<div class="math notranslate nohighlight">
+\[
+Q^H M Q = \underbrace{\text{diag}(0, 1, \dots, 1)}_{\tilde{P}} \underbrace{(T)}_{\text{Schur form}}
+\]</div>
+<p>Multiplying the upper-triangular matrix <span class="math notranslate nohighlight">\(T\)</span> by this diagonal matrix <span class="math notranslate nohighlight">\(\tilde{P}\)</span> simply <strong>zeros out the entire first row of <span class="math notranslate nohighlight">\(T\)</span></strong>. Let’s call this new matrix <span class="math notranslate nohighlight">\(\tilde{T}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\tilde{T} = \tilde{P} T =
+\begin{pmatrix}
+0 &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; \lambda_2 &amp; t_{23} &amp; \cdots \\
+\vdots &amp; &amp; \ddots &amp; \\
+0 &amp; \cdots &amp; &amp; \lambda_n
+\end{pmatrix}
+\end{split}\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(M\)</span> is similar to <span class="math notranslate nohighlight">\(\tilde{T}\)</span> (since <span class="math notranslate nohighlight">\(M = Q \tilde{T} Q^H\)</span>), which means they share the same eigenvalues. The eigenvalues of <span class="math notranslate nohighlight">\(\tilde{T}\)</span> are its diagonal entries:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Eigenvalues}(M) = \{0, \lambda_2, \lambda_3, \dots, \lambda_n\}
+\]</div>
+</section>
+<section id="apply-the-power-method">
+<h2>Apply the Power Method<a class="headerlink" href="#apply-the-power-method" title="Link to this heading">#</a></h2>
+<p>We now apply the power iteration to the matrix <span class="math notranslate nohighlight">\(M = PA\)</span>.</p>
+<ul class="simple">
+<li><p>The eigenvalues of <span class="math notranslate nohighlight">\(M\)</span> are <span class="math notranslate nohighlight">\(\{0, \lambda_2, \dots, \lambda_n\}\)</span>.</p></li>
+<li><p>We assumed that <span class="math notranslate nohighlight">\(|\lambda_2| &gt; |\lambda_3| \ge \dots \ge |\lambda_n|\)</span>.</p></li>
+<li><p>Therefore, the <strong>strictly dominant eigenvalue of <span class="math notranslate nohighlight">\(M\)</span> is <span class="math notranslate nohighlight">\(\lambda_2\)</span></strong>.</p></li>
+</ul>
+<p>The power method applied to <span class="math notranslate nohighlight">\(M\)</span> will converge to its dominant eigenvalue, <span class="math notranslate nohighlight">\(\lambda_2\)</span>, and its corresponding eigenvector, <span class="math notranslate nohighlight">\(\boldsymbol{q}_2\)</span>.</p>
+<p>We can prove <span class="math notranslate nohighlight">\(\boldsymbol{q}_2\)</span> is the eigenvector:</p>
+<div class="math notranslate nohighlight">
+\[
+M \boldsymbol{q}_2 = PA \boldsymbol{q}_2 = P(T_{12}\boldsymbol{q}_1 + \lambda_2 \boldsymbol{q}_2) = \lambda_2 \boldsymbol{q}_2
+\]</div>
+<p>This process, called <strong>deflation</strong>, can be repeated. After finding <span class="math notranslate nohighlight">\(\boldsymbol{q}_2\)</span>, we can form <span class="math notranslate nohighlight">\(P_2 = I - \boldsymbol{q}_1 \boldsymbol{q}_1^H - \boldsymbol{q}_2 \boldsymbol{q}_2^H\)</span> and apply the power method to <span class="math notranslate nohighlight">\(P_2 A\)</span> to find <span class="math notranslate nohighlight">\(\lambda_3\)</span>, and so on. This generalization is described next.</p>
+</section>
+<section id="deflation-a-general-step-for-lambda-i-1">
+<h2>Deflation: A General Step for <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span><a class="headerlink" href="#deflation-a-general-step-for-lambda-i-1" title="Link to this heading">#</a></h2>
+<p>This method of deflation can be applied sequentially to find all the eigenvalues. Let’s assume we have already found the first <span class="math notranslate nohighlight">\(i\)</span> Schur vectors, <span class="math notranslate nohighlight">\(\boldsymbol{q}_1, \dots, \boldsymbol{q}_i\)</span>. Our goal is to find <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span>.</p>
+<section id="construct-the-general-deflation-projector">
+<h3>Construct the General Deflation Projector<a class="headerlink" href="#construct-the-general-deflation-projector" title="Link to this heading">#</a></h3>
+<p>First, we define a projector <span class="math notranslate nohighlight">\(P_i\)</span> that maps any vector onto the subspace <em>orthogonal</em> to the entire subspace spanned by our known vectors, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_1, \dots, \boldsymbol{q}_i\}\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(Q_i = [\boldsymbol{q}_1, \dots, \boldsymbol{q}_i]\)</span> be the <span class="math notranslate nohighlight">\(n \times i\)</span> matrix with these vectors as its columns. Since these are orthonormal Schur vectors, <span class="math notranslate nohighlight">\(Q_i^H Q_i = I_i\)</span> (the <span class="math notranslate nohighlight">\(i \times i\)</span> identity).</p>
+<p>The projector <em>onto</em> this subspace is <span class="math notranslate nohighlight">\(Q_i Q_i^H\)</span>. The projector <em>orthogonal</em> to this subspace is therefore:</p>
+<div class="math notranslate nohighlight">
+\[
+P_i = I - Q_i Q_i^H
+\]</div>
+</section>
+<section id="id1">
+<h3>Define the Deflated Matrix<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>As before, we create a new deflated matrix, <span class="math notranslate nohighlight">\(M_i\)</span>, by applying this projector to <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+M_i = P_i A
+\]</div>
+<p>We will now run the power iteration on <span class="math notranslate nohighlight">\(M_i\)</span>.</p>
+</section>
+<section id="analyze-the-eigenvalues-of-m-i">
+<h3>Analyze the Eigenvalues of <span class="math notranslate nohighlight">\(M_i\)</span><a class="headerlink" href="#analyze-the-eigenvalues-of-m-i" title="Link to this heading">#</a></h3>
+<p>We use the same strategy: find the eigenvalues of <span class="math notranslate nohighlight">\(M_i\)</span> by performing a similarity transformation with the full Schur basis <span class="math notranslate nohighlight">\(Q = [\boldsymbol{q}_1, \dots, \boldsymbol{q}_n]\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+Q^H M_i Q = Q^H (P_i A) Q = (Q^H P_i Q) (Q^H A Q)
+\]</div>
+<p>Again, let’s analyze the two parts:</p>
+<ol class="arabic simple">
+<li><p><strong><span class="math notranslate nohighlight">\(Q^H A Q\)</span></strong>: This is just the upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span>.</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(Q^H P_i Q\)</span></strong>: We substitute the definition of <span class="math notranslate nohighlight">\(P_i\)</span>:</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+Q^H P_i Q = Q^H (I - Q_i Q_i^H) Q = Q^H Q - (Q^H Q_i) (Q_i^H Q)
+\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q^H Q = I\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity).</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q^H Q_i = Q^H [\boldsymbol{q}_1, \dots, \boldsymbol{q}_i]\)</span> is the first <span class="math notranslate nohighlight">\(i\)</span> columns of <span class="math notranslate nohighlight">\(Q^H Q = I\)</span>. This is an <span class="math notranslate nohighlight">\(n \times i\)</span> matrix, <span class="math notranslate nohighlight">\(\begin{pmatrix} I_i \\ 0 \end{pmatrix}\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q_i^H Q = [\boldsymbol{q}_1, \dots, \boldsymbol{q}_i]^H Q\)</span> is the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(Q^H Q = I\)</span>. This is an <span class="math notranslate nohighlight">\(i \times n\)</span> matrix, <span class="math notranslate nohighlight">\(\begin{pmatrix} I_i &amp; 0 \end{pmatrix}\)</span>.</p></li>
+<li><p>Their product is:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+(Q^H Q_i) (Q_i^H Q) = \begin{pmatrix} I_i \\ 0 \end{pmatrix} \begin{pmatrix} I_i &amp; 0 \end{pmatrix} = \begin{pmatrix} I_i &amp; 0 \\ 0 &amp; 0 \end{pmatrix}
+\end{split}\]</div>
+<p>This is an <span class="math notranslate nohighlight">\(n \times n\)</span> block-diagonal matrix, which is <span class="math notranslate nohighlight">\(\text{diag}(\underbrace{1, \dots, 1}_{i \text{ times}}, 0, \dots, 0)\)</span>.</p>
+<p>This gives us</p>
+<div class="math notranslate nohighlight">
+\[
+Q^H P_i Q = I - \text{diag}(1, \dots, 1, 0, \dots, 0) = \text{diag}(\underbrace{0, \dots, 0}_{i \text{ times}}, 1, \dots, 1).
+\]</div>
+<p>Let’s call this projector <span class="math notranslate nohighlight">\(\tilde{P}_i\)</span>.</p>
+</section>
+<section id="id2">
+<h3>Apply the Power Method<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>Now we compute the full transformation:</p>
+<div class="math notranslate nohighlight">
+\[
+Q^H M_i Q = \tilde{P}_i T = \text{diag}(0, \dots, 0, 1, \dots, 1) \cdot T
+\]</div>
+<p>Multiplying <span class="math notranslate nohighlight">\(T\)</span> by this diagonal matrix <span class="math notranslate nohighlight">\(\tilde{P}_i\)</span> <strong>zeros out the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(T\)</span></strong>. The resulting matrix, <span class="math notranslate nohighlight">\(\tilde{T}_i\)</span>, looks like this:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\tilde{T}_i =
+\begin{pmatrix}
+0 &amp; \cdots &amp; 0 &amp; 0 &amp; \cdots &amp; 0 \\
+\vdots &amp; \ddots &amp; \vdots &amp; \vdots &amp; &amp; \vdots \\
+0 &amp; \cdots &amp; 0 &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; \cdots &amp; 0 &amp; \lambda_{i+1} &amp; t_{i+1, i+2} &amp; \cdots \\
+\vdots &amp; &amp; \vdots &amp; &amp; \ddots &amp; \\
+0 &amp; \cdots &amp; 0 &amp; 0 &amp; \cdots &amp; \lambda_n
+\end{pmatrix}
+\end{split}\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(M_i\)</span> is similar to <span class="math notranslate nohighlight">\(\tilde{T}_i\)</span>, so their eigenvalues are the same. The eigenvalues of <span class="math notranslate nohighlight">\(\tilde{T}_i\)</span> are its diagonal entries:</p>
+<div class="math notranslate nohighlight">
+\[
+\text{Eigenvalues}(M_i) = \{\underbrace{0, \dots, 0}_{i \text{ times}}, \lambda_{i+1}, \lambda_{i+2}, \dots, \lambda_n\}
+\]</div>
+<p>Assuming we have a strict separation, <span class="math notranslate nohighlight">\(|\lambda_{i+1}| &gt; |\lambda_{i+2}|\)</span>, the <strong>strictly dominant eigenvalue of <span class="math notranslate nohighlight">\(M_i\)</span> is <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span></strong>.</p>
+<p>Therefore, applying the power iteration to <span class="math notranslate nohighlight">\(M_i = P_i A\)</span> will cause the iterates to converge to <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span>. The corresponding eigenvector can be shown to be <span class="math notranslate nohighlight">\(\boldsymbol{q}_{i+1}\)</span>.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="power_method.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Power Method</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="orthogonal_iteration.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The Orthogonal Iteration Algorithm</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#construct-the-deflation-projector">Construct the Deflation Projector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#define-the-deflated-matrix">Define the Deflated Matrix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analyze-the-eigenvalues-of-m">Analyze the Eigenvalues of <span class="math notranslate nohighlight">\(M\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#apply-the-power-method">Apply the Power Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deflation-a-general-step-for-lambda-i-1">Deflation: A General Step for <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#construct-the-general-deflation-projector">Construct the General Deflation Projector</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Define the Deflated Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analyze-the-eigenvalues-of-m-i">Analyze the Eigenvalues of <span class="math notranslate nohighlight">\(M_i\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Apply the Power Method</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
