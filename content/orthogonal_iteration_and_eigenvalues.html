@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solving Linear Systems &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Orthogonal Iteration and Eigenvalues &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/solving_linear_systems';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/orthogonal_iteration_and_eigenvalues';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The LU Decomposition Algorithm" href="lu_decomposition.html" />
-    <link rel="prev" title="Summary of Matrix Decompositions" href="summary_of_matrix_decompositions.html" />
+    <link rel="next" title="Computing Eigenvectors from the Schur Decomposition" href="computing_the_eigenvectors.html" />
+    <link rel="prev" title="Power and Orthogonal Iteration Methods" href="orthogonal_and_power_iteration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -198,7 +198,7 @@
 <li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
@@ -221,12 +221,12 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
-<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 </ul>
 </details></li>
@@ -285,7 +285,7 @@
       
       
       
-      <li><a href="../_sources/content/solving_linear_systems.md" target="_blank"
+      <li><a href="../_sources/content/orthogonal_iteration_and_eigenvalues.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -356,7 +356,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,11 +369,21 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Solving Linear Systems</h1>
+    <h1>Orthogonal Iteration and Eigenvalues</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-eigenvalue-approximations">From Subspaces to Eigenvalue Approximations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-t-k-to-the-schur-form">Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -381,29 +393,84 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="solving-linear-systems">
-<h1>Solving Linear Systems<a class="headerlink" href="#solving-linear-systems" title="Link to this heading">#</a></h1>
-<p>Welcome to the heart of numerical linear algebra. The problem of solving a system of linear equations, written in matrix form as <span class="math notranslate nohighlight">\(Ax = b\)</span>, is arguably one of the most fundamental and frequently encountered computational problems in all of science and engineering. From simulating the airflow over a wing and analyzing electrical circuits to training machine learning models and pricing financial derivatives, the need to solve for an unknown vector <span class="math notranslate nohighlight">\(x\)</span> is everywhere.</p>
-<p>At first glance, the problem might seem simple. If <span class="math notranslate nohighlight">\(A\)</span> is an invertible square matrix, a unique solution exists, and we can write it formally as <span class="math notranslate nohighlight">\(x = A^{-1}b\)</span>. So, why not just compute the inverse of <span class="math notranslate nohighlight">\(A\)</span> and multiply it by <span class="math notranslate nohighlight">\(b\)</span>? While mathematically sound, this approach is a computational pitfall. Calculating a matrix inverse is significantly more expensive and, more importantly, often less numerically accurate than solving the system directly. Our first core principle is this: <strong>we almost never compute a matrix inverse explicitly.</strong></p>
-<p>So, what’s the alternative? The central strategy of this chapter—and a recurring theme in numerical analysis—is <strong>factorization</strong>. The idea is to decompose the often dense and complicated matrix <span class="math notranslate nohighlight">\(A\)</span> into a product of simpler matrices. The star of this chapter is the <strong>LU factorization</strong>, where we write <span class="math notranslate nohighlight">\(A = LU\)</span>, with <span class="math notranslate nohighlight">\(L\)</span> being a lower triangular matrix and <span class="math notranslate nohighlight">\(U\)</span> being an upper triangular one.</p>
-<p>Why is this so helpful? Because solving triangular systems is computationally cheap and easy. By factoring <span class="math notranslate nohighlight">\(A\)</span>, we transform the single difficult problem <span class="math notranslate nohighlight">\(Ax = b\)</span> into two simple ones:</p>
-<ol class="arabic simple">
-<li><p>Solve <span class="math notranslate nohighlight">\(Ly = b\)</span> for <span class="math notranslate nohighlight">\(y\)</span> (using <em>forward substitution</em>).</p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(Ux = y\)</span> for <span class="math notranslate nohighlight">\(x\)</span> (using <em>backward substitution</em>).</p></li>
-</ol>
-<p>This two-step process is dramatically faster and more stable than the inverse-based approach.</p>
-<p>However, this elegant strategy brings its own set of challenges that form the core of our study:</p>
-<ol class="arabic simple">
-<li><p><strong>Existence and Uniqueness:</strong> Can any invertible matrix <span class="math notranslate nohighlight">\(A\)</span> be factored as <span class="math notranslate nohighlight">\(A=LU\)</span>? As we will see, the answer is no. This leads us to the first practical hurdle.</p></li>
-<li><p><strong>Numerical Stability:</strong> This is the most critical challenge. Computers do not work with real numbers; they use finite-precision floating-point arithmetic. This means that every calculation introduces a tiny <em>roundoff error</em>. While individual errors are small, they can accumulate catastrophically, rendering our computed solution meaningless. How can we trust our results?</p></li>
-<li><p><strong>Efficiency:</strong> For the massive systems that arise in practice, the speed of our algorithm is paramount. We need methods that scale efficiently as the size of the matrix grows.</p></li>
-</ol>
-<p>To navigate these challenges, we will develop a powerful set of tools and concepts. We’ll see that the problem of existence can be solved by introducing <strong>row pivoting</strong>, which leads to the more general and robust <span class="math notranslate nohighlight">\(PA = LU\)</span> factorization. Pivoting also turns out to be the key to ensuring numerical stability.</p>
-<p>To understand <em>why</em> it works, we must dive into the world of floating-point arithmetic and develop a rigorous framework for <strong>error analysis</strong>. We will distinguish between <em>forward error</em> (how close is our answer to the true answer?) and <em>backward error</em> (is our answer the exact solution to a slightly perturbed problem?). The concept of the <strong>condition number</strong> of a matrix will emerge as a crucial indicator of how sensitive a problem is to small perturbations, telling us when we can expect accurate solutions and when the problem is simply too ill-behaved.</p>
-<p>This chapter will guide you through this landscape step-by-step. We will begin with the simplest case—solving triangular systems. We will then introduce the LU factorization and its algorithm, investigate its potential for failure, and develop the pivoting strategy that saves it. Following that, we’ll take a necessary detour to formalize floating-point arithmetic and backward error analysis. Armed with these tools, we will prove why the LU factorization with pivoting is, in fact, numerically stable in practice. Finally, we will explore a special case for symmetric positive definite matrices, where the even faster and more stable <strong>Cholesky factorization</strong> can be used.</p>
-<p>By the end of this chapter, you will not only know <em>how</em> to solve a linear system effectively but also understand <em>why</em> the method works, how to analyze its limitations, and how to trust the results you get from the computer.</p>
-<div class="toctree-wrapper compound">
+  <section class="tex2jax_ignore mathjax_ignore" id="orthogonal-iteration-and-eigenvalues">
+<h1>Orthogonal Iteration and Eigenvalues<a class="headerlink" href="#orthogonal-iteration-and-eigenvalues" title="Link to this heading">#</a></h1>
+<div class="tip admonition" id="sec-oi-eigs">
+<p class="admonition-title">Key Idea</p>
+<p>Orthogonal (subspace) iteration produces a sequence of orthonormal bases <span class="math notranslate nohighlight">\(Q_k\)</span>. The <strong>projected matrix</strong>,</p>
+<div class="math notranslate nohighlight">
+\[
+T_k = Q_k^H A Q_k
+\]</div>
+<p>is the Rayleigh–Ritz compression of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span>. As <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur vectors of <span class="math notranslate nohighlight">\(A\)</span>, the matrix <span class="math notranslate nohighlight">\(T_k\)</span> approaches the (upper triangular) Schur form <span class="math notranslate nohighlight">\(T\)</span>. Consequently, the diagonal entries of <span class="math notranslate nohighlight">\(T_k\)</span> become increasingly accurate approximations of the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 </div>
+<section id="from-subspaces-to-eigenvalue-approximations">
+<h2>From Subspaces to Eigenvalue Approximations<a class="headerlink" href="#from-subspaces-to-eigenvalue-approximations" title="Link to this heading">#</a></h2>
+<p>Recall that one step of orthogonal iteration (using the thin QR factorization) is:</p>
+<div class="math notranslate nohighlight">
+\[
+Z_{k+1} = A Q_k, \qquad Z_{k+1} = Q_{k+1} R_{k+1}.
+\]</div>
+<p>We define the Rayleigh–Ritz matrix as:</p>
+<div class="math notranslate nohighlight">
+\[
+T_k = Q_k^H A Q_k \;\in\; \mathbb{C}^{p\times p}.
+\]</div>
+<p>By construction, <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> provides an orthonormal basis for a <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace, and <span class="math notranslate nohighlight">\(T_k\)</span> represents the matrix <span class="math notranslate nohighlight">\(A\)</span> projected onto that basis.</p>
+</section>
+<section id="convergence-of-t-k-to-the-schur-form">
+<h2>Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form<a class="headerlink" href="#convergence-of-t-k-to-the-schur-form" title="Link to this heading">#</a></h2>
+<p>Assume <span class="math notranslate nohighlight">\(A\)</span> has the Schur decomposition:</p>
+<div class="math notranslate nohighlight">
+\[
+A = Q T Q^H.
+\]</div>
+<p>If orthogonal iteration is initialized with a matrix <span class="math notranslate nohighlight">\(Q_0\)</span> of full column rank (whose columns have a nonzero component in the desired invariant subspace), then <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> will converge. Under standard spectral separation conditions, this subspace converges to the corresponding <span class="math notranslate nohighlight">\(p\)</span>-dimensional <span class="math notranslate nohighlight">\(A\)</span>-invariant subspace spanned by the appropriate columns of <span class="math notranslate nohighlight">\(Q\)</span>.</p>
+<p>Consequently:</p>
+<div class="math notranslate nohighlight">
+\[
+Q_k \;\to\; Q[:,1:p] \quad\Longrightarrow\quad
+T_k = Q_k^H A Q_k \;\to\; T[1:p,1:p],
+\]</div>
+<p>This means <span class="math notranslate nohighlight">\(T_k\)</span> asymptotically becomes upper triangular, with the target eigenvalues on its diagonal.</p>
+</section>
+<section id="shifts-accelerating-eigenvalue-convergence">
+<h2>Shifts: Accelerating Eigenvalue Convergence<a class="headerlink" href="#shifts-accelerating-eigenvalue-convergence" title="Link to this heading">#</a></h2>
+<p>Shifting modifies the iteration to dramatically accelerate convergence by emphasizing specific eigenvalues.</p>
+<p>Without shifting, the convergence of the <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace <span class="math notranslate nohighlight">\(\mathrm{range}(Q_k)\)</span> to the dominant invariant subspace (spanned by the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors) is governed by the eigenvalue separation. The convergence rate typically depends on the ratio of the largest “unwanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>) to the smallest “wanted” one (<span class="math notranslate nohighlight">\(\lambda_p\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{|\lambda_{p+1}|}{|\lambda_p|}
+\]</div>
+<p>If this ratio is close to 1 (i.e., the spectral gap is small), convergence can be impractically slow.</p>
+<p>To accelerate this, we introduce a scalar <strong>shift</strong> <span class="math notranslate nohighlight">\(\mu\)</span> and apply the iteration to the matrix <span class="math notranslate nohighlight">\(A - \mu I\)</span> instead:</p>
+<div class="math notranslate nohighlight">
+\[
+Z_k = (A - \mu I)\,Q_k, \qquad Z_k = Q_{k+1}\,R_{k+1}.
+\]</div>
+<p>This works because <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A - \mu I\)</span> share the same invariant subspaces (and Schur vectors), so <span class="math notranslate nohighlight">\(\mathrm{range}(Q_{k+1})\)</span> still converges to the same desired subspace. However, the convergence rate is now determined by the eigenvalues of the <em>shifted</em> matrix:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{|\lambda_{p+1}(A - \mu I)|}{|\lambda_p(A - \mu I)|} = \frac{|\lambda_{p+1} - \mu|}{|\lambda_p - \mu|}
+\]</div>
+<div class="tip admonition">
+<p class="admonition-title">Accelerating the Rate</p>
+<p>This new ratio is the key to acceleration. Convergence becomes very fast if this ratio is much less than 1 (<span class="math notranslate nohighlight">\(\ll 1\)</span>). This can be achieved by choosing a shift <span class="math notranslate nohighlight">\(\mu\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_{p+1} - \mu| \ll |\lambda_p - \mu|
+\]</div>
+<p>By picking <span class="math notranslate nohighlight">\(\mu\)</span> to be a good estimate of an “unwanted” eigenvalue (like <span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>), we can make the numerator extremely small, forcing rapid convergence.</p>
+</div>
+<p>The focus now shifts to the projected matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>, as its eigenvalues, <span class="math notranslate nohighlight">\(\text{eig}(T_k)\)</span>, serve as our best available approximations to the true eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>This enables a powerful feedback loop:</p>
+<ol class="arabic simple">
+<li><p>Run the iteration to compute the basis <span class="math notranslate nohighlight">\(Q_k\)</span>.</p></li>
+<li><p>Compute the projected matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span> and find its eigenvalues (known as “Ritz values”).</p></li>
+<li><p>Use one of these Ritz values as the shift <span class="math notranslate nohighlight">\(\mu\)</span> for the <em>next</em> iteration.</p></li>
+</ol>
+<p>This strategy of adaptively choosing shifts based on the current Rayleigh-Ritz approximations is the core idea that transforms subspace iteration into the highly efficient <strong>QR iteration with shifts</strong>.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -437,20 +504,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="summary_of_matrix_decompositions.html"
+       href="orthogonal_and_power_iteration.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Summary of Matrix Decompositions</p>
+        <p class="prev-next-title">Power and Orthogonal Iteration Methods</p>
       </div>
     </a>
     <a class="right-next"
-       href="lu_decomposition.html"
+       href="computing_the_eigenvectors.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The LU Decomposition Algorithm</p>
+        <p class="prev-next-title">Computing Eigenvectors from the Schur Decomposition</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -460,6 +527,23 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-eigenvalue-approximations">From Subspaces to Eigenvalue Approximations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-t-k-to-the-schur-form">Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

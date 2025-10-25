@@ -63,7 +63,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/orthogonal_iteration';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="next" title="Power and Orthogonal Iteration Methods" href="orthogonal_and_power_iteration.html" />
     <link rel="prev" title="The Method of Deflation" href="deflation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -225,6 +225,9 @@
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -596,7 +599,7 @@ E_{k+1}=T_{22}\,E_k\,(T_{11}+T_{12}E_k)^{-1}.
 \]</div>
 <p>up to constants.</p>
 <ul class="simple">
-<li><p><strong>What converges:</strong> The subspace <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> converges to the Schur subspace <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span> and the Ritz values of <span class="math notranslate nohighlight">\(B_k:=Q_k^H A Q_k\)</span> converge to the eigenvalues in <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p></li>
+<li><p><strong>What converges:</strong> The subspace <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> converges to the Schur subspace <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span> and the Ritz values of <span class="math notranslate nohighlight">\(T_k:=Q_k^H A Q_k\)</span> converge to the eigenvalues in <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p></li>
 <li><p><strong>How to measure error:</strong> <span class="math notranslate nohighlight">\(\|E_k\|=\|\tan\Theta_k\|\)</span>, where <span class="math notranslate nohighlight">\(\Theta_k\)</span> are the principal angles (see below for a definition of principal angles) between <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> and <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>; hence those angles go to <span class="math notranslate nohighlight">\(0\)</span> at the same rate.</p></li>
 </ul>
 </div>
@@ -605,7 +608,7 @@ E_{k+1}=T_{22}\,E_k\,(T_{11}+T_{12}E_k)^{-1}.
 <p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span>. Orthogonal iteration with block size <span class="math notranslate nohighlight">\(p\)</span> (i.e., <span class="math notranslate nohighlight">\(Q_k\)</span> has <span class="math notranslate nohighlight">\(p\)</span> columns) is</p>
 <div class="math notranslate nohighlight">
 \[
-Y_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Y_{k+1}),\quad Q_0^H Q_0=I_p.
+Z_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Z_{k+1}).
 \]</div>
 <p>The notation <span class="math notranslate nohighlight">\(\operatorname{orth}(\cdot)\)</span> means to compute an orthonormal basis for the range (e.g., via <span class="math notranslate nohighlight">\(QR\)</span>).</p>
 <p>We will work with the (unitary) Schur form. Choose a unitary <span class="math notranslate nohighlight">\(U\)</span> so that</p>
@@ -614,25 +617,26 @@ Y_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Y_{k+1}),\quad Q_0^H Q_0=I_p.
 A=U\begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix}U^H=:U T U^H,
 \end{split}\]</div>
 <p>where the <span class="math notranslate nohighlight">\(p\times p\)</span> block <span class="math notranslate nohighlight">\(T_{11}\)</span> holds the eigenvalues we want (e.g., the <span class="math notranslate nohighlight">\(p\)</span> largest in modulus, or any isolated cluster after a reordering), and <span class="math notranslate nohighlight">\(T_{22}\)</span> holds the rest. The convergence we wish to analyze is toward the Schur subspace <span class="math notranslate nohighlight">\(\mathcal{U}_1=\operatorname{span}(U_1)\)</span> (columns of <span class="math notranslate nohighlight">\(U\)</span> corresponding to <span class="math notranslate nohighlight">\(T_{11}\)</span>).</p>
-<p>Write the iterate in Schur coordinates as <span class="math notranslate nohighlight">\(Z_k:=U^H Q_k\)</span> and block it</p>
+<p><em>Note:</em> we will use the notation <span class="math notranslate nohighlight">\(U\)</span> below to avoid confusion with <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
+<p>Write the iterate in Schur coordinates as <span class="math notranslate nohighlight">\(Y_k:=U^H Q_k\)</span> and block it</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-Z_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Z_k^H Z_k=I_p.
+Y_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Y_k^H Y_k=I_p.
 \end{split}\]</div>
-<p>Subspace convergence can be studied through <span class="math notranslate nohighlight">\(Z_k\)</span>.</p>
+<p>Subspace convergence can be studied through <span class="math notranslate nohighlight">\(Y_k\)</span>.</p>
 </section>
 <section id="the-graph-map-and-the-core-recurrence">
 <h3>The graph map and the core recurrence<a class="headerlink" href="#the-graph-map-and-the-core-recurrence" title="Link to this heading">#</a></h3>
 <p>As long as <span class="math notranslate nohighlight">\(C_k\)</span> is nonsingular (true once the iterate has nonzero overlap with <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>), define the graph variable <span class="math notranslate nohighlight">\(E_k:=S_k C_k^{-1}\)</span> so that</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\operatorname{span}(Z_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
+\operatorname{span}(Y_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
 \end{split}\]</div>
 <p>The name graph variable comes from functional analysis and corresponds to viewing the subspace as the graph of a linear operator from the “top” to the “bottom” space.</p>
 <p>One step of the (unnormalized) iteration in Schur coordinates is</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-U^H Y_{k+1}=T Z_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
+U^H Z_{k+1}=T Y_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
 \end{split}\]</div>
 <p>Since column spaces are what matter, the next subspace can be represented as a graph too:</p>
 <div class="math notranslate nohighlight">
@@ -713,7 +717,7 @@ Assume the eigenvalues are ordered by modulus</p>
 \sin\theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1))
 \;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
 \]</div>
-<p>Finally, the Ritz matrix <span class="math notranslate nohighlight">\(B_k:=Q_k^H A Q_k\)</span> has eigenvalues that converge to the eigenvalues of <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p>
+<p>Finally, the Ritz matrix <span class="math notranslate nohighlight">\(T_k:=Q_k^H A Q_k\)</span> has eigenvalues that converge to the eigenvalues of <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p>
 </section>
 </div></section>
 <section id="practical-notes">
@@ -727,7 +731,7 @@ Assume the eigenvalues are ordered by modulus</p>
 </section>
 <section id="convergence-rate-of-the-ritz-eigenvalues">
 <h2>Convergence rate of the Ritz eigenvalues<a class="headerlink" href="#convergence-rate-of-the-ritz-eigenvalues" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(B_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}\)</span> be the Rayleigh–Ritz (Ritz) matrix at step <span class="math notranslate nohighlight">\(k\)</span>, and let its eigenvalues be <span class="math notranslate nohighlight">\(\{\mu_i^{(k)}\}_{i=1}^p\)</span>. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.</p>
+<p>Let <span class="math notranslate nohighlight">\(T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}\)</span> be the Rayleigh–Ritz (Ritz) matrix at step <span class="math notranslate nohighlight">\(k\)</span>, and let its eigenvalues be <span class="math notranslate nohighlight">\(\{\mu_i^{(k)}\}_{i=1}^p\)</span>. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.</p>
 <section id="blockschur-view">
 <h3>Block–Schur view<a class="headerlink" href="#blockschur-view" title="Link to this heading">#</a></h3>
 <p>Work in a Schur basis</p>
@@ -738,11 +742,11 @@ A = U \begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix} U^H
 <p>with <span class="math notranslate nohighlight">\(T_{11}\in\mathbb{C}^{p\times p}\)</span>. With</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-Z_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}\end{split}\]</div>
+Y_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}\end{split}\]</div>
 <p>and <span class="math notranslate nohighlight">\(E_k := S_k C_k^{-1}\)</span> (when <span class="math notranslate nohighlight">\(C_k\)</span> is invertible), a short calculation gives</p>
 <div class="math notranslate nohighlight">
 \[
-B_k = Z_k^H T Z_k
+T_k = Y_k^H T Y_k
 = (I+E_k^H E_k)^{-\tfrac12}
 \Big(T_{11} + T_{12}E_k + E_k^H T_{12}^H + E_k^H T_{22}E_k\Big)
 (I+E_k^H E_k)^{-\tfrac12}.
@@ -750,7 +754,7 @@ B_k = Z_k^H T Z_k
 <p>Hence</p>
 <div class="math notranslate nohighlight">
 \[
-B_k \;=\; T_{11} + \Delta_k,
+T_k \;=\; T_{11} + \Delta_k,
 \qquad
 \|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
 \]</div>
@@ -761,7 +765,7 @@ B_k \;=\; T_{11} + \Delta_k,
 <p>Assume <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> so that the invariant subspace is well conditioned; assume <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular (the start has nonzero overlap with <span class="math notranslate nohighlight">\(\mathcal U_1\)</span>), and suppose <span class="math notranslate nohighlight">\(\|E_k\|\)</span> is sufficiently small. Then there exists <span class="math notranslate nohighlight">\(c&gt;0\)</span> such that</p>
 <div class="math notranslate nohighlight">
 \[
-\mathrm{dist}\big(\Lambda(B_k),\Lambda(T_{11})\big)
+\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
 \;\le\; c\,\|E_k\| \;+\; \mathcal{O}\!\big(\|E_k\|^2\big).
 \]</div>
 <p>Here <span class="math notranslate nohighlight">\(\Lambda(X)\)</span> denotes the <strong>set of eigenvalues</strong> of <span class="math notranslate nohighlight">\(X\)</span>. The function <span class="math notranslate nohighlight">\(\mathrm{dist}\)</span> denotes the <strong>Hausdorff distance</strong> between (compact) subsets of <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>:</p>
@@ -782,7 +786,7 @@ B_k \;=\; T_{11} + \Delta_k,
 <p>(as proved above), then</p>
 <div class="math notranslate nohighlight">
 \[
-\mathrm{dist}\big(\Lambda(B_k),\Lambda(T_{11})\big)
+\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
 \;\le\; C' \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
 \]</div>
 <p>for some constant <span class="math notranslate nohighlight">\(C'\)</span> independent of <span class="math notranslate nohighlight">\(k\)</span>.</p>
@@ -913,11 +917,11 @@ B_k \;=\; T_{11} + \Delta_k,
       </div>
     </a>
     <a class="right-next"
-       href="LICENSE.html"
+       href="orthogonal_and_power_iteration.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">License for this book</p>
+        <p class="prev-next-title">Power and Orthogonal Iteration Methods</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

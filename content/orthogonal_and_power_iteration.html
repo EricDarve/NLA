@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solving Linear Systems &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Power and Orthogonal Iteration Methods &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/solving_linear_systems';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/orthogonal_and_power_iteration';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The LU Decomposition Algorithm" href="lu_decomposition.html" />
-    <link rel="prev" title="Summary of Matrix Decompositions" href="summary_of_matrix_decompositions.html" />
+    <link rel="next" title="Orthogonal Iteration and Eigenvalues" href="orthogonal_iteration_and_eigenvalues.html" />
+    <link rel="prev" title="The Orthogonal Iteration Algorithm" href="orthogonal_iteration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -198,7 +198,7 @@
 <li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
@@ -221,11 +221,11 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 </ul>
@@ -285,7 +285,7 @@
       
       
       
-      <li><a href="../_sources/content/solving_linear_systems.md" target="_blank"
+      <li><a href="../_sources/content/orthogonal_and_power_iteration.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -356,7 +356,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,11 +369,19 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Solving Linear Systems</h1>
+    <h1>Power and Orthogonal Iteration Methods</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-k-as-the-q-factor-in-a-qr-factorization-of-a-k"><span class="math notranslate nohighlight">\(Q_k\)</span> as the <span class="math notranslate nohighlight">\(Q\)</span>-factor in a QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span></a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -381,29 +391,65 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="solving-linear-systems">
-<h1>Solving Linear Systems<a class="headerlink" href="#solving-linear-systems" title="Link to this heading">#</a></h1>
-<p>Welcome to the heart of numerical linear algebra. The problem of solving a system of linear equations, written in matrix form as <span class="math notranslate nohighlight">\(Ax = b\)</span>, is arguably one of the most fundamental and frequently encountered computational problems in all of science and engineering. From simulating the airflow over a wing and analyzing electrical circuits to training machine learning models and pricing financial derivatives, the need to solve for an unknown vector <span class="math notranslate nohighlight">\(x\)</span> is everywhere.</p>
-<p>At first glance, the problem might seem simple. If <span class="math notranslate nohighlight">\(A\)</span> is an invertible square matrix, a unique solution exists, and we can write it formally as <span class="math notranslate nohighlight">\(x = A^{-1}b\)</span>. So, why not just compute the inverse of <span class="math notranslate nohighlight">\(A\)</span> and multiply it by <span class="math notranslate nohighlight">\(b\)</span>? While mathematically sound, this approach is a computational pitfall. Calculating a matrix inverse is significantly more expensive and, more importantly, often less numerically accurate than solving the system directly. Our first core principle is this: <strong>we almost never compute a matrix inverse explicitly.</strong></p>
-<p>So, what’s the alternative? The central strategy of this chapter—and a recurring theme in numerical analysis—is <strong>factorization</strong>. The idea is to decompose the often dense and complicated matrix <span class="math notranslate nohighlight">\(A\)</span> into a product of simpler matrices. The star of this chapter is the <strong>LU factorization</strong>, where we write <span class="math notranslate nohighlight">\(A = LU\)</span>, with <span class="math notranslate nohighlight">\(L\)</span> being a lower triangular matrix and <span class="math notranslate nohighlight">\(U\)</span> being an upper triangular one.</p>
-<p>Why is this so helpful? Because solving triangular systems is computationally cheap and easy. By factoring <span class="math notranslate nohighlight">\(A\)</span>, we transform the single difficult problem <span class="math notranslate nohighlight">\(Ax = b\)</span> into two simple ones:</p>
-<ol class="arabic simple">
-<li><p>Solve <span class="math notranslate nohighlight">\(Ly = b\)</span> for <span class="math notranslate nohighlight">\(y\)</span> (using <em>forward substitution</em>).</p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(Ux = y\)</span> for <span class="math notranslate nohighlight">\(x\)</span> (using <em>backward substitution</em>).</p></li>
-</ol>
-<p>This two-step process is dramatically faster and more stable than the inverse-based approach.</p>
-<p>However, this elegant strategy brings its own set of challenges that form the core of our study:</p>
-<ol class="arabic simple">
-<li><p><strong>Existence and Uniqueness:</strong> Can any invertible matrix <span class="math notranslate nohighlight">\(A\)</span> be factored as <span class="math notranslate nohighlight">\(A=LU\)</span>? As we will see, the answer is no. This leads us to the first practical hurdle.</p></li>
-<li><p><strong>Numerical Stability:</strong> This is the most critical challenge. Computers do not work with real numbers; they use finite-precision floating-point arithmetic. This means that every calculation introduces a tiny <em>roundoff error</em>. While individual errors are small, they can accumulate catastrophically, rendering our computed solution meaningless. How can we trust our results?</p></li>
-<li><p><strong>Efficiency:</strong> For the massive systems that arise in practice, the speed of our algorithm is paramount. We need methods that scale efficiently as the size of the matrix grows.</p></li>
-</ol>
-<p>To navigate these challenges, we will develop a powerful set of tools and concepts. We’ll see that the problem of existence can be solved by introducing <strong>row pivoting</strong>, which leads to the more general and robust <span class="math notranslate nohighlight">\(PA = LU\)</span> factorization. Pivoting also turns out to be the key to ensuring numerical stability.</p>
-<p>To understand <em>why</em> it works, we must dive into the world of floating-point arithmetic and develop a rigorous framework for <strong>error analysis</strong>. We will distinguish between <em>forward error</em> (how close is our answer to the true answer?) and <em>backward error</em> (is our answer the exact solution to a slightly perturbed problem?). The concept of the <strong>condition number</strong> of a matrix will emerge as a crucial indicator of how sensitive a problem is to small perturbations, telling us when we can expect accurate solutions and when the problem is simply too ill-behaved.</p>
-<p>This chapter will guide you through this landscape step-by-step. We will begin with the simplest case—solving triangular systems. We will then introduce the LU factorization and its algorithm, investigate its potential for failure, and develop the pivoting strategy that saves it. Following that, we’ll take a necessary detour to formalize floating-point arithmetic and backward error analysis. Armed with these tools, we will prove why the LU factorization with pivoting is, in fact, numerically stable in practice. Finally, we will explore a special case for symmetric positive definite matrices, where the even faster and more stable <strong>Cholesky factorization</strong> can be used.</p>
-<p>By the end of this chapter, you will not only know <em>how</em> to solve a linear system effectively but also understand <em>why</em> the method works, how to analyze its limitations, and how to trust the results you get from the computer.</p>
-<div class="toctree-wrapper compound">
+  <section class="tex2jax_ignore mathjax_ignore" id="power-and-orthogonal-iteration-methods">
+<h1>Power and Orthogonal Iteration Methods<a class="headerlink" href="#power-and-orthogonal-iteration-methods" title="Link to this heading">#</a></h1>
+<p>Given the way the orthogonal iteration method was constructed, we should expect some connection to the power iteration method. We explore this in more detail here. We show how the sequence of matrices <span class="math notranslate nohighlight">\(Q_k\)</span> from the orthogonal iteration method corresponds to a QR factorization of the sequence of matrices <span class="math notranslate nohighlight">\(A^k\)</span> from the power iteration method.</p>
+<section id="q-k-as-the-q-factor-in-a-qr-factorization-of-a-k">
+<span id="sec-oi-qr-ak"></span><h2><span class="math notranslate nohighlight">\(Q_k\)</span> as the <span class="math notranslate nohighlight">\(Q\)</span>-factor in a QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span><a class="headerlink" href="#q-k-as-the-q-factor-in-a-qr-factorization-of-a-k" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span>. Orthogonal iteration with an initial matrix <span class="math notranslate nohighlight">\(Q_0\in\mathbb{C}^{n\times p}\)</span> whose columns are orthonormal proceeds by computing, at each step, the thin QR factorization</p>
+<div class="math notranslate nohighlight">
+\[
+AQ_k = Q_{k+1} R_{k+1}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q_k\)</span> is unitary and <span class="math notranslate nohighlight">\(R_k\)</span> is upper triangular.</p>
+<p>Define the accumulated upper triangular factor</p>
+<div class="math notranslate nohighlight">
+\[
+\widehat{R}_k \;:=\; R_k R_{k-1}\cdots R_1 \quad (k\ge 1),\qquad \widehat{R}_0 := I_p.
+\]</div>
+<div class="proof theorem admonition" id="thm:AkQR">
+<p class="admonition-title"><span class="caption-number">Theorem 23 </span> (QR of <span class="math notranslate nohighlight">\(A^k Q_0\)</span>)</p>
+<section class="theorem-content" id="proof-content">
+<p>For all <span class="math notranslate nohighlight">\(k\ge 0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+A^k\,Q_0 \;=\; Q_k\,\widehat{R}_k .
+\]</div>
+<p>In particular, if <span class="math notranslate nohighlight">\(Q_0=I_n\)</span> (full orthogonal iteration on all of <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>), then</p>
+<div class="math notranslate nohighlight">
+\[
+A^k \;=\; Q_k\,\widehat{R}_k ,
+\]</div>
+<p>so <span class="math notranslate nohighlight">\(Q_k\)</span> is the <span class="math notranslate nohighlight">\(Q\)</span>-factor and <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> the <span class="math notranslate nohighlight">\(R\)</span>-factor in the QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. <em>Base cases.</em></p>
+<p>For <span class="math notranslate nohighlight">\(k=0\)</span>, the identity is <span class="math notranslate nohighlight">\(Q_0 = Q_0\)</span>.</p>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, it reads <span class="math notranslate nohighlight">\(A Q_0 = Q_1 R_1\)</span>, which is the defining QR step.</p>
+<p><em>Inductive step.</em> Assume <span class="math notranslate nohighlight">\(A^k Q_0 = Q_k \widehat{R}_k\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A^{k+1}Q_0
+&amp;= A(A^k Q_0)
+= A(Q_k \widehat{R}_k)
+= (A Q_k)\,\widehat{R}_k \\
+&amp;= (Q_{k+1} R_{k+1})\,\widehat{R}_k
+= Q_{k+1}\,(R_{k+1}\widehat{R}_k)
+= Q_{k+1}\,\widehat{R}_{k+1},
+\end{aligned}
+\end{split}\]</div>
+<p>which proves the claim by induction.</p>
 </div>
+<div class="note admonition">
+<p class="admonition-title">Remarks</p>
+<ul class="simple">
+<li><p>A product of upper triangular matrices is upper triangular, and with positive diagonals in each <span class="math notranslate nohighlight">\(R_j\)</span>, the factor <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> is upper triangular with positive diagonal. Hence the factorization above is the unique thin QR factorization of <span class="math notranslate nohighlight">\(A^k Q_0\)</span>.</p></li>
+<li><p>When <span class="math notranslate nohighlight">\(p=1\)</span> (the power method), <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> is the scalar <span class="math notranslate nohighlight">\(\prod_{j=1}^k r_j\)</span> with <span class="math notranslate nohighlight">\(r_j=\lVert A q_{j-1}\rVert_2\)</span>, and <span class="math notranslate nohighlight">\(q_k\)</span> is the normalized power-iteration vector. The identity reduces to the familiar normalization of <span class="math notranslate nohighlight">\(A^k q_0\)</span>.</p></li>
+<li><p>The column-space relation <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)=\operatorname{range}(A^k Q_0)\)</span> shows that orthogonal iteration orthonormalizes the images of the initial subspace under repeated application of <span class="math notranslate nohighlight">\(A\)</span>. This is the subspace analogue of the power method and explains why the nested leading-column spans of <span class="math notranslate nohighlight">\(Q_k\)</span> converge to invariant subspaces under standard spectral gap assumptions.</p></li>
+</ul>
+</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -437,20 +483,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="summary_of_matrix_decompositions.html"
+       href="orthogonal_iteration.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Summary of Matrix Decompositions</p>
+        <p class="prev-next-title">The Orthogonal Iteration Algorithm</p>
       </div>
     </a>
     <a class="right-next"
-       href="lu_decomposition.html"
+       href="orthogonal_iteration_and_eigenvalues.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The LU Decomposition Algorithm</p>
+        <p class="prev-next-title">Orthogonal Iteration and Eigenvalues</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -460,6 +506,21 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-k-as-the-q-factor-in-a-qr-factorization-of-a-k"><span class="math notranslate nohighlight">\(Q_k\)</span> as the <span class="math notranslate nohighlight">\(Q\)</span>-factor in a QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

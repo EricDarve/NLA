@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solving Linear Systems &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Computing Eigenvectors from the Schur Decomposition &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/solving_linear_systems';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/computing_the_eigenvectors';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The LU Decomposition Algorithm" href="lu_decomposition.html" />
-    <link rel="prev" title="Summary of Matrix Decompositions" href="summary_of_matrix_decompositions.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Orthogonal Iteration and Eigenvalues" href="orthogonal_iteration_and_eigenvalues.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -198,7 +198,7 @@
 <li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Solving Linear Systems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
@@ -221,13 +221,13 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
-<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Computing Eigenvectors from the Schur Decomposition</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -285,7 +285,7 @@
       
       
       
-      <li><a href="../_sources/content/solving_linear_systems.md" target="_blank"
+      <li><a href="../_sources/content/computing_the_eigenvectors.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -356,7 +356,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -367,11 +369,20 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Solving Linear Systems</h1>
+    <h1>Computing Eigenvectors from the Schur Decomposition</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-for-the-eigenvector">Solving for the Eigenvector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-and-cost">Solution and Cost</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -381,29 +392,66 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="solving-linear-systems">
-<h1>Solving Linear Systems<a class="headerlink" href="#solving-linear-systems" title="Link to this heading">#</a></h1>
-<p>Welcome to the heart of numerical linear algebra. The problem of solving a system of linear equations, written in matrix form as <span class="math notranslate nohighlight">\(Ax = b\)</span>, is arguably one of the most fundamental and frequently encountered computational problems in all of science and engineering. From simulating the airflow over a wing and analyzing electrical circuits to training machine learning models and pricing financial derivatives, the need to solve for an unknown vector <span class="math notranslate nohighlight">\(x\)</span> is everywhere.</p>
-<p>At first glance, the problem might seem simple. If <span class="math notranslate nohighlight">\(A\)</span> is an invertible square matrix, a unique solution exists, and we can write it formally as <span class="math notranslate nohighlight">\(x = A^{-1}b\)</span>. So, why not just compute the inverse of <span class="math notranslate nohighlight">\(A\)</span> and multiply it by <span class="math notranslate nohighlight">\(b\)</span>? While mathematically sound, this approach is a computational pitfall. Calculating a matrix inverse is significantly more expensive and, more importantly, often less numerically accurate than solving the system directly. Our first core principle is this: <strong>we almost never compute a matrix inverse explicitly.</strong></p>
-<p>So, what’s the alternative? The central strategy of this chapter—and a recurring theme in numerical analysis—is <strong>factorization</strong>. The idea is to decompose the often dense and complicated matrix <span class="math notranslate nohighlight">\(A\)</span> into a product of simpler matrices. The star of this chapter is the <strong>LU factorization</strong>, where we write <span class="math notranslate nohighlight">\(A = LU\)</span>, with <span class="math notranslate nohighlight">\(L\)</span> being a lower triangular matrix and <span class="math notranslate nohighlight">\(U\)</span> being an upper triangular one.</p>
-<p>Why is this so helpful? Because solving triangular systems is computationally cheap and easy. By factoring <span class="math notranslate nohighlight">\(A\)</span>, we transform the single difficult problem <span class="math notranslate nohighlight">\(Ax = b\)</span> into two simple ones:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="computing-eigenvectors-from-the-schur-decomposition">
+<h1>Computing Eigenvectors from the Schur Decomposition<a class="headerlink" href="#computing-eigenvectors-from-the-schur-decomposition" title="Link to this heading">#</a></h1>
+<p>We will focus on coming sections on computing the eigenvalues and accelerating their convergence using shifts. However, once we have computed the Schur decomposition of <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, we may also want to compute its eigenvectors. This can be achieved by first finding the eigenvectors of the upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span>. Let’s do that now.</p>
+<p>If <span class="math notranslate nohighlight">\(v\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(T\)</span> for an eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> (meaning <span class="math notranslate nohighlight">\(Tv = \lambda v\)</span>), then <span class="math notranslate nohighlight">\(x = Qv\)</span> is the corresponding eigenvector of <span class="math notranslate nohighlight">\(A\)</span>. This is because:</p>
+<div class="math notranslate nohighlight">
+\[Ax = (QTQ^H)(Qv) = QTv = Q(\lambda v) = \lambda(Qv) = \lambda x\]</div>
+<p>Our task, therefore, is to find a non-zero vector <span class="math notranslate nohighlight">\(v\)</span> for a given eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(T\)</span> such that <span class="math notranslate nohighlight">\(Tv = \lambda v\)</span>. This is equivalent to solving the homogeneous linear system:</p>
+<div class="math notranslate nohighlight">
+\[(T - \lambda I)v = 0\]</div>
+<section id="solving-for-the-eigenvector">
+<h2>Solving for the Eigenvector<a class="headerlink" href="#solving-for-the-eigenvector" title="Link to this heading">#</a></h2>
+<p>The eigenvalues <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(T\)</span> are its diagonal elements. Let’s find the eigenvector <span class="math notranslate nohighlight">\(v\)</span> corresponding to a specific eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span>. We can partition the matrix <span class="math notranslate nohighlight">\(T\)</span> and the vector <span class="math notranslate nohighlight">\(v\)</span> to isolate this <span class="math notranslate nohighlight">\(\lambda\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+T = \begin{pmatrix} T_{11} &amp; T_{12} &amp; T_{13} \\
+0 &amp; \lambda &amp; T_{23} \\
+0 &amp; 0 &amp; T_{33}
+\end{pmatrix}, \quad v = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix}
+\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(T_{11}\)</span> and <span class="math notranslate nohighlight">\(T_{33}\)</span> are upper triangular matrices, and <span class="math notranslate nohighlight">\(v_2\)</span> is a scalar component corresponding to <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<p>The system <span class="math notranslate nohighlight">\((T - \lambda I)v = 0\)</span> can now be written in block form:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix} T_{11} - \lambda I &amp; T_{12} &amp; T_{13} \\
+0 &amp; 0 &amp; T_{23} \\
+0 &amp; 0 &amp; T_{33} - \lambda I
+\end{pmatrix}
+\begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix}
+=
+\begin{pmatrix} 0 \\ 0 \\ 0 \end{pmatrix}
+\end{split}\]</div>
+<p>We solve this system using block back-substitution, starting from the bottom row:</p>
 <ol class="arabic simple">
-<li><p>Solve <span class="math notranslate nohighlight">\(Ly = b\)</span> for <span class="math notranslate nohighlight">\(y\)</span> (using <em>forward substitution</em>).</p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(Ux = y\)</span> for <span class="math notranslate nohighlight">\(x\)</span> (using <em>backward substitution</em>).</p></li>
+<li><p><strong>Third Row:</strong> <span class="math notranslate nohighlight">\((T_{33} - \lambda I)v_3 = 0\)</span>.
+The eigenvalues of <span class="math notranslate nohighlight">\(T_{33}\)</span> are its diagonal elements. Assuming <span class="math notranslate nohighlight">\(\lambda\)</span> is distinct from the eigenvalues of <span class="math notranslate nohighlight">\(T_{33}\)</span>, the matrix <span class="math notranslate nohighlight">\((T_{33} - \lambda I)\)</span> is invertible. Therefore, the only solution is <span class="math notranslate nohighlight">\(v_3 = 0\)</span>.</p></li>
+<li><p><strong>Second Row:</strong> <span class="math notranslate nohighlight">\(0 \cdot v_1 + 0 \cdot v_2 + T_{23} v_3 = 0\)</span>.
+Substituting <span class="math notranslate nohighlight">\(v_3 = 0\)</span>, this equation becomes <span class="math notranslate nohighlight">\(0 = 0\)</span>. This is always satisfied and provides no information for finding <span class="math notranslate nohighlight">\(v_1\)</span> or <span class="math notranslate nohighlight">\(v_2\)</span>.</p></li>
+<li><p><strong>First Row:</strong> <span class="math notranslate nohighlight">\((T_{11} - \lambda I)v_1 + T_{12}v_2 + T_{13}v_3 = 0\)</span>.
+With <span class="math notranslate nohighlight">\(v_3 = 0\)</span>, this simplifies to <span class="math notranslate nohighlight">\((T_{11} - \lambda I)v_1 + T_{12}v_2 = 0\)</span>.</p></li>
 </ol>
-<p>This two-step process is dramatically faster and more stable than the inverse-based approach.</p>
-<p>However, this elegant strategy brings its own set of challenges that form the core of our study:</p>
-<ol class="arabic simple">
-<li><p><strong>Existence and Uniqueness:</strong> Can any invertible matrix <span class="math notranslate nohighlight">\(A\)</span> be factored as <span class="math notranslate nohighlight">\(A=LU\)</span>? As we will see, the answer is no. This leads us to the first practical hurdle.</p></li>
-<li><p><strong>Numerical Stability:</strong> This is the most critical challenge. Computers do not work with real numbers; they use finite-precision floating-point arithmetic. This means that every calculation introduces a tiny <em>roundoff error</em>. While individual errors are small, they can accumulate catastrophically, rendering our computed solution meaningless. How can we trust our results?</p></li>
-<li><p><strong>Efficiency:</strong> For the massive systems that arise in practice, the speed of our algorithm is paramount. We need methods that scale efficiently as the size of the matrix grows.</p></li>
-</ol>
-<p>To navigate these challenges, we will develop a powerful set of tools and concepts. We’ll see that the problem of existence can be solved by introducing <strong>row pivoting</strong>, which leads to the more general and robust <span class="math notranslate nohighlight">\(PA = LU\)</span> factorization. Pivoting also turns out to be the key to ensuring numerical stability.</p>
-<p>To understand <em>why</em> it works, we must dive into the world of floating-point arithmetic and develop a rigorous framework for <strong>error analysis</strong>. We will distinguish between <em>forward error</em> (how close is our answer to the true answer?) and <em>backward error</em> (is our answer the exact solution to a slightly perturbed problem?). The concept of the <strong>condition number</strong> of a matrix will emerge as a crucial indicator of how sensitive a problem is to small perturbations, telling us when we can expect accurate solutions and when the problem is simply too ill-behaved.</p>
-<p>This chapter will guide you through this landscape step-by-step. We will begin with the simplest case—solving triangular systems. We will then introduce the LU factorization and its algorithm, investigate its potential for failure, and develop the pivoting strategy that saves it. Following that, we’ll take a necessary detour to formalize floating-point arithmetic and backward error analysis. Armed with these tools, we will prove why the LU factorization with pivoting is, in fact, numerically stable in practice. Finally, we will explore a special case for symmetric positive definite matrices, where the even faster and more stable <strong>Cholesky factorization</strong> can be used.</p>
-<p>By the end of this chapter, you will not only know <em>how</em> to solve a linear system effectively but also understand <em>why</em> the method works, how to analyze its limitations, and how to trust the results you get from the computer.</p>
-<div class="toctree-wrapper compound">
-</div>
+<p>We are left with one equation: <span class="math notranslate nohighlight">\((T_{11} - \lambda I)v_1 + T_{12}v_2 = 0\)</span>. Since <span class="math notranslate nohighlight">\(\lambda\)</span> is an eigenvalue, the full system <span class="math notranslate nohighlight">\((T - \lambda I)v = 0\)</span> is singular and must have a non-trivial solution. The singularity (the <span class="math notranslate nohighlight">\(0\)</span> on the diagonal) corresponds to the <span class="math notranslate nohighlight">\(v_2\)</span> component, which acts as a free variable.</p>
+<p>Because eigenvectors are unique only up to a non-zero scalar multiple, we can set <span class="math notranslate nohighlight">\(v_2 = 1\)</span> to find one such eigenvector. The first-row equation becomes:</p>
+<div class="math notranslate nohighlight">
+\[(T_{11} - \lambda I)v_1 + T_{12}(1) = 0 \implies (T_{11} - \lambda I)v_1 = -T_{12}\]</div>
+<p>Similar to the <span class="math notranslate nohighlight">\(T_{33}\)</span> case, <span class="math notranslate nohighlight">\((T_{11} - \lambda I)\)</span> is invertible because <span class="math notranslate nohighlight">\(\lambda\)</span> is not an eigenvalue of <span class="math notranslate nohighlight">\(T_{11}\)</span>. We can now solve for <span class="math notranslate nohighlight">\(v_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v_1 = -(T_{11} - \lambda I)^{-1} T_{12}\]</div>
+</section>
+<section id="solution-and-cost">
+<h2>Solution and Cost<a class="headerlink" href="#solution-and-cost" title="Link to this heading">#</a></h2>
+<p>We have found all components of the eigenvector <span class="math notranslate nohighlight">\(v\)</span> for the triangular matrix <span class="math notranslate nohighlight">\(T\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+v = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix} = \begin{pmatrix}
+- (T_{11}-\lambda I)^{-1} T_{12} \\ 1 \\ 0
+\end{pmatrix}
+\end{split}\]</div>
+<p>The corresponding eigenvector <span class="math notranslate nohighlight">\(x\)</span> of the original matrix <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(x = Qv\)</span>.</p>
+<p>Computationally, finding <span class="math notranslate nohighlight">\(v_1\)</span> involves solving a triangular linear system, which costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations. The final matrix-vector multiplication <span class="math notranslate nohighlight">\(x = Qv\)</span> also costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>. Thus, the computational cost to find each eigenvector from the Schur decomposition is <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -437,20 +485,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="summary_of_matrix_decompositions.html"
+       href="orthogonal_iteration_and_eigenvalues.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Summary of Matrix Decompositions</p>
+        <p class="prev-next-title">Orthogonal Iteration and Eigenvalues</p>
       </div>
     </a>
     <a class="right-next"
-       href="lu_decomposition.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The LU Decomposition Algorithm</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -460,6 +508,22 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-for-the-eigenvector">Solving for the Eigenvector</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-and-cost">Solution and Cost</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

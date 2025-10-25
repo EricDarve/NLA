@@ -206,7 +206,7 @@ $$
 $$
 
 up to constants.
-- **What converges:** The subspace $\mathrm{span}(Q_k)$ converges to the Schur subspace $\mathrm{span}(U_1)$ and the Ritz values of $B_k:=Q_k^H A Q_k$ converge to the eigenvalues in $T_{11}$.
+- **What converges:** The subspace $\mathrm{span}(Q_k)$ converges to the Schur subspace $\mathrm{span}(U_1)$ and the Ritz values of $T_k:=Q_k^H A Q_k$ converge to the eigenvalues in $T_{11}$.
 - **How to measure error:** $\|E_k\|=\|\tan\Theta_k\|$, where $\Theta_k$ are the principal angles (see below for a definition of principal angles) between $\mathrm{span}(Q_k)$ and $\mathrm{span}(U_1)$; hence those angles go to $0$ at the same rate.
 ```
 
@@ -215,7 +215,7 @@ up to constants.
 Let $A\in\mathbb{C}^{n\times n}$. Orthogonal iteration with block size $p$ (i.e., $Q_k$ has $p$ columns) is
 
 $$
-Y_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Y_{k+1}),\quad Q_0^H Q_0=I_p.
+Z_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Z_{k+1}).
 $$
 
 The notation $\operatorname{orth}(\cdot)$ means to compute an orthonormal basis for the range (e.g., via $QR$).
@@ -228,20 +228,22 @@ $$
 
 where the $p\times p$ block $T_{11}$ holds the eigenvalues we want (e.g., the $p$ largest in modulus, or any isolated cluster after a reordering), and $T_{22}$ holds the rest. The convergence we wish to analyze is toward the Schur subspace $\mathcal{U}_1=\operatorname{span}(U_1)$ (columns of $U$ corresponding to $T_{11}$).
 
-Write the iterate in Schur coordinates as $Z_k:=U^H Q_k$ and block it
+*Note:* we will use the notation $U$ below to avoid confusion with $Q_k$.
+
+Write the iterate in Schur coordinates as $Y_k:=U^H Q_k$ and block it
 
 $$
-Z_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Z_k^H Z_k=I_p.
+Y_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Y_k^H Y_k=I_p.
 $$
 
-Subspace convergence can be studied through $Z_k$.
+Subspace convergence can be studied through $Y_k$.
 
 ### The graph map and the core recurrence
 
 As long as $C_k$ is nonsingular (true once the iterate has nonzero overlap with $\mathcal{U}_1$), define the graph variable $E_k:=S_k C_k^{-1}$ so that 
 
 $$
-\operatorname{span}(Z_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
+\operatorname{span}(Y_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
 $$
 
 The name graph variable comes from functional analysis and corresponds to viewing the subspace as the graph of a linear operator from the "top" to the "bottom" space.
@@ -249,7 +251,7 @@ The name graph variable comes from functional analysis and corresponds to viewin
 One step of the (unnormalized) iteration in Schur coordinates is
 
 $$
-U^H Y_{k+1}=T Z_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
+U^H Z_{k+1}=T Y_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
 $$
 
 Since column spaces are what matter, the next subspace can be represented as a graph too:
@@ -346,7 +348,7 @@ $$
 \;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
 $$
 
-Finally, the Ritz matrix $B_k:=Q_k^H A Q_k$ has eigenvalues that converge to the eigenvalues of $T_{11}$.
+Finally, the Ritz matrix $T_k:=Q_k^H A Q_k$ has eigenvalues that converge to the eigenvalues of $T_{11}$.
 ```
 
 ### Practical notes
@@ -357,7 +359,7 @@ Finally, the Ritz matrix $B_k:=Q_k^H A Q_k$ has eigenvalues that converge to the
 
 ## Convergence rate of the Ritz eigenvalues
 
-Let $B_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}$ be the Rayleigh–Ritz (Ritz) matrix at step $k$, and let its eigenvalues be $\{\mu_i^{(k)}\}_{i=1}^p$. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.
+Let $T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}$ be the Rayleigh–Ritz (Ritz) matrix at step $k$, and let its eigenvalues be $\{\mu_i^{(k)}\}_{i=1}^p$. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.
 
 ### Block–Schur view
 
@@ -370,12 +372,12 @@ $$
 with $T_{11}\in\mathbb{C}^{p\times p}$. With 
 
 $$
-Z_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}$$
+Y_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}$$
 
 and $E_k := S_k C_k^{-1}$ (when $C_k$ is invertible), a short calculation gives
 
 $$
-B_k = Z_k^H T Z_k
+T_k = Y_k^H T Y_k
 = (I+E_k^H E_k)^{-\tfrac12}
 \Big(T_{11} + T_{12}E_k + E_k^H T_{12}^H + E_k^H T_{22}E_k\Big)
 (I+E_k^H E_k)^{-\tfrac12}.
@@ -384,7 +386,7 @@ $$
 Hence
 
 $$
-B_k \;=\; T_{11} + \Delta_k,
+T_k \;=\; T_{11} + \Delta_k,
 \qquad
 \|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
 $$
@@ -398,7 +400,7 @@ for some constants $\alpha$, $\beta$ depending only on $\|T_{11}\|$, $\|T_{12}\|
 Assume $\mathrm{sep}(T_{11},T_{22})>0$ so that the invariant subspace is well conditioned; assume $C_0$ is nonsingular (the start has nonzero overlap with $\mathcal U_1$), and suppose $\|E_k\|$ is sufficiently small. Then there exists $c>0$ such that
 
 $$
-\mathrm{dist}\big(\Lambda(B_k),\Lambda(T_{11})\big)
+\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
 \;\le\; c\,\|E_k\| \;+\; \mathcal{O}\!\big(\|E_k\|^2\big).
 $$
 
@@ -422,7 +424,7 @@ $$
 (as proved above), then
 
 $$
-\mathrm{dist}\big(\Lambda(B_k),\Lambda(T_{11})\big)
+\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
 \;\le\; C' \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
 $$
 
