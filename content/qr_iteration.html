@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -390,6 +390,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-few-iterations">First Few Iterations</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-decomposition-of-a-k">Proof of Decomposition of <span class="math notranslate nohighlight">\(A^k\)</span></a></li>
 </ul>
             </nav>
         </div>
@@ -487,7 +488,7 @@ T_{k+1} = (U_{k+1}^H T_k) U_{k+1} = R_{k+1} U_{k+1}
 </ol>
 <p>We just switch the order of the terms! We can compute the entire sequence of <span class="math notranslate nohighlight">\(T_k\)</span> matrices starting from <span class="math notranslate nohighlight">\(T_0 = A\)</span> without ever needing to form the <span class="math notranslate nohighlight">\(Q_k\)</span> matrices from the <strong>orthogonal iteration</strong>.</p>
 <p>This QR iteration produces the same sequence of <span class="math notranslate nohighlight">\(R_k\)</span> matrices as the <strong>orthogonal iteration</strong>.</p>
-<p>From <span class="math notranslate nohighlight">\(U_{k+1} = Q_k^H Q_{k+1}\)</span>, we can show by induction that the product of the unitary factors from the QR iteration, <span class="math notranslate nohighlight">\(U_1 \cdots U_k\)</span>, is equal to the <span class="math notranslate nohighlight">\(Q_k\)</span> matrix from the <strong>orthogonal iteration</strong> (assuming <span class="math notranslate nohighlight">\(Q_0 = I\)</span>). This product converges to the orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> from the <strong>Schur decomposition</strong>.</p>
+<p>From <span class="math notranslate nohighlight">\(U_{k+1} = Q_k^H Q_{k+1}\)</span>, we can show by induction that the product of the unitary factors from the QR iteration, <span class="math notranslate nohighlight">\(U_1 \cdots U_k\)</span>, is equal to the <span class="math notranslate nohighlight">\(Q_k\)</span> matrix from the <strong>orthogonal iteration</strong> (assuming <span class="math notranslate nohighlight">\(Q_0 = I\)</span>). This product therefore converges to the orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> from the <strong>Schur decomposition</strong>.</p>
 <p>Recall from our <a class="reference internal" href="orthogonal_and_power_iteration.html#sec-oi-qr-ak"><span class="std std-ref">previous section</span></a> that</p>
 <div class="math notranslate nohighlight">
 \[
@@ -524,14 +525,73 @@ A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1).
 A^k = \tilde{Q}_k \tilde{R}_k
 \]</div>
 </section>
-</div><p>Here is a direct proof of the selected result using mathematical induction.</p>
-<div class="proof admonition" id="proof">
-<p>Proof. We will use a proof by induction. We want to prove the statement <span class="math notranslate nohighlight">\(P(k)\)</span>:</p>
+</div><p>The proof is provided at the end of this section.</p>
+</section>
+</section>
+<section id="qr-iteration-algorithm">
+<h2>QR Iteration Algorithm<a class="headerlink" href="#qr-iteration-algorithm" title="Link to this heading">#</a></h2>
+<p>This leads to the following simple algorithm, often called the “unshifted” QR iteration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># We use np.copy() so the original matrix A is not modified</span>
+<span class="n">Tk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># The &#39;not_converged&#39; condition is abstract.</span>
+<span class="c1"># In a real implementation, you would check if the</span>
+<span class="c1"># sub-diagonal elements are all close to zero.</span>
+<span class="c1"># For this example, we&#39;ll just run a fixed number of iterations.</span>
+<span class="n">num_iterations</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
+    <span class="c1"># Step 1: Compute the QR decomposition of the current matrix</span>
+    <span class="c1"># In the derivation&#39;s notation: T_k = U_{k+1} R_{k+1}</span>
+    <span class="c1"># numpy.linalg.qr() returns Q, R (which are Uk, Rk here)</span>
+    <span class="n">Uk</span><span class="p">,</span> <span class="n">Rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Tk</span><span class="p">)</span>
+    
+    <span class="c1"># Step 2: Compute the next matrix by reversing the factors</span>
+    <span class="c1"># In the derivation&#39;s notation: T_{k+1} = R_{k+1} U_{k+1}</span>
+    <span class="c1"># We store the new T_{k+1} back into the Tk variable</span>
+    <span class="c1"># In Python, @ is the operator for matrix multiplication.</span>
+    <span class="n">Tk</span> <span class="o">=</span> <span class="n">Rk</span> <span class="o">@</span> <span class="n">Uk</span>
+</pre></div>
+</div>
+<section id="first-few-iterations">
+<h3>First Few Iterations<a class="headerlink" href="#first-few-iterations" title="Link to this heading">#</a></h3>
+<p>The algorithm produces a sequence of matrices <span class="math notranslate nohighlight">\(T_0, T_1, T_2, \dots\)</span> where <span class="math notranslate nohighlight">\(T_k\)</span> converges to an upper-triangular (Schur) form.</p>
+<ul class="simple">
+<li><p><strong>Start:</strong>
+<span class="math notranslate nohighlight">\(T_0 = A\)</span></p></li>
+<li><p><strong>Iteration 1:</strong></p>
+<ol class="arabic simple">
+<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_0 = U_1 R_1\)</span></p></li>
+<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_1 = R_1 U_1\)</span></p></li>
+</ol>
+</li>
+<li><p><strong>Iteration 2:</strong></p>
+<ol class="arabic simple">
+<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_1 = U_2 R_2\)</span></p></li>
+<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_2 = R_2 U_2\)</span></p></li>
+</ol>
+</li>
+<li><p><strong>Iteration 3:</strong></p>
+<ol class="arabic simple">
+<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_2 = U_3 R_3\)</span></p></li>
+<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_3 = R_3 U_3\)</span></p></li>
+</ol>
+</li>
+<li><p>… and so on.</p></li>
+</ul>
+</section>
+</section>
+<section id="proof-of-decomposition-of-a-k">
+<h2>Proof of Decomposition of <span class="math notranslate nohighlight">\(A^k\)</span><a class="headerlink" href="#proof-of-decomposition-of-a-k" title="Link to this heading">#</a></h2>
+<p>We provide a direct proof of the following statement <span class="math notranslate nohighlight">\(P(k)\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
 P(k): \quad A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)
 \]</div>
-<p>To simplify notation, let’s define two product matrices:</p>
+<div class="proof admonition" id="proof">
+<p>Proof. We will use a proof by induction. To simplify notation, let’s define two product matrices:</p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(\tilde{Q}_k = U_1 U_2 \cdots U_k\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\tilde{R}_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
@@ -652,62 +712,6 @@ A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}
 </div>
 </section>
 </section>
-<section id="qr-iteration-algorithm">
-<h2>QR Iteration Algorithm<a class="headerlink" href="#qr-iteration-algorithm" title="Link to this heading">#</a></h2>
-<p>This leads to the following simple algorithm, often called the “unshifted” QR iteration.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
-<span class="c1"># We use np.copy() so the original matrix A is not modified</span>
-<span class="n">Tk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-
-<span class="c1"># The &#39;not_converged&#39; condition is abstract.</span>
-<span class="c1"># In a real implementation, you would check if the</span>
-<span class="c1"># sub-diagonal elements are all close to zero.</span>
-<span class="c1"># For this example, we&#39;ll just run a fixed number of iterations.</span>
-<span class="n">num_iterations</span> <span class="o">=</span> <span class="mi">20</span>
-
-<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
-    <span class="c1"># Step 1: Compute the QR decomposition of the current matrix</span>
-    <span class="c1"># In the derivation&#39;s notation: T_k = U_{k+1} R_{k+1}</span>
-    <span class="c1"># numpy.linalg.qr() returns Q, R (which are Uk, Rk here)</span>
-    <span class="n">Uk</span><span class="p">,</span> <span class="n">Rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Tk</span><span class="p">)</span>
-    
-    <span class="c1"># Step 2: Compute the next matrix by reversing the factors</span>
-    <span class="c1"># In the derivation&#39;s notation: T_{k+1} = R_{k+1} U_{k+1}</span>
-    <span class="c1"># We store the new T_{k+1} back into the Tk variable</span>
-    <span class="c1"># In Python, @ is the operator for matrix multiplication.</span>
-    <span class="n">Tk</span> <span class="o">=</span> <span class="n">Rk</span> <span class="o">@</span> <span class="n">Uk</span>
-</pre></div>
-</div>
-<section id="first-few-iterations">
-<h3>First Few Iterations<a class="headerlink" href="#first-few-iterations" title="Link to this heading">#</a></h3>
-<p>The algorithm produces a sequence of matrices <span class="math notranslate nohighlight">\(T_0, T_1, T_2, \dots\)</span> where <span class="math notranslate nohighlight">\(T_k\)</span> converges to an upper-triangular (Schur) form.</p>
-<ul class="simple">
-<li><p><strong>Start:</strong>
-<span class="math notranslate nohighlight">\(T_0 = A\)</span></p></li>
-<li><p><strong>Iteration 1:</strong></p>
-<ol class="arabic simple">
-<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_0 = U_1 R_1\)</span></p></li>
-<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_1 = R_1 U_1\)</span></p></li>
-</ol>
-</li>
-<li><p><strong>Iteration 2:</strong></p>
-<ol class="arabic simple">
-<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_1 = U_2 R_2\)</span></p></li>
-<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_2 = R_2 U_2\)</span></p></li>
-</ol>
-</li>
-<li><p><strong>Iteration 3:</strong></p>
-<ol class="arabic simple">
-<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_2 = U_3 R_3\)</span></p></li>
-<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_3 = R_3 U_3\)</span></p></li>
-</ol>
-</li>
-<li><p>… and so on.</p></li>
-</ul>
-</section>
-</section>
-</section>
 
     <script type="text/x-thebe-config">
     {
@@ -783,6 +787,7 @@ A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-few-iterations">First Few Iterations</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-decomposition-of-a-k">Proof of Decomposition of <span class="math notranslate nohighlight">\(A^k\)</span></a></li>
 </ul>
   </nav></div>
 

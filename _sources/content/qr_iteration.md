@@ -106,7 +106,7 @@ We just switch the order of the terms! We can compute the entire sequence of $T_
 
 This QR iteration produces the same sequence of $R_k$ matrices as the **orthogonal iteration**. 
 
-From $U_{k+1} = Q_k^H Q_{k+1}$, we can show by induction that the product of the unitary factors from the QR iteration, $U_1 \cdots U_k$, is equal to the $Q_k$ matrix from the **orthogonal iteration** (assuming $Q_0 = I$). This product converges to the orthogonal matrix $Q$ from the **Schur decomposition**.
+From $U_{k+1} = Q_k^H Q_{k+1}$, we can show by induction that the product of the unitary factors from the QR iteration, $U_1 \cdots U_k$, is equal to the $Q_k$ matrix from the **orthogonal iteration** (assuming $Q_0 = I$). This product therefore converges to the orthogonal matrix $Q$ from the **Schur decomposition**.
 
 Recall from our [previous section](sec:oi-qr-ak) that
 
@@ -145,16 +145,67 @@ A^k = \tilde{Q}_k \tilde{R}_k
 $$
 ```
 
-Here is a direct proof of the selected result using mathematical induction.
+The proof is provided at the end of this section.
 
-```{prf:proof}
-We will use a proof by induction. We want to prove the statement $P(k)$:
+## QR Iteration Algorithm
+
+This leads to the following simple algorithm, often called the "unshifted" QR iteration.
+
+```python
+import numpy as np
+
+# We use np.copy() so the original matrix A is not modified
+Tk = np.copy(A)
+
+# The 'not_converged' condition is abstract.
+# In a real implementation, you would check if the
+# sub-diagonal elements are all close to zero.
+# For this example, we'll just run a fixed number of iterations.
+num_iterations = 20
+
+for k in range(num_iterations):
+    # Step 1: Compute the QR decomposition of the current matrix
+    # In the derivation's notation: T_k = U_{k+1} R_{k+1}
+    # numpy.linalg.qr() returns Q, R (which are Uk, Rk here)
+    Uk, Rk = np.linalg.qr(Tk)
+    
+    # Step 2: Compute the next matrix by reversing the factors
+    # In the derivation's notation: T_{k+1} = R_{k+1} U_{k+1}
+    # We store the new T_{k+1} back into the Tk variable
+    # In Python, @ is the operator for matrix multiplication.
+    Tk = Rk @ Uk
+```
+
+### First Few Iterations
+
+The algorithm produces a sequence of matrices $T_0, T_1, T_2, \dots$ where $T_k$ converges to an upper-triangular (Schur) form.
+
+* **Start:**
+    $T_0 = A$
+
+* **Iteration 1:**
+    1.  Compute QR decomposition: $T_0 = U_1 R_1$
+    2.  Compute next matrix: $T_1 = R_1 U_1$
+
+* **Iteration 2:**
+    1.  Compute QR decomposition: $T_1 = U_2 R_2$
+    2.  Compute next matrix: $T_2 = R_2 U_2$
+
+* **Iteration 3:**
+    1.  Compute QR decomposition: $T_2 = U_3 R_3$
+    2.  Compute next matrix: $T_3 = R_3 U_3$
+* ... and so on.
+
+## Proof of Decomposition of $A^k$
+
+We provide a direct proof of the following statement $P(k)$:
 
 $$
 P(k): \quad A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)
 $$
 
-To simplify notation, let's define two product matrices:
+```{prf:proof}
+We will use a proof by induction. To simplify notation, let's define two product matrices:
 
 * $\tilde{Q}_k = U_1 U_2 \cdots U_k$
 * $\tilde{R}_k = R_k R_{k-1} \cdots R_1$
@@ -304,52 +355,3 @@ This is exactly the statement $P(n+1)$.
 
 We have shown that the statement is true for $k=1$, and that if it is true for $k=n$, it is also true for $k=n+1$. Therefore, by induction, the statement $A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)$ is true for all integers $k \ge 1$.
 ```
-
-## QR Iteration Algorithm
-
-This leads to the following simple algorithm, often called the "unshifted" QR iteration.
-
-```python
-import numpy as np
-
-# We use np.copy() so the original matrix A is not modified
-Tk = np.copy(A)
-
-# The 'not_converged' condition is abstract.
-# In a real implementation, you would check if the
-# sub-diagonal elements are all close to zero.
-# For this example, we'll just run a fixed number of iterations.
-num_iterations = 20
-
-for k in range(num_iterations):
-    # Step 1: Compute the QR decomposition of the current matrix
-    # In the derivation's notation: T_k = U_{k+1} R_{k+1}
-    # numpy.linalg.qr() returns Q, R (which are Uk, Rk here)
-    Uk, Rk = np.linalg.qr(Tk)
-    
-    # Step 2: Compute the next matrix by reversing the factors
-    # In the derivation's notation: T_{k+1} = R_{k+1} U_{k+1}
-    # We store the new T_{k+1} back into the Tk variable
-    # In Python, @ is the operator for matrix multiplication.
-    Tk = Rk @ Uk
-```
-
-### First Few Iterations
-
-The algorithm produces a sequence of matrices $T_0, T_1, T_2, \dots$ where $T_k$ converges to an upper-triangular (Schur) form.
-
-* **Start:**
-    $T_0 = A$
-
-* **Iteration 1:**
-    1.  Compute QR decomposition: $T_0 = U_1 R_1$
-    2.  Compute next matrix: $T_1 = R_1 U_1$
-
-* **Iteration 2:**
-    1.  Compute QR decomposition: $T_1 = U_2 R_2$
-    2.  Compute next matrix: $T_2 = R_2 U_2$
-
-* **Iteration 3:**
-    1.  Compute QR decomposition: $T_2 = U_3 R_3$
-    2.  Compute next matrix: $T_3 = R_3 U_3$
-* ... and so on.
