@@ -16,7 +16,7 @@ where $Q_k$ is unitary and $R_k$ is upper triangular.
 Define the accumulated upper triangular factor
 
 $$
-\widehat{R}_k \;:=\; R_k R_{k-1}\cdots R_1 \quad (k\ge 1),\qquad \widehat{R}_0 := I_p.
+\widehat{R}_k := R_k R_{k-1}\cdots R_1 \quad (k\ge 1),\qquad \widehat{R}_0 := I_p.
 $$
 
 :::{prf:theorem} QR of $A^k Q_0$
@@ -25,13 +25,13 @@ $$
 For all $k\ge 0$,
 
 $$
-A^k\,Q_0 \;=\; Q_k\,\widehat{R}_k .
+A^k\,Q_0 = Q_k\,\widehat{R}_k .
 $$
 
 In particular, if $Q_0=I_n$ (full orthogonal iteration on all of $\mathbb{C}^n$), then
 
 $$
-A^k \;=\; Q_k\,\widehat{R}_k ,
+A^k = Q_k\,\widehat{R}_k ,
 $$
 
 so $Q_k$ is the $Q$-factor and $\widehat{R}_k$ the $R$-factor in the QR factorization of $A^k$.

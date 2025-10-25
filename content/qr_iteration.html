@@ -1,0 +1,844 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>QR Iteration &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/qr_iteration';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Computing Eigenvectors from the Schur Decomposition" href="computing_the_eigenvectors.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/qr_iteration.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>QR Iteration</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-orthogonal-iteration">Derivation from Orthogonal Iteration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-relate-t-k-to-a-qr-decomposition">Step 1: Relate <span class="math notranslate nohighlight">\(T_k\)</span> to a QR Decomposition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-relate-t-k-1-to-t-k">Step 2: Relate <span class="math notranslate nohighlight">\(T_{k+1}\)</span> to <span class="math notranslate nohighlight">\(T_k\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-the-key-steps">Summary of the Key Steps</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-iteration-algorithm">QR Iteration Algorithm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-few-iterations">First Few Iterations</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="qr-iteration">
+<h1>QR Iteration<a class="headerlink" href="#qr-iteration" title="Link to this heading">#</a></h1>
+<p>The derivations from <strong>orthogonal iteration</strong> lead to the celebrated QR iteration method, a fundamental algorithm for computing the Schur decomposition and eigenvalues of a matrix.</p>
+<p>In the QR iteration, we focus on computing the sequence of matrices:</p>
+<div class="math notranslate nohighlight">
+\[
+T_k = Q_k^H A Q_k
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q_k\)</span> is the sequence of orthogonal matrices produced by the method of <strong>orthogonal iteration</strong>.</p>
+<p>Let’s consider the relationship between <span class="math notranslate nohighlight">\(T_k\)</span> and the next matrix in the sequence, <span class="math notranslate nohighlight">\(T_{k+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = Q_{k+1}^H A Q_{k+1}
+\]</div>
+<p>Our goal is to find a way to compute <span class="math notranslate nohighlight">\(T_{k+1}\)</span> directly from <span class="math notranslate nohighlight">\(T_k\)</span> without needing to compute <span class="math notranslate nohighlight">\(A\)</span> or the full <span class="math notranslate nohighlight">\(Q_k\)</span> matrices.</p>
+<section id="derivation-from-orthogonal-iteration">
+<h2>Derivation from Orthogonal Iteration<a class="headerlink" href="#derivation-from-orthogonal-iteration" title="Link to this heading">#</a></h2>
+<p>The derivation proceeds in two main steps.</p>
+<section id="step-1-relate-t-k-to-a-qr-decomposition">
+<h3>Step 1: Relate <span class="math notranslate nohighlight">\(T_k\)</span> to a QR Decomposition<a class="headerlink" href="#step-1-relate-t-k-to-a-qr-decomposition" title="Link to this heading">#</a></h3>
+<p>From the definition of <strong>orthogonal iteration</strong>, we have the relation <span class="math notranslate nohighlight">\(A Q_k = Q_{k+1} R_{k+1}\)</span>. We can substitute this into the definition of <span class="math notranslate nohighlight">\(T_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_k = Q_k^H (A Q_k) = Q_k^H (Q_{k+1} R_{k+1})
+\]</div>
+<p>Let’s define a new unitary matrix <span class="math notranslate nohighlight">\(U_{k+1}\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[
+U_{k+1} \overset{def}{=} Q_k^H Q_{k+1}
+\]</div>
+<p>As <span class="math notranslate nohighlight">\(k\)</span> increases, <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur orthogonal transformation. Therefore, <span class="math notranslate nohighlight">\(U_{k+1}\)</span> can be interpreted as a small incremental rotation that updates <span class="math notranslate nohighlight">\(Q_k\)</span> to <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>.</p>
+<p>Substituting this definition, we get:</p>
+<div class="math notranslate nohighlight">
+\[
+T_k = U_{k+1} R_{k+1}
+\]</div>
+<p>This equation is simply the <strong>QR decomposition</strong> of the matrix <span class="math notranslate nohighlight">\(T_k\)</span>. This is a key insight: <span class="math notranslate nohighlight">\(U_{k+1}\)</span> and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> can be found by performing a QR decomposition on <span class="math notranslate nohighlight">\(T_k\)</span>, without any knowledge of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(Q_k\)</span>, or <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>.</p>
+</section>
+<section id="step-2-relate-t-k-1-to-t-k">
+<h3>Step 2: Relate <span class="math notranslate nohighlight">\(T_{k+1}\)</span> to <span class="math notranslate nohighlight">\(T_k\)</span><a class="headerlink" href="#step-2-relate-t-k-1-to-t-k" title="Link to this heading">#</a></h3>
+<p>Now let’s find an expression for <span class="math notranslate nohighlight">\(T_{k+1}\)</span> in terms of <span class="math notranslate nohighlight">\(T_k\)</span>. We start with the definition <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>, which (assuming <span class="math notranslate nohighlight">\(Q_k\)</span> is square) implies <span class="math notranslate nohighlight">\(A = Q_k T_k Q_k^H\)</span>.</p>
+<p>Substitute this expression for <span class="math notranslate nohighlight">\(A\)</span> into the definition of <span class="math notranslate nohighlight">\(T_{k+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = Q_{k+1}^H A Q_{k+1} = Q_{k+1}^H (Q_k T_k Q_k^H) Q_{k+1}
+\]</div>
+<p>By grouping the terms, we get:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = (Q_{k+1}^H Q_k) T_k (Q_k^H Q_{k+1})
+\]</div>
+<p>Recall our definition <span class="math notranslate nohighlight">\(U_{k+1} = Q_k^H Q_{k+1}\)</span>. This means <span class="math notranslate nohighlight">\(U_{k+1}^H = (Q_k^H Q_{k+1})^H = Q_{k+1}^H Q_k\)</span>. Substituting these into the equation for <span class="math notranslate nohighlight">\(T_{k+1}\)</span> gives:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = U_{k+1}^H T_k U_{k+1}
+\]</div>
+<p>This shows that <span class="math notranslate nohighlight">\(T_k\)</span> and <span class="math notranslate nohighlight">\(T_{k+1}\)</span> are unitarily similar, which confirms they have the same eigenvalues.</p>
+<p>Now, we combine the results from Step 1 and Step 2.</p>
+<p>From Step 1: <span class="math notranslate nohighlight">\(T_k = U_{k+1} R_{k+1}\)</span>.</p>
+<p>Left-multiplying by <span class="math notranslate nohighlight">\(U_{k+1}^H\)</span>, we get</p>
+<div class="math notranslate nohighlight">
+\[U_{k+1}^H T_k = U_{k+1}^H (U_{k+1} R_{k+1}) = R_{k+1}.\]</div>
+<p>Now substitute this into our equation for <span class="math notranslate nohighlight">\(T_{k+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = (U_{k+1}^H T_k) U_{k+1} = R_{k+1} U_{k+1}
+\]</div>
+<p>This provides the final, simple relationship:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(T_k = U_{k+1} R_{k+1}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(T_{k+1} = R_{k+1} U_{k+1}\)</span></p></li>
+</ol>
+<p>This is the basis for the method of QR iteration.</p>
+</section>
+<section id="summary-of-the-key-steps">
+<h3>Summary of the Key Steps<a class="headerlink" href="#summary-of-the-key-steps" title="Link to this heading">#</a></h3>
+<p>The derivation shows that we can generate the sequence <span class="math notranslate nohighlight">\(T_{k+1}\)</span> from <span class="math notranslate nohighlight">\(T_k\)</span> using two simple steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Step 1:</strong> Compute the QR decomposition of <span class="math notranslate nohighlight">\(T_k\)</span>:
+<span class="math notranslate nohighlight">\(T_k = U_{k+1} R_{k+1}\)</span></p></li>
+<li><p><strong>Step 2:</strong> Compute <span class="math notranslate nohighlight">\(T_{k+1}\)</span> by multiplying the factors in reverse order:
+<span class="math notranslate nohighlight">\(T_{k+1} = R_{k+1} U_{k+1}\)</span></p></li>
+</ol>
+<p>We just switch the order of the terms! We can compute the entire sequence of <span class="math notranslate nohighlight">\(T_k\)</span> matrices starting from <span class="math notranslate nohighlight">\(T_0 = A\)</span> without ever needing to form the <span class="math notranslate nohighlight">\(Q_k\)</span> matrices from the <strong>orthogonal iteration</strong>.</p>
+<p>This QR iteration produces the same sequence of <span class="math notranslate nohighlight">\(R_k\)</span> matrices as the <strong>orthogonal iteration</strong>.</p>
+<p>From <span class="math notranslate nohighlight">\(U_{k+1} = Q_k^H Q_{k+1}\)</span>, we can show by induction that the product of the unitary factors from the QR iteration, <span class="math notranslate nohighlight">\(U_1 \cdots U_k\)</span>, is equal to the <span class="math notranslate nohighlight">\(Q_k\)</span> matrix from the <strong>orthogonal iteration</strong> (assuming <span class="math notranslate nohighlight">\(Q_0 = I\)</span>). This product converges to the orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> from the <strong>Schur decomposition</strong>.</p>
+<p>Recall from our <a class="reference internal" href="orthogonal_and_power_iteration.html#sec-oi-qr-ak"><span class="std std-ref">previous section</span></a> that</p>
+<div class="math notranslate nohighlight">
+\[
+A^k = Q_k \, R_k R_{k-1}\cdots R_1.
+\]</div>
+<p>Using the new sequence of <span class="math notranslate nohighlight">\(U_k\)</span> matrices from the QR iteration, we can write</p>
+<div class="math notranslate nohighlight">
+\[
+A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1).
+\]</div>
+<p>We restate this important result as a formal theorem.</p>
+<div class="proof theorem admonition" id="thm:qr-iteration-ak">
+<p class="admonition-title"><span class="caption-number">Theorem 24 </span> (Relationship Between <span class="math notranslate nohighlight">\(A^k\)</span> and the QR Iteration Factors)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be a square matrix. Let the sequences of matrices <span class="math notranslate nohighlight">\(\{T_k\}\)</span>, <span class="math notranslate nohighlight">\(\{U_k\}\)</span>, and <span class="math notranslate nohighlight">\(\{R_k\}\)</span> be generated by the QR iteration algorithm, defined as:</p>
+<ol class="arabic simple">
+<li><p>Initialize <span class="math notranslate nohighlight">\(T_0 = A\)</span>.</p></li>
+<li><p>For <span class="math notranslate nohighlight">\(k=0, 1, 2, \dots\)</span>:</p>
+<ul class="simple">
+<li><p>Compute the QR decomposition: <span class="math notranslate nohighlight">\(T_k = U_{k+1} R_{k+1}\)</span></p></li>
+<li><p>Compute the next iterate: <span class="math notranslate nohighlight">\(T_{k+1} = R_{k+1} U_{k+1}\)</span></p></li>
+</ul>
+</li>
+</ol>
+<p>Where <span class="math notranslate nohighlight">\(U_{k+1}\)</span> is a unitary matrix and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is an upper triangular matrix.</p>
+<p>If we define the product matrices <span class="math notranslate nohighlight">\(\tilde{Q}_k\)</span> and <span class="math notranslate nohighlight">\(\tilde{R}_k\)</span> as:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tilde{Q}_k = U_1 U_2 \cdots U_k\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{R}_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
+</ul>
+<p>Then for any integer <span class="math notranslate nohighlight">\(k \ge 1\)</span>, the <span class="math notranslate nohighlight">\(k\)</span>-th power of the matrix <span class="math notranslate nohighlight">\(A\)</span> is given by:
+$<span class="math notranslate nohighlight">\(
+A^k = \tilde{Q}_k \tilde{R}_k
+\)</span>$</p>
+</section>
+</div><p>Here is a direct proof of the selected result using mathematical induction.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. We will use a proof by induction. We want to prove the statement <span class="math notranslate nohighlight">\(P(k)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+P(k): \quad A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)
+\]</div>
+<p>To simplify notation, let’s define two product matrices:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tilde{Q}_k = U_1 U_2 \cdots U_k\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{R}_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
+</ul>
+<p>Our goal is to prove <span class="math notranslate nohighlight">\(A^k = \tilde{Q}_k \tilde{R}_k\)</span> for all <span class="math notranslate nohighlight">\(k \ge 1\)</span>.</p>
+<p><strong>Lemma: <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span></strong></p>
+<p>Before the main proof, let’s first establish a key relationship between <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(T_k\)</span>. We will prove by induction that <span class="math notranslate nohighlight">\(T_k = \tilde{Q}_k^H A \tilde{Q}_k\)</span>. Note that this is not necessarily an obvious result since we start from the QR iteration, not the orthogonal iteration.</p>
+<ul class="simple">
+<li><p><strong>Base Case (k=1):</strong></p></li>
+</ul>
+<p>From the algorithm, <span class="math notranslate nohighlight">\(T_1 = R_1 U_1\)</span>.</p>
+<p>From the first step (<span class="math notranslate nohighlight">\(k=0\)</span>), we have <span class="math notranslate nohighlight">\(T_0 = U_1 R_1\)</span>. Since <span class="math notranslate nohighlight">\(T_0 = A\)</span>, this means <span class="math notranslate nohighlight">\(A = U_1 R_1\)</span>.</p>
+<p>Because <span class="math notranslate nohighlight">\(U_1\)</span> is unitary, <span class="math notranslate nohighlight">\(U_1^H = U_1^{-1}\)</span>, so we can write <span class="math notranslate nohighlight">\(R_1 = U_1^H A\)</span>.
+Substitute this into the equation for <span class="math notranslate nohighlight">\(T_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T\_1 = (U\_1^H A) U\_1 = U\_1^H A U\_1
+\]</div>
+<p>By definition, <span class="math notranslate nohighlight">\(\tilde{Q}_1 = U_1\)</span>, so <span class="math notranslate nohighlight">\(T_1 = \tilde{Q}_1^H A \tilde{Q}_1\)</span>. The base case holds.</p>
+<ul class="simple">
+<li><p><strong>Inductive Step:</strong></p></li>
+</ul>
+<p>Assume <span class="math notranslate nohighlight">\(T_n = \tilde{Q}_n^H A \tilde{Q}_n\)</span> for some <span class="math notranslate nohighlight">\(n \ge 1\)</span>. We want to show <span class="math notranslate nohighlight">\(T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}\)</span>.</p>
+<p>From the algorithm, <span class="math notranslate nohighlight">\(T_{n+1} = R_{n+1} U_{n+1}\)</span>.</p>
+<p>From the QR decomposition step, <span class="math notranslate nohighlight">\(T_n = U_{n+1} R_{n+1}\)</span>, which implies <span class="math notranslate nohighlight">\(R_{n+1} = U_{n+1}^H T_n\)</span>.</p>
+<p>Substitute this into the equation for <span class="math notranslate nohighlight">\(T_{n+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{n+1} = (U_{n+1}^H T_n) U_{n+1} = U_{n+1}^H T_n U_{n+1}
+\]</div>
+<p>Now, substitute the inductive hypothesis for <span class="math notranslate nohighlight">\(T_n\)</span>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$$
+T_{n+1} = U_{n+1}^H (\tilde{Q}_n^H A \tilde{Q}_n) U_{n+1}
+$$
+
+Grouping the terms:
+
+$$
+T_{n+1} = (U_{n+1}^H \tilde{Q}_n^H) A (\tilde{Q}_n U_{n+1})
+$$
+
+Using the property $(BC)^H = C^H B^H$, we get:
+
+$$
+T_{n+1} = (\tilde{Q}_n U_{n+1})^H A (\tilde{Q}_n U_{n+1})
+$$
+
+By definition, $\tilde{Q}_{n+1} = \tilde{Q}_n U_{n+1}$. Therefore:
+
+$$
+T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}
+$$
+
+This proves the lemma. Since $\tilde{Q}_k$ is unitary, we can rearrange this to $A = \tilde{Q}_k T_k \tilde{Q}_k^H$.
+</pre></div>
+</div>
+<p><strong>Main Proof</strong></p>
+<p>Now we proceed with the main proof for <span class="math notranslate nohighlight">\(A^k = \tilde{Q}_k \tilde{R}_k\)</span>.</p>
+<p><strong>Base Case (k=1)</strong></p>
+<p>We need to show <span class="math notranslate nohighlight">\(A^1 = \tilde{Q}_1 \tilde{R}_1\)</span>.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tilde{Q}_1 = U_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\tilde{R}_1 = R_1\)</span></p></li>
+</ul>
+<p>So we must show <span class="math notranslate nohighlight">\(A = U_1 R_1\)</span>.
+From the first step of the QR iteration (<span class="math notranslate nohighlight">\(k=0\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+T_0 = U_1 R_1
+\]</div>
+<p>By definition, <span class="math notranslate nohighlight">\(T_0 = A\)</span>. Therefore, <span class="math notranslate nohighlight">\(A = U_1 R_1\)</span>.
+The base case holds.</p>
+<p><strong>Inductive Hypothesis</strong></p>
+<p>Assume the statement <span class="math notranslate nohighlight">\(P(n)\)</span> is true for some integer <span class="math notranslate nohighlight">\(n \ge 1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^n = \tilde{Q}_n \tilde{R}_n = (U_1 \cdots U_n) (R_n \cdots R_1)
+\]</div>
+<p><strong>Inductive Step</strong></p>
+<p>We must prove the statement <span class="math notranslate nohighlight">\(P(n+1)\)</span> is true. We want to show <span class="math notranslate nohighlight">\(A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}\)</span>.</p>
+<p>Let’s start with <span class="math notranslate nohighlight">\(A^{n+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^{n+1} = A \cdot A^n
+\]</div>
+<p>Substitute the inductive hypothesis for <span class="math notranslate nohighlight">\(A^n\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A^{n+1} = A \\cdot (\\tilde{Q}\_n \\tilde{R}\_n)
+\end{split}\]</div>
+<p>Now, use our lemma <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span>. For <span class="math notranslate nohighlight">\(k=n\)</span>, we have <span class="math notranslate nohighlight">\(A = \tilde{Q}_n T_n \tilde{Q}_n^H\)</span>. Substitute this for <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A^{n+1} = (\tilde{Q}_n T_n \tilde{Q}_n^H) \cdot (\tilde{Q}_n \tilde{R}_n)
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\tilde{Q}_n\)</span> is a product of unitary matrices, it is also unitary, which means <span class="math notranslate nohighlight">\(\tilde{Q}_n^H \tilde{Q}_n = I\)</span> (the identity matrix).</p>
+<div class="math notranslate nohighlight">
+\[
+A^{n+1} = \tilde{Q}_n T_n (I) \tilde{R}_n = \tilde{Q}_n T_n \tilde{R}_n
+\]</div>
+<p>Now, use the QR algorithm’s definition for <span class="math notranslate nohighlight">\(T_n\)</span>: <span class="math notranslate nohighlight">\(T_n = U_{n+1} R_{n+1}\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+A^{n+1} = \tilde{Q}_n (U_{n+1} R_{n+1}) \tilde{R}_n
+\]</div>
+<p>Regroup the terms using the associativity of matrix multiplication:</p>
+<div class="math notranslate nohighlight">
+\[
+A^{n+1} = (\tilde{Q}_n U_{n+1}) (R_{n+1} \tilde{R}_n)
+\]</div>
+<p>By our definitions:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\((\tilde{Q}_n U_{n+1}) = (U_1 \cdots U_n) U_{n+1} = \tilde{Q}_{n+1}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\((R_{n+1} \tilde{R}_n) = R_{n+1} (R_n \cdots R_1) = \tilde{R}_{n+1}\)</span></p></li>
+</ul>
+<p>Substituting these back, we get:</p>
+<div class="math notranslate nohighlight">
+\[
+A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}
+\]</div>
+<p>This is exactly the statement <span class="math notranslate nohighlight">\(P(n+1)\)</span>.</p>
+<p>We have shown that the statement is true for <span class="math notranslate nohighlight">\(k=1\)</span>, and that if it is true for <span class="math notranslate nohighlight">\(k=n\)</span>, it is also true for <span class="math notranslate nohighlight">\(k=n+1\)</span>.</p>
+<p>Therefore, by the principle of mathematical induction, the statement <span class="math notranslate nohighlight">\(A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)\)</span> is true for all integers <span class="math notranslate nohighlight">\(k \ge 1\)</span>.</p>
+</div>
+</section>
+</section>
+<section id="qr-iteration-algorithm">
+<h2>QR Iteration Algorithm<a class="headerlink" href="#qr-iteration-algorithm" title="Link to this heading">#</a></h2>
+<p>This leads to the following simple algorithm, often called the “unshifted” QR iteration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># We use np.copy() so the original matrix A is not modified</span>
+<span class="n">Tk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># The &#39;not_converged&#39; condition is abstract.</span>
+<span class="c1"># In a real implementation, you would check if the</span>
+<span class="c1"># sub-diagonal elements are all close to zero.</span>
+<span class="c1"># For this example, we&#39;ll just run a fixed number of iterations.</span>
+<span class="n">num_iterations</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
+    <span class="c1"># Step 1: Compute the QR decomposition of the current matrix</span>
+    <span class="c1"># In the derivation&#39;s notation: T_k = U_{k+1} R_{k+1}</span>
+    <span class="c1"># numpy.linalg.qr() returns Q, R (which are Uk, Rk here)</span>
+    <span class="n">Uk</span><span class="p">,</span> <span class="n">Rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Tk</span><span class="p">)</span>
+    
+    <span class="c1"># Step 2: Compute the next matrix by reversing the factors</span>
+    <span class="c1"># In the derivation&#39;s notation: T_{k+1} = R_{k+1} U_{k+1}</span>
+    <span class="c1"># We store the new T_{k+1} back into the Tk variable</span>
+    <span class="c1"># In Python, @ is the operator for matrix multiplication.</span>
+    <span class="n">Tk</span> <span class="o">=</span> <span class="n">Rk</span> <span class="o">@</span> <span class="n">Uk</span>
+</pre></div>
+</div>
+<section id="first-few-iterations">
+<h3>First Few Iterations<a class="headerlink" href="#first-few-iterations" title="Link to this heading">#</a></h3>
+<p>The algorithm produces a sequence of matrices <span class="math notranslate nohighlight">\(T_0, T_1, T_2, \dots\)</span> where <span class="math notranslate nohighlight">\(T_k\)</span> converges to an upper-triangular (Schur) form.</p>
+<ul class="simple">
+<li><p><strong>Start:</strong>
+<span class="math notranslate nohighlight">\(T_0 = A\)</span></p></li>
+<li><p><strong>Iteration 1:</strong></p>
+<ol class="arabic simple">
+<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_0 = U_1 R_1\)</span></p></li>
+<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_1 = R_1 U_1\)</span></p></li>
+</ol>
+</li>
+<li><p><strong>Iteration 2:</strong></p>
+<ol class="arabic simple">
+<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_1 = U_2 R_2\)</span></p></li>
+<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_2 = R_2 U_2\)</span></p></li>
+</ol>
+</li>
+<li><p><strong>Iteration 3:</strong></p>
+<ol class="arabic simple">
+<li><p>Compute QR decomposition: <span class="math notranslate nohighlight">\(T_2 = U_3 R_3\)</span></p></li>
+<li><p>Compute next matrix: <span class="math notranslate nohighlight">\(T_3 = R_3 U_3\)</span></p></li>
+</ol>
+</li>
+<li><p>… and so on.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="computing_the_eigenvectors.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Computing Eigenvectors from the Schur Decomposition</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-from-orthogonal-iteration">Derivation from Orthogonal Iteration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-relate-t-k-to-a-qr-decomposition">Step 1: Relate <span class="math notranslate nohighlight">\(T_k\)</span> to a QR Decomposition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-relate-t-k-1-to-t-k">Step 2: Relate <span class="math notranslate nohighlight">\(T_{k+1}\)</span> to <span class="math notranslate nohighlight">\(T_k\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-the-key-steps">Summary of the Key Steps</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-iteration-algorithm">QR Iteration Algorithm</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-few-iterations">First Few Iterations</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

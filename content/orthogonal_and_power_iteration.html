@@ -228,6 +228,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -405,7 +406,7 @@ AQ_k = Q_{k+1} R_{k+1}
 <p>Define the accumulated upper triangular factor</p>
 <div class="math notranslate nohighlight">
 \[
-\widehat{R}_k \;:=\; R_k R_{k-1}\cdots R_1 \quad (k\ge 1),\qquad \widehat{R}_0 := I_p.
+\widehat{R}_k := R_k R_{k-1}\cdots R_1 \quad (k\ge 1),\qquad \widehat{R}_0 := I_p.
 \]</div>
 <div class="proof theorem admonition" id="thm:AkQR">
 <p class="admonition-title"><span class="caption-number">Theorem 23 </span> (QR of <span class="math notranslate nohighlight">\(A^k Q_0\)</span>)</p>
@@ -413,12 +414,12 @@ AQ_k = Q_{k+1} R_{k+1}
 <p>For all <span class="math notranslate nohighlight">\(k\ge 0\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
-A^k\,Q_0 \;=\; Q_k\,\widehat{R}_k .
+A^k\,Q_0 = Q_k\,\widehat{R}_k .
 \]</div>
 <p>In particular, if <span class="math notranslate nohighlight">\(Q_0=I_n\)</span> (full orthogonal iteration on all of <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>), then</p>
 <div class="math notranslate nohighlight">
 \[
-A^k \;=\; Q_k\,\widehat{R}_k ,
+A^k = Q_k\,\widehat{R}_k ,
 \]</div>
 <p>so <span class="math notranslate nohighlight">\(Q_k\)</span> is the <span class="math notranslate nohighlight">\(Q\)</span>-factor and <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> the <span class="math notranslate nohighlight">\(R\)</span>-factor in the QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
 </section>

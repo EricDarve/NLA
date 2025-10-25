@@ -1,38 +1,26 @@
 # The Orthogonal Iteration Algorithm
 
-The process of finding one eigenvector, building a projector, and repeating is a great theoretical concept, but it's complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the **orthogonal iteration**. This algorithm essentially performs the "power iteration with deflation" on all eigenvectors simultaneously.
+The process of finding one eigenvector, building a projector, and repeating (a method called deflation) is a great theoretical concept, but it's complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the **orthogonal iteration**. This algorithm essentially performs the "power iteration with deflation" on all eigenvectors simultaneously.
 
-The iteration is defined by two simple steps:
+## The Algorithm
 
-1.  **Multiply by $A$:** Apply the matrix $A$ to the current set of orthonormal basis vectors $Q_k$.
+The iteration is defined by two simple steps. We start with an initial $n \times p$ (or $n \times n$) orthogonal matrix $Q_0$ (e.g., from a $QR$ factorization of a random matrix).
 
-    $$
-    Z = A Q_k
-    $$
+For $k = 0, 1, 2, \dots$:
 
-2.  **Re-orthogonalize:** Use the $QR$ factorization to create a new orthonormal basis $Q_{k+1}$ from the resulting vectors $Z$.
+1. **Multiply (Power Step):** Apply the matrix $A$ to the current set of orthonormal basis vectors $Q_k$.
 
-    $$
-    Q_{k+1} R_{k+1} = Z
-    $$
+  $$
+  Z_{k+1} = A Q_k
+  $$
 
-    This step is what performs the implicit deflation.
+2. **Re-orthogonalize (Deflation Step):** Use the $QR$ factorization to create a new orthonormal basis $Q_{k+1}$ from the resulting vectors $Z_{k+1}$.
 
-  * The first column of $Q_{k+1}$ is just the normalized $A \boldsymbol{q}_1$, which is the standard power method.
-  * The second column of $Q_{k+1}$ is the normalized $A \boldsymbol{q}_2$ made orthogonal to $\boldsymbol{q}_1$.
-  * The $j$-th column of $Q_{k+1}$ is the normalized $A \boldsymbol{q}_j$ made orthogonal to $\text{span}\{\boldsymbol{q}_1, \dots, \boldsymbol{q}_{j-1}\}$.
+  $$
+  Q_{k+1} R_{k+1} = Z_{k+1}
+  $$
 
-This directly corresponds to our deflation idea. Column $j$ of $Q_k$ is effectively converging as if it were part of a power iteration on the deflated matrix $P_{ \{\boldsymbol{q}_1, \dots, \boldsymbol{q}_{j-1}\}^\perp } A$.
-
-For simplicity, in this section we will assume that
-
-$$
-|\lambda_1| > \cdots >|\lambda_n| > 0.
-$$
-
-## Algorithm
-
-Here is the complete algorithm, starting from a random orthogonal matrix $Q_0$.
+Here is the complete algorithm in Python:
 
 ```python
 import numpy as np
@@ -40,8 +28,8 @@ import numpy as np
 # Let A be a square matrix of size n x n
 n = A.shape[0]
 
-# Start with a random n x n orthogonal matrix
-Q, _ = np.linalg.qr(np.random.randn(n, n))
+# Start with a random n x p orthogonal matrix
+Q, _ = np.linalg.qr(np.random.randn(n, p))  # or p = n for full size
 
 # Set the number of iterations
 num_iterations = 1000 
@@ -57,24 +45,65 @@ for _ in range(num_iterations):
 # The matrix T = Q.conj().T @ A @ Q will be approximately upper triangular.
 ```
 
-### Convergence
+## How It Works: Implicit Deflation
 
-As $k \to \infty$, $Q_k$ converges to a Schur basis up to diagonal unitary factors (see below for a technical clarification). Equivalently, the ordered one-dimensional subspaces $\operatorname{span}\{q_{k,j}\}$ converge to $\operatorname{span}\{v_j\}$.
+The re-orthogonalization step is the key to the algorithm's power. The QR factorization is equivalent to performing the Gram-Schmidt process on the columns of $Z_{k+1} = [\boldsymbol{z}_1, \dots, \boldsymbol{z}_p]$, where $\boldsymbol{z}_j = A \boldsymbol{q}_{k,j}$.
 
-$Q$ in the Schur decomposition is not unique. If $A = Q T Q^H$, we can define a new $Q' = Q D$, where $D$ is any diagonal matrix with entries $e^{i \theta_j}$ ($\theta_j \in \mathbb R$, $|e^{i \theta_j}|=1$). $Q'$ is still unitary, and 
+Let's look at how the new columns of $Q_{k+1}$ are formed:
+
+* **Column 1:** The first new column, $\boldsymbol{q}_{k+1, 1}$, is just 
+
+  $$\boldsymbol{z}_1 / \|\boldsymbol{z}_1\| = (A \boldsymbol{q}_{k, 1}) / \|A \boldsymbol{q}_{k, 1}\|.$$
+  
+  This is **exactly the standard power method**. It will converge to the dominant eigenvector.
+
+* **Column 2:** The second new column, $\boldsymbol{q}_{k+1, 2}$, is formed by taking $\boldsymbol{z}_2 = A \boldsymbol{q}_{k, 2}$, making it orthogonal to the *newly computed* $\boldsymbol{q}_{k+1, 1}$, and then normalizing it.
+
+* **Column j:** The $j$-th new column, $\boldsymbol{q}_{k+1, j}$, is formed by taking $A \boldsymbol{q}_{k, j}$ and orthogonalizing it against the *entire set of previously computed new vectors*, $\text{span}\{\boldsymbol{q}_{k+1, 1}, \dots, \boldsymbol{q}_{k+1, j-1}\}$.
+
+This process is an **implicit deflation**. By continually removing the components of the more dominant vectors, the algorithm forces the $j$-th column to converge to the $j$-th Schur vector. As a result, the subspace spanned by the first $j$ columns of $Q_k$ converges to the $j$-dimensional dominant invariant subspace.
+
+## Convergence Results
+
+For this analysis, we will use $U$ to denote the true Schur basis from the Schur decomposition $A=UTU^H$, to avoid confusion with the iterate $Q_k$. We also make a simplifying assumption that the eigenvalues are well-separated in magnitude:
 
 $$
-A = (QD) T (QD)^H = Q (DTD^H) Q^H.
-$$ 
+|\lambda_1| > \cdots >|\lambda_n| > 0.
+$$
 
-The new matrix $T' = DTD^H$ is still upper triangular and has the same diagonal as $T$.
+As $k \to \infty$, the matrix $Q_k$ converges to the Schur basis $U$. (Note: This convergence is not to a unique $U$. Since $U$ can be multiplied by any diagonal unitary matrix $D$ and still be a valid Schur basis, we say $Q_k$ converges to $U$ "up to a diagonal unitary matrix.")
 
-Because of this, we cannot rigorously say that $Q_k$ converges to a specific $Q$. Instead, we have to state the convergence more carefully:
+A more general analysis considers using the method to find the $p$ dominant eigenvalues (i.e., $Q_k$ is an $n \times p$ matrix). We can partition the true Schur decomposition as:
 
-* $Q_k$ converges to $Q$ *up to a diagonal unitary matrix*.
-* More simply, the **subspaces converge**. For each $j$ from $1$ to $n$, the subspace spanned by column $j$ of $Q_k$ converges to the subspace spanned by the $j$th Schur vector.
+$$
+U = [U_1 ; U_2], \quad T = \begin{bmatrix} T_{11} & T_{12} \\ 0 & T_{22} \end{bmatrix},
+$$
 
-The angle between these two subspaces goes to 0. See below for a formal definition of the angle between subspaces.
+where $U_1$ contains the first $p$ Schur vectors and $T_{11}$ contains the $p$ dominant eigenvalues.
+
+The key convergence results are as follows:
+
+  * **Subspace Convergence Rate:** The subspace spanned by the iterate, $\text{span}(Q_k)$, converges to the true $p$-dimensional dominant invariant subspace, $\text{span}(U_1)$. The convergence rate is linear and is governed by the ratio of the first "unwanted" eigenvalue ($\lambda_{p+1}$) to the last "wanted" eigenvalue ($\lambda_p$):
+
+    $$
+    \sin \theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1)) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
+    $$
+    
+    *(Here, $\theta_{\max}$ is the largest principal angle between the two subspaces; see below for the exact definition.)*
+
+  * **Ritz Eigenvalue Convergence Rates:** The *Ritz eigenvalues* are the eigenvalues of the $p \times p$ matrix $T_k = Q_k^H A Q_k$. These converge to the true eigenvalues of $A$.
+
+    1.  **Convergence of the Set:** The error for the entire *set* of eigenvalues converges at the same rate as the subspace:
+
+        $$
+        \mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
+        $$
+
+    2.  **Convergence of Individual Eigenvalues:** The convergence for an *individual* Ritz eigenvalue $\mu_i^{(k)}$ to its corresponding true eigenvalue $\lambda_i$ (for $i \le p$) is often much faster. Its rate is determined by the ratio of $|\lambda_{p+1}|$ to that specific eigenvalue's modulus, $|\lambda_i|$:
+
+        $$
+        |\mu_i^{(k)} - \lambda_i| \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_i|} \right)^k
+        $$
 
 ## Proof of Convergence
 
@@ -181,8 +210,11 @@ This means that for each $j$, the subspace spanned by the first $j$ columns of $
 
 ## Second Proof of Convergence
 
+We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation. 
 
-We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation. This proof is more precise but also significantly more technical. It will give us a precise convergence rate for the method depending on the ratio $\lambda_{p+1} / \lambda_p$.
+**This proof is more precise but also significantly more technical and is optional.**
+
+It will give us a precise convergence rate for the method depending on the ratio $\lambda_{p+1} / \lambda_p$.
 
 ```{admonition} Summary of key ideas and results
 :class: tip
@@ -227,8 +259,6 @@ A=U\begin{bmatrix}T_{11}&T_{12}\\0&T_{22}\end{bmatrix}U^H=:U T U^H,
 $$
 
 where the $p\times p$ block $T_{11}$ holds the eigenvalues we want (e.g., the $p$ largest in modulus, or any isolated cluster after a reordering), and $T_{22}$ holds the rest. The convergence we wish to analyze is toward the Schur subspace $\mathcal{U}_1=\operatorname{span}(U_1)$ (columns of $U$ corresponding to $T_{11}$).
-
-*Note:* we will use the notation $U$ below to avoid confusion with $Q_k$.
 
 Write the iterate in Schur coordinates as $Y_k:=U^H Q_k$ and block it
 

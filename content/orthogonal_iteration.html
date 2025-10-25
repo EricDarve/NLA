@@ -228,6 +228,7 @@
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -379,10 +380,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm">Algorithm</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">Convergence</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">The Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works-implicit-deflation">How It Works: Implicit Deflation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-results">Convergence Results</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-convergence">Proof of Convergence</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inductive-proof">The Inductive Proof</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-case-p-1">Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span></a></li>
@@ -416,44 +416,33 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-orthogonal-iteration-algorithm">
 <h1>The Orthogonal Iteration Algorithm<a class="headerlink" href="#the-orthogonal-iteration-algorithm" title="Link to this heading">#</a></h1>
-<p>The process of finding one eigenvector, building a projector, and repeating is a great theoretical concept, but it’s complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the <strong>orthogonal iteration</strong>. This algorithm essentially performs the “power iteration with deflation” on all eigenvectors simultaneously.</p>
-<p>The iteration is defined by two simple steps:</p>
-<ol class="arabic">
-<li><p><strong>Multiply by <span class="math notranslate nohighlight">\(A\)</span>:</strong> Apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to the current set of orthonormal basis vectors <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-    Z = A Q_k
-    \]</div>
-</li>
-<li><p><strong>Re-orthogonalize:</strong> Use the <span class="math notranslate nohighlight">\(QR\)</span> factorization to create a new orthonormal basis <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> from the resulting vectors <span class="math notranslate nohighlight">\(Z\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-    Q_{k+1} R_{k+1} = Z
-    \]</div>
-<p>This step is what performs the implicit deflation.</p>
-</li>
+<p>The process of finding one eigenvector, building a projector, and repeating (a method called deflation) is a great theoretical concept, but it’s complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the <strong>orthogonal iteration</strong>. This algorithm essentially performs the “power iteration with deflation” on all eigenvectors simultaneously.</p>
+<section id="the-algorithm">
+<h2>The Algorithm<a class="headerlink" href="#the-algorithm" title="Link to this heading">#</a></h2>
+<p>The iteration is defined by two simple steps. We start with an initial <span class="math notranslate nohighlight">\(n \times p\)</span> (or <span class="math notranslate nohighlight">\(n \times n\)</span>) orthogonal matrix <span class="math notranslate nohighlight">\(Q_0\)</span> (e.g., from a <span class="math notranslate nohighlight">\(QR\)</span> factorization of a random matrix).</p>
+<p>For <span class="math notranslate nohighlight">\(k = 0, 1, 2, \dots\)</span>:</p>
+<ol class="arabic simple">
+<li><p><strong>Multiply (Power Step):</strong> Apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to the current set of orthonormal basis vectors <span class="math notranslate nohighlight">\(Q_k\)</span>.</p></li>
 </ol>
-<ul class="simple">
-<li><p>The first column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is just the normalized <span class="math notranslate nohighlight">\(A \boldsymbol{q}_1\)</span>, which is the standard power method.</p></li>
-<li><p>The second column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is the normalized <span class="math notranslate nohighlight">\(A \boldsymbol{q}_2\)</span> made orthogonal to <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span>.</p></li>
-<li><p>The <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is the normalized <span class="math notranslate nohighlight">\(A \boldsymbol{q}_j\)</span> made orthogonal to <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_1, \dots, \boldsymbol{q}_{j-1}\}\)</span>.</p></li>
-</ul>
-<p>This directly corresponds to our deflation idea. Column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(Q_k\)</span> is effectively converging as if it were part of a power iteration on the deflated matrix <span class="math notranslate nohighlight">\(P_{ \{\boldsymbol{q}_1, \dots, \boldsymbol{q}_{j-1}\}^\perp } A\)</span>.</p>
-<p>For simplicity, in this section we will assume that</p>
 <div class="math notranslate nohighlight">
 \[
-|\lambda_1| &gt; \cdots &gt;|\lambda_n| &gt; 0.
-\]</div>
-<section id="algorithm">
-<h2>Algorithm<a class="headerlink" href="#algorithm" title="Link to this heading">#</a></h2>
-<p>Here is the complete algorithm, starting from a random orthogonal matrix <span class="math notranslate nohighlight">\(Q_0\)</span>.</p>
+  Z_{k+1} = A Q_k
+  \]</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Re-orthogonalize (Deflation Step):</strong> Use the <span class="math notranslate nohighlight">\(QR\)</span> factorization to create a new orthonormal basis <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> from the resulting vectors <span class="math notranslate nohighlight">\(Z_{k+1}\)</span>.</p></li>
+</ol>
+<div class="math notranslate nohighlight">
+\[
+  Q_{k+1} R_{k+1} = Z_{k+1}
+  \]</div>
+<p>Here is the complete algorithm in Python:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="c1"># Let A be a square matrix of size n x n</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="c1"># Start with a random n x n orthogonal matrix</span>
-<span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="c1"># Start with a random n x p orthogonal matrix</span>
+<span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>  <span class="c1"># or p = n for full size</span>
 
 <span class="c1"># Set the number of iterations</span>
 <span class="n">num_iterations</span> <span class="o">=</span> <span class="mi">1000</span> 
@@ -469,22 +458,62 @@ document.write(`
 <span class="c1"># The matrix T = Q.conj().T @ A @ Q will be approximately upper triangular.</span>
 </pre></div>
 </div>
-<section id="convergence">
-<h3>Convergence<a class="headerlink" href="#convergence" title="Link to this heading">#</a></h3>
-<p>As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, <span class="math notranslate nohighlight">\(Q_k\)</span> converges to a Schur basis up to diagonal unitary factors (see below for a technical clarification). Equivalently, the ordered one-dimensional subspaces <span class="math notranslate nohighlight">\(\operatorname{span}\{q_{k,j}\}\)</span> converge to <span class="math notranslate nohighlight">\(\operatorname{span}\{v_j\}\)</span>.</p>
-<p><span class="math notranslate nohighlight">\(Q\)</span> in the Schur decomposition is not unique. If <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, we can define a new <span class="math notranslate nohighlight">\(Q' = Q D\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is any diagonal matrix with entries <span class="math notranslate nohighlight">\(e^{i \theta_j}\)</span> (<span class="math notranslate nohighlight">\(\theta_j \in \mathbb R\)</span>, <span class="math notranslate nohighlight">\(|e^{i \theta_j}|=1\)</span>). <span class="math notranslate nohighlight">\(Q'\)</span> is still unitary, and</p>
+</section>
+<section id="how-it-works-implicit-deflation">
+<h2>How It Works: Implicit Deflation<a class="headerlink" href="#how-it-works-implicit-deflation" title="Link to this heading">#</a></h2>
+<p>The re-orthogonalization step is the key to the algorithm’s power. The QR factorization is equivalent to performing the Gram-Schmidt process on the columns of <span class="math notranslate nohighlight">\(Z_{k+1} = [\boldsymbol{z}_1, \dots, \boldsymbol{z}_p]\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol{z}_j = A \boldsymbol{q}_{k,j}\)</span>.</p>
+<p>Let’s look at how the new columns of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> are formed:</p>
+<ul>
+<li><p><strong>Column 1:</strong> The first new column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 1}\)</span>, is just</p>
+<div class="math notranslate nohighlight">
+\[\boldsymbol{z}_1 / \|\boldsymbol{z}_1\| = (A \boldsymbol{q}_{k, 1}) / \|A \boldsymbol{q}_{k, 1}\|.\]</div>
+<p>This is <strong>exactly the standard power method</strong>. It will converge to the dominant eigenvector.</p>
+</li>
+<li><p><strong>Column 2:</strong> The second new column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 2}\)</span>, is formed by taking <span class="math notranslate nohighlight">\(\boldsymbol{z}_2 = A \boldsymbol{q}_{k, 2}\)</span>, making it orthogonal to the <em>newly computed</em> <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 1}\)</span>, and then normalizing it.</p></li>
+<li><p><strong>Column j:</strong> The <span class="math notranslate nohighlight">\(j\)</span>-th new column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, j}\)</span>, is formed by taking <span class="math notranslate nohighlight">\(A \boldsymbol{q}_{k, j}\)</span> and orthogonalizing it against the <em>entire set of previously computed new vectors</em>, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k+1, 1}, \dots, \boldsymbol{q}_{k+1, j-1}\}\)</span>.</p></li>
+</ul>
+<p>This process is an <strong>implicit deflation</strong>. By continually removing the components of the more dominant vectors, the algorithm forces the <span class="math notranslate nohighlight">\(j\)</span>-th column to converge to the <span class="math notranslate nohighlight">\(j\)</span>-th Schur vector. As a result, the subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the <span class="math notranslate nohighlight">\(j\)</span>-dimensional dominant invariant subspace.</p>
+</section>
+<section id="convergence-results">
+<h2>Convergence Results<a class="headerlink" href="#convergence-results" title="Link to this heading">#</a></h2>
+<p>For this analysis, we will use <span class="math notranslate nohighlight">\(U\)</span> to denote the true Schur basis from the Schur decomposition <span class="math notranslate nohighlight">\(A=UTU^H\)</span>, to avoid confusion with the iterate <span class="math notranslate nohighlight">\(Q_k\)</span>. We also make a simplifying assumption that the eigenvalues are well-separated in magnitude:</p>
 <div class="math notranslate nohighlight">
 \[
-A = (QD) T (QD)^H = Q (DTD^H) Q^H.
+|\lambda_1| &gt; \cdots &gt;|\lambda_n| &gt; 0.
 \]</div>
-<p>The new matrix <span class="math notranslate nohighlight">\(T' = DTD^H\)</span> is still upper triangular and has the same diagonal as <span class="math notranslate nohighlight">\(T\)</span>.</p>
-<p>Because of this, we cannot rigorously say that <span class="math notranslate nohighlight">\(Q_k\)</span> converges to a specific <span class="math notranslate nohighlight">\(Q\)</span>. Instead, we have to state the convergence more carefully:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(Q_k\)</span> converges to <span class="math notranslate nohighlight">\(Q\)</span> <em>up to a diagonal unitary matrix</em>.</p></li>
-<li><p>More simply, the <strong>subspaces converge</strong>. For each <span class="math notranslate nohighlight">\(j\)</span> from <span class="math notranslate nohighlight">\(1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>, the subspace spanned by column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the subspace spanned by the <span class="math notranslate nohighlight">\(j\)</span>th Schur vector.</p></li>
+<p>As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the matrix <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur basis <span class="math notranslate nohighlight">\(U\)</span>. (Note: This convergence is not to a unique <span class="math notranslate nohighlight">\(U\)</span>. Since <span class="math notranslate nohighlight">\(U\)</span> can be multiplied by any diagonal unitary matrix <span class="math notranslate nohighlight">\(D\)</span> and still be a valid Schur basis, we say <span class="math notranslate nohighlight">\(Q_k\)</span> converges to <span class="math notranslate nohighlight">\(U\)</span> “up to a diagonal unitary matrix.”)</p>
+<p>A more general analysis considers using the method to find the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues (i.e., <span class="math notranslate nohighlight">\(Q_k\)</span> is an <span class="math notranslate nohighlight">\(n \times p\)</span> matrix). We can partition the true Schur decomposition as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+U = [U_1 ; U_2], \quad T = \begin{bmatrix} T_{11} &amp; T_{12} \\ 0 &amp; T_{22} \end{bmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(U_1\)</span> contains the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors and <span class="math notranslate nohighlight">\(T_{11}\)</span> contains the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues.</p>
+<p>The key convergence results are as follows:</p>
+<ul>
+<li><p><strong>Subspace Convergence Rate:</strong> The subspace spanned by the iterate, <span class="math notranslate nohighlight">\(\text{span}(Q_k)\)</span>, converges to the true <span class="math notranslate nohighlight">\(p\)</span>-dimensional dominant invariant subspace, <span class="math notranslate nohighlight">\(\text{span}(U_1)\)</span>. The convergence rate is linear and is governed by the ratio of the first “unwanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>) to the last “wanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_p\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+    \sin \theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1)) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
+    \]</div>
+<p><em>(Here, <span class="math notranslate nohighlight">\(\theta_{\max}\)</span> is the largest principal angle between the two subspaces; see below for the exact definition.)</em></p>
+</li>
+<li><p><strong>Ritz Eigenvalue Convergence Rates:</strong> The <em>Ritz eigenvalues</em> are the eigenvalues of the <span class="math notranslate nohighlight">\(p \times p\)</span> matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>. These converge to the true eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Convergence of the Set:</strong> The error for the entire <em>set</em> of eigenvalues converges at the same rate as the subspace:</p>
+<div class="math notranslate nohighlight">
+\[
+        \mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
+        \]</div>
+</li>
+<li><p><strong>Convergence of Individual Eigenvalues:</strong> The convergence for an <em>individual</em> Ritz eigenvalue <span class="math notranslate nohighlight">\(\mu_i^{(k)}\)</span> to its corresponding true eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span> (for <span class="math notranslate nohighlight">\(i \le p\)</span>) is often much faster. Its rate is determined by the ratio of <span class="math notranslate nohighlight">\(|\lambda_{p+1}|\)</span> to that specific eigenvalue’s modulus, <span class="math notranslate nohighlight">\(|\lambda_i|\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+        |\mu_i^{(k)} - \lambda_i| \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_i|} \right)^k
+        \]</div>
+</li>
+</ol>
+</li>
 </ul>
-<p>The angle between these two subspaces goes to 0. See below for a formal definition of the angle between subspaces.</p>
-</section>
 </section>
 <section id="proof-of-convergence">
 <h2>Proof of Convergence<a class="headerlink" href="#proof-of-convergence" title="Link to this heading">#</a></h2>
@@ -573,7 +602,9 @@ Q_k = [\boldsymbol{q}_{k,1} | \dots | \boldsymbol{q}_{k,n}]
 </section>
 <section id="second-proof-of-convergence">
 <h2>Second Proof of Convergence<a class="headerlink" href="#second-proof-of-convergence" title="Link to this heading">#</a></h2>
-<p>We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation. This proof is more precise but also significantly more technical. It will give us a precise convergence rate for the method depending on the ratio <span class="math notranslate nohighlight">\(\lambda_{p+1} / \lambda_p\)</span>.</p>
+<p>We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation.</p>
+<p><strong>This proof is more precise but also significantly more technical and is optional.</strong></p>
+<p>It will give us a precise convergence rate for the method depending on the ratio <span class="math notranslate nohighlight">\(\lambda_{p+1} / \lambda_p\)</span>.</p>
 <div class="tip admonition">
 <p class="admonition-title">Summary of key ideas and results</p>
 <ul class="simple">
@@ -617,7 +648,6 @@ Z_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Z_{k+1}).
 A=U\begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix}U^H=:U T U^H,
 \end{split}\]</div>
 <p>where the <span class="math notranslate nohighlight">\(p\times p\)</span> block <span class="math notranslate nohighlight">\(T_{11}\)</span> holds the eigenvalues we want (e.g., the <span class="math notranslate nohighlight">\(p\)</span> largest in modulus, or any isolated cluster after a reordering), and <span class="math notranslate nohighlight">\(T_{22}\)</span> holds the rest. The convergence we wish to analyze is toward the Schur subspace <span class="math notranslate nohighlight">\(\mathcal{U}_1=\operatorname{span}(U_1)\)</span> (columns of <span class="math notranslate nohighlight">\(U\)</span> corresponding to <span class="math notranslate nohighlight">\(T_{11}\)</span>).</p>
-<p><em>Note:</em> we will use the notation <span class="math notranslate nohighlight">\(U\)</span> below to avoid confusion with <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
 <p>Write the iterate in Schur coordinates as <span class="math notranslate nohighlight">\(Y_k:=U^H Q_k\)</span> and block it</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -941,10 +971,9 @@ T_k \;=\; T_{11} + \Delta_k,
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm">Algorithm</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">Convergence</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">The Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works-implicit-deflation">How It Works: Implicit Deflation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-results">Convergence Results</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-convergence">Proof of Convergence</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inductive-proof">The Inductive Proof</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-case-p-1">Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span></a></li>
