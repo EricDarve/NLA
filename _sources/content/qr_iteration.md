@@ -18,6 +18,8 @@ $$
 
 Our goal is to find a way to compute $T_{k+1}$ directly from $T_k$ without needing to compute $A$ or the full $Q_k$ matrices.
 
+For the method of QR iteration, the matrix $Q_k$ is assumed to be **square** (i.e., we are computing all eigenvalues of a square matrix $A$).
+
 ## Derivation from Orthogonal Iteration
 
 The derivation proceeds in two main steps.
@@ -130,13 +132,14 @@ Let $A$ be a square matrix. Let the sequences of matrices $\{T_k\}$, $\{U_k\}$, 
     * Compute the QR decomposition: $T_k = U_{k+1} R_{k+1}$
     * Compute the next iterate: $T_{k+1} = R_{k+1} U_{k+1}$
 
-Where $U_{k+1}$ is a unitary matrix and $R_{k+1}$ is an upper triangular matrix.
+where $U_{k+1}$ is a unitary matrix and $R_{k+1}$ is an upper triangular matrix.
 
 If we define the product matrices $\tilde{Q}_k$ and $\tilde{R}_k$ as:
 * $\tilde{Q}_k = U_1 U_2 \cdots U_k$
 * $\tilde{R}_k = R_k R_{k-1} \cdots R_1$
 
 Then for any integer $k \ge 1$, the $k$-th power of the matrix $A$ is given by:
+
 $$
 A^k = \tilde{Q}_k \tilde{R}_k
 $$
@@ -172,7 +175,7 @@ Because $U_1$ is unitary, $U_1^H = U_1^{-1}$, so we can write $R_1 = U_1^H A$.
 Substitute this into the equation for $T_1$:
 
 $$
-T\_1 = (U\_1^H A) U\_1 = U\_1^H A U\_1
+T_1 = (U_1^H A) U_1 = U_1^H A U_1
 $$
 
 By definition, $\tilde{Q}_1 = U_1$, so $T_1 = \tilde{Q}_1^H A \tilde{Q}_1$. The base case holds.
@@ -193,29 +196,29 @@ $$
 
 Now, substitute the inductive hypothesis for $T_n$:
 
-    $$
-    T_{n+1} = U_{n+1}^H (\tilde{Q}_n^H A \tilde{Q}_n) U_{n+1}
-    $$
-    
-    Grouping the terms:
+$$
+T_{n+1} = U_{n+1}^H (\tilde{Q}_n^H A \tilde{Q}_n) U_{n+1}
+$$
 
-    $$
-    T_{n+1} = (U_{n+1}^H \tilde{Q}_n^H) A (\tilde{Q}_n U_{n+1})
-    $$
-    
-    Using the property $(BC)^H = C^H B^H$, we get:
+Grouping the terms:
 
-    $$
-    T_{n+1} = (\tilde{Q}_n U_{n+1})^H A (\tilde{Q}_n U_{n+1})
-    $$
-    
-    By definition, $\tilde{Q}_{n+1} = \tilde{Q}_n U_{n+1}$. Therefore:
+$$
+T_{n+1} = (U_{n+1}^H \tilde{Q}_n^H) A (\tilde{Q}_n U_{n+1})
+$$
 
-    $$
-    T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}
-    $$
-    
-    This proves the lemma. Since $\tilde{Q}_k$ is unitary, we can rearrange this to $A = \tilde{Q}_k T_k \tilde{Q}_k^H$.
+Using the property $(BC)^H = C^H B^H$, we get:
+
+$$
+T_{n+1} = (\tilde{Q}_n U_{n+1})^H A (\tilde{Q}_n U_{n+1})
+$$
+
+By definition, $\tilde{Q}_{n+1} = \tilde{Q}_n U_{n+1}$. Therefore:
+
+$$
+T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}
+$$
+
+This proves the lemma. Since $\tilde{Q}_k$ is unitary, we can rearrange this to $A = \tilde{Q}_k T_k \tilde{Q}_k^H$.
 
 **Main Proof**
 
@@ -259,7 +262,7 @@ $$
 Substitute the inductive hypothesis for $A^n$:
 
 $$
-A^{n+1} = A \\cdot (\\tilde{Q}\_n \\tilde{R}\_n)
+A^{n+1} = A \cdot (\tilde{Q}_n \tilde{R}_n)
 $$
 
 Now, use our lemma $A = \tilde{Q}_k T_k \tilde{Q}_k^H$. For $k=n$, we have $A = \tilde{Q}_n T_n \tilde{Q}_n^H$. Substitute this for $A$:
@@ -299,9 +302,7 @@ $$
 
 This is exactly the statement $P(n+1)$.
 
-We have shown that the statement is true for $k=1$, and that if it is true for $k=n$, it is also true for $k=n+1$.
-
-Therefore, by the principle of mathematical induction, the statement $A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)$ is true for all integers $k \ge 1$.
+We have shown that the statement is true for $k=1$, and that if it is true for $k=n$, it is also true for $k=n+1$. Therefore, by induction, the statement $A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)$ is true for all integers $k \ge 1$.
 ```
 
 ## QR Iteration Algorithm

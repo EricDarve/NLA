@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -416,6 +416,7 @@ T_k = Q_k^H A Q_k
 T_{k+1} = Q_{k+1}^H A Q_{k+1}
 \]</div>
 <p>Our goal is to find a way to compute <span class="math notranslate nohighlight">\(T_{k+1}\)</span> directly from <span class="math notranslate nohighlight">\(T_k\)</span> without needing to compute <span class="math notranslate nohighlight">\(A\)</span> or the full <span class="math notranslate nohighlight">\(Q_k\)</span> matrices.</p>
+<p>For the method of QR iteration, the matrix <span class="math notranslate nohighlight">\(Q_k\)</span> is assumed to be <strong>square</strong> (i.e., we are computing all eigenvalues of a square matrix <span class="math notranslate nohighlight">\(A\)</span>).</p>
 <section id="derivation-from-orthogonal-iteration">
 <h2>Derivation from Orthogonal Iteration<a class="headerlink" href="#derivation-from-orthogonal-iteration" title="Link to this heading">#</a></h2>
 <p>The derivation proceeds in two main steps.</p>
@@ -511,16 +512,17 @@ A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1).
 </ul>
 </li>
 </ol>
-<p>Where <span class="math notranslate nohighlight">\(U_{k+1}\)</span> is a unitary matrix and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is an upper triangular matrix.</p>
+<p>where <span class="math notranslate nohighlight">\(U_{k+1}\)</span> is a unitary matrix and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is an upper triangular matrix.</p>
 <p>If we define the product matrices <span class="math notranslate nohighlight">\(\tilde{Q}_k\)</span> and <span class="math notranslate nohighlight">\(\tilde{R}_k\)</span> as:</p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(\tilde{Q}_k = U_1 U_2 \cdots U_k\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\tilde{R}_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
 </ul>
-<p>Then for any integer <span class="math notranslate nohighlight">\(k \ge 1\)</span>, the <span class="math notranslate nohighlight">\(k\)</span>-th power of the matrix <span class="math notranslate nohighlight">\(A\)</span> is given by:
-$<span class="math notranslate nohighlight">\(
+<p>Then for any integer <span class="math notranslate nohighlight">\(k \ge 1\)</span>, the <span class="math notranslate nohighlight">\(k\)</span>-th power of the matrix <span class="math notranslate nohighlight">\(A\)</span> is given by:</p>
+<div class="math notranslate nohighlight">
+\[
 A^k = \tilde{Q}_k \tilde{R}_k
-\)</span>$</p>
+\]</div>
 </section>
 </div><p>Here is a direct proof of the selected result using mathematical induction.</p>
 <div class="proof admonition" id="proof">
@@ -546,7 +548,7 @@ P(k): \quad A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)
 Substitute this into the equation for <span class="math notranslate nohighlight">\(T_1\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-T\_1 = (U\_1^H A) U\_1 = U\_1^H A U\_1
+T_1 = (U_1^H A) U_1 = U_1^H A U_1
 \]</div>
 <p>By definition, <span class="math notranslate nohighlight">\(\tilde{Q}_1 = U_1\)</span>, so <span class="math notranslate nohighlight">\(T_1 = \tilde{Q}_1^H A \tilde{Q}_1\)</span>. The base case holds.</p>
 <ul class="simple">
@@ -561,31 +563,26 @@ T\_1 = (U\_1^H A) U\_1 = U\_1^H A U\_1
 T_{n+1} = (U_{n+1}^H T_n) U_{n+1} = U_{n+1}^H T_n U_{n+1}
 \]</div>
 <p>Now, substitute the inductive hypothesis for <span class="math notranslate nohighlight">\(T_n\)</span>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$$
+<div class="math notranslate nohighlight">
+\[
 T_{n+1} = U_{n+1}^H (\tilde{Q}_n^H A \tilde{Q}_n) U_{n+1}
-$$
-
-Grouping the terms:
-
-$$
+\]</div>
+<p>Grouping the terms:</p>
+<div class="math notranslate nohighlight">
+\[
 T_{n+1} = (U_{n+1}^H \tilde{Q}_n^H) A (\tilde{Q}_n U_{n+1})
-$$
-
-Using the property $(BC)^H = C^H B^H$, we get:
-
-$$
+\]</div>
+<p>Using the property <span class="math notranslate nohighlight">\((BC)^H = C^H B^H\)</span>, we get:</p>
+<div class="math notranslate nohighlight">
+\[
 T_{n+1} = (\tilde{Q}_n U_{n+1})^H A (\tilde{Q}_n U_{n+1})
-$$
-
-By definition, $\tilde{Q}_{n+1} = \tilde{Q}_n U_{n+1}$. Therefore:
-
-$$
+\]</div>
+<p>By definition, <span class="math notranslate nohighlight">\(\tilde{Q}_{n+1} = \tilde{Q}_n U_{n+1}\)</span>. Therefore:</p>
+<div class="math notranslate nohighlight">
+\[
 T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}
-$$
-
-This proves the lemma. Since $\tilde{Q}_k$ is unitary, we can rearrange this to $A = \tilde{Q}_k T_k \tilde{Q}_k^H$.
-</pre></div>
-</div>
+\]</div>
+<p>This proves the lemma. Since <span class="math notranslate nohighlight">\(\tilde{Q}_k\)</span> is unitary, we can rearrange this to <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span>.</p>
 <p><strong>Main Proof</strong></p>
 <p>Now we proceed with the main proof for <span class="math notranslate nohighlight">\(A^k = \tilde{Q}_k \tilde{R}_k\)</span>.</p>
 <p><strong>Base Case (k=1)</strong></p>
@@ -617,9 +614,9 @@ A^{n+1} = A \cdot A^n
 \]</div>
 <p>Substitute the inductive hypothesis for <span class="math notranslate nohighlight">\(A^n\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-A^{n+1} = A \\cdot (\\tilde{Q}\_n \\tilde{R}\_n)
-\end{split}\]</div>
+\[
+A^{n+1} = A \cdot (\tilde{Q}_n \tilde{R}_n)
+\]</div>
 <p>Now, use our lemma <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span>. For <span class="math notranslate nohighlight">\(k=n\)</span>, we have <span class="math notranslate nohighlight">\(A = \tilde{Q}_n T_n \tilde{Q}_n^H\)</span>. Substitute this for <span class="math notranslate nohighlight">\(A\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -651,8 +648,7 @@ A^{n+1} = (\tilde{Q}_n U_{n+1}) (R_{n+1} \tilde{R}_n)
 A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}
 \]</div>
 <p>This is exactly the statement <span class="math notranslate nohighlight">\(P(n+1)\)</span>.</p>
-<p>We have shown that the statement is true for <span class="math notranslate nohighlight">\(k=1\)</span>, and that if it is true for <span class="math notranslate nohighlight">\(k=n\)</span>, it is also true for <span class="math notranslate nohighlight">\(k=n+1\)</span>.</p>
-<p>Therefore, by the principle of mathematical induction, the statement <span class="math notranslate nohighlight">\(A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)\)</span> is true for all integers <span class="math notranslate nohighlight">\(k \ge 1\)</span>.</p>
+<p>We have shown that the statement is true for <span class="math notranslate nohighlight">\(k=1\)</span>, and that if it is true for <span class="math notranslate nohighlight">\(k=n\)</span>, it is also true for <span class="math notranslate nohighlight">\(k=n+1\)</span>. Therefore, by induction, the statement <span class="math notranslate nohighlight">\(A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)\)</span> is true for all integers <span class="math notranslate nohighlight">\(k \ge 1\)</span>.</p>
 </div>
 </section>
 </section>
