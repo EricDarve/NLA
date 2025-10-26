@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Determinant &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Reduction to Hessenberg Form &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -32,9 +32,9 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css?v=b4b7a797" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/determinants';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/upper_hessenberg';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Trace of a Matrix" href="trace.html" />
-    <link rel="prev" title="The Sherman-Morrison-Woodbury Formula" href="sherman_morrison_woodbury.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="QR Iteration" href="qr_iteration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,14 +177,14 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
@@ -221,7 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
@@ -229,7 +229,7 @@
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Reduction to Hessenberg Form</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -287,7 +287,7 @@
       
       
       
-      <li><a href="../_sources/content/determinants.md" target="_blank"
+      <li><a href="../_sources/content/upper_hessenberg.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -371,7 +371,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Determinant</h1>
+    <h1>Reduction to Hessenberg Form</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -381,9 +381,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-upper-hessenberg-form">Why Upper Hessenberg Form?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-reduction-works">How the Reduction Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
 </ul>
             </nav>
         </div>
@@ -395,43 +395,94 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="the-determinant">
-<h1>The Determinant<a class="headerlink" href="#the-determinant" title="Link to this heading">#</a></h1>
-<p>The <strong>determinant</strong> is a fundamental concept in linear algebra that associates a single scalar value with every square matrix. This value, denoted as <span class="math notranslate nohighlight">\(\det(A)\)</span> or <span class="math notranslate nohighlight">\(|A|\)</span>, encapsulates important properties of the matrix and the linear transformation it represents. It can be uniquely defined by four key properties.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="reduction-to-hessenberg-form">
+<h1>Reduction to Hessenberg Form<a class="headerlink" href="#reduction-to-hessenberg-form" title="Link to this heading">#</a></h1>
+<p>The standard QR iteration algorithm, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> requires <span class="math notranslate nohighlight">\(O(n^3)\)</span> floating-point operations (flops). If the iteration takes <span class="math notranslate nohighlight">\(k\)</span> steps to converge, the total cost would be <span class="math notranslate nohighlight">\(O(k \cdot n^3)\)</span>, which is not competitive.</p>
+<p>The key to making the QR iteration practical is to first reduce the matrix <span class="math notranslate nohighlight">\(A\)</span> to a form that is “cheaper” to iterate on, without changing its eigenvalues. This is a classic two-phase approach:</p>
 <ol class="arabic simple">
-<li><p><strong>Identity Matrix</strong>: The determinant of the identity matrix is 1, i.e., <span class="math notranslate nohighlight">\(\det(I) = 1\)</span>.</p></li>
-<li><p><strong>Column Swaps</strong>: Exchanging two columns of a matrix multiplies its determinant by -1.</p></li>
-<li><p><strong>Scalar Multiplication</strong>: Multiplying a single column by a scalar <span class="math notranslate nohighlight">\(\alpha\)</span> multiplies the entire determinant by <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
-<li><p><strong>Column Operations</strong>: Adding a multiple of one column to another column does not change the determinant.</p></li>
+<li><p><strong>Phase 1 (Reduction):</strong> Transform <span class="math notranslate nohighlight">\(A\)</span> into an <strong>upper Hessenberg matrix</strong> <span class="math notranslate nohighlight">\(H\)</span> via a similarity transformation. This is a one-time cost of <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>
+<li><p><strong>Phase 2 (Iteration):</strong> Apply the QR iteration directly to <span class="math notranslate nohighlight">\(H\)</span>. Since <span class="math notranslate nohighlight">\(H\)</span> has a special structure, this phase is much faster, costing only <span class="math notranslate nohighlight">\(O(n^2)\)</span> per iteration.</p></li>
 </ol>
-<section id="the-leibniz-formula">
-<h2>The Leibniz Formula<a class="headerlink" href="#the-leibniz-formula" title="Link to this heading">#</a></h2>
-<p>While the properties above define the determinant, it can be calculated explicitly using the <strong>Leibniz formula</strong>. This formula sums over all possible permutations of the matrix’s column indices.</p>
+<p>The total cost becomes <span class="math notranslate nohighlight">\(O(n^3 + k \cdot n^2)\)</span>, a dramatic improvement over <span class="math notranslate nohighlight">\(O(k \cdot n^3)\)</span>.</p>
+<section id="why-upper-hessenberg-form">
+<h2>Why Upper Hessenberg Form?<a class="headerlink" href="#why-upper-hessenberg-form" title="Link to this heading">#</a></h2>
+<p>An <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(H\)</span> is <strong>upper Hessenberg</strong> if all its entries below the first subdiagonal are zero. That is, <span class="math notranslate nohighlight">\(h_{ij} = 0\)</span> for all <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H = \begin{pmatrix}
+h_{11} &amp; h_{12} &amp; h_{13} &amp; \cdots &amp; h_{1n} \\
+h_{21} &amp; h_{22} &amp; h_{23} &amp; \cdots &amp; h_{2n} \\
+0 &amp; h_{32} &amp; h_{33} &amp; \cdots &amp; h_{3n} \\
+\vdots &amp; \ddots &amp; \ddots &amp; \ddots &amp; \vdots \\
+0 &amp; \cdots &amp; 0 &amp; h_{n,n-1} &amp; h_{nn}
+\end{pmatrix}
+\end{split}\]</div>
+<p>This form is the ideal compromise for the QR iteration for two critical reasons:</p>
+<ol class="arabic simple">
+<li><p><strong>It is computationally cheap to obtain.</strong> As we will see, we can compute an orthogonal <span class="math notranslate nohighlight">\(Q\)</span> such that <span class="math notranslate nohighlight">\(H = Q A Q^T\)</span> in <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops. This is far cheaper than the iterative process required for a full <strong>Schur decomposition</strong> (which produces an upper triangular matrix).</p></li>
+<li><p><strong>It is invariant under the QR iteration.</strong> If <span class="math notranslate nohighlight">\(H_k\)</span> is upper Hessenberg, we compute its QR factorization <span class="math notranslate nohighlight">\(H_k = Q_k R_k\)</span>. The subsequent “reverse multiplication” step, <span class="math notranslate nohighlight">\(H_{k+1} = R_k Q_k\)</span>, also produces an upper Hessenberg matrix. This “preservation of form” is essential.</p></li>
+<li><p><strong>The QR factorization is fast.</strong> Computing the QR factorization of an <span class="math notranslate nohighlight">\(n \times n\)</span> upper Hessenberg matrix does not require <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops. It can be done in <span class="math notranslate nohighlight">\(O(n^2)\)</span> time, for example, by using a sequence of <span class="math notranslate nohighlight">\(n-1\)</span> <strong>Givens rotations</strong> to eliminate the subdiagonal elements.</p></li>
+</ol>
+</section>
+<section id="how-the-reduction-works">
+<h2>How the Reduction Works<a class="headerlink" href="#how-the-reduction-works" title="Link to this heading">#</a></h2>
+<p>Our goal is to find an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> such that <span class="math notranslate nohighlight">\(H = Q A Q^T\)</span> is upper Hessenberg. This is a <strong>unitary similarity transformation</strong>, which is critical because it <strong>preserves the eigenvalues</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>We cannot introduce all the necessary zeros at once. Instead, we build <span class="math notranslate nohighlight">\(Q\)</span> as a product of <span class="math notranslate nohighlight">\(n-2\)</span> <strong>Householder reflectors</strong>, <span class="math notranslate nohighlight">\(Q = Q_{n-2} \cdots Q_2 Q_1\)</span>. The process works column by column.</p>
+<p><strong>Step 1: The First Column</strong></p>
+<p>We want to introduce zeros in the first column below the subdiagonal, i.e., in entries <span class="math notranslate nohighlight">\((3, 1), (4, 1), \dots, (n, 1)\)</span>.</p>
+<p>Find a Householder reflector, <span class="math notranslate nohighlight">\(Q_1\)</span>, that operates on rows 2 through <span class="math notranslate nohighlight">\(n\)</span>. This <span class="math notranslate nohighlight">\(Q_1\)</span> is constructed to zero out the desired elements in the first column, exactly as in a standard Householder QR factorization.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q_1 A = \begin{pmatrix}
+a_{11}' &amp; a_{12}' &amp; \cdots &amp; a_{1n}' \\
+a_{21}' &amp; a_{22}' &amp; \cdots &amp; a_{2n}' \\
+0 &amp; a_{32}' &amp; \cdots &amp; a_{3n}' \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; a_{n2}' &amp; \cdots &amp; a_{nn}'
+\end{pmatrix}
+\end{split}\]</div>
+<ol class="arabic simple">
+<li><p>Now, to maintain a similarity transformation, we <em>must</em> apply the reflector from the right: <span class="math notranslate nohighlight">\(A' = (Q_1 A) Q_1^T\)</span>. (Note: Householder reflectors are symmetric, so <span class="math notranslate nohighlight">\(Q_1^T = Q_1\)</span>).</p></li>
+<li><p>Because <span class="math notranslate nohighlight">\(Q_1\)</span> only operates on rows/columns 2 through <span class="math notranslate nohighlight">\(n\)</span>, this right-multiplication <span class="math notranslate nohighlight">\(A' Q_1^T\)</span> only mixes columns 2 through <span class="math notranslate nohighlight">\(n\)</span>. It <strong>does not affect the first column</strong>, so the zeros we just created are preserved.</p></li>
+</ol>
+<p><strong>Step 2: The Second Column</strong></p>
+<p>Our new matrix <span class="math notranslate nohighlight">\(A' = Q_1 A Q_1^T\)</span> has the desired first column. We now move to the second column and aim to zero out entries <span class="math notranslate nohighlight">\((4, 2), \dots, (n, 2)\)</span>.</p>
+<ol class="arabic simple">
+<li><p>We find a new Householder reflector, <span class="math notranslate nohighlight">\(Q_2\)</span>, that operates on rows 3 through <span class="math notranslate nohighlight">\(n\)</span>.</p></li>
+<li><p>We apply it from the left and right: <span class="math notranslate nohighlight">\(A'' = Q_2 A' Q_2^T\)</span>.</p></li>
+<li><p>The left-multiplication <span class="math notranslate nohighlight">\(Q_2 A'\)</span> creates the zeros in the second column.</p></li>
+<li><p>The right-multiplication <span class="math notranslate nohighlight">\(A'' Q_2^T\)</span> only affects columns 3 through <span class="math notranslate nohighlight">\(n\)</span>. It does not destroy the zeros in the first column or the newly created zeros in the second column.</p></li>
+</ol>
+<p><strong>Continuing the Process</strong></p>
+<p>We repeat this process for a total of <span class="math notranslate nohighlight">\(n-2\)</span> steps. At step <span class="math notranslate nohighlight">\(k\)</span>, we use a reflector <span class="math notranslate nohighlight">\(Q_k\)</span> that operates on rows/columns <span class="math notranslate nohighlight">\(k+1\)</span> through <span class="math notranslate nohighlight">\(n\)</span> to introduce zeros in the <span class="math notranslate nohighlight">\(k\)</span>-th column.</p>
+<p>The final matrix is:</p>
 <div class="math notranslate nohighlight">
 \[
-\det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma)
-a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
+H = Q_{n-2} \cdots Q_2 Q_1 A Q_1^T Q_2^T \cdots Q_{n-2}^T
 \]</div>
-<p>Here, <span class="math notranslate nohighlight">\(S_n\)</span> is the set of all permutations of the numbers <span class="math notranslate nohighlight">\(\{1, 2, \dots, n\}\)</span>, and <span class="math notranslate nohighlight">\(\text{sgn}(\sigma)\)</span> is the <strong>signature</strong> of the permutation <span class="math notranslate nohighlight">\(\sigma\)</span>. The signature is +1 if the permutation can be formed by an even number of swaps and -1 if it requires an odd number of swaps.</p>
+<p>If we define</p>
+<div class="math notranslate nohighlight">
+\[
+Q = Q_{n-2} \cdots Q_2 Q_1,
+\]</div>
+<p>then <span class="math notranslate nohighlight">\(H = Q A Q^T\)</span>, which is the upper Hessenberg matrix we seek.</p>
+<p>Note that the standard form is often written as</p>
+<div class="math notranslate nohighlight">
+\[
+H = Q^T A Q, \quad \text{or equivalently} \quad
+A = Q H Q^T,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q = Q_1^T Q_2 \cdots Q_{n-2}^T\)</span>. This is just a matter of convention.</p>
 </section>
-<section id="key-properties">
-<h2>Key Properties<a class="headerlink" href="#key-properties" title="Link to this heading">#</a></h2>
-<p>The determinant has several crucial properties that are used throughout mathematics and its applications.</p>
+<section id="computational-cost">
+<h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><strong>Transpose</strong>: The determinant of a matrix is equal to the determinant of its transpose: <span class="math notranslate nohighlight">\(\det(A) = \det(A^T)\)</span>.</p></li>
-<li><p><strong>Multiplicativity</strong>: The determinant of a product of matrices is the product of their determinants: <span class="math notranslate nohighlight">\(\det(AB) = \det(A)\det(B)\)</span>.</p></li>
-<li><p><strong>Inverse</strong>: The determinant of an inverse matrix is the reciprocal of the original determinant: <span class="math notranslate nohighlight">\(\det(A^{-1}) = \det(A)^{-1}\)</span>.</p></li>
-<li><p><strong>Singularity</strong>: A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>singular</strong> (i.e., not invertible) if and only if its determinant is zero: <span class="math notranslate nohighlight">\(\det(A) = 0\)</span>.</p></li>
-<li><p><strong>Triangular Matrices</strong>: If <span class="math notranslate nohighlight">\(A\)</span> is a triangular (upper or lower) matrix, its determinant is simply the product of its diagonal entries: <span class="math notranslate nohighlight">\(\det(A) = \prod_{i=1}^n a_{ii}\)</span>.</p></li>
+<li><p>There are <span class="math notranslate nohighlight">\(n-2\)</span> main steps in this reduction.</p></li>
+<li><p>At each step <span class="math notranslate nohighlight">\(k\)</span>, applying the Householder reflector <span class="math notranslate nohighlight">\(Q_k\)</span> from the left and the right to the <span class="math notranslate nohighlight">\(n \times n\)</span> matrix costs <span class="math notranslate nohighlight">\(O(n(n-k))\)</span> flops. The dominant cost at each step is <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p></li>
+<li><p>The total computational cost is the sum of these steps: <span class="math notranslate nohighlight">\(\sum_{k=1}^{n-2} O(n(n-k)) \approx O(n^3)\)</span>.
+(A more careful analysis shows the cost to be <span class="math notranslate nohighlight">\(\frac{10}{3}n^3\)</span> flops if <span class="math notranslate nohighlight">\(Q\)</span> is explicitly formed, or <span class="math notranslate nohighlight">\(\frac{4}{3}n^3\)</span> flops if only <span class="math notranslate nohighlight">\(H\)</span> is needed).</p></li>
 </ul>
-</section>
-<section id="geometric-interpretation">
-<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
-<p>Geometrically, the determinant represents the <strong>signed volume</strong> of the <span class="math notranslate nohighlight">\(n\)</span>-dimensional parallelepiped formed by the column vectors of the matrix.</p>
-<ul class="simple">
-<li><p>The <strong>absolute value</strong> of the determinant, <span class="math notranslate nohighlight">\(|\det(A)|\)</span>, gives the scaling factor of the transformation. For instance, in 2D, it’s the area of the parallelogram formed by the column vectors. In 3D, it’s the volume of the parallelepiped.</p></li>
-<li><p>The <strong>sign</strong> of the determinant indicates whether the transformation preserves or reverses the orientation of space. A positive determinant preserves orientation (like a rotation), while a negative determinant reverses it (like a reflection).</p></li>
-</ul>
+<p>This <span class="math notranslate nohighlight">\(O(n^3)\)</span> cost is a one-time, upfront investment. Once we have <span class="math notranslate nohighlight">\(H\)</span>, each subsequent QR iteration (which consists of an <span class="math notranslate nohighlight">\(O(n^2)\)</span> QR factorization and an <span class="math notranslate nohighlight">\(O(n^2)\)</span> matrix multiplication) is “fast,” allowing the overall algorithm to converge efficiently.</p>
 </section>
 </section>
 
@@ -466,20 +517,20 @@ a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="sherman_morrison_woodbury.html"
+       href="qr_iteration.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Sherman-Morrison-Woodbury Formula</p>
+        <p class="prev-next-title">QR Iteration</p>
       </div>
     </a>
     <a class="right-next"
-       href="trace.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Trace of a Matrix</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -499,9 +550,9 @@ a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-upper-hessenberg-form">Why Upper Hessenberg Form?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-reduction-works">How the Reduction Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
 </ul>
   </nav></div>
 
