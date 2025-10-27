@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Block Matrix Operations &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Shifted QR Iteration Algorithm &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/block_matrices';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/qr_iteration_with_shifts';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Four Fundamental Subspaces" href="four_fundamental_subspaces.html" />
-    <link rel="prev" title="Projections" href="projections.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="QR iteration for upper Hessenberg matrices" href="qr_iteration_with_hessenberg.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -188,7 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
@@ -221,7 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
@@ -231,7 +231,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Shifted QR Iteration Algorithm</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -289,7 +289,7 @@
       
       
       
-      <li><a href="../_sources/content/block_matrices.md" target="_blank"
+      <li><a href="../_sources/content/qr_iteration_with_shifts.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -373,7 +373,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Block Matrix Operations</h1>
+    <h1>The Shifted QR Iteration Algorithm</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -383,10 +383,13 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifted-qr-iteration-step-by-step">Shifted QR Iteration Step-by-Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#similarity-transformation-verification">Similarity Transformation Verification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-deflation">Convergence and Deflation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-shift-accelerates-convergence">How the Shift Accelerates Convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-deflation-is-used">How Deflation is Used</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -398,64 +401,141 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="block-matrix-operations">
-<h1>Block Matrix Operations<a class="headerlink" href="#block-matrix-operations" title="Link to this heading">#</a></h1>
-<p>A <strong>block matrix</strong>, or a partitioned matrix, is a matrix that has been divided into smaller rectangular matrices called <strong>blocks</strong>. This approach allows us to perform matrix operations by treating these blocks as if they were individual elements, which can greatly simplify complex calculations and reveal underlying structures. 🧱</p>
-<p>Let’s consider a matrix <span class="math notranslate nohighlight">\(A\)</span> partitioned into a <span class="math notranslate nohighlight">\(2 \times 2\)</span> block structure:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-shifted-qr-iteration-algorithm">
+<h1>The Shifted QR Iteration Algorithm<a class="headerlink" href="#the-shifted-qr-iteration-algorithm" title="Link to this heading">#</a></h1>
+<p>This approach combines the <strong>shift</strong> (to dramatically speed up convergence) with <strong>deflation</strong> (to reduce the problem size) to efficiently find all eigenvalues of a matrix.</p>
+<p>The core of the process is an iterative loop. Instead of decomposing the matrix <span class="math notranslate nohighlight">\(A\)</span> (or <span class="math notranslate nohighlight">\(T_k\)</span>) directly, we “shift” it by an approximate eigenvalue <span class="math notranslate nohighlight">\(\mu\)</span> <em>before</em> the QR factorization.</p>
+<p>Each step <span class="math notranslate nohighlight">\(k\)</span> of the iteration works as follows:</p>
+<ol class="arabic">
+<li><p><strong>Start with your matrix:</strong> Let <span class="math notranslate nohighlight">\(T_k\)</span> be the matrix at the current step (initially <span class="math notranslate nohighlight">\(T_0 = A\)</span>, which is assumed to be in <strong>upper Hessenberg</strong> form).</p></li>
+<li><p><strong>Choose a Shift:</strong> Select a shift <span class="math notranslate nohighlight">\(\mu\)</span>. A very effective choice is the bottom-right element of the current matrix: <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span>.</p></li>
+<li><p><strong>Factor the Shifted Matrix:</strong> Compute the QR factorization of the <em>shifted</em> matrix:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}A = \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix}\end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(A_{11}\)</span>, <span class="math notranslate nohighlight">\(A_{12}\)</span>, <span class="math notranslate nohighlight">\(A_{21}\)</span>, and <span class="math notranslate nohighlight">\(A_{22}\)</span> are matrices themselves.</p>
-<section id="addition-and-scalar-multiplication">
-<h2>Addition and Scalar Multiplication<a class="headerlink" href="#addition-and-scalar-multiplication" title="Link to this heading">#</a></h2>
-<p>Operating on block matrices is highly intuitive for linear operations.</p>
-<ul>
-<li><p><strong>Addition</strong>: To add two block matrices, you add their corresponding blocks. The matrices must have the same dimensions and be partitioned in the same way, so that corresponding blocks <span class="math notranslate nohighlight">\(A_{ij}\)</span> and <span class="math notranslate nohighlight">\(B_{ij}\)</span> are of the same size.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} + \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11} + B_{11} &amp; A_{12} + B_{12} \\ A_{21} + B_{21} &amp; A_{22} + B_{22} \end{pmatrix}
-    \end{split}\]</div>
+\[T_k - \mu I = U_k R_k\]</div>
 </li>
-<li><p><strong>Scalar Multiplication</strong>: To multiply a block matrix by a scalar, you simply multiply each block by that scalar.</p>
+<li><p><strong>Recombine and “Unshift”:</strong> Create the next matrix, <span class="math notranslate nohighlight">\(T_{k+1}\)</span>, by multiplying <span class="math notranslate nohighlight">\(R_k\)</span> and <span class="math notranslate nohighlight">\(U_k\)</span> in the reverse order and then adding the shift <span class="math notranslate nohighlight">\(\mu\)</span> back:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-    c \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} = \begin{pmatrix} cA_{11} &amp; cA_{12} \\ cA_{21} &amp; cA_{22} \end{pmatrix}
-    \end{split}\]</div>
+\[T_{k+1} = R_k U_k + \mu I\]</div>
 </li>
-</ul>
-</section>
-<section id="block-matrix-multiplication">
-<h2>Block Matrix Multiplication<a class="headerlink" href="#block-matrix-multiplication" title="Link to this heading">#</a></h2>
-<p>Block multiplication follows the same row-by-column rule as standard matrix multiplication, but with matrix operations inside. For this to work, the partitioning of the matrices must be compatible. For a product <span class="math notranslate nohighlight">\(AB\)</span>, the <strong>column partitioning of <span class="math notranslate nohighlight">\(A\)</span> must match the row partitioning of <span class="math notranslate nohighlight">\(B\)</span></strong>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11}B_{11} + A_{12}B_{21} &amp; A_{11}B_{12} + A_{12}B_{22} \\ A_{21}B_{11} + A_{22}B_{21} &amp; A_{21}B_{12} + A_{22}B_{22} \end{pmatrix}\end{split}\]</div>
-<p>It’s crucial to remember that matrix multiplication is not commutative, so the order of the products within each block element (e.g., <span class="math notranslate nohighlight">\(A_{11}B_{11}\)</span>) must be maintained. The result of block multiplication is identical to what you would get with standard element-wise multiplication.</p>
-</section>
-<section id="special-structures-and-inversion">
-<h2>Special Structures and Inversion<a class="headerlink" href="#special-structures-and-inversion" title="Link to this heading">#</a></h2>
-<p>Partitioning is especially powerful for matrices with special structures.</p>
-<ul>
-<li><p><strong>Block Diagonal Matrices</strong>: These are matrices where the off-diagonal blocks are zero matrices.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    A = \begin{pmatrix} A_{1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n} \end{pmatrix}
-    \end{split}\]</div>
-<p>For a block diagonal matrix, the determinant is the product of the determinants of the diagonal blocks: <span class="math notranslate nohighlight">\(\det(A) = \det(A_1)\det(A_2)\cdots\det(A_n)\)</span>. Its inverse is also a block diagonal matrix composed of the inverses of the diagonal blocks:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    A^{-1} = \begin{pmatrix} A_{1}^{-1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2}^{-1} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n}^{-1} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Block Matrix Inversion</strong>: The inverse of a general <span class="math notranslate nohighlight">\(2 \times 2\)</span> block matrix can also be expressed in block form, although the formula is more complex and involves the <strong>Schur complement</strong> of a block (e.g., <span class="math notranslate nohighlight">\(D - CA^{-1}B\)</span>).</p></li>
-</ul>
-</section>
-<section id="advantages-of-block-matrices">
-<h2>Advantages of Block Matrices<a class="headerlink" href="#advantages-of-block-matrices" title="Link to this heading">#</a></h2>
-<p>Using block notation is more than a convenience; it’s a powerful conceptual and computational tool.</p>
-<ol class="arabic simple">
-<li><p><strong>Simplifies Proofs</strong>: It allows for cleaner and more intuitive algebraic manipulations in theoretical proofs and derivations.</p></li>
-<li><p><strong>Reveals Structure</strong>: Partitioning can expose the underlying structure of a problem, such as how different subsystems in a larger system interact.</p></li>
-<li><p><strong>Computational Efficiency</strong>: It is the foundation for many efficient “divide and conquer” algorithms. Operations on structured matrices (like block diagonal or sparse matrices) can be performed much faster by operating on the smaller blocks. This is critical in parallel computing, where different blocks can be processed simultaneously on different processors.</p></li>
 </ol>
+<p>The process is a <strong>similarity transformation</strong> (<span class="math notranslate nohighlight">\(T_{k+1} = U_k^H T_k U_k\)</span>), which means all eigenvalues are preserved at every step. The algorithm is simply converging to the <strong>Schur form</strong>, an upper triangular matrix with the eigenvalues on the diagonal.</p>
+<section id="shifted-qr-iteration-step-by-step">
+<h2>Shifted QR Iteration Step-by-Step<a class="headerlink" href="#shifted-qr-iteration-step-by-step" title="Link to this heading">#</a></h2>
+<p>This iteration is implemented in the following Python code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">Tk</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">while</span> <span class="n">not_converged</span><span class="p">:</span>
+    <span class="c1"># Choose the shift (e.g., the bottom-right element)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">Tk</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="c1"># Create an identity matrix of the same size</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    
+    <span class="c1"># Perform QR factorization on the shifted matrix</span>
+    <span class="n">Qk</span><span class="p">,</span> <span class="n">Rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Tk</span> <span class="o">-</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">I</span><span class="p">)</span>
+    
+    <span class="c1"># Recombine and add the shift back</span>
+    <span class="n">Tk</span> <span class="o">=</span> <span class="n">Rk</span> <span class="o">@</span> <span class="n">Qk</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">I</span>
+</pre></div>
+</div>
+</section>
+<section id="similarity-transformation-verification">
+<h2>Similarity Transformation Verification<a class="headerlink" href="#similarity-transformation-verification" title="Link to this heading">#</a></h2>
+<p>We can verify that this algorithm preserves eigenvalues, because the transformation from <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is a <strong>unitary similarity transformation</strong>. Let’s walk through the derivation in detail.</p>
+<p>Our starting point is the two core equations of a single iteration:</p>
+<ol class="arabic">
+<li><p><strong>The QR factorization of the shifted matrix:</strong></p>
+<div class="math notranslate nohighlight">
+\[T_k - \mu I = U_{k+1} R_{k+1}\]</div>
+</li>
+<li><p><strong>The update step to find the next matrix in the sequence:</strong></p>
+<div class="math notranslate nohighlight">
+\[T_{k+1} = R_{k+1} U_{k+1} + \mu I\]</div>
+</li>
+</ol>
+<p>Our goal is to show that these two steps are equivalent to the similarity transformation <span class="math notranslate nohighlight">\(T_{k+1} = U_{k+1}^H T_k U_{k+1}\)</span>.</p>
+<p><strong>Step 1: Isolate <span class="math notranslate nohighlight">\(R_{k+1}\)</span></strong></p>
+<p>We begin with the first equation. Since <span class="math notranslate nohighlight">\(U_{k+1}\)</span> is a unitary matrix from the QR decomposition, its inverse is its conjugate transpose, <span class="math notranslate nohighlight">\(U_{k+1}^H\)</span>. We can left-multiply both sides by <span class="math notranslate nohighlight">\(U_{k+1}^H\)</span> to isolate <span class="math notranslate nohighlight">\(R_{k+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+U_{k+1}^H (T_k - \mu I) = U_{k+1}^H (U_{k+1} R_{k+1})
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(U_{k+1}^H U_{k+1} = I\)</span>, the equation simplifies to:</p>
+<div class="math notranslate nohighlight">
+\[
+R_{k+1} = U_{k+1}^H (T_k - \mu I)
+\]</div>
+<p><strong>Step 2: Substitute <span class="math notranslate nohighlight">\(R_{k+1}\)</span> into the Update Equation</strong></p>
+<p>Now, we take this expression for <span class="math notranslate nohighlight">\(R_{k+1}\)</span> and substitute it into the second equation, <span class="math notranslate nohighlight">\(T_{k+1} = R_{k+1} U_{k+1} + \mu I\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = \left[ U_{k+1}^H (T_k - \mu I) \right] U_{k+1} + \mu I
+\]</div>
+<p><strong>Step 3: Expand and Simplify</strong></p>
+<p>Let’s distribute the terms inside the parentheses. The term <span class="math notranslate nohighlight">\(U_{k+1}\)</span> on the right multiplies both <span class="math notranslate nohighlight">\(T_k\)</span> and <span class="math notranslate nohighlight">\(\mu I\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = (U_{k+1}^H T_k U_{k+1}) - (U_{k+1}^H (\mu I) U_{k+1}) + \mu I
+\]</div>
+<p>Because <span class="math notranslate nohighlight">\(\mu\)</span> is a scalar, it can be moved outside the matrix multiplication:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = U_{k+1}^H T_k U_{k+1} - \mu (U_{k+1}^H U_{k+1}) + \mu I
+\]</div>
+<p>Again, since <span class="math notranslate nohighlight">\(U_{k+1}^H U_{k+1} = I\)</span>, the equation becomes:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k+1} = U_{k+1}^H T_k U_{k+1} - \mu I + \mu I = U_{k+1}^H T_k U_{k+1}
+\]</div>
+<p>This proves that <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is unitarily similar to <span class="math notranslate nohighlight">\(T_k\)</span>. Since this relationship holds for every step of the iteration, the final converged matrix <span class="math notranslate nohighlight">\(T\)</span> is unitarily similar to the original matrix <span class="math notranslate nohighlight">\(A\)</span>. Similarity transformations <strong>preserve eigenvalues</strong>, which is why this algorithm correctly computes the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> while converging to the upper-triangular Schur form.</p>
+</section>
+<section id="convergence-and-deflation">
+<h2>Convergence and Deflation<a class="headerlink" href="#convergence-and-deflation" title="Link to this heading">#</a></h2>
+<p>This is where the shift and deflation work together. The shift is designed to dramatically speed up convergence, which in turn allows us to deflate the matrix and reduce the problem size.</p>
+<section id="how-the-shift-accelerates-convergence">
+<h3>How the Shift Accelerates Convergence<a class="headerlink" href="#how-the-shift-accelerates-convergence" title="Link to this heading">#</a></h3>
+<p>The convergence of the <em>basic</em> (un-shifted) QR iteration is governed by the ratios of the eigenvalues (e.g., <span class="math notranslate nohighlight">\(|\lambda_{i+1} / \lambda_i|^k\)</span>). The shifted QR iteration is mathematically equivalent to applying the basic QR iteration to the matrix <span class="math notranslate nohighlight">\(T_k - \mu I\)</span>. Therefore, its convergence rate is governed by the ratios of the <em>shifted</em> eigenvalues.</p>
+<p>The effectiveness of the algorithm is in <em>how</em> the shift <span class="math notranslate nohighlight">\(\mu\)</span> is chosen. We select <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span>, which, as the iteration progresses, becomes an increasingly accurate approximation of an eigenvalue, <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p>
+<p>This choice has a powerful effect on the convergence rate. Let’s look at the underlying theory. The algorithm works by iteratively finding the Schur vectors, which form the columns of a cumulative unitary matrix <span class="math notranslate nohighlight">\(Q_k\)</span> (such that <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>).</p>
+<ul>
+<li><p>The subspace spanned by the first <span class="math notranslate nohighlight">\(n-1\)</span> columns, <span class="math notranslate nohighlight">\(\text{span}(Q_k[:,1:n-1])\)</span>, converges to the true invariant subspace <span class="math notranslate nohighlight">\(\text{span}(Q[:,1:n-1])\)</span>.</p></li>
+<li><p>The rate of this subspace convergence is determined by the ratio of the smallest shifted eigenvalue to the next-smallest:</p>
+<div class="math notranslate nohighlight">
+\[
+    \left| \frac{\lambda_{n} - \mu}{\lambda_{n-1} - \mu} \right|^k
+    \]</div>
+</li>
+</ul>
+<p>Because our shift <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span> is chosen to be very close to <span class="math notranslate nohighlight">\(\lambda_n\)</span>, the numerator <span class="math notranslate nohighlight">\(|\lambda_n - \mu|\)</span> becomes extremely small. This makes the entire ratio <span class="math notranslate nohighlight">\(\frac{|\lambda_n - \mu|}{|\lambda_{n-1} - \mu|}\)</span> very close to zero, leading to exceptionally fast convergence. In practice, this convergence is often so fast (e.g., quadratic or cubic for symmetric matrices) that only one or two iterations are needed per eigenvalue.</p>
+<p>This abstract subspace convergence has a direct, observable effect on the matrix <span class="math notranslate nohighlight">\(T_k\)</span>.</p>
+<ol class="arabic simple">
+<li><p>Since the first <span class="math notranslate nohighlight">\(n-1\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span> are converging, the final column <span class="math notranslate nohighlight">\(Q_k[:,n]\)</span> (which must remain orthogonal to all other columns) must also converge to its corresponding Schur vector, <span class="math notranslate nohighlight">\(Q[:,n]\)</span>.</p></li>
+<li><p>The last row of <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span> is fundamentally linked to this last vector. As the column of <span class="math notranslate nohighlight">\(Q_k\)</span> converges, the last row of <span class="math notranslate nohighlight">\(T_k\)</span> converges to the last row of the final Schur form <span class="math notranslate nohighlight">\(T\)</span>, which is <span class="math notranslate nohighlight">\([0, 0, \dots, 0, \lambda_n]\)</span>.</p></li>
+<li><p>This means the sub-diagonal element <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span> is the value that is rapidly driven to zero by this accelerated convergence rate.</p></li>
+</ol>
+</section>
+<section id="how-deflation-is-used">
+<h3>How Deflation is Used<a class="headerlink" href="#how-deflation-is-used" title="Link to this heading">#</a></h3>
+<p>This convergence to a block upper triangular form is the signal to “deflate.”</p>
+<ol class="arabic">
+<li><p><strong>Identify Convergence:</strong> We check the sub-diagonal element in the last row, <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span>. When this value is small enough (e.g., below a machine-precision threshold), we declare that the <span class="math notranslate nohighlight">\(n\)</span>-th eigenvalue has converged.</p></li>
+<li><p><strong>Record the Eigenvalue:</strong> The converged value <span class="math notranslate nohighlight">\(T_k[n,n]\)</span> is now one of the eigenvalues of the original matrix <span class="math notranslate nohighlight">\(A\)</span>. We record it.</p></li>
+<li><p><strong>Deflate the Matrix:</strong> The eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> are the eigenvalues of the <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> block <span class="math notranslate nohighlight">\(A_{11}\)</span> and the eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span> we just found.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    T_k \approx \begin{pmatrix}
+    A_{11} &amp; A_{12} \\
+    0 &amp; \lambda_n
+    \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Repeat the Process:</strong> We can now “deflate” the problem by discarding the last row and column. The <em>entire</em> shifted QR iteration process (choose shift, factor, recombine) is repeated, but only on the <strong>smaller <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> matrix <span class="math notranslate nohighlight">\(A_{11}\)</span></strong>.</p></li>
+</ol>
+<p>This cycle repeats: the algorithm runs the shifted QR iteration on the smaller matrix until <em>its</em> last row converges, it records another eigenvalue, and it deflates again. This continues until the matrix is reduced to a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix, and all eigenvalues have been found.</p>
+</section>
 </section>
 </section>
 
@@ -490,20 +570,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="projections.html"
+       href="qr_iteration_with_hessenberg.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Projections</p>
+        <p class="prev-next-title">QR iteration for upper Hessenberg matrices</p>
       </div>
     </a>
     <a class="right-next"
-       href="four_fundamental_subspaces.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Four Fundamental Subspaces</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -523,10 +603,13 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifted-qr-iteration-step-by-step">Shifted QR Iteration Step-by-Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#similarity-transformation-verification">Similarity Transformation Verification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-deflation">Convergence and Deflation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-shift-accelerates-convergence">How the Shift Accelerates Convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-deflation-is-used">How Deflation is Used</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

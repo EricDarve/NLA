@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Block Matrix Operations &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>QR iteration for upper Hessenberg matrices &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/block_matrices';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/qr_iteration_with_hessenberg';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Four Fundamental Subspaces" href="four_fundamental_subspaces.html" />
-    <link rel="prev" title="Projections" href="projections.html" />
+    <link rel="next" title="The Shifted QR Iteration Algorithm" href="qr_iteration_with_shifts.html" />
+    <link rel="prev" title="Reduction to Hessenberg Form" href="upper_hessenberg.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -188,7 +188,7 @@
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
@@ -221,7 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
@@ -230,7 +230,7 @@
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">QR iteration for upper Hessenberg matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
 </ul>
 </details></li>
@@ -289,7 +289,7 @@
       
       
       
-      <li><a href="../_sources/content/block_matrices.md" target="_blank"
+      <li><a href="../_sources/content/qr_iteration_with_hessenberg.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -373,7 +373,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Block Matrix Operations</h1>
+    <h1>QR iteration for upper Hessenberg matrices</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -383,10 +383,7 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
             </nav>
         </div>
@@ -398,64 +395,33 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="block-matrix-operations">
-<h1>Block Matrix Operations<a class="headerlink" href="#block-matrix-operations" title="Link to this heading">#</a></h1>
-<p>A <strong>block matrix</strong>, or a partitioned matrix, is a matrix that has been divided into smaller rectangular matrices called <strong>blocks</strong>. This approach allows us to perform matrix operations by treating these blocks as if they were individual elements, which can greatly simplify complex calculations and reveal underlying structures. 🧱</p>
-<p>Let’s consider a matrix <span class="math notranslate nohighlight">\(A\)</span> partitioned into a <span class="math notranslate nohighlight">\(2 \times 2\)</span> block structure:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}A = \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix}\end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(A_{11}\)</span>, <span class="math notranslate nohighlight">\(A_{12}\)</span>, <span class="math notranslate nohighlight">\(A_{21}\)</span>, and <span class="math notranslate nohighlight">\(A_{22}\)</span> are matrices themselves.</p>
-<section id="addition-and-scalar-multiplication">
-<h2>Addition and Scalar Multiplication<a class="headerlink" href="#addition-and-scalar-multiplication" title="Link to this heading">#</a></h2>
-<p>Operating on block matrices is highly intuitive for linear operations.</p>
-<ul>
-<li><p><strong>Addition</strong>: To add two block matrices, you add their corresponding blocks. The matrices must have the same dimensions and be partitioned in the same way, so that corresponding blocks <span class="math notranslate nohighlight">\(A_{ij}\)</span> and <span class="math notranslate nohighlight">\(B_{ij}\)</span> are of the same size.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} + \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11} + B_{11} &amp; A_{12} + B_{12} \\ A_{21} + B_{21} &amp; A_{22} + B_{22} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Scalar Multiplication</strong>: To multiply a block matrix by a scalar, you simply multiply each block by that scalar.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    c \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} = \begin{pmatrix} cA_{11} &amp; cA_{12} \\ cA_{21} &amp; cA_{22} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-</ul>
-</section>
-<section id="block-matrix-multiplication">
-<h2>Block Matrix Multiplication<a class="headerlink" href="#block-matrix-multiplication" title="Link to this heading">#</a></h2>
-<p>Block multiplication follows the same row-by-column rule as standard matrix multiplication, but with matrix operations inside. For this to work, the partitioning of the matrices must be compatible. For a product <span class="math notranslate nohighlight">\(AB\)</span>, the <strong>column partitioning of <span class="math notranslate nohighlight">\(A\)</span> must match the row partitioning of <span class="math notranslate nohighlight">\(B\)</span></strong>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11}B_{11} + A_{12}B_{21} &amp; A_{11}B_{12} + A_{12}B_{22} \\ A_{21}B_{11} + A_{22}B_{21} &amp; A_{21}B_{12} + A_{22}B_{22} \end{pmatrix}\end{split}\]</div>
-<p>It’s crucial to remember that matrix multiplication is not commutative, so the order of the products within each block element (e.g., <span class="math notranslate nohighlight">\(A_{11}B_{11}\)</span>) must be maintained. The result of block multiplication is identical to what you would get with standard element-wise multiplication.</p>
-</section>
-<section id="special-structures-and-inversion">
-<h2>Special Structures and Inversion<a class="headerlink" href="#special-structures-and-inversion" title="Link to this heading">#</a></h2>
-<p>Partitioning is especially powerful for matrices with special structures.</p>
-<ul>
-<li><p><strong>Block Diagonal Matrices</strong>: These are matrices where the off-diagonal blocks are zero matrices.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    A = \begin{pmatrix} A_{1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n} \end{pmatrix}
-    \end{split}\]</div>
-<p>For a block diagonal matrix, the determinant is the product of the determinants of the diagonal blocks: <span class="math notranslate nohighlight">\(\det(A) = \det(A_1)\det(A_2)\cdots\det(A_n)\)</span>. Its inverse is also a block diagonal matrix composed of the inverses of the diagonal blocks:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    A^{-1} = \begin{pmatrix} A_{1}^{-1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2}^{-1} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n}^{-1} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Block Matrix Inversion</strong>: The inverse of a general <span class="math notranslate nohighlight">\(2 \times 2\)</span> block matrix can also be expressed in block form, although the formula is more complex and involves the <strong>Schur complement</strong> of a block (e.g., <span class="math notranslate nohighlight">\(D - CA^{-1}B\)</span>).</p></li>
-</ul>
-</section>
-<section id="advantages-of-block-matrices">
-<h2>Advantages of Block Matrices<a class="headerlink" href="#advantages-of-block-matrices" title="Link to this heading">#</a></h2>
-<p>Using block notation is more than a convenience; it’s a powerful conceptual and computational tool.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="qr-iteration-for-upper-hessenberg-matrices">
+<h1>QR iteration for upper Hessenberg matrices<a class="headerlink" href="#qr-iteration-for-upper-hessenberg-matrices" title="Link to this heading">#</a></h1>
+<p>The primary advantage of first converting a matrix to upper Hessenberg form is the significant reduction in computational cost for each step of the QR iteration. A single QR iteration for a dense matrix costs <span class="math notranslate nohighlight">\(O(n^3)\)</span>, but for an upper Hessenberg matrix, this cost is reduced to <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong>.</p>
+<p>The process works as follows:</p>
 <ol class="arabic simple">
-<li><p><strong>Simplifies Proofs</strong>: It allows for cleaner and more intuitive algebraic manipulations in theoretical proofs and derivations.</p></li>
-<li><p><strong>Reveals Structure</strong>: Partitioning can expose the underlying structure of a problem, such as how different subsystems in a larger system interact.</p></li>
-<li><p><strong>Computational Efficiency</strong>: It is the foundation for many efficient “divide and conquer” algorithms. Operations on structured matrices (like block diagonal or sparse matrices) can be performed much faster by operating on the smaller blocks. This is critical in parallel computing, where different blocks can be processed simultaneously on different processors.</p></li>
+<li><p><strong>Step 1: QR Factorization (<span class="math notranslate nohighlight">\(H = QR\)</span>)</strong></p>
+<ul class="simple">
+<li><p>The goal is to transform the upper Hessenberg matrix <span class="math notranslate nohighlight">\(H\)</span> into an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>.</p></li>
+<li><p>Because <span class="math notranslate nohighlight">\(H\)</span> is already <em>almost</em> upper triangular (it only has one subdiagonal), this is done very efficiently using <span class="math notranslate nohighlight">\(n-1\)</span> Givens transformations.</p></li>
+<li><p>Each Givens rotation <span class="math notranslate nohighlight">\(G_k\)</span> is applied from the left to zero out a single subdiagonal element <span class="math notranslate nohighlight">\(H[k+1, k]\)</span>.</p></li>
+<li><p>The complete <span class="math notranslate nohighlight">\(Q\)</span> matrix (which is orthogonal) is the product of all these individual Givens rotations: <span class="math notranslate nohighlight">\(Q^T = G_{n-1} \dots G_2 G_1\)</span>. Thus, <span class="math notranslate nohighlight">\(R = Q^T H\)</span>.</p></li>
+<li><p>Applying each of the <span class="math notranslate nohighlight">\(n-1\)</span> rotations to the matrix takes <span class="math notranslate nohighlight">\(O(n)\)</span> operations, leading to a total cost of <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong> for this step.</p></li>
+</ul>
+</li>
+<li><p><strong>Step 2: Re-multiplication (<span class="math notranslate nohighlight">\(H_{new} = RQ\)</span>)</strong></p>
+<ul class="simple">
+<li><p>To complete the iteration, the matrices are multiplied in the reverse order: <span class="math notranslate nohighlight">\(H_{new} = RQ\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(R = Q^T H\)</span>, we can write this as <span class="math notranslate nohighlight">\(H_{new} = (Q^T H) Q\)</span>. However, to maintain efficiency, we don’t form <span class="math notranslate nohighlight">\(Q\)</span> explicitly.</p></li>
+<li><p>Instead, we apply the saved Givens rotations (specifically, their transposes, <span class="math notranslate nohighlight">\(G_k^T\)</span>) one by one from the <em>right</em> to the <span class="math notranslate nohighlight">\(R\)</span> matrix: <span class="math notranslate nohighlight">\(H_{new} = R G_1^T G_2^T \dots G_{n-1}^T\)</span>.</p></li>
+<li><p>This step also involves <span class="math notranslate nohighlight">\(n-1\)</span> rotations, each costing <span class="math notranslate nohighlight">\(O(n)\)</span> operations, for a total cost of <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong>.</p></li>
+</ul>
+</li>
 </ol>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>Crucially, this two-step process <strong>preserves the upper Hessenberg form</strong>, so the new matrix <span class="math notranslate nohighlight">\(H_{new}\)</span> is also upper Hessenberg.</p>
+<p>This allows the next iteration to be performed just as efficiently. While a single iteration is <span class="math notranslate nohighlight">\(O(n^2)\)</span>, finding all eigenvalues typically requires <span class="math notranslate nohighlight">\(O(n)\)</span> iterations, leading to a total time cost of <strong><span class="math notranslate nohighlight">\(O(n^3)\)</span></strong> for the entire algorithm, a significant improvement over the <span class="math notranslate nohighlight">\(O(n^4)\)</span> required by the naive QR iteration on a full matrix.</p>
 </section>
 </section>
 
@@ -490,20 +456,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="projections.html"
+       href="upper_hessenberg.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Projections</p>
+        <p class="prev-next-title">Reduction to Hessenberg Form</p>
       </div>
     </a>
     <a class="right-next"
-       href="four_fundamental_subspaces.html"
+       href="qr_iteration_with_shifts.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Four Fundamental Subspaces</p>
+        <p class="prev-next-title">The Shifted QR Iteration Algorithm</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -523,10 +489,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
 </ul>
   </nav></div>
 
