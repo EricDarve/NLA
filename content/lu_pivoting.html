@@ -413,7 +413,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-row-pivoting">The Solution: LU Factorization with Row Pivoting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-pivoting">Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-partial-pivoting">Implementing LU with Partial Pivoting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-row-pivoting">Implementing LU with Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting">Proof of the Existence of LU Factorization with Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-final-word-on-stability">A Final Word on Stability</a></li>
@@ -740,14 +740,14 @@ U = \begin{pmatrix}
 <section id="the-pa-lu-factorization">
 <h3>The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization<a class="headerlink" href="#the-pa-lu-factorization" title="Link to this heading">#</a></h3>
 <p>The systematic swapping of rows can be represented mathematically by a <strong>permutation matrix</strong> <span class="math notranslate nohighlight">\(P\)</span>. A permutation matrix is an identity matrix with its rows reordered. Pre-multiplying a matrix <span class="math notranslate nohighlight">\(A\)</span> by <span class="math notranslate nohighlight">\(P\)</span> (i.e., forming <span class="math notranslate nohighlight">\(PA\)</span>) has the effect of applying those same row permutations to <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>Therefore, LU factorization with partial pivoting does not compute the factors of <span class="math notranslate nohighlight">\(A\)</span> itself, but rather of a row-permuted version of <span class="math notranslate nohighlight">\(A\)</span>. The resulting factorization is:</p>
+<p>Therefore, LU factorization with row pivoting does not compute the factors of <span class="math notranslate nohighlight">\(A\)</span> itself, but rather of a row-permuted version of <span class="math notranslate nohighlight">\(A\)</span>. The resulting factorization is:</p>
 <div class="math notranslate nohighlight">
 \[PA = LU\]</div>
 <p>This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the <span class="math notranslate nohighlight">\(PA=LU\)</span> factorization <strong>exists for any square matrix A</strong>, singular or not (see below for a proof).</p>
 </section>
-<section id="implementing-lu-with-partial-pivoting">
-<h3>Implementing LU with Partial Pivoting<a class="headerlink" href="#implementing-lu-with-partial-pivoting" title="Link to this heading">#</a></h3>
-<p>Below is a simple implementation of LU factorization with partial pivoting in Python. The function modifies the input matrix <code class="docutils literal notranslate"><span class="pre">A</span></code> in place to store the factors <code class="docutils literal notranslate"><span class="pre">L</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code>, and returns the permutation matrix <code class="docutils literal notranslate"><span class="pre">P</span></code>.</p>
+<section id="implementing-lu-with-row-pivoting">
+<h3>Implementing LU with Row Pivoting<a class="headerlink" href="#implementing-lu-with-row-pivoting" title="Link to this heading">#</a></h3>
+<p>Below is a simple implementation of LU factorization with row pivoting in Python. The function modifies the input matrix <code class="docutils literal notranslate"><span class="pre">A</span></code> in place to store the factors <code class="docutils literal notranslate"><span class="pre">L</span></code> and <code class="docutils literal notranslate"><span class="pre">U</span></code>, and returns the permutation matrix <code class="docutils literal notranslate"><span class="pre">P</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">lu_factorization_with_row_pivoting</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
@@ -790,7 +790,7 @@ A =
 1 &amp; \pi
 \end{pmatrix}
 \end{split}\]</div>
-<p>At the first step, the pivot candidates in the first column are <span class="math notranslate nohighlight">\(\epsilon\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Since <span class="math notranslate nohighlight">\(|1| &gt; |\epsilon|\)</span>, the partial pivoting strategy mandates a swap of row 1 and row 2. The permutation matrix and the resulting permuted matrix are:</p>
+<p>At the first step, the pivot candidates in the first column are <span class="math notranslate nohighlight">\(\epsilon\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Since <span class="math notranslate nohighlight">\(|1| &gt; |\epsilon|\)</span>, the row pivoting strategy mandates a swap of row 1 and row 2. The permutation matrix and the resulting permuted matrix are:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}P = \begin{pmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{pmatrix}, \qquad PA = \begin{pmatrix} 1 &amp; \pi \\ \epsilon &amp; 1 \end{pmatrix}\end{split}\]</div>
 <p>Now, we perform LU factorization on <span class="math notranslate nohighlight">\(PA\)</span>:</p>
@@ -807,7 +807,7 @@ U = \begin{pmatrix}
 </section>
 <section id="proof-of-the-existence-of-lu-factorization-with-row-pivoting">
 <h3>Proof of the Existence of LU Factorization with Row Pivoting<a class="headerlink" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting" title="Link to this heading">#</a></h3>
-<p>The use of partial pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for <em>any</em> square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.</p>
+<p>The use of row pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for <em>any</em> square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.</p>
 <div class="proof theorem admonition" id="thm:existence_lu_pivoting">
 <p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Existence of LU Factorization with Row Pivoting)</p>
 <section class="theorem-content" id="proof-content">
@@ -918,13 +918,13 @@ We can “lift” the permutation <span class="math notranslate nohighlight">\(P
 </section>
 <section id="a-final-word-on-stability">
 <h3>A Final Word on Stability<a class="headerlink" href="#a-final-word-on-stability" title="Link to this heading">#</a></h3>
-<p>It is crucial to note that while partial pivoting guarantees <span class="math notranslate nohighlight">\(|l_{ik}| \le 1\)</span>, it does <em>not</em> offer a mathematical guarantee that the entries of the <span class="math notranslate nohighlight">\(U\)</span> factor will not grow large. It is possible to construct matrices where significant element growth still occurs in <span class="math notranslate nohighlight">\(U\)</span>.</p>
+<p>It is crucial to note that while row pivoting guarantees <span class="math notranslate nohighlight">\(|l_{ik}| \le 1\)</span>, it does <em>not</em> offer a mathematical guarantee that the entries of the <span class="math notranslate nohighlight">\(U\)</span> factor will not grow large. It is possible to construct matrices where significant element growth still occurs in <span class="math notranslate nohighlight">\(U\)</span>.</p>
 <p>An example of a matrix that can cause large element growth is provided below, along with a discussion of the theoretical worst-case growth factor.</p>
-<p>However, decades of practical experience have shown that such cases are exceptionally rare. For the vast majority of problems encountered in science and engineering, LU with partial pivoting is a remarkably robust and accurate algorithm. It is the gold standard for solving dense linear systems directly.</p>
+<p>However, decades of practical experience have shown that such cases are exceptionally rare. For the vast majority of problems encountered in science and engineering, LU with row pivoting is a remarkably robust and accurate algorithm. It is the gold standard for solving dense linear systems directly.</p>
 </section>
 <section id="an-example-of-element-growth">
 <h3>An Example of Element Growth<a class="headerlink" href="#an-example-of-element-growth" title="Link to this heading">#</a></h3>
-<p>A classic example of a matrix that exhibits significant element growth in its <span class="math notranslate nohighlight">\(U\)</span> factor, even with partial pivoting, is one with 1s on the diagonal, -1s in the lower triangle, and 1s in the last column.</p>
+<p>A classic example of a matrix that exhibits significant element growth in its <span class="math notranslate nohighlight">\(U\)</span> factor, even with row pivoting, is one with 1s on the diagonal, -1s in the lower triangle, and 1s in the last column.</p>
 <p>The theoretical worst-case growth factor for an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix is <span class="math notranslate nohighlight">\(2^{n-1}\)</span>.</p>
 <p>Consider the following <span class="math notranslate nohighlight">\(4 \times 4\)</span> matrix:</p>
 <div class="math notranslate nohighlight">
@@ -1062,7 +1062,7 @@ U =
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-row-pivoting">The Solution: LU Factorization with Row Pivoting</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-pivoting">Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-partial-pivoting">Implementing LU with Partial Pivoting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-row-pivoting">Implementing LU with Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting">Proof of the Existence of LU Factorization with Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-final-word-on-stability">A Final Word on Stability</a></li>

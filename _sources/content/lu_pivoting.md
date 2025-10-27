@@ -370,15 +370,15 @@ This simple change prevents the uncontrolled growth of elements in the $L$ facto
 
 The systematic swapping of rows can be represented mathematically by a **permutation matrix** $P$. A permutation matrix is an identity matrix with its rows reordered. Pre-multiplying a matrix $A$ by $P$ (i.e., forming $PA$) has the effect of applying those same row permutations to $A$.
 
-Therefore, LU factorization with partial pivoting does not compute the factors of $A$ itself, but rather of a row-permuted version of $A$. The resulting factorization is:
+Therefore, LU factorization with row pivoting does not compute the factors of $A$ itself, but rather of a row-permuted version of $A$. The resulting factorization is:
 
 $$PA = LU$$
 
 This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the $PA=LU$ factorization **exists for any square matrix A**, singular or not (see below for a proof).
 
-### Implementing LU with Partial Pivoting
+### Implementing LU with Row Pivoting
 
-Below is a simple implementation of LU factorization with partial pivoting in Python. The function modifies the input matrix `A` in place to store the factors `L` and `U`, and returns the permutation matrix `P`.
+Below is a simple implementation of LU factorization with row pivoting in Python. The function modifies the input matrix `A` in place to store the factors `L` and `U`, and returns the permutation matrix `P`.
 
 ```python
 import numpy as np
@@ -423,7 +423,7 @@ A =
 \end{pmatrix}
 $$
 
-At the first step, the pivot candidates in the first column are $\epsilon$ and $1$. Since $|1| > |\epsilon|$, the partial pivoting strategy mandates a swap of row 1 and row 2. The permutation matrix and the resulting permuted matrix are:
+At the first step, the pivot candidates in the first column are $\epsilon$ and $1$. Since $|1| > |\epsilon|$, the row pivoting strategy mandates a swap of row 1 and row 2. The permutation matrix and the resulting permuted matrix are:
 
 $$P = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \qquad PA = \begin{pmatrix} 1 & \pi \\ \epsilon & 1 \end{pmatrix}$$
 
@@ -442,7 +442,7 @@ The enormous $\epsilon^{-1}$ term has vanished. All entries in $L$ and $U$ are o
 
 ### Proof of the Existence of LU Factorization with Row Pivoting
 
-The use of partial pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for *any* square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.
+The use of row pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for *any* square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.
 
 ```{prf:theorem} Existence of LU Factorization with Row Pivoting
 :label: thm:existence_lu_pivoting
@@ -560,15 +560,15 @@ Assume the statement holds for all matrices of size $(n-1)\times(n-1)$. We must 
 
 ### A Final Word on Stability
 
-It is crucial to note that while partial pivoting guarantees $|l_{ik}| \le 1$, it does *not* offer a mathematical guarantee that the entries of the $U$ factor will not grow large. It is possible to construct matrices where significant element growth still occurs in $U$.
+It is crucial to note that while row pivoting guarantees $|l_{ik}| \le 1$, it does *not* offer a mathematical guarantee that the entries of the $U$ factor will not grow large. It is possible to construct matrices where significant element growth still occurs in $U$.
 
 An example of a matrix that can cause large element growth is provided below, along with a discussion of the theoretical worst-case growth factor.
 
-However, decades of practical experience have shown that such cases are exceptionally rare. For the vast majority of problems encountered in science and engineering, LU with partial pivoting is a remarkably robust and accurate algorithm. It is the gold standard for solving dense linear systems directly.
+However, decades of practical experience have shown that such cases are exceptionally rare. For the vast majority of problems encountered in science and engineering, LU with row pivoting is a remarkably robust and accurate algorithm. It is the gold standard for solving dense linear systems directly.
 
 ### An Example of Element Growth
 
-A classic example of a matrix that exhibits significant element growth in its $U$ factor, even with partial pivoting, is one with 1s on the diagonal, -1s in the lower triangle, and 1s in the last column.
+A classic example of a matrix that exhibits significant element growth in its $U$ factor, even with row pivoting, is one with 1s on the diagonal, -1s in the lower triangle, and 1s in the last column.
 
 The theoretical worst-case growth factor for an $n \times n$ matrix is $2^{n-1}$.
 
