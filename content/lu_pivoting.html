@@ -410,8 +410,8 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-intuitive-parallel-with-summation-error">An Intuitive Parallel with Summation Error</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-partial-pivoting">The Solution: LU Factorization with Partial Pivoting</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-pivoting">Partial Pivoting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-row-pivoting">The Solution: LU Factorization with Row Pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-pivoting">Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-partial-pivoting">Implementing LU with Partial Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
@@ -720,13 +720,13 @@ U = \begin{pmatrix}
 <p>represent the worst-case sum of magnitudes for the terms that form <span class="math notranslate nohighlight">\(a_{ij}\)</span>. Therefore, the instability we observe when element growth occurs is perfectly consistent with our understanding of basic floating-point operations. Large intermediate numbers are a universal sign of potential numerical instability.</p>
 </section>
 </section>
-<section id="the-solution-lu-factorization-with-partial-pivoting">
-<h2>The Solution: LU Factorization with Partial Pivoting<a class="headerlink" href="#the-solution-lu-factorization-with-partial-pivoting" title="Link to this heading">#</a></h2>
+<section id="the-solution-lu-factorization-with-row-pivoting">
+<h2>The Solution: LU Factorization with Row Pivoting<a class="headerlink" href="#the-solution-lu-factorization-with-row-pivoting" title="Link to this heading">#</a></h2>
 <p>Now that we have identified the cause of instability in the basic LU algorithm, we can introduce the standard remedy.</p>
-<section id="partial-pivoting">
-<h3>Partial Pivoting<a class="headerlink" href="#partial-pivoting" title="Link to this heading">#</a></h3>
+<section id="row-pivoting">
+<h3>Row Pivoting<a class="headerlink" href="#row-pivoting" title="Link to this heading">#</a></h3>
 <p>The instability in Gaussian elimination arises when a pivot element <span class="math notranslate nohighlight">\(a_{kk}\)</span> is small relative to the entries below it. The solution is both simple and elegant: at each step, we must ensure that the pivot is as large as possible.</p>
-<p>This strategy is called <strong>partial pivoting</strong> (or row pivoting). At each step <span class="math notranslate nohighlight">\(k\)</span> of the elimination, the algorithm is modified as follows:</p>
+<p>This strategy is called <strong>row pivoting</strong> (or partial pivoting). At each step <span class="math notranslate nohighlight">\(k\)</span> of the elimination, the algorithm is modified as follows:</p>
 <ol class="arabic simple">
 <li><p><strong>Search for the largest pivot:</strong> Before performing elimination for column <span class="math notranslate nohighlight">\(k\)</span>, find the entry in that column with the largest absolute value, on or below the diagonal. Let this be <span class="math notranslate nohighlight">\(a_{pk}\)</span>, where <span class="math notranslate nohighlight">\(p \ge k\)</span>.</p></li>
 <li><p><strong>Swap rows:</strong> Interchange row <span class="math notranslate nohighlight">\(p\)</span> with the current pivot row, row <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
@@ -1059,8 +1059,8 @@ U =
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-intuitive-parallel-with-summation-error">An Intuitive Parallel with Summation Error</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-partial-pivoting">The Solution: LU Factorization with Partial Pivoting</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-pivoting">Partial Pivoting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-solution-lu-factorization-with-row-pivoting">The Solution: LU Factorization with Row Pivoting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-pivoting">Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-partial-pivoting">Implementing LU with Partial Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>

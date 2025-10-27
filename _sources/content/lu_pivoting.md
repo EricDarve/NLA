@@ -346,15 +346,15 @@ $$(|\tilde{L}||\tilde{U}|)_{ij} = \sum_k |\tilde{l}_{ik}||\tilde{u}_{kj}|,$$
 
 represent the worst-case sum of magnitudes for the terms that form $a_{ij}$. Therefore, the instability we observe when element growth occurs is perfectly consistent with our understanding of basic floating-point operations. Large intermediate numbers are a universal sign of potential numerical instability.
 
-## The Solution: LU Factorization with Partial Pivoting
+## The Solution: LU Factorization with Row Pivoting
 
 Now that we have identified the cause of instability in the basic LU algorithm, we can introduce the standard remedy.
 
-### Partial Pivoting
+### Row Pivoting
 
 The instability in Gaussian elimination arises when a pivot element $a_{kk}$ is small relative to the entries below it. The solution is both simple and elegant: at each step, we must ensure that the pivot is as large as possible.
 
-This strategy is called **partial pivoting** (or row pivoting). At each step $k$ of the elimination, the algorithm is modified as follows:
+This strategy is called **row pivoting** (or partial pivoting). At each step $k$ of the elimination, the algorithm is modified as follows:
 
 1.  **Search for the largest pivot:** Before performing elimination for column $k$, find the entry in that column with the largest absolute value, on or below the diagonal. Let this be $a_{pk}$, where $p \ge k$.
 2.  **Swap rows:** Interchange row $p$ with the current pivot row, row $k$.
