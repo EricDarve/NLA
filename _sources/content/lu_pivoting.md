@@ -374,7 +374,7 @@ Therefore, LU factorization with partial pivoting does not compute the factors o
 
 $$PA = LU$$
 
-This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the $PA=LU$ factorization **exists for any square matrix A**, singular or not.
+This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the $PA=LU$ factorization **exists for any square matrix A**, singular or not (see below for a proof).
 
 ### Implementing LU with Partial Pivoting
 
@@ -439,6 +439,124 @@ U = \begin{pmatrix}
 $$
 
 The enormous $\epsilon^{-1}$ term has vanished. All entries in $L$ and $U$ are of moderate size. The backward error is now proportional to $u$, rendering the algorithm **backward stable** for this problem.
+
+### Proof of the Existence of LU Factorization with Row Pivoting
+
+The use of partial pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for *any* square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.
+
+```{prf:theorem} Existence of LU Factorization with Row Pivoting
+:label: thm:existence_lu_pivoting
+For any square matrix $A\in\mathbb{F}^{n\times n}$ (where $\mathbb{F}=\mathbb{R}$ or $\mathbb{C}$), there exist a permutation matrix $P$, a unit lower–triangular matrix $L$, and an upper–triangular matrix $U$ such that
+
+$$
+PA = LU .
+$$
+```
+
+```{prf:proof}
+We proceed by induction on the dimension $n$. For notational simplicity, we use $\mathbb F = \mathbb R$; the complex case is identical.
+
+**Base case ($n=1$):**
+For a $1 \times 1$ matrix $A=[a]$, the factorization is trivial. We can choose $P=[1]$, $L=[1]$, and $U=[a]$. Then $PA = [1][a] = [a]$ and $LU = [1][a] = [a]$, so the statement holds.
+
+**Inductive step:**
+Assume the statement holds for all matrices of size $(n-1)\times(n-1)$. We must show it holds for an arbitrary $n\times n$ matrix $A$.
+
+1.  **Choose a pivot and permute.**
+    Search the first column of $A$ for an element with the largest absolute value. Let this element be in row $p$. If the entire first column is zero, we can choose any row (e.g., $p=1$). Let $P_1$ be the permutation matrix that swaps row 1 and row $p$. We then form the permuted matrix:
+
+    $$
+    A^{(1)} := P_1 A =
+    \begin{bmatrix}
+    \alpha & w^T \\
+    x & A_{22}
+    \end{bmatrix}
+    $$
+
+    where $\alpha \in \mathbb{R}$ is the pivot element, $w, x \in \mathbb{R}^{n-1}$, and $A_{22} \in \mathbb{R}^{(n-1)\times(n-1)}$. By our choice of pivot, $|\alpha| \ge |x_i|$ for all entries $x_i$ in the vector $x$.
+
+2.  **Eliminate below the pivot.**
+    We now perform one step of elimination. Define the vector of multipliers $\ell$ as:
+
+    $$
+    \ell :=
+    \begin{cases}
+    \alpha^{-1}x, & \text{if }\alpha\neq 0,\\
+    0,            & \text{if }\alpha=0.
+    \end{cases}
+    $$
+
+    Note that if $\alpha=0$, our pivot choice implies that the entire first column is zero, so $x=0$, and $\ell=0$ is the correct choice. We can write this elimination step using a matrix $E_1$:
+
+    $$
+    E_1 =
+    \begin{bmatrix}
+    1 & 0 \\
+    -\ell & I
+    \end{bmatrix}
+    \quad \implies \quad
+    E_1 A^{(1)} =
+    \begin{bmatrix}
+    \alpha & w^T \\
+    0 & S
+    \end{bmatrix}
+    $$
+
+    where $S = A_{22} - \ell w^T$ is the Schur complement. The matrix $E_1$ is unit lower-triangular, and its inverse $E_1^{-1} = \begin{bmatrix}1&0\\ \ell & I\end{bmatrix}$ is also unit lower-triangular.
+
+3.  **Apply the induction hypothesis.**
+    The Schur complement $S$ is an $(n-1)\times(n-1)$ matrix. By our induction hypothesis, there exists a factorization for $S$:
+
+    $$
+    P_S S = L_S U_S
+    $$
+
+    where $P_S$ is an $(n-1)\times(n-1)$ permutation matrix, $L_S$ is unit lower-triangular, and $U_S$ is upper-triangular.
+
+4.  **Assemble the final factorization.**
+    We can "lift" the permutation $P_S$ to the full $n \times n$ dimension by defining a block matrix $\Pi$:
+
+    $$
+    \Pi := \begin{bmatrix} 1 & 0 \\ 0 & P_S \end{bmatrix}
+    $$
+
+    Now, we multiply our previous result by $\Pi$:
+
+    $$
+    \Pi (E_1 A^{(1)}) =
+    \begin{bmatrix} 1 & 0 \\ 0 & P_S \end{bmatrix}
+    \begin{bmatrix} \alpha & w^T \\ 0 & S \end{bmatrix}
+    =
+    \begin{bmatrix} \alpha & w^T \\ 0 & P_S S \end{bmatrix}
+    $$
+
+    Substituting the factorization for $P_S S$, we get:
+
+    $$
+    \Pi E_1 P_1 A =
+    \begin{bmatrix} \alpha & w^T \\ 0 & L_S U_S \end{bmatrix}
+    =
+    \underbrace{\begin{bmatrix} 1 & 0 \\ 0 & L_S \end{bmatrix}}_{\text{unit lower-triangular}} \hspace{1em}
+    \underbrace{\begin{bmatrix} \alpha & w^T \\ 0 & U_S \end{bmatrix}}_{\text{upper-triangular}}
+    $$
+
+    Let's call these two new matrices $\tilde{L}$ and $U$. We now have $\Pi E_1 P_1 A = \tilde{L} U$. To isolate $A$, we rearrange:
+
+    $$
+    (\Pi P_1) A = (\Pi E_1^{-1} \Pi^{-1}) \tilde{L} U
+    $$
+
+    Let's examine the terms:
+    -   $P = \Pi P_1$ is a product of permutation matrices, and is therefore a permutation matrix.
+    -   $L = (\Pi E_1^{-1} \Pi^{-1}) \tilde{L}$. The matrix $E_1^{-1} = \begin{bmatrix}1&0\\ \ell & I\end{bmatrix}$ is unit lower-triangular. Conjugating by $\Pi$ only permutes rows and columns 2 through $n$, which preserves the unit lower-triangular structure. The product of two unit lower-triangular matrices ($\Pi E_1^{-1} \Pi^{-1}$ and $\tilde{L}$) is also unit lower-triangular.
+    -   $U$ is already upper-triangular by construction.
+
+    We have successfully constructed $P, L, U$ with the required properties such that $PA=LU$. This completes the induction.
+```
+
+**Remarks:**
+- This proof is constructive and directly corresponds to the LU factorization algorithm with row pivoting.
+- The proof does not require the matrix $A$ to be invertible. If $A$ is singular, the process still works, and the singularity will manifest as one or more zero entries on the diagonal of the upper-triangular factor $U$.
 
 ### A Final Word on Stability
 

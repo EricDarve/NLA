@@ -390,7 +390,7 @@ document.write(`
 <h1>Backward Stability of Householder and Givens QR<a class="headerlink" href="#backward-stability-of-householder-and-givens-qr" title="Link to this heading">#</a></h1>
 <p>This is perhaps the most important theoretical guarantee for these methods. While rounding errors mean we don’t compute the exact <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span> for a given <span class="math notranslate nohighlight">\(A\)</span>, we can prove something stronger.</p>
 <div class="proof theorem admonition" id="thm:backward_stability_qr">
-<p class="admonition-title"><span class="caption-number">Theorem 17 </span> (Backward Stability of QR Factorization)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 18 </span> (Backward Stability of QR Factorization)</p>
 <section class="theorem-content" id="proof-content">
 <p>When QR factorization is computed using a sequence of Householder or Givens transformations in floating-point arithmetic, the computed factors <span class="math notranslate nohighlight">\(\hat{Q}\)</span> and <span class="math notranslate nohighlight">\(\hat{R}\)</span> are the <em>exact</em> orthogonal and upper-triangular factors for a slightly perturbed matrix <span class="math notranslate nohighlight">\(A + \delta A\)</span>. The size of the perturbation is small, bounded by:</p>
 <div class="math notranslate nohighlight">

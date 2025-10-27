@@ -415,6 +415,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-partial-pivoting">Implementing LU with Partial Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting">Proof of the Existence of LU Factorization with Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-final-word-on-stability">A Final Word on Stability</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-of-element-growth">An Example of Element Growth</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-worst-case-growth-factor">The Worst-Case Growth Factor</a></li>
@@ -742,7 +743,7 @@ U = \begin{pmatrix}
 <p>Therefore, LU factorization with partial pivoting does not compute the factors of <span class="math notranslate nohighlight">\(A\)</span> itself, but rather of a row-permuted version of <span class="math notranslate nohighlight">\(A\)</span>. The resulting factorization is:</p>
 <div class="math notranslate nohighlight">
 \[PA = LU\]</div>
-<p>This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the <span class="math notranslate nohighlight">\(PA=LU\)</span> factorization <strong>exists for any square matrix A</strong>, singular or not.</p>
+<p>This is the standard form of LU factorization implemented in virtually all numerical software. It comes with a powerful guarantee that the basic version lacks: the <span class="math notranslate nohighlight">\(PA=LU\)</span> factorization <strong>exists for any square matrix A</strong>, singular or not (see below for a proof).</p>
 </section>
 <section id="implementing-lu-with-partial-pivoting">
 <h3>Implementing LU with Partial Pivoting<a class="headerlink" href="#implementing-lu-with-partial-pivoting" title="Link to this heading">#</a></h3>
@@ -803,6 +804,117 @@ U = \begin{pmatrix}
 \end{pmatrix}
 \end{split}\]</div>
 <p>The enormous <span class="math notranslate nohighlight">\(\epsilon^{-1}\)</span> term has vanished. All entries in <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> are of moderate size. The backward error is now proportional to <span class="math notranslate nohighlight">\(u\)</span>, rendering the algorithm <strong>backward stable</strong> for this problem.</p>
+</section>
+<section id="proof-of-the-existence-of-lu-factorization-with-row-pivoting">
+<h3>Proof of the Existence of LU Factorization with Row Pivoting<a class="headerlink" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting" title="Link to this heading">#</a></h3>
+<p>The use of partial pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for <em>any</em> square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.</p>
+<div class="proof theorem admonition" id="thm:existence_lu_pivoting">
+<p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Existence of LU Factorization with Row Pivoting)</p>
+<section class="theorem-content" id="proof-content">
+<p>For any square matrix <span class="math notranslate nohighlight">\(A\in\mathbb{F}^{n\times n}\)</span> (where <span class="math notranslate nohighlight">\(\mathbb{F}=\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>), there exist a permutation matrix <span class="math notranslate nohighlight">\(P\)</span>, a unit lower–triangular matrix <span class="math notranslate nohighlight">\(L\)</span>, and an upper–triangular matrix <span class="math notranslate nohighlight">\(U\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[
+PA = LU .
+\]</div>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. We proceed by induction on the dimension <span class="math notranslate nohighlight">\(n\)</span>. For notational simplicity, we use <span class="math notranslate nohighlight">\(\mathbb F = \mathbb R\)</span>; the complex case is identical.</p>
+<p><strong>Base case (<span class="math notranslate nohighlight">\(n=1\)</span>):</strong>
+For a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix <span class="math notranslate nohighlight">\(A=[a]\)</span>, the factorization is trivial. We can choose <span class="math notranslate nohighlight">\(P=[1]\)</span>, <span class="math notranslate nohighlight">\(L=[1]\)</span>, and <span class="math notranslate nohighlight">\(U=[a]\)</span>. Then <span class="math notranslate nohighlight">\(PA = [1][a] = [a]\)</span> and <span class="math notranslate nohighlight">\(LU = [1][a] = [a]\)</span>, so the statement holds.</p>
+<p><strong>Inductive step:</strong>
+Assume the statement holds for all matrices of size <span class="math notranslate nohighlight">\((n-1)\times(n-1)\)</span>. We must show it holds for an arbitrary <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Choose a pivot and permute.</strong>
+Search the first column of <span class="math notranslate nohighlight">\(A\)</span> for an element with the largest absolute value. Let this element be in row <span class="math notranslate nohighlight">\(p\)</span>. If the entire first column is zero, we can choose any row (e.g., <span class="math notranslate nohighlight">\(p=1\)</span>). Let <span class="math notranslate nohighlight">\(P_1\)</span> be the permutation matrix that swaps row 1 and row <span class="math notranslate nohighlight">\(p\)</span>. We then form the permuted matrix:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    A^{(1)} := P_1 A =
+    \begin{bmatrix}
+    \alpha &amp; w^T \\
+    x &amp; A_{22}
+    \end{bmatrix}
+    \end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\alpha \in \mathbb{R}\)</span> is the pivot element, <span class="math notranslate nohighlight">\(w, x \in \mathbb{R}^{n-1}\)</span>, and <span class="math notranslate nohighlight">\(A_{22} \in \mathbb{R}^{(n-1)\times(n-1)}\)</span>. By our choice of pivot, <span class="math notranslate nohighlight">\(|\alpha| \ge |x_i|\)</span> for all entries <span class="math notranslate nohighlight">\(x_i\)</span> in the vector <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</li>
+<li><p><strong>Eliminate below the pivot.</strong>
+We now perform one step of elimination. Define the vector of multipliers <span class="math notranslate nohighlight">\(\ell\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \ell :=
+    \begin{cases}
+    \alpha^{-1}x, &amp; \text{if }\alpha\neq 0,\\
+    0,            &amp; \text{if }\alpha=0.
+    \end{cases}
+    \end{split}\]</div>
+<p>Note that if <span class="math notranslate nohighlight">\(\alpha=0\)</span>, our pivot choice implies that the entire first column is zero, so <span class="math notranslate nohighlight">\(x=0\)</span>, and <span class="math notranslate nohighlight">\(\ell=0\)</span> is the correct choice. We can write this elimination step using a matrix <span class="math notranslate nohighlight">\(E_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    E_1 =
+    \begin{bmatrix}
+    1 &amp; 0 \\
+    -\ell &amp; I
+    \end{bmatrix}
+    \quad \implies \quad
+    E_1 A^{(1)} =
+    \begin{bmatrix}
+    \alpha &amp; w^T \\
+    0 &amp; S
+    \end{bmatrix}
+    \end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(S = A_{22} - \ell w^T\)</span> is the Schur complement. The matrix <span class="math notranslate nohighlight">\(E_1\)</span> is unit lower-triangular, and its inverse <span class="math notranslate nohighlight">\(E_1^{-1} = \begin{bmatrix}1&amp;0\\ \ell &amp; I\end{bmatrix}\)</span> is also unit lower-triangular.</p>
+</li>
+<li><p><strong>Apply the induction hypothesis.</strong>
+The Schur complement <span class="math notranslate nohighlight">\(S\)</span> is an <span class="math notranslate nohighlight">\((n-1)\times(n-1)\)</span> matrix. By our induction hypothesis, there exists a factorization for <span class="math notranslate nohighlight">\(S\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    P_S S = L_S U_S
+    \]</div>
+<p>where <span class="math notranslate nohighlight">\(P_S\)</span> is an <span class="math notranslate nohighlight">\((n-1)\times(n-1)\)</span> permutation matrix, <span class="math notranslate nohighlight">\(L_S\)</span> is unit lower-triangular, and <span class="math notranslate nohighlight">\(U_S\)</span> is upper-triangular.</p>
+</li>
+<li><p><strong>Assemble the final factorization.</strong>
+We can “lift” the permutation <span class="math notranslate nohighlight">\(P_S\)</span> to the full <span class="math notranslate nohighlight">\(n \times n\)</span> dimension by defining a block matrix <span class="math notranslate nohighlight">\(\Pi\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \Pi := \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; P_S \end{bmatrix}
+    \end{split}\]</div>
+<p>Now, we multiply our previous result by <span class="math notranslate nohighlight">\(\Pi\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \Pi (E_1 A^{(1)}) =
+    \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; P_S \end{bmatrix}
+    \begin{bmatrix} \alpha &amp; w^T \\ 0 &amp; S \end{bmatrix}
+    =
+    \begin{bmatrix} \alpha &amp; w^T \\ 0 &amp; P_S S \end{bmatrix}
+    \end{split}\]</div>
+<p>Substituting the factorization for <span class="math notranslate nohighlight">\(P_S S\)</span>, we get:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+    \Pi E_1 P_1 A =
+    \begin{bmatrix} \alpha &amp; w^T \\ 0 &amp; L_S U_S \end{bmatrix}
+    =
+    \underbrace{\begin{bmatrix} 1 &amp; 0 \\ 0 &amp; L_S \end{bmatrix}}_{\text{unit lower-triangular}} \hspace{1em}
+    \underbrace{\begin{bmatrix} \alpha &amp; w^T \\ 0 &amp; U_S \end{bmatrix}}_{\text{upper-triangular}}
+    \end{split}\]</div>
+<p>Let’s call these two new matrices <span class="math notranslate nohighlight">\(\tilde{L}\)</span> and <span class="math notranslate nohighlight">\(U\)</span>. We now have <span class="math notranslate nohighlight">\(\Pi E_1 P_1 A = \tilde{L} U\)</span>. To isolate <span class="math notranslate nohighlight">\(A\)</span>, we rearrange:</p>
+<div class="math notranslate nohighlight">
+\[
+    (\Pi P_1) A = (\Pi E_1^{-1} \Pi^{-1}) \tilde{L} U
+    \]</div>
+<p>Let’s examine the terms:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(P = \Pi P_1\)</span> is a product of permutation matrices, and is therefore a permutation matrix.</p></li>
+<li><p><span class="math notranslate nohighlight">\(L = (\Pi E_1^{-1} \Pi^{-1}) \tilde{L}\)</span>. The matrix <span class="math notranslate nohighlight">\(E_1^{-1} = \begin{bmatrix}1&amp;0\\ \ell &amp; I\end{bmatrix}\)</span> is unit lower-triangular. Conjugating by <span class="math notranslate nohighlight">\(\Pi\)</span> only permutes rows and columns 2 through <span class="math notranslate nohighlight">\(n\)</span>, which preserves the unit lower-triangular structure. The product of two unit lower-triangular matrices (<span class="math notranslate nohighlight">\(\Pi E_1^{-1} \Pi^{-1}\)</span> and <span class="math notranslate nohighlight">\(\tilde{L}\)</span>) is also unit lower-triangular.</p></li>
+<li><p><span class="math notranslate nohighlight">\(U\)</span> is already upper-triangular by construction.</p></li>
+</ul>
+<p>We have successfully constructed <span class="math notranslate nohighlight">\(P, L, U\)</span> with the required properties such that <span class="math notranslate nohighlight">\(PA=LU\)</span>. This completes the induction.</p>
+</li>
+</ol>
+</div>
+<p><strong>Remarks:</strong></p>
+<ul class="simple">
+<li><p>This proof is constructive and directly corresponds to the LU factorization algorithm with row pivoting.</p></li>
+<li><p>The proof does not require the matrix <span class="math notranslate nohighlight">\(A\)</span> to be invertible. If <span class="math notranslate nohighlight">\(A\)</span> is singular, the process still works, and the singularity will manifest as one or more zero entries on the diagonal of the upper-triangular factor <span class="math notranslate nohighlight">\(U\)</span>.</p></li>
+</ul>
 </section>
 <section id="a-final-word-on-stability">
 <h3>A Final Word on Stability<a class="headerlink" href="#a-final-word-on-stability" title="Link to this heading">#</a></h3>
@@ -952,6 +1064,7 @@ U =
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pa-lu-factorization">The <span class="math notranslate nohighlight">\(PA = LU\)</span> Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-lu-with-partial-pivoting">Implementing LU with Partial Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-unstable-example-stabilized">The Unstable Example, Stabilized</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting">Proof of the Existence of LU Factorization with Row Pivoting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-final-word-on-stability">A Final Word on Stability</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-of-element-growth">An Example of Element Growth</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-worst-case-growth-factor">The Worst-Case Growth Factor</a></li>
