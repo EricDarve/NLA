@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Eigenvalue Computation &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Symmetric vs Unsymmetric QR Iteration &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/eigenvalues';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/symmetric_vs_nonsymmetric_qr';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Power Method" href="power_method.html" />
-    <link rel="prev" title="Summary of LS Solution Methods" href="LS_summary.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="The Shifted QR Iteration Algorithm" href="qr_iteration_with_shifts.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -221,7 +221,7 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
@@ -232,7 +232,7 @@
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -290,7 +290,7 @@
       
       
       
-      <li><a href="../_sources/content/eigenvalues.md" target="_blank"
+      <li><a href="../_sources/content/symmetric_vs_nonsymmetric_qr.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -374,7 +374,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Eigenvalue Computation</h1>
+    <h1>Symmetric vs Unsymmetric QR Iteration</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -384,9 +384,17 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-no-direct-solution">The Challenge: No Direct Solution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-to-polynomial-root-finding">Equivalence to Polynomial Root-Finding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterative-methods-are-a-necessity">Iterative Methods are a Necessity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-1-reduction-to-upper-hessenberg-form">Phase 1: Reduction to Upper Hessenberg Form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unsymmetric-real-matrices">Unsymmetric Real Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-real-matrices">Symmetric Real Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-2-the-shifted-qr-iteration">Phase 2: The Shifted QR Iteration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Unsymmetric Real Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Symmetric Real Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-cost-and-convergence">3. Summary: Cost and Convergence</a></li>
 </ul>
             </nav>
         </div>
@@ -398,99 +406,160 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="eigenvalue-computation">
-<h1>Eigenvalue Computation<a class="headerlink" href="#eigenvalue-computation" title="Link to this heading">#</a></h1>
-<p>Eigenvalues and eigenvectors are fundamental concepts in linear algebra. They provide deep insight into the behavior of a matrix <span class="math notranslate nohighlight">\(A\)</span> by revealing the directions <span class="math notranslate nohighlight">\(v\)</span> in which the matrix acts as a simple scalar <span class="math notranslate nohighlight">\(\lambda\)</span>, such that <span class="math notranslate nohighlight">\(A v = \lambda v\)</span>.</p>
-<p>This single property unlocks a wide range of powerful applications:</p>
-<ul class="simple">
-<li><p><strong>Diagonalization:</strong> For a diagonalizable matrix, the eigendecomposition <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span> provides a “canonical” representation of the linear transformation, simplifying its structure.</p></li>
-<li><p><strong>Matrix Operations:</strong> This decomposition makes complex operations computationally trivial. It turns matrix powers into scalar powers (<span class="math notranslate nohighlight">\(A^k = X \Lambda^k X^{-1}\)</span>) and enables the general computation of matrix functions:</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[f(A) = X f(\Lambda) X^{-1}.\]</div>
-<ul class="simple">
-<li><p><strong>Dynamic Systems:</strong> Eigenvalues are essential for studying time-evolving systems. The solution to a system of linear differential equations, <span class="math notranslate nohighlight">\(\frac{dx}{dt} = M x\)</span>, is given by</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[x(t) = \exp(Mt) x_0.\]</div>
-<p>The stability and long-term behavior of this solution are dictated entirely by the eigenvalues of <span class="math notranslate nohighlight">\(M\)</span>, as the solution depends on terms of the form <span class="math notranslate nohighlight">\(\exp(\lambda_i t)\)</span>.</p>
-<p>Given their critical importance in physics, engineering, data analysis, and countless other scientific disciplines, the ability to <em>compute</em> eigenvalues and eigenvectors is a core practical problem. The theoretical definitions, such as solving the characteristic polynomial <span class="math notranslate nohighlight">\(\det(A - \lambda I) = 0\)</span>, do not lead to stable or efficient algorithms for general matrices.</p>
-<p>In this section, we shift our focus from the <em>theory</em> of eigenvalues to the <em>practice</em> of their numerical computation. We will develop the robust and scalable algorithms that are used in modern software to solve eigenvalue problems efficiently and accurately.</p>
-<section id="the-challenge-no-direct-solution">
-<h2>The Challenge: No Direct Solution<a class="headerlink" href="#the-challenge-no-direct-solution" title="Link to this heading">#</a></h2>
-<p>Unlike other problems we have studied, such as solving <span class="math notranslate nohighlight">\(Ax = b\)</span> using <span class="math notranslate nohighlight">\(LU\)</span> factorization, there is no “direct” method or finite formula to compute the eigenvalues of a general <span class="math notranslate nohighlight">\(n \times n\)</span> matrix for <span class="math notranslate nohighlight">\(n \ge 5\)</span>.</p>
-<p>The root of this difficulty lies in a deep, fundamental connection between finding eigenvalues and finding the roots of a polynomial.</p>
-</section>
-<section id="equivalence-to-polynomial-root-finding">
-<h2>Equivalence to Polynomial Root-Finding<a class="headerlink" href="#equivalence-to-polynomial-root-finding" title="Link to this heading">#</a></h2>
-<p>We know that the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are the roots of the <strong>characteristic polynomial</strong>, <span class="math notranslate nohighlight">\(p(\lambda) = \det(A - \lambda I)\)</span>. This shows that finding eigenvalues is <em>at least as hard</em> as finding polynomial roots.</p>
-<p>It turns out these two problems are mathematically <strong>equivalent</strong>. We can also prove that finding the roots of <em>any</em> polynomial <span class="math notranslate nohighlight">\(p(x)\)</span> is equivalent to finding the eigenvalues of a specific matrix.</p>
-<p>Consider a general monic polynomial of degree <span class="math notranslate nohighlight">\(n\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-p(x) = x^n + a_{n-1} x^{n-1} + \cdots + a_1 x + a_0
-\]</div>
-<p>We can construct a special matrix <span class="math notranslate nohighlight">\(A\)</span>, known as the <strong>companion matrix</strong> of the polynomial <span class="math notranslate nohighlight">\(p(x)\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A =
-\begin{pmatrix}
-    0 &amp; 1 &amp; &amp; &amp; \\
-    &amp; 0 &amp; 1 &amp; &amp; \\
-    &amp; &amp; \ddots &amp; \ddots &amp; \\
-    &amp; &amp; &amp; 0 &amp; 1 \\
-    -a_0 &amp; -a_1 &amp; \cdots &amp; -a_{n-2} &amp; -a_{n-1}
-\end{pmatrix}
-\end{split}\]</div>
-<div class="proof theorem admonition" id="thm:companion_matrix">
-<p class="admonition-title"><span class="caption-number">Theorem 19 </span> (Eigenvalues of the Companion Matrix)</p>
-<section class="theorem-content" id="proof-content">
-<p>The eigenvalues of this matrix <span class="math notranslate nohighlight">\(A\)</span> are <em>exactly</em> the roots of the polynomial <span class="math notranslate nohighlight">\(p(x)\)</span>.</p>
-</section>
-</div><div class="proof admonition" id="proof">
-<p>Proof. Let <span class="math notranslate nohighlight">\(z \in \mathbb{C}\)</span> be an eigenvalue and <span class="math notranslate nohighlight">\(u = (u_1, \ldots, u_n)^T\)</span> be the corresponding eigenvector, so <span class="math notranslate nohighlight">\(A u = z u\)</span>. Let’s write out the first <span class="math notranslate nohighlight">\(n-1\)</span> equations from this system:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-u_2 &amp;= z u_1 \\
-u_3 &amp;= z u_2 = z^2 u_1 \\
-&amp;\vdots \\
-u_n &amp;= z u_{n-1} = z^{n-1} u_1
-\end{aligned}
-\end{split}\]</div>
-<p>This defines the structure of the eigenvector. If we set <span class="math notranslate nohighlight">\(u_1 = 1\)</span>, the eigenvector is <span class="math notranslate nohighlight">\(u = (1, z, z^2, \ldots, z^{n-1})^T\)</span>.</p>
-<p>Now, we look at the <span class="math notranslate nohighlight">\(n\)</span>-th and final equation from <span class="math notranslate nohighlight">\(A u = z u\)</span>, which corresponds to the last row of <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
--a_0 u_1 - a_1 u_2 - \cdots - a_{n-1} u_n = z u_n
-\]</div>
-<p>Substituting <span class="math notranslate nohighlight">\(u_k = z^{k-1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
--a_0 - a_1 z - \cdots - a_{n-1} z^{n-1} = z (z^{n-1})
-\]</div>
-<p>Finally, moving all terms to one side, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0 = 0
-\]</div>
-<p>This is precisely <span class="math notranslate nohighlight">\(p(z) = 0\)</span>. Therefore, <span class="math notranslate nohighlight">\(z\)</span> is an eigenvalue of <span class="math notranslate nohighlight">\(A\)</span> if and only if <span class="math notranslate nohighlight">\(z\)</span> is a root of <span class="math notranslate nohighlight">\(p(x)\)</span>.</p>
-</div>
-</section>
-<section id="iterative-methods-are-a-necessity">
-<h2>Iterative Methods are a Necessity<a class="headerlink" href="#iterative-methods-are-a-necessity" title="Link to this heading">#</a></h2>
-<p>This equivalence is profound. The <strong>Abel-Ruffini theorem</strong>, a landmark result from the 19th century, proves that there is <strong>no general formula in radicals</strong> (i.e., no equivalent of the quadratic formula) for the roots of polynomials of degree 5 or higher.</p>
-<p>Because of this:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="symmetric-vs-unsymmetric-qr-iteration">
+<h1>Symmetric vs Unsymmetric QR Iteration<a class="headerlink" href="#symmetric-vs-unsymmetric-qr-iteration" title="Link to this heading">#</a></h1>
+<p>We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration algorithm with shifts for both cases.</p>
+<p>The standard, high-performance approach for finding all eigenvalues of a dense matrix is a <strong>two-phase process</strong>:</p>
 <ol class="arabic simple">
-<li><p>If a direct, exact algorithm for eigenvalues existed, we could use it to find the roots of any polynomial exactly, via its companion matrix.</p></li>
-<li><p>The Abel-Ruffini theorem tells us such a root-finding algorithm is impossible.</p></li>
-<li><p>Therefore, <strong>no direct, exact algorithm for eigenvalues can exist</strong> for general <span class="math notranslate nohighlight">\(n \times n\)</span> matrices.</p></li>
+<li><p><strong>Phase 1 (Direct):</strong> Use a <em>direct</em> (non-iterative) method to reduce the matrix to a simpler form that is unitarily similar. This step is <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>
+<li><p><strong>Phase 2 (Iterative):</strong> Use an <em>iterative</em> method (the shifted QR iteration) on this simpler form to find the eigenvalues.</p></li>
 </ol>
-<p>This forces us to use a different approach. All general-purpose eigenvalue solvers are, by necessity, <strong>iterative</strong>. They do not compute the exact eigenvalues in a finite number of steps. Instead, they generate a sequence of approximate solutions that converge to the true eigenvalues.</p>
-<p>Fortunately, the algorithms we will study are so effective that this is not a practical limitation. They converge extremely fast (often quadratically or cubically) and are numerically stable, allowing us to compute eigenvalues to machine accuracy. For all practical purposes, the results are indistinguishable from an “exact” solution.</p>
+<p>The differences between the symmetric and unsymmetric cases affect every part of this process.</p>
+<section id="phase-1-reduction-to-upper-hessenberg-form">
+<h2>Phase 1: Reduction to Upper Hessenberg Form<a class="headerlink" href="#phase-1-reduction-to-upper-hessenberg-form" title="Link to this heading">#</a></h2>
+<p>The goal of this phase is to introduce as many zeros as possible using a <em>finite</em> number of similarity transformations (e.g., Householder reflections) to make the subsequent iterative phase cheaper.</p>
+<section id="unsymmetric-real-matrices">
+<h3>Unsymmetric Real Matrices<a class="headerlink" href="#unsymmetric-real-matrices" title="Link to this heading">#</a></h3>
+<ul>
+<li><p><strong>Target Form:</strong> <strong>Upper Hessenberg form</strong>.</p></li>
+<li><p><strong>Structure:</strong> A matrix <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg if all entries below the first sub-diagonal are zero (<span class="math notranslate nohighlight">\(H_{ij} = 0\)</span> for <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>). It’s the “closest” you can get to upper triangular in a finite number of steps.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} H = \begin{pmatrix}
+    \times &amp; \times &amp; \times &amp; \times \\
+    \times &amp; \times &amp; \times &amp; \times \\
+    0 &amp; \times &amp; \times &amp; \times \\
+    0 &amp; 0 &amp; \times &amp; \times
+    \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Computational Cost:</strong> This reduction requires <span class="math notranslate nohighlight">\(\approx \frac{10}{3}n^3\)</span> floating-point operations (flops).</p></li>
+</ul>
 </section>
-<div class="toctree-wrapper compound">
+<section id="symmetric-real-matrices">
+<h3>Symmetric Real Matrices<a class="headerlink" href="#symmetric-real-matrices" title="Link to this heading">#</a></h3>
+<ul>
+<li><p><strong>Target Form:</strong> <strong>Tridiagonal form</strong>.</p></li>
+<li><p><strong>Structure:</strong> If the original matrix <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A = A^T\)</span>), any similarity transformation <span class="math notranslate nohighlight">\(H = Q^T A Q\)</span> will also be symmetric. A <strong>symmetric upper Hessenberg matrix is, by definition, tridiagonal</strong>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} T = \begin{pmatrix}
+    \times &amp; \times &amp; 0 &amp; 0 \\
+    \times &amp; \times &amp; \times &amp; 0 \\
+    0 &amp; \times &amp; \times &amp; \times \\
+    0 &amp; 0 &amp; \times &amp; \times
+    \end{pmatrix}
+    \end{split}\]</div>
+</li>
+<li><p><strong>Computational Cost:</strong> This reduction is significantly cheaper, requiring <span class="math notranslate nohighlight">\(\approx \frac{4}{3}n^3\)</span> flops.</p></li>
+</ul>
+<p>This initial reduction is a <em>huge</em> win for the symmetric case. The target matrix <span class="math notranslate nohighlight">\(T\)</span> has only <span class="math notranslate nohighlight">\(O(n)\)</span> non-zero elements, compared to the <span class="math notranslate nohighlight">\(O(n^2)\)</span> elements in the unsymmetric Hessenberg matrix <span class="math notranslate nohighlight">\(H\)</span>.</p>
+</section>
+</section>
+<section id="phase-2-the-shifted-qr-iteration">
+<h2>Phase 2: The Shifted QR Iteration<a class="headerlink" href="#phase-2-the-shifted-qr-iteration" title="Link to this heading">#</a></h2>
+<p>This is the iterative phase where we apply QR steps to the reduced matrix (<span class="math notranslate nohighlight">\(H\)</span> or <span class="math notranslate nohighlight">\(T\)</span>) to find the eigenvalues.</p>
+<section id="id1">
+<h3>Unsymmetric Real Matrices<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<ul>
+<li><p><strong>Eigenvalues:</strong> The eigenvalues can be <strong>real or complex conjugate pairs</strong>.</p></li>
+<li><p><strong>The Problem:</strong> A simple shift like <span class="math notranslate nohighlight">\(\mu = H[n,n]\)</span> will fail to converge if the eigenvalue it’s “chasing” is part of a complex pair. The shift (which is real) will oscillate and never settle.</p></li>
+<li><p><strong>The Algorithm (Francis QR Step):</strong> The standard solution is the <strong>double-shift QR algorithm</strong>.</p>
+<ol class="arabic simple">
+<li><p>It uses <em>two</em> shifts, <span class="math notranslate nohighlight">\(\mu_1\)</span> and <span class="math notranslate nohighlight">\(\mu_2\)</span>, which are chosen as the eigenvalues of the bottom-right <span class="math notranslate nohighlight">\(2 \times 2\)</span> submatrix of <span class="math notranslate nohighlight">\(H\)</span>.</p></li>
+<li><p>If the eigenvalues are complex (e.g., <span class="math notranslate nohighlight">\(a \pm bi\)</span>), this choice perfectly captures them.</p></li>
+<li><p>A “bulge chasing” technique performs this double-step implicitly, using only real arithmetic, which is very clever and stable.</p></li>
+</ol>
+</li>
+<li><p><strong>Cost per Iteration:</strong> This “bulge chase” on a Hessenberg matrix costs <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong> operations.</p></li>
+<li><p><strong>Convergence:</strong> The convergence is generally quadratic with the Francis double-shift:</p>
+<div class="math notranslate nohighlight">
+\[
+    \epsilon_{k+1} \approx c \, \epsilon_k^2
+    \]</div>
+<p>for some constant <span class="math notranslate nohighlight">\(c &lt; 1\)</span>, where <span class="math notranslate nohighlight">\(\epsilon_k\)</span> is the error at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
+</li>
+<li><p><strong>Final Form:</strong> The iteration converges to the <strong>Schur form</strong>—an upper triangular (or block-upper-triangular) matrix <span class="math notranslate nohighlight">\(S\)</span>. The eigenvalues are on the diagonal (or in <span class="math notranslate nohighlight">\(2 \times 2\)</span> blocks for complex pairs).</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Symmetric Real Matrices<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<ul>
+<li><p><strong>Eigenvalues:</strong> The eigenvalues are <strong>always real</strong>.</p></li>
+<li><p><strong>The Algorithm (Wilkinson Shift):</strong> Because the eigenvalues are real, we do not need a double-shift. We can use a single, real shift.</p>
+<ol class="arabic simple">
+<li><p>While the <span class="math notranslate nohighlight">\(\mu = T[n,n]\)</span> shift works, a much more robust and faster-converging choice is the <strong>Wilkinson shift</strong>. It’s the eigenvalue of the bottom <span class="math notranslate nohighlight">\(2 \times 2\)</span> submatrix that is <em>closer</em> to <span class="math notranslate nohighlight">\(T[n,n]\)</span>.</p></li>
+<li><p>This shift provides a safeguard against some pathological cases where the simple <span class="math notranslate nohighlight">\(T[n,n]\)</span> shift might fail.</p></li>
+</ol>
+</li>
+<li><p><strong>Cost per Iteration:</strong> Since the matrix is tridiagonal, applying one step of the QR algorithm (with “bulge chasing”) is astonishingly cheap. It only costs <strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong> operations.</p></li>
+<li><p><strong>Convergence:</strong> The convergence for the symmetric case with a Wilkinson shift is <strong>globally and cubically convergent</strong>. This is incredibly fast; it’s one of the most powerful results in numerical linear algebra:</p>
+<div class="math notranslate nohighlight">
+\[
+    \epsilon_{k+1} \approx c \, \epsilon_k^3
+    \]</div>
+<p>for some constant <span class="math notranslate nohighlight">\(c &lt; 1\)</span>.</p>
+</li>
+<li><p><strong>Final Form:</strong> The iteration converges to a <strong>diagonal matrix</strong> <span class="math notranslate nohighlight">\(D\)</span>. (A symmetric upper triangular matrix is, by definition, diagonal). The eigenvalues are the diagonal entries.</p></li>
+</ul>
+</section>
+</section>
+<section id="summary-cost-and-convergence">
+<h2>3. Summary: Cost and Convergence<a class="headerlink" href="#summary-cost-and-convergence" title="Link to this heading">#</a></h2>
+<p>Here is a side-by-side comparison of finding all eigenvalues.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Symmetric Case (e.g., <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code>)</p></th>
+<th class="head text-left"><p>Unsymmetric Case (e.g., <code class="docutils literal notranslate"><span class="pre">np.linalg.eig</span></code>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Eigenvalues</strong></p></td>
+<td class="text-left"><p>Always <strong>real</strong></p></td>
+<td class="text-left"><p>Can be <strong>real or complex conjugate pairs</strong></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Phase 1: Form</strong></p></td>
+<td class="text-left"><p><strong>Tridiagonal</strong> (<span class="math notranslate nohighlight">\(O(n)\)</span> non-zeros)</p></td>
+<td class="text-left"><p><strong>Upper Hessenberg</strong> (<span class="math notranslate nohighlight">\(O(n^2)\)</span> non-zeros)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Phase 1: Cost</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\approx \frac{4}{3}n^3\)</span> flops</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\approx \frac{10}{3}n^3\)</span> flops</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Phase 2: Shift</strong></p></td>
+<td class="text-left"><p>Single real shift (e.g., Wilkinson)</p></td>
+<td class="text-left"><p>Double shift (Francis QR step)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Phase 2: Cost / Iteration</strong></p></td>
+<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong></p></td>
+<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Phase 2: Convergence</strong></p></td>
+<td class="text-left"><p><strong>Cubic</strong> (extremely fast)</p></td>
+<td class="text-left"><p><strong>Quadratic</strong></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Phase 2: Total Cost</strong></p></td>
+<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong></p></td>
+<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n^3)\)</span></strong></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Overall Total Cost</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3) + O(n^2) = \mathbf{O(n^3)}\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3) + O(n^3) = \mathbf{O(n^3)}\)</span></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Final Form</strong></p></td>
+<td class="text-left"><p><strong>Diagonal</strong> (Schur form is diagonal)</p></td>
+<td class="text-left"><p><strong>Upper Triangular</strong> (Schur form)</p></td>
+</tr>
+</tbody>
+</table>
 </div>
+<p><strong>Key Takeaway on Cost:</strong></p>
+<p>While both algorithms have the same asymptotic complexity of <span class="math notranslate nohighlight">\(O(n^3)\)</span>, the <strong>symmetric case is significantly faster</strong>.</p>
+<ul class="simple">
+<li><p>The <span class="math notranslate nohighlight">\(O(n^3)\)</span> reduction step has a smaller constant (<span class="math notranslate nohighlight">\(\frac{4}{3}\)</span> vs. <span class="math notranslate nohighlight">\(\frac{10}{3}\)</span>).</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(O(n^3)\)</span> iterative phase for the unsymmetric case is completely <em>avoided</em> in the symmetric case, which has an almost-negligible <span class="math notranslate nohighlight">\(O(n^2)\)</span> iterative cost.</p></li>
+<li><p>Therefore, the total cost for the symmetric problem is dominated <em>only</em> by the initial reduction, whereas both phases contribute significantly to the cost of the unsymmetric problem.</p></li>
+</ul>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -524,20 +593,20 @@ z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0 = 0
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="LS_summary.html"
+       href="qr_iteration_with_shifts.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Summary of LS Solution Methods</p>
+        <p class="prev-next-title">The Shifted QR Iteration Algorithm</p>
       </div>
     </a>
     <a class="right-next"
-       href="power_method.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Power Method</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -557,9 +626,17 @@ z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0 = 0
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-no-direct-solution">The Challenge: No Direct Solution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-to-polynomial-root-finding">Equivalence to Polynomial Root-Finding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterative-methods-are-a-necessity">Iterative Methods are a Necessity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-1-reduction-to-upper-hessenberg-form">Phase 1: Reduction to Upper Hessenberg Form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unsymmetric-real-matrices">Unsymmetric Real Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-real-matrices">Symmetric Real Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-2-the-shifted-qr-iteration">Phase 2: The Shifted QR Iteration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Unsymmetric Real Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Symmetric Real Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-cost-and-convergence">3. Summary: Cost and Convergence</a></li>
 </ul>
   </nav></div>
 
