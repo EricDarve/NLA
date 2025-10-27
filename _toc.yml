@@ -48,4 +48,12 @@ chapters:
   - file: content/power_method.md
   - file: content/deflation.md
   - file: content/orthogonal_iteration.md
+  - file: content/orthogonal_and_power_iteration.md
+  - file: content/orthogonal_iteration_and_eigenvalues.md   
+  - file: content/computing_the_eigenvectors.md 
+  - file: content/qr_iteration.md
+  - file: content/upper_hessenberg.md
+  - file: content/qr_iteration_with_hessenberg.md
+  - file: content/qr_iteration_with_shifts.md
+  - file: content/symmetric_vs_nonsymmetric_qr.md
 - file: content/LICENSE.md

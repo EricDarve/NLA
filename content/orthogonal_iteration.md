@@ -1,32 +1,26 @@
 # The Orthogonal Iteration Algorithm
 
-The process of finding one eigenvector, building a projector, and repeating is a great theoretical concept, but it's complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the **orthogonal iteration**. This algorithm essentially performs the "power iteration with deflation" on all eigenvectors simultaneously.
+The process of finding one eigenvector, building a projector, and repeating (a method called deflation) is a great theoretical concept, but it's complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the **orthogonal iteration**. This algorithm essentially performs the "power iteration with deflation" on all eigenvectors simultaneously.
 
-The iteration is defined by two simple steps:
+## The Algorithm
 
-1.  **Multiply by $A$:** Apply the matrix $A$ to the current set of orthonormal basis vectors $Q_k$.
+The iteration is defined by two simple steps. We start with an initial $n \times p$ (or $n \times n$) orthogonal matrix $Q_0$ (e.g., from a $QR$ factorization of a random matrix).
 
-    $$
-    Z = A Q_k
-    $$
+For $k = 0, 1, 2, \dots$:
 
-2.  **Re-orthogonalize:** Use the $QR$ factorization to create a new orthonormal basis $Q_{k+1}$ from the resulting vectors $Z$.
+1. **Multiply (Power Step):** Apply the matrix $A$ to the current set of orthonormal basis vectors $Q_k$.
 
-    $$
-    Q_{k+1} R_{k+1} = Z
-    $$
+  $$
+  Z_{k+1} = A Q_k
+  $$
 
-    This step is what performs the implicit deflation.
+2. **Re-orthogonalize (Deflation Step):** Use the $QR$ factorization to create a new orthonormal basis $Q_{k+1}$ from the resulting vectors $Z_{k+1}$.
 
-  * The first column of $Q_{k+1}$ is just the normalized $A \boldsymbol{q}_1$, which is the standard power method.
-  * The second column of $Q_{k+1}$ is the normalized $A \boldsymbol{q}_2$ made orthogonal to $\boldsymbol{q}_1$.
-  * The $(i+1)$-th column of $Q_{k+1}$ is the normalized $A \boldsymbol{q}_i$ made orthogonal to $\text{span}\{\boldsymbol{q}_1, \dots, \boldsymbol{q}_i\}$.
+  $$
+  Q_{k+1} R_{k+1} = Z_{k+1}
+  $$
 
-This directly corresponds to our deflation idea. The column $\boldsymbol{q}_{i+1}$ from $Q_k$ is effectively converging as if it were part of a power iteration on the deflated matrix $P_{ \{\boldsymbol{q}_1, \dots, \boldsymbol{q}_i\}^\perp } A$.
-
-## Algorithm
-
-Here is the complete algorithm, starting from a random orthogonal matrix $Q_0$.
+Here is the complete algorithm in Python:
 
 ```python
 import numpy as np
@@ -34,8 +28,8 @@ import numpy as np
 # Let A be a square matrix of size n x n
 n = A.shape[0]
 
-# Start with a random n x n orthogonal matrix
-Q, _ = np.linalg.qr(np.random.randn(n, n))
+# Start with a random n x p orthogonal matrix
+Q, _ = np.linalg.qr(np.random.randn(n, p))  # or p = n for full size
 
 # Set the number of iterations
 num_iterations = 1000 
@@ -48,37 +42,72 @@ for _ in range(num_iterations):
     Q, R = np.linalg.qr(Z)
     
 # After iterating, Q will approximate the Schur vectors.
-# The matrix T = Q.T @ A @ Q will be approximately upper triangular.
+# The matrix T = Q.conj().T @ A @ Q will be approximately upper triangular.
 ```
 
-### Convergence
+## How It Works: Implicit Deflation
 
-As $k \to \infty$, the matrix $Q_k$ converges to the unitary matrix $Q$ from the **Schur decomposition**, $A = Q T Q^H$.
+The re-orthogonalization step is the key to the algorithm's power. The QR factorization is equivalent to performing the Gram-Schmidt process on the columns of $Z_{k+1} = [\boldsymbol{z}_1, \dots, \boldsymbol{z}_p]$, where $\boldsymbol{z}_j = A \boldsymbol{q}_{k,j}$.
 
-It is important to note that $Q$ in the Schur decomposition is not unique. If $A = Q T Q^H$, we can define a new $Q' = Q D$, where $D$ is any diagonal matrix with entries $e^{i \theta_j}$ ($\theta_j \in \mathbb R$, $|e^{i \theta_j}|=1$). $Q'$ is still unitary, and 
+Let's look at how the new columns of $Q_{k+1}$ are formed:
+
+* **Column 1:** The first new column, $\boldsymbol{q}_{k+1, 1}$, is just 
+
+  $$\boldsymbol{z}_1 / \|\boldsymbol{z}_1\| = (A \boldsymbol{q}_{k, 1}) / \|A \boldsymbol{q}_{k, 1}\|.$$
+  
+  This is **exactly the standard power method**. It will converge to the dominant eigenvector.
+
+* **Column 2:** The second new column, $\boldsymbol{q}_{k+1, 2}$, is formed by taking $\boldsymbol{z}_2 = A \boldsymbol{q}_{k, 2}$, making it orthogonal to the *newly computed* $\boldsymbol{q}_{k+1, 1}$, and then normalizing it.
+
+* **Column j:** The $j$-th new column, $\boldsymbol{q}_{k+1, j}$, is formed by taking $A \boldsymbol{q}_{k, j}$ and orthogonalizing it against the *entire set of previously computed new vectors*, $\text{span}\{\boldsymbol{q}_{k+1, 1}, \dots, \boldsymbol{q}_{k+1, j-1}\}$.
+
+This process is an **implicit deflation**. By continually removing the components of the more dominant vectors, the algorithm forces the $j$-th column to converge to the $j$-th Schur vector. As a result, the subspace spanned by the first $j$ columns of $Q_k$ converges to the $j$-dimensional dominant invariant subspace.
+
+## Convergence Results
+
+For this analysis, we will use $U$ to denote the true Schur basis from the Schur decomposition $A=UTU^H$, to avoid confusion with the iterate $Q_k$. We also make a simplifying assumption that the eigenvalues are well-separated in magnitude:
 
 $$
-A = (QD) T (QD)^H = Q (DTD^H) Q^H.
-$$ 
+|\lambda_1| > \cdots >|\lambda_n| > 0.
+$$
 
-The new matrix $T' = DTD^H$ is still upper triangular and has the same diagonal as $T$.
+As $k \to \infty$, the matrix $Q_k$ converges to the Schur basis $U$. (Note: This convergence is not to a unique $U$. Since $U$ can be multiplied by any diagonal unitary matrix $D$ and still be a valid Schur basis, we say $Q_k$ converges to $U$ "up to a diagonal unitary matrix.")
 
-Because of this, we cannot rigorously say that $Q_k$ converges to a specific $Q$. Instead, we have to state the convergence more carefully:
+A more general analysis considers using the method to find the $p$ dominant eigenvalues (i.e., $Q_k$ is an $n \times p$ matrix). We can partition the true Schur decomposition as:
 
-* $Q_k$ converges to $Q$ *up to a diagonal unitary matrix*.
-* More simply, the **subspaces converge**. For each $j$ from $1$ to $n$, the subspace spanned by column $j$ of $Q_k$ converges to the subspace spanned by the $j$th Schur vector.
+$$
+U = [U_1 ; U_2], \quad T = \begin{bmatrix} T_{11} & T_{12} \\ 0 & T_{22} \end{bmatrix},
+$$
 
-The angle between these two subspaces goes to 0. See below for a formal definition of the angle between subspaces.
+where $U_1$ contains the first $p$ Schur vectors and $T_{11}$ contains the $p$ dominant eigenvalues.
+
+The key convergence results are as follows:
+
+  * **Subspace Convergence Rate:** The subspace spanned by the iterate, $\text{span}(Q_k)$, converges to the true $p$-dimensional dominant invariant subspace, $\text{span}(U_1)$. The convergence rate is linear and is governed by the ratio of the first "unwanted" eigenvalue ($\lambda_{p+1}$) to the last "wanted" eigenvalue ($\lambda_p$):
+
+    $$
+    \sin \theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1)) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
+    $$
+    
+    *(Here, $\theta_{\max}$ is the largest principal angle between the two subspaces; see below for the exact definition.)*
+
+  * **Ritz Eigenvalue Convergence Rates:** The *Ritz eigenvalues* are the eigenvalues of the $p \times p$ matrix $T_k = Q_k^H A Q_k$. These converge to the true eigenvalues of $A$.
+
+    1.  **Convergence of the Set:** The error for the entire *set* of eigenvalues converges at the same rate as the subspace:
+
+        $$
+        \mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
+        $$
+
+    2.  **Convergence of Individual Eigenvalues:** The convergence for an *individual* Ritz eigenvalue $\mu_i^{(k)}$ to its corresponding true eigenvalue $\lambda_i$ (for $i \le p$) is often much faster. Its rate is determined by the ratio of $|\lambda_{p+1}|$ to that specific eigenvalue's modulus, $|\lambda_i|$:
+
+        $$
+        |\mu_i^{(k)} - \lambda_i| \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_i|} \right)^k
+        $$
 
 ## Proof of Convergence
 
 Let $A$ be an $n \times n$ matrix with a Schur decomposition $A = Q T Q^H$, where $Q = [\boldsymbol{v}_1 | \dots | \boldsymbol{v}_n]$ is unitary and $T$ is upper triangular. The diagonal entries of $T$ are the eigenvalues $\lambda_i = T_{ii}$.
-
-For this proof, we make the standard assumption that the eigenvalues have distinct magnitudes:
-
-$$
-|\lambda_1| > |\lambda_2| > \dots > |\lambda_n|. 
-$$
 
 Let 
 
@@ -92,7 +121,7 @@ $$
 \mathcal{V}_j = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_j\}
 $$
 
-be the $j$-dimensional dominant invariant subspace (spanned by the first $j$ Schur vectors). Let 
+be the $j$-dimensional dominant invariant subspace (spanned by the first $j$ Schur vectors with largest moduli). Let 
 
 $$
 \mathcal{S}_{k,j} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,j}\}
@@ -118,7 +147,7 @@ $$
 
 ### Base Case: $P(1)$
 
-We must show that $\mathcal{S}_{k,1} = \text{span}\{\boldsymbol{q}_{k,1}\}$ converges to $\mathcal{V}_1 = \text{span}\{\boldsymbol{v}_1\}$.
+We must show that $\mathcal{S}_{k,1} = \text{span}\{\boldsymbol{q}_{k,1}\}$ converges to $\mathcal{V}_1 = \text{span}\{\boldsymbol{v}_1\}$. We will assume that the start has nonzero overlap with the target subspaces; in particular $\langle \boldsymbol q_{0,1},\boldsymbol v_1\rangle \neq 0$.
 
 Let's analyze the first column of the iteration:
 
@@ -181,13 +210,16 @@ This means that for each $j$, the subspace spanned by the first $j$ columns of $
 
 ## Second Proof of Convergence
 
+We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation. 
 
-We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation. This proof is more precise but also significantly more technical. It will give us a precise convergence rate for the method depending on the ratio $\lambda_{p+1} / \lambda_p$.
+**This proof is more precise but also significantly more technical and is optional.**
+
+It will give us a precise convergence rate for the method depending on the ratio $\lambda_{p+1} / \lambda_p$.
 
 ```{admonition} Summary of key ideas and results
 :class: tip
 
-- **Coordinates:** Work in a Schur basis $A=UTU^\ast$ and express the current iterate $U^\ast Q_k$ (where $Q_k$ is assumed to have $p$ columns) as a graph 
+- **Coordinates:** Work in a Schur basis $A=UTU^H$ and express the current iterate $U^H Q_k$ (where $Q_k$ is assumed to have $p$ columns) as a graph 
 
 $$\mathrm{span}\!\begin{bmatrix} C_k \\ S_k \end{bmatrix} = \mathrm{span}\!\begin{bmatrix}I\\E_k\end{bmatrix}$$ 
 
@@ -206,7 +238,7 @@ $$
 $$
 
 up to constants.
-- **What converges:** The subspace $\mathrm{span}(Q_k)$ converges to the Schur subspace $\mathrm{span}(U_1)$ and the Ritz values of $B_k:=Q_k^\ast A Q_k$ converge to the eigenvalues in $T_{11}$.
+- **What converges:** The subspace $\mathrm{span}(Q_k)$ converges to the Schur subspace $\mathrm{span}(U_1)$ and the Ritz values of $T_k:=Q_k^H A Q_k$ converge to the eigenvalues in $T_{11}$.
 - **How to measure error:** $\|E_k\|=\|\tan\Theta_k\|$, where $\Theta_k$ are the principal angles (see below for a definition of principal angles) between $\mathrm{span}(Q_k)$ and $\mathrm{span}(U_1)$; hence those angles go to $0$ at the same rate.
 ```
 
@@ -215,7 +247,7 @@ up to constants.
 Let $A\in\mathbb{C}^{n\times n}$. Orthogonal iteration with block size $p$ (i.e., $Q_k$ has $p$ columns) is
 
 $$
-Y_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Y_{k+1}),\quad Q_0^\ast Q_0=I_p.
+Z_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Z_{k+1}).
 $$
 
 The notation $\operatorname{orth}(\cdot)$ means to compute an orthonormal basis for the range (e.g., via $QR$).
@@ -223,25 +255,25 @@ The notation $\operatorname{orth}(\cdot)$ means to compute an orthonormal basis 
 We will work with the (unitary) Schur form. Choose a unitary $U$ so that
 
 $$
-A=U\begin{bmatrix}T_{11}&T_{12}\\0&T_{22}\end{bmatrix}U^\ast=:U T U^\ast,
+A=U\begin{bmatrix}T_{11}&T_{12}\\0&T_{22}\end{bmatrix}U^H=:U T U^H,
 $$
 
 where the $p\times p$ block $T_{11}$ holds the eigenvalues we want (e.g., the $p$ largest in modulus, or any isolated cluster after a reordering), and $T_{22}$ holds the rest. The convergence we wish to analyze is toward the Schur subspace $\mathcal{U}_1=\operatorname{span}(U_1)$ (columns of $U$ corresponding to $T_{11}$).
 
-Write the iterate in Schur coordinates as $Z_k:=U^\ast Q_k$ and block it
+Write the iterate in Schur coordinates as $Y_k:=U^H Q_k$ and block it
 
 $$
-Z_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Z_k^\ast Z_k=I_p.
+Y_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Y_k^H Y_k=I_p.
 $$
 
-Subspace convergence can be studied through $Z_k$.
+Subspace convergence can be studied through $Y_k$.
 
 ### The graph map and the core recurrence
 
 As long as $C_k$ is nonsingular (true once the iterate has nonzero overlap with $\mathcal{U}_1$), define the graph variable $E_k:=S_k C_k^{-1}$ so that 
 
 $$
-\operatorname{span}(Z_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
+\operatorname{span}(Y_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
 $$
 
 The name graph variable comes from functional analysis and corresponds to viewing the subspace as the graph of a linear operator from the "top" to the "bottom" space.
@@ -249,7 +281,7 @@ The name graph variable comes from functional analysis and corresponds to viewin
 One step of the (unnormalized) iteration in Schur coordinates is
 
 $$
-U^\ast Y_{k+1}=T Z_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
+U^H Z_{k+1}=T Y_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
 $$
 
 Since column spaces are what matter, the next subspace can be represented as a graph too:
@@ -279,15 +311,9 @@ $$
 
 Therefore, once $\|E_k\|$ is small enough (in particular, $\|T_{11}^{-1}\|\,\|T_{12}\|\,\|E_k\|<1$), you get linear contraction with asymptotic factor $\|T_{22}\|\,\|T_{11}^{-1}\|$. This is the standard local behavior around $E=0$ in the non-Hermitian case.
 
-### Global convergence and rates (dominant-modulus case)
+### Global convergence and rates
 
-Assume the eigenvalues are ordered by modulus
-
-$$
-|\lambda_1| > \cdots > |\lambda_p| \;>\; |\lambda_{p+1}| > \cdots > |\lambda_n|,
-$$
-
-and the initial subspace has a nonzero component in $\mathcal{U}_1$. Then the orthogonal-iteration subspaces $\operatorname{span}(Q_k)$ converge to $\mathcal{U}_1$ (the Schur subspace for $\lambda_1,\ldots,\lambda_p$). Moreover, the principal-angle (or projector) errors decay essentially like powers of the modulus gap; asymptotically, each column converges at a rate $|\lambda_{i+1}/\lambda_i|$ (for $i=1,\dots,p$):
+Assume the initial subspace has a nonzero component in $\mathcal{U}_1$. Then the orthogonal-iteration subspaces $\operatorname{span}(Q_k)$ converge to $\mathcal{U}_1$ (the Schur subspace for $\lambda_1,\ldots,\lambda_p$). Moreover, the principal-angle (or projector) errors decay essentially like powers of the modulus gap; asymptotically, each column converges at a rate $|\lambda_{i+1}/\lambda_i|$ (for $i=1,\dots,p$):
 
 $$
 \sin\angle\bigl(\mathcal{U}_1,\operatorname{span}(Q_k)\bigr)\;\lesssim\; \kappa \, \Bigl(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\Bigr)^{k}.
@@ -333,7 +359,7 @@ $$
 where $\rho(\cdot)$ is the spectral radius. Writing $\Theta_k$ for the principal-angle matrix between $\mathrm{span}(Q_k)$ and $\mathrm{span}(U_1)$, we have $\|\tan\Theta_k\| = \|E_k\|$ and $\|\sin\Theta_k\|\le \|E_k\|$, so the subspaces converge.
 
 (b) (Global rate under a modulus gap)  
-Assume the eigenvalues are ordered by modulus with a gap
+Assume the eigenvalues are ordered by modulus
 
 $$
 |\lambda_1| > \cdots > |\lambda_p| \;>\; |\lambda_{p+1}| > \cdots >|\lambda_n|.
@@ -352,7 +378,7 @@ $$
 \;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
 $$
 
-Finally, the Ritz matrix $B_k:=Q_k^\ast A Q_k$ has eigenvalues that converge to the eigenvalues of $T_{11}$.
+Finally, the Ritz matrix $T_k:=Q_k^H A Q_k$ has eigenvalues that converge to the eigenvalues of $T_{11}$.
 ```
 
 ### Practical notes
@@ -361,8 +387,105 @@ Finally, the Ritz matrix $B_k:=Q_k^\ast A Q_k$ has eigenvalues that converge to 
 - **Acceleration:** shift-and-invert $(A-\sigma I)^{-1}$, polynomial filters (Chebyshev), and locking/deflation are standard to isolate interior clusters and improve gaps; these plug directly into the subspace iteration framework.
 - **Separation and Sylvester equations:** the spectral separation $\mathrm{sep}(T_{11},T_{22})>0$ ensures a well-conditioned invariant-subspace problem and appears in error/conditioning bounds (e.g., Schur–Parlett/sign function analyses).
 
+## Convergence rate of the Ritz eigenvalues
 
-### Definition of Principal Angles
+Let $T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}$ be the Rayleigh–Ritz (Ritz) matrix at step $k$, and let its eigenvalues be $\{\mu_i^{(k)}\}_{i=1}^p$. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.
+
+### Block–Schur view
+
+Work in a Schur basis 
+
+$$
+A = U \begin{bmatrix}T_{11}&T_{12}\\0&T_{22}\end{bmatrix} U^H
+$$
+
+with $T_{11}\in\mathbb{C}^{p\times p}$. With 
+
+$$
+Y_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}$$
+
+and $E_k := S_k C_k^{-1}$ (when $C_k$ is invertible), a short calculation gives
+
+$$
+T_k = Y_k^H T Y_k
+= (I+E_k^H E_k)^{-\tfrac12}
+\Big(T_{11} + T_{12}E_k + E_k^H T_{12}^H + E_k^H T_{22}E_k\Big)
+(I+E_k^H E_k)^{-\tfrac12}.
+$$
+
+Hence
+
+$$
+T_k \;=\; T_{11} + \Delta_k,
+\qquad
+\|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
+$$
+
+for some constants $\alpha$, $\beta$ depending only on $\|T_{11}\|$, $\|T_{12}\|$, and $\|T_{22}\|$. Standard eigenvalue–perturbation then yields
+
+
+```{prf:theorem} Ritz value rate
+:label: thm:ritz-rate-general
+
+Assume $\mathrm{sep}(T_{11},T_{22})>0$ so that the invariant subspace is well conditioned; assume $C_0$ is nonsingular (the start has nonzero overlap with $\mathcal U_1$), and suppose $\|E_k\|$ is sufficiently small. Then there exists $c>0$ such that
+
+$$
+\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
+\;\le\; c\,\|E_k\| \;+\; \mathcal{O}\!\big(\|E_k\|^2\big).
+$$
+
+Here $\Lambda(X)$ denotes the **set of eigenvalues** of $X$. The function $\mathrm{dist}$ denotes the **Hausdorff distance** between (compact) subsets of $\mathbb{C}$:
+
+$$
+\mathrm{dist}\big(\Lambda(X),\Lambda(Y)\big)
+\;=\;
+\max\!\Big\{
+  \max_{\lambda\in\Lambda(X)} \min_{\mu\in\Lambda(Y)} |\lambda-\mu|\;,\;
+  \max_{\mu\in\Lambda(Y)} \min_{\lambda\in\Lambda(X)} |\lambda-\mu|
+\Big\}.
+$$
+
+In particular, if 
+
+$$
+\|E_k\|\le C \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k
+$$ 
+
+(as proved above), then
+
+$$
+\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
+\;\le\; C' \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
+$$
+
+for some constant $C'$ independent of $k$.
+```
+
+```{prf:corollary} Per–eigenvalue Ritz value convergence
+:label: cor:ritz-per-eig
+
+If the invariant subspace for $\Lambda(T_{11})=\{\lambda_1,\dots,\lambda_p\}$ is separated from the rest (e.g., $\mathrm{sep}(T_{11},T_{22})>0$ in a Schur basis), and $C_0$ is nonsingular, then the $i$-th column of $E_k$ satisfies 
+
+$$
+\|E_k[:,i]\| \le \tilde c_i\,(|\lambda_{p+1}|/|\lambda_i|)^k
+$$
+
+for large $k$ (from the linearization $E_{k+1}\approx T_{22}E_kT_{11}^{-1}$). Consequently,
+
+$$
+|\mu_i^{(k)}-\lambda_i|\le c_i\Big(\tfrac{|\lambda_{p+1}|}{|\lambda_i|}\Big)^k,
+$$
+
+for $i \le p$. In particular, each leading Ritz value converges **geometrically**, and the $i$th one is controlled by the gap to the first unwanted eigenvalue $\lambda_{p+1}$.
+```
+
+### Takeaways
+
+- In general (non-Hermitian) problems, Ritz eigenvalues converge **geometrically** with the same factor that governs the subspace error $\|E_k\|$.
+- Practically, once the principal angles are small, Ritz values stabilize very rapidly; locking/deflation then allows focusing the iteration on remaining eigenvalues.
+
+
+## Definition of Principal Angles
 
 We define the concept of principal angles between two subspaces, which were used in the convergence analysis above.
 
@@ -401,22 +524,25 @@ $$
 $$
 
 ```{prf:lemma} Relationship with projector norms
-Let $P_{\mathcal U}$ and $P_{\mathcal V}$ denote the orthogonal projectors onto $\mathcal U$ and $\mathcal V$, respectively, and let $\Theta = \operatorname{diag}(\theta_1, \dots, \theta_p)$ be the diagonal matrix of principal angles.
+Let $P_{\mathcal U}$ and $P_{\mathcal V}$ be the orthogonal projectors and $\Theta=\mathrm{diag}(\theta_1,\dots,\theta_p)$ the principal angles (with $p=\dim\mathcal U\le \dim\mathcal V$).
 
-Then:
-
-$$
-\|\sin \Theta\| = \| P_{\mathcal U^\perp} P_{\mathcal V} \|
-= \| P_{\mathcal U} - P_{\mathcal V} \|,
-$$
-
-and
+Then
 
 $$
-\|\tan \Theta\| = \| P_{\mathcal U^\perp} P_{\mathcal V} (P_{\mathcal U} P_{\mathcal V})^{-1} \|
+\|\sin\Theta\|=\|P_{\mathcal U^\perp}P_{\mathcal V}\|.
 $$
 
-whenever the intersection $\mathcal U \cap \mathcal V$ is trivial.
+If in addition $\dim\mathcal U=\dim\mathcal V$, then
+
+$$
+\|P_{\mathcal U}-P_{\mathcal V}\|=\|\sin\Theta\|.
+$$
+
+Finally, if $\theta_{\max}<\tfrac{\pi}{2}$ (equivalently $U^*V$ is invertible), then
+
+$$
+\|\tan\Theta\|=\|\,P_{\mathcal U^\perp}P_{\mathcal V}(P_{\mathcal U}P_{\mathcal V})^{-1}\|.
+$$
 
 In particular, $\sin \Theta$ and $\tan \Theta$ provide quantitative measures of the distance or “gap” between the two subspaces.
 ```
