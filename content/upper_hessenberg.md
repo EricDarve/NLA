@@ -9,7 +9,7 @@ The key to making the QR iteration practical is to first reduce the matrix $A$ t
 
 The total cost becomes $O(n^3 + k \cdot n^2)$, a dramatic improvement over $O(k \cdot n^3)$.
 
-### Why Upper Hessenberg Form?
+## Why Upper Hessenberg Form?
 
 An $n \times n$ matrix $H$ is **upper Hessenberg** if all its entries below the first subdiagonal are zero. That is, $h_{ij} = 0$ for all $i > j+1$.
 
@@ -29,7 +29,7 @@ This form is the ideal compromise for the QR iteration for two critical reasons:
 2.  **It is invariant under the QR iteration.** If $H_k$ is upper Hessenberg, we compute its QR factorization $H_k = Q_k R_k$. The subsequent "reverse multiplication" step, $H_{k+1} = R_k Q_k$, also produces an upper Hessenberg matrix. This "preservation of form" is essential.
 3.  **The QR factorization is fast.** Computing the QR factorization of an $n \times n$ upper Hessenberg matrix does not require $O(n^3)$ flops. It can be done in $O(n^2)$ time, for example, by using a sequence of $n-1$ **Givens rotations** to eliminate the subdiagonal elements.
 
-### How the Reduction Works
+## How the Reduction Works
 
 Our goal is to find an orthogonal matrix $Q$ such that $H = Q A Q^T$ is upper Hessenberg. This is a **unitary similarity transformation**, which is critical because it **preserves the eigenvalues** of $A$.
 
@@ -90,7 +90,7 @@ $$
 
 where $Q = Q_1^T Q_2 \cdots Q_{n-2}^T$. This is just a matter of convention.
 
-### Computational Cost
+## Computational Cost
 
 * There are $n-2$ main steps in this reduction.
 * At each step $k$, applying the Householder reflector $Q_k$ from the left and the right to the $n \times n$ matrix costs $O(n(n-k))$ flops. The dominant cost at each step is $O(n^2)$.
