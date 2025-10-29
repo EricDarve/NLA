@@ -96,7 +96,7 @@ $$
 :::{admonition} Key Idea
 :class: tip
 
-This new ratio is the key to acceleration. To find the smallest eigenvalue $\lambda_n$, we can choose a shift $\mu$ that is a good approximation of $\lambda_n$. This makes the numerator $|\lambda_n - \mu|$ very small, forcing rapid convergence of $T_{k,21}$ to 0.
+This new ratio is the key to acceleration. To find the smallest eigenvalue $\lambda_n$, we can choose a shift $\mu$ that is a good approximation of $\lambda_n$. This makes the numerator $|\lambda_n - \mu|$ very small, forcing rapid (quadratic) convergence of $T_{k,21}$ to 0.
 :::
 
 The diagonal entries of $T_k = Q_k^H A Q_k$ provide our best available approximations to the eigenvalues. This enables a powerful feedback loop:
