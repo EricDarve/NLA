@@ -386,7 +386,12 @@ document.write(`
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-eigenvalue-approximations">From Subspaces to Eigenvalue Approximations</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-t-k-to-the-schur-form">Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-with-slow-convergence">The Problem with Slow Convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-shifted-iteration">The Shifted Iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-qr-algorithm-p-n">The Full QR Algorithm (<span class="math notranslate nohighlight">\(p=n\)</span>)</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -400,14 +405,14 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="orthogonal-iteration-and-eigenvalues">
 <h1>Orthogonal Iteration and Eigenvalues<a class="headerlink" href="#orthogonal-iteration-and-eigenvalues" title="Link to this heading">#</a></h1>
-<div class="tip admonition" id="sec-oi-eigs">
+<div class="tip admonition">
 <p class="admonition-title">Key Idea</p>
-<p>Orthogonal (subspace) iteration produces a sequence of orthonormal bases <span class="math notranslate nohighlight">\(Q_k\)</span>. The <strong>projected matrix</strong>,</p>
+<p>Orthogonal (subspace) iteration produces a sequence of orthonormal bases <span class="math notranslate nohighlight">\(Q_k\)</span>. The projected matrix,</p>
 <div class="math notranslate nohighlight">
 \[
 T_k = Q_k^H A Q_k
 \]</div>
-<p>is the Rayleigh–Ritz compression of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span>. As <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur vectors of <span class="math notranslate nohighlight">\(A\)</span>, the matrix <span class="math notranslate nohighlight">\(T_k\)</span> approaches the (upper triangular) Schur form <span class="math notranslate nohighlight">\(T\)</span>. Consequently, the diagonal entries of <span class="math notranslate nohighlight">\(T_k\)</span> become increasingly accurate approximations of the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>is the Rayleigh–Ritz compression of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span>. As this subspace converges to an invariant subspace of <span class="math notranslate nohighlight">\(A\)</span>, the matrix <span class="math notranslate nohighlight">\(T_k\)</span> converges to the (upper triangular) Schur form of <span class="math notranslate nohighlight">\(A\)</span> restricted to that subspace. Consequently, the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> (and ultimately its diagonal entries) become increasingly accurate approximations of the corresponding eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 </div>
 <section id="from-subspaces-to-eigenvalue-approximations">
 <h2>From Subspaces to Eigenvalue Approximations<a class="headerlink" href="#from-subspaces-to-eigenvalue-approximations" title="Link to this heading">#</a></h2>
@@ -419,62 +424,76 @@ Z_{k+1} = A Q_k, \qquad Z_{k+1} = Q_{k+1} R_{k+1}.
 <p>We define the Rayleigh–Ritz matrix as:</p>
 <div class="math notranslate nohighlight">
 \[
-T_k = Q_k^H A Q_k \;\in\; \mathbb{C}^{p\times p}.
+T_k = Q_k^H A Q_k \in \mathbb{C}^{p\times p}.
 \]</div>
 <p>By construction, <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> provides an orthonormal basis for a <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace, and <span class="math notranslate nohighlight">\(T_k\)</span> represents the matrix <span class="math notranslate nohighlight">\(A\)</span> projected onto that basis.</p>
 </section>
 <section id="convergence-of-t-k-to-the-schur-form">
 <h2>Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form<a class="headerlink" href="#convergence-of-t-k-to-the-schur-form" title="Link to this heading">#</a></h2>
-<p>Assume <span class="math notranslate nohighlight">\(A\)</span> has the Schur decomposition:</p>
+<p>Assume <span class="math notranslate nohighlight">\(A\)</span> has the Schur decomposition <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where the eigenvalues on the diagonal of <span class="math notranslate nohighlight">\(T\)</span> are ordered by magnitude, <span class="math notranslate nohighlight">\(|\lambda_1| &gt; |\lambda_2| &gt; \dots &gt; |\lambda_n| &gt; 0\)</span>.</p>
+<p>If orthogonal iteration is initialized with a matrix <span class="math notranslate nohighlight">\(Q_0\)</span> whose columns are linearly independent and have a nonzero component in the desired invariant subspace, then <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> will converge. Under standard spectral separation conditions, it converges to the dominant <span class="math notranslate nohighlight">\(p\)</span>-dimensional <span class="math notranslate nohighlight">\(A\)</span>-invariant subspace, which is spanned by the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors.</p>
+<p>Let <span class="math notranslate nohighlight">\(Q_p = Q[:,1:p]\)</span> be the <span class="math notranslate nohighlight">\(n \times p\)</span> matrix of the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors, and let <span class="math notranslate nohighlight">\(T_p = T[1:p,1:p]\)</span> be the corresponding <span class="math notranslate nohighlight">\(p \times p\)</span> principal submatrix of <span class="math notranslate nohighlight">\(T\)</span>. As the subspaces converge, so do the projected matrices:</p>
 <div class="math notranslate nohighlight">
 \[
-A = Q T Q^H.
+\operatorname{range}(Q_k) \to \operatorname{range}(Q_p) \quad\Longrightarrow\quad T_k = Q_k^H A Q_k \to T_p
 \]</div>
-<p>If orthogonal iteration is initialized with a matrix <span class="math notranslate nohighlight">\(Q_0\)</span> of full column rank (whose columns have a nonzero component in the desired invariant subspace), then <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> will converge. Under standard spectral separation conditions, this subspace converges to the corresponding <span class="math notranslate nohighlight">\(p\)</span>-dimensional <span class="math notranslate nohighlight">\(A\)</span>-invariant subspace spanned by the appropriate columns of <span class="math notranslate nohighlight">\(Q\)</span>.</p>
-<p>Consequently:</p>
-<div class="math notranslate nohighlight">
-\[
-Q_k \;\to\; Q[:,1:p] \quad\Longrightarrow\quad
-T_k = Q_k^H A Q_k \;\to\; T[1:p,1:p],
-\]</div>
-<p>This means <span class="math notranslate nohighlight">\(T_k\)</span> asymptotically becomes upper triangular, with the target eigenvalues on its diagonal.</p>
+<p>This means <span class="math notranslate nohighlight">\(T_k\)</span> asymptotically becomes upper triangular, and its eigenvalues (which are its diagonal entries) converge to the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\{\lambda_1, \dots, \lambda_p\}\)</span>.</p>
 </section>
 <section id="shifts-accelerating-eigenvalue-convergence">
 <h2>Shifts: Accelerating Eigenvalue Convergence<a class="headerlink" href="#shifts-accelerating-eigenvalue-convergence" title="Link to this heading">#</a></h2>
 <p>Shifting modifies the iteration to dramatically accelerate convergence by emphasizing specific eigenvalues.</p>
-<p>Without shifting, the convergence of the <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace <span class="math notranslate nohighlight">\(\mathrm{range}(Q_k)\)</span> to the dominant invariant subspace (spanned by the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors) is governed by the eigenvalue separation. The convergence rate typically depends on the ratio of the largest “unwanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>) to the smallest “wanted” one (<span class="math notranslate nohighlight">\(\lambda_p\)</span>):</p>
+<section id="the-problem-with-slow-convergence">
+<h3>The Problem with Slow Convergence<a class="headerlink" href="#the-problem-with-slow-convergence" title="Link to this heading">#</a></h3>
+<p>Without shifting, the convergence of <span class="math notranslate nohighlight">\(\mathrm{range}(Q_k)\)</span> to the dominant invariant subspace is governed by the eigenvalue separation. The convergence rate typically depends on the ratio of the largest “unwanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>) to the smallest “wanted” one (<span class="math notranslate nohighlight">\(\lambda_p\)</span>):</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{|\lambda_{p+1}|}{|\lambda_p|}
 \]</div>
 <p>If this ratio is close to 1 (i.e., the spectral gap is small), convergence can be impractically slow.</p>
+</section>
+<section id="the-shifted-iteration">
+<h3>The Shifted Iteration<a class="headerlink" href="#the-shifted-iteration" title="Link to this heading">#</a></h3>
 <p>To accelerate this, we introduce a scalar <strong>shift</strong> <span class="math notranslate nohighlight">\(\mu\)</span> and apply the iteration to the matrix <span class="math notranslate nohighlight">\(A - \mu I\)</span> instead:</p>
 <div class="math notranslate nohighlight">
 \[
-Z_k = (A - \mu I)\,Q_k, \qquad Z_k = Q_{k+1}\,R_{k+1}.
+Z_k = (A - \mu I) Q_k, \qquad Z_k = Q_{k+1} R_{k+1}.
 \]</div>
-<p>This works because <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A - \mu I\)</span> share the same invariant subspaces (and Schur vectors), so <span class="math notranslate nohighlight">\(\mathrm{range}(Q_{k+1})\)</span> still converges to the same desired subspace. However, the convergence rate is now determined by the eigenvalues of the <em>shifted</em> matrix:</p>
+<p>This works because <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A - \mu I\)</span> share the same invariant subspaces (and Schur vectors), so <span class="math notranslate nohighlight">\(\mathrm{range}(Q_{k+1})\)</span> still converges to an invariant subspace. However, the convergence rate is now determined by the eigenvalues of the <em>shifted</em> matrix, which are <span class="math notranslate nohighlight">\(\lambda_i - \mu\)</span>.</p>
+</section>
+<section id="the-full-qr-algorithm-p-n">
+<h3>The Full QR Algorithm (<span class="math notranslate nohighlight">\(p=n\)</span>)<a class="headerlink" href="#the-full-qr-algorithm-p-n" title="Link to this heading">#</a></h3>
+<p>This strategy becomes exceptionally powerful when we set <span class="math notranslate nohighlight">\(p=n\)</span>, which transforms orthogonal iteration into the <strong>QR algorithm</strong>. In this special case, <span class="math notranslate nohighlight">\(Q_k\)</span> and <span class="math notranslate nohighlight">\(T_k\)</span> are square <span class="math notranslate nohighlight">\(n \times n\)</span> matrices.</p>
+<p>We can analyze the convergence by partitioning <span class="math notranslate nohighlight">\(T_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+T_k = \begin{bmatrix}
+T_{k,11} &amp; T_{k,12} \\
+T_{k,21} &amp; T_{k,22}
+\end{bmatrix}
+\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(T_{k,22}\)</span> is a scalar (the bottom-right entry) and <span class="math notranslate nohighlight">\(T_{k,21}\)</span> is a row vector. For the <span class="math notranslate nohighlight">\(p=n\)</span> case, the analysis shows that the sub-diagonal block <span class="math notranslate nohighlight">\(T_{k,21}\)</span> converges to zero at a rate governed by the ratio of the smallest-magnitude eigenvalues:</p>
 <div class="math notranslate nohighlight">
 \[
-\frac{|\lambda_{p+1}(A - \mu I)|}{|\lambda_p(A - \mu I)|} = \frac{|\lambda_{p+1} - \mu|}{|\lambda_p - \mu|}
+|T_{k,21}| \to 0 \quad \text{with rate} \quad \frac{|\lambda_n|}{|\lambda_{n-1}|}
+\]</div>
+<p>As <span class="math notranslate nohighlight">\(T_{k,21} \to 0\)</span>, <span class="math notranslate nohighlight">\(T_k\)</span> becomes block upper triangular, and the scalar <span class="math notranslate nohighlight">\(T_{k,22}\)</span> converges to the eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p>
+<p>When we apply a shift <span class="math notranslate nohighlight">\(\mu\)</span>, the convergence rate of <span class="math notranslate nohighlight">\(T_{k,21}\)</span> to zero becomes:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{|\lambda_n - \mu|}{|\lambda_{n-1} - \mu|}
 \]</div>
 <div class="tip admonition">
-<p class="admonition-title">Accelerating the Rate</p>
-<p>This new ratio is the key to acceleration. Convergence becomes very fast if this ratio is much less than 1 (<span class="math notranslate nohighlight">\(\ll 1\)</span>). This can be achieved by choosing a shift <span class="math notranslate nohighlight">\(\mu\)</span> such that:</p>
-<div class="math notranslate nohighlight">
-\[
-|\lambda_{p+1} - \mu| \ll |\lambda_p - \mu|
-\]</div>
-<p>By picking <span class="math notranslate nohighlight">\(\mu\)</span> to be a good estimate of an “unwanted” eigenvalue (like <span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>), we can make the numerator extremely small, forcing rapid convergence.</p>
+<p class="admonition-title">Key Idea</p>
+<p>This new ratio is the key to acceleration. To find the smallest eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span>, we can choose a shift <span class="math notranslate nohighlight">\(\mu\)</span> that is a good approximation of <span class="math notranslate nohighlight">\(\lambda_n\)</span>. This makes the numerator <span class="math notranslate nohighlight">\(|\lambda_n - \mu|\)</span> very small, forcing rapid convergence of <span class="math notranslate nohighlight">\(T_{k,21}\)</span> to 0.</p>
 </div>
-<p>The focus now shifts to the projected matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>, as its eigenvalues, <span class="math notranslate nohighlight">\(\text{eig}(T_k)\)</span>, serve as our best available approximations to the true eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>This enables a powerful feedback loop:</p>
-<ol class="arabic simple">
-<li><p>Run the iteration to compute the basis <span class="math notranslate nohighlight">\(Q_k\)</span>.</p></li>
-<li><p>Compute the projected matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span> and find its eigenvalues (known as “Ritz values”).</p></li>
-<li><p>Use one of these Ritz values as the shift <span class="math notranslate nohighlight">\(\mu\)</span> for the <em>next</em> iteration.</p></li>
-</ol>
-<p>This strategy of adaptively choosing shifts based on the current Rayleigh-Ritz approximations is the core idea that transforms subspace iteration into the highly efficient <strong>QR iteration with shifts</strong>.</p>
+<p>The diagonal entries of <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span> provide our best available approximations to the eigenvalues. This enables a powerful feedback loop:</p>
+<ul class="simple">
+<li><p>Set <span class="math notranslate nohighlight">\(p=n\)</span>, so that <span class="math notranslate nohighlight">\(Q_k\)</span> is a full <span class="math notranslate nohighlight">\(n \times n\)</span> unitary matrix at each step</p></li>
+<li><p>At step <span class="math notranslate nohighlight">\(k\)</span>, compute the projected matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>.</p></li>
+<li><p>Use the bottom-right entry of this matrix, <span class="math notranslate nohighlight">\(\mu_k = (T_k)_{nn}\)</span>, as the shift for the next iteration. This value, known as the Rayleigh quotient shift, is an excellent, adaptively improving approximation of <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p></li>
+</ul>
+<p>This strategy of adaptively choosing a shift based on the last entry of <span class="math notranslate nohighlight">\(T_k\)</span> is the core idea that transforms subspace iteration into the highly efficient QR iteration with shifts.</p>
+</section>
 </section>
 </section>
 
@@ -544,7 +563,12 @@ Z_k = (A - \mu I)\,Q_k, \qquad Z_k = Q_{k+1}\,R_{k+1}.
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-eigenvalue-approximations">From Subspaces to Eigenvalue Approximations</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-t-k-to-the-schur-form">Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-with-slow-convergence">The Problem with Slow Convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-shifted-iteration">The Shifted Iteration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-qr-algorithm-p-n">The Full QR Algorithm (<span class="math notranslate nohighlight">\(p=n\)</span>)</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
