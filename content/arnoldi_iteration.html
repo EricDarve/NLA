@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Power and Orthogonal Iteration Methods &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Arnoldi Iteration &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/orthogonal_and_power_iteration';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/arnoldi_iteration';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Orthogonal Iteration and Eigenvalues" href="orthogonal_iteration_and_eigenvalues.html" />
-    <link rel="prev" title="The Orthogonal Iteration Algorithm" href="orthogonal_iteration.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="The Core Idea: Projection onto Krylov Subspaces" href="krylov_subspaces.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -221,11 +221,11 @@
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
@@ -235,9 +235,9 @@
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">The Core Idea: Projection onto Krylov Subspaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Iteration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Arnoldi Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -295,7 +295,7 @@
       
       
       
-      <li><a href="../_sources/content/orthogonal_and_power_iteration.md" target="_blank"
+      <li><a href="../_sources/content/arnoldi_iteration.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -379,7 +379,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Power and Orthogonal Iteration Methods</h1>
+    <h1>The Arnoldi Iteration</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -389,7 +389,9 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-k-as-the-q-factor-in-a-qr-factorization-of-a-k"><span class="math notranslate nohighlight">\(Q_k\)</span> as the <span class="math notranslate nohighlight">\(Q\)</span>-factor in a QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-algorithm">The Arnoldi Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ritz-values-and-ritz-vectors">Ritz Values and Ritz Vectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-is-this-a-good-approximation">Why is this a good approximation?</a></li>
 </ul>
             </nav>
         </div>
@@ -401,63 +403,129 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="power-and-orthogonal-iteration-methods">
-<h1>Power and Orthogonal Iteration Methods<a class="headerlink" href="#power-and-orthogonal-iteration-methods" title="Link to this heading">#</a></h1>
-<p>Given the way the orthogonal iteration method was constructed, we should expect some connection to the power iteration method. We explore this in more detail here. We show how the sequence of matrices <span class="math notranslate nohighlight">\(Q_k\)</span> from the orthogonal iteration method corresponds to a QR factorization of the sequence of matrices <span class="math notranslate nohighlight">\(A^k\)</span> from the power iteration method.</p>
-<section id="q-k-as-the-q-factor-in-a-qr-factorization-of-a-k">
-<span id="sec-oi-qr-ak"></span><h2><span class="math notranslate nohighlight">\(Q_k\)</span> as the <span class="math notranslate nohighlight">\(Q\)</span>-factor in a QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span><a class="headerlink" href="#q-k-as-the-q-factor-in-a-qr-factorization-of-a-k" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span>. Orthogonal iteration with an initial matrix <span class="math notranslate nohighlight">\(Q_0\in\mathbb{C}^{n\times p}\)</span> whose columns are orthonormal proceeds by computing, at each step, the thin QR factorization</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-arnoldi-iteration">
+<h1>The Arnoldi Iteration<a class="headerlink" href="#the-arnoldi-iteration" title="Link to this heading">#</a></h1>
+<p>Previously, we introduced the core idea of the Arnoldi iteration: a numerically stable process to build an orthonormal basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> for the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k(A, q_1)\)</span>. This process simultaneously generates a <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix <span class="math notranslate nohighlight">\(H_k = Q_k^T A Q_k\)</span>.</p>
+<p>Now, we will formalize this algorithm and show precisely why the eigenvalues of <span class="math notranslate nohighlight">\(H_k\)</span> are good approximations for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<section id="the-arnoldi-algorithm">
+<h2>The Arnoldi Algorithm<a class="headerlink" href="#the-arnoldi-algorithm" title="Link to this heading">#</a></h2>
+<p>The algorithm is an iterative application of the Modified Gram-Schmidt process. Starting with a chosen unit vector <span class="math notranslate nohighlight">\(q_1\)</span>, we generate <span class="math notranslate nohighlight">\(q_2, q_3, \dots, q_k\)</span> one by one.</p>
+<p><strong>Algorithm 5.1: The Arnoldi Iteration</strong></p>
+<ul class="simple">
+<li><p><strong>Input:</strong> A matrix <span class="math notranslate nohighlight">\(A\)</span>, a number of steps <span class="math notranslate nohighlight">\(k\)</span>, and a starting vector <span class="math notranslate nohighlight">\(q_1\)</span> with <span class="math notranslate nohighlight">\(\|q_1\|_2 = 1\)</span>.</p></li>
+<li><p><strong>Output:</strong> <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> with orthonormal columns and a <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix <span class="math notranslate nohighlight">\(H_k\)</span> with entries <span class="math notranslate nohighlight">\(h_{ij}\)</span>.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">arnoldi_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Arnoldi Iteration</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    A : matrix or linear operator</span>
+<span class="sd">        The matrix to approximate eigenvalues of</span>
+<span class="sd">    q1 : array</span>
+<span class="sd">        Starting vector with ||q1||_2 = 1</span>
+<span class="sd">    k : int</span>
+<span class="sd">        Number of iterations</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    Q_k : matrix</span>
+<span class="sd">        Orthonormal basis vectors [q_1, ..., q_k]</span>
+<span class="sd">    H_k : matrix</span>
+<span class="sd">        k x k upper Hessenberg matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="p">[</span><span class="n">q1</span><span class="p">]</span>  <span class="c1"># List to store q_j vectors</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>  <span class="c1"># Upper Hessenberg matrix</span>
+    
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="c1"># Compute matrix-vector product</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        
+        <span class="c1"># Modified Gram-Schmidt orthogonalization</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">v</span>  <span class="c1"># Compute projection coefficient</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">H</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">Q</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># Subtract projection</span>
+        
+        <span class="c1"># Compute next basis vector</span>
+        <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">h_next</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">h_next</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Lucky breakdown: invariant subspace found</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Lucky breakdown at iteration&quot;</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">Q</span><span class="p">),</span> <span class="n">H</span><span class="p">[:</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="n">H</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_next</span>
+            <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">h_next</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">Q</span><span class="p">),</span> <span class="n">H</span>
+</pre></div>
+</div>
+<p>This algorithm produces the <span class="math notranslate nohighlight">\(k \times k\)</span> matrix <span class="math notranslate nohighlight">\(H_k\)</span> and the basis <span class="math notranslate nohighlight">\(Q_k\)</span> that satisfy the <strong>Arnoldi relation</strong> we saw previously:</p>
 <div class="math notranslate nohighlight">
 \[
-AQ_k = Q_{k+1} R_{k+1}
+A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(Q_k\)</span> is unitary and <span class="math notranslate nohighlight">\(R_k\)</span> is upper triangular.</p>
-<p>Define the accumulated upper triangular factor</p>
-<div class="math notranslate nohighlight">
-\[
-\widehat{R}_k := R_k R_{k-1}\cdots R_1 \quad (k\ge 1),\qquad \widehat{R}_0 := I_p.
-\]</div>
-<div class="proof theorem admonition" id="thm:AkQR">
-<p class="admonition-title"><span class="caption-number">Theorem 24 </span> (QR of <span class="math notranslate nohighlight">\(A^k Q_0\)</span>)</p>
-<section class="theorem-content" id="proof-content">
-<p>For all <span class="math notranslate nohighlight">\(k\ge 0\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[
-A^k\,Q_0 = Q_k\,\widehat{R}_k .
-\]</div>
-<p>In particular, if <span class="math notranslate nohighlight">\(Q_0=I_n\)</span> (full orthogonal iteration on all of <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>), then</p>
-<div class="math notranslate nohighlight">
-\[
-A^k = Q_k\,\widehat{R}_k ,
-\]</div>
-<p>so <span class="math notranslate nohighlight">\(Q_k\)</span> is the <span class="math notranslate nohighlight">\(Q\)</span>-factor and <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> the <span class="math notranslate nohighlight">\(R\)</span>-factor in the QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
+<p>The computational cost is dominated by the <span class="math notranslate nohighlight">\(k\)</span> sparse matrix-vector products and the <span class="math notranslate nohighlight">\(O(k^2 n)\)</span> work of the inner loop. As long as <span class="math notranslate nohighlight">\(k \ll n\)</span>, this is far more efficient than any <span class="math notranslate nohighlight">\(O(n^3)\)</span> direct method.</p>
 </section>
-</div><div class="proof admonition" id="proof">
-<p>Proof. <em>Base cases.</em></p>
-<p>For <span class="math notranslate nohighlight">\(k=0\)</span>, the identity is <span class="math notranslate nohighlight">\(Q_0 = Q_0\)</span>.</p>
-<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, it reads <span class="math notranslate nohighlight">\(A Q_0 = Q_1 R_1\)</span>, which is the defining QR step.</p>
-<p><em>Inductive step.</em> Assume <span class="math notranslate nohighlight">\(A^k Q_0 = Q_k \widehat{R}_k\)</span>. Then</p>
+<section id="ritz-values-and-ritz-vectors">
+<h2>Ritz Values and Ritz Vectors<a class="headerlink" href="#ritz-values-and-ritz-vectors" title="Link to this heading">#</a></h2>
+<p>Our strategy is to use the eigenvalues of the small, dense matrix <span class="math notranslate nohighlight">\(H_k\)</span> to approximate the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. Let’s formalize this.</p>
+<p>Let <span class="math notranslate nohighlight">\(H_k\)</span> have an eigendecomposition <span class="math notranslate nohighlight">\(H_k = Y_k \Lambda_k Y_k^{-1}\)</span>, where <span class="math notranslate nohighlight">\(\Lambda_k = \text{diag}(\theta_1, \dots, \theta_k)\)</span> is the diagonal matrix of eigenvalues and <span class="math notranslate nohighlight">\(Y_k = [y_1, \dots, y_k]\)</span> contains the corresponding eigenvectors.</p>
+<ul class="simple">
+<li><p><strong>Ritz Values:</strong> The eigenvalues <span class="math notranslate nohighlight">\(\theta_j\)</span> of <span class="math notranslate nohighlight">\(H_k\)</span> are called the <strong>Ritz values</strong>. They serve as our approximations to the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>Ritz Vectors:</strong> The eigenvectors <span class="math notranslate nohighlight">\(y_j\)</span> of <span class="math notranslate nohighlight">\(H_k\)</span> are <span class="math notranslate nohighlight">\(k\)</span>-dimensional. We can “lift” them back into the <span class="math notranslate nohighlight">\(n\)</span>-dimensional space to get our approximate eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>, which are called the <strong>Ritz vectors</strong>:</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+u_j = Q_k y_j
+\]</div>
+<p>Note that <span class="math notranslate nohighlight">\(u_j\)</span> is a linear combination of our basis vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_k\)</span>, so <span class="math notranslate nohighlight">\(u_j \in \mathcal{K}_k\)</span>.</p>
+</section>
+<section id="why-is-this-a-good-approximation">
+<h2>Why is this a good approximation?<a class="headerlink" href="#why-is-this-a-good-approximation" title="Link to this heading">#</a></h2>
+<p>Let’s see just how “approximate” these eigenpairs are. We can derive an exact expression for the residual <span class="math notranslate nohighlight">\(A u_j - \theta_j u_j\)</span>.</p>
+<p>We start with the Arnoldi relation:</p>
+<div class="math notranslate nohighlight">
+\[
+A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T
+\]</div>
+<p>Now, multiply from the right by a single eigenvector <span class="math notranslate nohighlight">\(y_j\)</span> of <span class="math notranslate nohighlight">\(H_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A Q_k y_j = Q_k H_k y_j + h_{k+1,k} q_{k+1} (e_k^T y_j)
+\]</div>
+<p>Substitute our definitions. On the left, <span class="math notranslate nohighlight">\(Q_k y_j = u_j\)</span>. On the right, <span class="math notranslate nohighlight">\(H_k y_j = \theta_j y_j\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-A^{k+1}Q_0
-&amp;= A(A^k Q_0)
-= A(Q_k \widehat{R}_k)
-= (A Q_k)\,\widehat{R}_k \\
-&amp;= (Q_{k+1} R_{k+1})\,\widehat{R}_k
-= Q_{k+1}\,(R_{k+1}\widehat{R}_k)
-= Q_{k+1}\,\widehat{R}_{k+1},
+A u_j &amp;= Q_k (\theta_j y_j) + h_{k+1,k} q_{k+1} (e_k^T y_j) \\
+&amp;= \theta_j (Q_k y_j) + h_{k+1,k} q_{k+1} (e_k^T y_j) \\
+&amp;= \theta_j u_j + h_{k+1,k} q_{k+1} (y_j)_k
 \end{aligned}
 \end{split}\]</div>
-<p>which proves the claim by induction.</p>
-</div>
-<div class="note admonition">
-<p class="admonition-title">Remarks</p>
-<ul class="simple">
-<li><p>A product of upper triangular matrices is upper triangular, and with positive diagonals in each <span class="math notranslate nohighlight">\(R_j\)</span>, the factor <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> is upper triangular with positive diagonal. Hence the factorization above is the unique thin QR factorization of <span class="math notranslate nohighlight">\(A^k Q_0\)</span>.</p></li>
-<li><p>When <span class="math notranslate nohighlight">\(p=1\)</span> (the power method), <span class="math notranslate nohighlight">\(\widehat{R}_k\)</span> is the scalar <span class="math notranslate nohighlight">\(\prod_{j=1}^k r_j\)</span> with <span class="math notranslate nohighlight">\(r_j=\lVert A q_{j-1}\rVert_2\)</span>, and <span class="math notranslate nohighlight">\(q_k\)</span> is the normalized power-iteration vector. The identity reduces to the familiar normalization of <span class="math notranslate nohighlight">\(A^k q_0\)</span>.</p></li>
-<li><p>The column-space relation <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)=\operatorname{range}(A^k Q_0)\)</span> shows that orthogonal iteration orthonormalizes the images of the initial subspace under repeated application of <span class="math notranslate nohighlight">\(A\)</span>. This is the subspace analogue of the power method and explains why the nested leading-column spans of <span class="math notranslate nohighlight">\(Q_k\)</span> converge to invariant subspaces under standard spectral gap assumptions.</p></li>
-</ul>
+<p>where <span class="math notranslate nohighlight">\((y_j)_k = e_k^T y_j\)</span> is simply the <span class="math notranslate nohighlight">\(k\)</span>-th (i.e., last) component of the small eigenvector <span class="math notranslate nohighlight">\(y_j\)</span>.</p>
+<p>Rearranging this gives us the <strong>residual vector</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+A u_j - \theta_j u_j = h_{k+1,k} (y_j)_k q_{k+1}
+\]</div>
+<p>This is a remarkable and powerful result. It gives us a cheap and easy way to check the quality of our approximation. By taking the 2-norm (and since <span class="math notranslate nohighlight">\(\|q_{k+1}\|_2 = 1\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+\| A u_j - \theta_j u_j \|_2 = |h_{k+1,k}| \cdot |(y_j)_k|
+\]</div>
+<p>This tells us that the Ritz pair <span class="math notranslate nohighlight">\((\theta_j, u_j)\)</span> is a good approximation for an eigenpair of <span class="math notranslate nohighlight">\(A\)</span> if:</p>
+<ol class="arabic simple">
+<li><p>The quantity <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span> (the “breakdown” term) is small, OR</p></li>
+<li><p>The last component <span class="math notranslate nohighlight">\((y_j)_k\)</span> of the small eigenvector <span class="math notranslate nohighlight">\(y_j\)</span> is small.</p></li>
+</ol>
+<p>In practice, the Arnoldi iteration is run, and the eigenvalues of <span class="math notranslate nohighlight">\(H_k\)</span> are computed. We then compute the residual norm for each Ritz pair using this formula. If the residual is below a desired tolerance, we declare that Ritz pair “converged.”</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Lucky breakdown:</strong> If at some step <span class="math notranslate nohighlight">\(j\)</span>, we find <span class="math notranslate nohighlight">\(h_{j+1, j} = 0\)</span>, what does this mean? The Arnoldi relation becomes <span class="math notranslate nohighlight">\(A Q_j = Q_j H_j\)</span>. This implies that the subspace <span class="math notranslate nohighlight">\(\mathcal{K}_j = \text{span}(q_1, \dots, q_j)\)</span> is an <strong>invariant subspace</strong> of <span class="math notranslate nohighlight">\(A\)</span>. In this case, the <span class="math notranslate nohighlight">\(j\)</span> Ritz values (the eigenvalues of <span class="math notranslate nohighlight">\(H_j\)</span>) are <em>exactly</em> eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. This is rare in practice but is a welcome event when it occurs.</p>
 </div>
 </section>
 </section>
@@ -493,20 +561,20 @@ A^{k+1}Q_0
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="orthogonal_iteration.html"
+       href="krylov_subspaces.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Orthogonal Iteration Algorithm</p>
+        <p class="prev-next-title">The Core Idea: Projection onto Krylov Subspaces</p>
       </div>
     </a>
     <a class="right-next"
-       href="orthogonal_iteration_and_eigenvalues.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Orthogonal Iteration and Eigenvalues</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -526,7 +594,9 @@ A^{k+1}Q_0
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#q-k-as-the-q-factor-in-a-qr-factorization-of-a-k"><span class="math notranslate nohighlight">\(Q_k\)</span> as the <span class="math notranslate nohighlight">\(Q\)</span>-factor in a QR factorization of <span class="math notranslate nohighlight">\(A^k\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-algorithm">The Arnoldi Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ritz-values-and-ritz-vectors">Ritz Values and Ritz Vectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-is-this-a-good-approximation">Why is this a good approximation?</a></li>
 </ul>
   </nav></div>
 
