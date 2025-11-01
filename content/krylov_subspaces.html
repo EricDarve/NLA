@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Projections &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Core Idea: Projection onto Krylov Subspaces &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/projections';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/krylov_subspaces';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Block Matrix Operations" href="block_matrices.html" />
-    <link rel="prev" title="Orthogonal Matrices" href="orthogonal_matrices.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="Iterative Methods for Eigenvalue Computation" href="eigenvalues_iterative.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,7 +177,7 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
@@ -187,7 +187,7 @@
 <li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
@@ -235,8 +235,8 @@
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">The Core Idea: Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Core Idea: Projection onto Krylov Subspaces</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -294,7 +294,7 @@
       
       
       
-      <li><a href="../_sources/content/projections.md" target="_blank"
+      <li><a href="../_sources/content/krylov_subspaces.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -378,7 +378,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Projections</h1>
+    <h1>The Core Idea: Projection onto Krylov Subspaces</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -388,26 +388,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-projections-orthogonal-vs-oblique">Types of Projections: Orthogonal vs. Oblique</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projections">Orthogonal Projections</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projections">Oblique Projections</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-formulas">Mathematical Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projection-formula">Orthogonal Projection Formula</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#special-case-projection-onto-a-line">Special Case: Projection onto a Line</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projection-formula">Oblique Projection Formula</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-properties">Key Results and Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-matrices-and-projections">Orthogonal Matrices and Projections</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-and-explanation">Derivation and Explanation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-projection-matrix-p-qq-t">Properties of the Projection Matrix <span class="math notranslate nohighlight">\(P = QQ^T\)</span></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#revisiting-the-hessenberg-reduction">Revisiting the Hessenberg Reduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-truncation">The Iterative Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-projection-and-the-approximation">The Projection and the Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-eigensolver-strategy">The Iterative Eigensolver Strategy</a></li>
 </ul>
             </nav>
         </div>
@@ -419,107 +403,95 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="projections">
-<h1>Projections<a class="headerlink" href="#projections" title="Link to this heading">#</a></h1>
-<p>A <strong>projection</strong> is a linear transformation that takes a vector and maps it onto a subspace. Intuitively, you can think of it as casting a shadow. If you shine a light on an object (a vector), the shadow it creates on a surface (a subspace) is its projection. Projections are fundamental in areas like computer graphics, statistics (for least-squares regression), and solving systems of linear equations.</p>
-<p>All projections are represented by a square matrix <span class="math notranslate nohighlight">\(P\)</span> that is <strong>idempotent</strong>, meaning that applying the projection more than once has no further effect. Algebraically, this is the defining property of a projection matrix:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-core-idea-projection-onto-krylov-subspaces">
+<h1>The Core Idea: Projection onto Krylov Subspaces<a class="headerlink" href="#the-core-idea-projection-onto-krylov-subspaces" title="Link to this heading">#</a></h1>
+<p>We established that for large, sparse matrices, our only computationally feasible tool is the sparse matrix-vector product, <span class="math notranslate nohighlight">\(v \mapsto Av\)</span>. Any method that modifies the matrix <span class="math notranslate nohighlight">\(A\)</span> itself, like the dense QR algorithm, is unusable due to “fill-in.”</p>
+<p>This forces us to ask a new question: How can we find eigenvalues using <em>only</em> matrix-vector products?</p>
+<p>The answer lies in building a small, dense matrix <span class="math notranslate nohighlight">\(H_k\)</span> whose eigenvalues approximate the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. We do this by projecting <span class="math notranslate nohighlight">\(A\)</span> onto a carefully chosen low-dimensional subspace.</p>
+<section id="revisiting-the-hessenberg-reduction">
+<h2>Revisiting the Hessenberg Reduction<a class="headerlink" href="#revisiting-the-hessenberg-reduction" title="Link to this heading">#</a></h2>
+<p>Let’s reconsider the full Hessenberg reduction from our study of direct methods:</p>
 <div class="math notranslate nohighlight">
-\[P^2 = P\]</div>
-<section id="types-of-projections-orthogonal-vs-oblique">
-<h2>Types of Projections: Orthogonal vs. Oblique<a class="headerlink" href="#types-of-projections-orthogonal-vs-oblique" title="Link to this heading">#</a></h2>
-<p>The distinction between the two main types of projections depends on the direction of the projection relative to the target subspace. 📐</p>
-<section id="orthogonal-projections">
-<h3>Orthogonal Projections<a class="headerlink" href="#orthogonal-projections" title="Link to this heading">#</a></h3>
-<p>An <strong>orthogonal projection</strong> is the most common type. Here, the direction of projection is <strong>perpendicular (orthogonal)</strong> to the subspace you are projecting onto. This is like the shadow cast by the sun when it’s directly overhead.</p>
-<p>A key feature of an orthogonal projection is that it finds the point in the subspace that is <strong>geometrically closest</strong> to the original vector. This “best approximation” property is the foundation of least-squares solutions to overdetermined systems of equations.</p>
-</section>
-<section id="oblique-projections">
-<h3>Oblique Projections<a class="headerlink" href="#oblique-projections" title="Link to this heading">#</a></h3>
-<p>An <strong>oblique projection</strong> is one where the direction of projection is <strong>not perpendicular</strong> to the target subspace. This is analogous to the long, angled shadow cast by the sun when it’s low in the sky. While less common than orthogonal projections, they are used in specific applications like perspective projections in computer graphics.</p>
-</section>
-</section>
-<section id="mathematical-formulas">
-<h2>Mathematical Formulas<a class="headerlink" href="#mathematical-formulas" title="Link to this heading">#</a></h2>
-<p>The specific formula for a projection matrix depends on the type of projection and the subspace being projected onto.</p>
-<section id="orthogonal-projection-formula">
-<h3>Orthogonal Projection Formula<a class="headerlink" href="#orthogonal-projection-formula" title="Link to this heading">#</a></h3>
-<p>To project a vector onto the subspace spanned by the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span> (where the columns of <span class="math notranslate nohighlight">\(A\)</span> are linearly independent), the orthogonal projection matrix <span class="math notranslate nohighlight">\(P\)</span> is given by:</p>
+\[
+A Q = Q H
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{n \times n}\)</span> is orthogonal and <span class="math notranslate nohighlight">\(H \in \mathbb{R}^{n \times n}\)</span> is upper Hessenberg.</p>
+<p>Let’s look at this equation one column at a time. Let <span class="math notranslate nohighlight">\(q_j\)</span> be the <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(h_j\)</span> be the <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(H\)</span>. The <span class="math notranslate nohighlight">\(j\)</span>-th column of the equation <span class="math notranslate nohighlight">\(AQ = QH\)</span> reads:</p>
 <div class="math notranslate nohighlight">
-\[P = A(A^T A)^{-1} A^T\]</div>
-<p>The projection of a vector <span class="math notranslate nohighlight">\(b\)</span> onto this subspace is then calculated as <span class="math notranslate nohighlight">\(p = Pb\)</span>.</p>
-<section id="special-case-projection-onto-a-line">
-<h4>Special Case: Projection onto a Line<a class="headerlink" href="#special-case-projection-onto-a-line" title="Link to this heading">#</a></h4>
-<p>If you are projecting onto a line spanned by a single non-zero vector <span class="math notranslate nohighlight">\(a\)</span>, the formula simplifies significantly. In this case, <span class="math notranslate nohighlight">\(A\)</span> is just the column vector <span class="math notranslate nohighlight">\(a\)</span>.</p>
+\[
+A q_j = Q h_j = \sum_{i=1}^{n} q_i h_{ij}
+\]</div>
+<p>Because <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg, <span class="math notranslate nohighlight">\(h_{ij} = 0\)</span> for all <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>. This simplifies the sum dramatically:</p>
 <div class="math notranslate nohighlight">
-\[P = \frac{aa^T}{a^T a}\]</div>
-<p>The projection of a vector <span class="math notranslate nohighlight">\(b\)</span> onto the line defined by <span class="math notranslate nohighlight">\(a\)</span> is:</p>
+\[
+A q_j = \sum_{i=1}^{j+1} h_{ij} q_i = h_{1j}q_1 + h_{2j}q_2 + \dots + h_{j,j}q_j + h_{j+1,j}q_{j+1}
+\]</div>
+<p>We can rearrange this to solve for the “new” vector, <span class="math notranslate nohighlight">\(q_{j+1}\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[p = \left(\frac{a \cdot b}{\|a\|^2}\right) a\]</div>
-<p>This formula has a clear geometric meaning: it scales the direction vector <span class="math notranslate nohighlight">\(a\)</span> by a factor determined by the dot product of <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>.</p>
+\[
+h_{j+1,j} q_{j+1} = A q_j - \sum_{i=1}^{j} h_{ij} q_i
+\]</div>
+<p>This equation reveals that the Hessenberg reduction is actually a <strong>Gram-Schmidt-like iterative process</strong>. Starting with an arbitrary unit vector <span class="math notranslate nohighlight">\(q_1\)</span>:</p>
+<ol class="arabic simple">
+<li><p>Compute the vector <span class="math notranslate nohighlight">\(v = A q_j\)</span>.</p></li>
+<li><p>Orthogonalize <span class="math notranslate nohighlight">\(v\)</span> against the “old” basis vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_j\)</span>. The coefficients of this orthogonalization are <span class="math notranslate nohighlight">\(h_{ij} = q_i^T v\)</span> (since <span class="math notranslate nohighlight">\(q_i^T q_k = 0\)</span>).</p></li>
+<li><p>The remaining vector, <span class="math notranslate nohighlight">\(w = v - \sum_{i=1}^{j} h_{ij} q_i\)</span>, is, by construction, orthogonal to <span class="math notranslate nohighlight">\(q_1, \dots, q_j\)</span>.</p></li>
+<li><p>Normalize this vector: <span class="math notranslate nohighlight">\(h_{j+1,j} = \|w\|_2\)</span> and <span class="math notranslate nohighlight">\(q_{j+1} = w / h_{j+1,j}\)</span>.</p></li>
+</ol>
+<p>This is the <strong>Arnoldi iteration</strong>.</p>
+<p>If we run this process for <span class="math notranslate nohighlight">\(n\)</span> steps, we build the full matrices <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(H\)</span>. The cost is dominated by the <span class="math notranslate nohighlight">\(n\)</span> sparse matvecs and the <span class="math notranslate nohighlight">\(O(n^3)\)</span> work of the <span class="math notranslate nohighlight">\(n\)</span> growing orthogonalizations. We have simply re-derived the <span class="math notranslate nohighlight">\(O(n^3)\)</span> dense Hessenberg reduction, and the sparsity of <span class="math notranslate nohighlight">\(A\)</span> has not saved us.</p>
 </section>
-</section>
-<section id="oblique-projection-formula">
-<h3>Oblique Projection Formula<a class="headerlink" href="#oblique-projection-formula" title="Link to this heading">#</a></h3>
-<p>For an oblique projection, you must specify both the subspace to project <strong>onto</strong> (the range) and the direction to project <strong>along</strong> (the null space).</p>
-<p>Let the range be spanned by the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span>. The direction of projection is defined as the subspace orthogonal to the columns of another matrix, <span class="math notranslate nohighlight">\(B\)</span>. The projection matrix <span class="math notranslate nohighlight">\(P\)</span> is then given by:</p>
+<section id="the-iterative-truncation">
+<h2>The Iterative Truncation<a class="headerlink" href="#the-iterative-truncation" title="Link to this heading">#</a></h2>
+<p>The key insight is that it is possible to <strong>stop this process early</strong>.</p>
+<p>What if we only run the Arnoldi iteration for <span class="math notranslate nohighlight">\(k\)</span> steps, where <span class="math notranslate nohighlight">\(k \ll n\)</span>?</p>
+<p>After <span class="math notranslate nohighlight">\(k\)</span> steps, we have produced an orthonormal set of vectors <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> and a small <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix <span class="math notranslate nohighlight">\(H_k\)</span>, which is the top-left block of the full <span class="math notranslate nohighlight">\(H\)</span>.</p>
+<p>The process generates the following relationship, which is the key to all iterative methods:</p>
 <div class="math notranslate nohighlight">
-\[P = A(B^T A)^{-1} B^T\]</div>
-<p>Here, the null space of the projection <span class="math notranslate nohighlight">\(P\)</span> (the direction of projection) is the set of all vectors orthogonal to the column space of <span class="math notranslate nohighlight">\(B\)</span>.</p>
-<p>Notice that if you choose <span class="math notranslate nohighlight">\(B = A\)</span>, the direction of projection becomes orthogonal to the range (since it’s orthogonal to the columns of <span class="math notranslate nohighlight">\(A\)</span>). This makes the projection orthogonal, and the formula reduces to the standard orthogonal projection formula: <span class="math notranslate nohighlight">\(P = A(A^T A)^{-1} A^T\)</span>.</p>
-</section>
-</section>
-<section id="key-results-and-properties">
-<h2>Key Results and Properties<a class="headerlink" href="#key-results-and-properties" title="Link to this heading">#</a></h2>
-<p>Projection matrices have several important and elegant properties.</p>
+\[
+\boxed{A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(e_k^T = [0, \dots, 0, 1]\)</span> is the <span class="math notranslate nohighlight">\(k\)</span>-th standard basis vector. This is known as the <strong>Arnoldi relation</strong>.</p>
 <ul class="simple">
-<li><p><strong>Idempotence</strong>: As mentioned, all projection matrices satisfy <span class="math notranslate nohighlight">\(P^2 = P\)</span>.</p></li>
-<li><p><strong>Symmetry</strong>: A projection matrix <span class="math notranslate nohighlight">\(P\)</span> represents an <strong>orthogonal projection</strong> if and only if it is a <strong>symmetric matrix</strong> (<span class="math notranslate nohighlight">\(P = P^T\)</span>). Oblique projection matrices are generally not symmetric.</p></li>
-<li><p><strong>Complementary Projection</strong>: If <span class="math notranslate nohighlight">\(P\)</span> is a projection matrix, then the matrix <span class="math notranslate nohighlight">\(Q = I - P\)</span> is also a projection matrix. <span class="math notranslate nohighlight">\(Q\)</span> is called the <strong>complementary projection</strong>. It projects onto the null space of <span class="math notranslate nohighlight">\(P\)</span> along the range of <span class="math notranslate nohighlight">\(P\)</span>. For an orthogonal projection <span class="math notranslate nohighlight">\(P\)</span>, its complement <span class="math notranslate nohighlight">\(I-P\)</span> is also an orthogonal projection onto the orthogonal complement of the original subspace.</p></li>
+<li><p>The term <span class="math notranslate nohighlight">\(Q_k H_k\)</span> exactly represents the components of <span class="math notranslate nohighlight">\(A Q_k\)</span> that lie <em>within</em> the subspace spanned by <span class="math notranslate nohighlight">\(Q_k.\)</span></p></li>
+<li><p>The term <span class="math notranslate nohighlight">\(h_{k+1,k} q_{k+1} e_k^T\)</span> is the “remainder” or “residual”—the part of <span class="math notranslate nohighlight">\(A Q_k\)</span> that points “out” of the subspace.</p></li>
 </ul>
 </section>
-<section id="orthogonal-matrices-and-projections">
-<h2>Orthogonal Matrices and Projections<a class="headerlink" href="#orthogonal-matrices-and-projections" title="Link to this heading">#</a></h2>
-<p>The connection is simple and direct: if the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span> are <strong>orthonormal</strong>, meaning they form an <strong>orthogonal matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span>, the formula for the orthogonal projection matrix onto the column space of <span class="math notranslate nohighlight">\(A\)</span> simplifies dramatically.</p>
-<p>Specifically, the projection matrix <span class="math notranslate nohighlight">\(P\)</span> becomes <span class="math notranslate nohighlight">\(P = QQ^T\)</span>.</p>
-<section id="derivation-and-explanation">
-<h3>Derivation and Explanation<a class="headerlink" href="#derivation-and-explanation" title="Link to this heading">#</a></h3>
-<p>The standard formula for an orthogonal projection matrix <span class="math notranslate nohighlight">\(P\)</span> that projects vectors onto the column space of a matrix <span class="math notranslate nohighlight">\(A\)</span> is:</p>
+<section id="the-projection-and-the-approximation">
+<h2>The Projection and the Approximation<a class="headerlink" href="#the-projection-and-the-approximation" title="Link to this heading">#</a></h2>
+<p>If we simply ignore the residual term (which we hope is small), we get an approximation:</p>
 <div class="math notranslate nohighlight">
-\[P = A(A^T A)^{-1} A^T\]</div>
-<p>An <strong>orthogonal matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span> (which must be a tall or square matrix with orthonormal columns) has the defining property that its columns are mutually perpendicular and have a length of one. Algebraically, this means:</p>
+\[
+A Q_k \approx Q_k H_k
+\]</div>
+<p>This suggests that <span class="math notranslate nohighlight">\(A\)</span> behaves like <span class="math notranslate nohighlight">\(H_k\)</span> <em>when restricted to the subspace <span class="math notranslate nohighlight">\(\text{span}(Q_k)\)</span></em>. Let’s make this formal by left-multiplying the Arnoldi relation by <span class="math notranslate nohighlight">\(Q_k^T\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[Q^T Q = I\]</div>
-<p>where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p>
-<p>If we substitute our orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> for the general matrix <span class="math notranslate nohighlight">\(A\)</span> in the projection formula, the <span class="math notranslate nohighlight">\((Q^T Q)\)</span> term simplifies to the identity matrix <span class="math notranslate nohighlight">\(I\)</span>:</p>
+\[\begin{split}
+\begin{aligned}
+Q_k^T (A Q_k) &amp;= Q_k^T (Q_k H_k + h_{k+1,k} q_{k+1} e_k^T) \\
+Q_k^T A Q_k &amp;= (Q_k^T Q_k) H_k + h_{k+1,k} (Q_k^T q_{k+1}) e_k^T
+\end{aligned}
+\end{split}\]</div>
+<p>By construction, <span class="math notranslate nohighlight">\(Q_k\)</span> is orthonormal, so <span class="math notranslate nohighlight">\(Q_k^T Q_k = I_k\)</span>. Also, <span class="math notranslate nohighlight">\(q_{k+1}\)</span> is orthogonal to all columns in <span class="math notranslate nohighlight">\(Q_k\)</span>, so <span class="math notranslate nohighlight">\(Q_k^T q_{k+1} = \mathbf{0}\)</span>. The equation simplifies perfectly:</p>
 <div class="math notranslate nohighlight">
-\[P = Q(\underbrace{Q^T Q}_{I})^{-1} Q^T = Q(I)^{-1}Q^T = QIQ^T = QQ^T\]</div>
-<p>So, the orthogonal projection matrix onto the subspace spanned by a set of orthonormal vectors (the columns of <span class="math notranslate nohighlight">\(Q\)</span>) is simply <span class="math notranslate nohighlight">\(P = QQ^T\)</span>.</p>
+\[
+H_k = Q_k^T A Q_k
+\]</div>
+<p>This <span class="math notranslate nohighlight">\(k \times k\)</span> matrix <span class="math notranslate nohighlight">\(H_k\)</span> is the <strong>Rayleigh-Ritz projection</strong> of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace spanned by <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
+<p>This subspace, <span class="math notranslate nohighlight">\(\mathcal{K}_k(A, q_1) = \text{span}\{q_1, Aq_1, A^2q_1, \dots, A^{k-1}q_1\}\)</span>, is called the <strong>Krylov subspace</strong> of degree <span class="math notranslate nohighlight">\(k\)</span> generated by <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(q_1\)</span>.</p>
+<p>The Arnoldi iteration is a numerically stable way to build an orthonormal basis for this subspace.</p>
 </section>
-<section id="properties-of-the-projection-matrix-p-qq-t">
-<h3>Properties of the Projection Matrix <span class="math notranslate nohighlight">\(P = QQ^T\)</span><a class="headerlink" href="#properties-of-the-projection-matrix-p-qq-t" title="Link to this heading">#</a></h3>
-<p>This simplified form, <span class="math notranslate nohighlight">\(P=QQ^T\)</span>, neatly demonstrates the two defining properties of an orthogonal projection matrix.</p>
-<ol class="arabic">
-<li><p><strong>Symmetry</strong>: A matrix is symmetric if <span class="math notranslate nohighlight">\(P^T = P\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[P^T = (QQ^T)^T = (Q^T)^T Q^T = QQ^T = P\]</div>
-<p>The matrix is its own transpose, so it is <strong>symmetric</strong>.</p>
-</li>
-<li><p><strong>Idempotence</strong>: A matrix is idempotent if <span class="math notranslate nohighlight">\(P^2 = P\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[P^2 = (QQ^T)(QQ^T) = Q(\underbrace{Q^T Q}_{I})Q^T = QIQ^T = QQ^T = P\]</div>
-<p>Projecting a vector twice is the same as projecting it once.</p>
-</li>
-</ol>
-</section>
-</section>
-<section id="geometric-interpretation">
-<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
-<p>When we project a vector <span class="math notranslate nohighlight">\(x\)</span> onto the column space of an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>, the operation <span class="math notranslate nohighlight">\(p = Px = QQ^Tx\)</span> can be seen as a two-step process:</p>
+<section id="the-iterative-eigensolver-strategy">
+<h2>The Iterative Eigensolver Strategy<a class="headerlink" href="#the-iterative-eigensolver-strategy" title="Link to this heading">#</a></h2>
+<p>This defines the general strategy for all modern iterative eigensolvers:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(Q^Tx\)</span>: First, we multiply by <span class="math notranslate nohighlight">\(Q^T\)</span>. This calculates the dot products of <span class="math notranslate nohighlight">\(x\)</span> with each orthonormal column of <span class="math notranslate nohighlight">\(Q\)</span>. In essence, it finds the coordinates of <span class="math notranslate nohighlight">\(x\)</span> in the basis defined by the columns of <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(Q(Q^Tx)\)</span>: Next, we multiply the resulting coordinate vector by <span class="math notranslate nohighlight">\(Q\)</span>. This creates a linear combination of the orthonormal basis vectors (the columns of <span class="math notranslate nohighlight">\(Q\)</span>) using those coordinates.</p></li>
+<li><p><strong>Build Subspace:</strong> Choose a starting vector <span class="math notranslate nohighlight">\(q_1\)</span> and run the Arnoldi iteration for <span class="math notranslate nohighlight">\(k\)</span> steps to build an orthonormal basis <span class="math notranslate nohighlight">\(Q_k\)</span> for the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> and the <span class="math notranslate nohighlight">\(k \times k\)</span> Hessenberg projection <span class="math notranslate nohighlight">\(H_k = Q_k^T A Q_k\)</span>.</p></li>
+<li><p><strong>Solve Small Problem:</strong> Compute the eigenvalues of the <em>small, dense</em> matrix <span class="math notranslate nohighlight">\(H_k\)</span> using a standard method (e.g., the QR iteration algorithm). Let these eigenvalues be <span class="math notranslate nohighlight">\(\theta_1, \dots, \theta_k\)</span>. These are called the <strong>Ritz values</strong>.</p></li>
+<li><p><strong>Check Convergence:</strong> These Ritz values are our approximations for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. We can check their associated residual error (which, as we will see, is related to the <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span> term) to see if they are “good enough.”</p></li>
+<li><p><strong>Iterate:</strong> If not converged, we can expand the subspace (increase <span class="math notranslate nohighlight">\(k\)</span>) and repeat.</p></li>
 </ol>
-<p>The result is a new vector <span class="math notranslate nohighlight">\(p\)</span> that lives within the column space of <span class="math notranslate nohighlight">\(Q\)</span> and is the closest possible vector in that subspace to the original vector <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>The total cost is dominated by the <span class="math notranslate nohighlight">\(k\)</span> sparse matrix-vector products, at <span class="math notranslate nohighlight">\(O(k \cdot nnz(A)) \approx O(kn)\)</span>, and the <span class="math notranslate nohighlight">\(k\)</span> orthogonalization steps, at <span class="math notranslate nohighlight">\(O(k^2 n)\)</span>. As long as <span class="math notranslate nohighlight">\(k \ll n\)</span>, this cost is vastly lower than the <span class="math notranslate nohighlight">\(O(n^3)\)</span> cost of a direct method.</p>
+<p>In the special (and very common) case that <span class="math notranslate nohighlight">\(A\)</span> is symmetric, the projected matrix <span class="math notranslate nohighlight">\(H_k\)</span> will also be symmetric. A symmetric Hessenberg matrix is <strong>tridiagonal</strong>. This simplification of the Arnoldi iteration is known as the <strong>Lanczos iteration</strong>, which is even more efficient.</p>
 </section>
 </section>
 
@@ -554,20 +526,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="orthogonal_matrices.html"
+       href="eigenvalues_iterative.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Orthogonal Matrices</p>
+        <p class="prev-next-title">Iterative Methods for Eigenvalue Computation</p>
       </div>
     </a>
     <a class="right-next"
-       href="block_matrices.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Block Matrix Operations</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -587,26 +559,10 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-projections-orthogonal-vs-oblique">Types of Projections: Orthogonal vs. Oblique</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projections">Orthogonal Projections</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projections">Oblique Projections</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-formulas">Mathematical Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projection-formula">Orthogonal Projection Formula</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#special-case-projection-onto-a-line">Special Case: Projection onto a Line</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projection-formula">Oblique Projection Formula</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-properties">Key Results and Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-matrices-and-projections">Orthogonal Matrices and Projections</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-and-explanation">Derivation and Explanation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-projection-matrix-p-qq-t">Properties of the Projection Matrix <span class="math notranslate nohighlight">\(P = QQ^T\)</span></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#revisiting-the-hessenberg-reduction">Revisiting the Hessenberg Reduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-truncation">The Iterative Truncation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-projection-and-the-approximation">The Projection and the Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-eigensolver-strategy">The Iterative Eigensolver Strategy</a></li>
 </ul>
   </nav></div>
 
