@@ -1,4 +1,4 @@
-# The Arnoldi Iteration
+# The Arnoldi Process
 
 Previously, we introduced the core idea of the Arnoldi iteration: a numerically stable process to build an orthonormal basis $Q_k = [q_1, \dots, q_k]$ for the Krylov subspace $\mathcal{K}_k(A, q_1)$. This process simultaneously generates a $k \times k$ upper Hessenberg matrix $H_k = Q_k^T A Q_k$.
 
@@ -8,7 +8,7 @@ Now, we will formalize this algorithm and show precisely why the eigenvalues of 
 
 The algorithm is an iterative application of the Modified Gram-Schmidt process. Starting with a chosen unit vector $q_1$, we generate $q_2, q_3, \dots, q_k$ one by one.
 
-**Algorithm 5.1: The Arnoldi Iteration**
+**Algorithm: The Arnoldi Iteration**
 
 * **Input:** A matrix $A$, a number of steps $k$, and a starting vector $q_1$ with $\|q_1\|_2 = 1$.
 * **Output:** $Q_k = [q_1, \dots, q_k]$ with orthonormal columns and a $k \times k$ upper Hessenberg matrix $H_k$ with entries $h_{ij}$.

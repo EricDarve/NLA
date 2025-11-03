@@ -236,8 +236,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">The Core Idea: Projection onto Krylov Subspaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -430,9 +434,11 @@ document.write(`
 <p>This iteration is implemented in the following Python code:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+<span class="c1"># Assume A is the initial upper Hessenberg matrix</span>
 <span class="n">Tk</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
+<span class="c1"># This loop would contain logic to check for convergence and perform deflation</span>
 <span class="k">while</span> <span class="n">not_converged</span><span class="p">:</span>
     <span class="c1"># Choose the shift (e.g., the bottom-right element)</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="n">Tk</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -443,58 +449,58 @@ document.write(`
     <span class="c1"># Perform QR factorization on the shifted matrix</span>
     <span class="n">Qk</span><span class="p">,</span> <span class="n">Rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Tk</span> <span class="o">-</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">I</span><span class="p">)</span>
     
-    <span class="c1"># Recombine and add the shift back</span>
+    <span class="c1"># Recombine and add the shift back to get the next iterate</span>
     <span class="n">Tk</span> <span class="o">=</span> <span class="n">Rk</span> <span class="o">@</span> <span class="n">Qk</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">I</span>
 </pre></div>
 </div>
 </section>
 <section id="similarity-transformation-verification">
 <h2>Similarity Transformation Verification<a class="headerlink" href="#similarity-transformation-verification" title="Link to this heading">#</a></h2>
-<p>We can verify that this algorithm preserves eigenvalues, because the transformation from <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is a <strong>unitary similarity transformation</strong>. Let’s walk through the derivation in detail.</p>
+<p>We can verify that this algorithm preserves eigenvalues because the transformation from <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is a <strong>unitary similarity transformation</strong>. Let’s walk through the derivation in detail.</p>
 <p>Our starting point is the two core equations of a single iteration:</p>
 <ol class="arabic">
 <li><p><strong>The QR factorization of the shifted matrix:</strong></p>
 <div class="math notranslate nohighlight">
-\[T_k - \mu I = U_{k+1} R_{k+1}\]</div>
+\[T_k - \mu I = U_{k} R_{k}\]</div>
 </li>
 <li><p><strong>The update step to find the next matrix in the sequence:</strong></p>
 <div class="math notranslate nohighlight">
-\[T_{k+1} = R_{k+1} U_{k+1} + \mu I\]</div>
+\[T_{k+1} = R_{k} U_{k} + \mu I\]</div>
 </li>
 </ol>
-<p>Our goal is to show that these two steps are equivalent to the similarity transformation <span class="math notranslate nohighlight">\(T_{k+1} = U_{k+1}^H T_k U_{k+1}\)</span>.</p>
-<p><strong>Step 1: Isolate <span class="math notranslate nohighlight">\(R_{k+1}\)</span></strong></p>
-<p>We begin with the first equation. Since <span class="math notranslate nohighlight">\(U_{k+1}\)</span> is a unitary matrix from the QR decomposition, its inverse is its conjugate transpose, <span class="math notranslate nohighlight">\(U_{k+1}^H\)</span>. We can left-multiply both sides by <span class="math notranslate nohighlight">\(U_{k+1}^H\)</span> to isolate <span class="math notranslate nohighlight">\(R_{k+1}\)</span>:</p>
+<p>Our goal is to show that these two steps are equivalent to the similarity transformation <span class="math notranslate nohighlight">\(T_{k+1} = U_{k}^H T_k U_{k}\)</span>.</p>
+<p><strong>Step 1: Isolate <span class="math notranslate nohighlight">\(R_{k}\)</span></strong></p>
+<p>We begin with the first equation. Since <span class="math notranslate nohighlight">\(U_{k}\)</span> is a unitary matrix from the QR decomposition, its inverse is its conjugate transpose, <span class="math notranslate nohighlight">\(U_{k}^H\)</span>. We can left-multiply both sides by <span class="math notranslate nohighlight">\(U_{k}^H\)</span> to isolate <span class="math notranslate nohighlight">\(R_{k}\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-U_{k+1}^H (T_k - \mu I) = U_{k+1}^H (U_{k+1} R_{k+1})
+U_{k}^H (T_k - \mu I) = U_{k}^H (U_{k} R_{k})
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(U_{k+1}^H U_{k+1} = I\)</span>, the equation simplifies to:</p>
+<p>Since <span class="math notranslate nohighlight">\(U_{k}^H U_{k} = I\)</span>, the equation simplifies to:</p>
 <div class="math notranslate nohighlight">
 \[
-R_{k+1} = U_{k+1}^H (T_k - \mu I)
+R_{k} = U_{k}^H (T_{k} - \mu I)
 \]</div>
-<p><strong>Step 2: Substitute <span class="math notranslate nohighlight">\(R_{k+1}\)</span> into the Update Equation</strong></p>
-<p>Now, we take this expression for <span class="math notranslate nohighlight">\(R_{k+1}\)</span> and substitute it into the second equation, <span class="math notranslate nohighlight">\(T_{k+1} = R_{k+1} U_{k+1} + \mu I\)</span>:</p>
+<p><strong>Step 2: Substitute <span class="math notranslate nohighlight">\(R_{k}\)</span> into the Update Equation</strong></p>
+<p>Now, we take this expression for <span class="math notranslate nohighlight">\(R_{k}\)</span> and substitute it into the second equation, <span class="math notranslate nohighlight">\(T_{k+1} = R_{k} U_{k} + \mu I\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-T_{k+1} = \left[ U_{k+1}^H (T_k - \mu I) \right] U_{k+1} + \mu I
+T_{k+1} = \left[ U_{k}^H (T_k - \mu I) \right] U_{k} + \mu I
 \]</div>
 <p><strong>Step 3: Expand and Simplify</strong></p>
-<p>Let’s distribute the terms inside the parentheses. The term <span class="math notranslate nohighlight">\(U_{k+1}\)</span> on the right multiplies both <span class="math notranslate nohighlight">\(T_k\)</span> and <span class="math notranslate nohighlight">\(\mu I\)</span>:</p>
+<p>Let’s distribute the terms inside the parentheses. The term <span class="math notranslate nohighlight">\(U_{k}\)</span> on the right multiplies both <span class="math notranslate nohighlight">\(T_k\)</span> and <span class="math notranslate nohighlight">\(\mu I\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-T_{k+1} = (U_{k+1}^H T_k U_{k+1}) - (U_{k+1}^H (\mu I) U_{k+1}) + \mu I
+T_{k+1} = (U_{k}^H T_k U_{k}) - (U_{k}^H (\mu I) U_{k}) + \mu I
 \]</div>
 <p>Because <span class="math notranslate nohighlight">\(\mu\)</span> is a scalar, it can be moved outside the matrix multiplication:</p>
 <div class="math notranslate nohighlight">
 \[
-T_{k+1} = U_{k+1}^H T_k U_{k+1} - \mu (U_{k+1}^H U_{k+1}) + \mu I
+T_{k+1} = U_{k}^H T_k U_{k} - \mu (U_{k}^H I U_{k}) + \mu I
 \]</div>
-<p>Again, since <span class="math notranslate nohighlight">\(U_{k+1}^H U_{k+1} = I\)</span>, the equation becomes:</p>
+<p>Again, since <span class="math notranslate nohighlight">\(U_{k}^H U_{k} = I\)</span>, the equation becomes:</p>
 <div class="math notranslate nohighlight">
 \[
-T_{k+1} = U_{k+1}^H T_k U_{k+1} - \mu I + \mu I = U_{k+1}^H T_k U_{k+1}
+T_{k+1} = U_{k}^H T_k U_{k} - \mu I + \mu I = U_{k}^H T_k U_{k}
 \]</div>
 <p>This proves that <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is unitarily similar to <span class="math notranslate nohighlight">\(T_k\)</span>. Since this relationship holds for every step of the iteration, the final converged matrix <span class="math notranslate nohighlight">\(T\)</span> is unitarily similar to the original matrix <span class="math notranslate nohighlight">\(A\)</span>. Similarity transformations <strong>preserve eigenvalues</strong>, which is why this algorithm correctly computes the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> while converging to the upper-triangular Schur form.</p>
 </section>
@@ -505,41 +511,31 @@ T_{k+1} = U_{k+1}^H T_k U_{k+1} - \mu I + \mu I = U_{k+1}^H T_k U_{k+1}
 <h3>How the Shift Accelerates Convergence<a class="headerlink" href="#how-the-shift-accelerates-convergence" title="Link to this heading">#</a></h3>
 <p>The convergence of the <em>basic</em> (un-shifted) QR iteration is governed by the ratios of the eigenvalues (e.g., <span class="math notranslate nohighlight">\(|\lambda_{i+1} / \lambda_i|^k\)</span>). The shifted QR iteration is mathematically equivalent to applying the basic QR iteration to the matrix <span class="math notranslate nohighlight">\(T_k - \mu I\)</span>. Therefore, its convergence rate is governed by the ratios of the <em>shifted</em> eigenvalues.</p>
 <p>The effectiveness of the algorithm is in <em>how</em> the shift <span class="math notranslate nohighlight">\(\mu\)</span> is chosen. We select <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span>, which, as the iteration progresses, becomes an increasingly accurate approximation of an eigenvalue, <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p>
-<p>This choice has a powerful effect on the convergence rate. Let’s look at the underlying theory. The algorithm works by iteratively finding the Schur vectors, which form the columns of a cumulative unitary matrix <span class="math notranslate nohighlight">\(Q_k\)</span> (such that <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>).</p>
-<ul>
-<li><p>The subspace spanned by the first <span class="math notranslate nohighlight">\(n-1\)</span> columns, <span class="math notranslate nohighlight">\(\text{span}(Q_k[:,1:n-1])\)</span>, converges to the true invariant subspace <span class="math notranslate nohighlight">\(\text{span}(Q[:,1:n-1])\)</span>.</p></li>
-<li><p>The rate of this subspace convergence is determined by the ratio of the smallest shifted eigenvalue to the next-smallest:</p>
+<p>This choice has a powerful effect on the convergence rate. The rate at which the sub-diagonal element <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span> goes to zero is determined by the ratio:</p>
 <div class="math notranslate nohighlight">
 \[
-    \left| \frac{\lambda_{n} - \mu}{\lambda_{n-1} - \mu} \right|^k
-    \]</div>
-</li>
-</ul>
-<p>Because our shift <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span> is chosen to be very close to <span class="math notranslate nohighlight">\(\lambda_n\)</span>, the numerator <span class="math notranslate nohighlight">\(|\lambda_n - \mu|\)</span> becomes extremely small. This makes the entire ratio <span class="math notranslate nohighlight">\(\frac{|\lambda_n - \mu|}{|\lambda_{n-1} - \mu|}\)</span> very close to zero, leading to exceptionally fast convergence. In practice, this convergence is often so fast (e.g., quadratic or cubic for symmetric matrices) that only one or two iterations are needed per eigenvalue.</p>
-<p>This abstract subspace convergence has a direct, observable effect on the matrix <span class="math notranslate nohighlight">\(T_k\)</span>.</p>
-<ol class="arabic simple">
-<li><p>Since the first <span class="math notranslate nohighlight">\(n-1\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span> are converging, the final column <span class="math notranslate nohighlight">\(Q_k[:,n]\)</span> (which must remain orthogonal to all other columns) must also converge to its corresponding Schur vector, <span class="math notranslate nohighlight">\(Q[:,n]\)</span>.</p></li>
-<li><p>The last row of <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span> is fundamentally linked to this last vector. As the column of <span class="math notranslate nohighlight">\(Q_k\)</span> converges, the last row of <span class="math notranslate nohighlight">\(T_k\)</span> converges to the last row of the final Schur form <span class="math notranslate nohighlight">\(T\)</span>, which is <span class="math notranslate nohighlight">\([0, 0, \dots, 0, \lambda_n]\)</span>.</p></li>
-<li><p>This means the sub-diagonal element <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span> is the value that is rapidly driven to zero by this accelerated convergence rate.</p></li>
-</ol>
+\left| \frac{\lambda_{n} - \mu}{\lambda_{n-1} - \mu} \right|
+\]</div>
+<p>Because our shift <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span> is chosen to be very close to <span class="math notranslate nohighlight">\(\lambda_n\)</span>, the numerator <span class="math notranslate nohighlight">\(|\lambda_n - \mu|\)</span> becomes extremely small. This makes the entire ratio very close to zero, leading to exceptionally fast convergence. In practice, this convergence is often <strong>quadratic</strong> (and <strong>cubic</strong> for symmetric matrices), meaning only one or two iterations are needed per eigenvalue.</p>
+<p>This abstract convergence has a direct, observable effect on the matrix <span class="math notranslate nohighlight">\(T_k\)</span>: the sub-diagonal element <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span> is rapidly driven to zero.</p>
 </section>
 <section id="how-deflation-is-used">
 <h3>How Deflation is Used<a class="headerlink" href="#how-deflation-is-used" title="Link to this heading">#</a></h3>
-<p>This convergence to a block upper triangular form is the signal to “deflate.”</p>
-<ol class="arabic">
+<p>This convergence is the signal to “deflate.”</p>
+<ol class="arabic simple">
 <li><p><strong>Identify Convergence:</strong> We check the sub-diagonal element in the last row, <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span>. When this value is small enough (e.g., below a machine-precision threshold), we declare that the <span class="math notranslate nohighlight">\(n\)</span>-th eigenvalue has converged.</p></li>
 <li><p><strong>Record the Eigenvalue:</strong> The converged value <span class="math notranslate nohighlight">\(T_k[n,n]\)</span> is now one of the eigenvalues of the original matrix <span class="math notranslate nohighlight">\(A\)</span>. We record it.</p></li>
-<li><p><strong>Deflate the Matrix:</strong> The eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> are the eigenvalues of the <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> block <span class="math notranslate nohighlight">\(A_{11}\)</span> and the eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span> we just found.</p>
+<li><p><strong>Deflate the Matrix:</strong> When <span class="math notranslate nohighlight">\(T_k[n,n-1] \approx 0\)</span>, the matrix has the approximate form:</p></li>
+</ol>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    T_k \approx \begin{pmatrix}
-    A_{11} &amp; A_{12} \\
-    0 &amp; \lambda_n
-    \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Repeat the Process:</strong> We can now “deflate” the problem by discarding the last row and column. The <em>entire</em> shifted QR iteration process (choose shift, factor, recombine) is repeated, but only on the <strong>smaller <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> matrix <span class="math notranslate nohighlight">\(A_{11}\)</span></strong>.</p></li>
-</ol>
+T_k \approx \begin{pmatrix}
+A_{11} &amp; A_{12} \\
+0 &amp; \lambda_n
+\end{pmatrix}
+\end{split}\]</div>
+<p>The eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> are the eigenvalues of the <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> block <span class="math notranslate nohighlight">\(A_{11}\)</span> combined with the eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span> we just found.</p>
+<p><strong>Repeat the Process:</strong> We can now “deflate” the problem by discarding the last row and column. The <em>entire</em> shifted QR iteration process (choose shift, factor, recombine) is repeated, but only on the <strong>smaller <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> matrix <span class="math notranslate nohighlight">\(A_{11}\)</span></strong>.</p>
 <p>This cycle repeats: the algorithm runs the shifted QR iteration on the smaller matrix until <em>its</em> last row converges, it records another eigenvalue, and it deflates again. This continues until the matrix is reduced to a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix, and all eigenvalues have been found.</p>
 </section>
 </section>

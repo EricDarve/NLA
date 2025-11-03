@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Vector spaces &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Convergence of the Lanczos Process &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/vector_space';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/lanczos_convergence';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Dot Product and Vector Norms" href="dot_product_and_norms.html" />
-    <link rel="prev" title="Linear Algebra Bootcamp" href="bootcamp.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="The Lanczos Algorithm: Arnoldi for Symmetric Matrices" href="lanczos_iteration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -177,8 +177,8 @@
             </li>
         </ul>
         <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Vector spaces</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
@@ -235,13 +235,13 @@
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
 
 <li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -299,7 +299,7 @@
       
       
       
-      <li><a href="../_sources/content/vector_space.md" target="_blank"
+      <li><a href="../_sources/content/lanczos_convergence.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -383,7 +383,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Vector spaces</h1>
+    <h1>Convergence of the Lanczos Process</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -393,14 +393,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-addition">Vector addition</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalar-multiplication">Scalar multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-vector-space">Definition: Vector space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subspaces">Subspaces</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-combinations-and-span">Linear combinations and span</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-independence">Linear independence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bases-and-dimension">Bases and dimension</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#monotonic-convergence-of-extremal-ritz-values">Monotonic Convergence of Extremal Ritz Values</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-quantitative-convergence-rate">A Quantitative Convergence Rate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-interior-eigenvalues">Convergence of Interior Eigenvalues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-stronger-theory-for-a-special-case">A Stronger Theory for a Special Case</a></li>
 </ul>
             </nav>
         </div>
@@ -412,165 +408,108 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="vector-spaces">
-<h1>Vector spaces<a class="headerlink" href="#vector-spaces" title="Link to this heading">#</a></h1>
-<p>We will primarily work with vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> and occasionally <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>.</p>
-<p>An element of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is a column vector</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="convergence-of-the-lanczos-process">
+<h1>Convergence of the Lanczos Process<a class="headerlink" href="#convergence-of-the-lanczos-process" title="Link to this heading">#</a></h1>
+<p>The benefits of moving from Arnoldi to Lanczos for symmetric matrices extend beyond computational efficiency. The convergence behavior of the Ritz values becomes far more structured and predictable. For non-symmetric matrices, the Ritz values from Arnoldi can appear anywhere in the complex plane and may not exhibit clear convergence patterns. For symmetric matrices, the Lanczos algorithm provides powerful guarantees, particularly for the extremal eigenvalues.</p>
+<section id="monotonic-convergence-of-extremal-ritz-values">
+<h2>Monotonic Convergence of Extremal Ritz Values<a class="headerlink" href="#monotonic-convergence-of-extremal-ritz-values" title="Link to this heading">#</a></h2>
+<p>Let’s consider the largest eigenvalue, <span class="math notranslate nohighlight">\(\lambda_1\)</span>, of a symmetric matrix <span class="math notranslate nohighlight">\(A\)</span>. It can be characterized by the Rayleigh quotient:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-x = \begin{pmatrix}
-x_1\\
-x_2\\
-\vdots\\
-x_n
-\end{pmatrix},
-\quad x_i \in \mathbb{R}.
-\end{split}\]</div>
-<section id="vector-addition">
-<h2>Vector addition<a class="headerlink" href="#vector-addition" title="Link to this heading">#</a></h2>
-<p>Given <span class="math notranslate nohighlight">\(x,y \in \mathbb{R}^n\)</span>,</p>
+\[ \lambda_1 = \max_{\boldsymbol{x} \neq \boldsymbol{0}} \frac{\boldsymbol{x}^T A \boldsymbol{x}}{\boldsymbol{x}^T \boldsymbol{x}}
+\]</div>
+<p>The largest eigenvalue of the <span class="math notranslate nohighlight">\(k\)</span>-th Lanczos matrix <span class="math notranslate nohighlight">\(T_k\)</span>, which we denote <span class="math notranslate nohighlight">\(\lambda_1(T_k)\)</span>, is the largest Ritz value. By definition of the Ritz procedure, this value is the maximum of the Rayleigh quotient of <span class="math notranslate nohighlight">\(A\)</span> over the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{pmatrix}
-x_1\\
-x_2\\
-\vdots\\
-x_n
-\end{pmatrix}
-+
-\begin{pmatrix}
-y_1\\
-y_2\\
-\vdots\\
-y_n
-\end{pmatrix}
-=
-\begin{pmatrix}
-x_1+y_1\\
-x_2+y_2\\
-\vdots\\
-x_n+y_n
-\end{pmatrix}.
-\end{split}\]</div>
+\[
+\lambda_1(T_k) = \max_{\boldsymbol{z} \in \mathcal{K}_k, \boldsymbol{z} \neq \boldsymbol{0}} \frac{\boldsymbol{z}^T A \boldsymbol{z}}{\boldsymbol{z}^T \boldsymbol{z}}
+\]</div>
+<p>Since the maximization for <span class="math notranslate nohighlight">\(\lambda_1(T_k)\)</span> is performed over a subspace of the full space <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, it is an immediate consequence that the largest Ritz value can never exceed the true largest eigenvalue:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_1(T_k) \le \lambda_1
+\]</div>
+<p>Furthermore, since the Krylov subspaces are nested (<span class="math notranslate nohighlight">\(\mathcal{K}_k \subset \mathcal{K}_{k+1}\)</span>), the space of available test vectors grows with each iteration. This implies that the maximum of the Rayleigh quotient can only increase (or stay the same):</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_1(T_k) \le \lambda_1(T_{k+1})
+\]</div>
+<p>This establishes a fundamental property of the Lanczos algorithm: the approximations to the largest eigenvalue, <span class="math notranslate nohighlight">\(\lambda_1(T_k)\)</span>, form a <strong>monotonically increasing sequence that is bounded above by <span class="math notranslate nohighlight">\(\lambda_1\)</span></strong>. Likewise, the approximations to the smallest eigenvalue, <span class="math notranslate nohighlight">\(\lambda_n(T_k)\)</span>, form a monotonically decreasing sequence bounded below by <span class="math notranslate nohighlight">\(\lambda_n\)</span>. This structured, monotonic convergence is a significant improvement over the often erratic behavior of Ritz values in the general Arnoldi case.</p>
 </section>
-<section id="scalar-multiplication">
-<h2>Scalar multiplication<a class="headerlink" href="#scalar-multiplication" title="Link to this heading">#</a></h2>
-<p>For <span class="math notranslate nohighlight">\(\alpha \in \mathbb{R}\)</span> and <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>,</p>
+<section id="a-quantitative-convergence-rate">
+<h2>A Quantitative Convergence Rate<a class="headerlink" href="#a-quantitative-convergence-rate" title="Link to this heading">#</a></h2>
+<p>We can achieve a much more precise, quantitative understanding of the convergence rate by again invoking the connection between Krylov subspaces and matrix polynomials. Recall that any vector in the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k(\boldsymbol{q}_1, A)\)</span> can be written as <span class="math notranslate nohighlight">\(\boldsymbol{z} = p(A)\boldsymbol{q}_1\)</span> for some polynomial <span class="math notranslate nohighlight">\(p\)</span> of degree less than <span class="math notranslate nohighlight">\(k\)</span>. The largest Ritz value can therefore be expressed as an optimization over this class of polynomials:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\alpha
-\begin{pmatrix}
-x_1\\
-x_2\\
-\vdots\\
-x_n
-\end{pmatrix}
-=
-\begin{pmatrix}
-\alpha x_1\\
-\alpha x_2\\
-\vdots\\
-\alpha x_n
-\end{pmatrix}.
-\end{split}\]</div>
-<p>Vectors in <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> are defined the same way, with scalars <span class="math notranslate nohighlight">\(\alpha \in \mathbb{C}\)</span>.</p>
+\[
+\lambda_1(T_k) = \max_{p \in \mathcal{P}_{k-1}} \frac{ (p(A)\boldsymbol{q}_1)^T A (p(A)\boldsymbol{q}_1) }{ (p(A)\boldsymbol{q}_1)^T (p(A)\boldsymbol{q}_1) } = \max_{p \in \mathcal{P}_{k-1}} \frac{ \boldsymbol{q}_1^T p(A)^T A p(A) \boldsymbol{q}_1 }{ \boldsymbol{q}_1^T p(A)^2 \boldsymbol{q}_1 }
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{P}_{k-1}\)</span> is the set of polynomials of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>.</p>
+<p>This expression reveals that the Lanczos algorithm implicitly finds the polynomial that maximizes this ratio. By making a clever choice of a specific polynomial—the <strong>Chebyshev polynomial</strong>—one can derive a powerful bound on the error of the largest Ritz value. The full derivation is detailed, but the celebrated result is as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_1 - \lambda_1(T_k) \le (\lambda_1 - \lambda_n) \left( \frac{\tan \phi_1}{T_{k-1}(1 + 2\rho_1)} \right)^2
+\]</div>
+<p>Let’s dissect this important formula:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(T_{k-1}(x)\)</span> is the Chebyshev polynomial of the first kind of degree <span class="math notranslate nohighlight">\(k-1\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\phi_1\)</span> is the angle between the starting vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_1\)</span> and the true eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{v}_1\)</span> corresponding to <span class="math notranslate nohighlight">\(\lambda_1\)</span>. This term reminds us that convergence depends on the starting vector not being pathologically orthogonal to the eigenvector we seek.</p></li>
+<li><p>The crucial term is the <strong>gap ratio</strong>, <span class="math notranslate nohighlight">\(\rho_1\)</span>, defined by the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+    \rho_1 = \frac{\lambda_1 - \lambda_2}{\lambda_2 - \lambda_n}
+    \]</div>
+</li>
+</ul>
+<p>This ratio quantifies how well-separated the largest eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span> is from the rest of the spectrum, relative to the width of the rest of the spectrum.</p>
+<p>The power of this bound comes from the behavior of Chebyshev polynomials. For an argument <span class="math notranslate nohighlight">\(x &gt; 1\)</span>, <span class="math notranslate nohighlight">\(T_{k-1}(x)\)</span> grows exponentially with <span class="math notranslate nohighlight">\(k\)</span>. In our case, the argument is <span class="math notranslate nohighlight">\(1 + 2\rho_1\)</span>, which is always greater than 1. The growth is approximately:</p>
+<div class="math notranslate nohighlight">
+\[
+T_{k-1}(1 + 2\rho_1) \approx \frac{1}{2} (4 \rho_1)^{k-1}
+\]</div>
+<p>when <span class="math notranslate nohighlight">\(\rho_1 \gg 1\)</span>.</p>
+<p>Since this term appears squared in the denominator of the error bound, the error <span class="math notranslate nohighlight">\(\lambda_1 - \lambda_1(T_k)\)</span> converges to zero at a remarkable exponential rate. The speed of this convergence is governed by the gap ratio <span class="math notranslate nohighlight">\(\rho_1\)</span>. If <span class="math notranslate nohighlight">\(\lambda_1\)</span> is well-separated from the other eigenvalues, <span class="math notranslate nohighlight">\(\rho_1\)</span> is large, and convergence is exceptionally fast.</p>
 </section>
-<section id="definition-vector-space">
-<h2>Definition: Vector space<a class="headerlink" href="#definition-vector-space" title="Link to this heading">#</a></h2>
-<p>A <strong>vector space</strong> <span class="math notranslate nohighlight">\(V\)</span> over a field <span class="math notranslate nohighlight">\(\mathbb{F}\)</span> (such as <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>) is a set equipped with addition <span class="math notranslate nohighlight">\((x,y)\mapsto x+y\)</span> and scalar multiplication <span class="math notranslate nohighlight">\((\alpha,x)\mapsto \alpha x\)</span> satisfying, for all <span class="math notranslate nohighlight">\(x,y,z\in V\)</span> and <span class="math notranslate nohighlight">\(\alpha,\beta\in\mathbb{F}\)</span>:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(x+(y+z)=(x+y)+z\)</span>  (Associativity of addition)</p></li>
-<li><p><span class="math notranslate nohighlight">\(x+y=y+x\)</span>  (Commutativity of addition)</p></li>
-<li><p>There exists <span class="math notranslate nohighlight">\(0\in V\)</span> with <span class="math notranslate nohighlight">\(x+0=x\)</span>  (Additive identity)</p></li>
-<li><p>For each <span class="math notranslate nohighlight">\(x\)</span> there exists <span class="math notranslate nohighlight">\(-x\)</span> with <span class="math notranslate nohighlight">\(x+(-x)=0\)</span>  (Additive inverse)</p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha(\beta x)=(\alpha\beta)x\)</span>  (Associativity of scalar multiplication / compatibility with field multiplication)</p></li>
-<li><p><span class="math notranslate nohighlight">\(1x=x\)</span>  (Multiplicative identity of the field acts as identity on vectors)</p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha(x+y)=\alpha x+\alpha y\)</span>  (Left distributivity of scalar over vector addition)</p></li>
-<li><p><span class="math notranslate nohighlight">\((\alpha+\beta)x=\alpha x+\beta x\)</span>  (Right distributivity of scalar addition over scalar multiplication)</p></li>
+<section id="convergence-of-interior-eigenvalues">
+<h2>Convergence of Interior Eigenvalues<a class="headerlink" href="#convergence-of-interior-eigenvalues" title="Link to this heading">#</a></h2>
+<p>The remarkable convergence rate we established for the largest eigenvalue, <span class="math notranslate nohighlight">\(\lambda_1\)</span>, is a cornerstone of the Lanczos method. The same theory applies to the smallest eigenvalue, <span class="math notranslate nohighlight">\(\lambda_n\)</span>. By analyzing the convergence of Lanczos on the matrix <span class="math notranslate nohighlight">\(-A\)</span>, whose largest eigenvalue is <span class="math notranslate nohighlight">\(-\lambda_n\)</span>, we find that the smallest Ritz value, <span class="math notranslate nohighlight">\(\lambda_k(T_k)\)</span>, converges monotonically downward to <span class="math notranslate nohighlight">\(\lambda_n\)</span> with a rate governed by the gap ratio at the low end of the spectrum, <span class="math notranslate nohighlight">\(\rho_n = (\lambda_{n-1} - \lambda_n) / (\lambda_1 - \lambda_{n-1})\)</span>.</p>
+<p>This raises a natural question: what about the “inner” eigenvalues, <span class="math notranslate nohighlight">\(\lambda_i\)</span> for <span class="math notranslate nohighlight">\(1 &lt; i &lt; n\)</span>?</p>
+<p>The good news is that the Ritz values <span class="math notranslate nohighlight">\(\lambda_i(T_k)\)</span> do converge to the true eigenvalues <span class="math notranslate nohighlight">\(\lambda_i\)</span>. The challenging news is that they do so more slowly, and the convergence is no longer guaranteed to be monotonic. The Lanczos algorithm, at its core, is a procedure that excels at approximating the function <span class="math notranslate nohighlight">\(f(x)=x\)</span> with a polynomial on the spectrum of <span class="math notranslate nohighlight">\(A\)</span>. Polynomials are notoriously good at approximating functions near the ends of an interval, but less effective in the middle. This intuition is borne out by the theory.</p>
+<p>A similar, though more complex, bound exists for the convergence of the <span class="math notranslate nohighlight">\(i\)</span>-th Ritz value, <span class="math notranslate nohighlight">\(\lambda_i(T_k)\)</span>. It is given by:</p>
+<div class="math notranslate nohighlight">
+\[
+0 \le \lambda_i - \lambda_i(T_k) \le (\lambda_i - \lambda_n) \left( \frac{\kappa_i \tan \phi}{T_{k-i}(1 + 2\rho_i)} \right)^2
+\]</div>
+<p>This formula reveals why the inner eigenvalues converge more slowly. Let’s analyze its components in comparison to the bound for <span class="math notranslate nohighlight">\(\lambda_1\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Reduced Polynomial Degree:</strong> The argument of the Chebyshev polynomial is now <span class="math notranslate nohighlight">\(T_{k-i}\)</span>, not <span class="math notranslate nohighlight">\(T_{k-1}\)</span>. This is the most critical change. It implies that the algorithm effectively uses <span class="math notranslate nohighlight">\(k-i\)</span> iterations to find the <span class="math notranslate nohighlight">\(i\)</span>-th eigenvalue. Intuitively, the Lanczos process “spends” its first degrees of freedom pinning down the larger, outer eigenvalues before it can effectively resolve the inner ones. With a lower-degree polynomial, the exponential growth is significantly stunted, leading to slower convergence.</p></li>
+<li><p><strong>The Gap Ratio <span class="math notranslate nohighlight">\(\rho_i\)</span>:</strong> The gap ratio for an inner eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span> is typically defined relative to its nearest neighbor and the far end of the spectrum:</p>
+<div class="math notranslate nohighlight">
+\[
+    \rho_i = \frac{\lambda_i - \lambda_{i+1}}{\lambda_{i+1} - \lambda_n}
+    \]</div>
+<p>For many matrices, the gaps between interior eigenvalues (<span class="math notranslate nohighlight">\(\lambda_i - \lambda_{i+1}\)</span>) are much smaller than the gaps at the spectral edges (<span class="math notranslate nohighlight">\(\lambda_1 - \lambda_2\)</span>). A smaller gap ratio <span class="math notranslate nohighlight">\(\rho_i\)</span> means the argument to the Chebyshev polynomial is smaller, further reducing its growth and slowing convergence.</p>
+</li>
+<li><p><strong>The “Interference” Factor <span class="math notranslate nohighlight">\(\kappa_i\)</span>:</strong> The new term <span class="math notranslate nohighlight">\(\kappa_i\)</span> is a product that depends on the Ritz values that are larger than the one we are targeting:</p>
+<div class="math notranslate nohighlight">
+\[
+    \kappa_i = \prod_{j=1}^{i-1} \frac{\lambda_j(T_k) - \lambda_n}{\lambda_j(T_k) - \lambda_i}
+    \]</div>
+<p>As the outer Ritz values <span class="math notranslate nohighlight">\(\lambda_j(T_k)\)</span> converge to their true counterparts <span class="math notranslate nohighlight">\(\lambda_j\)</span>, this term approaches a constant. However, it quantifies the “cost” of having to approximate the larger eigenvalues first. Each factor in the product is greater than 1, so <span class="math notranslate nohighlight">\(\kappa_i\)</span> acts as a penalty term that grows with <span class="math notranslate nohighlight">\(i\)</span>, further increasing the error bound.</p>
+</li>
 </ol>
-</section>
-<section id="subspaces">
-<h2>Subspaces<a class="headerlink" href="#subspaces" title="Link to this heading">#</a></h2>
-<p>A <strong>subspace</strong> <span class="math notranslate nohighlight">\(S \subset \mathbb{R}^n\)</span> is a nonempty set closed under linear combinations. Equivalently, for any <span class="math notranslate nohighlight">\(x,y \in S\)</span> and <span class="math notranslate nohighlight">\(\alpha,\beta \in \mathbb{R}\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[
-\alpha x + \beta y \in S.
-\]</div>
-<p>Every subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is itself a vector space under the same operations.</p>
-</section>
-<section id="linear-combinations-and-span">
-<h2>Linear combinations and span<a class="headerlink" href="#linear-combinations-and-span" title="Link to this heading">#</a></h2>
-<p>Given vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k \in \mathbb{R}^n\)</span>, a <strong>linear combination</strong> has the form</p>
-<div class="math notranslate nohighlight">
-\[
-\alpha_1 x_1 + \alpha_2 x_2 + \cdots + \alpha_k x_k,
-\quad \alpha_1,\dots,\alpha_k \in \mathbb{R}.
-\]</div>
-<p>The <strong>span</strong> of <span class="math notranslate nohighlight">\(\{x_1,\dots,x_k\}\)</span> is the set of all linear combinations:</p>
-<div class="math notranslate nohighlight">
-\[
-\operatorname{span}\{x_1,\dots,x_k\}
-=
-\left\{
-\sum_{i=1}^k \alpha_i x_i \;:\; \alpha_1,\dots,\alpha_k \in \mathbb{R}
-\right\}.
-\]</div>
-<p>The span is always a subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
-</section>
-<section id="linear-independence">
-<h2>Linear independence<a class="headerlink" href="#linear-independence" title="Link to this heading">#</a></h2>
-<p>Vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> are <strong>linearly independent</strong> if the only solution to the homogeneous combination equaling zero is the trivial one:</p>
-<div class="math notranslate nohighlight">
-\[
-\sum_{i=1}^k \alpha_i x_i = 0
-\quad \Rightarrow \quad
-\alpha_1=\cdots=\alpha_k=0.
-\]</div>
-<p>If there exists a nontrivial choice of coefficients yielding zero, the vectors are <strong>linearly dependent</strong>.</p>
-</section>
-<section id="bases-and-dimension">
-<h2>Bases and dimension<a class="headerlink" href="#bases-and-dimension" title="Link to this heading">#</a></h2>
-<p>A set of vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> is a <strong>basis</strong> for a subspace <span class="math notranslate nohighlight">\(S\)</span> if:</p>
+<p>In summary, the Lanczos algorithm exhibits a distinct <strong>convergence hierarchy</strong>:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> are linearly independent, and</p></li>
-<li><p><span class="math notranslate nohighlight">\(\operatorname{span}\{x_1,\dots,x_k\} = S\)</span>.</p></li>
+<li><p><strong>Extremal eigenvalues (<span class="math notranslate nohighlight">\(\lambda_1, \lambda_n\)</span>) converge first and fastest.</strong> Their convergence rate is determined by the relative gaps at the edges of the spectrum.</p></li>
+<li><p><strong>Interior eigenvalues converge later and more slowly.</strong> The convergence for <span class="math notranslate nohighlight">\(\lambda_i\)</span> only truly begins after the larger eigenvalues <span class="math notranslate nohighlight">\(\lambda_1, \dots, \lambda_{i-1}\)</span> are reasonably well-approximated.</p></li>
 </ol>
-<p>If <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> form a basis for <span class="math notranslate nohighlight">\(S\)</span>, then <span class="math notranslate nohighlight">\(k\)</span> is the <strong>dimension</strong> of <span class="math notranslate nohighlight">\(S\)</span>, written</p>
-<div class="math notranslate nohighlight">
-\[
-\dim(S) = k.
-\]</div>
-<p>While a subspace can have many different bases, each basis has the same number of vectors. Hence dimension is well defined.</p>
-<p><strong>Example (a plane in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>).</strong> Let</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-a_1=\begin{pmatrix}1\\0\\0\end{pmatrix},\quad
-a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
-\end{split}\]</div>
-<p>Then <span class="math notranslate nohighlight">\(a_1\)</span> and <span class="math notranslate nohighlight">\(a_2\)</span> are linearly independent, and</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\operatorname{span}\{a_1,a_2\}
-=
-\left\{
-\begin{pmatrix}
-\alpha\\
-\beta\\
-0
-\end{pmatrix}
-:\; \alpha,\beta\in\mathbb{R}
-\right\},
-\end{split}\]</div>
-<p>which is the <span class="math notranslate nohighlight">\(x_1\)</span>-<span class="math notranslate nohighlight">\(x_2\)</span> plane in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>. Therefore <span class="math notranslate nohighlight">\(\dim(\operatorname{span}\{a_1,a_2\})=2\)</span>.</p>
+<p>This behavior is a fundamental trade-off. While Lanczos is exceptionally powerful for finding a few extremal eigenvalues of a large symmetric matrix, it is not the ideal tool if one needs to find all eigenvalues, or specifically target an eigenvalue deep inside the spectrum without modification. For such tasks, more advanced techniques like shift-and-invert Lanczos are required.</p>
 </section>
-<section id="direct-sum">
-<h2>Direct sum<a class="headerlink" href="#direct-sum" title="Link to this heading">#</a></h2>
-<p>If <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are subspaces, then <span class="math notranslate nohighlight">\(U+V\)</span> is a subspace. We say that <span class="math notranslate nohighlight">\(W=U \oplus V\)</span> is the direct sum of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> if <span class="math notranslate nohighlight">\(U \cap V = \{0\}\)</span>. The direct sum means that if a vector is decomposed into its <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> components, this decomposition is unique.</p>
-<p>Example: verify that if <span class="math notranslate nohighlight">\(x_1\)</span>, …, <span class="math notranslate nohighlight">\(x_k\)</span> are linearly independent, then the space <span class="math notranslate nohighlight">\(S\)</span> spanned by these vectors is the direct sum of their individual spans:</p>
-<div class="math notranslate nohighlight">
-\[
-S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
-\]</div>
+<section id="a-stronger-theory-for-a-special-case">
+<h2>A Stronger Theory for a Special Case<a class="headerlink" href="#a-stronger-theory-for-a-special-case" title="Link to this heading">#</a></h2>
+<p>This brings us to the final, crucial comparison between Lanczos and Arnoldi.</p>
+<ul class="simple">
+<li><p><strong>For symmetric matrices (Lanczos)</strong>, the eigenvalues lie on the real line. The convergence of extremal eigenvalues is monotonic and is governed by the <em>gaps</em> between eigenvalues. We have sharp, predictive, and powerful convergence bounds like the one above that tell us <em>how fast</em> we can expect to converge based on the intrinsic properties (the spectrum) of the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>For non-symmetric matrices (Arnoldi)</strong>, the eigenvalues lie in the complex plane. There is no simple notion of “monotonic” convergence, and the Ritz values can wander unpredictably before settling. While convergence theory exists, it is far more complex and less predictive. The bounds often depend not just on the eigenvalues, but on the geometry of the <em>field of values</em> and the <em>pseudospectrum</em> of the matrix, which are much harder to analyze. The problem of finding the best polynomial approximation on a 2D domain in the complex plane is fundamentally harder than the 1D version for symmetric matrices.</p></li>
+</ul>
+<p>In summary, the Lanczos algorithm is not just faster per-iteration than Arnoldi; it is backed by a much stronger and more predictive convergence theory that guarantees the rapid and monotonic convergence of the extremal Ritz values. This combination of speed and theoretical elegance makes it an indispensable tool for symmetric eigenvalue problems.</p>
 </section>
 </section>
 
@@ -605,20 +544,20 @@ S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="bootcamp.html"
+       href="lanczos_iteration.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Linear Algebra Bootcamp</p>
+        <p class="prev-next-title">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</p>
       </div>
     </a>
     <a class="right-next"
-       href="dot_product_and_norms.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Dot Product and Vector Norms</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -638,14 +577,10 @@ S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-addition">Vector addition</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scalar-multiplication">Scalar multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-vector-space">Definition: Vector space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subspaces">Subspaces</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-combinations-and-span">Linear combinations and span</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-independence">Linear independence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bases-and-dimension">Bases and dimension</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#monotonic-convergence-of-extremal-ritz-values">Monotonic Convergence of Extremal Ritz Values</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-quantitative-convergence-rate">A Quantitative Convergence Rate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-interior-eigenvalues">Convergence of Interior Eigenvalues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-stronger-theory-for-a-special-case">A Stronger Theory for a Special Case</a></li>
 </ul>
   </nav></div>
 

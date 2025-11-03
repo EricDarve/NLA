@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Core Idea: Projection onto Krylov Subspaces &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Projection onto Krylov Subspaces &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -63,7 +63,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/krylov_subspaces';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="The Arnoldi Iteration" href="arnoldi_iteration.html" />
+    <link rel="next" title="The Arnoldi Process" href="arnoldi_iteration.html" />
     <link rel="prev" title="Iterative Methods for Eigenvalue Computation" href="eigenvalues_iterative.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -236,8 +236,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Core Idea: Projection onto Krylov Subspaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Iteration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -379,7 +383,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Core Idea: Projection onto Krylov Subspaces</h1>
+    <h1>Projection onto Krylov Subspaces</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -392,6 +396,7 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#revisiting-the-hessenberg-reduction">Revisiting the Hessenberg Reduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-truncation">The Iterative Truncation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-projection-and-the-approximation">The Projection and the Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-krylov-subspace">The Krylov Subspace</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-eigensolver-strategy">The Iterative Eigensolver Strategy</a></li>
 </ul>
             </nav>
@@ -404,8 +409,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="the-core-idea-projection-onto-krylov-subspaces">
-<h1>The Core Idea: Projection onto Krylov Subspaces<a class="headerlink" href="#the-core-idea-projection-onto-krylov-subspaces" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="projection-onto-krylov-subspaces">
+<h1>Projection onto Krylov Subspaces<a class="headerlink" href="#projection-onto-krylov-subspaces" title="Link to this heading">#</a></h1>
 <p>We established that for large, sparse matrices, our only computationally feasible tool is the sparse matrix-vector product, <span class="math notranslate nohighlight">\(v \mapsto Av\)</span>. Any method that modifies the matrix <span class="math notranslate nohighlight">\(A\)</span> itself, like the dense QR algorithm, is unusable due to “fill-in.”</p>
 <p>This forces us to ask a new question: How can we find eigenvalues using <em>only</em> matrix-vector products?</p>
 <p>The answer lies in building a small, dense matrix <span class="math notranslate nohighlight">\(H_k\)</span> whose eigenvalues approximate the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. We do this by projecting <span class="math notranslate nohighlight">\(A\)</span> onto a carefully chosen low-dimensional subspace.</p>
@@ -479,8 +484,13 @@ Q_k^T A Q_k &amp;= (Q_k^T Q_k) H_k + h_{k+1,k} (Q_k^T q_{k+1}) e_k^T
 H_k = Q_k^T A Q_k
 \]</div>
 <p>This <span class="math notranslate nohighlight">\(k \times k\)</span> matrix <span class="math notranslate nohighlight">\(H_k\)</span> is the <strong>Rayleigh-Ritz projection</strong> of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace spanned by <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
+</section>
+<section id="the-krylov-subspace">
+<h2>The Krylov Subspace<a class="headerlink" href="#the-krylov-subspace" title="Link to this heading">#</a></h2>
+<p>The projection is onto the subspace spanned by the columns of <span class="math notranslate nohighlight">\(Q_k\)</span>. What is this subspace?</p>
+<p>The Arnoldi process starts with <span class="math notranslate nohighlight">\(q_1\)</span> and generates subsequent vectors using matrix-vector products with <span class="math notranslate nohighlight">\(A\)</span>. By induction, one can see that the basis vectors <span class="math notranslate nohighlight">\(\{q_1, \dots, q_k\}\)</span> form an orthonormal basis for the space spanned by the vectors <span class="math notranslate nohighlight">\(\{q_1, Aq_1, A^2q_1, \dots, A^{k-1}q_1\}\)</span>.</p>
 <p>This subspace, <span class="math notranslate nohighlight">\(\mathcal{K}_k(A, q_1) = \text{span}\{q_1, Aq_1, A^2q_1, \dots, A^{k-1}q_1\}\)</span>, is called the <strong>Krylov subspace</strong> of degree <span class="math notranslate nohighlight">\(k\)</span> generated by <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(q_1\)</span>.</p>
-<p>The Arnoldi iteration is a numerically stable way to build an orthonormal basis for this subspace.</p>
+<p>The Arnoldi iteration is a numerically stable way (essentially a modified Gram-Schmidt process) to build an orthonormal basis for this subspace. The matrix <span class="math notranslate nohighlight">\(H_k\)</span> is therefore the projection of <span class="math notranslate nohighlight">\(A\)</span> onto the <span class="math notranslate nohighlight">\(k\)</span>-th Krylov subspace.</p>
 </section>
 <section id="the-iterative-eigensolver-strategy">
 <h2>The Iterative Eigensolver Strategy<a class="headerlink" href="#the-iterative-eigensolver-strategy" title="Link to this heading">#</a></h2>
@@ -540,7 +550,7 @@ H_k = Q_k^T A Q_k
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">The Arnoldi Iteration</p>
+        <p class="prev-next-title">The Arnoldi Process</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -563,6 +573,7 @@ H_k = Q_k^T A Q_k
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#revisiting-the-hessenberg-reduction">Revisiting the Hessenberg Reduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-truncation">The Iterative Truncation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-projection-and-the-approximation">The Projection and the Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-krylov-subspace">The Krylov Subspace</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-iterative-eigensolver-strategy">The Iterative Eigensolver Strategy</a></li>
 </ul>
   </nav></div>

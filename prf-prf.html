@@ -240,8 +240,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="content/eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="content/krylov_subspaces.html">The Core Idea: Projection onto Krylov Subspaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="content/arnoldi_iteration.html">The Arnoldi Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="content/lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="content/LICENSE.html">License for this book</a></li>
@@ -352,14 +356,22 @@ document.write(`
 
    <div class="modindex-jumpbox">
    <a href="#cap-cor:ritz-per-eig"><strong>cor:ritz-per-eig</strong></a> | 
+   <a href="#cap-def:characteristic_polynomial"><strong>def:characteristic_polynomial</strong></a> | 
+   <a href="#cap-def:minimal_polynomial"><strong>def:minimal_polynomial</strong></a> | 
+   <a href="#cap-def:pseudospectrum1"><strong>def:pseudospectrum1</strong></a> | 
+   <a href="#cap-def:pseudospectrum2"><strong>def:pseudospectrum2</strong></a> | 
    <a href="#cap-definition-0"><strong>definition-0</strong></a> | 
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
    <a href="#cap-lemma-4"><strong>lemma-4</strong></a> | 
+   <a href="#cap-prop:minimal_polynomial"><strong>prop:minimal_polynomial</strong></a> | 
    <a href="#cap-theorem-1"><strong>theorem-1</strong></a> | 
    <a href="#cap-thm:AkQR"><strong>thm:AkQR</strong></a> | 
+   <a href="#cap-thm:arnoldi_krylov_basis"><strong>thm:arnoldi_krylov_basis</strong></a> | 
+   <a href="#cap-thm:arnoldi_optimality"><strong>thm:arnoldi_optimality</strong></a> | 
    <a href="#cap-thm:backward_error_lu"><strong>thm:backward_error_lu</strong></a> | 
    <a href="#cap-thm:backward_stability_qr"><strong>thm:backward_stability_qr</strong></a> | 
    <a href="#cap-thm:cartan_dieudonne"><strong>thm:cartan_dieudonne</strong></a> | 
+   <a href="#cap-thm:cayley_hamilton"><strong>thm:cayley_hamilton</strong></a> | 
    <a href="#cap-thm:companion_matrix"><strong>thm:companion_matrix</strong></a> | 
    <a href="#cap-thm:det-svd"><strong>thm:det-svd</strong></a> | 
    <a href="#cap-thm:det_via_qr"><strong>thm:det_via_qr</strong></a> | 
@@ -369,6 +381,7 @@ document.write(`
    <a href="#cap-thm:existence_lu_existence"><strong>thm:existence_lu_existence</strong></a> | 
    <a href="#cap-thm:existence_lu_pivoting"><strong>thm:existence_lu_pivoting</strong></a> | 
    <a href="#cap-thm:existence_qr"><strong>thm:existence_qr</strong></a> | 
+   <a href="#cap-thm:non_hermitian_convergence"><strong>thm:non_hermitian_convergence</strong></a> | 
    <a href="#cap-thm:orth-it-nh"><strong>thm:orth-it-nh</strong></a> | 
    <a href="#cap-thm:orth-it-nh-rigorous"><strong>thm:orth-it-nh-rigorous</strong></a> | 
    <a href="#cap-thm:perturbation_bound"><strong>thm:perturbation_bound</strong></a> | 
@@ -391,6 +404,38 @@ document.write(`
        <td>
        <a href="content/orthogonal_iteration.html#cor:ritz-per-eig"><code class="xref">cor:ritz-per-eig</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>corollary</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-def:characteristic_polynomial"><td></td><td>
+       <strong>def:characteristic_polynomial</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#def:characteristic_polynomial"><code class="xref">def:characteristic_polynomial</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>definition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-def:minimal_polynomial"><td></td><td>
+       <strong>def:minimal_polynomial</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#def:minimal_polynomial"><code class="xref">def:minimal_polynomial</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>definition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-def:pseudospectrum1"><td></td><td>
+       <strong>def:pseudospectrum1</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#def:pseudospectrum1"><code class="xref">def:pseudospectrum1</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>definition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-def:pseudospectrum2"><td></td><td>
+       <strong>def:pseudospectrum2</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#def:pseudospectrum2"><code class="xref">def:pseudospectrum2</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>definition</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-definition-0"><td></td><td>
        <strong>definition-0</strong></td><td></td></tr>
@@ -416,6 +461,14 @@ document.write(`
        <a href="content/orthogonal_iteration.html#lemma-4"><code class="xref">lemma-4</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>lemma</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-prop:minimal_polynomial"><td></td><td>
+       <strong>prop:minimal_polynomial</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#prop:minimal_polynomial"><code class="xref">prop:minimal_polynomial</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>proposition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-theorem-1"><td></td><td>
        <strong>theorem-1</strong></td><td></td></tr>
      <tr>
@@ -430,6 +483,22 @@ document.write(`
        <td></td>
        <td>
        <a href="content/orthogonal_and_power_iteration.html#thm:AkQR"><code class="xref">thm:AkQR</code></a> <em>(content/orthogonal_and_power_iteration)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:arnoldi_krylov_basis"><td></td><td>
+       <strong>thm:arnoldi_krylov_basis</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#thm:arnoldi_krylov_basis"><code class="xref">thm:arnoldi_krylov_basis</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:arnoldi_optimality"><td></td><td>
+       <strong>thm:arnoldi_optimality</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#thm:arnoldi_optimality"><code class="xref">thm:arnoldi_optimality</code></a> <em>(content/arnoldi_convergence)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:backward_error_lu"><td></td><td>
@@ -454,6 +523,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/orthogonal_matrices.html#thm:cartan_dieudonne"><code class="xref">thm:cartan_dieudonne</code></a> <em>(content/orthogonal_matrices)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:cayley_hamilton"><td></td><td>
+       <strong>thm:cayley_hamilton</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#thm:cayley_hamilton"><code class="xref">thm:cayley_hamilton</code></a> <em>(content/arnoldi_convergence)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:companion_matrix"><td></td><td>
@@ -526,6 +603,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/existence_and_uniqueness_qr.html#thm:existence_qr"><code class="xref">thm:existence_qr</code></a> <em>(content/existence_and_uniqueness_qr)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:non_hermitian_convergence"><td></td><td>
+       <strong>thm:non_hermitian_convergence</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#thm:non_hermitian_convergence"><code class="xref">thm:non_hermitian_convergence</code></a> <em>(content/arnoldi_convergence)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:orth-it-nh"><td></td><td>

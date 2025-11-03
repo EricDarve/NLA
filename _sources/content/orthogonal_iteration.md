@@ -76,7 +76,7 @@ As $k \to \infty$, the matrix $Q_k$ converges to the Schur basis $U$. (Note: Thi
 A more general analysis considers using the method to find the $p$ dominant eigenvalues (i.e., $Q_k$ is an $n \times p$ matrix). We can partition the true Schur decomposition as:
 
 $$
-U = [U_1 ; U_2], \quad T = \begin{bmatrix} T_{11} & T_{12} \\ 0 & T_{22} \end{bmatrix},
+U = [U_1, U_2], \quad T = \begin{bmatrix} T_{11} & T_{12} \\ 0 & T_{22} \end{bmatrix},
 $$
 
 where $U_1$ contains the first $p$ Schur vectors and $T_{11}$ contains the $p$ dominant eigenvalues.
@@ -409,7 +409,7 @@ and $E_k := S_k C_k^{-1}$ (when $C_k$ is invertible), a short calculation gives
 $$
 T_k = Y_k^H T Y_k
 = (I+E_k^H E_k)^{-\tfrac12}
-\Big(T_{11} + T_{12}E_k + E_k^H T_{12}^H + E_k^H T_{22}E_k\Big)
+\Big(T_{11} + T_{12}E_k + E_k^H T_{22}E_k\Big)
 (I+E_k^H E_k)^{-\tfrac12}.
 $$
 
@@ -508,7 +508,7 @@ $$
 such that
 
 $$
-\langle u_i, v_j \rangle =
+u_i^H \, v_j =
 \begin{cases}
 \cos(\theta_i), & \text{if } i = j, \\
 0, & \text{if } i \ne j.
@@ -538,10 +538,10 @@ $$
 \|P_{\mathcal U}-P_{\mathcal V}\|=\|\sin\Theta\|.
 $$
 
-Finally, if $\theta_{\max}<\tfrac{\pi}{2}$ (equivalently $U^*V$ is invertible), then
+Finally, if $\theta_{\max}<\tfrac{\pi}{2}$ (equivalently $U^H V$ is invertible), then
 
 $$
-\|\tan\Theta\|=\|\,P_{\mathcal U^\perp}P_{\mathcal V}(P_{\mathcal U}P_{\mathcal V})^{-1}\|.
+\|\tan\Theta\| = \| \, P_{\mathcal U^\perp} V (U^H V)^{-1}\|.
 $$
 
 In particular, $\sin \Theta$ and $\tan \Theta$ provide quantitative measures of the distance or “gap” between the two subspaces.

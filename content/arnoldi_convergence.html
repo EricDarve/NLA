@@ -1,0 +1,961 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Convergence of the Arnoldi Process &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/arnoldi_convergence';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Lanczos Algorithm: Arnoldi for Symmetric Matrices" href="lanczos_iteration.html" />
+    <link rel="prev" title="The Arnoldi Process" href="arnoldi_iteration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/arnoldi_convergence.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Convergence of the Arnoldi Process</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Convergence of the Arnoldi Process</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-krylov-subspace">The Krylov Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-as-a-krylov-basis">Arnoldi as a Krylov Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-as-qr-factorization">Arnoldi as QR Factorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-polynomial-connection">The Polynomial Connection</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#optimal-polynomial-approximation-and-eigenvalue-convergence">Optimal Polynomial Approximation and Eigenvalue Convergence</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cayley-hamilton-theorem">The Cayley-Hamilton Theorem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-s-optimality-property">Arnoldi’s Optimality Property</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-eigenvalue-approximation">Connection to Eigenvalue Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rigorous-statement-for-non-hermitian-matrices">Rigorous Statement for Non-Hermitian Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenges-with-this-bound">⚠️ Challenges with This Bound</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pseudo-spectral-interpretation">Pseudo-Spectral Interpretation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-pseudospectrum">What is the Pseudospectrum?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trefethen-embree-theory-arnoldi-computes-the-pseudospectrum">Trefethen-Embree Theory: Arnoldi Computes the Pseudospectrum</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relationship-between-ritz-values-and-the-residual-norm">The Relationship Between Ritz Values and the Residual Norm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="convergence-of-the-arnoldi-process">
+<h1>Convergence of the Arnoldi Process<a class="headerlink" href="#convergence-of-the-arnoldi-process" title="Link to this heading">#</a></h1>
+<p>We have introduced the Arnoldi iteration as a practical algorithm for building a small Hessenberg matrix <span class="math notranslate nohighlight">\(H_k\)</span>. We now explore the deeper theoretical connections between this algorithm and the fundamental structure it explores: the <strong>Krylov subspace</strong>.</p>
+<section id="the-krylov-subspace">
+<h2>The Krylov Subspace<a class="headerlink" href="#the-krylov-subspace" title="Link to this heading">#</a></h2>
+<p>For a matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times n}\)</span> and a starting vector <span class="math notranslate nohighlight">\(q_1\)</span>, the <span class="math notranslate nohighlight">\(k\)</span>-dimensional Krylov subspace is defined as the space spanned by the first <span class="math notranslate nohighlight">\(k\)</span> vectors in the “power sequence”:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{K}_k(A, q_1) = \text{span}\{q_1, Aq_1, A^2q_1, \dots, A^{k-1}q_1\}
+\]</div>
+<p>This subspace is, in essence, the set of all vectors we can “reach” from <span class="math notranslate nohighlight">\(q_1\)</span> by applying <span class="math notranslate nohighlight">\(A\)</span> up to <span class="math notranslate nohighlight">\(k-1\)</span> times.</p>
+</section>
+<section id="arnoldi-as-a-krylov-basis">
+<h2>Arnoldi as a Krylov Basis<a class="headerlink" href="#arnoldi-as-a-krylov-basis" title="Link to this heading">#</a></h2>
+<p>The most important theoretical property of the Arnoldi iteration is that it provides a stable, orthonormal basis for this exact subspace.</p>
+<div class="proof theorem admonition" id="thm:arnoldi_krylov_basis">
+<p class="admonition-title"><span class="caption-number">Theorem 26 </span> (Arnoldi Produces a Krylov Basis)</p>
+<section class="theorem-content" id="proof-content">
+<p>The basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> generated by the <span class="math notranslate nohighlight">\(k\)</span>-step Arnoldi algorithm (assuming no breakdown) is an orthonormal basis for the <span class="math notranslate nohighlight">\(k\)</span>-dimensional Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k(A, q_1)\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. We will prove by induction that <span class="math notranslate nohighlight">\(\text{span}\{q_1, \dots, q_j\} = \text{span}\{q_1, \dots, A^{j-1}q_1\}\)</span> for all <span class="math notranslate nohighlight">\(j=1, \dots, k\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(\mathcal{Q}_j = \text{span}\{q_1, \dots, q_j\}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{K}_j = \text{span}\{q_1, \dots, A^{j-1}q_1\}\)</span>.</p>
+<ul class="simple">
+<li><p><strong>Base Case (j=1):</strong> <span class="math notranslate nohighlight">\(\mathcal{Q}_1 = \text{span}\{q_1\}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{K}_1 = \text{span}\{q_1\}\)</span>. They are equal.</p></li>
+<li><p><strong>Inductive Hypothesis:</strong> Assume <span class="math notranslate nohighlight">\(\mathcal{Q}_j = \mathcal{K}_j\)</span> for some <span class="math notranslate nohighlight">\(j &lt; k\)</span>.</p></li>
+<li><p><strong>Inductive Step:</strong> We must show <span class="math notranslate nohighlight">\(\mathcal{Q}_{j+1} = \mathcal{K}_{j+1}\)</span>.</p></li>
+</ul>
+<p>This requires two inclusions:</p>
+<ol class="arabic">
+<li><p><strong>Show <span class="math notranslate nohighlight">\(\mathcal{Q}_{j+1} \subseteq \mathcal{K}_{j+1}\)</span>:</strong></p>
+<p><span class="math notranslate nohighlight">\(\mathcal{Q}_{j+1} = \text{span}\{\mathcal{Q}_j, q_{j+1}\}\)</span>. By the inductive hypothesis, <span class="math notranslate nohighlight">\(\mathcal{Q}_j = \mathcal{K}_j \subseteq \mathcal{K}_{j+1}\)</span>. We only need to show <span class="math notranslate nohighlight">\(q_{j+1} \in \mathcal{K}_{j+1}\)</span>.
+The Arnoldi recurrence is</p>
+<div class="math notranslate nohighlight">
+\[
+    q_{j+1} = (h_{j+1,j})^{-1} (A q_j - \sum_{i=1}^{j} h_{ij} q_i).
+    \]</div>
+<p>By the IH, both <span class="math notranslate nohighlight">\(q_j\)</span> and the <span class="math notranslate nohighlight">\(q_i\)</span> terms are in <span class="math notranslate nohighlight">\(\mathcal{Q}_j = \mathcal{K}_j\)</span>.</p>
+<ul class="simple">
+<li><p>Since <span class="math notranslate nohighlight">\(q_i \in \mathcal{K}_j \subseteq \mathcal{K}_{j+1}\)</span>, the sum <span class="math notranslate nohighlight">\(\sum h_{ij} q_i\)</span> is in <span class="math notranslate nohighlight">\(\mathcal{K}_{j+1}\)</span>.</p></li>
+<li><p>Since <span class="math notranslate nohighlight">\(q_j \in \mathcal{K}_j\)</span>,</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[
+    A q_j \in A(\mathcal{K}_j) = A(\text{span}\{q_1, \dots, A^{j-1}q_1\}) = \text{span}\{Aq_1, \dots, A^j q_1\} \subseteq \mathcal{K}_{j+1}.
+    \]</div>
+<ul class="simple">
+<li><p>Therefore, <span class="math notranslate nohighlight">\(q_{j+1}\)</span> is a linear combination of vectors in <span class="math notranslate nohighlight">\(\mathcal{K}_{j+1}\)</span>, so <span class="math notranslate nohighlight">\(q_{j+1} \in \mathcal{K}_{j+1}\)</span>.</p></li>
+<li><p>This proves <span class="math notranslate nohighlight">\(\mathcal{Q}_{j+1} \subseteq \mathcal{K}_{j+1}\)</span>.</p></li>
+</ul>
+</li>
+<li><p><strong>Show <span class="math notranslate nohighlight">\(\mathcal{K}_{j+1} \subseteq \mathcal{Q}_{j+1}\)</span>:</strong></p>
+<p><span class="math notranslate nohighlight">\(\mathcal{K}_{j+1} = \text{span}\{\mathcal{K}_j, A^j q_1\}\)</span>. By the IH, <span class="math notranslate nohighlight">\(\mathcal{K}_j = \mathcal{Q}_j \subseteq \mathcal{Q}_{j+1}\)</span>. We only need to show <span class="math notranslate nohighlight">\(A^j q_1 \in \mathcal{Q}_{j+1}\)</span>.</p>
+<p>We prove by induction on <span class="math notranslate nohighlight">\(m\)</span> that <span class="math notranslate nohighlight">\(A^m q_1 \in \mathcal{Q}_{m+1}\)</span> for <span class="math notranslate nohighlight">\(m = 0, \dots, j\)</span>:</p>
+<ul class="simple">
+<li><p><strong>Base:</strong> <span class="math notranslate nohighlight">\(A^0 q_1 = q_1 \in \mathcal{Q}_1\)</span>.</p></li>
+<li><p><strong>Step:</strong> Assume <span class="math notranslate nohighlight">\(A^m q_1 \in \mathcal{Q}_{m+1}\)</span> for some <span class="math notranslate nohighlight">\(m &lt; j\)</span>. From the Arnoldi relation, <span class="math notranslate nohighlight">\(A q_i \in \mathcal{Q}_{i+1}\)</span> for any <span class="math notranslate nohighlight">\(i\)</span>. Since <span class="math notranslate nohighlight">\(A^m q_1 \in \mathcal{Q}_{m+1}\)</span>, we have <span class="math notranslate nohighlight">\(A^{m+1} q_1 = A(A^m q_1) \in A(\mathcal{Q}_{m+1}) \subseteq \mathcal{Q}_{m+2}\)</span>.</p></li>
+</ul>
+<p>Therefore <span class="math notranslate nohighlight">\(A^j q_1 \in \mathcal{Q}_{j+1}\)</span>, proving <span class="math notranslate nohighlight">\(\mathcal{K}_{j+1} \subseteq \mathcal{Q}_{j+1}\)</span>.</p>
+</li>
+</ol>
+<p>Since we have shown inclusion in both directions, we conclude <span class="math notranslate nohighlight">\(\mathcal{Q}_{j+1} = \mathcal{K}_{j+1}\)</span>.</p>
+</div>
+</section>
+<section id="arnoldi-as-qr-factorization">
+<h2>Arnoldi as QR Factorization<a class="headerlink" href="#arnoldi-as-qr-factorization" title="Link to this heading">#</a></h2>
+<p>This equivalence has a powerful matrix interpretation. Let’s define the <strong>Krylov matrix</strong> <span class="math notranslate nohighlight">\(K_k\)</span> whose columns are the generators of the Krylov subspace:</p>
+<div class="math notranslate nohighlight">
+\[
+K_k = [q_1, Aq_1, A^2 q_1, \dots, A^{k-1} q_1]
+\]</div>
+<p>Our theorem <span class="math notranslate nohighlight">\(\mathcal{K}_k = \text{span}(Q_k)\)</span> means that every column of <span class="math notranslate nohighlight">\(K_k\)</span> can be written as a linear combination of the columns of <span class="math notranslate nohighlight">\(Q_k\)</span>. This gives the matrix relationship:</p>
+<div class="math notranslate nohighlight">
+\[
+K_k = Q_k R_k
+\]</div>
+<p>What is <span class="math notranslate nohighlight">\(R_k\)</span>? The <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(K_k\)</span> is <span class="math notranslate nohighlight">\(A^{j-1}q_1\)</span>. From our proof, we know <span class="math notranslate nohighlight">\(A^{j-1}q_1 \in \mathcal{K}_j = \text{span}\{q_1, \dots, q_j\}\)</span>. This means that to build the <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(K_k\)</span>, we only need the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span>. This is the exact definition of an upper triangular matrix <span class="math notranslate nohighlight">\(R_k\)</span>.</p>
+<p><strong>Key Insight:</strong> The Arnoldi iteration is implicitly performing a <strong>QR factorization of the Krylov matrix <span class="math notranslate nohighlight">\(K_k\)</span></strong>.</p>
+<p>This is of great practical importance. The columns of <span class="math notranslate nohighlight">\(K_k\)</span> (the power-sequence <span class="math notranslate nohighlight">\(A^j q_1\)</span>) tend to converge very quickly to the direction of the dominant eigenvector. This makes the Krylov matrix <span class="math notranslate nohighlight">\(K_k\)</span> extremely ill-conditioned, and a standard Gram-Schmidt <span class="math notranslate nohighlight">\(QR\)</span> factorization would fail due to catastrophic cancellation. The Arnoldi iteration, by orthogonalizing “as it goes,” is a numerically stable way to compute this same basis.</p>
+</section>
+<section id="the-polynomial-connection">
+<h2>The Polynomial Connection<a class="headerlink" href="#the-polynomial-connection" title="Link to this heading">#</a></h2>
+<p>The definition of <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> leads to one additional insight. Any vector <span class="math notranslate nohighlight">\(v \in \mathcal{K}_k\)</span> is a linear combination of the basis vectors:</p>
+<div class="math notranslate nohighlight">
+\[
+v = c_0 q_1 + c_1 A q_1 + c_2 A^2 q_1 + \dots + c_{k-1} A^{k-1} q_1
+\]</div>
+<p>We can factor out <span class="math notranslate nohighlight">\(q_1\)</span> to the right:</p>
+<div class="math notranslate nohighlight">
+\[
+v = (c_0 I + c_1 A + c_2 A^2 + \dots + c_{k-1} A^{k-1}) q_1
+\]</div>
+<p>This can be written as <span class="math notranslate nohighlight">\(v = p(A) q_1\)</span>, where <span class="math notranslate nohighlight">\(p(z) = \sum_{i=0}^{k-1} c_i z^i\)</span> is a polynomial of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>.</p>
+<p>Thus, the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> is the space of all vectors that can be formed by applying a polynomial of <span class="math notranslate nohighlight">\(A\)</span> of degree <span class="math notranslate nohighlight">\(&lt; k\)</span> to the starting vector <span class="math notranslate nohighlight">\(q_1\)</span>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The Arnoldi-based eigenvalue algorithm is therefore doing the following:</p>
+<p>It searches for the “best” eigenvector approximations (the Ritz vectors) within the subspace of all vectors of the form <span class="math notranslate nohighlight">\(p(A) q_1\)</span>, where <span class="math notranslate nohighlight">\(p\)</span> is a polynomial of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>.</p>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="optimal-polynomial-approximation-and-eigenvalue-convergence">
+<h1>Optimal Polynomial Approximation and Eigenvalue Convergence<a class="headerlink" href="#optimal-polynomial-approximation-and-eigenvalue-convergence" title="Link to this heading">#</a></h1>
+<p>In this section, we reframe the Arnoldi process as a problem of optimal polynomial approximation.</p>
+<section id="the-cayley-hamilton-theorem">
+<h2>The Cayley-Hamilton Theorem<a class="headerlink" href="#the-cayley-hamilton-theorem" title="Link to this heading">#</a></h2>
+<p>Polynomials of <span class="math notranslate nohighlight">\(A\)</span> can be used to interpret the convergence of the Arnoldi process. The fundamental connection is provided by the Cayley-Hamilton theorem.</p>
+<div class="proof definition admonition" id="def:characteristic_polynomial">
+<p class="admonition-title"><span class="caption-number">Definition 2 </span> (Characteristic Polynomial)</p>
+<section class="definition-content" id="proof-content">
+<p>The characteristic polynomial of <span class="math notranslate nohighlight">\(A \in \mathbb{C}^{n \times n}\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[
+p_A(z) = \det(zI - A) = z^n + c_{n-1}z^{n-1} + \cdots + c_1 z + c_0.
+\]</div>
+</section>
+</div><div class="proof theorem admonition" id="thm:cayley_hamilton">
+<p class="admonition-title"><span class="caption-number">Theorem 27 </span> (Cayley-Hamilton Theorem)</p>
+<section class="theorem-content" id="proof-content">
+<p>Every square matrix satisfies its characteristic equation:</p>
+<div class="math notranslate nohighlight">
+\[
+p_A(A) = 0.
+\]</div>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. <em>Proof for diagonalizable matrices.</em> Assume <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span> where <span class="math notranslate nohighlight">\(\Lambda = \text{diag}(\lambda_1, \ldots, \lambda_n)\)</span>. For any polynomial <span class="math notranslate nohighlight">\(p(z)\)</span>, we have</p>
+<div class="math notranslate nohighlight">
+\[
+p(A) = X p(\Lambda) X^{-1},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(p(\Lambda) = \text{diag}(p(\lambda_1), \ldots, p(\lambda_n))\)</span>.</p>
+<p>The characteristic polynomial can be written as</p>
+<div class="math notranslate nohighlight">
+\[
+p_A(z) = \prod_{i=1}^n (z - \lambda_i).
+\]</div>
+<p>Therefore,</p>
+<div class="math notranslate nohighlight">
+\[
+[p_A(\Lambda)]_{ii} = p_A(\lambda_i) = \prod_{j=1}^n (\lambda_i - \lambda_j) = 0.
+\]</div>
+<p>Hence <span class="math notranslate nohighlight">\(p_A(\Lambda) = 0\)</span>, which implies</p>
+<div class="math notranslate nohighlight">
+\[
+p_A(A) = X p_A(\Lambda) X^{-1} = 0.
+\]</div>
+</div>
+<p><strong>Remark 5.</strong> The Cayley-Hamilton theorem holds for all matrices, not just diagonalizable ones. The general proof uses the adjugate matrix or Jordan canonical form.</p>
+<div class="proof definition admonition" id="def:minimal_polynomial">
+<p class="admonition-title"><span class="caption-number">Definition 3 </span> (Minimal Polynomial)</p>
+<section class="definition-content" id="proof-content">
+<p>The minimal polynomial <span class="math notranslate nohighlight">\(m_A(z)\)</span> is the monic polynomial of smallest degree such that <span class="math notranslate nohighlight">\(m_A(A) = 0\)</span>.</p>
+</section>
+</div><div class="proof proposition admonition" id="prop:minimal_polynomial">
+<p class="admonition-title"><span class="caption-number">Proposition 1 </span> (Properties of the Minimal Polynomial)</p>
+<section class="proposition-content" id="proof-content">
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable with distinct eigenvalues <span class="math notranslate nohighlight">\(\lambda_1, \ldots, \lambda_d\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+m_A(z) = \prod_{i=1}^d (z - \lambda_i).
+\]</div>
+</section>
+</div></section>
+<section id="arnoldi-s-optimality-property">
+<h2>Arnoldi’s Optimality Property<a class="headerlink" href="#arnoldi-s-optimality-property" title="Link to this heading">#</a></h2>
+<p>Let’s explore in what sense the Arnoldi process makes <span class="math notranslate nohighlight">\(p(A)\)</span> small.</p>
+<div class="proof theorem admonition" id="thm:arnoldi_optimality">
+<p class="admonition-title"><span class="caption-number">Theorem 28 </span> (Arnoldi Optimality)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(H_k\)</span> be the <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix from the Arnoldi process, and let</p>
+<div class="math notranslate nohighlight">
+\[
+p_k(z) = \det(zI - H_k) = z^k + c_{k-1}z^{k-1} + \cdots + c_0
+\]</div>
+<p>be its characteristic polynomial (which is monic of degree <span class="math notranslate nohighlight">\(k\)</span>). Then <span class="math notranslate nohighlight">\(p_k\)</span> minimizes</p>
+<div class="math notranslate nohighlight">
+\[
+\| p(A) q_1 \|_2
+\]</div>
+<p>among all monic polynomials <span class="math notranslate nohighlight">\(p(z) = z^k + d_{k-1}z^{k-1} + \cdots + d_0\)</span> of degree <span class="math notranslate nohighlight">\(k\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. From the Arnoldi relation <span class="math notranslate nohighlight">\(A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T\)</span>, we have</p>
+<div class="math notranslate nohighlight">
+\[
+A Q_k = Q_{k+1} \tilde{H}_k,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tilde{H}_k \in \mathbb{C}^{(k+1) \times k}\)</span> is the extended Hessenberg matrix.</p>
+<p><strong>Key observation:</strong> If we ran the Arnoldi process to completion with an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, we would obtain the full decomposition</p>
+<div class="math notranslate nohighlight">
+\[
+A Q = Q H,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is unitary and <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg. Here <span class="math notranslate nohighlight">\(Q_k\)</span> consists of the first <span class="math notranslate nohighlight">\(k\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(H_k\)</span> is the leading <span class="math notranslate nohighlight">\(k \times k\)</span> block of <span class="math notranslate nohighlight">\(H\)</span>, and <span class="math notranslate nohighlight">\(\tilde{H}_k\)</span> is the leading <span class="math notranslate nohighlight">\((k+1) \times k\)</span> block of <span class="math notranslate nohighlight">\(H\)</span>.</p>
+<p>For any polynomial <span class="math notranslate nohighlight">\(p(z)\)</span>, we have</p>
+<div class="math notranslate nohighlight">
+\[
+p(A) Q = Q p(H).
+\]</div>
+<p>Considering only the first column (<span class="math notranslate nohighlight">\(q_1 = Q e_1\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+p(A) q_1 = Q p(H) e_1.
+\]</div>
+<p>Since the first <span class="math notranslate nohighlight">\(k+1\)</span> rows of <span class="math notranslate nohighlight">\(p(H) e_1\)</span> depend only on the first <span class="math notranslate nohighlight">\(k+1\)</span> rows and <span class="math notranslate nohighlight">\(k\)</span> columns of <span class="math notranslate nohighlight">\(H\)</span> (by the Hessenberg structure), we have</p>
+<div class="math notranslate nohighlight">
+\[
+p(A) q_1 = Q_{k+1} [p(H) e_1]_{1:k+1},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\([p(H) e_1]_{1:k+1}\)</span> denotes the first <span class="math notranslate nohighlight">\(k+1\)</span> entries of <span class="math notranslate nohighlight">\(p(H) e_1\)</span>.</p>
+<p>For the characteristic polynomial <span class="math notranslate nohighlight">\(p_k(z) = \det(zI - H_k)\)</span> of the <span class="math notranslate nohighlight">\(k \times k\)</span> matrix <span class="math notranslate nohighlight">\(H_k\)</span>, by Cayley-Hamilton, <span class="math notranslate nohighlight">\(p_k(H_k) = 0\)</span>. The bordered structure of <span class="math notranslate nohighlight">\(H\)</span> implies that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+p_k(H) e_1 = \begin{bmatrix} 
+0 \\ \vdots \\ 0 \\ \beta \\ 0 \\ \vdots \\ 0
+\end{bmatrix},
+\end{split}\]</div>
+<p>where the first <span class="math notranslate nohighlight">\(k\)</span> entries are zero and <span class="math notranslate nohighlight">\(\beta \neq 0\)</span> (generically). Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+p_k(A) q_1 = Q_{k+1} \begin{bmatrix} 0 \\ \vdots \\ 0 \\ \beta \end{bmatrix} = \beta q_{k+1} \perp \text{span}(Q_k).
+\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> has orthonormal columns,</p>
+<div class="math notranslate nohighlight">
+\[
+\| p_k(A) q_1 \|_2 = |\beta|.
+\]</div>
+<p>For any other monic polynomial <span class="math notranslate nohighlight">\(p(z) = z^k + d_{k-1}z^{k-1} + \cdots + d_0\)</span>, we can write</p>
+<div class="math notranslate nohighlight">
+\[
+p(z) - p_k(z) = q_{k-1}(z)
+\]</div>
+<p>for some polynomial <span class="math notranslate nohighlight">\(q_{k-1}\)</span> of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[
+p(A) q_1 = p_k(A) q_1 + q_{k-1}(A) q_1.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(q_{k-1}(A) q_1 \in \mathcal{K}_k(A, q_1) = \text{span}(Q_k)\)</span> and <span class="math notranslate nohighlight">\(p_k(A) q_1 \perp \text{span}(Q_k)\)</span>, by the Pythagorean theorem:</p>
+<div class="math notranslate nohighlight">
+\[
+\| p(A) q_1 \|_2^2 = \| p_k(A) q_1 \|_2^2 + \| q_{k-1}(A) q_1 \|_2^2 \geq \| p_k(A) q_1 \|_2^2.
+\]</div>
+</div>
+</section>
+<section id="connection-to-eigenvalue-approximation">
+<h2>Connection to Eigenvalue Approximation<a class="headerlink" href="#connection-to-eigenvalue-approximation" title="Link to this heading">#</a></h2>
+<p>The optimality theorem is the key to understanding why the Ritz values (the eigenvalues of <span class="math notranslate nohighlight">\(H_k\)</span>) converge to the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. The theorem states that the Arnoldi process finds a monic polynomial <span class="math notranslate nohighlight">\(p_k(z)\)</span> that makes the vector <span class="math notranslate nohighlight">\(p_k(A)q_1\)</span> as small as possible in the 2-norm.</p>
+<p>Let’s analyze what this means for the roots of <span class="math notranslate nohighlight">\(p_k(z)\)</span>. The roots of the characteristic polynomial <span class="math notranslate nohighlight">\(p_k(z) = \det(zI - H_k)\)</span> are precisely the Ritz values, which we denote by <span class="math notranslate nohighlight">\(\mu_1, \dots, \mu_k\)</span>. Thus, we can write:</p>
+<div class="math notranslate nohighlight">
+\[
+p_k(z) = \prod_{j=1}^k (z - \mu_j)
+\]</div>
+<p>To see how this relates to the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, let’s assume <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, so <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span> where <span class="math notranslate nohighlight">\(\Lambda = \text{diag}(\lambda_1, \dots, \lambda_n)\)</span>. We can express the starting vector <span class="math notranslate nohighlight">\(q_1\)</span> in the basis of eigenvectors: <span class="math notranslate nohighlight">\(q_1 = Xw\)</span> for some vector of coefficients <span class="math notranslate nohighlight">\(w\)</span>.</p>
+<p>Now, we can evaluate the vector <span class="math notranslate nohighlight">\(p_k(A)q_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+p_k(A) q_1 &amp;= p_k(X \Lambda X^{-1}) (Xw) \\
+&amp;= X p_k(\Lambda) X^{-1} X w \\
+&amp;= X p_k(\Lambda) w
+\end{align}
+\end{split}\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(p_k(\Lambda)\)</span> is a diagonal matrix whose entries are the polynomial <span class="math notranslate nohighlight">\(p_k\)</span> evaluated at each eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+p_k(\Lambda) = \text{diag}\left( p_k(\lambda_1), \dots, p_k(\lambda_n) \right) = \text{diag}\left( \prod_{j=1}^k (\lambda_i - \mu_j) \right)_{i=1}^n
+\]</div>
+<p>This gives us an expression for the norm that the Arnoldi process minimizes:</p>
+<div class="math notranslate nohighlight">
+\[
+\| p_k(A) q_1 \|_2 = \| X p_k(\Lambda) w \|_2
+\]</div>
+<p>The vector <span class="math notranslate nohighlight">\(p_k(\Lambda)w\)</span> has components <span class="math notranslate nohighlight">\([p_k(\lambda_1)w_1, \dots, p_k(\lambda_n)w_n]^T\)</span>. If the norm <span class="math notranslate nohighlight">\(\|p_k(A)q_1\|\)</span> is small, it implies that the vector <span class="math notranslate nohighlight">\(p_k(\Lambda)w\)</span> must also be small. This means that for each <span class="math notranslate nohighlight">\(i\)</span>, the product <span class="math notranslate nohighlight">\(|p_k(\lambda_i) w_i| = |w_i \prod_{j=1}^k (\lambda_i - \mu_j)|\)</span> must be small.</p>
+<p>If a particular coefficient <span class="math notranslate nohighlight">\(w_i\)</span> is not small (i.e., the starting vector <span class="math notranslate nohighlight">\(q_1\)</span> has a significant component in the direction of the eigenvector <span class="math notranslate nohighlight">\(x_i\)</span>), then the product <span class="math notranslate nohighlight">\(\prod_{j=1}^k (\lambda_i - \mu_j)\)</span> must be small. This can only happen if at least one Ritz value <span class="math notranslate nohighlight">\(\mu_j\)</span> is close to the eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span>.</p>
+</section>
+<section id="rigorous-statement-for-non-hermitian-matrices">
+<h2>Rigorous Statement for Non-Hermitian Matrices<a class="headerlink" href="#rigorous-statement-for-non-hermitian-matrices" title="Link to this heading">#</a></h2>
+<p>We will need the <strong>left eigenvector</strong>.</p>
+<ul class="simple">
+<li><p>The <strong>right eigenvector</strong> <span class="math notranslate nohighlight">\(x_i\)</span> satisfies <span class="math notranslate nohighlight">\(A x_i = \lambda_i x_i\)</span>.</p></li>
+<li><p>The <strong>left eigenvector</strong> <span class="math notranslate nohighlight">\(y_i\)</span> satisfies <span class="math notranslate nohighlight">\(y_i^H A = \lambda_i y_i^H\)</span>.</p></li>
+</ul>
+<p>The <strong>condition number of the eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span></strong> is <span class="math notranslate nohighlight">\(1/\delta_i\)</span>, where <span class="math notranslate nohighlight">\(\delta_i = |y_i^H x_i|\)</span> (assuming <span class="math notranslate nohighlight">\(\|x_i\|_2 = \|y_i\|_2 = 1\)</span>). If the left and right eigenvectors are nearly orthogonal, <span class="math notranslate nohighlight">\(\delta_i\)</span> is close to zero, and the eigenvalue is called “ill-conditioned.”</p>
+<div class="proof theorem admonition" id="thm:non_hermitian_convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 29 </span> (Non-Hermitian Convergence)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\((\mu, \tilde{x})\)</span> be an approximate eigenpair (e.g., a Ritz pair) with <span class="math notranslate nohighlight">\(\|\tilde{x}\|_2 = 1\)</span>, and let <span class="math notranslate nohighlight">\(r = A\tilde{x} - \mu\tilde{x}\)</span> be the residual.</p>
+<p>Then, there exists an eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span> of <span class="math notranslate nohighlight">\(A\)</span> such that:</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_i - \mu| \le \frac{\|r\|_2}{\delta_i} + O(\|r\|_2^2)
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\delta_i = |y_i^H x_i|\)</span> is the eigenvector-pair cosine for the eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span>.</p>
+<p>Ignoring the higher-order terms, this gives the approximation:</p>
+<div class="math notranslate nohighlight">
+\[
+\underbrace{|\lambda_i - \mu|}_{\text{Eigenvalue Error}} \lessapprox \frac{\overbrace{\|r\|_2}^{\text{Residual Norm}}}{\underbrace{\delta_i}_{\text{Eigenvector Cosine}}}
+\]</div>
+</section>
+</div><section id="challenges-with-this-bound">
+<h3>⚠️ Challenges with This Bound<a class="headerlink" href="#challenges-with-this-bound" title="Link to this heading">#</a></h3>
+<p>This “eigenvalue-based” bound, while correct, is often insufficient to explain the complex convergence of the Arnoldi method. The primary challenge is that the bound <span class="math notranslate nohighlight">\(|\lambda_i - \mu| \lessapprox \frac{\|r\|_2}{\delta_i}\)</span> can be very large (i.e., pessimistic) even when the residual norm <span class="math notranslate nohighlight">\(\|r\|_2\)</span> is small. If an eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span> is ill-conditioned, its eigenvector-pair cosine <span class="math notranslate nohighlight">\(\delta_i\)</span> will be very small. This means that even a tiny residual <span class="math notranslate nohighlight">\(\|r\|_2\)</span> (which is guaranteed by a small <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span>) does not guarantee a small eigenvalue error.</p>
+<p>To gain a more precise understanding, we need a framework that moves beyond the eigenvalues themselves and considers the behavior of the resolvent <span class="math notranslate nohighlight">\((zI - A)^{-1}\)</span>. This leads to the theory of pseudospectra, which provides a much more accurate and descriptive tool for analyzing Arnoldi convergence.</p>
+</section>
+</section>
+<section id="pseudo-spectral-interpretation">
+<h2>Pseudo-Spectral Interpretation<a class="headerlink" href="#pseudo-spectral-interpretation" title="Link to this heading">#</a></h2>
+<p>The theory of pseudospectra, developed Trefethen–Embree, provides the modern framework for understanding the behavior of the Arnoldi method for non-Hermitian matrices. It successfully explains the complex, and often seemingly erratic, convergence patterns that eigenvalue-based theories cannot.</p>
+<p>Here is an explanation of the concept and its direct relationship to the Arnoldi method and its residual.</p>
+<section id="what-is-the-pseudospectrum">
+<h3>What is the Pseudospectrum?<a class="headerlink" href="#what-is-the-pseudospectrum" title="Link to this heading">#</a></h3>
+<p>The spectrum (the set of eigenvalues) of a non-normal matrix can be a “misleading” indicator of the matrix’s behavior. The pseudospectrum provides a more descriptive picture.</p>
+<p>The pseudospectrum has two common, equivalent definitions:</p>
+<div class="proof definition admonition" id="def:pseudospectrum1">
+<p class="admonition-title"><span class="caption-number">Definition 4 </span> (Pseudospectrum (Almost Eigenvalues))</p>
+<section class="definition-content" id="proof-content">
+<p>The pseudospectrum is a set of complex numbers that are “almost” eigenvalues. A number <span class="math notranslate nohighlight">\(z\)</span> is an <span class="math notranslate nohighlight">\(\epsilon\)</span>-almost eigenvalue if there exists a unit vector <span class="math notranslate nohighlight">\(v\)</span> such that <span class="math notranslate nohighlight">\(\|(A - zI)v\|\)</span> is small (i.e., less than <span class="math notranslate nohighlight">\(\epsilon\)</span>). This is equivalent to stating that the smallest singular value of <span class="math notranslate nohighlight">\((A-zI)\)</span> is <span class="math notranslate nohighlight">\(\sigma_{\min}(A-zI) \le \epsilon\)</span>, or equivalently, <span class="math notranslate nohighlight">\(\|(zI-A)^{-1}\|_2 \ge 1/\epsilon\)</span>.</p>
+</section>
+</div><div class="proof definition admonition" id="def:pseudospectrum2">
+<p class="admonition-title"><span class="caption-number">Definition 5 </span> (Pseudospectrum (Nearby Matrix Eigenvalues))</p>
+<section class="definition-content" id="proof-content">
+<p>The <strong><span class="math notranslate nohighlight">\(\epsilon\)</span>-pseudospectrum</strong> of a matrix <span class="math notranslate nohighlight">\(A\)</span>, denoted <span class="math notranslate nohighlight">\(\Lambda_\epsilon(A)\)</span>, is the set of all eigenvalues of matrices that are <span class="math notranslate nohighlight">\(\epsilon\)</span>-close to <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+\Lambda_\epsilon(A) = \{ z \in \mathbb{C} \mid z \in \Lambda(A+E) \text{ for some } E \text{ with } \|E\| \le \epsilon \}
+\]</div>
+</section>
+</div><p>For a normal (e.g., Hermitian) matrix, the <span class="math notranslate nohighlight">\(\epsilon\)</span>-pseudospectrum is simply the union of <span class="math notranslate nohighlight">\(\epsilon\)</span>-sized disks around the true eigenvalues. For a non-normal matrix, <span class="math notranslate nohighlight">\(\Lambda_\epsilon(A)\)</span> can be dramatically larger, forming complex regions in the plane that reveal the matrix’s sensitivity to perturbation.</p>
+</section>
+<section id="trefethen-embree-theory-arnoldi-computes-the-pseudospectrum">
+<h3>Trefethen-Embree Theory: Arnoldi Computes the Pseudospectrum<a class="headerlink" href="#trefethen-embree-theory-arnoldi-computes-the-pseudospectrum" title="Link to this heading">#</a></h3>
+<p>The core idea of the Trefethen and Embree theory is that the Arnoldi method’s Ritz values are not “trying” to find the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. Instead, <strong>the Arnoldi method computes approximations to the pseudospectra of <span class="math notranslate nohighlight">\(A\)</span></strong>.</p>
+<p>This perspective explains the “challenges” of non-Hermitian matrices:</p>
+<ul class="simple">
+<li><p><strong>Erratic Convergence:</strong> Ritz values that appear, seem to converge, and then vanish (“phantom” eigenvalues) are not failures. They are simply the algorithm successfully resolving the complex shapes of the pseudospectrum.</p></li>
+<li><p><strong>Ill-Conditioning:</strong> The <span class="math notranslate nohighlight">\(\kappa(X)\)</span> factor in the previous theorem is a <em>global</em> measure of non-normality. Pseudospectra provide a more detailed, <em>local</em> picture of this non-normality across the complex plane.</p></li>
+</ul>
+</section>
+<section id="the-relationship-between-ritz-values-and-the-residual-norm">
+<h3>The Relationship Between Ritz Values and the Residual Norm<a class="headerlink" href="#the-relationship-between-ritz-values-and-the-residual-norm" title="Link to this heading">#</a></h3>
+<p>This is the most crucial part of the theory. There is an exact, “backward error” relationship that proves that <strong>every Ritz value is an exact eigenvalue of a slightly perturbed matrix</strong>.</p>
+<p>This relationship directly connects the Ritz values (<span class="math notranslate nohighlight">\(\mu_j^{(k)}\)</span>) to the residual norm (<span class="math notranslate nohighlight">\(h_{k+1,k}\)</span>).</p>
+<p><strong>The Arnoldi Relation:</strong></p>
+<p>At step <span class="math notranslate nohighlight">\(k\)</span>, the Arnoldi iteration produces the decomposition:
+<span class="math notranslate nohighlight">\(AQ_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T\)</span></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Q_k\)</span> is the <span class="math notranslate nohighlight">\(n \times k\)</span> matrix of orthonormal basis vectors.</p></li>
+<li><p><span class="math notranslate nohighlight">\(H_k\)</span> is the <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix.</p></li>
+<li><p>The <strong>Ritz values</strong> (<span class="math notranslate nohighlight">\(\mu_j^{(k)}\)</span>) are the eigenvalues of <span class="math notranslate nohighlight">\(H_k\)</span>.</p></li>
+<li><p>The term <span class="math notranslate nohighlight">\(h_{k+1,k} q_{k+1} e_k^T\)</span> is the residual matrix. The norm <span class="math notranslate nohighlight">\(\|AQ_k - Q_k H_k\|\)</span> is precisely this residual and is equal to <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span>.</p></li>
+</ul>
+<p><strong>The Backward Error Proof:</strong></p>
+<p>Let <span class="math notranslate nohighlight">\(\mu\)</span> be a Ritz value. By definition, it is an eigenvalue of <span class="math notranslate nohighlight">\(H_k\)</span>, so there is a corresponding eigenvector <span class="math notranslate nohighlight">\(y\)</span> such that <span class="math notranslate nohighlight">\(H_k y = \mu y\)</span>.</p>
+<ol class="arabic simple">
+<li><p>Let <span class="math notranslate nohighlight">\(x = Q_k y\)</span>. This <span class="math notranslate nohighlight">\(x\)</span> is the “Ritz vector” corresponding to <span class="math notranslate nohighlight">\(\mu\)</span>.</p></li>
+<li><p>Let’s look at the residual for this specific Ritz pair <span class="math notranslate nohighlight">\((A - \mu I)x\)</span>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(Ax - \mu x = A(Q_k y) - \mu(Q_k y)\)</span></p></li>
+<li><p>Substitute the Arnoldi relation: <span class="math notranslate nohighlight">\(Ax = (Q_k H_k + h_{k+1,k} q_{k+1} e_k^T) y\)</span></p></li>
+<li><p>Substitute <span class="math notranslate nohighlight">\(H_k y = \mu y\)</span>: <span class="math notranslate nohighlight">\(Ax = Q_k(\mu y) + h_{k+1,k} q_{k+1} (e_k^T y)\)</span></p></li>
+<li><p>This simplifies to: <span class="math notranslate nohighlight">\(Ax - \mu x = (h_{k+1,k} \cdot (e_k^T y)) q_{k+1}\)</span></p></li>
+</ul>
+</li>
+<li><p>This equation shows that the residual for the Ritz pair <span class="math notranslate nohighlight">\((\mu, x)\)</span> is confined to the direction of the next basis vector <span class="math notranslate nohighlight">\(q_{k+1}\)</span>.</p></li>
+<li><p>We can now define a perturbation matrix <span class="math notranslate nohighlight">\(E\)</span> such that <span class="math notranslate nohighlight">\((A+E)x = \mu x\)</span>.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(E = - (h_{k+1,k} \cdot (e_k^T y)) q_{k+1} x^H / \|x\|^2\)</span></p></li>
+<li><p>The norm of this perturbation <span class="math notranslate nohighlight">\(E\)</span> can be shown to be exactly: <span class="math notranslate nohighlight">\(\|E\| = h_{k+1,k} |(e_k^T y)| / \|y\|\)</span></p></li>
+<li><p>This is often simplified to the bound <span class="math notranslate nohighlight">\(\|E\| \le h_{k+1,k}\)</span>.</p></li>
+</ul>
+</li>
+</ol>
+<p><strong>Conclusion</strong></p>
+<p>This proves that any Ritz value <span class="math notranslate nohighlight">\(\mu\)</span> is the <strong>exact eigenvalue</strong> of a perturbed matrix <span class="math notranslate nohighlight">\(A+E\)</span>, where the norm of the perturbation <span class="math notranslate nohighlight">\(\|E\|\)</span> is directly proportional to the Arnoldi residual norm <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span>.</p>
+<p>By the second definition of the pseudospectrum, this means:</p>
+<p><span class="math notranslate nohighlight">\(\mu \in \Lambda_\epsilon(A)\)</span> where <span class="math notranslate nohighlight">\(\epsilon = h_{k+1,k} |(e_k^T y)| / \|y\| \le h_{k+1,k}\)</span></p>
+<p>In short: The Arnoldi method’s Ritz values are not “approximations” to the pseudospectrum. They are, by construction, guaranteed members of the <span class="math notranslate nohighlight">\(\epsilon\)</span>-pseudospectrum, where the perturbation norm <span class="math notranslate nohighlight">\(\epsilon\)</span> is bounded by the Arnoldi residual norm <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span>.</p>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>The Arnoldi process constructs a sequence of monic polynomials whose application to <span class="math notranslate nohighlight">\(q_1\)</span> has minimal norm. When this norm is small, the roots of these polynomials (the Ritz values) approximate eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, with the quality of approximation depending on the spectral properties of <span class="math notranslate nohighlight">\(A\)</span> and the initial vector <span class="math notranslate nohighlight">\(q_1\)</span>.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="arnoldi_iteration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Arnoldi Process</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="lanczos_iteration.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Convergence of the Arnoldi Process</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-krylov-subspace">The Krylov Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-as-a-krylov-basis">Arnoldi as a Krylov Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-as-qr-factorization">Arnoldi as QR Factorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-polynomial-connection">The Polynomial Connection</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#optimal-polynomial-approximation-and-eigenvalue-convergence">Optimal Polynomial Approximation and Eigenvalue Convergence</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cayley-hamilton-theorem">The Cayley-Hamilton Theorem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arnoldi-s-optimality-property">Arnoldi’s Optimality Property</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-eigenvalue-approximation">Connection to Eigenvalue Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rigorous-statement-for-non-hermitian-matrices">Rigorous Statement for Non-Hermitian Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#challenges-with-this-bound">⚠️ Challenges with This Bound</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pseudo-spectral-interpretation">Pseudo-Spectral Interpretation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-the-pseudospectrum">What is the Pseudospectrum?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trefethen-embree-theory-arnoldi-computes-the-pseudospectrum">Trefethen-Embree Theory: Arnoldi Computes the Pseudospectrum</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relationship-between-ritz-values-and-the-residual-norm">The Relationship Between Ritz Values and the Residual Norm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

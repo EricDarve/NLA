@@ -1,0 +1,717 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Lanczos Algorithm: Arnoldi for Symmetric Matrices &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/lanczos_iteration';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Convergence of the Lanczos Process" href="lanczos_convergence.html" />
+    <link rel="prev" title="Convergence of the Arnoldi Process" href="arnoldi_convergence.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/lanczos_iteration.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The Lanczos Algorithm: Arnoldi for Symmetric Matrices</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-hessenberg-to-tridiagonal">From Hessenberg to Tridiagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-term-recurrence">The Three-Term Recurrence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#another-derivation-of-the-three-term-recurrence">Another Derivation of the Three-Term Recurrence</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-algorithm">Lanczos Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-vs-arnoldi-a-comparison">Lanczos vs. Arnoldi: A Comparison</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-practical-caveat-loss-of-orthogonality">A Practical Caveat: Loss of Orthogonality</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-lanczos-algorithm-arnoldi-for-symmetric-matrices">
+<h1>The Lanczos Algorithm: Arnoldi for Symmetric Matrices<a class="headerlink" href="#the-lanczos-algorithm-arnoldi-for-symmetric-matrices" title="Link to this heading">#</a></h1>
+<p>We now turn our attention to the important special case where the matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times n}\)</span> is symmetric. The Arnoldi iteration, while general, does not exploit this structure. When symmetry is present, the algorithm simplifies dramatically, leading to profound computational savings. This specialized algorithm is the <strong>Lanczos algorithm</strong>, one of the most influential algorithms in numerical linear algebra.</p>
+<section id="from-hessenberg-to-tridiagonal">
+<h2>From Hessenberg to Tridiagonal<a class="headerlink" href="#from-hessenberg-to-tridiagonal" title="Link to this heading">#</a></h2>
+<p>Recall the fundamental relation from the Arnoldi iteration after <span class="math notranslate nohighlight">\(k\)</span> steps:</p>
+<div class="math notranslate nohighlight">
+\[
+A Q_k = Q_k H_k + h_{k+1,k} \boldsymbol{q}_{k+1} \boldsymbol{e}_k^T
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q_k = [\boldsymbol{q}_1 | \cdots | \boldsymbol{q}_k]\)</span> has orthonormal columns, and <span class="math notranslate nohighlight">\(H_k\)</span> is a <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix. By pre-multiplying by <span class="math notranslate nohighlight">\(Q_k^T\)</span> and using the orthogonality of the columns of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>, we arrived at the projection:</p>
+<div class="math notranslate nohighlight">
+\[
+H_k = Q_k^T A Q_k
+\]</div>
+<p>Now, let us impose the condition that <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A = A^T\)</span>). The projected matrix <span class="math notranslate nohighlight">\(H_k\)</span> must inherit this symmetry:</p>
+<div class="math notranslate nohighlight">
+\[
+H_k^T = (Q_k^T A Q_k)^T = Q_k^T A^T (Q_k^T)^T = Q_k^T A Q_k = H_k
+\]</div>
+<p>So, <span class="math notranslate nohighlight">\(H_k\)</span> must be a symmetric matrix.</p>
+<p>It is a remarkable fact that a matrix cannot be both upper Hessenberg and symmetric without having a very specific structure: it must be <strong>tridiagonal</strong>.</p>
+<p>An upper Hessenberg matrix has zeros below its first subdiagonal (<span class="math notranslate nohighlight">\(h_{i,j} = 0\)</span> for <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>). A symmetric matrix requires that <span class="math notranslate nohighlight">\(h_{i,j} = h_{j,i}\)</span> for all <span class="math notranslate nohighlight">\(i,j\)</span>. If we combine these properties, any non-zero entry in the upper triangle, say <span class="math notranslate nohighlight">\(h_{j, i}\)</span> with <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>, would imply a corresponding non-zero entry <span class="math notranslate nohighlight">\(h_{i,j}\)</span> in the lower triangle, which would violate the Hessenberg structure. Thus, the only non-zero entries can be on the main diagonal, the first superdiagonal, and the first subdiagonal.</p>
+<p>We therefore rename the matrix <span class="math notranslate nohighlight">\(T_k = H_k\)</span> to emphasize its tridiagonal nature. It is standard to denote the diagonal entries by <span class="math notranslate nohighlight">\(\alpha_j\)</span> and the off-diagonal entries by <span class="math notranslate nohighlight">\(\beta_j\)</span>. Since <span class="math notranslate nohighlight">\(T_k\)</span> is symmetric, we have <span class="math notranslate nohighlight">\(T_{j, j-1} = T_{j-1, j}\)</span>.</p>
+<p>In the Lanczos recurrence, we will set the diagonal entries <span class="math notranslate nohighlight">\(\alpha_k = h_{k,k}\)</span> and the new subdiagonal entry <span class="math notranslate nohighlight">\(\beta_k = h_{k+1,k}\)</span>. The matrix <span class="math notranslate nohighlight">\(T_k\)</span> is then:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+T_k = Q_k^T A Q_k =
+\begin{pmatrix}
+\alpha_1 &amp; \beta_1 &amp; &amp; &amp; \\
+\beta_1 &amp; \alpha_2 &amp; \beta_2 &amp; &amp; \\
+&amp; \beta_2 &amp; \ddots &amp; \ddots &amp; \\
+&amp; &amp; \ddots &amp; \alpha_{k-1} &amp; \beta_{k-1} \\
+&amp; &amp; &amp; \beta_{k-1} &amp; \alpha_k
+\end{pmatrix}
+\end{split}\]</div>
+</section>
+<section id="the-three-term-recurrence">
+<h2>The Three-Term Recurrence<a class="headerlink" href="#the-three-term-recurrence" title="Link to this heading">#</a></h2>
+<p>This tridiagonal structure leads to a dramatic simplification of the Arnoldi recurrence. The core step in Arnoldi is the modified Gram-Schmidt process used to compute <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+h_{k+1, k} \boldsymbol{q}_{k+1} = A \boldsymbol{q}_k - \sum_{j=1}^{k} h_{j,k} \boldsymbol{q}_j
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(H_k\)</span> (now <span class="math notranslate nohighlight">\(T_k\)</span>) is tridiagonal, for a given column <span class="math notranslate nohighlight">\(k\)</span>, the only non-zero entries <span class="math notranslate nohighlight">\(h_{j,k}\)</span> are <span class="math notranslate nohighlight">\(h_{k-1, k}\)</span> and <span class="math notranslate nohighlight">\(h_{k,k}\)</span>. Using our new notation, these are <span class="math notranslate nohighlight">\(\beta_{k-1}\)</span> and <span class="math notranslate nohighlight">\(\alpha_k\)</span>, respectively. All other <span class="math notranslate nohighlight">\(h_{j,k}\)</span> for <span class="math notranslate nohighlight">\(j &lt; k-1\)</span> are zero.</p>
+<p>The summation therefore collapses from <span class="math notranslate nohighlight">\(k\)</span> terms to just two, yielding the famous <strong>Lanczos three-term recurrence</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+\beta_k \boldsymbol{q}_{k+1} = A \boldsymbol{q}_k - \alpha_k \boldsymbol{q}_k - \beta_{k-1} \boldsymbol{q}_{k-1}
+\]</div>
+<section id="another-derivation-of-the-three-term-recurrence">
+<h3>Another Derivation of the Three-Term Recurrence<a class="headerlink" href="#another-derivation-of-the-three-term-recurrence" title="Link to this heading">#</a></h3>
+<p>Another way to derive the three-term recurrence is to start from the Arnoldi relation and use symmetry directly. We start with:</p>
+<div class="math notranslate nohighlight">
+\[
+A q_k = \sum_{j=1}^{k+1} h_{j,k} q_j
+\]</div>
+<p>Take a dot product with <span class="math notranslate nohighlight">\(q_i\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+q_i^T A q_k = \sum_{j=1}^{k+1} h_{j,k} q_i^T q_j = h_{i,k}
+\]</div>
+<p>Using symmetry of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+q_i^T A q_k = (A q_i)^T q_k
+\]</div>
+<p>However <span class="math notranslate nohighlight">\(A q_i \in \text{span}\{q_1, \dots, q_{i+1}\}\)</span>, so <span class="math notranslate nohighlight">\(q_k\)</span> is orthogonal to <span class="math notranslate nohighlight">\(A q_i\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>. Thus <span class="math notranslate nohighlight">\(q_i^T A q_k = 0\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>, which implies <span class="math notranslate nohighlight">\(h_{i,k} = 0\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>. This leads us again to the three-term recurrence.</p>
+</section>
+</section>
+<section id="lanczos-algorithm">
+<h2>Lanczos Algorithm<a class="headerlink" href="#lanczos-algorithm" title="Link to this heading">#</a></h2>
+<p>Let’s assemble this into the algorithm. The Python implementation of the Lanczos iteration is as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">lanczos</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Lanczos iteration for symmetric matrix A.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    A: n x n symmetric matrix</span>
+<span class="sd">    b: starting vector (will be normalized)</span>
+<span class="sd">    m: number of iterations</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    T: m x m tridiagonal matrix</span>
+<span class="sd">    Q: n x m matrix with orthonormal columns (optional, for Ritz vectors)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="c1"># Initialize</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">q_prev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">beta_prev</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="n">Q</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
+        
+        <span class="c1"># Matrix-vector product</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">q</span>
+        
+        <span class="c1"># Compute diagonal entry</span>
+        <span class="n">alpha</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">v</span>
+        
+        <span class="c1"># Three-term recurrence</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">beta_prev</span> <span class="o">*</span> <span class="n">q_prev</span>
+        
+        <span class="c1"># Compute off-diagonal entry</span>
+        <span class="n">beta_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        
+        <span class="c1"># Check for invariant subspace</span>
+        <span class="k">if</span> <span class="n">beta_k</span> <span class="o">&lt;</span> <span class="mf">1e-12</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">break</span>
+        
+        <span class="c1"># Update for next iteration</span>
+        <span class="n">q_prev</span> <span class="o">=</span> <span class="n">q</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">beta_k</span>
+        <span class="n">beta_prev</span> <span class="o">=</span> <span class="n">beta_k</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">beta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta_k</span>
+    
+    <span class="c1"># Construct tridiagonal matrix T</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">beta</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">beta</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">T</span><span class="p">,</span> <span class="n">Q</span>
+</pre></div>
+</div>
+<p>The eigenvalues of the tridiagonal matrix <span class="math notranslate nohighlight">\(T_m\)</span> are the <strong>Ritz values</strong>, which approximate the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. The corresponding eigenvectors of <span class="math notranslate nohighlight">\(T_m\)</span> can be used to compute the associated <strong>Ritz vectors</strong>, which approximate the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</section>
+<section id="lanczos-vs-arnoldi-a-comparison">
+<h2>Lanczos vs. Arnoldi: A Comparison<a class="headerlink" href="#lanczos-vs-arnoldi-a-comparison" title="Link to this heading">#</a></h2>
+<p>The transition from Arnoldi to Lanczos is not merely an aesthetic simplification; it represents one of the most significant performance gains in numerical methods. The cost of running for <span class="math notranslate nohighlight">\(k\)</span> iterations is dominated by two components: matrix-vector products and the vector orthogonalization steps. For a sparse matrix <span class="math notranslate nohighlight">\(A\)</span> where the number of non-zero entries, <span class="math notranslate nohighlight">\(\text{nnz}(A)\)</span>, is on the order of <span class="math notranslate nohighlight">\(n\)</span>, the costs are summarized below.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Cost Component</p></th>
+<th class="head text-left"><p>Arnoldi Iteration (General <span class="math notranslate nohighlight">\(A\)</span>)</p></th>
+<th class="head text-left"><p>Lanczos Iteration (Symmetric <span class="math notranslate nohighlight">\(A\)</span>)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Matrix-Vector Products</strong> <br/> (Total for <span class="math notranslate nohighlight">\(k\)</span> iterations)</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(k \cdot \text{nnz}(A))\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(k \cdot \text{nnz}(A))\)</span></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Vector Operations</strong> <br/> (Total for <span class="math notranslate nohighlight">\(k\)</span> iterations)</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(k^2 n)\)</span> <br/> <em>Orthogonalization against all <span class="math notranslate nohighlight">\(j-1\)</span> previous vectors at iteration <span class="math notranslate nohighlight">\(j\)</span></em></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(kn)\)</span> <br/> <em>Operations involve only the 2 previous vectors at each iteration</em></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Storage Requirement</strong></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(kn)\)</span> <br/> <em>Must store the entire basis <span class="math notranslate nohighlight">\(Q_k\)</span></em></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n)\)</span> <br/> <em>Only needs to store the two most recent vectors</em></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Total Asymptotic Cost</strong> <br/> (for sparse <span class="math notranslate nohighlight">\(A\)</span>)</p></td>
+<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(k^2 n)\)</span></strong></p></td>
+<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(kn)\)</span></strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>As the table shows, the cost of Lanczos scales linearly with the number of iterations, whereas Arnoldi scales quadratically. This makes the <strong>Lanczos algorithm dramatically more efficient</strong>, allowing for many more iterations to be run to achieve convergence, which is essential when dealing with the massive matrices found in modern scientific computing.</p>
+</section>
+<section id="a-practical-caveat-loss-of-orthogonality">
+<h2>A Practical Caveat: Loss of Orthogonality<a class="headerlink" href="#a-practical-caveat-loss-of-orthogonality" title="Link to this heading">#</a></h2>
+<p>In theory, the Lanczos vectors <span class="math notranslate nohighlight">\(\boldsymbol{q}_j\)</span> are perfectly orthogonal. However, in finite-precision arithmetic, rounding errors accumulate, and the orthogonality among the vectors degrades over time. Specifically, <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> tends to lose orthogonality with the first few vectors <span class="math notranslate nohighlight">\(\boldsymbol{q}_j\)</span> whose corresponding Ritz vector components are converging.</p>
+<p>This loss of orthogonality is a famous and subtle feature of the algorithm. It manifests as the appearance of multiple copies (“ghosts”) of already-converged eigenvalues in the spectrum of <span class="math notranslate nohighlight">\(T_m\)</span>. While this can be problematic, it can also be managed. Techniques like <em>full reorthogonalization</em> (which makes the algorithm as expensive as Arnoldi) or more practical <em>selective reorthogonalization</em> can be employed to maintain orthogonality where it matters most. For many applications, particularly finding the largest or smallest eigenvalues, the unmodified Lanczos algorithm is remarkably effective despite this issue.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="arnoldi_convergence.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Convergence of the Arnoldi Process</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="lanczos_convergence.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Convergence of the Lanczos Process</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-hessenberg-to-tridiagonal">From Hessenberg to Tridiagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-term-recurrence">The Three-Term Recurrence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#another-derivation-of-the-three-term-recurrence">Another Derivation of the Three-Term Recurrence</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-algorithm">Lanczos Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-vs-arnoldi-a-comparison">Lanczos vs. Arnoldi: A Comparison</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-practical-caveat-loss-of-orthogonality">A Practical Caveat: Loss of Orthogonality</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Arnoldi Iteration &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Arnoldi Process &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -63,8 +63,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'content/arnoldi_iteration';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="License for this book" href="LICENSE.html" />
-    <link rel="prev" title="The Core Idea: Projection onto Krylov Subspaces" href="krylov_subspaces.html" />
+    <link rel="next" title="Convergence of the Arnoldi Process" href="arnoldi_convergence.html" />
+    <link rel="prev" title="Projection onto Krylov Subspaces" href="krylov_subspaces.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -236,8 +236,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">The Core Idea: Projection onto Krylov Subspaces</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Arnoldi Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -379,7 +383,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Arnoldi Iteration</h1>
+    <h1>The Arnoldi Process</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -403,14 +407,14 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="the-arnoldi-iteration">
-<h1>The Arnoldi Iteration<a class="headerlink" href="#the-arnoldi-iteration" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-arnoldi-process">
+<h1>The Arnoldi Process<a class="headerlink" href="#the-arnoldi-process" title="Link to this heading">#</a></h1>
 <p>Previously, we introduced the core idea of the Arnoldi iteration: a numerically stable process to build an orthonormal basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> for the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k(A, q_1)\)</span>. This process simultaneously generates a <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix <span class="math notranslate nohighlight">\(H_k = Q_k^T A Q_k\)</span>.</p>
 <p>Now, we will formalize this algorithm and show precisely why the eigenvalues of <span class="math notranslate nohighlight">\(H_k\)</span> are good approximations for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 <section id="the-arnoldi-algorithm">
 <h2>The Arnoldi Algorithm<a class="headerlink" href="#the-arnoldi-algorithm" title="Link to this heading">#</a></h2>
 <p>The algorithm is an iterative application of the Modified Gram-Schmidt process. Starting with a chosen unit vector <span class="math notranslate nohighlight">\(q_1\)</span>, we generate <span class="math notranslate nohighlight">\(q_2, q_3, \dots, q_k\)</span> one by one.</p>
-<p><strong>Algorithm 5.1: The Arnoldi Iteration</strong></p>
+<p><strong>Algorithm: The Arnoldi Iteration</strong></p>
 <ul class="simple">
 <li><p><strong>Input:</strong> A matrix <span class="math notranslate nohighlight">\(A\)</span>, a number of steps <span class="math notranslate nohighlight">\(k\)</span>, and a starting vector <span class="math notranslate nohighlight">\(q_1\)</span> with <span class="math notranslate nohighlight">\(\|q_1\|_2 = 1\)</span>.</p></li>
 <li><p><strong>Output:</strong> <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> with orthonormal columns and a <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix <span class="math notranslate nohighlight">\(H_k\)</span> with entries <span class="math notranslate nohighlight">\(h_{ij}\)</span>.</p></li>
@@ -566,15 +570,15 @@ A u_j - \theta_j u_j = h_{k+1,k} (y_j)_k q_{k+1}
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Core Idea: Projection onto Krylov Subspaces</p>
+        <p class="prev-next-title">Projection onto Krylov Subspaces</p>
       </div>
     </a>
     <a class="right-next"
-       href="LICENSE.html"
+       href="arnoldi_convergence.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">License for this book</p>
+        <p class="prev-next-title">Convergence of the Arnoldi Process</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

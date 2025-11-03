@@ -236,8 +236,12 @@
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">The Core Idea: Projection onto Krylov Subspaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -494,7 +498,7 @@ document.write(`
 <p>A more general analysis considers using the method to find the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues (i.e., <span class="math notranslate nohighlight">\(Q_k\)</span> is an <span class="math notranslate nohighlight">\(n \times p\)</span> matrix). We can partition the true Schur decomposition as:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-U = [U_1 ; U_2], \quad T = \begin{bmatrix} T_{11} &amp; T_{12} \\ 0 &amp; T_{22} \end{bmatrix},
+U = [U_1, U_2], \quad T = \begin{bmatrix} T_{11} &amp; T_{12} \\ 0 &amp; T_{22} \end{bmatrix},
 \end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(U_1\)</span> contains the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors and <span class="math notranslate nohighlight">\(T_{11}\)</span> contains the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues.</p>
 <p>The key convergence results are as follows:</p>
@@ -787,7 +791,7 @@ Y_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}\end{split}\]</div>
 \[
 T_k = Y_k^H T Y_k
 = (I+E_k^H E_k)^{-\tfrac12}
-\Big(T_{11} + T_{12}E_k + E_k^H T_{12}^H + E_k^H T_{22}E_k\Big)
+\Big(T_{11} + T_{12}E_k + E_k^H T_{22}E_k\Big)
 (I+E_k^H E_k)^{-\tfrac12}.
 \]</div>
 <p>Hence</p>
@@ -873,7 +877,7 @@ T_k \;=\; T_{11} + \Delta_k,
 <p>such that</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\langle u_i, v_j \rangle =
+u_i^H \, v_j =
 \begin{cases}
 \cos(\theta_i), &amp; \text{if } i = j, \\
 0, &amp; \text{if } i \ne j.
@@ -899,10 +903,10 @@ T_k \;=\; T_{11} + \Delta_k,
 \[
 \|P_{\mathcal U}-P_{\mathcal V}\|=\|\sin\Theta\|.
 \]</div>
-<p>Finally, if <span class="math notranslate nohighlight">\(\theta_{\max}&lt;\tfrac{\pi}{2}\)</span> (equivalently <span class="math notranslate nohighlight">\(U^*V\)</span> is invertible), then</p>
+<p>Finally, if <span class="math notranslate nohighlight">\(\theta_{\max}&lt;\tfrac{\pi}{2}\)</span> (equivalently <span class="math notranslate nohighlight">\(U^H V\)</span> is invertible), then</p>
 <div class="math notranslate nohighlight">
 \[
-\|\tan\Theta\|=\|\,P_{\mathcal U^\perp}P_{\mathcal V}(P_{\mathcal U}P_{\mathcal V})^{-1}\|.
+\|\tan\Theta\| = \| \, P_{\mathcal U^\perp} V (U^H V)^{-1}\|.
 \]</div>
 <p>In particular, <span class="math notranslate nohighlight">\(\sin \Theta\)</span> and <span class="math notranslate nohighlight">\(\tan \Theta\)</span> provide quantitative measures of the distance or “gap” between the two subspaces.</p>
 </section>
