@@ -404,7 +404,8 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-the-qr-factorization">Cost of the QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-per-step-step-k">Cost per Step (Step <span class="math notranslate nohighlight">\(k\)</span>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#total-cost">Total Cost</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-using-the-factors">Cost of Using the Factors</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-costs">Summary of Costs</a></li>
 </ul>
@@ -537,28 +538,37 @@ Q^T b = (Q_n \dots Q_2 Q_1)b
 </section>
 <section id="computational-cost">
 <h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
-<p>Let’s analyze in more details the computational cost of the Householder QR algorithm. Understanding the cost, measured in floating-point operations (flops), is essential for comparing algorithms and predicting their performance. We’ll consider an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, typically with <span class="math notranslate nohighlight">\(m \ge n\)</span>.</p>
-<p>A “flop” here refers to one addition and one multiplication.</p>
-<section id="cost-of-the-qr-factorization">
-<h3>Cost of the QR Factorization<a class="headerlink" href="#cost-of-the-qr-factorization" title="Link to this heading">#</a></h3>
-<p>The factorization process involves applying <span class="math notranslate nohighlight">\(n\)</span> successive Householder transformations, <span class="math notranslate nohighlight">\(Q_1, Q_2, \dots, Q_n\)</span>, to the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[A \rightarrow Q_1 A \rightarrow Q_2 (Q_1 A) \rightarrow \dots \rightarrow R\]</div>
-<p>Let’s look at the cost of a single step, say step <span class="math notranslate nohighlight">\(k\)</span>. At this stage, we have already introduced zeros in the first <span class="math notranslate nohighlight">\(k-1\)</span> columns. We are now working on an <span class="math notranslate nohighlight">\((m-k+1) \times (n-k+1)\)</span> submatrix. Applying the Householder transformation <span class="math notranslate nohighlight">\(Q_k\)</span> to this submatrix requires approximately: <span class="math notranslate nohighlight">\(2(m-k+1)(n-k+1)\)</span> flops.</p>
+<p>Let’s analyze the computational cost, measured in floating-point operations (flops). Here a “flop” typically refers to one floating-point operation (an addition, subtraction, or multiplication). Note that it is also common to count Mult+Add as one operation, but we will count them separately here.</p>
+<section id="cost-per-step-step-k">
+<h3>Cost per Step (Step <span class="math notranslate nohighlight">\(k\)</span>)<a class="headerlink" href="#cost-per-step-step-k" title="Link to this heading">#</a></h3>
+<p>At step <span class="math notranslate nohighlight">\(k\)</span>, we are applying a Householder transformation to an <span class="math notranslate nohighlight">\((m-k+1) \times (n-k+1)\)</span> submatrix. Let <span class="math notranslate nohighlight">\(m' = m-k+1\)</span> and <span class="math notranslate nohighlight">\(n' = n-k+1\)</span>.</p>
+<p>The update <span class="math notranslate nohighlight">\(A' \leftarrow (I - \beta \mathbf{v}\mathbf{v}^T) A'\)</span> is computed as:</p>
+<ol class="arabic simple">
+<li><p><strong><span class="math notranslate nohighlight">\(\mathbf{w}^T = \mathbf{v}^T A'\)</span></strong> (vector-matrix product): This requires <span class="math notranslate nohighlight">\(m'n'\)</span> multiplications and <span class="math notranslate nohighlight">\(m'(n'-1) \approx m'n'\)</span> additions.</p>
+<ul class="simple">
+<li><p><em>Cost: <span class="math notranslate nohighlight">\(\approx 2m'n' \text{ flops}\)</span></em></p></li>
+</ul>
+</li>
+<li><p><strong><span class="math notranslate nohighlight">\(A' \leftarrow A' - (\beta \mathbf{v})\mathbf{w}^T\)</span></strong> (outer product update): This requires <span class="math notranslate nohighlight">\(m'n'\)</span> multiplications (to form <span class="math notranslate nohighlight">\(\beta \mathbf{v}\mathbf{w}^T\)</span>) and <span class="math notranslate nohighlight">\(m'n'\)</span> subtractions.</p>
+<ul class="simple">
+<li><p><em>Cost: <span class="math notranslate nohighlight">\(\approx 2m'n' \text{ flops}\)</span></em></p></li>
+</ul>
+</li>
+</ol>
+<p>The total cost at step <span class="math notranslate nohighlight">\(k\)</span> is the sum of these, which is approximately <span class="math notranslate nohighlight">\(\mathbf{4(m-k+1)(n-k+1)}\)</span> <strong>flops</strong>.</p>
+</section>
+<section id="total-cost">
+<h3>Total Cost<a class="headerlink" href="#total-cost" title="Link to this heading">#</a></h3>
 <p>To find the total cost, we sum this from <span class="math notranslate nohighlight">\(k=1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[
-\text{Total Cost} \approx \sum_{k=1}^{n} 2(m-k+1)(n-k+1) \text{ flops}
-\]</div>
-<p>We can approximate this sum with an integral for large <span class="math notranslate nohighlight">\(m\)</span> and <span class="math notranslate nohighlight">\(n\)</span>, which gives the following result:</p>
+\[\text{Total Cost } \approx \sum_{k=1}^{n} 4(m-k+1)(n-k+1) \text{ flops}\]</div>
+<p>We can approximate this sum with an integral. We get:</p>
 <div class="math notranslate nohighlight">
-\[
-\text{Cost}(A=QR) \approx 2mn^2 - \frac{2}{3}n^3 \text{ flops}
-\]</div>
+\[\text{Cost}(A=QR) \approx 2 \times \left( mn^2 - \frac{1}{3}n^3 \right) = \mathbf{2mn^2 - \frac{2}{3}n^3} \text{ flops}\]</div>
 <p><strong>Two important special cases emerge from this formula:</strong></p>
 <ol class="arabic simple">
-<li><p><strong>Square Matrix (<span class="math notranslate nohighlight">\(m=n\)</span>)</strong>: The cost is <span class="math notranslate nohighlight">\(\approx 2n^3 - \frac{2}{3}n^3 = \frac{4}{3}n^3\)</span> flops. This is about twice the cost of performing an LU factorization, which is <span class="math notranslate nohighlight">\(\frac{2}{3}n^3\)</span>. Stability comes at a price! 💰</p></li>
-<li><p><strong>Tall and Skinny Matrix (<span class="math notranslate nohighlight">\(m \gg n\)</span>)</strong>: The <span class="math notranslate nohighlight">\(2mn^2\)</span> term dominates, and the cost is approximately <span class="math notranslate nohighlight">\(2mn^2\)</span> flops. This is the most common scenario in data analysis and least-squares problems.</p></li>
+<li><p><strong>Square Matrix (<span class="math notranslate nohighlight">\(m=n\)</span>):</strong> The cost is <span class="math notranslate nohighlight">\(\approx 2n^3 - \frac{2}{3}n^3 = \mathbf{\frac{4}{3}n^3}\)</span> flops. This is about twice the cost of performing an LU factorization, which is <span class="math notranslate nohighlight">\(\frac{2}{3}n^3\)</span> flops.</p></li>
+<li><p><strong>Tall and Skinny Matrix (<span class="math notranslate nohighlight">\(m \gg n\)</span>):</strong> The <span class="math notranslate nohighlight">\(2mn^2\)</span> term dominates, and the cost is approximately <span class="math notranslate nohighlight">\(\mathbf{2mn^2}\)</span> flops.</p></li>
 </ol>
 </section>
 <section id="cost-of-using-the-factors">
@@ -678,7 +688,8 @@ Q^T b = (Q_n \dots Q_2 Q_1)b
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-the-qr-factorization">Cost of the QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-per-step-step-k">Cost per Step (Step <span class="math notranslate nohighlight">\(k\)</span>)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#total-cost">Total Cost</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-using-the-factors">Cost of Using the Factors</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-costs">Summary of Costs</a></li>
 </ul>
