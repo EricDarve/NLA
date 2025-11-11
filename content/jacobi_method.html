@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Class Notes 2025 &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>The Jacobi Iteration Method &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,10 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/intro';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/jacobi_method';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Linear Algebra Bootcamp" href="bootcamp.html" />
+    <link rel="next" title="The Gauss-Seidel Iteration Method" href="gauss_seidel_method.html" />
+    <link rel="prev" title="Splitting Methods and Convergence Theory" href="splitting_methods_definition.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,8 +127,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -146,7 +145,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -171,13 +170,13 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
                     Class Notes 2025
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
@@ -245,9 +244,9 @@
 <li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="classical_iterative_methods.html">Classical Iterative Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="classical_iterative_methods.html">Classical Iterative Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jacobi_method.html">The Jacobi Iteration Method</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Jacobi Iteration Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sor_method.html">Successive Over-Relaxation (SOR) Method</a></li>
 </ul>
@@ -307,7 +306,7 @@
       
       
       
-      <li><a href="../_sources/content/intro.md" target="_blank"
+      <li><a href="../_sources/content/jacobi_method.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -378,7 +377,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -389,11 +390,26 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Class Notes 2025</h1>
+    <h1>The Jacobi Iteration Method</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-splitting-and-iteration">Defining the Splitting and Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-parallelism">Implementation and Parallelism</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-criteria">Convergence Criteria</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonal-dominance-condition">Diagonal Dominance Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-considerations">Practical Considerations</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -403,18 +419,129 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="class-notes-2025">
-<h1>Class Notes 2025<a class="headerlink" href="#class-notes-2025" title="Link to this heading">#</a></h1>
-<p>These are class notes for the Numerical Linear Algebra course at Stanford University, Spring 2025. The course is taught by <a class="reference external" href="https://profiles.stanford.edu/eric-darve">Eric Darve</a>.</p>
-<!-- - [[QR factorization and least-squares]]
-- [[Computing eigenvalues]]
-- [[Iterative methods for eigenvalue computation]]
-- [[Classical iterative methods to solve sparse linear systems]]
-- [[Krylov iterative methods to solve sparse linear systems]] -->
-<p>Book: <a class="reference external" href="https://epubs.siam.org/doi/book/10.1137/1.9781611976557">Numerical Linear Algebra with Julia</a>, Darve and Wootters; <a class="reference external" href="https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545">Amazon</a>, <a class="reference external" href="https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ">Google Books</a></p>
-<p><a href="https://github.com/EricDarve/NLA">Edit on GitHub</a></p>
-<div class="toctree-wrapper compound">
+  <section class="tex2jax_ignore mathjax_ignore" id="the-jacobi-iteration-method">
+<h1>The Jacobi Iteration Method<a class="headerlink" href="#the-jacobi-iteration-method" title="Link to this heading">#</a></h1>
+<p>The Jacobi iteration, proposed by Carl Gustav Jacob Jacobi in 1845, is the <strong>simplest</strong> of the stationary iterative methods for solving large sparse linear systems <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. It serves as an excellent foundational example of a splitting method.</p>
+<section id="defining-the-splitting-and-iteration">
+<h2>Defining the Splitting and Iteration<a class="headerlink" href="#defining-the-splitting-and-iteration" title="Link to this heading">#</a></h2>
+<p>Recall that in a splitting method, we decompose the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A = M - N\)</span>, where <span class="math notranslate nohighlight">\(M\)</span> is easily invertible. The iterative step is defined by <span class="math notranslate nohighlight">\(M \mathbf{x}^{(k+1)} = \mathbf{b} + N \mathbf{x}^{(k)}\)</span>.</p>
+<p>For the Jacobi method, we define the splitting based on the diagonal, strictly lower triangular, and strictly upper triangular parts of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[A = D - L - U\]</div>
+<p>where <span class="math notranslate nohighlight">\(D = \text{diag}(A)\)</span> is the diagonal matrix of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(-L\)</span> is the strictly lower triangular part, and <span class="math notranslate nohighlight">\(-U\)</span> is the strictly upper triangular part.</p>
+<p>The Jacobi method uses <span class="math notranslate nohighlight">\(M = D\)</span> and <span class="math notranslate nohighlight">\(N = L + U\)</span>. Substituting these into the general splitting framework yields the Jacobi iteration:</p>
+<div class="math notranslate nohighlight">
+\[D \mathbf{x}^{(k+1)} = \mathbf{b} + (L+U) \mathbf{x}^{(k)} \quad \text{}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(D\)</span> is a diagonal matrix, <span class="math notranslate nohighlight">\(D^{-1}\)</span> is trivial to compute, and the iteration can be explicitly written as a fixed-point iteration:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{x}^{(k+1)} = D^{-1} (L+U) \mathbf{x}^{(k)} + D^{-1} \mathbf{b} \quad \text{}\]</div>
+<p>We define the Jacobi iteration matrix (or tensor) as <span class="math notranslate nohighlight">\(G = R_J = D^{-1}(L+U)\)</span> and the constant vector <span class="math notranslate nohighlight">\(\mathbf{c}_J = D^{-1}\mathbf{b}\)</span>. The iterative scheme then takes the standard stationary form:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{x}^{(k+1)} = G \mathbf{x}^{(k)} + \mathbf{c}_J \quad \text{}\]</div>
+<p>In component form, this updates each entry <span class="math notranslate nohighlight">\(x_i\)</span> using the previous iteration’s values for all other components:</p>
+<div class="math notranslate nohighlight">
+\[x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij} x_j^{(k)} \right) \quad \text{}\]</div>
+<p>Note that this method requires the diagonal entries <span class="math notranslate nohighlight">\(a_{ii}\)</span> to be nonzero.</p>
+</section>
+<section id="python-code-example">
+<h2>Python Code Example<a class="headerlink" href="#python-code-example" title="Link to this heading">#</a></h2>
+<p>Here is a simple implementation of the Jacobi method in Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">jacobi</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the linear system Ax = b using the Jacobi iteration method.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    A : ndarray</span>
+<span class="sd">        Coefficient matrix (n x n)</span>
+<span class="sd">    b : ndarray</span>
+<span class="sd">        Right-hand side vector (n,)</span>
+<span class="sd">    x0 : ndarray, optional</span>
+<span class="sd">        Initial guess (n,). If None, uses zero vector.</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Tolerance for convergence (default: 1e-10)</span>
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">        Maximum number of iterations (default: 1000)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        Approximate solution vector</span>
+<span class="sd">    iterations : int</span>
+<span class="sd">        Number of iterations performed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    
+    <span class="c1"># Extract diagonal D and off-diagonal (L + U)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+    <span class="n">LU</span> <span class="o">=</span> <span class="n">A</span> <span class="o">-</span> <span class="n">D</span>
+    <span class="n">D_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+        <span class="c1"># x^(k+1) = D^(-1) * (b + (L+U) * x^(k))</span>
+        <span class="n">x_new</span> <span class="o">=</span> <span class="n">D_inv</span> <span class="o">@</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">LU</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span>
+        
+        <span class="c1"># Check convergence</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x_new</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: Maximum iterations (</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">) reached without convergence&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_iter</span>
+</pre></div>
 </div>
+</section>
+<section id="implementation-and-parallelism">
+<h2>Implementation and Parallelism<a class="headerlink" href="#implementation-and-parallelism" title="Link to this heading">#</a></h2>
+<p>A key attraction of the Jacobi method is its <strong>ease of implementation and high parallelism</strong>.</p>
+<p>Because the matrix <span class="math notranslate nohighlight">\(D\)</span> is diagonal (or block diagonal), the computation of all components of <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> can be performed <strong>independently and concurrently</strong>. This characteristic has led to the Jacobi method also being referred to as <strong>simultaneous iteration</strong>.</p>
+<p>For massively parallel machines, the Jacobi method is appealing because the operation <span class="math notranslate nohighlight">\(D \mathbf{x}^{(k+1)} = \mathbf{b} + (L+U) \mathbf{x}^{(k)}\)</span> is highly parallelized. This contrasts with methods like Gauss-Seidel, where component updates are sequential due to the dependency on newly computed values within the current iteration.</p>
+</section>
+<section id="convergence-criteria">
+<h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Link to this heading">#</a></h2>
+<p>As with any splitting method, the Jacobi iteration converges for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span> if and only if the <strong>spectral radius</strong> of the iteration matrix <span class="math notranslate nohighlight">\(\rho(G)\)</span> is less than one.</p>
+<p>We rely on the matrix properties to guarantee this condition:</p>
+<section id="diagonal-dominance-condition">
+<h3>Diagonal Dominance Condition<a class="headerlink" href="#diagonal-dominance-condition" title="Link to this heading">#</a></h3>
+<div class="proof theorem admonition" id="thm:jacobi_convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 31 </span> (Convergence of the Jacobi Method)</p>
+<section class="theorem-content" id="proof-content">
+<p>The Jacobi iteration is guaranteed to converge if the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>strictly row diagonally dominant</strong>:</p>
+<div class="math notranslate nohighlight">
+\[|a_{ii}| &gt; \sum_{j \neq i} |a_{ij}| \text{ for all } i \quad \text{}\]</div>
+<p>A similar result holds if <span class="math notranslate nohighlight">\(A\)</span> is <strong>strictly column diagonally dominant</strong>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. If <span class="math notranslate nohighlight">\(A\)</span> is strictly row diagonally dominant, we can prove convergence using the operator <span class="math notranslate nohighlight">\(\infty\)</span>-norm:</p>
+<ol class="arabic simple">
+<li><p>The iteration matrix is <span class="math notranslate nohighlight">\(G = D^{-1}(L+U)\)</span>.</p></li>
+<li><p>The <span class="math notranslate nohighlight">\(\infty\)</span>-norm of <span class="math notranslate nohighlight">\(G\)</span> is given by <span class="math notranslate nohighlight">\(\|G\|_{\infty} = \max_i \sum_{j \neq i} |a_{ij}| / |a_{ii}|\)</span>.</p></li>
+<li><p>Strict row diagonal dominance implies <span class="math notranslate nohighlight">\(\|G\|_{\infty} &lt; 1\)</span>.</p></li>
+<li><p>Since the spectral radius <span class="math notranslate nohighlight">\(\rho(G)\)</span> is bounded by any matrix norm, <span class="math notranslate nohighlight">\(\rho(G) \le \|G\|_{\infty}\)</span>, convergence is assured because <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>.</p></li>
+</ol>
+<p>For column diagonally dominant matrices, convergence can be shown similarly using the matrix 1-norm, which confirms that <span class="math notranslate nohighlight">\(\|G^k\|_1 \to 0\)</span>.</p>
+<p><strong>Convergence Proof using the Gershgorin Circle Theorem</strong></p>
+<p>The Gershgorin Circle Theorem provides an alternative way to establish convergence under diagonal dominance:</p>
+<ol class="arabic simple">
+<li><p>Any eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> of an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(G\)</span> lies within at least one of the Gershgorin discs. The <span class="math notranslate nohighlight">\(i\)</span>-th disc is centered at <span class="math notranslate nohighlight">\(g_{ii}\)</span> with radius <span class="math notranslate nohighlight">\(R_i = \sum_{j \neq i} |g_{ij}|\)</span>.</p></li>
+<li><p>For the Jacobi iteration matrix <span class="math notranslate nohighlight">\(G = D^{-1}(L+U)\)</span>, the diagonal entries are <span class="math notranslate nohighlight">\(g_{ii} = 0\)</span>.</p></li>
+<li><p>The radius of the <span class="math notranslate nohighlight">\(i\)</span>-th disc for <span class="math notranslate nohighlight">\(G\)</span> is <span class="math notranslate nohighlight">\(R_i = \sum_{j \neq i} |a_{ij}/a_{ii}|\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is strictly diagonally dominant, <span class="math notranslate nohighlight">\(R_i &lt; 1\)</span> for all <span class="math notranslate nohighlight">\(i\)</span>.</p></li>
+<li><p>Since the center of every disc is 0 and all discs have radii less than 1, all eigenvalues <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(G\)</span> must satisfy <span class="math notranslate nohighlight">\(|\lambda| &lt; 1\)</span>.</p></li>
+<li><p>This ensures that the spectral radius <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>, and thus the Jacobi iteration converges for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span>.</p></li>
+</ol>
+</div>
+</section>
+</section>
+<section id="practical-considerations">
+<h2>Practical Considerations<a class="headerlink" href="#practical-considerations" title="Link to this heading">#</a></h2>
+<p>The Jacobi method provides a crucial entry point into iterative solvers, demonstrating the fundamental trade-off between simplicity/parallelism and convergence speed.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -447,12 +574,21 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="splitting_methods_definition.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Splitting Methods and Convergence Theory</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="bootcamp.html"
+       href="gauss_seidel_method.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Linear Algebra Bootcamp</p>
+        <p class="prev-next-title">The Gauss-Seidel Iteration Method</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -462,6 +598,28 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-splitting-and-iteration">Defining the Splitting and Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-parallelism">Implementation and Parallelism</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-criteria">Convergence Criteria</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonal-dominance-condition">Diagonal Dominance Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-considerations">Practical Considerations</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Class Notes 2025 &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Classical Iterative Methods &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,10 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/intro';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/classical_iterative_methods';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Linear Algebra Bootcamp" href="bootcamp.html" />
+    <link rel="next" title="Splitting Methods and Convergence Theory" href="splitting_methods_definition.html" />
+    <link rel="prev" title="Convergence of the Lanczos Process" href="lanczos_convergence.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -126,8 +127,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -146,7 +145,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="intro.html">
   
   
   
@@ -171,13 +170,13 @@
     <div class="bd-toc-item navbar-nav active">
         
         <ul class="nav bd-sidenav bd-sidenav__home-link">
-            <li class="toctree-l1 current active">
-                <a class="reference internal" href="#">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
                     Class Notes 2025
                 </a>
             </li>
         </ul>
-        <ul class="nav bd-sidenav">
+        <ul class="current nav bd-sidenav">
 <li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
@@ -245,7 +244,7 @@
 <li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="classical_iterative_methods.html">Classical Iterative Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Classical Iterative Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="jacobi_method.html">The Jacobi Iteration Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
@@ -307,7 +306,7 @@
       
       
       
-      <li><a href="../_sources/content/intro.md" target="_blank"
+      <li><a href="../_sources/content/classical_iterative_methods.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -378,7 +377,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -389,11 +390,26 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Class Notes 2025</h1>
+    <h1>Classical Iterative Methods</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-the-problem-with-direct-methods-for-large-sparse-systems">Motivation: The Problem with Direct Methods for Large Sparse Systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-with-lu-and-cholesky-factorization">The Problem with LU and Cholesky Factorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-and-limitations-of-splitting-methods">Advantages and Limitations of Splitting Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages">Advantages</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">Limitations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-cases-applications-and-motivation">Use Cases, Applications, and Motivation</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -403,16 +419,76 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="class-notes-2025">
-<h1>Class Notes 2025<a class="headerlink" href="#class-notes-2025" title="Link to this heading">#</a></h1>
-<p>These are class notes for the Numerical Linear Algebra course at Stanford University, Spring 2025. The course is taught by <a class="reference external" href="https://profiles.stanford.edu/eric-darve">Eric Darve</a>.</p>
-<!-- - [[QR factorization and least-squares]]
-- [[Computing eigenvalues]]
-- [[Iterative methods for eigenvalue computation]]
-- [[Classical iterative methods to solve sparse linear systems]]
-- [[Krylov iterative methods to solve sparse linear systems]] -->
-<p>Book: <a class="reference external" href="https://epubs.siam.org/doi/book/10.1137/1.9781611976557">Numerical Linear Algebra with Julia</a>, Darve and Wootters; <a class="reference external" href="https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545">Amazon</a>, <a class="reference external" href="https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ">Google Books</a></p>
-<p><a href="https://github.com/EricDarve/NLA">Edit on GitHub</a></p>
+  <section class="tex2jax_ignore mathjax_ignore" id="classical-iterative-methods">
+<h1>Classical Iterative Methods<a class="headerlink" href="#classical-iterative-methods" title="Link to this heading">#</a></h1>
+<p>Splitting methods form the basis of a fundamental class of <strong>stationary iterative methods</strong> used to solve linear systems <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. A stationary iterative method generates a sequence of iterates <span class="math notranslate nohighlight">\(\mathbf{x}^{(k)}\)</span> converging to the solution <span class="math notranslate nohighlight">\(\mathbf{x} = A^{-1}\mathbf{b}\)</span>, where the calculation of <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> from <span class="math notranslate nohighlight">\(\mathbf{x}^{(k)}\)</span> is computationally inexpensive.</p>
+<p>A splitting method begins by decomposing the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> into the difference of two matrices, <span class="math notranslate nohighlight">\(M\)</span> and <span class="math notranslate nohighlight">\(N\)</span> (or sometimes <span class="math notranslate nohighlight">\(C\)</span> and <span class="math notranslate nohighlight">\(R\)</span>, or <span class="math notranslate nohighlight">\(M\)</span> and <span class="math notranslate nohighlight">\(K\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[
+A = M - N
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(M\)</span> must be chosen such that it is nonsingular and a linear system involving <span class="math notranslate nohighlight">\(M\)</span> is easily solvable.</p>
+<p>The original equation <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> can then be rewritten as <span class="math notranslate nohighlight">\(M\mathbf{x} = N\mathbf{x} + \mathbf{b}\)</span>. This leads directly to the core iterative step:</p>
+<div class="math notranslate nohighlight">
+\[
+M \mathbf{x}^{(k+1)} = N \mathbf{x}^{(k)} + \mathbf{b}
+\]</div>
+<p>This can alternatively be expressed as:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{x}^{(k+1)} = M^{-1} N \mathbf{x}^{(k)} + M^{-1} \mathbf{b} = R \mathbf{x}^{(k)} + \mathbf{c}.
+\]</div>
+<p>The convergence of these iterative schemes is determined solely by the <strong>spectral radius</strong> of the iteration matrix <span class="math notranslate nohighlight">\(R = M^{-1}N\)</span>. These iterative schemes converge for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> if and only if <span class="math notranslate nohighlight">\(\rho(M^{-1} N) &lt; 1\)</span>.</p>
+<p>Classical splitting methods are defined by specific choices for <span class="math notranslate nohighlight">\(M\)</span>:</p>
+<ul class="simple">
+<li><p><strong>Jacobi Method:</strong> <span class="math notranslate nohighlight">\(M = D\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the diagonal of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>Gauss-Seidel Method:</strong> <span class="math notranslate nohighlight">\(M = D - L\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> is the strictly lower triangular part of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>Successive Over-Relaxation (SOR):</strong> <span class="math notranslate nohighlight">\(M = \frac{1}{\omega}D - L\)</span>, where <span class="math notranslate nohighlight">\(\omega\)</span> is the relaxation parameter. SOR includes Gauss-Seidel as the special case when <span class="math notranslate nohighlight">\(\omega=1\)</span>.</p></li>
+</ul>
+<p>More advanced techniques, like <strong>Chebyshev iteration</strong>, utilize properties of the spectrum of the iteration matrix to accelerate convergence, positioning them as an effective refinement of the basic stationary approach.</p>
+<section id="motivation-the-problem-with-direct-methods-for-large-sparse-systems">
+<h2>Motivation: The Problem with Direct Methods for Large Sparse Systems<a class="headerlink" href="#motivation-the-problem-with-direct-methods-for-large-sparse-systems" title="Link to this heading">#</a></h2>
+<p>Splitting methods and other iterative techniques are essential for solving <strong>large sparse linear systems</strong> (<span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>) because classical <strong>direct solution methods</strong> suffer from catastrophic computational and memory disadvantages in this context.</p>
+</section>
+<section id="the-problem-with-lu-and-cholesky-factorization">
+<h2>The Problem with LU and Cholesky Factorization<a class="headerlink" href="#the-problem-with-lu-and-cholesky-factorization" title="Link to this heading">#</a></h2>
+<p>Direct methods, such as Gaussian elimination leading to LU factorization (or Cholesky factorization for symmetric positive definite matrices), are highly efficient for dense matrices, typically requiring <span class="math notranslate nohighlight">\(O(n^3)\)</span> floating point operations (flops). LU factorization requires <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops, and Cholesky factorization requires <span class="math notranslate nohighlight">\(n^3/3\)</span> flops.</p>
+<p>However, when <span class="math notranslate nohighlight">\(A\)</span> is a <strong>large sparse matrix</strong> (often arising from the discretization of Partial Differential Equations, where the number of non-zero entries may be linear, <span class="math notranslate nohighlight">\(O(n)\)</span>), these direct methods face two critical issues:</p>
+<ol class="arabic simple">
+<li><p><strong>High Computational Cost:</strong> While sparsity helps reduce the <span class="math notranslate nohighlight">\(O(n^3)\)</span> cost, for truly large systems (especially arising from 3D models), the computational expense remains too high. For a band matrix with semi-bandwidth <span class="math notranslate nohighlight">\(w\)</span>, the factorization cost is approximately <span class="math notranslate nohighlight">\(N w^2/2\)</span> flops, where <span class="math notranslate nohighlight">\(N\)</span> is the order of the matrix.</p></li>
+<li><p><strong>Fill-in:</strong> During the factorization process (e.g., <span class="math notranslate nohighlight">\(A=LU\)</span> or <span class="math notranslate nohighlight">\(A=LL^T\)</span>), new non-zero entries (<strong>fill-in</strong>) are often introduced in positions that were originally zero in <span class="math notranslate nohighlight">\(A\)</span>. This fill-in drastically increases the memory required to store the factors <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> and complicates the data structures needed to manage the sparse matrix efficiently. In the context of large-scale problems, the demand for computer storage can become unmanageable.</p></li>
+</ol>
+<p>Because of these limitations, iterative methods are practically mandatory for solving systems arising from modern, complex models, such as three-dimensional PDEs.</p>
+</section>
+<section id="advantages-and-limitations-of-splitting-methods">
+<h2>Advantages and Limitations of Splitting Methods<a class="headerlink" href="#advantages-and-limitations-of-splitting-methods" title="Link to this heading">#</a></h2>
+<p>The splitting approach provides a viable alternative by reformulating the solution process into an iterative sequence:</p>
+<section id="advantages">
+<h3>Advantages<a class="headerlink" href="#advantages" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Exploitation of Sparsity:</strong> Splitting methods naturally exploit the sparsity of <span class="math notranslate nohighlight">\(A\)</span>. Since the primary operation required per iteration is a matrix-vector product (<span class="math notranslate nohighlight">\(N\mathbf{x}^{(k)}\)</span>) and solving a system with <span class="math notranslate nohighlight">\(M\)</span> (<span class="math notranslate nohighlight">\(M\mathbf{x}^{(k+1)} = \dots\)</span>), and <span class="math notranslate nohighlight">\(M\)</span> is chosen to be simple (like diagonal or triangular) and <span class="math notranslate nohighlight">\(N\)</span> may be sparser than <span class="math notranslate nohighlight">\(A\)</span>, the computational work per step is minimal.</p></li>
+<li><p><strong>Computational Simplicity and Parallelism:</strong> These methods are relatively easy to program and require minimal storage (low storage requirement is a main appeal of iterative methods). The updates in methods like Jacobi iteration can often be performed simultaneously or in parallel, making them attractive for parallel computing environments.</p></li>
+<li><p><strong>Flexibility (Preconditioning):</strong> The matrix <span class="math notranslate nohighlight">\(M\)</span> is commonly referred to as the <strong>preconditioning matrix</strong>. The splitting methods themselves, especially in their symmetric variants (SSOR), serve as essential building blocks for more robust and powerful modern techniques, notably the <strong>preconditioned Conjugate Gradient (CG)</strong> method or other Krylov subspace methods.</p></li>
+</ul>
+</section>
+<section id="limitations">
+<h3>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Convergence Rate and Guarantee:</strong> The method may converge very slowly or, potentially, not converge at all (<span class="math notranslate nohighlight">\(\rho(M^{-1}N) \ge 1\)</span>). For example, the Jacobi method is guaranteed to converge only if the matrix is strictly row or column diagonally dominant.</p></li>
+<li><p><strong>Suboptimal Performance:</strong> For sufficiently large problems (<span class="math notranslate nohighlight">\(n\)</span> large), basic splitting methods like Jacobi and SOR are generally inferior in performance to highly advanced methods like Fast Fourier Transform (FFT), block cyclic reduction, and Multigrid.</p></li>
+<li><p><strong>Polynomial Acceleration:</strong> Certain splittings, such as SOR, can lead to iteration matrices where polynomial acceleration (like Chebyshev acceleration) is difficult or yields only minor improvements, especially if the spectrum of the iteration matrix is located on a circle.</p></li>
+</ul>
+</section>
+</section>
+<section id="use-cases-applications-and-motivation">
+<h2>Use Cases, Applications, and Motivation<a class="headerlink" href="#use-cases-applications-and-motivation" title="Link to this heading">#</a></h2>
+<p>Splitting methods are highly motivated by applications that lead to massive, sparse linear systems:</p>
+<ul class="simple">
+<li><p><strong>Discretization of PDEs:</strong> A primary application is solving systems arising from finite difference or finite element discretizations of Partial Differential Equations, particularly elliptic types. In these cases, the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> is typically large and highly sparse, with a well-defined structure (e.g., matrices consisting of a few nonzero diagonals).</p></li>
+<li><p><strong>Preconditioning:</strong> The most significant modern use case for classical splitting methods is as preconditioners. The matrix <span class="math notranslate nohighlight">\(M\)</span> is sought to be a simple, easily invertible approximation of <span class="math notranslate nohighlight">\(A\)</span> such that the preconditioned system <span class="math notranslate nohighlight">\(M^{-1} A \mathbf{x} = M^{-1} \mathbf{b}\)</span> has a much smaller condition number <span class="math notranslate nohighlight">\(\kappa(M^{-1}A)\)</span> than <span class="math notranslate nohighlight">\(\kappa(A)\)</span>. A small condition number leads to fast convergence when combined with Krylov subspace acceleration methods (like Conjugate Gradient or GMRES).</p></li>
+<li><p><strong>Building Blocks for Multilevel Methods:</strong> Basic iterative methods remain relevant as they often serve as “smoothers” within sophisticated multilevel methods like Multigrid, where their simplicity and ability to quickly damp high-frequency error components are leveraged.</p></li>
+</ul>
+</section>
 <div class="toctree-wrapper compound">
 </div>
 </section>
@@ -447,12 +523,21 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="lanczos_convergence.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Convergence of the Lanczos Process</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="bootcamp.html"
+       href="splitting_methods_definition.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Linear Algebra Bootcamp</p>
+        <p class="prev-next-title">Splitting Methods and Convergence Theory</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -462,6 +547,28 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-the-problem-with-direct-methods-for-large-sparse-systems">Motivation: The Problem with Direct Methods for Large Sparse Systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-with-lu-and-cholesky-factorization">The Problem with LU and Cholesky Factorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-and-limitations-of-splitting-methods">Advantages and Limitations of Splitting Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages">Advantages</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">Limitations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-cases-applications-and-motivation">Use Cases, Applications, and Motivation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

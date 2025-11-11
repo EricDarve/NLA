@@ -248,6 +248,13 @@
 <li class="toctree-l2"><a class="reference internal" href="content/lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="content/classical_iterative_methods.html">Classical Iterative Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="content/splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/jacobi_method.html">The Jacobi Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/sor_method.html">Successive Over-Relaxation (SOR) Method</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="content/LICENSE.html">License for this book</a></li>
 </ul>
 
@@ -364,6 +371,9 @@ document.write(`
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
    <a href="#cap-lemma-4"><strong>lemma-4</strong></a> | 
    <a href="#cap-prop:minimal_polynomial"><strong>prop:minimal_polynomial</strong></a> | 
+   <a href="#cap-sor_convergence_conditions"><strong>sor_convergence_conditions</strong></a> | 
+   <a href="#cap-sor_necessary_condition"><strong>sor_necessary_condition</strong></a> | 
+   <a href="#cap-sor_sufficient_condition"><strong>sor_sufficient_condition</strong></a> | 
    <a href="#cap-theorem-1"><strong>theorem-1</strong></a> | 
    <a href="#cap-thm:AkQR"><strong>thm:AkQR</strong></a> | 
    <a href="#cap-thm:arnoldi_krylov_basis"><strong>thm:arnoldi_krylov_basis</strong></a> | 
@@ -381,6 +391,8 @@ document.write(`
    <a href="#cap-thm:existence_lu_existence"><strong>thm:existence_lu_existence</strong></a> | 
    <a href="#cap-thm:existence_lu_pivoting"><strong>thm:existence_lu_pivoting</strong></a> | 
    <a href="#cap-thm:existence_qr"><strong>thm:existence_qr</strong></a> | 
+   <a href="#cap-thm:gauss_seidel_convergence"><strong>thm:gauss_seidel_convergence</strong></a> | 
+   <a href="#cap-thm:jacobi_convergence"><strong>thm:jacobi_convergence</strong></a> | 
    <a href="#cap-thm:non_hermitian_convergence"><strong>thm:non_hermitian_convergence</strong></a> | 
    <a href="#cap-thm:orth-it-nh"><strong>thm:orth-it-nh</strong></a> | 
    <a href="#cap-thm:orth-it-nh-rigorous"><strong>thm:orth-it-nh-rigorous</strong></a> | 
@@ -389,6 +401,7 @@ document.write(`
    <a href="#cap-thm:ritz-rate-general"><strong>thm:ritz-rate-general</strong></a> | 
    <a href="#cap-thm:spectral_theorem"><strong>thm:spectral_theorem</strong></a> | 
    <a href="#cap-thm:spectral_theorem_real"><strong>thm:spectral_theorem_real</strong></a> | 
+   <a href="#cap-thm:splitting_convergence"><strong>thm:splitting_convergence</strong></a> | 
    <a href="#cap-thm:summation_error"><strong>thm:summation_error</strong></a> | 
    <a href="#cap-thm:svd"><strong>thm:svd</strong></a> | 
    <a href="#cap-thm:unique_thin_qr"><strong>thm:unique_thin_qr</strong></a> | 
@@ -468,6 +481,30 @@ document.write(`
        <td>
        <a href="content/arnoldi_convergence.html#prop:minimal_polynomial"><code class="xref">prop:minimal_polynomial</code></a> <em>(content/arnoldi_convergence)</em></td><td>
        <em>proposition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-sor_convergence_conditions"><td></td><td>
+       <strong>sor_convergence_conditions</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/sor_method.html#sor_convergence_conditions"><code class="xref">sor_convergence_conditions</code></a> <em>(content/sor_method)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-sor_necessary_condition"><td></td><td>
+       <strong>sor_necessary_condition</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/sor_method.html#sor_necessary_condition"><code class="xref">sor_necessary_condition</code></a> <em>(content/sor_method)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-sor_sufficient_condition"><td></td><td>
+       <strong>sor_sufficient_condition</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/sor_method.html#sor_sufficient_condition"><code class="xref">sor_sufficient_condition</code></a> <em>(content/sor_method)</em></td><td>
+       <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-theorem-1"><td></td><td>
        <strong>theorem-1</strong></td><td></td></tr>
@@ -605,6 +642,22 @@ document.write(`
        <a href="content/existence_and_uniqueness_qr.html#thm:existence_qr"><code class="xref">thm:existence_qr</code></a> <em>(content/existence_and_uniqueness_qr)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:gauss_seidel_convergence"><td></td><td>
+       <strong>thm:gauss_seidel_convergence</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/gauss_seidel_method.html#thm:gauss_seidel_convergence"><code class="xref">thm:gauss_seidel_convergence</code></a> <em>(content/gauss_seidel_method)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:jacobi_convergence"><td></td><td>
+       <strong>thm:jacobi_convergence</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/jacobi_method.html#thm:jacobi_convergence"><code class="xref">thm:jacobi_convergence</code></a> <em>(content/jacobi_method)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:non_hermitian_convergence"><td></td><td>
        <strong>thm:non_hermitian_convergence</strong></td><td></td></tr>
      <tr>
@@ -667,6 +720,14 @@ document.write(`
        <td></td>
        <td>
        <a href="content/normal_matrices.html#thm:spectral_theorem_real"><code class="xref">thm:spectral_theorem_real</code></a> <em>(content/normal_matrices)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:splitting_convergence"><td></td><td>
+       <strong>thm:splitting_convergence</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/splitting_methods_definition.html#thm:splitting_convergence"><code class="xref">thm:splitting_convergence</code></a> <em>(content/splitting_methods_definition)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:summation_error"><td></td><td>

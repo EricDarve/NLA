@@ -1,0 +1,723 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Successive Over-Relaxation (SOR) Method &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/sor_method';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="The Gauss-Seidel Iteration Method" href="gauss_seidel_method.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="classical_iterative_methods.html">Classical Iterative Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jacobi_method.html">The Jacobi Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Successive Over-Relaxation (SOR) Method</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/sor_method.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Successive Over-Relaxation (SOR) Method</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-sor-iteration">Defining the SOR Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sor-as-a-splitting-method">SOR as a Splitting Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relaxation-parameter-omega">The Relaxation Parameter <span class="math notranslate nohighlight">\(\omega\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-conditions">Convergence Conditions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#necessary-condition">Necessary Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sufficient-condition">Sufficient Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orderings">Orderings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequential-natural-ordering-1-to-n">1. Sequential (Natural) Ordering: 1 to <span class="math notranslate nohighlight">\(n\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-sor-ssor-1-to-n-followed-by-n-to-1">2. Symmetric SOR (SSOR): 1 to <span class="math notranslate nohighlight">\(n\)</span> followed by <span class="math notranslate nohighlight">\(n\)</span> to 1</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-permutation">3. Randomized Permutation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-structural-orderings">4. Alternative Structural Orderings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimality-and-performance">Optimality and Performance</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="successive-over-relaxation-sor-method">
+<h1>Successive Over-Relaxation (SOR) Method<a class="headerlink" href="#successive-over-relaxation-sor-method" title="Link to this heading">#</a></h1>
+<p>The Successive Over-Relaxation (SOR) method, denoted as SOR(<span class="math notranslate nohighlight">\(\omega\)</span>), is a highly effective stationary iterative method that improves upon the Gauss-Seidel iteration by introducing a <strong>relaxation parameter, <span class="math notranslate nohighlight">\(\omega\)</span></strong>, designed to accelerate convergence.</p>
+<p>The motivation behind SOR is to overcome the limitation of Jacobi and Gauss-Seidel methods, which lack a parameter that can be adjusted to accelerate convergence in challenging cases. The SOR iteration is equivalent to the Gauss-Seidel method when <span class="math notranslate nohighlight">\(\omega = 1\)</span>.</p>
+<section id="defining-the-sor-iteration">
+<h2>Defining the SOR Iteration<a class="headerlink" href="#defining-the-sor-iteration" title="Link to this heading">#</a></h2>
+<p>The SOR method is a <strong>splitting method</strong> that modifies the successive update generated by the Gauss-Seidel iteration (<span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}_{\text{GS}}\)</span>) by taking a weighted average of the current iterate (<span class="math notranslate nohighlight">\(\mathbf{x}^{(k)}_{\text{SOR}}\)</span>) and the Gauss-Seidel increment (<span class="math notranslate nohighlight">\(\Delta \mathbf{x}_{\text{GS}}\)</span>).</p>
+<p>If we define the Gauss-Seidel update as <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}_{\text{GS}} = \mathbf{x}^{(k)} + \Delta \mathbf{x}_{\text{GS}}\)</span>, then the SOR update is:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{x}^{(k+1)}_{\text{SOR}} = \mathbf{x}^{(k)}_{\text{SOR}} + \omega \, \Delta \mathbf{x}_{\text{GS}}\]</div>
+<p>In terms of the matrix components <span class="math notranslate nohighlight">\(A = D - L - U\)</span> (where <span class="math notranslate nohighlight">\(D\)</span> is diagonal, <span class="math notranslate nohighlight">\(-L\)</span> is strictly lower triangular, and <span class="math notranslate nohighlight">\(-U\)</span> is strictly upper triangular), the Gauss-Seidel update is:</p>
+<div class="math notranslate nohighlight">
+\[\Delta \mathbf{x}_{\text{GS}} = D^{-1} \big( \mathbf{b} + L \mathbf{x}^{(k+1)}_{\text{GS}} + U \mathbf{x}^{(k)} \big) - \mathbf{x}^{(k)}\]</div>
+<p>Substituting this into the relaxed form gives the defining equation for the SOR update:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{x}^{(k+1)}_{\text{SOR}} = \mathbf{x}^{(k)}_{\text{SOR}} + \omega \bigg[ D^{-1} \big( \mathbf{b} + L \mathbf{x}^{(k+1)}_{\text{SOR}} + U \mathbf{x}^{(k)}_{\text{SOR}} \big) - \mathbf{x}^{(k)}_{\text{SOR}} \bigg]\]</div>
+</section>
+<section id="sor-as-a-splitting-method">
+<h2>SOR as a Splitting Method<a class="headerlink" href="#sor-as-a-splitting-method" title="Link to this heading">#</a></h2>
+<p>The rearranged matrix form shows that SOR fits the general splitting framework <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)} = M^{-1} N \mathbf{x}^{(k)} + M^{-1}\mathbf{b}\)</span>. By separating the <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> terms to the left-hand side, we get:</p>
+<div class="math notranslate nohighlight">
+\[\Big( \frac{1}{\omega} D - L \Big) \mathbf{x}^{(k+1)}_{\text{SOR}} = \mathbf{b} + \Big( \big( \frac{1}{\omega} - 1 \big) D + U \Big) \mathbf{x}^{(k)}_{\text{SOR}}\]</div>
+<p>Thus, the splitting <span class="math notranslate nohighlight">\(A = M - N\)</span> is defined by:</p>
+<div class="math notranslate nohighlight">
+\[M = \frac{1}{\omega} D - L \quad \text{and} \quad N = \Big( \frac{1}{\omega} - 1 \Big) D + U\]</div>
+<p>The SOR iteration matrix, <span class="math notranslate nohighlight">\(G_{\text{SOR}} = L_{\omega}\)</span>, is given by:</p>
+<div class="math notranslate nohighlight">
+\[L_{\omega} = (D - \omega L)^{-1} [(1 - \omega) D + \omega U]\]</div>
+</section>
+<section id="the-relaxation-parameter-omega">
+<h2>The Relaxation Parameter <span class="math notranslate nohighlight">\(\omega\)</span><a class="headerlink" href="#the-relaxation-parameter-omega" title="Link to this heading">#</a></h2>
+<p>The parameter <span class="math notranslate nohighlight">\(\omega\)</span> distinguishes SOR into three regimes:</p>
+<ol class="arabic simple">
+<li><p><strong>Gauss-Seidel:</strong> When <span class="math notranslate nohighlight">\(\omega = 1\)</span>, the SOR splitting recovers the Gauss-Seidel method.</p></li>
+<li><p><strong>Underrelaxation (<span class="math notranslate nohighlight">\(\omega &lt; 1\)</span>):</strong> Used to damp the increment (<span class="math notranslate nohighlight">\(\Delta \mathbf{x}\)</span>). If the standard iteration is diverging, applying a smaller increment may stabilize the process.</p></li>
+<li><p><strong>Overrelaxation (<span class="math notranslate nohighlight">\(\omega &gt; 1\)</span>):</strong> This is the typical use case, where the goal is to accelerate convergence by moving further in a potentially good direction.</p></li>
+</ol>
+<p>The choice of <span class="math notranslate nohighlight">\(\omega\)</span> depends heavily on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</section>
+<section id="python-code-example">
+<h2>Python Code Example<a class="headerlink" href="#python-code-example" title="Link to this heading">#</a></h2>
+<p>Here is a simple implementation of the SOR method in Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Solve the linear system Ax = b using the SOR iteration method.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    A : ndarray</span>
+<span class="sd">        Coefficient matrix (n x n)</span>
+<span class="sd">    b : ndarray</span>
+<span class="sd">        Right-hand side vector (n,)</span>
+<span class="sd">    omega : float</span>
+<span class="sd">        Relaxation parameter (0 &lt; omega &lt; 2)</span>
+<span class="sd">    x0 : ndarray, optional</span>
+<span class="sd">        Initial guess (n,). If None, uses zero vector.</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Tolerance for convergence (default: 1e-10)</span>
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">        Maximum number of iterations (default: 1000)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    x : ndarray</span>
+<span class="sd">        Approximate solution vector</span>
+<span class="sd">    iterations : int</span>
+<span class="sd">        Number of iterations performed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+        <span class="n">x_old</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+        <span class="c1"># Update each component using SOR iteration</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">],</span> <span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">omega</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">omega</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+        
+        <span class="c1"># Check convergence</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_old</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: Maximum iterations (</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">) reached without convergence&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_iter</span>
+</pre></div>
+</div>
+</section>
+<section id="convergence-conditions">
+<h2>Convergence Conditions<a class="headerlink" href="#convergence-conditions" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="sor_convergence_conditions">
+<p class="admonition-title"><span class="caption-number">Theorem 33 </span> (SOR Convergence Conditions)</p>
+<section class="theorem-content" id="proof-content">
+<p>The SOR method converges if and only if the spectral radius of the iteration matrix <span class="math notranslate nohighlight">\(\rho(G_{\text{SOR}})\)</span> is less than one.</p>
+</section>
+</div><section id="necessary-condition">
+<h3>Necessary Condition<a class="headerlink" href="#necessary-condition" title="Link to this heading">#</a></h3>
+<div class="proof theorem admonition" id="sor_necessary_condition">
+<p class="admonition-title"><span class="caption-number">Theorem 34 </span> (Necessary Condition for SOR Convergence)</p>
+<section class="theorem-content" id="proof-content">
+<p>A <strong>necessary condition</strong> for the convergence of the SOR method is <span class="math notranslate nohighlight">\(0 &lt; \omega &lt; 2\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. This can be proven by analyzing the determinant of the iteration matrix. Since <span class="math notranslate nohighlight">\(\det(G_{\text{SOR}}) = (1 - \omega)^n\)</span>, and the spectral radius must satisfy</p>
+<div class="math notranslate nohighlight">
+\[\rho(G_{\text{SOR}}) \ge |\det(G_{\text{SOR}})|^{1/n} = |1 - \omega|,\]</div>
+<p>convergence requires <span class="math notranslate nohighlight">\(|\omega - 1| &lt; 1\)</span>, which yields <span class="math notranslate nohighlight">\(0 &lt; \omega &lt; 2\)</span>.</p>
+</div>
+</section>
+<section id="sufficient-condition">
+<h3>Sufficient Condition<a class="headerlink" href="#sufficient-condition" title="Link to this heading">#</a></h3>
+<p>The convergence of SOR is guaranteed under certain conditions on the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="proof theorem admonition" id="sor_sufficient_condition">
+<p class="admonition-title"><span class="caption-number">Theorem 35 </span> (Sufficient Condition for SOR Convergence)</p>
+<section class="theorem-content" id="proof-content">
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is a <strong>Symmetric Positive Definite</strong> matrix, SOR converges for any relaxation parameter <span class="math notranslate nohighlight">\(\omega\)</span> such that <span class="math notranslate nohighlight">\(0 &lt; \omega &lt; 2\)</span>. This also implies that Gauss-Seidel (<span class="math notranslate nohighlight">\(\omega=1\)</span>) converges if <span class="math notranslate nohighlight">\(A\)</span> is SPD.</p>
+</section>
+</div></section>
+</section>
+<section id="orderings">
+<h2>Orderings<a class="headerlink" href="#orderings" title="Link to this heading">#</a></h2>
+<p>The selection of the ordering, or permutation, of variables is a fundamental concern for the Successive Over-Relaxation (SOR) method, as this iterative approach, like Gauss-Seidel, relies on computing components successively based on a <strong>fixed prescribed order</strong>. The sequence in which components are updated influences both the rate of convergence and the potential for parallelism.</p>
+<p>We can identify several common types of orderings used with SOR:</p>
+<section id="sequential-natural-ordering-1-to-n">
+<h3>1. Sequential (Natural) Ordering: 1 to <span class="math notranslate nohighlight">\(n\)</span><a class="headerlink" href="#sequential-natural-ordering-1-to-n" title="Link to this heading">#</a></h3>
+<p>This is the standard, fixed, prescribed order in which the entries of the solution vector <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> are computed. This ordering corresponds to iterating through the indices from <span class="math notranslate nohighlight">\(j=1\)</span> up to <span class="math notranslate nohighlight">\(j=n\)</span> in sequence.</p>
+<ul class="simple">
+<li><p>In the context of matrices derived from partial differential equations (PDEs), common sequential orderings (such as row-wise or column-wise enumeration of grid points) are often referred to as <strong>natural orderings</strong>. These typically represent <strong>consistent orderings</strong>.</p></li>
+<li><p>For matrices derived from convection-diffusion problems, optimal convergence speed using SOR often depends critically on ordering the variables in the direction of the convection flow.</p></li>
+</ul>
+</section>
+<section id="symmetric-sor-ssor-1-to-n-followed-by-n-to-1">
+<h3>2. Symmetric SOR (SSOR): 1 to <span class="math notranslate nohighlight">\(n\)</span> followed by <span class="math notranslate nohighlight">\(n\)</span> to 1<a class="headerlink" href="#symmetric-sor-ssor-1-to-n-followed-by-n-to-1" title="Link to this heading">#</a></h3>
+<p>The Symmetric Successive Over-Relaxation (SSOR) method uses a pair of sweeps: a forward sweep (1 to <span class="math notranslate nohighlight">\(n\)</span>) followed by a backward sweep (<span class="math notranslate nohighlight">\(n\)</span> to 1).</p>
+<ul class="simple">
+<li><p>An SSOR step consists of the standard SOR step, followed by a <strong>backward SOR step</strong>. This backward sweep is defined analogously to the backward Gauss-Seidel sweep, where coordinate corrections are performed in the reverse order, <span class="math notranslate nohighlight">\(n, n-1, \dots, 1\)</span>.</p></li>
+<li><p>This symmetrization is crucial because, if the matrix <span class="math notranslate nohighlight">\(A\)</span> is symmetric and positive definite (SPD), the iteration matrix resulting from the forward/backward sweeps is similar to an SPD matrix. This property makes <strong>SSOR highly effective as a preconditioner</strong> in iterative acceleration methods, particularly the Conjugate Gradient (CG) method.</p></li>
+</ul>
+</section>
+<section id="randomized-permutation">
+<h3>3. Randomized Permutation<a class="headerlink" href="#randomized-permutation" title="Link to this heading">#</a></h3>
+<p>The SOR iteration can also be implemented using a <strong>different randomized permutation at every iteration</strong>.</p>
+</section>
+<section id="alternative-structural-orderings">
+<h3>4. Alternative Structural Orderings<a class="headerlink" href="#alternative-structural-orderings" title="Link to this heading">#</a></h3>
+<p>Beyond simple sequential or randomized orderings, specific structural permutations can be vital for accelerating SOR, especially when solving systems derived from PDEs. These include <strong>red-black and multicolor orderings</strong>, which are techniques that partition the variables (or nodes in the associated graph) into independent sets such that no two variables in the same set are directly coupled in the matrix.</p>
+<p>For example, in a 2D grid corresponding to a discretized PDE, a <strong>red-black ordering</strong> colors the grid points alternately (like a chessboard), so that all “red” points can be updated independently of each other, followed by all “black” points. This allows for greater parallelism and can improve convergence rates. <strong>Multicolor orderings</strong> generalize this idea to more than two colors, further dividing the variables into multiple independent sets, which is especially useful for matrices with more complex sparsity patterns. By updating all variables of the same color simultaneously, these orderings exploit the matrix structure to enhance the efficiency and scalability of the SOR method.</p>
+</section>
+</section>
+<section id="optimality-and-performance">
+<h2>Optimality and Performance<a class="headerlink" href="#optimality-and-performance" title="Link to this heading">#</a></h2>
+<p>The primary difficulty in implementing SOR is determining the <strong>optimal relaxation parameter, <span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span></strong>, which minimizes <span class="math notranslate nohighlight">\(\rho(L_{\omega})\)</span>. When <span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span> is used, SOR can significantly outperform Jacobi and Gauss-Seidel. The SOR method is a classic example of achieving substantial acceleration by leveraging knowledge about the matrix structure to tune a parameter, transforming a linearly convergent method into one with potentially a faster convergence rate.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gauss_seidel_method.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Gauss-Seidel Iteration Method</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="LICENSE.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">License for this book</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-sor-iteration">Defining the SOR Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sor-as-a-splitting-method">SOR as a Splitting Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relaxation-parameter-omega">The Relaxation Parameter <span class="math notranslate nohighlight">\(\omega\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-conditions">Convergence Conditions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#necessary-condition">Necessary Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sufficient-condition">Sufficient Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orderings">Orderings</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequential-natural-ordering-1-to-n">1. Sequential (Natural) Ordering: 1 to <span class="math notranslate nohighlight">\(n\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-sor-ssor-1-to-n-followed-by-n-to-1">2. Symmetric SOR (SSOR): 1 to <span class="math notranslate nohighlight">\(n\)</span> followed by <span class="math notranslate nohighlight">\(n\)</span> to 1</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-permutation">3. Randomized Permutation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-structural-orderings">4. Alternative Structural Orderings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimality-and-performance">Optimality and Performance</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
