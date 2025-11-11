@@ -135,34 +135,37 @@ To do this, we only need to store the essential information for each transformat
 
 ## Computational Cost
 
-Let's analyze in more details the computational cost of the Householder QR algorithm. Understanding the cost, measured in floating-point operations (flops), is essential for comparing algorithms and predicting their performance. We'll consider an $m \times n$ matrix $A$, typically with $m \ge n$.
+Let’s analyze the computational cost, measured in floating-point operations (flops). Here a "flop" typically refers to one floating-point operation (an addition, subtraction, or multiplication). Note that it is also common to count Mult+Add as one operation, but we will count them separately here.
 
-A "flop" here refers to one addition and one multiplication.
+### Cost per Step (Step $k$)
 
-### Cost of the QR Factorization
+At step $k$, we are applying a Householder transformation to an $(m-k+1) \times (n-k+1)$ submatrix. Let $m' = m-k+1$ and $n' = n-k+1$.
 
-The factorization process involves applying $n$ successive Householder transformations, $Q_1, Q_2, \dots, Q_n$, to the matrix $A$.
+The update $A' \leftarrow (I - \beta \mathbf{v}\mathbf{v}^T) A'$ is computed as:
 
-$$A \rightarrow Q_1 A \rightarrow Q_2 (Q_1 A) \rightarrow \dots \rightarrow R$$
+1.  **$\mathbf{w}^T = \mathbf{v}^T A'$** (vector-matrix product): This requires $m'n'$ multiplications and $m'(n'-1) \approx m'n'$ additions.
+    * *Cost: $\approx 2m'n' \text{ flops}$*
 
-Let's look at the cost of a single step, say step $k$. At this stage, we have already introduced zeros in the first $k-1$ columns. We are now working on an $(m-k+1) \times (n-k+1)$ submatrix. Applying the Householder transformation $Q_k$ to this submatrix requires approximately: $2(m-k+1)(n-k+1)$ flops.
+2.  **$A' \leftarrow A' - (\beta \mathbf{v})\mathbf{w}^T$** (outer product update): This requires $m'n'$ multiplications (to form $\beta \mathbf{v}\mathbf{w}^T$) and $m'n'$ subtractions.
+    * *Cost: $\approx 2m'n' \text{ flops}$*
+
+The total cost at step $k$ is the sum of these, which is approximately $\mathbf{4(m-k+1)(n-k+1)}$ **flops**.
+
+### Total Cost
 
 To find the total cost, we sum this from $k=1$ to $n$:
 
-$$
-\text{Total Cost} \approx \sum_{k=1}^{n} 2(m-k+1)(n-k+1) \text{ flops}
-$$
+$$\text{Total Cost } \approx \sum_{k=1}^{n} 4(m-k+1)(n-k+1) \text{ flops}$$
 
-We can approximate this sum with an integral for large $m$ and $n$, which gives the following result:
+We can approximate this sum with an integral. We get:
 
-$$
-\text{Cost}(A=QR) \approx 2mn^2 - \frac{2}{3}n^3 \text{ flops}
-$$
+$$\text{Cost}(A=QR) \approx 2 \times \left( mn^2 - \frac{1}{3}n^3 \right) = \mathbf{2mn^2 - \frac{2}{3}n^3} \text{ flops}$$
 
 **Two important special cases emerge from this formula:**
 
-1.  **Square Matrix ($m=n$)**: The cost is $\approx 2n^3 - \frac{2}{3}n^3 = \frac{4}{3}n^3$ flops. This is about twice the cost of performing an LU factorization, which is $\frac{2}{3}n^3$. Stability comes at a price! 💰
-2.  **Tall and Skinny Matrix ($m \gg n$)**: The $2mn^2$ term dominates, and the cost is approximately $2mn^2$ flops. This is the most common scenario in data analysis and least-squares problems.
+1.  **Square Matrix ($m=n$):** The cost is $\approx 2n^3 - \frac{2}{3}n^3 = \mathbf{\frac{4}{3}n^3}$ flops. This is about twice the cost of performing an LU factorization, which is $\frac{2}{3}n^3$ flops.
+
+2.  **Tall and Skinny Matrix ($m \gg n$):** The $2mn^2$ term dominates, and the cost is approximately $\mathbf{2mn^2}$ flops.
 
 ### Cost of Using the Factors
 

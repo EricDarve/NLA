@@ -56,4 +56,17 @@ chapters:
   - file: content/qr_iteration_with_hessenberg.md
   - file: content/qr_iteration_with_shifts.md
   - file: content/symmetric_vs_nonsymmetric_qr.md
+- file: content/eigenvalues_iterative
+  sections:  
+  - file: content/krylov_subspaces.md
+  - file: content/arnoldi_iteration.md
+  - file: content/arnoldi_convergence.md
+  - file: content/lanczos_iteration.md
+  - file: content/lanczos_convergence.md
+- file: content/classical_iterative_methods
+  sections:
+  - file: content/splitting_methods_definition.md
+  - file: content/jacobi_method.md
+  - file: content/gauss_seidel_method.md
+  - file: content/sor_method.md
 - file: content/LICENSE.md
