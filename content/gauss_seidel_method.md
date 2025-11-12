@@ -24,7 +24,7 @@ $$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)
 
 ## Algorithm and Implementation
 
-A key difference between Gauss-Seidel and Jacobi iteration lies in the dependencies: because the components of $\mathbf{x}^{(k+1)}$ must be computed sequentially (or successively), the Gauss-Seidel method is **less parallel** than the Jacobi method. Conversely, Gauss-Seidel typically converges **faster** than Jacobi, often requiring about half the number of iterations in many cases.
+A key difference between Gauss-Seidel and Jacobi iteration lies in the dependencies: because the components of $\mathbf{x}^{(k+1)}$ must be computed sequentially (or successively), the Gauss-Seidel method is **less parallel** than the Jacobi method. Conversely, Gauss-Seidel typically converges **faster than Jacobi, often requiring about half the number of iterations in many cases.**
 
 ## Python Code Example
 

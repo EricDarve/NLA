@@ -69,4 +69,5 @@ chapters:
   - file: content/jacobi_method.md
   - file: content/gauss_seidel_method.md
   - file: content/sor_method.md
+  - file: content/chebyshev_acceleration.md
 - file: content/LICENSE.md
