@@ -1,0 +1,830 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Generalized Minimal Residual Method (GMRES) &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/gmres';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="A Comparative Summary: CG vs. GMRES" href="cg_vs_gmres.html" />
+    <link rel="prev" title="The Conjugate Gradient (CG) Method" href="conjugate_gradient.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="classical_iterative_methods.html">Classical Iterative Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jacobi_method.html">The Jacobi Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sor_method.html">Successive Over-Relaxation (SOR) Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Generalized Minimal Residual Method (GMRES)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">A Comparative Summary: CG vs. GMRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/gmres.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>The Generalized Minimal Residual Method (GMRES)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-conjugate-gradients-to-gmres">From Conjugate Gradients to GMRES</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-analogy-and-computational-cost">The Arnoldi Analogy and Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-new-objective-minimizing-the-residual">A New Objective: Minimizing the Residual</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-gmres-least-squares-problem">Deriving the GMRES Least-Squares Problem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-relation">The Arnoldi Relation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transforming-the-problem">Transforming the Problem</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-algorithm-computational-steps">The GMRES Algorithm: Computational Steps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-step">The Arnoldi Step</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-qr-factorization-and-solve">Update the QR Factorization and Solve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-the-final-solution">Compute the Final Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-gmres">Convergence of GMRES</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-polynomial-problem">The GMRES Polynomial Problem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-formal-error-bound">A Formal Error Bound</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-failure-case-for-gmres">A “Failure Case” for GMRES</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="the-generalized-minimal-residual-method-gmres">
+<h1>The Generalized Minimal Residual Method (GMRES)<a class="headerlink" href="#the-generalized-minimal-residual-method-gmres" title="Link to this heading">#</a></h1>
+<section id="from-conjugate-gradients-to-gmres">
+<h2>From Conjugate Gradients to GMRES<a class="headerlink" href="#from-conjugate-gradients-to-gmres" title="Link to this heading">#</a></h2>
+<p>In our study of iterative methods, the <strong>Conjugate Gradient (CG) algorithm</strong> is a powerful and efficient tool. However, its use is strictly limited to systems where the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>symmetric positive definite (SPD)</strong>. When we face a general, non-symmetric square matrix, CG is no longer applicable, and we require a new approach.</p>
+<p>This is the problem that the <strong>Generalized Minimal Residual (GMRES)</strong> method solves.</p>
+</section>
+<section id="the-arnoldi-analogy-and-computational-cost">
+<h2>The Arnoldi Analogy and Computational Cost<a class="headerlink" href="#the-arnoldi-analogy-and-computational-cost" title="Link to this heading">#</a></h2>
+<p>GMRES is a Krylov subspace method, just like CG. The relationship between them is best understood through the lens of the processes that build their respective subspaces:</p>
+<ul class="simple">
+<li><p><strong>CG</strong> is based on the <strong>Lanczos process</strong>, which leverages the symmetry of <span class="math notranslate nohighlight">\(A\)</span> to build an orthogonal basis using a short-term (three-term) recurrence. This is computationally cheap and requires minimal storage.</p></li>
+<li><p><strong>GMRES</strong> is based on the <strong>Arnoldi process</strong>, which applies to <em>any</em> matrix. This generality comes at a price: the Arnoldi process requires a long-term recurrence. To maintain orthogonality, each new vector must be explicitly orthogonalized against <em>all</em> previously generated basis vectors.</p></li>
+</ul>
+<p>This distinction in the underlying process has a direct impact on the algorithms:</p>
+<ol class="arabic simple">
+<li><p><strong>Applicability:</strong> CG is restricted to SPD matrices, while GMRES can be applied to any square matrix.</p></li>
+<li><p><strong>Cost:</strong> GMRES has a significantly higher computational and storage cost per iteration. It must store a complete basis <span class="math notranslate nohighlight">\(Q_k\)</span> for the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>, and the work to generate <span class="math notranslate nohighlight">\(q_{k+1}\)</span> grows with each step <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+</ol>
+<p>Conceptually, the GMRES approach is more straightforward than CG. Because it cannot rely on the special properties of an <span class="math notranslate nohighlight">\(A\)</span>-conjugate basis, it lacks the optimization opportunities that make CG so efficient (like short-term recurrences). Instead, GMRES “just solves a least-squares problem” at each step.</p>
+</section>
+<section id="a-new-objective-minimizing-the-residual">
+<h2>A New Objective: Minimizing the Residual<a class="headerlink" href="#a-new-objective-minimizing-the-residual" title="Link to this heading">#</a></h2>
+<p>The fundamental difference between CG and GMRES lies in the cost function they are designed to optimize.</p>
+<p>Recall that CG is built to find the approximation <span class="math notranslate nohighlight">\(x^{(k)} \in \mathcal{K}_k\)</span> that minimizes the <strong><span class="math notranslate nohighlight">\(A\)</span>-norm of the error</strong> (<span class="math notranslate nohighlight">\(e^{(k)} = x - x^{(k)}\)</span>):</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>CG Objective:</strong> <span class="math notranslate nohighlight">\(\min_{x^{(k)} \in \mathcal{K}_k} \| x - x^{(k)} \|_A^2\)</span>, where <span class="math notranslate nohighlight">\(\| z \|_A^2 = z^T A z\)</span></p>
+</div>
+<p>This objective function is computationally convenient <em>only</em> when <span class="math notranslate nohighlight">\(A\)</span> is SPD, as it defines a valid norm.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>GMRES takes a more direct and intuitive approach. It abandons the <span class="math notranslate nohighlight">\(A\)</span>-norm and instead seeks to find the approximation <span class="math notranslate nohighlight">\(x^{(k)}\)</span> in the Krylov subspace that minimizes the <strong>2-norm of the residual</strong> (<span class="math notranslate nohighlight">\(r^{(k)} = b - Ax^{(k)}\)</span>).</p>
+</div>
+<p>This new objective function is precisely what gives the method its name: <strong>G</strong>eneralized <strong>M</strong>inimal <strong>RES</strong>idual.</p>
+<p>This choice makes sense. The residual is the only quantity we can easily measure without knowing the true solution <span class="math notranslate nohighlight">\(x\)</span>. Minimizing the residual’s norm is the most natural goal for finding an approximate solution.</p>
+<p>This choice of minimizing <span class="math notranslate nohighlight">\(\| r^{(k)} \|_2\)</span> is formally equivalent to minimizing the <span class="math notranslate nohighlight">\(A^TA\)</span>-norm of the error. If we let our approximation <span class="math notranslate nohighlight">\(x^{(k)}\)</span> be represented by <span class="math notranslate nohighlight">\(Q_k y\)</span> (where <span class="math notranslate nohighlight">\(Q_k\)</span> is the Arnoldi basis for <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>), we see the direct connection:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\| x - x^{(k)} \|_{A^TA}^2 &amp; = (x - Q_k y)^T A^TA (x - Q_k y) \\[.5em]
+&amp; = \| A(x - Q_k y) \|_2^2 \\[.5em]
+&amp; = \| b - A Q_k y \|_2^2 = \| r^{(k)} \|_2^2
+\end{align}
+\end{split}\]</div>
+<p>Thus, at each step <span class="math notranslate nohighlight">\(k\)</span>, GMRES finds the vector <span class="math notranslate nohighlight">\(x^{(k)} \in \mathcal{K}_k\)</span> that makes the residual <span class="math notranslate nohighlight">\(r^{(k)}\)</span> as small as possible in the Euclidean 2-norm. In the following sections, we will explore how this minimization problem is solved efficiently.</p>
+</section>
+<section id="deriving-the-gmres-least-squares-problem">
+<h2>Deriving the GMRES Least-Squares Problem<a class="headerlink" href="#deriving-the-gmres-least-squares-problem" title="Link to this heading">#</a></h2>
+<p>In the previous section, we established that the core task of GMRES is to find the approximation <span class="math notranslate nohighlight">\(x^{(k)} = Q_k y\)</span> that minimizes the 2-norm of the residual. This gives us the following formal optimization problem for the coefficients <span class="math notranslate nohighlight">\(y \in \mathbb{R}^k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{y \in \mathbb{R}^k} \| b - A Q_k y \|_2
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(x_k = Q_k y\)</span>.</p>
+<p>At first glance, this appears to be a large, <span class="math notranslate nohighlight">\(N \times k\)</span> least-squares problem. The key to solving it efficiently lies in the <strong>Arnoldi process</strong> used to build the <span class="math notranslate nohighlight">\(Q_k\)</span> basis.</p>
+<section id="the-arnoldi-relation">
+<h3>The Arnoldi Relation<a class="headerlink" href="#the-arnoldi-relation" title="Link to this heading">#</a></h3>
+<p>Recall the fundamental Arnoldi relation, which connects <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(Q_k\)</span>, and <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+A Q_k = Q_{k+1} \underline{H}_k
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> is the <span class="math notranslate nohighlight">\((k+1) \times k\)</span> <strong>upper-Hessenberg matrix</strong> of coefficients generated by the process. This matrix is precisely <span class="math notranslate nohighlight">\(Q_{k+1}^T A Q_k\)</span>.</p>
+</section>
+<section id="transforming-the-problem">
+<h3>Transforming the Problem<a class="headerlink" href="#transforming-the-problem" title="Link to this heading">#</a></h3>
+<p>We can substitute this relation directly into our minimization problem:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_y \| b - Q_{k+1} \underline{H}_k y \|_2
+\]</div>
+<p>Next, we must handle the vector <span class="math notranslate nohighlight">\(b\)</span>. The Arnoldi process was <em>started</em> with the normalized initial residual, <span class="math notranslate nohighlight">\(q_1 = b / \|b\|_2\)</span>. This means <span class="math notranslate nohighlight">\(b = \|b\|_2 q_1\)</span>. The vector <span class="math notranslate nohighlight">\(q_1\)</span> is, by definition, the first column of the <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> basis.</p>
+<p>Therefore, we can express the vector <span class="math notranslate nohighlight">\(b\)</span> perfectly within the <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> basis:</p>
+<div class="math notranslate nohighlight">
+\[
+b = Q_{k+1} (\|b\|_2 \, e_1)
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(e_1 = [1, 0, \dots, 0]^T\)</span> is the first standard basis vector in <span class="math notranslate nohighlight">\(\mathbb{R}^{k+1}\)</span>.</p>
+<p>Let’s substitute this final piece back into our problem. We are now minimizing:</p>
+<div class="math notranslate nohighlight">
+\[
+\| Q_{k+1} (\|b\|_2 \, e_1) - Q_{k+1} \underline{H}_k y \|_2
+\]</div>
+<p>We can factor out the <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> matrix:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_y \left\| Q_{k+1} \left( (\|b\|_2 \, e_1) - \underline{H}_k y \right) \right\|_2
+\]</div>
+<p>This is the crucial step. Because <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is an <span class="math notranslate nohighlight">\(N \times (k+1)\)</span> matrix with <strong>orthonormal columns</strong>, it acts as an isometry. This means it preserves the 2-norm of any vector it multiplies (i.e., <span class="math notranslate nohighlight">\(\| Q_{k+1} z \|_2 = \|z\|_2\)</span> for any <span class="math notranslate nohighlight">\(z \in \mathbb{R}^{k+1}\)</span>).</p>
+<p>This property allows us to “remove” <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> from the outside of the norm, transforming our large <span class="math notranslate nohighlight">\(N \times k\)</span> problem into a <em>small</em> <span class="math notranslate nohighlight">\((k+1) \times k\)</span> problem:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{y \in \mathbb{R}^k} \big\| \|b\|_2 \, e_1 - \underline{H}_k \, y \big\|_2, \qquad x_k = Q_k y.
+\]</div>
+<p>This is the central least-squares problem that GMRES solves at each iteration. It is a small, <span class="math notranslate nohighlight">\((k+1) \times k\)</span> problem that can be solved very efficiently, typically using a QR factorization of <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> (which is itself cheap, as <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> is upper Hessenberg).</p>
+</section>
+</section>
+<section id="the-gmres-algorithm-computational-steps">
+<h2>The GMRES Algorithm: Computational Steps<a class="headerlink" href="#the-gmres-algorithm-computational-steps" title="Link to this heading">#</a></h2>
+<p>The derivation in the previous section established that at each step <span class="math notranslate nohighlight">\(k\)</span>, we must solve the small least-squares problem:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{y \in \mathbb{R}^k} \big\| \beta e_1 - \underline{H}_k \, y \big\|_2
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\beta = \|b\|_2 = \|r^{(0)}\|_2\)</span>.</p>
+<p>Solving this from scratch at every iteration would be inefficient. A practical GMRES implementation is <em>incremental</em>. It cleverly updates the solution from step <span class="math notranslate nohighlight">\(k-1\)</span> to step <span class="math notranslate nohighlight">\(k\)</span>. This is achieved by maintaining a QR factorization of the <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> matrix, which is updated at each step using Givens rotations.</p>
+<p>The algorithm proceeds in the following three stages at each iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<section id="the-arnoldi-step">
+<h3>The Arnoldi Step<a class="headerlink" href="#the-arnoldi-step" title="Link to this heading">#</a></h3>
+<p>We first run one step of the Arnoldi process. This involves:</p>
+<ol class="arabic simple">
+<li><p>Computing <span class="math notranslate nohighlight">\(w = A q_k\)</span>.</p></li>
+<li><p>Orthogonalizing <span class="math notranslate nohighlight">\(w\)</span> against all previous basis vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_k\)</span>. The coefficients from this orthogonalization form the <span class="math notranslate nohighlight">\(k\)</span>-th column of the Hessenberg matrix <span class="math notranslate nohighlight">\(\underline{H}_k\)</span>.</p></li>
+<li><p>Normalizing the resulting vector to get the new basis vector, <span class="math notranslate nohighlight">\(q_{k+1}\)</span>.</p></li>
+</ol>
+<p>This single step provides us with the <span class="math notranslate nohighlight">\(k\)</span>-th column of <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> and the new basis vector <span class="math notranslate nohighlight">\(q_{k+1}\)</span>.</p>
+</section>
+<section id="update-the-qr-factorization-and-solve">
+<h3>Update the QR Factorization and Solve<a class="headerlink" href="#update-the-qr-factorization-and-solve" title="Link to this heading">#</a></h3>
+<p>This is the core of the GMRES computation. We have the <span class="math notranslate nohighlight">\((k+1) \times k\)</span> least-squares problem. We solve it by maintaining the QR factorization of <span class="math notranslate nohighlight">\(\underline{H}_k\)</span>.</p>
+<p>Because <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> is upper Hessenberg, its QR factorization is cheap to compute and, more importantly, <em>cheap to update</em>. When we add column <span class="math notranslate nohighlight">\(k\)</span> (which we just computed in the Arnoldi step), we only need to introduce a single new Givens rotation, <span class="math notranslate nohighlight">\(G_k\)</span>, to zero out the new subdiagonal element.</p>
+<p>Let <span class="math notranslate nohighlight">\(G_1, \dots, G_k\)</span> be the sequence of Givens rotations that transforms <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> into an upper-triangular matrix <span class="math notranslate nohighlight">\(R_k\)</span> (padded with a row of zeros).</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+G_k^T \cdots G_1^T \underline{H}_k =
+\begin{pmatrix}
+R_k \\ 0
+\end{pmatrix}
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(R_k\)</span> is a <span class="math notranslate nohighlight">\(k \times k\)</span> upper-triangular matrix.</p>
+<p>To solve the least-squares problem, we must apply the <em>exact same</em> sequence of rotations to the right-hand-side vector, <span class="math notranslate nohighlight">\(\beta e_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\min_y \left\| \left( G_k^T \cdots G_1^T \right) (\beta e_1) -
+\begin{pmatrix}
+R_k \\ 0
+\end{pmatrix}
+y \right\|_2
+\end{split}\]</div>
+<p>Let’s define the rotated right-hand-side vector as <span class="math notranslate nohighlight">\(g_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+g_k = \left( G_k^T \cdots G_1^T \right) (\beta e_1) = \begin{pmatrix} p_k \\ \rho_k \end{pmatrix}
+\end{split}\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(p_k\)</span> is a vector of length <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\(\rho_k\)</span> is a single scalar. Our minimization problem is now:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\min_y \left\| \begin{pmatrix} p_k \\ \rho_k \end{pmatrix} -
+\begin{pmatrix}
+R_k \\ 0
+\end{pmatrix}
+y \right\|_2^2
+=
+\min_y \left\| \begin{pmatrix} p_k - R_k y \\ \rho_k \end{pmatrix} \right\|_2^2
+= \min_y \| p_k - R_k y \|_2^2 + |\rho_k|^2
+\end{split}\]</div>
+<p>The minimum is achieved when we make the first term zero. We find our coefficient vector <span class="math notranslate nohighlight">\(y^{(k)}\)</span> by solving the <span class="math notranslate nohighlight">\(k \times k\)</span> upper-triangular system:</p>
+<div class="math notranslate nohighlight">
+\[
+R_k \, y^{(k)} = p_k
+\]</div>
+<p>This is easily solved by back-substitution.</p>
+<p>A key result in this approach is that the 2-norm of the residual at this step is exactly the leftover scalar term, <span class="math notranslate nohighlight">\(\rho_k\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+\| r^{(k)} \|_2 = \| \beta e_1 - \underline{H}_k y^{(k)} \|_2 = |\rho_k|
+\]</div>
+<p>This gives us a cheap way to monitor the residual norm at every single iteration <em>without</em> computing the solution <span class="math notranslate nohighlight">\(x^{(k)}\)</span> or the residual <span class="math notranslate nohighlight">\(r^{(k)}\)</span>. We use <span class="math notranslate nohighlight">\(\rho_k\)</span> as our stopping criterion.</p>
+</section>
+<section id="compute-the-final-solution">
+<h3>Compute the Final Solution<a class="headerlink" href="#compute-the-final-solution" title="Link to this heading">#</a></h3>
+<p>We only perform this final step once the residual norm <span class="math notranslate nohighlight">\(\rho_k\)</span> is small enough (i.e., <span class="math notranslate nohighlight">\(\rho_k &lt; \text{tol} \cdot \beta\)</span>).</p>
+<p>Once the loop terminates at iteration <span class="math notranslate nohighlight">\(k\)</span>, we have the coefficient vector <span class="math notranslate nohighlight">\(y^{(k)}\)</span> from solving <span class="math notranslate nohighlight">\(R_k y^{(k)} = p_k\)</span>. The final approximate solution is the linear combination of the Krylov basis vectors defined by <span class="math notranslate nohighlight">\(y^{(k)}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+x^{(k)} = Q_k \, y^{(k)}
+\]</div>
+<p>This final matrix-vector product is the last computation required to get our answer.</p>
+</section>
+</section>
+<section id="convergence-of-gmres">
+<h2>Convergence of GMRES<a class="headerlink" href="#convergence-of-gmres" title="Link to this heading">#</a></h2>
+<p>Understanding <em>when</em> GMRES converges is a complex topic, as it depends on the entirety of the matrix <span class="math notranslate nohighlight">\(A\)</span>, not just on individual properties like its condition number (as in CG for SPD matrices).</p>
+<p>The key to understanding its convergence lies in the polynomial approximation problem that GMRES implicitly solves.</p>
+<section id="the-gmres-polynomial-problem">
+<h3>The GMRES Polynomial Problem<a class="headerlink" href="#the-gmres-polynomial-problem" title="Link to this heading">#</a></h3>
+<p>Recall that at step <span class="math notranslate nohighlight">\(k\)</span>, GMRES finds the approximation <span class="math notranslate nohighlight">\(x^{(k)} = Q_k y\)</span> in the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> that minimizes the 2-norm of the residual. Any vector <span class="math notranslate nohighlight">\(x^{(k)} \in \mathcal{K}_k\)</span> can be written as <span class="math notranslate nohighlight">\(x^{(k)} = q(A)b\)</span> for some polynomial <span class="math notranslate nohighlight">\(q\)</span> of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>.</p>
+<p>Therefore, the residual <span class="math notranslate nohighlight">\(r^{(k)}\)</span> can be expressed as:</p>
+<div class="math notranslate nohighlight">
+\[
+r^{(k)} = b - A x^{(k)} = b - A q(A) b = (I - A q(A)) b
+\]</div>
+<p>If we define a new polynomial <span class="math notranslate nohighlight">\(p(z) = 1 - z q(z)\)</span>, we can see that:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(p(z)\)</span> is a polynomial of degree at most <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(p(0) = 1 - 0 \cdot q(0) = 1\)</span>.</p></li>
+</ol>
+<p>Thus, GMRES finds the <span class="math notranslate nohighlight">\(x^{(k)}\)</span> corresponding to the polynomial <span class="math notranslate nohighlight">\(p \in \mathcal{P}_k\)</span> (the set of polynomials of degree <span class="math notranslate nohighlight">\(\le k\)</span>) that satisfies <span class="math notranslate nohighlight">\(p(0)=1\)</span> and minimizes the norm of the resulting residual:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\|r^{(k)}\|_2 = \min_{ \substack{p \in \mathcal{P}_k \\ p(0) = 1} } \| p(A) b \|_2
+\end{split}\]</div>
+<p>This tells us that <strong>GMRES converges quickly if there exists a low-degree polynomial <span class="math notranslate nohighlight">\(p\)</span> such that <span class="math notranslate nohighlight">\(p(0)=1\)</span> and <span class="math notranslate nohighlight">\(p(A)b\)</span> is small.</strong></p>
+</section>
+<section id="a-formal-error-bound">
+<h3>A Formal Error Bound<a class="headerlink" href="#a-formal-error-bound" title="Link to this heading">#</a></h3>
+<p>This polynomial formulation leads to a famous (though often pessimistic) upper bound on the GMRES residual.</p>
+<div class="proof theorem admonition" id="gmres_residual_bound">
+<p class="admonition-title"><span class="caption-number">Theorem 40 </span> (GMRES Residual Bound)</p>
+<section class="theorem-content" id="proof-content">
+<p>Suppose that <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable with an eigenvalue decomposition <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span>. Then the GMRES residual at step <span class="math notranslate nohighlight">\(k\)</span> is bounded by:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\|r^{(k)}\|_2 \le \|b\|_2 \cdot \kappa(X) \cdot \min_{ \substack{p \in \mathcal{P}_k \\p(0) = 1} } \max_{\lambda \in \Lambda(A)} |p(\lambda)|
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Lambda(A)\)</span> is the set of <span class="math notranslate nohighlight">\(A\)</span>’s eigenvalues and <span class="math notranslate nohighlight">\(\kappa(X) = \|X\|_2 \|X^{-1}\|_2\)</span> is the condition number of the eigenvector matrix <span class="math notranslate nohighlight">\(X\)</span>.</p>
+</section>
+</div><p>This bound reveals the two key factors governing GMRES convergence:</p>
+<ol class="arabic simple">
+<li><p><strong>Eigenvalue Distribution:</strong> The term <span class="math notranslate nohighlight">\(\min \max |p(\lambda)|\)</span>. We need to find a low-degree polynomial <span class="math notranslate nohighlight">\(p\)</span> (with <span class="math notranslate nohighlight">\(p(0)=1\)</span>) that is as small as possible on <em>all</em> eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<ul class="simple">
+<li><p><strong>Good Case:</strong> If the eigenvalues are clustered in a few compact groups, all far from the origin, it is easy to construct such a polynomial.</p></li>
+<li><p><strong>Bad Case:</strong> If the eigenvalues are distributed widely, or worse, accumulate near the origin, it is very difficult for a low-degree polynomial to be small on all of them simultaneously.</p></li>
+</ul>
+</li>
+<li><p><strong>Non-Normality of <span class="math notranslate nohighlight">\(A\)</span>:</strong> The term <span class="math notranslate nohighlight">\(\kappa(X)\)</span>.</p>
+<ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is a <strong>normal matrix</strong> (e.g., symmetric, skew-symmetric, or unitary), its eigenvectors are orthogonal, and <span class="math notranslate nohighlight">\(\kappa(X) = 1\)</span>. In this case, convergence is governed <em>only</em> by the eigenvalue distribution.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is <strong>non-normal</strong>, its eigenvectors can be nearly linearly dependent, making <span class="math notranslate nohighlight">\(\kappa(X)\)</span> very large. A large <span class="math notranslate nohighlight">\(\kappa(X)\)</span> can permit slow convergence even when the eigenvalue distribution appears favorable. This is the most significant departure from the convergence behavior of CG.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="a-failure-case-for-gmres">
+<h3>A “Failure Case” for GMRES<a class="headerlink" href="#a-failure-case-for-gmres" title="Link to this heading">#</a></h3>
+<p>A classic example of worst-case behavior occurs when the eigenvalues are uniformly distributed on the unit circle.</p>
+<p>Consider a simple <strong>permutation matrix</strong> <span class="math notranslate nohighlight">\(A\)</span> that represents a single cycle on <span class="math notranslate nohighlight">\(n\)</span> elements, for instance, <span class="math notranslate nohighlight">\(\pi(i) = (i \mod n) + 1\)</span>. The eigenvalues of this matrix are the <span class="math notranslate nohighlight">\(n\)</span> roots of unity, which are perfectly spread around the unit circle.</p>
+<p>Let’s try to solve <span class="math notranslate nohighlight">\(Ax = e_1\)</span>. The solution <span class="math notranslate nohighlight">\(x\)</span> is the vector <span class="math notranslate nohighlight">\(e_r\)</span> such that <span class="math notranslate nohighlight">\(\pi(r) = 1\)</span>, which in this case is <span class="math notranslate nohighlight">\(e_n\)</span>. The Krylov subspace is:</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{K}_k(A, e_1) = \text{span} \{e_1, A e_1, \dots, A^{k-1} e_1\} = \text{span} \{e_1, e_2, \dots, e_k\}
+\]</div>
+<p>The subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> is simply the coordinate subspace spanned by the first <span class="math notranslate nohighlight">\(k\)</span> standard basis vectors.</p>
+<p>The true solution is <span class="math notranslate nohighlight">\(x = e_n\)</span>. This solution vector is <strong>orthogonal</strong> to the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> for all <span class="math notranslate nohighlight">\(k &lt; n\)</span>. Because the GMRES approximation <span class="math notranslate nohighlight">\(x^{(k)}\)</span> <em>must</em> lie in <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>, the algorithm cannot make <em>any</em> progress toward the solution. The residual norm will remain completely stagnant.</p>
+<p>Only at iteration <span class="math notranslate nohighlight">\(k=n\)</span> does the subspace <span class="math notranslate nohighlight">\(\mathcal{K}_n\)</span> finally contain the solution. GMRES will find the exact solution in <span class="math notranslate nohighlight">\(n\)</span> steps (as it must, in exact arithmetic), but it shows zero convergence until the very last iteration. This is a catastrophic failure of “fast” convergence, and it stems directly from an eigenvalue distribution that makes the polynomial problem <span class="math notranslate nohighlight">\(\min \max |p(\lambda)|\)</span> impossible to solve well for <span class="math notranslate nohighlight">\(k &lt; n\)</span>.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="conjugate_gradient.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Conjugate Gradient (CG) Method</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cg_vs_gmres.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">A Comparative Summary: CG vs. GMRES</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-conjugate-gradients-to-gmres">From Conjugate Gradients to GMRES</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-analogy-and-computational-cost">The Arnoldi Analogy and Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-new-objective-minimizing-the-residual">A New Objective: Minimizing the Residual</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-gmres-least-squares-problem">Deriving the GMRES Least-Squares Problem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-relation">The Arnoldi Relation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transforming-the-problem">Transforming the Problem</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-algorithm-computational-steps">The GMRES Algorithm: Computational Steps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-step">The Arnoldi Step</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-qr-factorization-and-solve">Update the QR Factorization and Solve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-the-final-solution">Compute the Final Solution</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-gmres">Convergence of GMRES</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-polynomial-problem">The GMRES Polynomial Problem</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-formal-error-bound">A Formal Error Bound</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-failure-case-for-gmres">A “Failure Case” for GMRES</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

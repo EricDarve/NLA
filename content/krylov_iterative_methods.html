@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary of LS Solution Methods &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Krylov Subspace Methods &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_summary';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/krylov_iterative_methods';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Eigenvalue Computation" href="eigenvalues.html" />
-    <link rel="prev" title="SVD for Rank-Deficient Least-Squares" href="LS_using_SVD.html" />
+    <link rel="next" title="The Conjugate Gradient (CG) Method" href="conjugate_gradient.html" />
+    <link rel="prev" title="The Chebyshev Iteration Method" href="chebyshev_acceleration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
@@ -218,7 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of LS Solution Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -252,7 +252,7 @@
 <li class="toctree-l2"><a class="reference internal" href="chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Krylov Subspace Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">A Comparative Summary: CG vs. GMRES</a></li>
@@ -314,7 +314,7 @@
       
       
       
-      <li><a href="../_sources/content/LS_summary.md" target="_blank"
+      <li><a href="../_sources/content/krylov_iterative_methods.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -385,7 +385,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -396,11 +398,21 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary of LS Solution Methods</h1>
+    <h1>Krylov Subspace Methods</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#searching-for-an-optimal-solution">Searching for an Optimal Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-challenge-what-is-optimal">The Central Challenge: What is “Optimal”?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-tractable-paths-to-optimality">Two Tractable Paths to Optimality</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -410,64 +422,59 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-ls-solution-methods">
-<h1>Summary of LS Solution Methods<a class="headerlink" href="#summary-of-ls-solution-methods" title="Link to this heading">#</a></h1>
-<p>Choosing the right algorithm for a linear least-squares problem depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>, specifically its size, condition number, and rank.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="lls-methods-summary">
-<caption><span class="caption-number">Table 1 </span><span class="caption-text">Comparison of Methods for Solving <span class="math notranslate nohighlight">\(\text{argmin}_x \|Ax - b\|_2\)</span></span><a class="headerlink" href="#lls-methods-summary" title="Link to this table">#</a></caption>
-<thead>
-<tr class="row-odd"><th class="head"><p>Method</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="krylov-subspace-methods">
+<h1>Krylov Subspace Methods<a class="headerlink" href="#krylov-subspace-methods" title="Link to this heading">#</a></h1>
+<section id="searching-for-an-optimal-solution">
+<h2>Searching for an Optimal Solution<a class="headerlink" href="#searching-for-an-optimal-solution" title="Link to this heading">#</a></h2>
+<p>In the previous chapters, we explored classical iterative methods like Jacobi, Gauss-Seidel, and SOR. These “splitting” methods provide a simple and intuitive way to approach the linear system <span class="math notranslate nohighlight">\(Ax=b\)</span>, but their convergence can be slow and highly dependent on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>. We now turn our attention to a more powerful and sophisticated family of techniques: <strong>Krylov subspace methods</strong>.</p>
+<p>These methods represent a fundamental shift in strategy. Instead of a simple fixed-point iteration, we will build a sequence of approximate solutions <span class="math notranslate nohighlight">\(x^{(k)}\)</span> by searching within a carefully constructed, expanding subspace. This subspace, known as the <strong>Krylov subspace</strong>, is the heart of the entire approach.</p>
+<p><strong>Definition: The Krylov Subspace</strong></p>
+<p>Given a matrix <span class="math notranslate nohighlight">\(A\)</span> and a starting vector (typically the initial residual <span class="math notranslate nohighlight">\(r^{(0)} = b - Ax^{(0)}\)</span>), the <span class="math notranslate nohighlight">\(k\)</span>-th Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> is the space spanned by the first <span class="math notranslate nohighlight">\(k\)</span> vectors in the sequence <span class="math notranslate nohighlight">\(\{r^{(0)}, Ar^{(0)}, A^2r^{(0)}, \ldots\}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+{\mathcal K}_k(A, r^{(0)}) = \text{span}\{ r^{(0)}, A r^{(0)}, A^2 r^{(0)}, \ldots, A^{k-1} r^{(0)} \}
+\]</div>
+<p>The core idea of Krylov methods is to find an <span class="math notranslate nohighlight">\(x^{(k)}\)</span> in the affine subspace <span class="math notranslate nohighlight">\(x^{(0)} + {\mathcal K}_k\)</span> that is “optimal” in some sense. Assuming <span class="math notranslate nohighlight">\(x^{(0)} = 0\)</span> for simplicity, our goal is to find <span class="math notranslate nohighlight">\(x^{(k)} \in {\mathcal K}_k(A, b)\)</span> that best approximates the true solution <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</section>
+<section id="the-central-challenge-what-is-optimal">
+<h2>The Central Challenge: What is “Optimal”?<a class="headerlink" href="#the-central-challenge-what-is-optimal" title="Link to this heading">#</a></h2>
+<p>This brings us to the central question: <strong>How do we define the “optimal” solution</strong> within the Krylov subspace?</p>
+<p>Let’s say we have an orthogonal basis <span class="math notranslate nohighlight">\(Q_k\)</span> for <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. Our approximate solution would then be <span class="math notranslate nohighlight">\(x^{(k)} = Q_k y_k\)</span> for some vector of coefficients <span class="math notranslate nohighlight">\(y_k\)</span>.</p>
+<p>The most natural and desirable choice would be to find the <span class="math notranslate nohighlight">\(x^{(k)}\)</span> that is <em>closest</em> to the true, unknown solution <span class="math notranslate nohighlight">\(x\)</span>. This means we would try to minimize the 2-norm of the <strong>true error</strong> <span class="math notranslate nohighlight">\(e^{(k)} = x - x^{(k)}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+y_k = \underset{y \in \mathbb{R}^k}{\rm argmin} \, \| x - Q_k y \|_2
+\]</div>
+<p>The solution to this least-squares problem is the orthogonal projection of <span class="math notranslate nohighlight">\(x\)</span> onto the subspace, given by <span class="math notranslate nohighlight">\(y_k = Q_k^T x\)</span>.</p>
+<p>Here we hit a wall. To compute <span class="math notranslate nohighlight">\(Q_k^T x\)</span>, we would need to know <span class="math notranslate nohighlight">\(x\)</span>. But <span class="math notranslate nohighlight">\(x = A^{-1}b\)</span> is the very solution we are trying to find! This “best” possible solution is intractable.</p>
+</section>
+<section id="two-tractable-paths-to-optimality">
+<h2>Two Tractable Paths to Optimality<a class="headerlink" href="#two-tractable-paths-to-optimality" title="Link to this heading">#</a></h2>
+<p>Instead, Krylov methods define alternative, <em>computable</em> optimality criteria that we <em>can</em> solve. The choice of criterion depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>, and different choices give rise to different methods.</p>
+<p>In this chapter, we will focus on the two most important and widely used methods.</p>
+<ol class="arabic">
+<li><p><strong>The Conjugate Gradient Method (CG)</strong></p>
 <ul class="simple">
-<li><p>Core Equation(s) to Solve</p></li>
-<li><p>Stability &amp; Conditioning</p></li>
-<li><p>Handles Rank Deficiency?</p></li>
-<li><p>Computational Cost</p></li>
+<li><p><strong>For:</strong> Symmetric Positive Definite (SPD) matrices.</p></li>
+<li><p><strong>The Idea:</strong> For SPD matrices, we can define a special “energy” norm, known as the <strong>A-norm</strong>: <span class="math notranslate nohighlight">\(\|v\|_A = \sqrt{v^T A v}\)</span>. It turns out that finding the <span class="math notranslate nohighlight">\(x^{(k)} \in {\mathcal K}_k\)</span> that minimizes the <strong><span class="math notranslate nohighlight">\(A\)</span>-norm of the true error</strong> is a tractable problem. This insight leads to the celebrated Conjugate Gradient method, a remarkably efficient algorithm that (in exact arithmetic) guarantees convergence in at most <span class="math notranslate nohighlight">\(n\)</span> steps.</p></li>
 </ul>
-</th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>Normal Equations</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Form <span class="math notranslate nohighlight">\(C = A^T A\)</span>, <span class="math notranslate nohighlight">\(d = A^T b\)</span></p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(Cx = d\)</span></p></li>
-</ol>
 </li>
-<li><p><strong>Poor.</strong> <span class="math notranslate nohighlight">\(\kappa(A^T A) = \kappa(A)^2\)</span>. Numerically unstable for ill-conditioned problems.</p></li>
-<li><p><strong>No.</strong> Requires <span class="math notranslate nohighlight">\(A\)</span> to be full column rank so that <span class="math notranslate nohighlight">\(A^T A\)</span> is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by forming <span class="math notranslate nohighlight">\(A^TA\)</span>. Typically the fastest method.</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd"><td><p><strong>QR Factorization</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Factor <span class="math notranslate nohighlight">\(A = Q_1R_1\)</span> (Thin QR)</p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(R_1x = Q_1^T b\)</span></p></li>
-</ol>
+<li><p><strong>The Generalized Minimal Residual Method (GMRES)</strong></p>
+<ul>
+<li><p><strong>For:</strong> General, nonsingular matrices.</p></li>
+<li><p><strong>The Idea:</strong> When <span class="math notranslate nohighlight">\(A\)</span> is not SPD, the <span class="math notranslate nohighlight">\(A\)</span>-norm is not available. Instead, we take a different approach. While we cannot measure the error <span class="math notranslate nohighlight">\(e^{(k)}\)</span>, we <em>can</em> measure the <strong>residual</strong> <span class="math notranslate nohighlight">\(r^{(k)} = b - Ax^{(k)}\)</span>. The GMRES method seeks the <span class="math notranslate nohighlight">\(x^{(k)} \in {\mathcal K}_k\)</span> that minimizes the 2-norm of this residual.</p>
+<div class="math notranslate nohighlight">
+\[
+        \text{Find } x^{(k)} \in {\mathcal K}_k(A, b) \quad \text{such that} \quad \| b - A x^{(k)} \|_2 \text{ is minimized.}
+        \]</div>
 </li>
-<li><p><strong>Good.</strong> <span class="math notranslate nohighlight">\(\kappa(R_1) = \kappa(A)\)</span>. The numerically stable, general-purpose method.</p></li>
-<li><p><strong>No.</strong> Requires <span class="math notranslate nohighlight">\(A\)</span> to be full column rank so that <span class="math notranslate nohighlight">\(R_1\)</span> is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by the factorization. Slower than Normal Eq.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="row-even"><td><p><strong>SVD</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Factor <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(x = V \Sigma^\dagger U^T b\)</span></p></li>
-</ol>
+<p>This is a standard linear least-squares problem (in <span class="math notranslate nohighlight">\(k\)</span> dimensions) that we can solve at each step.</p>
 </li>
-<li><p><strong>Excellent.</strong> Most numerically robust method, not affected by <span class="math notranslate nohighlight">\(\kappa(A)\)</span>.</p></li>
-<li><p><strong>Yes.</strong> This is its key advantage. Finds the unique min-norm solution.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by the SVD. Generally the slowest of the three.</p></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+</ol>
+<p>We will begin by deriving the Conjugate Gradient method, leveraging the special properties of SPD matrices, before moving on to the more general (and more complex) framework of GMRES.</p>
+</section>
+<div class="toctree-wrapper compound">
 </div>
 </section>
 
@@ -502,20 +509,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="LS_using_SVD.html"
+       href="chebyshev_acceleration.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">SVD for Rank-Deficient Least-Squares</p>
+        <p class="prev-next-title">The Chebyshev Iteration Method</p>
       </div>
     </a>
     <a class="right-next"
-       href="eigenvalues.html"
+       href="conjugate_gradient.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Eigenvalue Computation</p>
+        <p class="prev-next-title">The Conjugate Gradient (CG) Method</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -525,6 +532,23 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#searching-for-an-optimal-solution">Searching for an Optimal Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-challenge-what-is-optimal">The Central Challenge: What is “Optimal”?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-tractable-paths-to-optimality">Two Tractable Paths to Optimality</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

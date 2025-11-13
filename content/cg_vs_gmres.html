@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary of LS Solution Methods &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>A Comparative Summary: CG vs. GMRES &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_summary';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/cg_vs_gmres';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Eigenvalue Computation" href="eigenvalues.html" />
-    <link rel="prev" title="SVD for Rank-Deficient Least-Squares" href="LS_using_SVD.html" />
+    <link rel="next" title="MINRES" href="minres.html" />
+    <link rel="prev" title="The Generalized Minimal Residual Method (GMRES)" href="gmres.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
@@ -218,7 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of LS Solution Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -252,10 +252,10 @@
 <li class="toctree-l2"><a class="reference internal" href="chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">A Comparative Summary: CG vs. GMRES</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">A Comparative Summary: CG vs. GMRES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
 </ul>
 </details></li>
@@ -314,7 +314,7 @@
       
       
       
-      <li><a href="../_sources/content/LS_summary.md" target="_blank"
+      <li><a href="../_sources/content/cg_vs_gmres.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -385,7 +385,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -396,11 +398,26 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary of LS Solution Methods</h1>
+    <h1>A Comparative Summary: CG vs. GMRES</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-differences">Key Differences</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applicability">Applicability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recurrence-and-optimality">Recurrence and Optimality</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-and-storage-cost">Computational and Storage Cost</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-summary-table">Comparison Summary Table</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-practicality-of-restarting">The Practicality of Restarting</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -410,65 +427,92 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-ls-solution-methods">
-<h1>Summary of LS Solution Methods<a class="headerlink" href="#summary-of-ls-solution-methods" title="Link to this heading">#</a></h1>
-<p>Choosing the right algorithm for a linear least-squares problem depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>, specifically its size, condition number, and rank.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="lls-methods-summary">
-<caption><span class="caption-number">Table 1 </span><span class="caption-text">Comparison of Methods for Solving <span class="math notranslate nohighlight">\(\text{argmin}_x \|Ax - b\|_2\)</span></span><a class="headerlink" href="#lls-methods-summary" title="Link to this table">#</a></caption>
-<thead>
-<tr class="row-odd"><th class="head"><p>Method</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="a-comparative-summary-cg-vs-gmres">
+<h1>A Comparative Summary: CG vs. GMRES<a class="headerlink" href="#a-comparative-summary-cg-vs-gmres" title="Link to this heading">#</a></h1>
+<p>Both the Conjugate Gradients (CG) and GMRES algorithms are foundational Krylov subspace methods for solving large, sparse linear systems <span class="math notranslate nohighlight">\(Ax=b\)</span>. However, they are designed for different classes of problems, and their computational costs and practical behaviors differ dramatically.</p>
+<p>The primary difference stems from the underlying process they use to build their respective Krylov subspaces:</p>
 <ul class="simple">
-<li><p>Core Equation(s) to Solve</p></li>
-<li><p>Stability &amp; Conditioning</p></li>
-<li><p>Handles Rank Deficiency?</p></li>
-<li><p>Computational Cost</p></li>
+<li><p><strong>CG</strong> is built upon the <strong>Lanczos process</strong>, which only applies to symmetric matrices.</p></li>
+<li><p><strong>GMRES</strong> is built upon the <strong>Arnoldi process</strong>, which applies to any square matrix.</p></li>
 </ul>
-</th>
+<p>This single distinction leads to all the major differences in their performance, cost, and applicability.</p>
+<section id="key-differences">
+<h2>Key Differences<a class="headerlink" href="#key-differences" title="Link to this heading">#</a></h2>
+<section id="applicability">
+<h3>Applicability<a class="headerlink" href="#applicability" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Conjugate Gradients (CG):</strong> This is a specialized algorithm. It is guaranteed to converge <em>only</em> if the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>symmetric positive definite (SPD)</strong>. It leverages this symmetry to achieve high efficiency.</p></li>
+<li><p><strong>GMRES:</strong> This is a general-purpose algorithm. It can be applied to <strong>any square, invertible matrix</strong> <span class="math notranslate nohighlight">\(A\)</span>, including those that are non-symmetric, indefinite, or both.</p></li>
+</ul>
+</section>
+<section id="recurrence-and-optimality">
+<h3>Recurrence and Optimality<a class="headerlink" href="#recurrence-and-optimality" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Conjugate Gradients (CG):</strong> By leveraging the <span class="math notranslate nohighlight">\(A\)</span>-norm, CG satisfies an optimality condition using a <strong>short-term (three-term) recurrence</strong>. This means that to compute the next vector, it only needs information from the previous two steps.</p></li>
+<li><p><strong>GMRES:</strong> Lacking symmetry, GMRES must use a <strong>long-term recurrence</strong> (the full Arnoldi process). To enforce orthogonality, each new basis vector <span class="math notranslate nohighlight">\(q_{k+1}\)</span> must be explicitly orthogonalized against <em>all</em> preceding vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_k\)</span>. It finds the solution in the subspace that minimizes the 2-norm of the residual.</p></li>
+</ul>
+</section>
+<section id="computational-and-storage-cost">
+<h3>Computational and Storage Cost<a class="headerlink" href="#computational-and-storage-cost" title="Link to this heading">#</a></h3>
+<p>This is the most significant practical difference. The short-term recurrence of CG makes it extremely cheap, while the long-term recurrence of GMRES makes its cost grow with each iteration.</p>
+<ul class="simple">
+<li><p><strong>Conjugate Gradients (CG):</strong></p>
+<ul>
+<li><p><strong>Cost per Iteration <span class="math notranslate nohighlight">\(k\)</span>:</strong> <span class="math notranslate nohighlight">\(O(\text{nnz}(A) + n)\)</span>. This cost is <strong>constant</strong>. It is dominated by one sparse matrix-vector product (<span class="math notranslate nohighlight">\(O(\text{nnz})\)</span>) and a few vector operations (<span class="math notranslate nohighlight">\(O(n)\)</span>).</p></li>
+<li><p><strong>Storage:</strong> <span class="math notranslate nohighlight">\(O(n)\)</span>. CG only needs to store a few vectors (the solution, residual, and direction vectors).</p></li>
+</ul>
+</li>
+<li><p><strong>GMRES:</strong></p>
+<ul>
+<li><p><strong>Cost per Iteration <span class="math notranslate nohighlight">\(k\)</span>:</strong> <span class="math notranslate nohighlight">\(O(\text{nnz}(A) + kn)\)</span>. This cost <strong>grows linearly with <span class="math notranslate nohighlight">\(k\)</span></strong>. The <span class="math notranslate nohighlight">\(\text{nnz}(A)\)</span> term is the matrix-vector product, but the <span class="math notranslate nohighlight">\(kn\)</span> term comes from orthogonalizing the new vector against the <span class="math notranslate nohighlight">\(k\)</span> previous basis vectors. This <span class="math notranslate nohighlight">\(kn\)</span> term quickly becomes the dominant cost.</p></li>
+<li><p><strong>Storage:</strong> <span class="math notranslate nohighlight">\(O(kn)\)</span>. GMRES must store the entire basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> to perform the orthogonalization, so its memory footprint grows at each step.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="comparison-summary-table">
+<h3>Comparison Summary Table<a class="headerlink" href="#comparison-summary-table" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Algorithm</p></th>
+<th class="head text-left"><p>Applicability</p></th>
+<th class="head text-center"><p>Cost at Iteration <span class="math notranslate nohighlight">\(k\)</span></p></th>
+<th class="head text-center"><p>Total Storage</p></th>
+<th class="head text-center"><p>Total Time (after <span class="math notranslate nohighlight">\(k\)</span> steps)</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><strong>Normal Equations</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Form <span class="math notranslate nohighlight">\(C = A^T A\)</span>, <span class="math notranslate nohighlight">\(d = A^T b\)</span></p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(Cx = d\)</span></p></li>
-</ol>
-</li>
-<li><p><strong>Poor.</strong> <span class="math notranslate nohighlight">\(\kappa(A^T A) = \kappa(A)^2\)</span>. Numerically unstable for ill-conditioned problems.</p></li>
-<li><p><strong>No.</strong> Requires <span class="math notranslate nohighlight">\(A\)</span> to be full column rank so that <span class="math notranslate nohighlight">\(A^T A\)</span> is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by forming <span class="math notranslate nohighlight">\(A^TA\)</span>. Typically the fastest method.</p></li>
-</ul>
-</td>
+<tr class="row-even"><td class="text-left"><p><strong>CG</strong></p></td>
+<td class="text-left"><p>Symmetric Positive Definite</p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(\text{nnz} + n)\)</span></p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(n)\)</span></p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(k \, (\text{nnz} + n))\)</span></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>QR Factorization</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Factor <span class="math notranslate nohighlight">\(A = Q_1R_1\)</span> (Thin QR)</p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(R_1x = Q_1^T b\)</span></p></li>
-</ol>
-</li>
-<li><p><strong>Good.</strong> <span class="math notranslate nohighlight">\(\kappa(R_1) = \kappa(A)\)</span>. The numerically stable, general-purpose method.</p></li>
-<li><p><strong>No.</strong> Requires <span class="math notranslate nohighlight">\(A\)</span> to be full column rank so that <span class="math notranslate nohighlight">\(R_1\)</span> is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by the factorization. Slower than Normal Eq.</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even"><td><p><strong>SVD</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Factor <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(x = V \Sigma^\dagger U^T b\)</span></p></li>
-</ol>
-</li>
-<li><p><strong>Excellent.</strong> Most numerically robust method, not affected by <span class="math notranslate nohighlight">\(\kappa(A)\)</span>.</p></li>
-<li><p><strong>Yes.</strong> This is its key advantage. Finds the unique min-norm solution.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by the SVD. Generally the slowest of the three.</p></li>
-</ul>
-</td>
+<tr class="row-odd"><td class="text-left"><p><strong>GMRES</strong></p></td>
+<td class="text-left"><p>Any Square Matrix</p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(\text{nnz} + kn)\)</span></p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(kn)\)</span></p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(k \cdot \text{nnz} + k^2n)\)</span></p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</section>
+<section id="the-practicality-of-restarting">
+<h3>The Practicality of Restarting<a class="headerlink" href="#the-practicality-of-restarting" title="Link to this heading">#</a></h3>
+<p>The comparison table makes the primary weakness of GMRES clear: <strong>it struggles with large <span class="math notranslate nohighlight">\(k\)</span></strong>.</p>
+<p>The <span class="math notranslate nohighlight">\(k^2n\)</span> time complexity and <span class="math notranslate nohighlight">\(kn\)</span> storage cost mean that running GMRES for many iterations is computationally prohibitive. It becomes unacceptably slow, and its memory requirement will eventually exceed the system’s capacity.</p>
+<p>This leads to a common practical compromise: <strong>restarted GMRES</strong>, often denoted as <strong>GMRES(<span class="math notranslate nohighlight">\(m\)</span>)</strong>.</p>
+<ol class="arabic simple">
+<li><p>We choose a fixed restart parameter <span class="math notranslate nohighlight">\(m\)</span> (e.g., <span class="math notranslate nohighlight">\(m=20\)</span> or <span class="math notranslate nohighlight">\(m=50\)</span>).</p></li>
+<li><p>We run <span class="math notranslate nohighlight">\(m\)</span> steps of the “inner” GMRES algorithm.</p></li>
+<li><p>We compute the approximate solution <span class="math notranslate nohighlight">\(x^{(m)}\)</span> and use it as the new starting guess.</p></li>
+<li><p>We “restart” the algorithm, discarding the entire Krylov basis <span class="math notranslate nohighlight">\(Q_m\)</span> and building a new one from the new residual <span class="math notranslate nohighlight">\(r^{(m)} = b - A x^{(m)}\)</span>.</p></li>
+</ol>
+<p>This “restarting” procedure effectively caps the computational and storage costs at <span class="math notranslate nohighlight">\(O(mn)\)</span> and <span class="math notranslate nohighlight">\(O(m \cdot \text{nnz} + m^2n)\)</span>, respectively.</p>
+<p>The drawback, however, is significant: <strong>restarting slows down convergence</strong>. By throwing away the Krylov subspace, we lose all the information the algorithm has gathered about the matrix. This can lead to a much higher total number of iterations and, in some difficult cases, can cause the algorithm to stagnate completely. CG, by contrast, never needs to be restarted.</p>
+</section>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -502,20 +546,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="LS_using_SVD.html"
+       href="gmres.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">SVD for Rank-Deficient Least-Squares</p>
+        <p class="prev-next-title">The Generalized Minimal Residual Method (GMRES)</p>
       </div>
     </a>
     <a class="right-next"
-       href="eigenvalues.html"
+       href="minres.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Eigenvalue Computation</p>
+        <p class="prev-next-title">MINRES</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -525,6 +569,28 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-differences">Key Differences</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applicability">Applicability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#recurrence-and-optimality">Recurrence and Optimality</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-and-storage-cost">Computational and Storage Cost</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-summary-table">Comparison Summary Table</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-practicality-of-restarting">The Practicality of Restarting</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

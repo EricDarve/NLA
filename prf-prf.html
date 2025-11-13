@@ -256,6 +256,13 @@
 <li class="toctree-l2"><a class="reference internal" href="content/chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="content/krylov_iterative_methods.html">Krylov Subspace Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="content/conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/cg_vs_gmres.html">A Comparative Summary: CG vs. GMRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/minres.html">MINRES</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="content/LICENSE.html">License for this book</a></li>
 </ul>
 
@@ -363,12 +370,18 @@ document.write(`
    <h1>Proof Index</h1>
 
    <div class="modindex-jumpbox">
+   <a href="#cap-a_inner_prod"><strong>a_inner_prod</strong></a> | 
+   <a href="#cap-cg_finite_convergence"><strong>cg_finite_convergence</strong></a> | 
+   <a href="#cap-cg_residual_basis"><strong>cg_residual_basis</strong></a> | 
+   <a href="#cap-cg_residual_orthogonality"><strong>cg_residual_orthogonality</strong></a> | 
+   <a href="#cap-cg_residuals_orthogonal"><strong>cg_residuals_orthogonal</strong></a> | 
    <a href="#cap-cor:ritz-per-eig"><strong>cor:ritz-per-eig</strong></a> | 
    <a href="#cap-def:characteristic_polynomial"><strong>def:characteristic_polynomial</strong></a> | 
    <a href="#cap-def:minimal_polynomial"><strong>def:minimal_polynomial</strong></a> | 
    <a href="#cap-def:pseudospectrum1"><strong>def:pseudospectrum1</strong></a> | 
    <a href="#cap-def:pseudospectrum2"><strong>def:pseudospectrum2</strong></a> | 
    <a href="#cap-definition-0"><strong>definition-0</strong></a> | 
+   <a href="#cap-gmres_residual_bound"><strong>gmres_residual_bound</strong></a> | 
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
    <a href="#cap-lemma-4"><strong>lemma-4</strong></a> | 
    <a href="#cap-prop:minimal_polynomial"><strong>prop:minimal_polynomial</strong></a> | 
@@ -410,6 +423,46 @@ document.write(`
    </div>
 
    <table class="indextable modindextable">
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-a_inner_prod"><td></td><td>
+       <strong>a_inner_prod</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/conjugate_gradient.html#a_inner_prod"><code class="xref">a_inner_prod</code></a> <em>(content/conjugate_gradient)</em></td><td>
+       <em>definition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-cg_finite_convergence"><td></td><td>
+       <strong>cg_finite_convergence</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/conjugate_gradient.html#cg_finite_convergence"><code class="xref">cg_finite_convergence</code></a> <em>(content/conjugate_gradient)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-cg_residual_basis"><td></td><td>
+       <strong>cg_residual_basis</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/conjugate_gradient.html#cg_residual_basis"><code class="xref">cg_residual_basis</code></a> <em>(content/conjugate_gradient)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-cg_residual_orthogonality"><td></td><td>
+       <strong>cg_residual_orthogonality</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/conjugate_gradient.html#cg_residual_orthogonality"><code class="xref">cg_residual_orthogonality</code></a> <em>(content/conjugate_gradient)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-cg_residuals_orthogonal"><td></td><td>
+       <strong>cg_residuals_orthogonal</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/conjugate_gradient.html#cg_residuals_orthogonal"><code class="xref">cg_residuals_orthogonal</code></a> <em>(content/conjugate_gradient)</em></td><td>
+       <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-cor:ritz-per-eig"><td></td><td>
        <strong>cor:ritz-per-eig</strong></td><td></td></tr>
@@ -458,6 +511,14 @@ document.write(`
        <td>
        <a href="content/cholesky.html#definition-0"><code class="xref">definition-0</code></a> <em>(content/cholesky)</em></td><td>
        <em>definition</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-gmres_residual_bound"><td></td><td>
+       <strong>gmres_residual_bound</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/gmres.html#gmres_residual_bound"><code class="xref">gmres_residual_bound</code></a> <em>(content/gmres)</em></td><td>
+       <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-lem:banach"><td></td><td>
        <strong>lem:banach</strong></td><td></td></tr>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary of LS Solution Methods &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>MINRES &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -60,11 +60,11 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'content/LS_summary';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/minres';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Eigenvalue Computation" href="eigenvalues.html" />
-    <link rel="prev" title="SVD for Rank-Deficient Least-Squares" href="LS_using_SVD.html" />
+    <link rel="next" title="License for this book" href="LICENSE.html" />
+    <link rel="prev" title="A Comparative Summary: CG vs. GMRES" href="cg_vs_gmres.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -206,7 +206,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
@@ -218,7 +218,7 @@
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of LS Solution Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -252,11 +252,11 @@
 <li class="toctree-l2"><a class="reference internal" href="chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">A Comparative Summary: CG vs. GMRES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">MINRES</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -314,7 +314,7 @@
       
       
       
-      <li><a href="../_sources/content/LS_summary.md" target="_blank"
+      <li><a href="../_sources/content/minres.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -385,7 +385,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -396,11 +398,23 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary of LS Solution Methods</h1>
+    <h1>MINRES</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-arnoldi-to-lanczos">From Arnoldi to Lanczos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minres-least-squares-problem">The MINRES Least-Squares Problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#efficiency-gains">Efficiency Gains</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">Convergence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cg-vs-minres">CG vs. MINRES</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -410,65 +424,96 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-ls-solution-methods">
-<h1>Summary of LS Solution Methods<a class="headerlink" href="#summary-of-ls-solution-methods" title="Link to this heading">#</a></h1>
-<p>Choosing the right algorithm for a linear least-squares problem depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>, specifically its size, condition number, and rank.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="lls-methods-summary">
-<caption><span class="caption-number">Table 1 </span><span class="caption-text">Comparison of Methods for Solving <span class="math notranslate nohighlight">\(\text{argmin}_x \|Ax - b\|_2\)</span></span><a class="headerlink" href="#lls-methods-summary" title="Link to this table">#</a></caption>
-<thead>
-<tr class="row-odd"><th class="head"><p>Method</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="minres">
+<h1>MINRES<a class="headerlink" href="#minres" title="Link to this heading">#</a></h1>
+<p>We have seen that GMRES is a general-purpose method for any square matrix, but its cost grows with each iteration. By contrast, the Conjugate Gradient (CG) method is incredibly efficient, but it applies <em>only</em> to symmetric positive definite (SPD) matrices.</p>
+<p>This raises a natural question: what if we have a matrix <span class="math notranslate nohighlight">\(A\)</span> that is <strong>symmetric, but not positive definite (indefinite)?</strong></p>
 <ul class="simple">
-<li><p>Core Equation(s) to Solve</p></li>
-<li><p>Stability &amp; Conditioning</p></li>
-<li><p>Handles Rank Deficiency?</p></li>
-<li><p>Computational Cost</p></li>
+<li><p>CG is not applicable, as the <span class="math notranslate nohighlight">\(A\)</span>-norm is not a valid norm and the algorithm is not guaranteed to converge.</p></li>
+<li><p>GMRES <em>is</em> applicable, but it fails to exploit the symmetry of <span class="math notranslate nohighlight">\(A\)</span>. We would be paying the full <span class="math notranslate nohighlight">\(O(kn)\)</span> cost per iteration, which is unnecessary.</p></li>
 </ul>
-</th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>Normal Equations</strong></p>
+<p>This is the problem solved by the <strong>Minimal Residual (MINRES)</strong> algorithm, developed by Paige and Saunders. MINRES is, in essence, a specialized and highly efficient version of GMRES that leverages symmetry.</p>
+<section id="from-arnoldi-to-lanczos">
+<h2>From Arnoldi to Lanczos<a class="headerlink" href="#from-arnoldi-to-lanczos" title="Link to this heading">#</a></h2>
+<p>The core distinction between GMRES and MINRES is analogous to the difference between the Arnoldi and Lanczos processes:</p>
 <ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Form <span class="math notranslate nohighlight">\(C = A^T A\)</span>, <span class="math notranslate nohighlight">\(d = A^T b\)</span></p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(Cx = d\)</span></p></li>
-</ol>
+<li><p><strong>GMRES</strong> is built on the <strong>Arnoldi process</strong> (<span class="math notranslate nohighlight">\(A Q_k = Q_{k+1} \underline{H}_k\)</span>) for general matrices, producing a Hessenberg matrix <span class="math notranslate nohighlight">\(\underline{H}_k\)</span>.</p></li>
+<li><p><strong>MINRES</strong> is built on the <strong>Lanczos process</strong> for symmetric matrices. When <span class="math notranslate nohighlight">\(A\)</span> is symmetric, the Arnoldi process simplifies <em>exactly</em> to the Lanczos process. The resulting Hessenberg matrix <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> becomes a tridiagonal matrix, which we will call <span class="math notranslate nohighlight">\(\underline{T}_k\)</span>.</p></li>
+</ul>
+<p>The Lanczos relation gives us:</p>
+<div class="math notranslate nohighlight">
+\[
+A Q_k = Q_{k+1} \underline{T}_k
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\underline{T}_k\)</span> is a <span class="math notranslate nohighlight">\((k+1) \times k\)</span> <em>tridiagonal</em> matrix.</p>
+</section>
+<section id="the-minres-least-squares-problem">
+<h2>The MINRES Least-Squares Problem<a class="headerlink" href="#the-minres-least-squares-problem" title="Link to this heading">#</a></h2>
+<p>Like GMRES, MINRES seeks to minimize the 2-norm of the residual at each step:</p>
+<div class="math notranslate nohighlight">
+\[
+\min_{y \in \mathbb{R}^k} \|r^{(k)}\|_2 = \min_y \| b - A Q_k y \|_2
+\]</div>
+<p>We follow the exact same derivation as in GMRES, substituting the Lanczos relation instead of the Arnoldi relation:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\| b - A Q_k y \|_2
+&amp; = \| (\beta e_1) Q_{k+1} - (Q_{k+1} \underline{T}_k) y \|_2 \\[.5em]
+&amp; = \left\| Q_{k+1} \left( \beta e_1 - \underline{T}_k y \right) \right\|_2 \\[.5em]
+&amp; = \| \beta e_1 - \underline{T}_k y \|_2
+\end{align}
+\end{split}\]</div>
+<p>Thus, the GMRES problem is reduced from minimizing over a Hessenberg matrix <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> to minimizing over a tridiagonal matrix <span class="math notranslate nohighlight">\(\underline{T}_k\)</span>.</p>
+</section>
+<section id="efficiency-gains">
+<h2>Efficiency Gains<a class="headerlink" href="#efficiency-gains" title="Link to this heading">#</a></h2>
+<p>This reduction in structure is the source of all the efficiency gains. We solve this small least-squares problem just as we do in GMRES: by maintaining a QR factorization using Givens rotations.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+G_k^T \cdots G_1^T \underline{T}_k =
+\begin{pmatrix}
+R_k \\ 0
+\end{pmatrix}
+\end{split}\]</div>
+<p>However, because <span class="math notranslate nohighlight">\(\underline{T}_k\)</span> is sparse (tridiagonal), the Givens rotations required to update this factorization are also very simple. The resulting upper-triangular matrix <span class="math notranslate nohighlight">\(R_k\)</span> is also sparse (it has only two upper diagonals).</p>
+<p>More importantly, the underlying Lanczos process is a <strong>short-term recurrence</strong>, just like in CG. We no longer need to store the entire <span class="math notranslate nohighlight">\(Q_k\)</span> basis or perform the <span class="math notranslate nohighlight">\(O(kn)\)</span> orthogonalization.</p>
+<p>As a result, the cost per iteration of MINRES is only <strong><span class="math notranslate nohighlight">\(O(\text{nnz} + n)\)</span></strong>.</p>
+<p>This is a remarkable result. We have developed an algorithm for general symmetric matrices that has the <strong>exact same asymptotic cost as CG</strong>, but with the broader applicability of GMRES (for symmetric systems).</p>
+</section>
+<section id="convergence">
+<h2>Convergence<a class="headerlink" href="#convergence" title="Link to this heading">#</a></h2>
+<p>The convergence of MINRES is governed by the eigenvalue distribution, and for the SPD case, it satisfies a bound similar to that of CG:</p>
+<div class="math notranslate nohighlight">
+\[
+\|r^{(k)}\|_2 \le 2 \, \| r^{(0)} \|_2 \left( \frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1} \right)^k
+\]</div>
+<p>For symmetric indefinite problems, MINRES is the method of choice.</p>
+</section>
+<section id="cg-vs-minres">
+<h2>CG vs. MINRES<a class="headerlink" href="#cg-vs-minres" title="Link to this heading">#</a></h2>
+<ul>
+<li><p><strong>Conjugate Gradients (CG)</strong> finds the approximation <span class="math notranslate nohighlight">\(x^{(k)}_{CG} \in \mathcal{K}_k\)</span> that minimizes the <strong><span class="math notranslate nohighlight">\(A\)</span>-norm of the error</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+    \min_{x \in \mathcal{K}_k} \| x - x^{(k)} \|_A
+    \]</div>
 </li>
-<li><p><strong>Poor.</strong> <span class="math notranslate nohighlight">\(\kappa(A^T A) = \kappa(A)^2\)</span>. Numerically unstable for ill-conditioned problems.</p></li>
-<li><p><strong>No.</strong> Requires <span class="math notranslate nohighlight">\(A\)</span> to be full column rank so that <span class="math notranslate nohighlight">\(A^T A\)</span> is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by forming <span class="math notranslate nohighlight">\(A^TA\)</span>. Typically the fastest method.</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd"><td><p><strong>QR Factorization</strong></p>
-<ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Factor <span class="math notranslate nohighlight">\(A = Q_1R_1\)</span> (Thin QR)</p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(R_1x = Q_1^T b\)</span></p></li>
-</ol>
+<li><p><strong>Minimal Residual (MINRES)</strong> finds the approximation <span class="math notranslate nohighlight">\(x^{(k)}_{MINRES} \in \mathcal{K}_k\)</span> that minimizes the <strong>2-norm of the residual</strong>:</p>
+<div class="math notranslate nohighlight">
+\[
+    \min_{x \in \mathcal{K}_k} \| b - A x^{(k)} \|_2
+    \]</div>
 </li>
-<li><p><strong>Good.</strong> <span class="math notranslate nohighlight">\(\kappa(R_1) = \kappa(A)\)</span>. The numerically stable, general-purpose method.</p></li>
-<li><p><strong>No.</strong> Requires <span class="math notranslate nohighlight">\(A\)</span> to be full column rank so that <span class="math notranslate nohighlight">\(R_1\)</span> is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by the factorization. Slower than Normal Eq.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="row-even"><td><p><strong>SVD</strong></p>
+<p>Even though both are for symmetric systems, both are built on the Lanczos process, and both have the same efficient <span class="math notranslate nohighlight">\(O(\text{nnz} + n)\)</span> cost, their iterates (<span class="math notranslate nohighlight">\(x^{(k)}_{CG}\)</span> vs. <span class="math notranslate nohighlight">\(x^{(k)}_{MINRES}\)</span>) are different at each step.</p>
+<p>CG guarantees a monotonically decreasing <span class="math notranslate nohighlight">\(A\)</span>-norm of the error, while MINRES guarantees a monotonically decreasing 2-norm of the residual.</p>
+<p>This clarifies the “job” of each algorithm:</p>
 <ul class="simple">
-<li><ol class="arabic simple">
-<li><p>Factor <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></li>
-<li><p>Solve <span class="math notranslate nohighlight">\(x = V \Sigma^\dagger U^T b\)</span></p></li>
-</ol>
-</li>
-<li><p><strong>Excellent.</strong> Most numerically robust method, not affected by <span class="math notranslate nohighlight">\(\kappa(A)\)</span>.</p></li>
-<li><p><strong>Yes.</strong> This is its key advantage. Finds the unique min-norm solution.</p></li>
-<li><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span>. Dominated by the SVD. Generally the slowest of the three.</p></li>
+<li><p><strong>CG:</strong> The method of choice for <strong>SPD</strong> systems.</p></li>
+<li><p><strong>MINRES:</strong> The method of choice for <strong>symmetric indefinite</strong> systems (where the <span class="math notranslate nohighlight">\(A\)</span>-norm isn’t a norm and CG fails).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -502,20 +547,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="LS_using_SVD.html"
+       href="cg_vs_gmres.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">SVD for Rank-Deficient Least-Squares</p>
+        <p class="prev-next-title">A Comparative Summary: CG vs. GMRES</p>
       </div>
     </a>
     <a class="right-next"
-       href="eigenvalues.html"
+       href="LICENSE.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Eigenvalue Computation</p>
+        <p class="prev-next-title">License for this book</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -525,6 +570,25 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-arnoldi-to-lanczos">From Arnoldi to Lanczos</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minres-least-squares-problem">The MINRES Least-Squares Problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#efficiency-gains">Efficiency Gains</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence">Convergence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cg-vs-minres">CG vs. MINRES</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
