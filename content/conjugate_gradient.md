@@ -449,7 +449,7 @@ $$
 At this point, we have not yet chosen the normalization for $p_{k+1}$. To simplify, we choose the following normalization:
 
 $$
-u_{k+1,k+1} = 1, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k.
+u_{k+1,k+1} = 1, \quad u_{k,k+1} = \frac{p_k^T A r_k}{d_k}, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k \,.
 $$
 
 **This is the key three-term recurrence relation to update $p_{k+1}$ in CG.**

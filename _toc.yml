@@ -76,4 +76,6 @@ chapters:
   - file: content/gmres.md
   - file: content/cg_vs_gmres.md
   - file: content/minres.md
+  - file: content/preconditioning.md
+  - file: content/pcg.md
 - file: content/LICENSE.md
