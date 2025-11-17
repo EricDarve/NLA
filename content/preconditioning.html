@@ -1,0 +1,731 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Preconditioning &#8212; CME 302 Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/proof.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'content/preconditioning';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Preconditioning the Conjugate Gradient (PCG) Algorithm" href="pcg.html" />
+    <link rel="prev" title="MINRES" href="minres.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CME 302 Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    Class Notes 2025
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="classical_iterative_methods.html">Classical Iterative Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jacobi_method.html">The Jacobi Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sor_method.html">Successive Over-Relaxation (SOR) Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="krylov_iterative_methods.html">Krylov Subspace Methods</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">A Comparative Summary: CG vs. GMRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pcg.html">Preconditioning the Conjugate Gradient (PCG) Algorithm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/content/preconditioning.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Preconditioning</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-goal-of-a-preconditioner">The Goal of a Preconditioner</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-types-of-preconditioning">Three Types of Preconditioning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-preconditioners">Examples of Preconditioners</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-iteration-preconditioners">1. Classical Iteration Preconditioners</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-factorization-preconditioners-ilu-ic">2. Incomplete Factorization Preconditioners (ILU/IC)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-approximate-inverse-spai-preconditioners">3. Sparse Approximate Inverse (SPAI) Preconditioners</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-specialized-preconditioners">4. Advanced &amp; Specialized Preconditioners</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="preconditioning">
+<h1>Preconditioning<a class="headerlink" href="#preconditioning" title="Link to this heading">#</a></h1>
+<p>In our previous discussions on iterative methods like the Conjugate Gradient (CG) algorithm and GMRES, we observed a critical fact: their convergence speed is highly dependent on the properties of the system matrix <span class="math notranslate nohighlight">\(A\)</span>. Specifically, convergence is slow when the <strong>condition number</strong> <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is large, or when the <strong>eigenvalues</strong> are spread out. Convergence improves significantly if the matrix is “closer” to the identity, has clustered eigenvalues, and its eigenbasis is well-conditioned.</p>
+<p>For many practical problems, especially those arising from the discretization of partial differential equations, <span class="math notranslate nohighlight">\(\kappa(A)\)</span> can be very large, rendering our standard iterative methods impractically slow. This motivates the central topic of this section: <strong>preconditioning</strong>.</p>
+<section id="the-goal-of-a-preconditioner">
+<h2>The Goal of a Preconditioner<a class="headerlink" href="#the-goal-of-a-preconditioner" title="Link to this heading">#</a></h2>
+<p>The core idea of preconditioning is simple: instead of solving the original, difficult system <span class="math notranslate nohighlight">\(Ax=b\)</span>, we solve a related, “easier” system that has the same solution. We do this by applying a <strong>preconditioner</strong> <span class="math notranslate nohighlight">\(M\)</span>, which is a matrix that <em>approximates</em> <span class="math notranslate nohighlight">\(A\)</span> but is much easier to invert.</p>
+<p>A good preconditioner <span class="math notranslate nohighlight">\(M\)</span> must balance two competing goals:</p>
+<ol class="arabic simple">
+<li><p><strong>Improve Convergence:</strong> The preconditioned system (e.g., <span class="math notranslate nohighlight">\(M^{-1}A\)</span>) must be “nicer” than the original <span class="math notranslate nohighlight">\(A\)</span>. Ideally, its eigenvalues are clustered, and its condition number <span class="math notranslate nohighlight">\(\kappa(M^{-1}A)\)</span> is much smaller than <span class="math notranslate nohighlight">\(\kappa(A)\)</span>. The best possible (but impractical) choice is <span class="math notranslate nohighlight">\(M=A\)</span>, which gives <span class="math notranslate nohighlight">\(M^{-1}A = I\)</span> and <span class="math notranslate nohighlight">\(\kappa(M^{-1}A)=1\)</span>, allowing convergence in one iteration.</p></li>
+<li><p><strong>Be Easy to Apply:</strong> The preconditioner is only useful if it is computationally cheap. We must be able to solve linear systems of the form <span class="math notranslate nohighlight">\(Mz=r\)</span> (i.e., compute <span class="math notranslate nohighlight">\(M^{-1}r\)</span>) very quickly in each iteration of our method (e.g., CG or GMRES).</p></li>
+</ol>
+<p>The art of preconditioning lies in finding a matrix <span class="math notranslate nohighlight">\(M\)</span> that strikes the optimal trade-off between these two goals.</p>
+</section>
+<section id="three-types-of-preconditioning">
+<h2>Three Types of Preconditioning<a class="headerlink" href="#three-types-of-preconditioning" title="Link to this heading">#</a></h2>
+<p>There are three main ways to apply a preconditioner <span class="math notranslate nohighlight">\(M\)</span> (or its components <span class="math notranslate nohighlight">\(M_1, M_2\)</span>) to the system <span class="math notranslate nohighlight">\(Ax=b\)</span>.</p>
+<ol class="arabic">
+<li><p><strong>Left Preconditioning:</strong> We multiply from the left by an approximation <span class="math notranslate nohighlight">\(M_1 \approx A\)</span>. We solve the modified system:</p>
+<div class="math notranslate nohighlight">
+\[(M_1^{-1} A) x = M_1^{-1} b\]</div>
+<p>This is a common choice for non-symmetric solvers like GMRES, as it directly acts on the system matrix to improve its properties.</p>
+</li>
+<li><p><strong>Right Preconditioning:</strong> We use an approximation <span class="math notranslate nohighlight">\(M_2 \approx A\)</span> and introduce a variable substitution <span class="math notranslate nohighlight">\(x = M_2^{-1} z\)</span>. This leads to the system:</p>
+<div class="math notranslate nohighlight">
+\[(A M_2^{-1}) z = b, \quad \text{followed by} \quad x = M_2^{-1} z\]</div>
+<p>This is also common for GMRES. A key advantage of right preconditioning is that the residual of the original system, <span class="math notranslate nohighlight">\(r = b - Ax\)</span>, can be computed directly, which is often desirable.</p>
+</li>
+<li><p><strong>Symmetric (Split) Preconditioning:</strong> We use two matrices, <span class="math notranslate nohighlight">\(M_1\)</span> and <span class="math notranslate nohighlight">\(M_2\)</span>, to “split” the preconditioning:</p>
+<div class="math notranslate nohighlight">
+\[(M_1^{-1} A M_2^{-1}) z = M_1^{-1} b, \quad \text{followed by} \quad x = M_2^{-1} z\]</div>
+</li>
+</ol>
+<p>This third case is <strong>essential for methods like CG and MINRES</strong>. The Conjugate Gradient algorithm <em>requires</em> the system matrix to be Symmetric Positive Definite (SPD). If <span class="math notranslate nohighlight">\(A\)</span> is SPD, the left-preconditioned matrix <span class="math notranslate nohighlight">\(M_1^{-1} A\)</span> is generally <em>not</em> symmetric, so we cannot apply CG.</p>
+<p>To preserve symmetry, we must construct the preconditioned system in a symmetric way. For example, if we have a preconditioner <span class="math notranslate nohighlight">\(M\)</span> that is itself SPD, we can find its Cholesky factor <span class="math notranslate nohighlight">\(C\)</span> such that <span class="math notranslate nohighlight">\(M = C C^T\)</span>. We can then set <span class="math notranslate nohighlight">\(M_1 = C\)</span> and <span class="math notranslate nohighlight">\(M_2 = C^T\)</span>. This transforms <span class="math notranslate nohighlight">\(Ax=b\)</span> into the equivalent system:</p>
+<div class="math notranslate nohighlight">
+\[
+(C^{-1} A C^{-T}) z = C^{-1} b, \quad \text{where} \quad x = C^{-T} z
+\]</div>
+<p>The new system matrix <span class="math notranslate nohighlight">\(A' = C^{-1} A C^{-T}\)</span> is SPD, and we can now safely apply the standard CG algorithm to <span class="math notranslate nohighlight">\(A'z = b'\)</span>.</p>
+</section>
+<section id="examples-of-preconditioners">
+<h2>Examples of Preconditioners<a class="headerlink" href="#examples-of-preconditioners" title="Link to this heading">#</a></h2>
+<p>Choosing a preconditioner is arguably the most critical and problem-dependent step in successfully using iterative solvers. There is no single “best” preconditioner; the choice is always a trade-off between <strong>effectiveness</strong> (how much it reduces the iteration count), <strong>computational cost</strong> (how expensive it is to apply <span class="math notranslate nohighlight">\(M^{-1}r\)</span>), and <strong>storage cost</strong>.</p>
+<p>We will survey the main families, progressing from the simplest “classical” methods to more advanced, specialized, and powerful techniques.</p>
+<section id="classical-iteration-preconditioners">
+<h3>1. Classical Iteration Preconditioners<a class="headerlink" href="#classical-iteration-preconditioners" title="Link to this heading">#</a></h3>
+<p>These simple preconditioners are derived directly from the classical iterative methods (Jacobi, Gauss-Seidel, SOR) we studied earlier. The preconditioner <span class="math notranslate nohighlight">\(M\)</span> is chosen to be the part of the matrix <span class="math notranslate nohighlight">\(A\)</span> that is “inverted” in a single step of that method. Let <span class="math notranslate nohighlight">\(A = D - L - U\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the diagonal, <span class="math notranslate nohighlight">\(-L\)</span> is the strict lower triangle, and <span class="math notranslate nohighlight">\(-U\)</span> is the strict upper triangle.</p>
+<ul class="simple">
+<li><p><strong>Jacobi:</strong> <span class="math notranslate nohighlight">\(M = D\)</span>. The preconditioner is just the diagonal of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>Gauss-Seidel:</strong> <span class="math notranslate nohighlight">\(M = D - L\)</span>. The preconditioner is the lower-triangular part of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>Successive Over-Relaxation (SOR):</strong> <span class="math notranslate nohighlight">\(M = \frac{1}{\omega}(D - \omega L)\)</span>.</p></li>
+</ul>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pros</p></th>
+<th class="head text-left"><p>Cons</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>✅ <strong>Very cheap:</strong> Trivial to construct and apply.</p></td>
+<td class="text-left"><p>❌ <strong>Often weak:</strong> Convergence improvement is minimal for ill-conditioned systems.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>✅ <strong>Low memory:</strong> <span class="math notranslate nohighlight">\(M\)</span> is (at most) a triangle or diagonal of <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
+<td class="text-left"><p>❌ <strong>Sequential (Gauss-Seidel/SOR):</strong> The forward solve <span class="math notranslate nohighlight">\(Mz=r\)</span> is sequential and does not parallelize well.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>✅ <strong>Parallel (Jacobi):</strong> The Jacobi preconditioner is “embarrassingly parallel,” as <span class="math notranslate nohighlight">\(M^{-1} = D^{-1}\)</span> is just a component-wise division.</p></td>
+<td class="text-left"><p>❌ <strong>Limited Applicability:</strong> May not be SPD, and can fail if a diagonal entry is zero.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Applicability:</strong>
+While rarely effective as standalone preconditioners for difficult problems, they are <strong>crucial components of other methods</strong>. For instance, they are often used as “smoothers” within the <strong>Multigrid</strong> algorithm.</p>
+</section>
+<section id="incomplete-factorization-preconditioners-ilu-ic">
+<h3>2. Incomplete Factorization Preconditioners (ILU/IC)<a class="headerlink" href="#incomplete-factorization-preconditioners-ilu-ic" title="Link to this heading">#</a></h3>
+<p>This is the most common and “workhorse” family of general-purpose preconditioners. The idea is to perform an LU or Cholesky factorization of <span class="math notranslate nohighlight">\(A\)</span>, but to <em>discard</em> some or all of the “fill-in” (new non-zeros) that is created during the factorization.</p>
+<ul class="simple">
+<li><p><strong>Incomplete Cholesky (IC):</strong> Used for <strong>SPD matrices</strong> (e.g., with CG). We compute an approximate Cholesky factor <span class="math notranslate nohighlight">\(C\)</span> such that <span class="math notranslate nohighlight">\(A \approx C C^T = M\)</span>. We then use <span class="math notranslate nohighlight">\(M = C C^T\)</span> as the preconditioner.</p></li>
+<li><p><strong>Incomplete LU (ILU):</strong> Used for <strong>non-symmetric matrices</strong> (e.g., with GMRES). We compute <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> such that <span class="math notranslate nohighlight">\(A \approx L U = M\)</span>.</p></li>
+</ul>
+<p>The level of fill-in is controlled by different strategies:</p>
+<ul class="simple">
+<li><p><strong>ILU(0) / IC(0):</strong> The “zero-fill” variants. We only keep entries in <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> where <span class="math notranslate nohighlight">\(A\)</span> originally had a non-zero. The sparsity pattern of <span class="math notranslate nohighlight">\(L+U\)</span> is identical to that of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
+<li><p><strong>ILU(k) / IC(k):</strong> “Level-based” fill. We allow fill-in up to a “level” <span class="math notranslate nohighlight">\(k\)</span>. <span class="math notranslate nohighlight">\(k=0\)</span> is ILU(0). Higher <span class="math notranslate nohighlight">\(k\)</span> means more fill, a more accurate <span class="math notranslate nohighlight">\(M\)</span>, but more cost.</p></li>
+<li><p><strong>ILUT:</strong> “Threshold-based” ILU. We discard any fill-in entries that are smaller than a given drop tolerance <span class="math notranslate nohighlight">\(\tau\)</span>.</p></li>
+</ul>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pros</p></th>
+<th class="head text-left"><p>Cons</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>✅ <strong>Very effective:</strong> Often provides a massive reduction in iterations. A huge step up from classical methods.</p></td>
+<td class="text-left"><p>❌ <strong>Sequential solves:</strong> Applying <span class="math notranslate nohighlight">\(M^{-1}\)</span> requires a forward and a backward triangular solve, which are difficult to parallelize.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>✅ <strong>General purpose:</strong> Often the first-choice preconditioner for unstructured sparse systems.</p></td>
+<td class="text-left"><p>❌ <strong>Breakdown:</strong> The factorization can fail (e.g., encounter a zero pivot), especially for ILU(0). IC(0) is only guaranteed to exist for M-matrices.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>✅ <strong>Tunable:</strong> The level <code class="docutils literal notranslate"><span class="pre">k</span></code> or threshold <code class="docutils literal notranslate"><span class="pre">t</span></code> gives a direct knob to trade off cost vs. effectiveness.</p></td>
+<td class="text-left"><p>❌ <strong>Construction cost:</strong> Can be expensive to compute, though this is usually an “offline” (one-time) cost.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Applicability:</strong>
+ILU/IC are the default preconditioners for unstructured sparse linear systems on single-core or shared-memory (CPU) architectures. IC is essential for preconditioning CG, and ILU is a staple for GMRES.</p>
+</section>
+<section id="sparse-approximate-inverse-spai-preconditioners">
+<h3>3. Sparse Approximate Inverse (SPAI) Preconditioners<a class="headerlink" href="#sparse-approximate-inverse-spai-preconditioners" title="Link to this heading">#</a></h3>
+<p>This family operates on a completely different philosophy. Instead of finding <span class="math notranslate nohighlight">\(M \approx A\)</span> and applying <span class="math notranslate nohighlight">\(M^{-1}\)</span> with a solve, we try to <em>directly compute</em> a sparse matrix <span class="math notranslate nohighlight">\(M\)</span> that approximates <span class="math notranslate nohighlight">\(A^{-1}\)</span>.</p>
+<p>The preconditioning step is then just a <strong>matrix-vector product</strong>: <span class="math notranslate nohighlight">\(z = M r\)</span>.</p>
+<p>This is typically set up as an optimization problem: for a given sparsity pattern, find <span class="math notranslate nohighlight">\(M\)</span> that minimizes <span class="math notranslate nohighlight">\(\| I - MA \|_F\)</span> (for left preconditioning) or <span class="math notranslate nohighlight">\(\| I - AM \|_F\)</span> (for right preconditioning) in the Frobenius norm.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pros</p></th>
+<th class="head text-left"><p>Cons</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>✅ <strong>Fully parallel:</strong> The “apply” step is a sparse matrix-vector product, which is ideal for parallel hardware like GPUs.</p></td>
+<td class="text-left"><p>❌ <strong>High construction cost:</strong> Finding <span class="math notranslate nohighlight">\(M\)</span> can be very expensive, often more so than an ILU factorization.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>✅ <strong>Overcomes triangular solve bottleneck:</strong> This is the main motivation for using SPAI.</p></td>
+<td class="text-left"><p>❌ <strong>Effectiveness:</strong> Often less effective at reducing iterations than a comparable ILU. The “best” sparse approximation of <span class="math notranslate nohighlight">\(A^{-1}\)</span> is often not sparse at all.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Applicability:</strong>
+These are specialized for high-performance, massively parallel systems where the sequential nature of ILU/IC becomes the primary performance bottleneck.</p>
+</section>
+<section id="advanced-specialized-preconditioners">
+<h3>4. Advanced &amp; Specialized Preconditioners<a class="headerlink" href="#advanced-specialized-preconditioners" title="Link to this heading">#</a></h3>
+<p>This group includes highly powerful methods that are often tailored to specific problem structures, such as those from PDEs.</p>
+<ul class="simple">
+<li><p><strong>Algebraic Multigrid (AMG):</strong> This is a “black-box” version of geometric multigrid. It works <em>only from the matrix <span class="math notranslate nohighlight">\(A\)</span></em> to automatically build a hierarchy of “coarse” problems. It then uses simple smoothers (like Jacobi or Gauss-Seidel) on each level to eliminate error at different frequencies.</p>
+<ul>
+<li><p><strong>Pros:</strong> <strong>Optimal complexity.</strong> For many elliptic PDEs, this is an <span class="math notranslate nohighlight">\(O(N)\)</span> method. The number of iterations is <em>independent</em> of the problem size <span class="math notranslate nohighlight">\(N\)</span>.</p></li>
+<li><p><strong>Cons:</strong> Very complex to implement. Makes assumptions about the matrix (e.g., near M-matrix) to build its coarse grids, and can fail if these are not met.</p></li>
+<li><p><strong>Applicability:</strong> The standard, go-to solver/preconditioner for large sparse systems from elliptic PDEs (e.g., finite element methods).</p></li>
+</ul>
+</li>
+<li><p><strong>Domain Decomposition (DD):</strong> This is a family of “divide-and-conquer” methods designed for parallel computing. The problem domain is split into subdomains (like a puzzle).</p>
+<ul>
+<li><p><strong>Pros:</strong> <strong>Inherently parallel.</strong> Designed from the ground up to run on distributed-memory supercomputers.</p></li>
+<li><p><strong>Cons:</strong> Requires significant setup, and its performance depends on correctly handling the “interface” problem between subdomains, often requiring a “coarse-grid solve.”</p></li>
+<li><p><strong>Applicability:</strong> The standard for large-scale, parallel PDE simulations (CFD, structural mechanics).</p></li>
+</ul>
+</li>
+<li><p><strong>Block / Physics-Based Preconditioners:</strong> For systems of coupled PDEs (e.g., Stokes flow, Maxwell’s equations), the matrix <span class="math notranslate nohighlight">\(A\)</span> has a natural block structure.</p>
+<ul>
+<li><p><strong>Pros:</strong> By building a preconditioner <span class="math notranslate nohighlight">\(M\)</span> that <em>respects this block structure</em>, we can achieve far superior results than a “monolithic” preconditioner (like ILU) that ignores it.</p></li>
+<li><p><strong>Cons:</strong> <strong>Highly specialized.</strong> You must use knowledge of the physics to design the preconditioner.</p></li>
+<li><p><strong>Applicability:</strong> Essential for any multi-physics problem (e.g., fluid-structure interaction, electromagnetics).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>As this survey shows, there is no “best” preconditioner. <strong>Jacobi</strong> is cheap but weak. <strong>ILU</strong> is a good default but not parallel. <strong>SPAI</strong> is parallel but expensive to build. <strong>AMG</strong> is optimal for its target class but complex and not universal. <strong>Domain Decomposition</strong> is for supercomputers.</p>
+<p>The choice is a key part of the “art” of numerical linear algebra, requiring an understanding of the problem’s origin (PDEs, data science), its structure (SPD, non-symmetric, block), and the computational hardware (CPU, GPU, cluster).</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./content"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="minres.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">MINRES</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="pcg.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Preconditioning the Conjugate Gradient (PCG) Algorithm</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-goal-of-a-preconditioner">The Goal of a Preconditioner</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-types-of-preconditioning">Three Types of Preconditioning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-preconditioners">Examples of Preconditioners</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-iteration-preconditioners">1. Classical Iteration Preconditioners</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-factorization-preconditioners-ilu-ic">2. Incomplete Factorization Preconditioners (ILU/IC)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-approximate-inverse-spai-preconditioners">3. Sparse Approximate Inverse (SPAI) Preconditioners</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-specialized-preconditioners">4. Advanced &amp; Specialized Preconditioners</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
