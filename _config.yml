@@ -18,6 +18,7 @@
 # Jekyll site settings
 title: CME 302 Numerical Linear Algebra
 author: Eric Darve
+copyright: "2025"
 email: eric.darve@stanford.edu
 description: >-
   This is a study guide for the CME 302 Numerical Linear Algebra course at Stanford University.
@@ -25,7 +26,7 @@ description: >-
 baseurl: /  # the subpath of your site, e.g. /blog. If there is no subpath for your site, use an empty string ""
 url: YOUR URL                  # the base hostname & protocol for your site, e.g. http://example.com
 
-xecute:
+execute:
   execute_notebooks         : auto  # Whether to execute notebooks at build time. Must be one of ("auto", "force", "cache", "off")
   cache                     : ""    # A path to the jupyter cache that will be used to store execution artifacts. Defaults to `_build/.jupyter_cache/`
   exclude_patterns          : []    # A list of patterns to *skip* in execution (e.g. a notebook that takes a really long time)
