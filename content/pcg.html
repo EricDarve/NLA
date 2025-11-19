@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Preconditioning the Conjugate Gradient (PCG) Algorithm &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Preconditioned Conjugate Gradient &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -258,7 +258,7 @@
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">CG vs. GMRES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
 <li class="toctree-l2"><a class="reference internal" href="preconditioning.html">Preconditioning</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Preconditioning the Conjugate Gradient (PCG) Algorithm</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Preconditioned Conjugate Gradient</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License for this book</a></li>
@@ -400,7 +400,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Preconditioning the Conjugate Gradient (PCG) Algorithm</h1>
+    <h1>Preconditioned Conjugate Gradient</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -435,8 +435,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="preconditioning-the-conjugate-gradient-pcg-algorithm">
-<h1>Preconditioning the Conjugate Gradient (PCG) Algorithm<a class="headerlink" href="#preconditioning-the-conjugate-gradient-pcg-algorithm" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="preconditioned-conjugate-gradient">
+<h1>Preconditioned Conjugate Gradient<a class="headerlink" href="#preconditioned-conjugate-gradient" title="Link to this heading">#</a></h1>
 <p>Our previous discussion on the convergence of the Conjugate Gradient (CG) method highlighted its dependence on the condition number <span class="math notranslate nohighlight">\(\kappa(A)\)</span>. To accelerate convergence, we must apply a preconditioner, but we face a critical constraint: <strong>we must maintain the Symmetric Positive Definite (SPD) property</strong> of the system matrix.</p>
 <p>A general-purpose left preconditioner <span class="math notranslate nohighlight">\(MA\)</span> or right preconditioner <span class="math notranslate nohighlight">\(AM\)</span> will destroy the symmetry of <span class="math notranslate nohighlight">\(A\)</span>. We must therefore use a <strong>symmetric preconditioner</strong>.</p>
 <div class="admonition note">

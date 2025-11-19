@@ -1,4 +1,4 @@
-# Preconditioning the Conjugate Gradient (PCG) Algorithm
+# Preconditioned Conjugate Gradient
 
 Our previous discussion on the convergence of the Conjugate Gradient (CG) method highlighted its dependence on the condition number $\kappa(A)$. To accelerate convergence, we must apply a preconditioner, but we face a critical constraint: **we must maintain the Symmetric Positive Definite (SPD) property** of the system matrix.
 
