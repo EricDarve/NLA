@@ -428,7 +428,7 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-the-ritz-eigenvalues">Convergence rate of the Ritz eigenvalues</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blockschur-view">Block–Schur view</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#block-schur-view">Block-Schur view</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#takeaways">Takeaways</a></li>
 </ul>
 </li>
@@ -792,8 +792,8 @@ Assume the eigenvalues are ordered by modulus</p>
 <section id="convergence-rate-of-the-ritz-eigenvalues">
 <h2>Convergence rate of the Ritz eigenvalues<a class="headerlink" href="#convergence-rate-of-the-ritz-eigenvalues" title="Link to this heading">#</a></h2>
 <p>Let <span class="math notranslate nohighlight">\(T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}\)</span> be the Rayleigh–Ritz (Ritz) matrix at step <span class="math notranslate nohighlight">\(k\)</span>, and let its eigenvalues be <span class="math notranslate nohighlight">\(\{\mu_i^{(k)}\}_{i=1}^p\)</span>. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.</p>
-<section id="blockschur-view">
-<h3>Block–Schur view<a class="headerlink" href="#blockschur-view" title="Link to this heading">#</a></h3>
+<section id="block-schur-view">
+<h3>Block-Schur view<a class="headerlink" href="#block-schur-view" title="Link to this heading">#</a></h3>
 <p>Work in a Schur basis</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -818,7 +818,7 @@ T_k \;=\; T_{11} + \Delta_k,
 \qquad
 \|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
 \]</div>
-<p>for some constants <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span> depending only on <span class="math notranslate nohighlight">\(\|T_{11}\|\)</span>, <span class="math notranslate nohighlight">\(\|T_{12}\|\)</span>, and <span class="math notranslate nohighlight">\(\|T_{22}\|\)</span>. Standard eigenvalue–perturbation then yields</p>
+<p>for some constants <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span> depending only on <span class="math notranslate nohighlight">\(\|T_{11}\|\)</span>, <span class="math notranslate nohighlight">\(\|T_{12}\|\)</span>, and <span class="math notranslate nohighlight">\(\|T_{22}\|\)</span>. Standard eigenvalue perturbation then yields</p>
 <div class="proof theorem admonition" id="thm:ritz-rate-general">
 <p class="admonition-title"><span class="caption-number">Theorem 23 </span> (Ritz value rate)</p>
 <section class="theorem-content" id="proof-content">
@@ -852,7 +852,7 @@ T_k \;=\; T_{11} + \Delta_k,
 <p>for some constant <span class="math notranslate nohighlight">\(C'\)</span> independent of <span class="math notranslate nohighlight">\(k\)</span>.</p>
 </section>
 </div><div class="proof corollary admonition" id="cor:ritz-per-eig">
-<p class="admonition-title"><span class="caption-number">Corollary 1 </span> (Per–eigenvalue Ritz value convergence)</p>
+<p class="admonition-title"><span class="caption-number">Corollary 1 </span> (Per eigenvalue Ritz value convergence)</p>
 <section class="corollary-content" id="proof-content">
 <p>If the invariant subspace for <span class="math notranslate nohighlight">\(\Lambda(T_{11})=\{\lambda_1,\dots,\lambda_p\}\)</span> is separated from the rest (e.g., <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> in a Schur basis), and <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular, then the <span class="math notranslate nohighlight">\(i\)</span>-th column of <span class="math notranslate nohighlight">\(E_k\)</span> satisfies</p>
 <div class="math notranslate nohighlight">
@@ -930,8 +930,8 @@ u_i^H \, v_j =
 </div><p><strong>Remarks</strong></p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(\theta_1=0\)</span> if and only if <span class="math notranslate nohighlight">\(\mathcal U \cap \mathcal V \neq \{0\}\)</span>.</p></li>
-<li><p>The largest principal angle <span class="math notranslate nohighlight">\(\theta_p\)</span> provides a measure of the worst‐alignment of <span class="math notranslate nohighlight">\(\mathcal U\)</span> with <span class="math notranslate nohighlight">\(\mathcal V\)</span>.</p></li>
-<li><p>In many numerical analyses (e.g., subspace iteration, perturbation bounds), one works with <span class="math notranslate nohighlight">\(\sin\theta_i\)</span> or <span class="math notranslate nohighlight">\(\tan\theta_i\)</span> rather than <span class="math notranslate nohighlight">\(\theta_i\)</span> itself.  ￼</p></li>
+<li><p>The largest principal angle <span class="math notranslate nohighlight">\(\theta_p\)</span> provides a measure of the worst alignment of <span class="math notranslate nohighlight">\(\mathcal U\)</span> with <span class="math notranslate nohighlight">\(\mathcal V\)</span>.</p></li>
+<li><p>In many numerical analyses (e.g., subspace iteration, perturbation bounds), one works with <span class="math notranslate nohighlight">\(\sin\theta_i\)</span> or <span class="math notranslate nohighlight">\(\tan\theta_i\)</span> rather than <span class="math notranslate nohighlight">\(\theta_i\)</span> itself.</p></li>
 <li><p>When <span class="math notranslate nohighlight">\(p=q=1\)</span> (lines), this notion reduces to the usual angle between two lines.</p></li>
 </ul>
 </section>
@@ -1019,7 +1019,7 @@ u_i^H \, v_j =
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-the-ritz-eigenvalues">Convergence rate of the Ritz eigenvalues</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blockschur-view">Block–Schur view</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#block-schur-view">Block-Schur view</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#takeaways">Takeaways</a></li>
 </ul>
 </li>

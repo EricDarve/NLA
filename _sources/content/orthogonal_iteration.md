@@ -385,13 +385,13 @@ Finally, the Ritz matrix $T_k:=Q_k^H A Q_k$ has eigenvalues that converge to the
 
 - **Non-normality can slow convergence.** Poorly conditioned eigenvectors (large departure from normality) can introduce substantial polynomial factors before the geometric rate dominates. It is one reason subspace iteration targets Schur vectors and/or uses accelerations.
 - **Acceleration:** shift-and-invert $(A-\sigma I)^{-1}$, polynomial filters (Chebyshev), and locking/deflation are standard to isolate interior clusters and improve gaps; these plug directly into the subspace iteration framework.
-- **Separation and Sylvester equations:** the spectral separation $\mathrm{sep}(T_{11},T_{22})>0$ ensures a well-conditioned invariant-subspace problem and appears in error/conditioning bounds (e.g., Schur–Parlett/sign function analyses).
+- **Separation and Sylvester equations:** the spectral separation $\mathrm{sep}(T_{11},T_{22})>0$ ensures a well-conditioned invariant-subspace problem and appears in error/conditioning bounds (e.g., Schur--Parlett/sign function analyses).
 
 ## Convergence rate of the Ritz eigenvalues
 
-Let $T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}$ be the Rayleigh–Ritz (Ritz) matrix at step $k$, and let its eigenvalues be $\{\mu_i^{(k)}\}_{i=1}^p$. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.
+Let $T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}$ be the Rayleigh--Ritz (Ritz) matrix at step $k$, and let its eigenvalues be $\{\mu_i^{(k)}\}_{i=1}^p$. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.
 
-### Block–Schur view
+### Block-Schur view
 
 Work in a Schur basis 
 
@@ -421,7 +421,7 @@ T_k \;=\; T_{11} + \Delta_k,
 \|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
 $$
 
-for some constants $\alpha$, $\beta$ depending only on $\|T_{11}\|$, $\|T_{12}\|$, and $\|T_{22}\|$. Standard eigenvalue–perturbation then yields
+for some constants $\alpha$, $\beta$ depending only on $\|T_{11}\|$, $\|T_{12}\|$, and $\|T_{22}\|$. Standard eigenvalue perturbation then yields
 
 
 ```{prf:theorem} Ritz value rate
@@ -461,7 +461,7 @@ $$
 for some constant $C'$ independent of $k$.
 ```
 
-```{prf:corollary} Per–eigenvalue Ritz value convergence
+```{prf:corollary} Per eigenvalue Ritz value convergence
 :label: cor:ritz-per-eig
 
 If the invariant subspace for $\Lambda(T_{11})=\{\lambda_1,\dots,\lambda_p\}$ is separated from the rest (e.g., $\mathrm{sep}(T_{11},T_{22})>0$ in a Schur basis), and $C_0$ is nonsingular, then the $i$-th column of $E_k$ satisfies 
@@ -550,7 +550,6 @@ In particular, $\sin \Theta$ and $\tan \Theta$ provide quantitative measures of 
 **Remarks**
 
 * $\theta_1=0$ if and only if $\mathcal U \cap \mathcal V \neq \{0\}$.
-* The largest principal angle $\theta_p$ provides a measure of the worst‐alignment of $\mathcal U$ with $\mathcal V$.
-* In many numerical analyses (e.g., subspace iteration, perturbation bounds), one works with $\sin\theta_i$ or $\tan\theta_i$ rather than $\theta_i$ itself.  ￼
+* The largest principal angle $\theta_p$ provides a measure of the worst alignment of $\mathcal U$ with $\mathcal V$.
+* In many numerical analyses (e.g., subspace iteration, perturbation bounds), one works with $\sin\theta_i$ or $\tan\theta_i$ rather than $\theta_i$ itself.
 * When $p=q=1$ (lines), this notion reduces to the usual angle between two lines.
-
