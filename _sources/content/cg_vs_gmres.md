@@ -1,4 +1,4 @@
-# A Comparative Summary: CG vs. GMRES
+# CG vs. GMRES
 
 Both the Conjugate Gradients (CG) and GMRES algorithms are foundational Krylov subspace methods for solving large, sparse linear systems $Ax=b$. However, they are designed for different classes of problems, and their computational costs and practical behaviors differ dramatically.
 
