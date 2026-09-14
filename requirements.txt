@@ -1,10 +1,16 @@
-# Requirements for the demo notebooks
-# Useful for MyBinder configuration
-pandas
-numpy
-datascience
-folium
-matplotlib
-nbinteract
-scipy
-jupyter-book
+# Build requirements for the Jupyter Book.
+#   pip install -r requirements.txt
+
+# Pinned to the 1.x line on purpose. Jupyter Book 2.x is a ground-up rewrite on
+# the Node-based MyST engine: it drops Sphinx entirely, so sphinx-proof, the
+# {prf:*} directives used throughout content/, _config.yml and _toc.yml would
+# all need to be migrated. Do not relax this pin without doing that migration.
+jupyter-book>=1.0.4,<2
+
+sphinx-proof      # {prf:theorem}, {prf:definition}, ... directives used in content/
+ghp-import        # Publishes _build/html to the gh-pages branch
+
+# Only needed for `make pdf`. The pdfhtml builder prints the book from a
+# headless Chromium driven by Playwright. Download the browser itself once:
+#   playwright install chromium
+playwright
