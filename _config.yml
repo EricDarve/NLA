@@ -13,6 +13,17 @@ exclude_patterns:
   - addl_material/*    # Notes not listed in _toc.yml
 
 #######################################################################################
+# Repository link
+# Adds a GitHub button to the header of every page.
+
+repository:
+  url: https://github.com/EricDarve/NLA
+  branch: main
+
+html:
+  use_repository_button: true
+
+#######################################################################################
 # Notebook execution settings
 
 execute:
