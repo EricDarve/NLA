@@ -437,15 +437,16 @@ then the composition <span class="math notranslate nohighlight">\(T_2 \circ T_1\
 <p>The formula for <strong>matrix-matrix multiplication</strong> is:</p>
 <div class="math notranslate nohighlight">
 \[
-c_{ij} = \sum_{k} a_{ik} b_{kj}
+c_{ij} = \sum_{k=1}^m a_{ik} b_{kj}
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(C = AB\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(C = AB\)</span>. Column by column, this says that the <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(AB\)</span> is <span class="math notranslate nohighlight">\(A b_j\)</span>, where <span class="math notranslate nohighlight">\(b_j\)</span> is the <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(B\)</span>, which extends the column picture of the matrix-vector product.</p>
+<p>Each of the <span class="math notranslate nohighlight">\(\ell n\)</span> entries of <span class="math notranslate nohighlight">\(C\)</span> is a dot product of length <span class="math notranslate nohighlight">\(m\)</span>, so forming <span class="math notranslate nohighlight">\(AB\)</span> takes about <span class="math notranslate nohighlight">\(2 \ell m n\)</span> flops. For square matrices this is <span class="math notranslate nohighlight">\(O(n^3)\)</span>, the baseline against which the cost of every factorization in later chapters is measured.</p>
 <p><strong>Properties:</strong></p>
 <ul class="simple">
 <li><p>Defined only if the number of columns of <span class="math notranslate nohighlight">\(A\)</span> equals the number of rows of <span class="math notranslate nohighlight">\(B\)</span>.</p></li>
 <li><p><strong>Associative:</strong> <span class="math notranslate nohighlight">\((AB)C = A(BC)\)</span>.</p></li>
 <li><p><strong>Not commutative:</strong> <span class="math notranslate nohighlight">\(AB \ne BA\)</span> in general.</p></li>
-<li><p><strong>Transpose rule:</strong> <span class="math notranslate nohighlight">\((AB)^T = B^T A^T\)</span>.</p></li>
+<li><p><strong>Transpose rule:</strong> <span class="math notranslate nohighlight">\((AB)^T = B^T A^T\)</span>, and <span class="math notranslate nohighlight">\((AB)^H = B^H A^H\)</span>.</p></li>
 </ul>
 </section>
 <hr class="docutils" />
@@ -456,15 +457,20 @@ c_{ij} = \sum_{k} a_{ik} b_{kj}
 \[
 I_n x = x
 \]</div>
-<p>for all <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>.</p>
+<p>for all <span class="math notranslate nohighlight">\(x \in \mathbb{R}^n\)</span>. It also acts as the identity for matrix multiplication: <span class="math notranslate nohighlight">\(A I_n = I_m A = A\)</span> for any <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
 <p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>invertible</strong> if there exists <span class="math notranslate nohighlight">\(A^{-1}\)</span> such that:</p>
 <div class="math notranslate nohighlight">
 \[
 A^{-1}A = AA^{-1} = I_n.
 \]</div>
+<p>When it exists, <span class="math notranslate nohighlight">\(A^{-1}\)</span> is unique. For invertible <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> of the same size, inverting a product reverses the order:</p>
+<div class="math notranslate nohighlight">
+\[
+(AB)^{-1} = B^{-1} A^{-1}.
+\]</div>
 <div class="admonition-fact admonition">
 <p class="admonition-title">Fact</p>
-<p><span class="math notranslate nohighlight">\(A\)</span> is invertible if and only if its columns are linearly independent.</p>
+<p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is invertible if and only if its columns are linearly independent.</p>
 </div>
 </section>
 <hr class="docutils" />
@@ -481,12 +487,14 @@ x = \sum_{i=1}^n \alpha_i v_i
 \[
 x = V\alpha, \quad \alpha = V^{-1}x.
 \]</div>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is the matrix of <span class="math notranslate nohighlight">\(T\)</span> in the standard basis and <span class="math notranslate nohighlight">\(B\)</span> is the matrix in the basis <span class="math notranslate nohighlight">\(\{v_i\}\)</span>, then:</p>
+<p>Let <span class="math notranslate nohighlight">\(T: \mathbb{R}^n \to \mathbb{R}^n\)</span>, so that its matrix is square and the same basis is used for the input and the output. If <span class="math notranslate nohighlight">\(A\)</span> is the matrix of <span class="math notranslate nohighlight">\(T\)</span> in the standard basis and <span class="math notranslate nohighlight">\(B\)</span> is the matrix in the basis <span class="math notranslate nohighlight">\(\{v_i\}\)</span>, then:</p>
 <div class="math notranslate nohighlight">
 \[
-A = V B V^{-1}.
+A = V B V^{-1},
+\qquad
+B = V^{-1} A V.
 \]</div>
-<p>This is the <strong>change of basis formula</strong>.</p>
+<p>This is the <strong>change of basis formula</strong>. Matrices related this way are called <strong>similar</strong>, and the map <span class="math notranslate nohighlight">\(B \mapsto V B V^{-1}\)</span> is a <strong>similarity transformation</strong>. Similar matrices represent the same linear transformation in different bases; later chapters use similarity transformations to reduce a matrix to a simpler form without changing its eigenvalues.</p>
 </section>
 </section>
 
