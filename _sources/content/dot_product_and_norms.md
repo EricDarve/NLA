@@ -39,7 +39,8 @@ $$
 Key properties:
 
 - $S^\perp$ is itself a subspace of $\mathbb{R}^n$.
-- Any vector $v \in \mathbb{R}^n$ can be uniquely written as the sum of a vector in $S$ and a vector in $S^\perp$.
+- $S \cap S^\perp = \{0\}$, and any vector $v \in \mathbb{R}^n$ can be uniquely written as the sum of a vector in $S$ and a vector in $S^\perp$. In the notation of the previous section, $\mathbb{R}^n = S \oplus S^\perp$.
+- $(S^\perp)^\perp = S$.
 - The dimensions satisfy:
 
 $$
@@ -51,7 +52,14 @@ $$
 The dot product allows us to define the **Euclidean norm** (or **2-norm**) of a vector $x$:
 
 $$
-\|x\|_2 = \sqrt{x^T x} = \left( \sum_{i=1}^n x_i^2 \right)^{1/2}.
+\|x\|_2 = \sqrt{x^T x} = \left( \sum_{i=1}^n x_i^2 \right)^{1/2}
+\qquad (x \in \mathbb{R}^n).
+$$
+
+For $x \in \mathbb{C}^n$ the conjugate transpose is required, since $\sum_i x_i^2$ need not be a non-negative real number:
+
+$$
+\|x\|_2 = \sqrt{x^H x} = \left( \sum_{i=1}^n |x_i|^2 \right)^{1/2}.
 $$
 
 ### General Definition of a Norm
@@ -73,7 +81,7 @@ $$
 2. **2-norm** (Euclidean norm):
 
 $$
-\|x\|_2 = \left( \sum_{i=1}^n x_i^2 \right)^{1/2} = \sqrt{x^T x}.
+\|x\|_2 = \left( \sum_{i=1}^n |x_i|^2 \right)^{1/2}.
 $$
 
 3. **Infinity norm** (max norm):
@@ -82,7 +90,7 @@ $$
 \|x\|_\infty = \max_{1 \le i \le n} |x_i|.
 $$
 
-4. **p-norm** (for $p > 1$):
+4. **p-norm** (for $p \ge 1$):
 
 $$
 \|x\|_p = \left( \sum_{i=1}^n |x_i|^p \right)^{1/p}.
@@ -141,17 +149,17 @@ $$\|\mathbf{x}\|_\infty \le \cdots \le \|\mathbf{x}\|_2 \le \|\mathbf{x}\|_1$$
 
 ## Geometric Interpretation
 
-The **unit ball** of a norm $\|\cdot\|$ is the set:
+The **unit ball** of a norm $\|\cdot\|$ is the solid region it bounds; the **unit sphere** is that region's boundary:
 
 $$
-\{ x \in \mathbb{R}^n \;|\; \|x\| = 1 \}.
+B = \{ x \in \mathbb{R}^n \;|\; \|x\| \le 1 \},
+\qquad
+\partial B = \{ x \in \mathbb{R}^n \;|\; \|x\| = 1 \}.
 $$
 
-- For the 2-norm, the unit ball is a sphere (circle in $\mathbb{R}^2$).
-- For the 1-norm, the unit ball in $\mathbb{R}^2$ is a diamond shape.
-- For the infinity norm, the unit ball is a square in $\mathbb{R}^2$.
+In $\mathbb{R}^2$, the unit ball is a disk for the 2-norm, a diamond for the 1-norm, and a square for the infinity norm.
 
-As $p \to \infty$, the $p$-norm unit ball transitions from “diamond-like” (near $p=1$) to “square-like” (as $p \to \infty$).
+Since $\|x\|_p$ decreases with $p$, the constraint $\|x\|_p \le 1$ weakens as $p$ grows: the unit balls are nested and expand from the diamond at $p=1$ to the square at $p=\infty$.
 
 ## Why Different Norms Matter
 
@@ -164,30 +172,42 @@ As $p \to \infty$, the $p$-norm unit ball transitions from “diamond-like” (n
     * A point on an axis means that the other components of the vector are zero. This is why L1 regularization (used in LASSO) produces **sparse solutions**, which is useful for feature selection.
 
 - **Encouraging Small, Non-Zero Values ($p \ge 2$):**
-    * The L2-norm ($\|x\|_2$) constraint region is a circle (or hypersphere), which is perfectly round and has no corners. The solution can occur anywhere on its surface.
+    * The L2-norm ($\|x\|_2$) constraint region is a disk (or ball), which is perfectly round and has no corners. The solution can occur anywhere on its boundary.
     * This norm penalizes large values heavily ($x_i^2$), so it tends to find solutions where all components are small and non-zero rather than forcing some to be exactly zero. This is the basis for Ridge Regression.
     * For norms with $p>2$, the penalty on large components is even more severe, further encouraging solutions where all entries have similar, non-zero magnitudes.
 
 ## Cauchy–Schwarz and Hölder Inequalities
 
 **Hölder’s inequality:**  
-For $x, y \in \mathbb{R}^n$ and $p, q > 0$ such that $\frac{1}{p} + \frac{1}{q} = 1$,
+For $x, y \in \mathbb{R}^n$ and conjugate exponents $1 \le p, q \le \infty$ satisfying $\frac{1}{p} + \frac{1}{q} = 1$ (with the convention $1/\infty = 0$),
 
 $$
 |x^T y| \le \|x\|_p \, \|y\|_q.
 $$
 
+The pair $p=1$, $q=\infty$ gives the frequently used bound $|x^T y| \le \|x\|_1 \, \|y\|_\infty$.
+
 **Cauchy–Schwarz inequality:**  
 Special case $p = q = 2$:
 
 $$
-|x^T y| \le \|x\|_2 \, \|y\|_2.
+|x^T y| \le \|x\|_2 \, \|y\|_2,
 $$
+
+with equality if and only if $x$ and $y$ are linearly dependent.
+
+For nonzero $x$ and $y$, this bound is what makes the **angle** $\theta$ between them well defined:
+
+$$
+\cos \theta = \frac{x^T y}{\|x\|_2 \, \|y\|_2},
+$$
+
+since Cauchy–Schwarz forces $|\cos\theta| \le 1$.
 
 **Why is This Bound Important?**
 
 - **Proving Algorithm Convergence:** Many iterative algorithms in NLA work by generating a sequence of vectors that get progressively closer to a solution. The Cauchy-Schwarz inequality is often used to prove that the **error** at each step is decreasing, guaranteeing that the algorithm will eventually converge.
-- **Geometric Insight:** The inequality has a clear geometric meaning. The dot product is maximized when the vectors are perfectly aligned ($\theta = 0$ or $\pi$) and is zero when they are orthogonal. This intuition is invaluable when developing new algorithms. 
+- **Geometric Insight:** The inequality has a clear geometric meaning. The dot product $x^T y$ is largest when the vectors are aligned ($\theta = 0$), smallest when they are opposed ($\theta = \pi$), and zero when they are orthogonal ($\theta = \pi/2$). This intuition is invaluable when developing new algorithms. 
 
 ## Application: Pythagorean Theorem
 
@@ -203,6 +223,6 @@ This follows immediately from expanding $\|x+y\|_2^2$ using the dot product defi
 | Norm          | Formula                                              | Unit Ball Shape ($\mathbb{R}^2$) |
 |---------------|------------------------------------------------------|-----------------------------------|
 | 1-norm        | $\sum_{i=1}^n \lvert x_i\rvert$                      | Diamond                           |
-| 2-norm        | $(\sum_{i=1}^n x_i^2)^{1/2}$                         | Circle                            |
+| 2-norm        | $(\sum_{i=1}^n \lvert x_i\rvert^2)^{1/2}$          | Disk                              |
 | Infinity-norm | $\max_i \lvert x_i\rvert$                            | Square                            |
 | p-norm        | $(\sum_{i=1}^n \lvert x_i\rvert^p)^{1/p}$           | Smooth transition from diamond to square as $p$ increases |
