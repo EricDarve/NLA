@@ -1,6 +1,6 @@
 # Operator and Matrix Norms
 
-A **matrix norm** is a function that assigns a strictly positive number to a matrix, providing a measure of its "size" or "magnitude". Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.
+A **matrix norm** is a function that assigns a non-negative number to a matrix, providing a measure of its "size" or "magnitude". Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.
 
 ## The Operator Norm (Induced p-Norm)
 
@@ -10,12 +10,14 @@ The operator norm is defined as the maximum possible ratio of $\|Ax\|_p$ to $\|x
 
 $$\| A \|_p = \sup_{x \neq 0} \frac{\|A x\|_p}{\|x\|_p} = \max_{\|x\|_p = 1} \| Ax \|_p$$
 
-Geometrically, if you apply the matrix $A$ to all the vectors on the unit circle (or unit sphere in higher dimensions), you'll get an ellipse (or ellipsoid). The p-norm $\|A\|_p$ is the length of the longest vector from the origin to a point on that resulting shape.
+Geometrically, take $p = 2$: applying $A$ to the Euclidean unit sphere gives an ellipsoid (an ellipse in $\mathbb{R}^2$), and $\|A\|_2$ is the length of the longest vector from the origin to a point on it. For other values of $p$ the unit ball is not round, so its image is not an ellipsoid; $\|A\|_p$ is then the largest $p$-norm attained on that image.
 
 The three most widely used operator norms are:
 * **1-Norm**: The maximum absolute column sum. It is computed as $\|A\|_1 = \max_j \sum_i |a_{ij}|$.
 * **$\infty$-Norm**: The maximum absolute row sum. It is computed as $\|A\|_\infty = \max_i \sum_j |a_{ij}|$.
 * **2-Norm (Spectral Norm)**: This norm is equal to the largest **singular value** of the matrix, denoted $\sigma_{\max}(A)$. While it corresponds to the true geometric "maximum stretch," it is generally more computationally intensive than the 1-norm or $\infty$-norm.
+
+Singular values are defined later in this chapter, in the section on the singular value decomposition. Until then, read $\sigma_{\max}(A)$ as the largest factor by which $A$ stretches a vector in the 2-norm.
 
 ## The Frobenius Norm
 
@@ -23,9 +25,9 @@ Another useful and easy-to-compute norm is the **Frobenius norm**. Unlike the op
 
 $$\|A\|_F = \left( \sum_{i=1}^m \sum_{j=1}^n |a_{ij}|^2 \right)^{1/2}$$
 
-The Frobenius norm is very convenient for analyzing matrices that can be decomposed into blocks.
+That it is not an induced norm is easy to check: every induced norm satisfies $\|I\| = 1$, whereas $\|I_n\|_F = \sqrt{n}$.
 
-The two most fundamental inequalities for matrix operator norms are the **sub-multiplicative** inequality, $\|AB\| \le \|A\| \|B\|$, and the **consistency** inequality, $\|Ax\| \le \|A\| \|x\|$.
+The Frobenius norm is very convenient for analyzing matrices that can be decomposed into blocks.
 
 ## Key Inequalities for Operator Norms
 
@@ -59,6 +61,7 @@ The most useful specific inequalities relate the common operator norms ($1$-norm
 * $\frac{1}{\sqrt{n}}\|A\|_\infty \le \|A\|_2 \le \sqrt{n}\|A\|_\infty$
 * $\frac{1}{\sqrt{n}}\|A\|_1 \le \|A\|_2 \le \sqrt{n}\|A\|_1$
 * $\frac{1}{n}\|A\|_\infty \le \|A\|_1 \le n\|A\|_\infty$
+* $\|A\|_2 \le \sqrt{\|A\|_1 \|A\|_\infty}$, which carries no factor of $n$ and is usually the sharpest of these bounds
 
 ## Other Fundamental Properties
 
@@ -71,13 +74,15 @@ All matrix norms must also satisfy the standard properties of a norm:
 
 While the operator and Frobenius norms are the most common, other specialized norms are valuable in various applications. We introduce two such examples: the simple but non-sub-multiplicative **max norm**, and the more general family of **Schatten norms**, which are based on a matrix's singular values.
 
-## Max Norm
+### Max Norm
 
 The largest element in the matrix by magnitude. Note that this norm is **not** sub-multiplicative ($\|AB\| \le \|A\|\|B\|$ does not hold).
 
 $$\|A\|_{\text{max}} = \max_{ij} |a_{ij}|$$
 
-## Schatten Norms (based on singular values)
+Taking $A = B = \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}$ shows this: $\|A\|_{\text{max}} = \|B\|_{\text{max}} = 1$, while $AB = \begin{pmatrix} 2 & 2 \\ 2 & 2 \end{pmatrix}$ has $\|AB\|_{\text{max}} = 2$.
+
+### Schatten Norms (based on singular values)
 
 The Schatten $p$-norm is defined by applying the vector $p$-norm to the vector of the matrix's singular values, $\sigma_i$.
 
