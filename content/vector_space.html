@@ -172,7 +172,7 @@
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="intro.html">
-                    Class Notes 2025
+                    Class Notes 2026
                 </a>
             </li>
         </ul>
@@ -417,7 +417,11 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-combinations-and-span">Linear combinations and span</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-independence">Linear independence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bases-and-dimension">Bases and dimension</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sums-of-subspaces">Sums of subspaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-than-two-subspaces">More than two subspaces</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -443,6 +447,7 @@ x_n
 \end{pmatrix},
 \quad x_i \in \mathbb{R}.
 \end{split}\]</div>
+<p>Throughout this page, a subscript on <span class="math notranslate nohighlight">\(x\)</span> denotes a <strong>component</strong> of a single vector, while a list of distinct vectors is written <span class="math notranslate nohighlight">\(v_1, \dots, v_k\)</span>.</p>
 <section id="vector-addition">
 <h2>Vector addition<a class="headerlink" href="#vector-addition" title="Link to this heading">#</a></h2>
 <p>Given <span class="math notranslate nohighlight">\(x,y \in \mathbb{R}^n\)</span>,</p>
@@ -494,16 +499,23 @@ x_n
 </section>
 <section id="definition-vector-space">
 <h2>Definition: Vector space<a class="headerlink" href="#definition-vector-space" title="Link to this heading">#</a></h2>
-<p>A <strong>vector space</strong> <span class="math notranslate nohighlight">\(V\)</span> over a field <span class="math notranslate nohighlight">\(\mathbb{F}\)</span> (such as <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>) is a set equipped with addition <span class="math notranslate nohighlight">\((x,y)\mapsto x+y\)</span> and scalar multiplication <span class="math notranslate nohighlight">\((\alpha,x)\mapsto \alpha x\)</span> satisfying, for all <span class="math notranslate nohighlight">\(x,y,z\in V\)</span> and <span class="math notranslate nohighlight">\(\alpha,\beta\in\mathbb{F}\)</span>:</p>
+<p>A <strong>vector space</strong> <span class="math notranslate nohighlight">\(V\)</span> over a field <span class="math notranslate nohighlight">\(\mathbb{F}\)</span> (such as <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>) is a set equipped with two operations,</p>
+<div class="math notranslate nohighlight">
+\[
++ \;:\; V \times V \to V,
+\qquad
+\cdot \;:\; \mathbb{F} \times V \to V,
+\]</div>
+<p>written <span class="math notranslate nohighlight">\((x,y)\mapsto x+y\)</span> and <span class="math notranslate nohighlight">\((\alpha,x)\mapsto \alpha x\)</span>. Both operations take their values in <span class="math notranslate nohighlight">\(V\)</span>, so <span class="math notranslate nohighlight">\(V\)</span> is <strong>closed</strong> under addition and scalar multiplication. The operations must satisfy, for all <span class="math notranslate nohighlight">\(x,y,z\in V\)</span> and <span class="math notranslate nohighlight">\(\alpha,\beta\in\mathbb{F}\)</span>:</p>
 <ol class="arabic simple">
 <li><p><span class="math notranslate nohighlight">\(x+(y+z)=(x+y)+z\)</span>  (Associativity of addition)</p></li>
 <li><p><span class="math notranslate nohighlight">\(x+y=y+x\)</span>  (Commutativity of addition)</p></li>
 <li><p>There exists <span class="math notranslate nohighlight">\(0\in V\)</span> with <span class="math notranslate nohighlight">\(x+0=x\)</span>  (Additive identity)</p></li>
 <li><p>For each <span class="math notranslate nohighlight">\(x\)</span> there exists <span class="math notranslate nohighlight">\(-x\)</span> with <span class="math notranslate nohighlight">\(x+(-x)=0\)</span>  (Additive inverse)</p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha(\beta x)=(\alpha\beta)x\)</span>  (Associativity of scalar multiplication / compatibility with field multiplication)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha(\beta x)=(\alpha\beta)x\)</span>  (Compatibility with field multiplication)</p></li>
 <li><p><span class="math notranslate nohighlight">\(1x=x\)</span>  (Multiplicative identity of the field acts as identity on vectors)</p></li>
-<li><p><span class="math notranslate nohighlight">\(\alpha(x+y)=\alpha x+\alpha y\)</span>  (Left distributivity of scalar over vector addition)</p></li>
-<li><p><span class="math notranslate nohighlight">\((\alpha+\beta)x=\alpha x+\beta x\)</span>  (Right distributivity of scalar addition over scalar multiplication)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\alpha(x+y)=\alpha x+\alpha y\)</span>  (Distributivity of scalar multiplication over vector addition)</p></li>
+<li><p><span class="math notranslate nohighlight">\((\alpha+\beta)x=\alpha x+\beta x\)</span>  (Distributivity of scalar multiplication over field addition)</p></li>
 </ol>
 </section>
 <section id="subspaces">
@@ -513,33 +525,34 @@ x_n
 \[
 \alpha x + \beta y \in S.
 \]</div>
-<p>Every subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is itself a vector space under the same operations.</p>
+<p>Nonemptiness is essential: choosing <span class="math notranslate nohighlight">\(\alpha=\beta=0\)</span> for any <span class="math notranslate nohighlight">\(x \in S\)</span> shows that every subspace contains the zero vector.</p>
+<p>Every subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is itself a vector space under the same operations. Two subspaces always exist: the <strong>trivial subspace</strong> <span class="math notranslate nohighlight">\(\{0\}\)</span>, and <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> itself.</p>
 </section>
 <section id="linear-combinations-and-span">
 <h2>Linear combinations and span<a class="headerlink" href="#linear-combinations-and-span" title="Link to this heading">#</a></h2>
-<p>Given vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k \in \mathbb{R}^n\)</span>, a <strong>linear combination</strong> has the form</p>
+<p>Given vectors <span class="math notranslate nohighlight">\(v_1,\dots,v_k \in \mathbb{R}^n\)</span>, a <strong>linear combination</strong> has the form</p>
 <div class="math notranslate nohighlight">
 \[
-\alpha_1 x_1 + \alpha_2 x_2 + \cdots + \alpha_k x_k,
+\alpha_1 v_1 + \alpha_2 v_2 + \cdots + \alpha_k v_k,
 \quad \alpha_1,\dots,\alpha_k \in \mathbb{R}.
 \]</div>
-<p>The <strong>span</strong> of <span class="math notranslate nohighlight">\(\{x_1,\dots,x_k\}\)</span> is the set of all linear combinations:</p>
+<p>The <strong>span</strong> of <span class="math notranslate nohighlight">\(\{v_1,\dots,v_k\}\)</span> is the set of all linear combinations:</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{span}\{x_1,\dots,x_k\}
+\operatorname{span}\{v_1,\dots,v_k\}
 =
 \left\{
-\sum_{i=1}^k \alpha_i x_i \;:\; \alpha_1,\dots,\alpha_k \in \mathbb{R}
+\sum_{i=1}^k \alpha_i v_i \;:\; \alpha_1,\dots,\alpha_k \in \mathbb{R}
 \right\}.
 \]</div>
-<p>The span is always a subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
+<p>The span is always a subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. By convention, the span of the empty set is the trivial subspace, <span class="math notranslate nohighlight">\(\operatorname{span} \emptyset = \{0\}\)</span>.</p>
 </section>
 <section id="linear-independence">
 <h2>Linear independence<a class="headerlink" href="#linear-independence" title="Link to this heading">#</a></h2>
-<p>Vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> are <strong>linearly independent</strong> if the only solution to the homogeneous combination equaling zero is the trivial one:</p>
+<p>Vectors <span class="math notranslate nohighlight">\(v_1,\dots,v_k\)</span> are <strong>linearly independent</strong> if the only solution to the homogeneous combination equaling zero is the trivial one:</p>
 <div class="math notranslate nohighlight">
 \[
-\sum_{i=1}^k \alpha_i x_i = 0
+\sum_{i=1}^k \alpha_i v_i = 0
 \quad \Rightarrow \quad
 \alpha_1=\cdots=\alpha_k=0.
 \]</div>
@@ -547,17 +560,22 @@ x_n
 </section>
 <section id="bases-and-dimension">
 <h2>Bases and dimension<a class="headerlink" href="#bases-and-dimension" title="Link to this heading">#</a></h2>
-<p>A set of vectors <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> is a <strong>basis</strong> for a subspace <span class="math notranslate nohighlight">\(S\)</span> if:</p>
+<p>A set of vectors <span class="math notranslate nohighlight">\(v_1,\dots,v_k\)</span> is a <strong>basis</strong> for a subspace <span class="math notranslate nohighlight">\(S\)</span> if:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> are linearly independent, and</p></li>
-<li><p><span class="math notranslate nohighlight">\(\operatorname{span}\{x_1,\dots,x_k\} = S\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(v_1,\dots,v_k\)</span> are linearly independent, and</p></li>
+<li><p><span class="math notranslate nohighlight">\(\operatorname{span}\{v_1,\dots,v_k\} = S\)</span>.</p></li>
 </ol>
-<p>If <span class="math notranslate nohighlight">\(x_1,\dots,x_k\)</span> form a basis for <span class="math notranslate nohighlight">\(S\)</span>, then <span class="math notranslate nohighlight">\(k\)</span> is the <strong>dimension</strong> of <span class="math notranslate nohighlight">\(S\)</span>, written</p>
+<p>Every subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> has a basis. While a subspace can have many different bases, every basis of <span class="math notranslate nohighlight">\(S\)</span> has the same number of vectors, and that common number is the <strong>dimension</strong> of <span class="math notranslate nohighlight">\(S\)</span>, written</p>
 <div class="math notranslate nohighlight">
 \[
 \dim(S) = k.
 \]</div>
-<p>While a subspace can have many different bases, each basis has the same number of vectors. Hence dimension is well defined.</p>
+<p>Dimension is therefore well defined. A few consequences are worth recording:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\dim(\{0\}) = 0\)</span>: the trivial subspace has the empty set as a basis.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(S \subset \mathbb{R}^n\)</span> is a subspace, then <span class="math notranslate nohighlight">\(\dim(S) \le n\)</span>, with equality only for <span class="math notranslate nohighlight">\(S = \mathbb{R}^n\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\dim(S) = k\)</span>, then any <span class="math notranslate nohighlight">\(k\)</span> linearly independent vectors of <span class="math notranslate nohighlight">\(S\)</span> already form a basis of <span class="math notranslate nohighlight">\(S\)</span>, and any set spanning <span class="math notranslate nohighlight">\(S\)</span> has at least <span class="math notranslate nohighlight">\(k\)</span> vectors.</p></li>
+</ul>
 <p><strong>Example (a plane in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>).</strong> Let</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -580,14 +598,64 @@ a_2=\begin{pmatrix}1\\1\\0\end{pmatrix}.
 \end{split}\]</div>
 <p>which is the <span class="math notranslate nohighlight">\(x_1\)</span>-<span class="math notranslate nohighlight">\(x_2\)</span> plane in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>. Therefore <span class="math notranslate nohighlight">\(\dim(\operatorname{span}\{a_1,a_2\})=2\)</span>.</p>
 </section>
-<section id="direct-sum">
-<h2>Direct sum<a class="headerlink" href="#direct-sum" title="Link to this heading">#</a></h2>
-<p>If <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> are subspaces, then <span class="math notranslate nohighlight">\(U+V\)</span> is a subspace. We say that <span class="math notranslate nohighlight">\(W=U \oplus V\)</span> is the direct sum of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> if <span class="math notranslate nohighlight">\(U \cap V = \{0\}\)</span>. The direct sum means that if a vector is decomposed into its <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(V\)</span> components, this decomposition is unique.</p>
-<p>Example: verify that if <span class="math notranslate nohighlight">\(x_1\)</span>, …, <span class="math notranslate nohighlight">\(x_k\)</span> are linearly independent, then the space <span class="math notranslate nohighlight">\(S\)</span> spanned by these vectors is the direct sum of their individual spans:</p>
+<section id="sums-of-subspaces">
+<h2>Sums of subspaces<a class="headerlink" href="#sums-of-subspaces" title="Link to this heading">#</a></h2>
+<p>Given subspaces <span class="math notranslate nohighlight">\(U, W \subset \mathbb{R}^n\)</span>, their <strong>sum</strong> is the set of all vectors obtained by adding an element of each:</p>
 <div class="math notranslate nohighlight">
 \[
-S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
+U + W = \{\, u + w \;:\; u \in U,\; w \in W \,\}.
 \]</div>
+<p>The sum <span class="math notranslate nohighlight">\(U+W\)</span> is again a subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>; it is the smallest subspace containing both <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(W\)</span>. Its dimension satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\dim(U+W) = \dim(U) + \dim(W) - \dim(U \cap W).
+\]</div>
+</section>
+<section id="direct-sum">
+<h2>Direct sum<a class="headerlink" href="#direct-sum" title="Link to this heading">#</a></h2>
+<p>The sum of <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(W\)</span> is a <strong>direct sum</strong>, written <span class="math notranslate nohighlight">\(U \oplus W\)</span>, if every vector of <span class="math notranslate nohighlight">\(U+W\)</span> has a <strong>unique</strong> decomposition</p>
+<div class="math notranslate nohighlight">
+\[
+x = u + w, \qquad u \in U,\; w \in W.
+\]</div>
+<p>This uniqueness is the defining property. For <strong>two</strong> subspaces it is equivalent to the simple test</p>
+<div class="math notranslate nohighlight">
+\[
+U \cap W = \{0\}:
+\]</div>
+<p>if <span class="math notranslate nohighlight">\(u+w = u'+w'\)</span> with <span class="math notranslate nohighlight">\(u,u' \in U\)</span> and <span class="math notranslate nohighlight">\(w,w' \in W\)</span>, then <span class="math notranslate nohighlight">\(u-u' = w'-w\)</span> belongs to <span class="math notranslate nohighlight">\(U \cap W\)</span>, so both sides vanish precisely when the intersection is trivial.</p>
+<p>When the sum is direct, dimensions add:</p>
+<div class="math notranslate nohighlight">
+\[
+\dim(U \oplus W) = \dim(U) + \dim(W),
+\]</div>
+<p>which is the case <span class="math notranslate nohighlight">\(\dim(U \cap W)=0\)</span> of the formula in the previous section.</p>
+<section id="more-than-two-subspaces">
+<h3>More than two subspaces<a class="headerlink" href="#more-than-two-subspaces" title="Link to this heading">#</a></h3>
+<p>For subspaces <span class="math notranslate nohighlight">\(U_1,\dots,U_k\)</span>, the sum <span class="math notranslate nohighlight">\(U_1+\cdots+U_k\)</span> is a <strong>direct sum</strong>, written <span class="math notranslate nohighlight">\(U_1 \oplus \cdots \oplus U_k\)</span>, if the only way to write the zero vector as</p>
+<div class="math notranslate nohighlight">
+\[
+0 = u_1 + \cdots + u_k, \qquad u_i \in U_i,
+\]</div>
+<p>is the trivial one, <span class="math notranslate nohighlight">\(u_1=\cdots=u_k=0\)</span>. This is equivalent to uniqueness of the decomposition of every vector in the sum, and also to the condition</p>
+<div class="math notranslate nohighlight">
+\[
+U_i \cap \sum_{j \neq i} U_j = \{0\}
+\qquad \text{for each } i=1,\dots,k.
+\]</div>
+<p>For a direct sum of <span class="math notranslate nohighlight">\(k\)</span> subspaces, dimensions again add:</p>
+<div class="math notranslate nohighlight">
+\[
+\dim(U_1 \oplus \cdots \oplus U_k) = \sum_{i=1}^k \dim(U_i).
+\]</div>
+<p><strong>Exercise.</strong> Verify that if <span class="math notranslate nohighlight">\(v_1,\dots,v_k\)</span> are linearly independent, then the space <span class="math notranslate nohighlight">\(S\)</span> spanned by these vectors is the direct sum of their individual spans:</p>
+<div class="math notranslate nohighlight">
+\[
+S = \operatorname{span}\{v_1\} \oplus \cdots \oplus \operatorname{span}\{v_k\}.
+\]</div>
+<p>Use the zero-vector criterion above: a decomposition <span class="math notranslate nohighlight">\(0 = u_1 + \cdots + u_k\)</span> with <span class="math notranslate nohighlight">\(u_i = \alpha_i v_i \in \operatorname{span}\{v_i\}\)</span> is exactly a linear dependence among <span class="math notranslate nohighlight">\(v_1,\dots,v_k\)</span>, so independence forces every <span class="math notranslate nohighlight">\(u_i\)</span> to vanish.</p>
+<p>A central example of a direct sum appears in the next section: every subspace <span class="math notranslate nohighlight">\(S \subset \mathbb{R}^n\)</span> satisfies <span class="math notranslate nohighlight">\(\mathbb{R}^n = S \oplus S^\perp\)</span>, where <span class="math notranslate nohighlight">\(S^\perp\)</span> is the orthogonal complement of <span class="math notranslate nohighlight">\(S\)</span>.</p>
+</section>
 </section>
 </section>
 
@@ -662,7 +730,11 @@ S = \text{span}\{x_1\} \oplus \cdots \oplus \text{span}\{x_k\}
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-combinations-and-span">Linear combinations and span</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linear-independence">Linear independence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bases-and-dimension">Bases and dimension</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sums-of-subspaces">Sums of subspaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#direct-sum">Direct sum</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-than-two-subspaces">More than two subspaces</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
@@ -687,7 +759,7 @@ By Eric Darve
 
   <p class="copyright">
     
-      © Copyright 2025.
+      © Copyright 2026.
       <br/>
     
   </p>
