@@ -1,5 +1,7 @@
 # Linear Transformations and Matrices
 
+Throughout, vectors are column vectors ($n \times 1$ matrices); their transposes are row vectors ($1 \times n$ matrices).
+
 ## Linear Transformations
 
 A **linear transformation** from $\mathbb{R}^n$ to $\mathbb{R}^m$ is a map  
@@ -37,9 +39,13 @@ $$
 
 3. $T: \mathbb{R}^2 \to \mathbb{R}$  
    $(1, 0) \mapsto 1$, $(0, 1) \mapsto 0$  
+   Extracts the first coordinate of $x$.
+
+4. $T: \mathbb{R}^2 \to \mathbb{R}^2$  
+   $(1, 0) \mapsto (1, 0)$, $(0, 1) \mapsto (0, 0)$  
    Orthogonal projection onto the $x$-axis.
 
-4. $T: \mathbb{R} \to \mathbb{R}^2$  
+5. $T: \mathbb{R} \to \mathbb{R}^2$  
    $1 \mapsto (1, 1)$  
    Maps $\mathbb{R}$ onto the line $y = x$.
 
@@ -112,6 +118,8 @@ $$
 
 ## Transpose and Conjugate Transpose
 
+Everything above is stated over $\mathbb{R}$. The same definitions carry over to $T: \mathbb{C}^n \to \mathbb{C}^m$, with scalars $\alpha \in \mathbb{C}$ and $A \in \mathbb{C}^{m \times n}$.
+
 - **Transpose** $A^T$: $(i, j)$ entry of $A^T$ is $a_{ji}$.
 - **Conjugate transpose** $A^H$: Take complex conjugate of each entry of $A^T$.
 
@@ -127,13 +135,15 @@ $$
 (Ax)^H y = x^H (A^H y).
 $$
 
+$A^T$ is the only matrix that moves across the dot product this way, which is what makes it the **adjoint** of $A$. Later chapters rely on this identity repeatedly, starting with the normal equations.
+
 ---
 
 ## Special Matrices
+
+Each definition below equates $A$ with its transpose or conjugate transpose, so $A$ must be square:
 
 - **Symmetric**: $A^T = A$
 - **Skew-symmetric**: $A^T = -A$
 - **Hermitian**: $A^H = A$
 - **Skew-Hermitian**: $A^H = -A$
-
-Vectors are treated as column vectors ($n \times 1$ matrices). Their transposes are row vectors ($1 \times n$ matrices).
