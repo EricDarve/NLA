@@ -419,9 +419,11 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-between-norms">Equivalence Between Norms</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fundamental-properties">Other Fundamental Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -435,28 +437,29 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="operator-and-matrix-norms">
 <h1>Operator and Matrix Norms<a class="headerlink" href="#operator-and-matrix-norms" title="Link to this heading">#</a></h1>
-<p>A <strong>matrix norm</strong> is a function that assigns a strictly positive number to a matrix, providing a measure of its “size” or “magnitude”. Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.</p>
+<p>A <strong>matrix norm</strong> is a function that assigns a non-negative number to a matrix, providing a measure of its “size” or “magnitude”. Norms are fundamental tools in numerical analysis for understanding the behavior of matrix operations and for quantifying errors in computations.</p>
 <section id="the-operator-norm-induced-p-norm">
 <h2>The Operator Norm (Induced p-Norm)<a class="headerlink" href="#the-operator-norm-induced-p-norm" title="Link to this heading">#</a></h2>
 <p>The most common family of matrix norms are <strong>operator norms</strong>, also known as <strong>induced norms</strong>. These norms are derived directly from vector p-norms and are defined by how much a matrix can “stretch” a vector.</p>
 <p>The operator norm is defined as the maximum possible ratio of <span class="math notranslate nohighlight">\(\|Ax\|_p\)</span> to <span class="math notranslate nohighlight">\(\|x\|_p\)</span> for any non-zero vector <span class="math notranslate nohighlight">\(x\)</span>. This is equivalent to finding the maximum length of the vector <span class="math notranslate nohighlight">\(Ax\)</span> for any vector <span class="math notranslate nohighlight">\(x\)</span> with a length of 1.</p>
 <div class="math notranslate nohighlight">
 \[\| A \|_p = \sup_{x \neq 0} \frac{\|A x\|_p}{\|x\|_p} = \max_{\|x\|_p = 1} \| Ax \|_p\]</div>
-<p>Geometrically, if you apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to all the vectors on the unit circle (or unit sphere in higher dimensions), you’ll get an ellipse (or ellipsoid). The p-norm <span class="math notranslate nohighlight">\(\|A\|_p\)</span> is the length of the longest vector from the origin to a point on that resulting shape.</p>
+<p>Geometrically, take <span class="math notranslate nohighlight">\(p = 2\)</span>: applying <span class="math notranslate nohighlight">\(A\)</span> to the Euclidean unit sphere gives an ellipsoid (an ellipse in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>), and <span class="math notranslate nohighlight">\(\|A\|_2\)</span> is the length of the longest vector from the origin to a point on it. For other values of <span class="math notranslate nohighlight">\(p\)</span> the unit ball is not round, so its image is not an ellipsoid; <span class="math notranslate nohighlight">\(\|A\|_p\)</span> is then the largest <span class="math notranslate nohighlight">\(p\)</span>-norm attained on that image.</p>
 <p>The three most widely used operator norms are:</p>
 <ul class="simple">
 <li><p><strong>1-Norm</strong>: The maximum absolute column sum. It is computed as <span class="math notranslate nohighlight">\(\|A\|_1 = \max_j \sum_i |a_{ij}|\)</span>.</p></li>
 <li><p><strong><span class="math notranslate nohighlight">\(\infty\)</span>-Norm</strong>: The maximum absolute row sum. It is computed as <span class="math notranslate nohighlight">\(\|A\|_\infty = \max_i \sum_j |a_{ij}|\)</span>.</p></li>
 <li><p><strong>2-Norm (Spectral Norm)</strong>: This norm is equal to the largest <strong>singular value</strong> of the matrix, denoted <span class="math notranslate nohighlight">\(\sigma_{\max}(A)\)</span>. While it corresponds to the true geometric “maximum stretch,” it is generally more computationally intensive than the 1-norm or <span class="math notranslate nohighlight">\(\infty\)</span>-norm.</p></li>
 </ul>
+<p>Singular values are defined later in this chapter, in the section on the singular value decomposition. Until then, read <span class="math notranslate nohighlight">\(\sigma_{\max}(A)\)</span> as the largest factor by which <span class="math notranslate nohighlight">\(A\)</span> stretches a vector in the 2-norm.</p>
 </section>
 <section id="the-frobenius-norm">
 <h2>The Frobenius Norm<a class="headerlink" href="#the-frobenius-norm" title="Link to this heading">#</a></h2>
 <p>Another useful and easy-to-compute norm is the <strong>Frobenius norm</strong>. Unlike the operator norms, it is not induced by a vector norm. Instead, it treats the matrix as a single long vector and calculates its standard Euclidean norm (the square root of the sum of the squares of all its elements).</p>
 <div class="math notranslate nohighlight">
 \[\|A\|_F = \left( \sum_{i=1}^m \sum_{j=1}^n |a_{ij}|^2 \right)^{1/2}\]</div>
+<p>That it is not an induced norm is easy to check: every induced norm satisfies <span class="math notranslate nohighlight">\(\|I\| = 1\)</span>, whereas <span class="math notranslate nohighlight">\(\|I_n\|_F = \sqrt{n}\)</span>.</p>
 <p>The Frobenius norm is very convenient for analyzing matrices that can be decomposed into blocks.</p>
-<p>The two most fundamental inequalities for matrix operator norms are the <strong>sub-multiplicative</strong> inequality, <span class="math notranslate nohighlight">\(\|AB\| \le \|A\| \|B\|\)</span>, and the <strong>consistency</strong> inequality, <span class="math notranslate nohighlight">\(\|Ax\| \le \|A\| \|x\|\)</span>.</p>
 </section>
 <section id="key-inequalities-for-operator-norms">
 <h2>Key Inequalities for Operator Norms<a class="headerlink" href="#key-inequalities-for-operator-norms" title="Link to this heading">#</a></h2>
@@ -487,6 +490,7 @@ document.write(`
 <li><p><span class="math notranslate nohighlight">\(\frac{1}{\sqrt{n}}\|A\|_\infty \le \|A\|_2 \le \sqrt{n}\|A\|_\infty\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\frac{1}{\sqrt{n}}\|A\|_1 \le \|A\|_2 \le \sqrt{n}\|A\|_1\)</span></p></li>
 <li><p><span class="math notranslate nohighlight">\(\frac{1}{n}\|A\|_\infty \le \|A\|_1 \le n\|A\|_\infty\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\|A\|_2 \le \sqrt{\|A\|_1 \|A\|_\infty}\)</span>, which carries no factor of <span class="math notranslate nohighlight">\(n\)</span> and is usually the sharpest of these bounds</p></li>
 </ul>
 </section>
 <section id="other-fundamental-properties">
@@ -501,15 +505,15 @@ document.write(`
 <section id="other-matrix-norms">
 <h2>Other Matrix Norms<a class="headerlink" href="#other-matrix-norms" title="Link to this heading">#</a></h2>
 <p>While the operator and Frobenius norms are the most common, other specialized norms are valuable in various applications. We introduce two such examples: the simple but non-sub-multiplicative <strong>max norm</strong>, and the more general family of <strong>Schatten norms</strong>, which are based on a matrix’s singular values.</p>
-</section>
 <section id="max-norm">
-<h2>Max Norm<a class="headerlink" href="#max-norm" title="Link to this heading">#</a></h2>
+<h3>Max Norm<a class="headerlink" href="#max-norm" title="Link to this heading">#</a></h3>
 <p>The largest element in the matrix by magnitude. Note that this norm is <strong>not</strong> sub-multiplicative (<span class="math notranslate nohighlight">\(\|AB\| \le \|A\|\|B\|\)</span> does not hold).</p>
 <div class="math notranslate nohighlight">
 \[\|A\|_{\text{max}} = \max_{ij} |a_{ij}|\]</div>
+<p>Taking <span class="math notranslate nohighlight">\(A = B = \begin{pmatrix} 1 &amp; 1 \\ 1 &amp; 1 \end{pmatrix}\)</span> shows this: <span class="math notranslate nohighlight">\(\|A\|_{\text{max}} = \|B\|_{\text{max}} = 1\)</span>, while <span class="math notranslate nohighlight">\(AB = \begin{pmatrix} 2 &amp; 2 \\ 2 &amp; 2 \end{pmatrix}\)</span> has <span class="math notranslate nohighlight">\(\|AB\|_{\text{max}} = 2\)</span>.</p>
 </section>
 <section id="schatten-norms-based-on-singular-values">
-<h2>Schatten Norms (based on singular values)<a class="headerlink" href="#schatten-norms-based-on-singular-values" title="Link to this heading">#</a></h2>
+<h3>Schatten Norms (based on singular values)<a class="headerlink" href="#schatten-norms-based-on-singular-values" title="Link to this heading">#</a></h3>
 <p>The Schatten <span class="math notranslate nohighlight">\(p\)</span>-norm is defined by applying the vector <span class="math notranslate nohighlight">\(p\)</span>-norm to the vector of the matrix’s singular values, <span class="math notranslate nohighlight">\(\sigma_i\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[\|A\|_{S,p} = \left( \sum_{i=1}^{\min(m,n)} \sigma_i^p \right)^{1/p}\]</div>
@@ -528,6 +532,7 @@ document.write(`
 \[\|A\|_{S,\infty} = \max_i \sigma_i = \|A\|_2\]</div>
 </li>
 </ul>
+</section>
 </section>
 </section>
 
@@ -604,9 +609,11 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-between-norms">Equivalence Between Norms</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-fundamental-properties">Other Fundamental Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-matrix-norms">Other Matrix Norms</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#max-norm">Max Norm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#schatten-norms-based-on-singular-values">Schatten Norms (based on singular values)</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
