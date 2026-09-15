@@ -426,8 +426,26 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-column-properties">Basic Column Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-matrix">Identity Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linearity-in-each-column">Linearity in Each Column</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-swaps">Column Swaps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-multiple-of-another-column">Adding a Multiple of Another Column</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose">Transpose</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#triangular-matrices">Triangular Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiplicativity">Multiplicativity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#singularity">Singularity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inverse">Inverse</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-determinant-lemma">The Matrix Determinant Lemma</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-one-special-case">Rank-One Special Case</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation</a></li>
 </ul>
             </nav>
         </div>
@@ -441,41 +459,218 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-determinant">
 <h1>The Determinant<a class="headerlink" href="#the-determinant" title="Link to this heading">#</a></h1>
-<p>The <strong>determinant</strong> is a fundamental concept in linear algebra that associates a single scalar value with every square matrix. This value, denoted as <span class="math notranslate nohighlight">\(\det(A)\)</span> or <span class="math notranslate nohighlight">\(|A|\)</span>, encapsulates important properties of the matrix and the linear transformation it represents. It can be uniquely defined by four key properties.</p>
-<ol class="arabic simple">
-<li><p><strong>Identity Matrix</strong>: The determinant of the identity matrix is 1, i.e., <span class="math notranslate nohighlight">\(\det(I) = 1\)</span>.</p></li>
-<li><p><strong>Column Swaps</strong>: Exchanging two columns of a matrix multiplies its determinant by -1.</p></li>
-<li><p><strong>Scalar Multiplication</strong>: Multiplying a single column by a scalar <span class="math notranslate nohighlight">\(\alpha\)</span> multiplies the entire determinant by <span class="math notranslate nohighlight">\(\alpha\)</span>.</p></li>
-<li><p><strong>Column Operations</strong>: Adding a multiple of one column to another column does not change the determinant.</p></li>
-</ol>
+<p>The <strong>determinant</strong> assigns a scalar <span class="math notranslate nohighlight">\(\det(A)\)</span> to each square matrix <span class="math notranslate nohighlight">\(A\)</span>. It tells us whether <span class="math notranslate nohighlight">\(A\)</span> is invertible and, for real matrices, how the transformation <span class="math notranslate nohighlight">\(x \mapsto Ax\)</span> changes volume and orientation. The notation <span class="math notranslate nohighlight">\(|A|\)</span> is also used for the determinant; it should not be confused with the absolute value <span class="math notranslate nohighlight">\(|\det(A)|\)</span>.</p>
+<p>Throughout this section, <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> are <span class="math notranslate nohighlight">\(n \times n\)</span> matrices over <span class="math notranslate nohighlight">\(\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>, with <span class="math notranslate nohighlight">\(n \geq 1\)</span>.</p>
 <section id="the-leibniz-formula">
 <h2>The Leibniz Formula<a class="headerlink" href="#the-leibniz-formula" title="Link to this heading">#</a></h2>
-<p>While the properties above define the determinant, it can be calculated explicitly using the <strong>Leibniz formula</strong>. This formula sums over all possible permutations of the matrix’s column indices.</p>
+<p>We define the determinant by the <strong>Leibniz formula</strong>:</p>
 <div class="math notranslate nohighlight">
 \[
-\det(A) = \sum_{\sigma \in S_n} \text{sgn}(\sigma)
-a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
+\det(A) = \sum_{\sigma \in S_n} \operatorname{sgn}(\sigma)
+\prod_{i=1}^n a_{i,\sigma(i)}.
 \]</div>
-<p>Here, <span class="math notranslate nohighlight">\(S_n\)</span> is the set of all permutations of the numbers <span class="math notranslate nohighlight">\(\{1, 2, \dots, n\}\)</span>, and <span class="math notranslate nohighlight">\(\text{sgn}(\sigma)\)</span> is the <strong>signature</strong> of the permutation <span class="math notranslate nohighlight">\(\sigma\)</span>. The signature is +1 if the permutation can be formed by an even number of swaps and -1 if it requires an odd number of swaps.</p>
+<p>Here, <span class="math notranslate nohighlight">\(S_n\)</span> is the set of all permutations of <span class="math notranslate nohighlight">\(\{1,\ldots,n\}\)</span>. Each product selects exactly one entry from each row and each column. The <strong>sign</strong> <span class="math notranslate nohighlight">\(\operatorname{sgn}(\sigma)\)</span> is <span class="math notranslate nohighlight">\(+1\)</span> if <span class="math notranslate nohighlight">\(\sigma\)</span> can be obtained from the identity permutation by an even number of swaps, and <span class="math notranslate nohighlight">\(-1\)</span> if that number is odd. Although the sequence of swaps is not unique, its parity is, so the sign is well defined.</p>
+<p>For a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix, <span class="math notranslate nohighlight">\(\det([a]) = a\)</span>. For a <span class="math notranslate nohighlight">\(2 \times 2\)</span> matrix, there are two permutations, giving</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\det\begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix} = ad-bc.
+\end{split}\]</div>
+<p>The Leibniz formula has <span class="math notranslate nohighlight">\(n!\)</span> terms. It is useful for proving properties, but evaluating it directly is impractical for large matrices. In the next chapter, we will use matrix factorizations to compute determinants more efficiently.</p>
+</section>
+<section id="basic-column-properties">
+<h2>Basic Column Properties<a class="headerlink" href="#basic-column-properties" title="Link to this heading">#</a></h2>
+<p>Write <span class="math notranslate nohighlight">\(A = [a_1,\ldots,a_n]\)</span>, where <span class="math notranslate nohighlight">\(a_j\)</span> denotes column <span class="math notranslate nohighlight">\(j\)</span>. We first establish the rules for changing individual columns.</p>
+<section id="identity-matrix">
+<h3>Identity Matrix<a class="headerlink" href="#identity-matrix" title="Link to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\det(I) = 1.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. In the Leibniz formula for <span class="math notranslate nohighlight">\(I\)</span>, the identity permutation contributes <span class="math notranslate nohighlight">\(1\)</span>. Every other permutation selects at least one off-diagonal entry, which is zero.</p>
+</div>
+</section>
+<section id="linearity-in-each-column">
+<h3>Linearity in Each Column<a class="headerlink" href="#linearity-in-each-column" title="Link to this heading">#</a></h3>
+<p>If all other columns are held fixed, the determinant is linear in the remaining column:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+&amp;\det[a_1,\ldots,\alpha u+\beta v,\ldots,a_n] \\
+&amp;\quad = \alpha\det[a_1,\ldots,u,\ldots,a_n] \\
+&amp;\qquad {}+\beta\det[a_1,\ldots,v,\ldots,a_n].
+\end{aligned}
+\end{split}\]</div>
+<p>This property is called <strong>multilinearity</strong>: the determinant is linear in each column separately.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Each product in the Leibniz formula contains exactly one entry from the column being changed. Replacing that column by <span class="math notranslate nohighlight">\(\alpha u+\beta v\)</span> splits each product into two terms. Summing gives the stated identity.</p>
+</div>
+<p>In particular, multiplying one column by <span class="math notranslate nohighlight">\(\alpha\)</span> multiplies the determinant by <span class="math notranslate nohighlight">\(\alpha\)</span>, and a matrix with a zero column has determinant zero. Multiplying the whole matrix by <span class="math notranslate nohighlight">\(\alpha\)</span> scales all <span class="math notranslate nohighlight">\(n\)</span> columns, so</p>
+<div class="math notranslate nohighlight">
+\[\det(\alpha A) = \alpha^n\det(A).\]</div>
+<p>Linearity in one column does <strong>not</strong> mean linearity in the whole matrix. In general, <span class="math notranslate nohighlight">\(\det(A+B) \neq \det(A)+\det(B)\)</span>. For example, <span class="math notranslate nohighlight">\(\det(I_2+I_2)=4\)</span>, whereas <span class="math notranslate nohighlight">\(\det(I_2)+\det(I_2)=2\)</span>.</p>
+</section>
+<section id="column-swaps">
+<h3>Column Swaps<a class="headerlink" href="#column-swaps" title="Link to this heading">#</a></h3>
+<p>Exchanging two columns multiplies the determinant by <span class="math notranslate nohighlight">\(-1\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Let <span class="math notranslate nohighlight">\(\tau\)</span> be the permutation that exchanges the two column indices. After the swap, the product indexed by <span class="math notranslate nohighlight">\(\sigma\)</span> in the Leibniz formula uses the entries that were previously indexed by <span class="math notranslate nohighlight">\(\tau\circ\sigma\)</span>. These products still run through all the original products, but their signs are reversed: composing with one swap changes the sign of a permutation. Thus the new determinant is <span class="math notranslate nohighlight">\(-\det(A)\)</span>.</p>
+</div>
+<p>If two columns are equal, swapping them leaves the matrix unchanged while negating its determinant. Hence <span class="math notranslate nohighlight">\(\det(A)=-\det(A)\)</span>, and <span class="math notranslate nohighlight">\(\det(A)=0\)</span>.</p>
+</section>
+<section id="adding-a-multiple-of-another-column">
+<h3>Adding a Multiple of Another Column<a class="headerlink" href="#adding-a-multiple-of-another-column" title="Link to this heading">#</a></h3>
+<p>Replacing column <span class="math notranslate nohighlight">\(a_j\)</span> by <span class="math notranslate nohighlight">\(a_j+\alpha a_i\)</span>, where <span class="math notranslate nohighlight">\(i\neq j\)</span>, does not change the determinant.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. By linearity in column <span class="math notranslate nohighlight">\(j\)</span>, the new determinant equals <span class="math notranslate nohighlight">\(\det(A)\)</span> plus <span class="math notranslate nohighlight">\(\alpha\)</span> times the determinant of the matrix obtained by replacing column <span class="math notranslate nohighlight">\(j\)</span> with <span class="math notranslate nohighlight">\(a_i\)</span>. The latter matrix has two equal columns, so its determinant is zero.</p>
+</div>
+</section>
 </section>
 <section id="key-properties">
 <h2>Key Properties<a class="headerlink" href="#key-properties" title="Link to this heading">#</a></h2>
-<p>The determinant has several crucial properties that are used throughout mathematics and its applications.</p>
-<ul class="simple">
-<li><p><strong>Transpose</strong>: The determinant of a matrix is equal to the determinant of its transpose: <span class="math notranslate nohighlight">\(\det(A) = \det(A^T)\)</span>.</p></li>
-<li><p><strong>Multiplicativity</strong>: The determinant of a product of matrices is the product of their determinants: <span class="math notranslate nohighlight">\(\det(AB) = \det(A)\det(B)\)</span>.</p></li>
-<li><p><strong>Inverse</strong>: The determinant of an inverse matrix is the reciprocal of the original determinant: <span class="math notranslate nohighlight">\(\det(A^{-1}) = \det(A)^{-1}\)</span>.</p></li>
-<li><p><strong>Singularity</strong>: A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>singular</strong> (i.e., not invertible) if and only if its determinant is zero: <span class="math notranslate nohighlight">\(\det(A) = 0\)</span>.</p></li>
-<li><p><strong>Triangular Matrices</strong>: If <span class="math notranslate nohighlight">\(A\)</span> is a triangular (upper or lower) matrix, its determinant is simply the product of its diagonal entries: <span class="math notranslate nohighlight">\(\det(A) = \prod_{i=1}^n a_{ii}\)</span>.</p></li>
-</ul>
+<section id="transpose">
+<h3>Transpose<a class="headerlink" href="#transpose" title="Link to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\det(A^T) = \det(A).\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. The Leibniz formula gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\det(A^T)
+&amp;= \sum_{\sigma\in S_n}\operatorname{sgn}(\sigma)
+   \prod_{i=1}^n a_{\sigma(i),i} \\
+&amp;= \sum_{\sigma\in S_n}\operatorname{sgn}(\sigma)
+   \prod_{j=1}^n a_{j,\sigma^{-1}(j)}.
+\end{aligned}
+\end{split}\]</div>
+<p>The second line just reorders the factors using <span class="math notranslate nohighlight">\(j=\sigma(i)\)</span>. A permutation and its inverse have the same sign: reversing a sequence of swaps gives the inverse using the same number of swaps. As <span class="math notranslate nohighlight">\(\sigma\)</span> runs through <span class="math notranslate nohighlight">\(S_n\)</span>, so does <span class="math notranslate nohighlight">\(\sigma^{-1}\)</span>. The last sum is therefore the Leibniz formula for <span class="math notranslate nohighlight">\(\det(A)\)</span>.</p>
+</div>
+<p>Consequently, every column rule above also holds for rows: the determinant is linear in each row, a row swap reverses its sign, and adding a multiple of one row to another leaves it unchanged.</p>
+</section>
+<section id="triangular-matrices">
+<h3>Triangular Matrices<a class="headerlink" href="#triangular-matrices" title="Link to this heading">#</a></h3>
+<p>For an upper or lower triangular matrix,</p>
+<div class="math notranslate nohighlight">
+\[\det(A) = \prod_{i=1}^n a_{ii}.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Suppose <span class="math notranslate nohighlight">\(A\)</span> is upper triangular. In a nonzero term of the Leibniz formula, the entry selected from row <span class="math notranslate nohighlight">\(n\)</span> must be <span class="math notranslate nohighlight">\(a_{nn}\)</span>, since all other entries in that row are zero. Column <span class="math notranslate nohighlight">\(n\)</span> has then been used, so the entry from row <span class="math notranslate nohighlight">\(n-1\)</span> must be <span class="math notranslate nohighlight">\(a_{n-1,n-1}\)</span>. Continuing upward shows that only the identity permutation can contribute. Its term is the product of the diagonal entries. This argument also covers a zero diagonal entry, in which case every term vanishes.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is lower triangular, <span class="math notranslate nohighlight">\(A^T\)</span> is upper triangular with the same diagonal. Apply the result above and <span class="math notranslate nohighlight">\(\det(A)=\det(A^T)\)</span>.</p>
+</div>
+</section>
+<section id="multiplicativity">
+<h3>Multiplicativity<a class="headerlink" href="#multiplicativity" title="Link to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\det(AB) = \det(A)\det(B).\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(AB\)</span> is <span class="math notranslate nohighlight">\(\sum_{i=1}^n b_{ij}a_i\)</span>. Expanding the determinant one column at a time gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\det(AB)
+&amp;= \sum_{i_1,\ldots,i_n=1}^n
+   \left(\prod_{j=1}^n b_{i_j,j}\right) \\
+&amp;\qquad\qquad {}\cdot\det[a_{i_1},\ldots,a_{i_n}].
+\end{aligned}
+\end{split}\]</div>
+<p>If two indices <span class="math notranslate nohighlight">\(i_j\)</span> coincide, the determinant in that term has repeated columns and is zero. The remaining terms correspond to permutations <span class="math notranslate nohighlight">\(\sigma\)</span>, with <span class="math notranslate nohighlight">\(i_j=\sigma(j)\)</span>. Reordering the columns of <span class="math notranslate nohighlight">\(A\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+\det[a_{\sigma(1)},\ldots,a_{\sigma(n)}]
+= \operatorname{sgn}(\sigma)\det(A).
+\]</div>
+<p>Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\det(AB)
+&amp;= \det(A)\sum_{\sigma\in S_n}\operatorname{sgn}(\sigma)
+   \prod_{j=1}^n b_{\sigma(j),j} \\
+&amp;= \det(A)\det(B).
+\end{aligned}
+\end{split}\]</div>
+<p>The sum is the Leibniz formula for <span class="math notranslate nohighlight">\(B^T\)</span>, and <span class="math notranslate nohighlight">\(\det(B^T)=\det(B)\)</span>. No invertibility assumption was needed.</p>
+</div>
+</section>
+<section id="singularity">
+<h3>Singularity<a class="headerlink" href="#singularity" title="Link to this heading">#</a></h3>
+<p>A matrix <span class="math notranslate nohighlight">\(A\)</span> is singular (not invertible) if and only if <span class="math notranslate nohighlight">\(\det(A)=0\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. If <span class="math notranslate nohighlight">\(A\)</span> is singular, its columns are linearly dependent. Thus one column can be written as a linear combination of the others. Expanding the determinant in that column gives terms with repeated columns, all of which are zero. If the column itself is zero, the determinant is zero by linearity as well.</p>
+<p>Conversely, if <span class="math notranslate nohighlight">\(A\)</span> is invertible, multiplicativity gives</p>
+<div class="math notranslate nohighlight">
+\[1 = \det(I) = \det(AA^{-1}) = \det(A)\det(A^{-1}).\]</div>
+<p>Hence <span class="math notranslate nohighlight">\(\det(A)\neq 0\)</span>. Equivalently, a zero determinant implies that <span class="math notranslate nohighlight">\(A\)</span> is singular.</p>
+</div>
+</section>
+<section id="inverse">
+<h3>Inverse<a class="headerlink" href="#inverse" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is invertible, then</p>
+<div class="math notranslate nohighlight">
+\[\det(A^{-1}) = \frac{1}{\det(A)}.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. The identity <span class="math notranslate nohighlight">\(\det(A)\det(A^{-1})=1\)</span> was established above. Since <span class="math notranslate nohighlight">\(\det(A)\neq 0\)</span>, division gives the result.</p>
+</div>
+</section>
+</section>
+<section id="the-matrix-determinant-lemma">
+<h2>The Matrix Determinant Lemma<a class="headerlink" href="#the-matrix-determinant-lemma" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be an invertible <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, and let <span class="math notranslate nohighlight">\(U,V\)</span> be <span class="math notranslate nohighlight">\(n \times k\)</span> matrices. The <a class="reference external" href="https://en.wikipedia.org/wiki/Matrix_determinant_lemma#Generalization">matrix determinant lemma</a> states that</p>
+<div class="math notranslate nohighlight">
+\[
+\det(A+UV^T)
+= \det(A)\det(I_k+V^TA^{-1}U).
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(I_k\)</span> is the <span class="math notranslate nohighlight">\(k \times k\)</span> identity matrix. The update <span class="math notranslate nohighlight">\(UV^T\)</span> has rank at most <span class="math notranslate nohighlight">\(k\)</span>, and the determinant on the right involves a <span class="math notranslate nohighlight">\(k \times k\)</span> matrix. The identity holds even when <span class="math notranslate nohighlight">\(A+UV^T\)</span> is singular.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Set <span class="math notranslate nohighlight">\(X=A^{-1}U\)</span>. Factoring out <span class="math notranslate nohighlight">\(A\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+\det(A+UV^T)=\det(A)\det(I_n+XV^T).
+\]</div>
+<p>It remains to show that <span class="math notranslate nohighlight">\(\det(I_n+XV^T)=\det(I_k+V^TX)\)</span>. Consider the <span class="math notranslate nohighlight">\((n+k)\times(n+k)\)</span> matrix written in four blocks:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M=\begin{pmatrix}
+I_n &amp; X \\
+-V^T &amp; I_k
+\end{pmatrix}.
+\end{split}\]</div>
+<p>We will compute its determinant in two ways, using only additions of multiples of rows. First, add to the bottom <span class="math notranslate nohighlight">\(k\)</span> rows the combinations of the top <span class="math notranslate nohighlight">\(n\)</span> rows specified by <span class="math notranslate nohighlight">\(V^T\)</span>. This gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}
+I_n &amp; X \\
+0 &amp; I_k+V^TX
+\end{pmatrix}.
+\end{split}\]</div>
+<p>These row operations preserve the determinant. In a nonzero term of the Leibniz formula, the bottom <span class="math notranslate nohighlight">\(k\)</span> rows must select the last <span class="math notranslate nohighlight">\(k\)</span> columns, leaving the first <span class="math notranslate nohighlight">\(n\)</span> columns for the top rows. The identity block contributes <span class="math notranslate nohighlight">\(1\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[\det(M)=\det(I_k+V^TX).\]</div>
+<p>Next, start again from <span class="math notranslate nohighlight">\(M\)</span>. Subtract from the top <span class="math notranslate nohighlight">\(n\)</span> rows the combinations of the bottom <span class="math notranslate nohighlight">\(k\)</span> rows specified by <span class="math notranslate nohighlight">\(X\)</span>. This gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}
+I_n+XV^T &amp; 0 \\
+-V^T &amp; I_k
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Again, the determinant is unchanged. Now the top <span class="math notranslate nohighlight">\(n\)</span> rows must select the first <span class="math notranslate nohighlight">\(n\)</span> columns, and the identity block contributes <span class="math notranslate nohighlight">\(1\)</span>. Hence</p>
+<div class="math notranslate nohighlight">
+\[\det(M)=\det(I_n+XV^T).\]</div>
+<p>Equating the two expressions for <span class="math notranslate nohighlight">\(\det(M)\)</span> and substituting <span class="math notranslate nohighlight">\(X=A^{-1}U\)</span> proves the lemma.</p>
+</div>
+<section id="rank-one-special-case">
+<h3>Rank-One Special Case<a class="headerlink" href="#rank-one-special-case" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, write <span class="math notranslate nohighlight">\(U=u\)</span> and <span class="math notranslate nohighlight">\(V=v\)</span>, where <span class="math notranslate nohighlight">\(u,v\)</span> are column vectors. The matrix <span class="math notranslate nohighlight">\(I_k+V^TA^{-1}U\)</span> then has a single entry, <span class="math notranslate nohighlight">\(1+v^TA^{-1}u\)</span>, so the lemma becomes</p>
+<div class="math notranslate nohighlight">
+\[\det(A+uv^T)=(1+v^TA^{-1}u)\det(A).\]</div>
+<p>This is the identity used in the preceding section on the <a class="reference internal" href="sherman_morrison_woodbury.html"><span class="std std-doc">Sherman-Morrison-Woodbury formula</span></a>.</p>
+</section>
 </section>
 <section id="geometric-interpretation">
-<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
-<p>Geometrically, the determinant represents the <strong>signed volume</strong> of the <span class="math notranslate nohighlight">\(n\)</span>-dimensional parallelepiped formed by the column vectors of the matrix.</p>
-<ul class="simple">
-<li><p>The <strong>absolute value</strong> of the determinant, <span class="math notranslate nohighlight">\(|\det(A)|\)</span>, gives the scaling factor of the transformation. For instance, in 2D, it’s the area of the parallelogram formed by the column vectors. In 3D, it’s the volume of the parallelepiped.</p></li>
-<li><p>The <strong>sign</strong> of the determinant indicates whether the transformation preserves or reverses the orientation of space. A positive determinant preserves orientation (like a rotation), while a negative determinant reverses it (like a reflection).</p></li>
-</ul>
+<h2>Geometric Interpretation<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
+<p>For a real matrix <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(|\det(A)|\)</span> is the volume of the parallelepiped spanned by its columns. In two dimensions this is the area of a parallelogram; in three dimensions it is the usual volume of a parallelepiped. More generally, the transformation <span class="math notranslate nohighlight">\(x\mapsto Ax\)</span> multiplies <span class="math notranslate nohighlight">\(n\)</span>-dimensional volumes by <span class="math notranslate nohighlight">\(|\det(A)|\)</span>.</p>
+<p>For an invertible real matrix, the sign records orientation: a positive determinant preserves orientation, while a negative determinant reverses it. If <span class="math notranslate nohighlight">\(\det(A)=0\)</span>, the columns lie in a lower-dimensional subspace and the <span class="math notranslate nohighlight">\(n\)</span>-dimensional volume is zero. The transformation then collapses at least one direction.</p>
+<p>The volume factor need not describe how individual lengths change. A matrix can stretch one direction and compress another while leaving volume unchanged. For complex matrices, the algebraic identities above still hold, but the determinant may be complex, so this interpretation in terms of a positive or negative sign does not apply.</p>
 </section>
 </section>
 
@@ -544,8 +739,26 @@ a_{1,\sigma(1)} \cdots a_{n,\sigma(n)}
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-leibniz-formula">The Leibniz Formula</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-column-properties">Basic Column Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#identity-matrix">Identity Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linearity-in-each-column">Linearity in Each Column</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#column-swaps">Column Swaps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-multiple-of-another-column">Adding a Multiple of Another Column</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties">Key Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose">Transpose</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#triangular-matrices">Triangular Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiplicativity">Multiplicativity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#singularity">Singularity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inverse">Inverse</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-determinant-lemma">The Matrix Determinant Lemma</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-one-special-case">Rank-One Special Case</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation</a></li>
 </ul>
   </nav></div>
 

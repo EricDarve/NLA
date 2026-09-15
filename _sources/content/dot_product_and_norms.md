@@ -122,7 +122,41 @@ $$
 \|x\|_\infty \le \|x\|_1 \le n \, \|x\|_\infty.
 $$
 
-These follow from the **Cauchy–Schwarz inequality** (see below) and basic properties of maxima and sums.
+````{prf:proof}
+We prove each pair of bounds directly from the definitions.
+
+For the 1- and 2-norms, expanding the square gives
+
+$$
+\|x\|_1^2
+= \left(\sum_{i=1}^n |x_i|\right)^2
+= \sum_{i=1}^n |x_i|^2 + 2\sum_{i<j}|x_i||x_j|
+\ge \|x\|_2^2.
+$$
+
+Taking square roots yields $\|x\|_2\le\|x\|_1$. For the other direction, apply the Cauchy–Schwarz inequality, proved below as a special case of Hölder's inequality, to $(|x_1|,\dots,|x_n|)^T$ and $(1,\dots,1)^T$:
+
+$$
+\|x\|_1 = \sum_{i=1}^n |x_i|\cdot 1
+\le \left(\sum_{i=1}^n |x_i|^2\right)^{1/2}
+\left(\sum_{i=1}^n 1^2\right)^{1/2}
+= \sqrt{n}\,\|x\|_2.
+$$
+
+For the infinity norm, let $M=\max_i|x_i|=\|x\|_\infty$. At least one component has magnitude $M$, and every component has magnitude at most $M$. Therefore
+
+$$
+M^2\le\sum_{i=1}^n |x_i|^2\le nM^2,
+$$
+
+which gives $\|x\|_\infty\le\|x\|_2\le\sqrt{n}\,\|x\|_\infty$ after taking square roots. Similarly,
+
+$$
+M\le\sum_{i=1}^n |x_i|\le nM,
+$$
+
+so $\|x\|_\infty\le\|x\|_1\le n\,\|x\|_\infty$. These bounds establish equivalence: the constants depend on $n$, but not on $x$.
+````
 
 To illustrate why the dimension $n$ is critical, consider the vector $\mathbf{x} = [1, 1, \dots, 1]^T \in \mathbb{R}^n$.
 * $\|\mathbf{x}\|_\infty = 1$
@@ -186,6 +220,62 @@ $$
 $$
 
 The pair $p=1$, $q=\infty$ gives the frequently used bound $|x^T y| \le \|x\|_1 \, \|y\|_\infty$.
+
+````{prf:proof}
+First consider $p=1$ and $q=\infty$. The triangle inequality for real numbers gives
+
+$$
+|x^T y|\le\sum_{i=1}^n |x_i||y_i|
+\le\left(\sum_{i=1}^n |x_i|\right)\max_i|y_i|
+=\|x\|_1\,\|y\|_\infty.
+$$
+
+The case $p=\infty$, $q=1$ follows by exchanging $x$ and $y$.
+
+Now suppose $1<p,q<\infty$. We first prove the scalar bound known as **Young's inequality**: for $a,b\ge0$,
+
+$$
+ab\le\frac{a^p}{p}+\frac{b^q}{q}.
+$$
+
+If $b=0$, the bound is immediate. For fixed $b>0$, consider
+
+$$
+f(a)=\frac{a^p}{p}-ab,\qquad a\ge0.
+$$
+
+Its derivative is $f'(a)=a^{p-1}-b$, which is negative before $a=b^{1/(p-1)}$ and positive after it. Thus this point is the minimum. Since $q=p/(p-1)$ and $1/p-1=-1/q$, the minimum value is
+
+$$
+f\bigl(b^{1/(p-1)}\bigr)
+=\frac{b^q}{p}-b^q=-\frac{b^q}{q}.
+$$
+
+Rearranging $f(a)\ge-b^q/q$ proves the scalar bound.
+
+If either $x$ or $y$ is zero, Hölder's inequality is immediate. Otherwise, set
+
+$$
+a_i=\frac{|x_i|}{\|x\|_p},\qquad
+b_i=\frac{|y_i|}{\|y\|_q}.
+$$
+
+These choices give $\sum_i a_i^p=\sum_i b_i^q=1$. Applying the scalar bound to each pair and summing yields
+
+$$
+\sum_{i=1}^n a_i b_i
+\le\frac{1}{p}\sum_{i=1}^n a_i^p
++\frac{1}{q}\sum_{i=1}^n b_i^q
+=\frac{1}{p}+\frac{1}{q}=1.
+$$
+
+Multiplying by $\|x\|_p\,\|y\|_q$ now gives
+
+$$
+|x^T y|\le\sum_{i=1}^n |x_i||y_i|
+\le\|x\|_p\,\|y\|_q.
+$$
+````
 
 **Cauchy–Schwarz inequality:**  
 Special case $p = q = 2$:

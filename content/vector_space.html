@@ -625,6 +625,49 @@ U + W = \{\, u + w \;:\; u \in U,\; w \in W \,\}.
 \[
 \dim(U+W) = \dim(U) + \dim(W) - \dim(U \cap W).
 \]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Choose a basis <span class="math notranslate nohighlight">\(s_1,\dots,s_r\)</span> of <span class="math notranslate nohighlight">\(U\cap W\)</span>. Extend it to a basis of each subspace:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+U &amp;: s_1,\dots,s_r,u_1,\dots,u_p,\\
+W &amp;: s_1,\dots,s_r,w_1,\dots,w_q.
+\end{aligned}
+\end{split}\]</div>
+<p>To extend a linearly independent list to a basis, keep adding a vector outside its span until it spans the subspace. Each added vector preserves linear independence, and the process must stop because the subspace is finite-dimensional.</p>
+<p>We will show that</p>
+<div class="math notranslate nohighlight">
+\[
+s_1,\dots,s_r,u_1,\dots,u_p,w_1,\dots,w_q
+\]</div>
+<p>is a basis of <span class="math notranslate nohighlight">\(U+W\)</span>. It spans <span class="math notranslate nohighlight">\(U+W\)</span> because every vector in the sum has the form <span class="math notranslate nohighlight">\(u+w\)</span>, and each of <span class="math notranslate nohighlight">\(u\)</span> and <span class="math notranslate nohighlight">\(w\)</span> can be expanded in the corresponding basis above.</p>
+<p>To prove linear independence, suppose</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{i=1}^r a_i s_i + \sum_{j=1}^p b_j u_j
++ \sum_{k=1}^q c_k w_k = 0.
+\]</div>
+<p>Then</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{k=1}^q c_k w_k
+= -\sum_{i=1}^r a_i s_i - \sum_{j=1}^p b_j u_j
+\]</div>
+<p>belongs to both <span class="math notranslate nohighlight">\(W\)</span> and <span class="math notranslate nohighlight">\(U\)</span>, so it lies in <span class="math notranslate nohighlight">\(U\cap W\)</span>. Thus it can be written as <span class="math notranslate nohighlight">\(\sum_{i=1}^r d_i s_i\)</span>, giving</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{k=1}^q c_k w_k - \sum_{i=1}^r d_i s_i = 0.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(s_1,\dots,s_r,w_1,\dots,w_q\)</span> is a basis of <span class="math notranslate nohighlight">\(W\)</span>, all the <span class="math notranslate nohighlight">\(c_k\)</span> and <span class="math notranslate nohighlight">\(d_i\)</span> vanish. The original relation now involves only the basis vectors of <span class="math notranslate nohighlight">\(U\)</span>, so all the <span class="math notranslate nohighlight">\(a_i\)</span> and <span class="math notranslate nohighlight">\(b_j\)</span> vanish as well. This proves linear independence.</p>
+<p>Counting the vectors in these bases gives</p>
+<div class="math notranslate nohighlight">
+\[
+\dim(U+W) = r+p+q
+= (r+p)+(r+q)-r
+= \dim(U)+\dim(W)-\dim(U\cap W).
+\]</div>
+<p>The same argument applies when any of the lists is empty, using the convention that an empty sum is zero.</p>
+</div>
 </section>
 <section id="direct-sum">
 <h2>Direct sum<a class="headerlink" href="#direct-sum" title="Link to this heading">#</a></h2>

@@ -577,7 +577,36 @@ S^\perp = \{ y \in \mathbb{R}^n \;|\; \forall x \in S,\; x^T y = 0 \}.
 \[
 \|x\|_\infty \le \|x\|_1 \le n \, \|x\|_\infty.
 \]</div>
-<p>These follow from the <strong>Cauchy–Schwarz inequality</strong> (see below) and basic properties of maxima and sums.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. We prove each pair of bounds directly from the definitions.</p>
+<p>For the 1- and 2-norms, expanding the square gives</p>
+<div class="math notranslate nohighlight">
+\[
+\|x\|_1^2
+= \left(\sum_{i=1}^n |x_i|\right)^2
+= \sum_{i=1}^n |x_i|^2 + 2\sum_{i&lt;j}|x_i||x_j|
+\ge \|x\|_2^2.
+\]</div>
+<p>Taking square roots yields <span class="math notranslate nohighlight">\(\|x\|_2\le\|x\|_1\)</span>. For the other direction, apply the Cauchy–Schwarz inequality, proved below as a special case of Hölder’s inequality, to <span class="math notranslate nohighlight">\((|x_1|,\dots,|x_n|)^T\)</span> and <span class="math notranslate nohighlight">\((1,\dots,1)^T\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\|x\|_1 = \sum_{i=1}^n |x_i|\cdot 1
+\le \left(\sum_{i=1}^n |x_i|^2\right)^{1/2}
+\left(\sum_{i=1}^n 1^2\right)^{1/2}
+= \sqrt{n}\,\|x\|_2.
+\]</div>
+<p>For the infinity norm, let <span class="math notranslate nohighlight">\(M=\max_i|x_i|=\|x\|_\infty\)</span>. At least one component has magnitude <span class="math notranslate nohighlight">\(M\)</span>, and every component has magnitude at most <span class="math notranslate nohighlight">\(M\)</span>. Therefore</p>
+<div class="math notranslate nohighlight">
+\[
+M^2\le\sum_{i=1}^n |x_i|^2\le nM^2,
+\]</div>
+<p>which gives <span class="math notranslate nohighlight">\(\|x\|_\infty\le\|x\|_2\le\sqrt{n}\,\|x\|_\infty\)</span> after taking square roots. Similarly,</p>
+<div class="math notranslate nohighlight">
+\[
+M\le\sum_{i=1}^n |x_i|\le nM,
+\]</div>
+<p>so <span class="math notranslate nohighlight">\(\|x\|_\infty\le\|x\|_1\le n\,\|x\|_\infty\)</span>. These bounds establish equivalence: the constants depend on <span class="math notranslate nohighlight">\(n\)</span>, but not on <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</div>
 <p>To illustrate why the dimension <span class="math notranslate nohighlight">\(n\)</span> is critical, consider the vector <span class="math notranslate nohighlight">\(\mathbf{x} = [1, 1, \dots, 1]^T \in \mathbb{R}^n\)</span>.</p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(\|\mathbf{x}\|_\infty = 1\)</span></p></li>
@@ -642,6 +671,53 @@ For <span class="math notranslate nohighlight">\(x, y \in \mathbb{R}^n\)</span> 
 |x^T y| \le \|x\|_p \, \|y\|_q.
 \]</div>
 <p>The pair <span class="math notranslate nohighlight">\(p=1\)</span>, <span class="math notranslate nohighlight">\(q=\infty\)</span> gives the frequently used bound <span class="math notranslate nohighlight">\(|x^T y| \le \|x\|_1 \, \|y\|_\infty\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. First consider <span class="math notranslate nohighlight">\(p=1\)</span> and <span class="math notranslate nohighlight">\(q=\infty\)</span>. The triangle inequality for real numbers gives</p>
+<div class="math notranslate nohighlight">
+\[
+|x^T y|\le\sum_{i=1}^n |x_i||y_i|
+\le\left(\sum_{i=1}^n |x_i|\right)\max_i|y_i|
+=\|x\|_1\,\|y\|_\infty.
+\]</div>
+<p>The case <span class="math notranslate nohighlight">\(p=\infty\)</span>, <span class="math notranslate nohighlight">\(q=1\)</span> follows by exchanging <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<p>Now suppose <span class="math notranslate nohighlight">\(1&lt;p,q&lt;\infty\)</span>. We first prove the scalar bound known as <strong>Young’s inequality</strong>: for <span class="math notranslate nohighlight">\(a,b\ge0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+ab\le\frac{a^p}{p}+\frac{b^q}{q}.
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(b=0\)</span>, the bound is immediate. For fixed <span class="math notranslate nohighlight">\(b&gt;0\)</span>, consider</p>
+<div class="math notranslate nohighlight">
+\[
+f(a)=\frac{a^p}{p}-ab,\qquad a\ge0.
+\]</div>
+<p>Its derivative is <span class="math notranslate nohighlight">\(f'(a)=a^{p-1}-b\)</span>, which is negative before <span class="math notranslate nohighlight">\(a=b^{1/(p-1)}\)</span> and positive after it. Thus this point is the minimum. Since <span class="math notranslate nohighlight">\(q=p/(p-1)\)</span> and <span class="math notranslate nohighlight">\(1/p-1=-1/q\)</span>, the minimum value is</p>
+<div class="math notranslate nohighlight">
+\[
+f\bigl(b^{1/(p-1)}\bigr)
+=\frac{b^q}{p}-b^q=-\frac{b^q}{q}.
+\]</div>
+<p>Rearranging <span class="math notranslate nohighlight">\(f(a)\ge-b^q/q\)</span> proves the scalar bound.</p>
+<p>If either <span class="math notranslate nohighlight">\(x\)</span> or <span class="math notranslate nohighlight">\(y\)</span> is zero, Hölder’s inequality is immediate. Otherwise, set</p>
+<div class="math notranslate nohighlight">
+\[
+a_i=\frac{|x_i|}{\|x\|_p},\qquad
+b_i=\frac{|y_i|}{\|y\|_q}.
+\]</div>
+<p>These choices give <span class="math notranslate nohighlight">\(\sum_i a_i^p=\sum_i b_i^q=1\)</span>. Applying the scalar bound to each pair and summing yields</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{i=1}^n a_i b_i
+\le\frac{1}{p}\sum_{i=1}^n a_i^p
++\frac{1}{q}\sum_{i=1}^n b_i^q
+=\frac{1}{p}+\frac{1}{q}=1.
+\]</div>
+<p>Multiplying by <span class="math notranslate nohighlight">\(\|x\|_p\,\|y\|_q\)</span> now gives</p>
+<div class="math notranslate nohighlight">
+\[
+|x^T y|\le\sum_{i=1}^n |x_i||y_i|
+\le\|x\|_p\,\|y\|_q.
+\]</div>
+</div>
 <p><strong>Cauchy–Schwarz inequality:</strong><br />
 Special case <span class="math notranslate nohighlight">\(p = q = 2\)</span>:</p>
 <div class="math notranslate nohighlight">

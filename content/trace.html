@@ -425,8 +425,19 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-trace">Properties of the Trace</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-divergence-of-a-vector-field">Interpretation: Divergence of a Vector Field 🌊</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-trace">Properties of the Trace</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linearity">Linearity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cyclic-property">Cyclic Property</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose-and-conjugate-transpose">Transpose and Conjugate Transpose</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#invariance-under-a-change-of-basis">Invariance Under a Change of Basis</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#useful-identities">Useful Identities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outer-products">Outer Products</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-divergence-of-a-linear-vector-field">Interpretation: Divergence of a Linear Vector Field</a></li>
 </ul>
             </nav>
         </div>
@@ -440,40 +451,158 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-trace-of-a-matrix">
 <h1>The Trace of a Matrix<a class="headerlink" href="#the-trace-of-a-matrix" title="Link to this heading">#</a></h1>
-<p>The <strong>trace</strong> of a square matrix is a fundamental concept in linear algebra, defined as the sum of the elements on its main diagonal. It is denoted as <span class="math notranslate nohighlight">\(\text{tr}(A)\)</span>.</p>
-<p>For an <span class="math notranslate nohighlight">\(n \times n\)</span> square matrix <span class="math notranslate nohighlight">\(A\)</span> with elements <span class="math notranslate nohighlight">\(a_{ij}\)</span>, its trace is calculated as:</p>
+<p>The <strong>trace</strong> of a square matrix is the sum of its diagonal entries. For <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{n\times n}\)</span> or <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[\text{tr}(A) = \sum_{i=1}^n a_{ii}\]</div>
-<p>For example, for the matrix <span class="math notranslate nohighlight">\(A = \begin{pmatrix} 3 &amp; 0 &amp; 1 \\ 5 &amp; -2 &amp; 9 \\ 4 &amp; 6 &amp; 8 \end{pmatrix}\)</span>, the trace is <span class="math notranslate nohighlight">\(\text{tr}(A) = 3 + (-2) + 8 = 9\)</span>.</p>
+\[\operatorname{tr}(A)=\sum_{i=1}^n a_{ii}.\]</div>
+<p>For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}
+3 &amp; 0 &amp; 1 \\
+5 &amp; -2 &amp; 9 \\
+4 &amp; 6 &amp; 8
+\end{pmatrix}
+\quad\Longrightarrow\quad
+\operatorname{tr}(A)=3+(-2)+8=9.
+\end{split}\]</div>
+<p>In particular, <span class="math notranslate nohighlight">\(\operatorname{tr}(I_n)=n\)</span>. Only diagonal entries contribute to the trace, so it takes <span class="math notranslate nohighlight">\(n-1\)</span> additions to compute it.</p>
 <section id="properties-of-the-trace">
 <h2>Properties of the Trace<a class="headerlink" href="#properties-of-the-trace" title="Link to this heading">#</a></h2>
-<p>The trace has several important properties that make it a useful tool in linear algebra and its applications.</p>
-<ul>
-<li><p><strong>Linearity</strong>: The trace is a linear operator. For matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> and a scalar <span class="math notranslate nohighlight">\(c\)</span>:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\text{tr}(A + B) = \text{tr}(A) + \text{tr}(B)\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\text{tr}(cA) = c \cdot \text{tr}(A)\)</span></p></li>
-</ul>
-</li>
-<li><p><strong>Cyclic Property</strong>: The trace of a product of matrices is invariant under cyclic permutations of the matrices. For matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span>:</p>
+<section id="linearity">
+<h3>Linearity<a class="headerlink" href="#linearity" title="Link to this heading">#</a></h3>
+<p>For square matrices <span class="math notranslate nohighlight">\(A,B\)</span> of the same size and scalars <span class="math notranslate nohighlight">\(\alpha,\beta\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
-    \text{tr}(AB) = \text{tr}(BA)
-    \]</div>
-<p>This property is one of the most significant. It implies that <span class="math notranslate nohighlight">\(\text{tr}(ABC) = \text{tr}(BCA) = \text{tr}(CAB)\)</span>. Note that the trace is not invariant under arbitrary permutations, so in general, <span class="math notranslate nohighlight">\(\text{tr}(ABC) \neq \text{tr}(ACB)\)</span>.</p>
-</li>
-<li><p><strong>Trace of the Transpose</strong>: The trace of a matrix is equal to the trace of its transpose: <span class="math notranslate nohighlight">\(\text{tr}(A) = \text{tr}(A^T)\)</span>.</p></li>
-</ul>
+\operatorname{tr}(\alpha A+\beta B)
+=\alpha\operatorname{tr}(A)+\beta\operatorname{tr}(B).
+\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. The diagonal entries of <span class="math notranslate nohighlight">\(\alpha A+\beta B\)</span> are <span class="math notranslate nohighlight">\(\alpha a_{ii}+\beta b_{ii}\)</span>. Thus</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\operatorname{tr}(\alpha A+\beta B)
+&amp;=\sum_{i=1}^n(\alpha a_{ii}+\beta b_{ii}) \\
+&amp;=\alpha\sum_{i=1}^n a_{ii}+\beta\sum_{i=1}^n b_{ii}.
+\end{aligned}
+\end{split}\]</div>
+</div>
 </section>
-<section id="interpretation-divergence-of-a-vector-field">
-<h2>Interpretation: Divergence of a Vector Field 🌊<a class="headerlink" href="#interpretation-divergence-of-a-vector-field" title="Link to this heading">#</a></h2>
-<p>The trace has a powerful geometric and physical interpretation when the matrix <span class="math notranslate nohighlight">\(A\)</span> represents a linear vector field, defined by the transformation <span class="math notranslate nohighlight">\(\vec{F}(\vec{x}) = A\vec{x}\)</span>. In this context, the trace of the matrix <span class="math notranslate nohighlight">\(A\)</span> is equal to the <strong>divergence</strong> of the vector field <span class="math notranslate nohighlight">\(\vec{F}\)</span>.</p>
-<p>The divergence measures the rate at which “flow” is expanding or contracting at a given point.</p>
+<section id="cyclic-property">
+<h3>Cyclic Property<a class="headerlink" href="#cyclic-property" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(m\times n\)</span> and <span class="math notranslate nohighlight">\(B\)</span> is <span class="math notranslate nohighlight">\(n\times m\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{tr}(AB)=\operatorname{tr}(BA).\]</div>
+<p>The factors may be rectangular: <span class="math notranslate nohighlight">\(AB\)</span> is <span class="math notranslate nohighlight">\(m\times m\)</span>, while <span class="math notranslate nohighlight">\(BA\)</span> is <span class="math notranslate nohighlight">\(n\times n\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Expand the diagonal entries of each product and interchange the finite sums:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\operatorname{tr}(AB)
+&amp;=\sum_{i=1}^m\sum_{j=1}^n a_{ij}b_{ji} \\
+&amp;=\sum_{j=1}^n\sum_{i=1}^m b_{ji}a_{ij} \\
+&amp;=\operatorname{tr}(BA).
+\end{aligned}
+\end{split}\]</div>
+</div>
+<p>For three factors of compatible sizes, grouping them into two factors gives</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{tr}(ABC)
+=\operatorname{tr}(BCA)
+=\operatorname{tr}(CAB).
+\]</div>
+<p>For example, apply the two-factor identity to <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(BC\)</span> to move <span class="math notranslate nohighlight">\(A\)</span> from the front to the back. The same argument works for any number of factors: moving the first factor to the end preserves the trace.</p>
+<p>An arbitrary reordering need not preserve the trace. For example, let</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}1&amp;0\\0&amp;0\end{pmatrix},\qquad
+B=\begin{pmatrix}0&amp;1\\0&amp;0\end{pmatrix},\qquad
+C=\begin{pmatrix}0&amp;0\\1&amp;0\end{pmatrix}.
+\end{split}\]</div>
+<p>Then <span class="math notranslate nohighlight">\(ABC=A\)</span> and <span class="math notranslate nohighlight">\(ACB=0\)</span>, so <span class="math notranslate nohighlight">\(\operatorname{tr}(ABC)=1\)</span> while <span class="math notranslate nohighlight">\(\operatorname{tr}(ACB)=0\)</span>.</p>
+<p>The trace is also not multiplicative: in general, <span class="math notranslate nohighlight">\(\operatorname{tr}(AB)\neq\operatorname{tr}(A)\operatorname{tr}(B)\)</span>. Taking <span class="math notranslate nohighlight">\(A=B=I_2\)</span> gives <span class="math notranslate nohighlight">\(2\)</span> on the left and <span class="math notranslate nohighlight">\(4\)</span> on the right.</p>
+</section>
+<section id="transpose-and-conjugate-transpose">
+<h3>Transpose and Conjugate Transpose<a class="headerlink" href="#transpose-and-conjugate-transpose" title="Link to this heading">#</a></h3>
+<p>For a square matrix <span class="math notranslate nohighlight">\(A\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{tr}(A^T)=\operatorname{tr}(A),\qquad
+\operatorname{tr}(A^H)=\overline{\operatorname{tr}(A)}.
+\]</div>
+<p>Here, <span class="math notranslate nohighlight">\(A^H\)</span> denotes the conjugate transpose and the overline denotes complex conjugation.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Transposition leaves the diagonal entries unchanged. The conjugate transpose replaces each diagonal entry <span class="math notranslate nohighlight">\(a_{ii}\)</span> by <span class="math notranslate nohighlight">\(\overline{a_{ii}}\)</span>, so its trace is the complex conjugate of their sum.</p>
+</div>
+</section>
+<section id="invariance-under-a-change-of-basis">
+<h3>Invariance Under a Change of Basis<a class="headerlink" href="#invariance-under-a-change-of-basis" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(S\)</span> is invertible, then</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{tr}(S^{-1}AS)=\operatorname{tr}(A).\]</div>
+<p>Thus similar matrices have the same trace. Although their individual diagonal entries may differ, the trace does not depend on the basis used to represent the linear transformation.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Use the cyclic property to move <span class="math notranslate nohighlight">\(S^{-1}\)</span> to the end:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\operatorname{tr}(S^{-1}AS)
+&amp;=\operatorname{tr}(ASS^{-1}) \\
+&amp;=\operatorname{tr}(A).
+\end{aligned}
+\end{split}\]</div>
+</div>
+<p>The later section on <a class="reference internal" href="applications_of_eigenvalues.html"><span class="std std-doc">applications of eigenvalues</span></a> uses this property to relate the trace to the sum of the eigenvalues.</p>
+</section>
+</section>
+<section id="useful-identities">
+<h2>Useful Identities<a class="headerlink" href="#useful-identities" title="Link to this heading">#</a></h2>
+<section id="outer-products">
+<h3>Outer Products<a class="headerlink" href="#outer-products" title="Link to this heading">#</a></h3>
+<p>For column vectors <span class="math notranslate nohighlight">\(u,v\in\mathbb{R}^n\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{tr}(uv^T)=\sum_{i=1}^n u_iv_i=v^Tu.\]</div>
+<p>The diagonal entries of <span class="math notranslate nohighlight">\(uv^T\)</span> are <span class="math notranslate nohighlight">\(u_iv_i\)</span>, which gives the identity directly. For complex vectors, the corresponding identity with conjugation is</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{tr}(uv^H)=\sum_{i=1}^n u_i\overline{v_i}=v^Hu.\]</div>
+</section>
+<section id="the-frobenius-norm">
+<h3>The Frobenius Norm<a class="headerlink" href="#the-frobenius-norm" title="Link to this heading">#</a></h3>
+<p>For a possibly rectangular matrix <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{m\times n}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\operatorname{tr}(A^HA)
+&amp;=\sum_{j=1}^n\sum_{i=1}^m |a_{ij}|^2 \\
+&amp;=\|A\|_F^2.
+\end{aligned}
+\end{split}\]</div>
+<p>Indeed, diagonal entry <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(A^HA\)</span> is the squared norm of column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(A\)</span>. Summing over the columns gives the squared Frobenius norm. For a real matrix, this reduces to <span class="math notranslate nohighlight">\(\operatorname{tr}(A^TA)=\|A\|_F^2\)</span>.</p>
+</section>
+</section>
+<section id="interpretation-divergence-of-a-linear-vector-field">
+<h2>Interpretation: Divergence of a Linear Vector Field<a class="headerlink" href="#interpretation-divergence-of-a-linear-vector-field" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{n\times n}\)</span> and consider the vector field <span class="math notranslate nohighlight">\(F(x)=Ax\)</span>. The <strong>divergence</strong> is the sum of the partial derivatives of each component with respect to its matching coordinate:</p>
+<div class="math notranslate nohighlight">
+\[
+\nabla\cdot F=\sum_{i=1}^n\frac{\partial F_i}{\partial x_i}.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(F_i(x)=\sum_{j=1}^n a_{ij}x_j\)</span>, we have <span class="math notranslate nohighlight">\(\partial F_i/\partial x_i=a_{ii}\)</span>. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\nabla\cdot F=\operatorname{tr}(A).\]</div>
+<p>If particles move with velocity <span class="math notranslate nohighlight">\(F(x)\)</span>, so that <span class="math notranslate nohighlight">\(\dot{x}=Ax\)</span>, the divergence gives the instantaneous rate of volume change per unit volume:</p>
 <ul class="simple">
-<li><p><strong>Positive Trace (<span class="math notranslate nohighlight">\(\text{tr}(A) &gt; 0\)</span>)</strong>: The vector field is <strong>expanding</strong>. This corresponds to a source or an expanding fluid.</p></li>
-<li><p><strong>Negative Trace (<span class="math notranslate nohighlight">\(\text{tr}(A) &lt; 0\)</span>)</strong>: The vector field is <strong>contracting</strong>. This corresponds to a sink or a compressing fluid.</p></li>
-<li><p><strong>Zero Trace (<span class="math notranslate nohighlight">\(\text{tr}(A) = 0\)</span>)</strong>: The vector field is <strong>incompressible</strong> or <strong>divergence-free</strong>. The flow entering any region is exactly balanced by the flow exiting it. This is a crucial concept in fluid dynamics for modeling materials like water.</p></li>
+<li><p>A positive trace means that a volume of moving particles grows.</p></li>
+<li><p>A negative trace means that it shrinks.</p></li>
+<li><p>A zero trace means that volume is preserved; the flow is <strong>divergence-free</strong>.</p></li>
 </ul>
+<p>This concerns volume, rather than expansion or contraction in every direction. For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A=\begin{pmatrix}2&amp;0\\0&amp;-1\end{pmatrix}\end{split}\]</div>
+<p>has positive trace, but the motion <span class="math notranslate nohighlight">\(\dot{x}=Ax\)</span> expands in the first coordinate and contracts in the second. If the first diagonal entry is changed to <span class="math notranslate nohighlight">\(1\)</span>, the trace becomes zero: expansion in one coordinate and contraction in the other preserve area while changing shape.</p>
+<p>These statements describe motion under the velocity field <span class="math notranslate nohighlight">\(F(x)=Ax\)</span>. For a single application of the linear map <span class="math notranslate nohighlight">\(x\mapsto Ax\)</span>, the volume scaling factor is <span class="math notranslate nohighlight">\(|\det(A)|\)</span>, as discussed in the preceding section.</p>
 </section>
 </section>
 
@@ -541,8 +670,19 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-trace">Properties of the Trace</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-divergence-of-a-vector-field">Interpretation: Divergence of a Vector Field 🌊</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-trace">Properties of the Trace</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linearity">Linearity</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cyclic-property">Cyclic Property</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transpose-and-conjugate-transpose">Transpose and Conjugate Transpose</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#invariance-under-a-change-of-basis">Invariance Under a Change of Basis</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#useful-identities">Useful Identities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outer-products">Outer Products</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-frobenius-norm">The Frobenius Norm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-divergence-of-a-linear-vector-field">Interpretation: Divergence of a Linear Vector Field</a></li>
 </ul>
   </nav></div>
 
