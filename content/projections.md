@@ -1,111 +1,264 @@
 # Projections
 
-A **projection** is a linear transformation that takes a vector and maps it onto a subspace. Intuitively, you can think of it as casting a shadow. If you shine a light on an object (a vector), the shadow it creates on a surface (a subspace) is its projection. Projections are fundamental in areas like computer graphics, statistics (for least-squares regression), and solving systems of linear equations.
+A projection splits a vector into two parts and keeps one of them. The two parts belong to complementary subspaces: one is the space we project **onto**, and the other is the space we project **along**.
 
-All projections are represented by a square matrix $P$ that is **idempotent**, meaning that applying the projection more than once has no further effect. Algebraically, this is the defining property of a projection matrix:
+This distinction connects several algorithms in this course. LU factorization removes components using oblique projections. Orthogonal projections select closest approximations and appear in QR factorization, eigenvalue computations, and iterative methods.
 
-$$P^2 = P$$
+We work first in $\mathbb{R}^n$ with the usual dot product. The corresponding formulas for complex vectors are given at the end.
 
-## Types of Projections: Orthogonal vs. Oblique
+## Projection onto a Subspace along a Complement
 
-The distinction between the two main types of projections depends on the direction of the projection relative to the target subspace. 📐
+Suppose $S$ and $T$ are complementary subspaces:
 
-### Orthogonal Projections
-An **orthogonal projection** is the most common type. Here, the direction of projection is **perpendicular (orthogonal)** to the subspace you are projecting onto. This is like the shadow cast by the sun when it's directly overhead.
+$$\mathbb{R}^n=S\oplus T.$$
 
-A key feature of an orthogonal projection is that it finds the point in the subspace that is **geometrically closest** to the original vector. This "best approximation" property is the foundation of least-squares solutions to overdetermined systems of equations.
+This means that every $x\in\mathbb{R}^n$ has a unique decomposition
 
-### Oblique Projections
-An **oblique projection** is one where the direction of projection is **not perpendicular** to the target subspace. This is analogous to the long, angled shadow cast by the sun when it's low in the sky. While less common than orthogonal projections, they are used in specific applications like perspective projections in computer graphics.
+$$x=s+t,\qquad s\in S,\quad t\in T.$$
 
-## Mathematical Formulas
+The **projection onto $S$ along $T$** is the map
 
-The specific formula for a projection matrix depends on the type of projection and the subspace being projected onto.
+$$Px=s.$$
 
-### Orthogonal Projection Formula
-To project a vector onto the subspace spanned by the columns of a matrix $A$ (where the columns of $A$ are linearly independent), the orthogonal projection matrix $P$ is given by:
+It keeps the component in $S$ and removes the component in $T$. Thus $P$ acts as the identity on $S$ and as zero on $T$. In particular,
 
-$$P = A(A^T A)^{-1} A^T$$
+$$Px\in S,\qquad x-Px\in T.$$
 
-The projection of a vector $b$ onto this subspace is then calculated as $p = Pb$.
+The decomposition also shows that $P$ is linear: adding or scaling two vectors adds or scales their $S$ and $T$ components. Applying $P$ a second time leaves $Px$ unchanged, so
 
-#### Special Case: Projection onto a Line
-If you are projecting onto a line spanned by a single non-zero vector $a$, the formula simplifies significantly. In this case, $A$ is just the column vector $a$.
+$$P^2=P.$$
 
-$$P = \frac{aa^T}{a^T a}$$
+A square matrix satisfying this identity is called **idempotent**. Conversely, every idempotent matrix is a projection in the sense just described.
 
-The projection of a vector $b$ onto the line defined by $a$ is:
+````{prf:proof}
+Let $P^2=P$, and define its range and null space by
 
-$$p = \left(\frac{a \cdot b}{\|a\|^2}\right) a$$
+$$
+\begin{aligned}
+S&=\operatorname{range}(P)=\{Px:x\in\mathbb{R}^n\}, \\
+T&=\ker(P)=\{x:Px=0\}.
+\end{aligned}
+$$
 
-This formula has a clear geometric meaning: it scales the direction vector $a$ by a factor determined by the dot product of $a$ and $b$.
+For every $x$,
 
-### Oblique Projection Formula
+$$x=Px+(I-P)x.$$
 
-For an oblique projection, you must specify both the subspace to project **onto** (the range) and the direction to project **along** (the null space).
+The first term is in $S$, and the second is in $T$, because $P(I-P)x=(P-P^2)x=0$. If $s\in S$, write $s=Py$; then $Ps=P^2y=Py=s$. A vector belonging to both $S$ and $T$ must therefore satisfy $Ps=s$ and $Ps=0$, so it is zero. This proves $\mathbb{R}^n=S\oplus T$ and the uniqueness of the decomposition.
+````
 
-Let the range be spanned by the columns of a matrix $A$. The direction of projection is defined as the subspace orthogonal to the columns of another matrix, $B$. The projection matrix $P$ is then given by:
+Specifying the range alone does not determine a projection: the choice of complementary null space also matters. The zero matrix and the identity matrix are projections onto $\{0\}$ and $\mathbb{R}^n$, respectively.
 
-$$P = A(B^T A)^{-1} B^T$$
+### The Complementary Projection
 
-Here, the null space of the projection $P$ (the direction of projection) is the set of all vectors orthogonal to the column space of $B$.
+If $P$ projects onto $S$ along $T$, then $I-P$ projects onto $T$ along $S$. Indeed,
 
-Notice that if you choose $B = A$, the direction of projection becomes orthogonal to the range (since it's orthogonal to the columns of $A$). This makes the projection orthogonal, and the formula reduces to the standard orthogonal projection formula: $P = A(A^T A)^{-1} A^T$.
+$$
+(I-P)^2=I-P,\qquad P(I-P)=(I-P)P=0.
+$$
 
-## Key Results and Properties
+The decomposition $x=Px+(I-P)x$ identifies both components. For a general projection, these components need not be perpendicular.
 
-Projection matrices have several important and elegant properties.
+Products of projections require care: $P_1P_2$ need not be a projection. If $P_1P_2=P_2P_1$, however, then $(P_1P_2)^2=P_1^2P_2^2=P_1P_2$. If both projections are orthogonal and commute, their product is also symmetric and hence an orthogonal projection.
 
-* **Idempotence**: As mentioned, all projection matrices satisfy $P^2 = P$.
-* **Symmetry**: A projection matrix $P$ represents an **orthogonal projection** if and only if it is a **symmetric matrix** ($P = P^T$). Oblique projection matrices are generally not symmetric.
-* **Complementary Projection**: If $P$ is a projection matrix, then the matrix $Q = I - P$ is also a projection matrix. $Q$ is called the **complementary projection**. It projects onto the null space of $P$ along the range of $P$. For an orthogonal projection $P$, its complement $I-P$ is also an orthogonal projection onto the orthogonal complement of the original subspace.
+### A Basis Adapted to the Projection
 
-## Orthogonal Matrices and Projections
+Choose a basis $s_1,\ldots,s_r$ of $S$ and a basis $t_1,\ldots,t_{n-r}$ of $T$. Together they form a basis of $\mathbb{R}^n$. With
 
-The connection is simple and direct: if the columns of a matrix $A$ are **orthonormal**, meaning they form an **orthogonal matrix** $Q$, the formula for the orthogonal projection matrix onto the column space of $A$ simplifies dramatically.
+$$C=[s_1,\ldots,s_r,t_1,\ldots,t_{n-r}],$$
 
-Specifically, the projection matrix $P$ becomes $P = QQ^T$.
+we have
 
-### Derivation and Explanation
+$$C^{-1}PC=\begin{pmatrix}I_r&0\\0&0\end{pmatrix}.$$
 
-The standard formula for an orthogonal projection matrix $P$ that projects vectors onto the column space of a matrix $A$ is:
+This follows because $Ps_i=s_i$ and $Pt_j=0$. By invariance of trace under a change of basis,
 
-$$P = A(A^T A)^{-1} A^T$$
+$$\operatorname{tr}(P)=r=\operatorname{rank}(P).$$
 
-An **orthogonal matrix** $Q$ (which must be a tall or square matrix with orthonormal columns) has the defining property that its columns are mutually perpendicular and have a length of one. Algebraically, this means:
+Also, $P$ is invertible only when $P=I_n$. These statements hold for both orthogonal and oblique projections.
 
-$$Q^T Q = I$$
+## Orthogonal and Oblique Projections
 
-where $I$ is the identity matrix.
+The projection onto $S$ is **orthogonal** when its null space is $S^\perp$, the set of vectors perpendicular to every vector in $S$. Its defining geometric properties are
 
-If we substitute our orthogonal matrix $Q$ for the general matrix $A$ in the projection formula, the $(Q^T Q)$ term simplifies to the identity matrix $I$:
+$$Px\in S,\qquad x-Px\perp S.$$
 
-$$P = Q(\underbrace{Q^T Q}_{I})^{-1} Q^T = Q(I)^{-1}Q^T = QIQ^T = QQ^T$$
+For each subspace $S$, there is exactly one orthogonal projection, because $\mathbb{R}^n=S\oplus S^\perp$. A projection whose null space is a different complement is called **oblique**.
 
-So, the orthogonal projection matrix onto the subspace spanned by a set of orthonormal vectors (the columns of $Q$) is simply $P = QQ^T$.
+For example, both matrices
 
-### Properties of the Projection Matrix $P = QQ^T$
+$$
+P_{\mathrm{orth}}=\begin{pmatrix}1&0\\0&0\end{pmatrix},\qquad
+P_{\mathrm{obl}}=\begin{pmatrix}1&1\\0&0\end{pmatrix}
+$$
 
-This simplified form, $P=QQ^T$, neatly demonstrates the two defining properties of an orthogonal projection matrix.
+project onto the horizontal axis and satisfy $P^2=P$. Their null spaces differ:
 
-1.  **Symmetry**: A matrix is symmetric if $P^T = P$.
+$$
+\begin{aligned}
+\ker(P_{\mathrm{orth}})&=\operatorname{span}\{(0,1)^T\}, \\
+\ker(P_{\mathrm{obl}})&=\operatorname{span}\{(-1,1)^T\}.
+\end{aligned}
+$$
 
-    $$P^T = (QQ^T)^T = (Q^T)^T Q^T = QQ^T = P$$
+Consequently, they send $x=(1,2)^T$ to different points: $(1,0)^T$ and $(3,0)^T$, respectively.
 
-    The matrix is its own transpose, so it is **symmetric**.
+```{figure} ../_static/projection_comparison.svg
+:alt: Orthogonal and oblique projections of x=(1,2) onto the horizontal axis. The orthogonal projection follows a vertical line to (1,0). The oblique projection follows a line parallel to (-1,1) to (3,0).
 
-2.  **Idempotence**: A matrix is idempotent if $P^2 = P$.
-    
-    $$P^2 = (QQ^T)(QQ^T) = Q(\underbrace{Q^T Q}_{I})Q^T = QIQ^T = QQ^T = P$$
+Both projections have the same range $S$. The segment from $x$ to $Px$ is parallel to the null space $T$, shown in orange.
+```
 
-    Projecting a vector twice is the same as projecting it once.
+### Symmetry Characterizes Orthogonal Projections
 
-## Geometric Interpretation 📐
+For a projection matrix $P$,
 
-When we project a vector $x$ onto the column space of an orthogonal matrix $Q$, the operation $p = Px = QQ^Tx$ can be seen as a two-step process:
+$$P\text{ is orthogonal}\quad\Longleftrightarrow\quad P^T=P.$$
 
-1.  $Q^Tx$: First, we multiply by $Q^T$. This calculates the dot products of $x$ with each orthonormal column of $Q$. In essence, it finds the coordinates of $x$ in the basis defined by the columns of $Q$.
+````{prf:proof}
+Suppose first that $P^T=P$. For $s=Px$ in its range and $t$ in its null space,
 
-2.  $Q(Q^Tx)$: Next, we multiply the resulting coordinate vector by $Q$. This creates a linear combination of the orthonormal basis vectors (the columns of $Q$) using those coordinates.
+$$s^Tt=x^TP^Tt=x^TPt=0.$$
 
-The result is a new vector $p$ that lives within the column space of $Q$ and is the closest possible vector in that subspace to the original vector $x$.
+Thus the range and null space are perpendicular. Since they are complementary, the null space is exactly the orthogonal complement of the range.
+
+Conversely, suppose $P$ is an orthogonal projection. Decompose both $x$ and $y$ into their range and null-space components. Perpendicularity gives
+
+$$x^TPy=(Px)^TPy=(Px)^Ty=x^TP^Ty.$$
+
+This holds for every $x,y$, so $P=P^T$.
+````
+
+An orthogonal **projection** is different from an orthogonal **matrix**. A projection onto a proper subspace discards nonzero vectors in its null space and is singular. An orthogonal matrix preserves every vector's length and is invertible. Only $I_n$ has both properties.
+
+## Formulas for Orthogonal Projections
+
+### An Orthonormal Basis
+
+Let $Q=[q_1,\ldots,q_r]\in\mathbb{R}^{n\times r}$ have orthonormal columns spanning $S$, so $Q^TQ=I_r$. Then
+
+$$P=QQ^T,\qquad Px=\sum_{j=1}^r q_j(q_j^Tx).$$
+
+````{prf:proof}
+The vector $p=QQ^Tx$ belongs to $S$. Moreover,
+
+$$Q^T(x-p)=Q^Tx-Q^TQQ^Tx=0,$$
+
+so the residual $x-p$ is perpendicular to every column of $Q$, and hence to $S$. These two conditions identify $p$ as the orthogonal projection of $x$.
+````
+
+The computation has two steps: $Q^Tx$ finds the coefficients of the projected vector in the basis $q_1,\ldots,q_r$, and $Q(Q^Tx)$ reconstructs that vector. When $x$ lies outside $S$, these are the coordinates of its projection, not coordinates representing all of $x$.
+
+Here $Q$ is usually rectangular. If it is square, then $S=\mathbb{R}^n$ and $QQ^T=I_n$. Projection onto the zero subspace is simply $P=0$.
+
+### Any Basis of the Subspace
+
+Let $A\in\mathbb{R}^{n\times r}$ have linearly independent columns spanning $S$, with $1\leq r\leq n$. Then
+
+$$P=A(A^TA)^{-1}A^T.$$
+
+````{prf:proof}
+Write the projected vector as $p=Ac$. The condition $x-p\perp S$ becomes
+
+$$A^T(x-Ac)=0,\qquad A^TAc=A^Tx.$$
+
+The matrix $A^TA$ is invertible: for any nonzero $c$,
+
+$$c^TA^TAc=\|Ac\|_2^2>0,$$
+
+because the columns of $A$ are linearly independent. Thus
+
+$$c=(A^TA)^{-1}A^Tx,\qquad p=A(A^TA)^{-1}A^Tx.$$
+````
+
+The projection depends only on $S$, not on the chosen basis. If a spanning matrix has dependent columns, its $A^TA$ is singular; select a basis for its column space before using this formula.
+
+For a line spanned by a nonzero vector $a$, the formula reduces to
+
+$$P=\frac{aa^T}{a^Ta},\qquad Px=a\frac{a^Tx}{a^Ta}.$$
+
+These formulas describe the projection mathematically. To apply $P$, one can solve the small system $A^TAc=A^Tx$ and form $Ac$; there is no need to form the inverse or the full $n\times n$ projection matrix. With an orthonormal basis, only the two products $Q^Tx$ and $Q(Q^Tx)$ are needed. Later chapters discuss how to compute such bases using QR.
+
+## The Closest-Point Property
+
+The orthogonal projection $p=Px$ is the unique vector in $S$ closest to $x$ in the 2-norm:
+
+$$p=\underset{y\in S}{\operatorname{argmin}}\ \|x-y\|_2.$$
+
+````{prf:proof}
+For any $y\in S$, write $x-y=(x-p)+(p-y)$ and expand the squared norm:
+
+$$
+\begin{aligned}
+\|x-y\|_2^2
+&=\|x-p\|_2^2+\|p-y\|_2^2 \\
+&\qquad {}+2(x-p)^T(p-y).
+\end{aligned}
+$$
+
+The cross term is $2(x-p)^T(p-y)$. It is zero because $x-p$ is perpendicular to $S$ and $p-y$ belongs to $S$. Therefore,
+
+$$\|x-y\|_2^2=\|x-p\|_2^2+\|p-y\|_2^2.$$
+
+The right side is minimized uniquely when $y=p$.
+````
+
+Taking $y=0$ gives
+
+$$\|x\|_2^2=\|Px\|_2^2+\|(I-P)x\|_2^2.$$
+
+Thus an orthogonal projection never increases the 2-norm: $\|Px\|_2\leq\|x\|_2$. If $P\neq0$, then $\|P\|_2=1$, because $Ps=s$ for any nonzero $s$ in its range. The zero projection has norm zero.
+
+An oblique projection need not give the closest point and can increase lengths. For instance,
+
+$$P_t=\begin{pmatrix}1&t\\0&0\end{pmatrix}$$
+
+satisfies $P_t^2=P_t$, but sends the unit vector $(0,1)^T$ to $(t,0)^T$. Its output can therefore be arbitrarily long as $|t|$ increases.
+
+## A Formula for Oblique Projections
+
+Let $A,B\in\mathbb{R}^{n\times r}$ have linearly independent columns, and assume that $B^TA$ is invertible. Then
+
+$$P=A(B^TA)^{-1}B^T$$
+
+is the projection onto $S=\operatorname{range}(A)$ along $T=\ker(B^T)$. The columns of $B$ span $T^\perp$, not $T$ itself.
+
+The invertibility condition is essential. It says that no nonzero vector in $S$ lies in $T$; since the dimensions are $r$ and $n-r$, the two spaces are complementary. Linearly independent columns in each matrix alone do not suffice. For example, $A=(1,0)^T$ and $B=(0,1)^T$ both have independent columns, but $B^TA=0$.
+
+````{prf:proof}
+We seek $p=Ac$ such that $x-p\in\ker(B^T)$. This condition gives
+
+$$B^T(x-Ac)=0,\qquad B^TAc=B^Tx.$$
+
+Solving for $c$ yields the stated formula. It follows directly that
+
+$$
+\begin{aligned}
+P^2
+&=A(B^TA)^{-1}(B^TA)(B^TA)^{-1}B^T \\
+&=P.
+\end{aligned}
+$$
+
+Every $Px$ is in $\operatorname{range}(A)$, and $PA=A$, so the range is exactly that space. Also, $B^TP=B^T$: if $Px=0$, then $B^Tx=0$, while $B^Tx=0$ immediately implies $Px=0$. Hence $\ker(P)=\ker(B^T)$.
+````
+
+Taking $B=A$ recovers the orthogonal projection formula. More generally, this formula gives an orthogonal projection exactly when the column spaces of $A$ and $B$ coincide; otherwise it is oblique.
+
+## How Projections Enter the Course
+
+Oblique projections help describe the elimination steps in [LU factorization](lu_decomposition.md). Orthogonal projections are used to construct orthonormal bases in [QR factorization](modified_gram_schmidt.md), and to find approximations in smaller subspaces in eigenvalue computations and iterative methods for solving linear systems. We will explain these connections when we develop each method later in the course.
+
+## Complex Vectors
+
+For the usual complex inner product, replace transposes in the projection formulas by conjugate transposes:
+
+$$
+\begin{aligned}
+P_{\mathrm{orth}}&=Q Q^H
+                 =A(A^HA)^{-1}A^H, \\
+P_{\mathrm{general}}&=A(B^HA)^{-1}B^H.
+\end{aligned}
+$$
+
+Here $Q$ and $A$ span the same subspace, $Q^HQ=I$, and the same rank and invertibility assumptions apply. An orthogonal projection is characterized by $P^2=P=P^H$. In the closest-point proof, the cross term becomes $2\operatorname{Re}((x-p)^H(p-y))$ and vanishes for the same reason.
