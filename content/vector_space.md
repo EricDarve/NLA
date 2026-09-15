@@ -189,6 +189,59 @@ $$
 \dim(U+W) = \dim(U) + \dim(W) - \dim(U \cap W).
 $$
 
+````{prf:proof}
+Choose a basis $s_1,\dots,s_r$ of $U\cap W$. Extend it to a basis of each subspace:
+
+$$
+\begin{aligned}
+U &: s_1,\dots,s_r,u_1,\dots,u_p,\\
+W &: s_1,\dots,s_r,w_1,\dots,w_q.
+\end{aligned}
+$$
+
+To extend a linearly independent list to a basis, keep adding a vector outside its span until it spans the subspace. Each added vector preserves linear independence, and the process must stop because the subspace is finite-dimensional.
+
+We will show that
+
+$$
+s_1,\dots,s_r,u_1,\dots,u_p,w_1,\dots,w_q
+$$
+
+is a basis of $U+W$. It spans $U+W$ because every vector in the sum has the form $u+w$, and each of $u$ and $w$ can be expanded in the corresponding basis above.
+
+To prove linear independence, suppose
+
+$$
+\sum_{i=1}^r a_i s_i + \sum_{j=1}^p b_j u_j
++ \sum_{k=1}^q c_k w_k = 0.
+$$
+
+Then
+
+$$
+\sum_{k=1}^q c_k w_k
+= -\sum_{i=1}^r a_i s_i - \sum_{j=1}^p b_j u_j
+$$
+
+belongs to both $W$ and $U$, so it lies in $U\cap W$. Thus it can be written as $\sum_{i=1}^r d_i s_i$, giving
+
+$$
+\sum_{k=1}^q c_k w_k - \sum_{i=1}^r d_i s_i = 0.
+$$
+
+Since $s_1,\dots,s_r,w_1,\dots,w_q$ is a basis of $W$, all the $c_k$ and $d_i$ vanish. The original relation now involves only the basis vectors of $U$, so all the $a_i$ and $b_j$ vanish as well. This proves linear independence.
+
+Counting the vectors in these bases gives
+
+$$
+\dim(U+W) = r+p+q
+= (r+p)+(r+q)-r
+= \dim(U)+\dim(W)-\dim(U\cap W).
+$$
+
+The same argument applies when any of the lists is empty, using the convention that an empty sum is zero.
+````
+
 ## Direct sum
 
 The sum of $U$ and $W$ is a **direct sum**, written $U \oplus W$, if every vector of $U+W$ has a **unique** decomposition

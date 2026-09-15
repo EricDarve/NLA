@@ -6,9 +6,15 @@ The **Sherman-Morrison-Woodbury formula** provides an efficient and powerful met
 
 The simplest case of this identity is the **Sherman-Morrison formula**, which applies to a **rank-one update**. A rank-one update means we are perturbing an invertible matrix $A$ by adding an outer product of two vectors, $uv^T$.
 
-If $A$ is an invertible matrix and $u, v$ are vectors, then the inverse of the updated matrix $A + uv^T$ is given by:
+If $A$ is an invertible matrix, $u, v$ are vectors, and $1 + v^T A^{-1} u \neq 0$, then the inverse of the updated matrix $A + uv^T$ is given by:
 
 $$(A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^T A^{-1}}{1 + v^T A^{-1} u}$$
+
+The condition on the scalar is not a technicality: $A + uv^T$ is invertible precisely when it holds. This follows from the **matrix determinant lemma**,
+
+$$\det(A + uv^T) = (1 + v^T A^{-1} u)\,\det(A),$$
+
+so the determinant vanishes exactly when the denominator does.
 
 The remarkable efficiency of this formula comes from the denominator, $1 + v^T A^{-1} u$. Since $v^T$, $A^{-1}$, and $u$ are a row vector, a matrix, and a column vector, respectively, their product is a **scalar**. This means we avoid a complex matrix inversion and instead only need to perform a simple scalar division.
 
@@ -27,7 +33,13 @@ This leads to the following efficient computational steps:
 4.  Compute the scalar value in the numerator's right part: $\alpha = v^T y$.
 5.  Combine these results to find the final solution: $x = y - z (\frac{\alpha}{\beta})$.
 
-This procedure replaces a full $O(n^3)$ matrix inversion with a few matrix-vector multiplications (or system solves, which are typically $O(n^2)$) and vector operations, resulting in significant computational savings.
+This procedure replaces a full $O(n^3)$ matrix inversion with two solves against $A$ and a handful of vector operations. The saving depends on already having a factorization of $A$: with an LU factorization in hand, each of steps 1 and 2 is a pair of $O(n^2)$ triangular solves. Computing that factorization from scratch would itself cost $O(n^3)$.
+
+## Numerical Accuracy
+
+The formula is exact, but computers round numbers during the calculation, and these small errors can sometimes lead to an inaccurate answer. A large correction $z(\alpha/\beta)$ is not a problem by itself. The concern is when it nearly cancels $y$: errors already present in the two vectors can then be large compared with their difference. Similarly, when $\beta = 1 + v^T z$ is close to zero, a small rounding error in $v^T z$ can be large compared with $\beta$, affecting the division by $\beta$.
+
+We will discuss these accuracy questions in the next chapter, [Solving Linear Systems](solving_linear_systems.md).
 
 ## The Woodbury Matrix Identity (Generalization)
 
@@ -42,7 +54,11 @@ $$(A + UCV)^{-1} = A^{-1} - A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}$$
 This identity holds provided that the matrix $(C^{-1} + VA^{-1}U)$ is invertible.
 ````
 
-Here, the update is $UCV$, where $U$ is an $n \times k$ matrix, $C$ is a $k \times k$ matrix, and $V$ is a $k \times n$ matrix. The key advantage is that instead of inverting the large $n \times n$ matrix on the left, we only need to invert the much smaller $k \times k$ matrix $(C^{-1} + VA^{-1}U)$ on the right. This is extremely beneficial when $k$ is much smaller than $n$.
+The key advantage is that instead of inverting the large $n \times n$ matrix on the left, we only need to invert the much smaller $k \times k$ matrix $(C^{-1} + VA^{-1}U)$ on the right. This is extremely beneficial when $k$ is much smaller than $n$.
+
+Taking $k = 1$ recovers the Sherman-Morrison formula. Set $U = u$, $C = [1]$ and $V = v^T$. Then $C^{-1} + VA^{-1}U$ is the $1 \times 1$ matrix $1 + v^T A^{-1} u$, inverting it is a scalar division, and the identity reads
+
+$$(A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}u v^T A^{-1}}{1 + v^T A^{-1} u}.$$
 
 ````{prf:proof} Woodbury Matrix Identity
 
@@ -54,23 +70,54 @@ $$(A + UCV) \left( A^{-1} - A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)$$
 
 We can expand this product using the distributive property:
 
-$$= A(A^{-1}) - A(A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}) + UCV(A^{-1}) - UCV(A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1})$$
+$$
+\begin{aligned}
+= {} & A(A^{-1}) - A(A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}) \\
+     & {} + UCV(A^{-1}) - UCV(A^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}).
+\end{aligned}
+$$
 
 Now, let's simplify each term:
-* $A(A^{-1}) = I$
-* $A(A^{-1}U \dots) = U(\dots)$
+* $A A^{-1} = I$
+* Again using $A A^{-1} = I$,
+
+  $$
+  \begin{aligned}
+  & A A^{-1} U (C^{-1} + VA^{-1}U)^{-1}VA^{-1} \\
+  & \qquad = U (C^{-1} + VA^{-1}U)^{-1}VA^{-1}.
+  \end{aligned}
+  $$
 
 This simplifies the expression to:
 
-$$= I - U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} + UCVA^{-1} - UCVA^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}$$
+$$
+\begin{aligned}
+= {} & I - U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \\
+     & {} + UCVA^{-1} - UCVA^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}.
+\end{aligned}
+$$
 
 Now, let's factor out the common term $U$ on the left side of the last three terms:
 
-$$= I + U \left( - (C^{-1} + VA^{-1}U)^{-1}VA^{-1} + CVA^{-1} - CVA^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)$$
+$$
+= I + U \left(
+\begin{aligned}
+& - (C^{-1} + VA^{-1}U)^{-1}VA^{-1} + CVA^{-1} \\
+& {} - CVA^{-1}U(C^{-1} + VA^{-1}U)^{-1}VA^{-1}
+\end{aligned}
+\right).
+$$
 
 Let's focus on the expression inside the parentheses. We can factor out the term $(C^{-1} + VA^{-1}U)^{-1}VA^{-1}$ from the first and third parts:
 
-$$= I + U \left( CVA^{-1} - (I + CVA^{-1}U)(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)$$
+$$
+= I + U \left(
+\begin{aligned}
+& CVA^{-1} \\
+& {} - (I + CVA^{-1}U)(C^{-1} + VA^{-1}U)^{-1}VA^{-1}
+\end{aligned}
+\right).
+$$
 
 The key step is to simplify the term $(I + CVA^{-1}U)$. We can factor out $C$ on the left:
 
@@ -78,7 +125,14 @@ $$I + CVA^{-1}U = C(C^{-1} + VA^{-1}U)$$
 
 Now, we substitute this back into our main expression:
 
-$$= I + U \left( CVA^{-1} - C(C^{-1} + VA^{-1}U)(C^{-1} + VA^{-1}U)^{-1}VA^{-1} \right)$$
+$$
+= I + U \left(
+\begin{aligned}
+& CVA^{-1} \\
+& {} - C(C^{-1} + VA^{-1}U)(C^{-1} + VA^{-1}U)^{-1}VA^{-1}
+\end{aligned}
+\right).
+$$
 
 The matrix $(C^{-1} + VA^{-1}U)$ and its inverse $(C^{-1} + VA^{-1}U)^{-1}$ cancel out to become the identity matrix:
 
@@ -88,6 +142,6 @@ This simplifies to:
 
 $$= I + U \left( CVA^{-1} - CVA^{-1} \right) = I + U(0) = I$$
 
-Since the product of the matrix and its proposed inverse is the identity matrix, the formula is correct.
+The product is the identity matrix. Both factors are square, so a one-sided inverse is automatically two-sided, and the proposed expression is therefore $(A + UCV)^{-1}$.
 
 ````
