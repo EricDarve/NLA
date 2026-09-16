@@ -425,26 +425,34 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-an-eigenvalue">What is an Eigenvalue?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-of-eigenvalues">Existence of Eigenvalues</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-schur-decomposition">The (Complex) Schur Decomposition</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-of-the-schur-decomposition">Components of the Schur Decomposition</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#relationship-to-eigenvalues">Relationship to Eigenvalues</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-existence">Proof of Existence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-it-s-so-important-for-computation">Why It’s So Important for Computation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalues-eigenvectors-and-eigenspaces">Eigenvalues, Eigenvectors, and Eigenspaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-of-eigenvalues">Existence of Eigenvalues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#real-matrices-can-have-complex-eigenvalues">Real Matrices Can Have Complex Eigenvalues</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonalization-a-change-to-an-eigenvector-basis">Diagonalization: A Change to an Eigenvector Basis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-three-factors-do">What the Three Factors Do</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-worked-diagonalization">A Worked Diagonalization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-are-there-enough-eigenvectors">When Are There Enough Eigenvectors?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distinct-eigenvalues-give-independent-eigenvectors">Distinct Eigenvalues Give Independent Eigenvectors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#repeated-eigenvalues-two-different-multiplicities">Repeated Eigenvalues: Two Different Multiplicities</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-matrix-that-cannot-be-diagonalized">A Matrix That Cannot Be Diagonalized</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-powers-and-repeated-application">Matrix Powers and Repeated Application</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evolution-in-an-eigenvector-basis">Evolution in an Eigenvector Basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-two-bodies-exchanging-heat">Example: Two Bodies Exchanging Heat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#growth-decay-and-oscillation">Growth, Decay, and Oscillation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-time-systems">Continuous-Time Systems</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-schur-decomposition">The Complex Schur Decomposition</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-schur-form-tells-us">What Schur Form Tells Us</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-schur-decomposition">The Real Schur Decomposition</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Proof of Existence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-eigendecomposition-diagonalization">The Eigendecomposition (Diagonalization)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-of-the-eigendecomposition">Components of the Eigendecomposition</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-application-and-connection-to-time-a-n">Interpretation, Application, and Connection to Time (<span class="math notranslate nohighlight">\(A^n\)</span>)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#application-calculating-powers-of-a-matrix">Application: Calculating Powers of a Matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-dynamics-and-stability">Interpretation: Dynamics and Stability</a></li>
-</ul>
-</li>
 </ul>
             </nav>
         </div>
@@ -458,298 +466,391 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="eigendecomposition">
 <h1>Eigendecomposition<a class="headerlink" href="#eigendecomposition" title="Link to this heading">#</a></h1>
-<section id="what-is-an-eigenvalue">
-<h2>What is an Eigenvalue?<a class="headerlink" href="#what-is-an-eigenvalue" title="Link to this heading">#</a></h2>
-<p>The <strong>eigendecomposition</strong> is a method for breaking down a square matrix (<span class="math notranslate nohighlight">\(A\)</span>) into its fundamental constituents: its eigenvalues and eigenvectors. This breakdown reveals the core properties of the linear transformation represented by the matrix, particularly how it behaves when applied repeatedly.</p>
-<p>For any square matrix <span class="math notranslate nohighlight">\(A\)</span>, a non-zero vector <span class="math notranslate nohighlight">\(x\)</span> is called an <strong>eigenvector</strong> if applying the matrix <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(x\)</span> results only in scaling <span class="math notranslate nohighlight">\(x\)</span> by a scalar factor <span class="math notranslate nohighlight">\(\lambda\)</span>. This scalar factor <span class="math notranslate nohighlight">\(\lambda\)</span> is known as the <strong>eigenvalue</strong>.</p>
-<p>The relationship is expressed by the key equation:</p>
+<p>An eigendecomposition expresses a matrix in a basis of eigenvectors. In that basis, applying the matrix amounts to multiplying each coordinate by a scalar. The central question is whether there are enough independent eigenvectors to form a basis.</p>
+<p>Throughout this section, <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(n\times n\)</span> matrix with <span class="math notranslate nohighlight">\(n\ge1\)</span>. We allow complex eigenvalues and eigenvectors, even when <span class="math notranslate nohighlight">\(A\)</span> has real entries.</p>
+<section id="eigenvalues-eigenvectors-and-eigenspaces">
+<h2>Eigenvalues, Eigenvectors, and Eigenspaces<a class="headerlink" href="#eigenvalues-eigenvectors-and-eigenspaces" title="Link to this heading">#</a></h2>
+<p>A scalar <span class="math notranslate nohighlight">\(\lambda\)</span> is an <strong>eigenvalue</strong> of <span class="math notranslate nohighlight">\(A\)</span> if there is a nonzero vector <span class="math notranslate nohighlight">\(x\)</span> such that</p>
 <div class="math notranslate nohighlight">
-\[
-Ax = \lambda x
-\]</div>
-<p>Eigenvectors represent special directions in the space that are not changed by the transformation, but are only stretched, compressed, or flipped.</p>
+\[Ax=\lambda x.\]</div>
+<p>The vector <span class="math notranslate nohighlight">\(x\)</span> is a corresponding <strong>eigenvector</strong>. The requirement <span class="math notranslate nohighlight">\(x\ne0\)</span> is essential: the zero vector satisfies this equation for every <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<p>For real <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(\lambda\)</span>, the line through <span class="math notranslate nohighlight">\(x\)</span> is mapped into itself. A positive eigenvalue preserves the direction along this line, a negative one reverses it, and <span class="math notranslate nohighlight">\(\lambda=0\)</span> sends the line to zero. Lengths along the line are multiplied by <span class="math notranslate nohighlight">\(|\lambda|\)</span>. Complex eigenvalues require a complex vector space; the picture of stretching a real line does not apply to them.</p>
+<p>If <span class="math notranslate nohighlight">\(x\)</span> is an eigenvector, so is every nonzero scalar multiple of <span class="math notranslate nohighlight">\(x\)</span>. More generally, the <strong>eigenspace</strong> associated with <span class="math notranslate nohighlight">\(\lambda\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[E_\lambda=N(A-\lambda I).\]</div>
+<p>It contains zero and all the eigenvectors for that eigenvalue. In particular, when zero is an eigenvalue, its eigenspace is <span class="math notranslate nohighlight">\(N(A)\)</span>.</p>
+<p>For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix}
+\end{split}\]</div>
+<p>has eigenvectors</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+x_1&amp;=\begin{pmatrix}1\\0\end{pmatrix}, &amp; Ax_1&amp;=2x_1,\\
+x_2&amp;=\begin{pmatrix}-1\\1\end{pmatrix}, &amp; Ax_2&amp;=x_2.
+\end{aligned}
+\end{split}\]</div>
+<p>These two eigenvectors are independent, but they are not orthogonal. We will use them to diagonalize <span class="math notranslate nohighlight">\(A\)</span> below.</p>
 </section>
 <section id="existence-of-eigenvalues">
 <h2>Existence of Eigenvalues<a class="headerlink" href="#existence-of-eigenvalues" title="Link to this heading">#</a></h2>
+<p>The eigenvalue equation is equivalent to <span class="math notranslate nohighlight">\((A-\lambda I)x=0\)</span> with <span class="math notranslate nohighlight">\(x\ne0\)</span>. Thus</p>
+<div class="math notranslate nohighlight">
+\[\lambda\text{ is an eigenvalue}\quad\Longleftrightarrow\quad
+\det(A-\lambda I)=0.\]</div>
+<p>The <strong>characteristic polynomial</strong> is</p>
+<div class="math notranslate nohighlight">
+\[p_A(t)=\det(A-tI).\]</div>
+<p>It has degree <span class="math notranslate nohighlight">\(n\)</span> and leading coefficient <span class="math notranslate nohighlight">\((-1)^n\)</span>. Some texts use <span class="math notranslate nohighlight">\(\det(tI-A)\)</span> instead; the roots are the same. For a <span class="math notranslate nohighlight">\(2\times2\)</span> matrix,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+p_A(t)
+&amp;=\det\begin{pmatrix}a-t&amp;b\\c&amp;d-t\end{pmatrix}\\
+&amp;=(a-t)(d-t)-bc\\
+&amp;=t^2-(a+d)t+(ad-bc).
+\end{aligned}
+\end{split}\]</div>
 <div class="proof theorem admonition" id="thm:eigenvalue_existence">
 <p class="admonition-title"><span class="caption-number">Theorem 3 </span> (Existence of Eigenvalues)</p>
 <section class="theorem-content" id="proof-content">
-<p>A cornerstone of linear algebra is that every <span class="math notranslate nohighlight">\(n \times n\)</span> matrix with complex entries has at least one eigenvalue and its corresponding eigenvector.</p>
+<p>Every <span class="math notranslate nohighlight">\(n\times n\)</span> complex matrix, with <span class="math notranslate nohighlight">\(n\ge1\)</span>, has <span class="math notranslate nohighlight">\(n\)</span> eigenvalues in <span class="math notranslate nohighlight">\(\mathbb{C}\)</span> when roots are counted with their multiplicities.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. Using the Characteristic Polynomial</p>
-<p>This is the most common proof and relies on the determinant and the Fundamental Theorem of Algebra.</p>
-<ol class="arabic">
-<li><p>The defining equation for an eigenvalue is <span class="math notranslate nohighlight">\(Ax = \lambda x\)</span>, which can be rewritten as:</p>
-<div class="math notranslate nohighlight">
-\[(A - \lambda I)x = 0\]</div>
-<p>where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p>
-</li>
-<li><p>For this equation to have a non-zero solution for <span class="math notranslate nohighlight">\(x\)</span>, the matrix <span class="math notranslate nohighlight">\((A - \lambda I)\)</span> must be <strong>singular</strong>. A square matrix is singular if and only if its determinant is zero.</p>
-<div class="math notranslate nohighlight">
-\[\det(A - \lambda I) = 0\]</div>
-</li>
-<li><p>The expression <span class="math notranslate nohighlight">\(p(\lambda) = \det(A - \lambda I)\)</span> is a polynomial in the variable <span class="math notranslate nohighlight">\(\lambda\)</span>. If <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, this <strong>characteristic polynomial</strong> has degree <span class="math notranslate nohighlight">\(n\)</span>. For example, if <span class="math notranslate nohighlight">\(A = \begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}\)</span>, then:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \det(A - \lambda I) = \det\begin{pmatrix} a-\lambda &amp; b \\ c &amp; d-\lambda \end{pmatrix} = (a-\lambda)(d-\lambda) - bc = \lambda^2 - (a+d)\lambda + (ad-bc)
-    \end{split}\]</div>
-</li>
-<li><p>The <strong>Fundamental Theorem of Algebra</strong> states that any non-constant polynomial with complex coefficients has at least one root in the complex numbers.</p></li>
-<li><p>Since the characteristic polynomial <span class="math notranslate nohighlight">\(p(\lambda)\)</span> is a polynomial of degree <span class="math notranslate nohighlight">\(n \ge 1\)</span>, it must have at least one complex root. Any such root <span class="math notranslate nohighlight">\(\lambda_0\)</span> satisfies <span class="math notranslate nohighlight">\(\det(A - \lambda_0 I) = 0\)</span>, which by definition makes <span class="math notranslate nohighlight">\(\lambda_0\)</span> an eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-</ol>
+<p>Proof. Using the Characteristic Polynomial.
+By the Fundamental Theorem of Algebra, the degree-<span class="math notranslate nohighlight">\(n\)</span> polynomial <span class="math notranslate nohighlight">\(p_A\)</span> factors into <span class="math notranslate nohighlight">\(n\)</span> linear factors over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>. Each root <span class="math notranslate nohighlight">\(\lambda\)</span> makes <span class="math notranslate nohighlight">\(A-\lambda I\)</span> singular, so <span class="math notranslate nohighlight">\(N(A-\lambda I)\)</span> contains a nonzero vector. That vector is an eigenvector for <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
 </div>
+<p>Counting roots with multiplicity does <strong>not</strong> guarantee <span class="math notranslate nohighlight">\(n\)</span> independent eigenvectors.</p>
+<p>The existence of at least one eigenvalue can also be proved without determinants.</p>
 <div class="proof admonition" id="proof">
-<p>Proof. Using Linear Dependence</p>
-<p>This algebraic proof avoids the use of determinants.</p>
-<ol class="arabic">
-<li><p>Take any non-zero vector <span class="math notranslate nohighlight">\(x \in \mathbb{C}^n\)</span>. Consider the following set of <span class="math notranslate nohighlight">\(n+1\)</span> vectors:</p>
+<p>Proof. Using Linear Dependence.
+Choose any nonzero <span class="math notranslate nohighlight">\(x\in\mathbb{C}^n\)</span>. The <span class="math notranslate nohighlight">\(n+1\)</span> vectors</p>
 <div class="math notranslate nohighlight">
-\[\{x, Ax, A^2x, \dots, A^nx\}\]</div>
-</li>
-<li><p>Since these <span class="math notranslate nohighlight">\(n+1\)</span> vectors reside in an <span class="math notranslate nohighlight">\(n\)</span>-dimensional space, they must be <strong>linearly dependent</strong>. Therefore, there exist complex scalars <span class="math notranslate nohighlight">\(c_0, c_1, \dots, c_n\)</span>, not all zero, such that:</p>
+\[x,Ax,A^2x,\ldots,A^nx\]</div>
+<p>are linearly dependent. Hence there are scalars <span class="math notranslate nohighlight">\(c_0,\ldots,c_n\)</span>, not all zero, such that</p>
 <div class="math notranslate nohighlight">
-\[c_0 x + c_1 Ax + c_2 A^2x + \dots + c_n A^nx = 0\]</div>
-</li>
-<li><p>This equation can be written as a polynomial in the matrix <span class="math notranslate nohighlight">\(A\)</span> acting on the vector <span class="math notranslate nohighlight">\(x\)</span>:</p>
+\[c_0x+c_1Ax+\cdots+c_nA^nx=0.\]</div>
+<p>Define <span class="math notranslate nohighlight">\(P(t)=c_0+c_1t+\cdots+c_nt^n\)</span>. Then <span class="math notranslate nohighlight">\(P(A)x=0\)</span>, where the constant term in <span class="math notranslate nohighlight">\(P(A)\)</span> is <span class="math notranslate nohighlight">\(c_0I\)</span>. This nonzero polynomial cannot be constant, since <span class="math notranslate nohighlight">\(c_0x=0\)</span> with <span class="math notranslate nohighlight">\(x\ne0\)</span> would force <span class="math notranslate nohighlight">\(c_0=0\)</span>.</p>
+<p>Let <span class="math notranslate nohighlight">\(k\ge1\)</span> be its degree, so <span class="math notranslate nohighlight">\(c_k\ne0\)</span>. By the Fundamental Theorem of Algebra,</p>
 <div class="math notranslate nohighlight">
-\[P(A)x = 0 \quad \text{where} \quad P(z) = c_0 + c_1 z + \dots + c_n z^n\]</div>
-</li>
-<li><p>By the Fundamental Theorem of Algebra, we can factor the polynomial <span class="math notranslate nohighlight">\(P(z)\)</span> in terms of its roots <span class="math notranslate nohighlight">\(\lambda_1, \dots, \lambda_k\)</span> (where <span class="math notranslate nohighlight">\(k \le n\)</span>):</p>
+\[P(t)=c_k\prod_{j=1}^k(t-\lambda_j).\]</div>
+<p>Substituting <span class="math notranslate nohighlight">\(A\)</span> and dividing by <span class="math notranslate nohighlight">\(c_k\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[P(z) = c_k(z - \lambda_1)(z - \lambda_2)\cdots(z - \lambda_k)\]</div>
-</li>
-<li><p>Substituting the matrix <span class="math notranslate nohighlight">\(A\)</span> back into this factored form gives:</p>
+\[(A-\lambda_1I)\cdots(A-\lambda_kI)x=0.\]</div>
+<p>Apply these factors from right to left. More explicitly, set <span class="math notranslate nohighlight">\(v_k=x\)</span> and define</p>
 <div class="math notranslate nohighlight">
-\[c_k(A - \lambda_1 I)(A - \lambda_2 I)\cdots(A - \lambda_k I)x = 0\]</div>
-</li>
-<li><p>Let’s read this expression from right to left. Let <span class="math notranslate nohighlight">\(v_k = x\)</span>, <span class="math notranslate nohighlight">\(v_{k-1} = (A - \lambda_k I)v_k\)</span>, <span class="math notranslate nohighlight">\(v_{k-2} = (A - \lambda_{k-1} I)v_{k-1}\)</span>, and so on. Since the final result is the zero vector, and we started with a non-zero vector <span class="math notranslate nohighlight">\(x\)</span>, there must be some step where a non-zero vector was transformed into the zero vector.</p></li>
-<li><p>That is, there must be some index <span class="math notranslate nohighlight">\(i\)</span> and some non-zero vector <span class="math notranslate nohighlight">\(v_i\)</span> such that <span class="math notranslate nohighlight">\((A - \lambda_i I)v_i = 0\)</span>. This is the definition of <span class="math notranslate nohighlight">\(\lambda_i\)</span> being an eigenvalue with corresponding eigenvector <span class="math notranslate nohighlight">\(v_i\)</span>. If no such step existed, all the matrices <span class="math notranslate nohighlight">\((A-\lambda_i I)\)</span> would be invertible, and their product would also be invertible, which contradicts the fact that it maps the non-zero vector <span class="math notranslate nohighlight">\(x\)</span> to zero.</p></li>
-</ol>
+\[v_{j-1}=(A-\lambda_jI)v_j,
+\qquad j=k,k-1,\ldots,1.\]</div>
+<p>We start with <span class="math notranslate nohighlight">\(v_k\ne0\)</span> and end with <span class="math notranslate nohighlight">\(v_0=0\)</span>. At the first step that produces zero, the input <span class="math notranslate nohighlight">\(v_j\)</span> is nonzero and satisfies</p>
+<div class="math notranslate nohighlight">
+\[(A-\lambda_jI)v_j=0.\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(Av_j=\lambda_jv_j\)</span>: we have found an eigenvalue and a corresponding eigenvector.</p>
 </div>
+<section id="real-matrices-can-have-complex-eigenvalues">
+<h3>Real Matrices Can Have Complex Eigenvalues<a class="headerlink" href="#real-matrices-can-have-complex-eigenvalues" title="Link to this heading">#</a></h3>
+<p>The real rotation matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}R=\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix}\end{split}\]</div>
+<p>has characteristic polynomial <span class="math notranslate nohighlight">\(t^2+1\)</span>. Its eigenvalues are <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(-i\)</span>, with eigenvectors <span class="math notranslate nohighlight">\((1,-i)^T\)</span> and <span class="math notranslate nohighlight">\((1,i)^T\)</span>, respectively. It has no real eigenvectors: a rotation by <span class="math notranslate nohighlight">\(90^\circ\)</span> preserves no real line.</p>
+<p>For any real matrix, nonreal eigenvalues occur in conjugate pairs. Indeed, taking complex conjugates of <span class="math notranslate nohighlight">\(Ax=\lambda x\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[A\overline{x}=\overline{\lambda}\,\overline{x}.\]</div>
+<p>The corresponding roots have the same multiplicity because the characteristic polynomial has real coefficients.</p>
 </section>
-<section id="the-complex-schur-decomposition">
-<h2>The (Complex) Schur Decomposition<a class="headerlink" href="#the-complex-schur-decomposition" title="Link to this heading">#</a></h2>
-<p>The existence of at least one eigenvalue leads directly to the <strong>Schur Decomposition</strong>, a powerful result that exists for <em>every</em> square matrix. Unlike the eigendecomposition, the Schur decomposition is guaranteed to exist regardless of whether the matrix is diagonalizable.</p>
-<p>The Schur decomposition represents the matrix <span class="math notranslate nohighlight">\(A\)</span> in the form:</p>
+</section>
+<section id="diagonalization-a-change-to-an-eigenvector-basis">
+<h2>Diagonalization: A Change to an Eigenvector Basis<a class="headerlink" href="#diagonalization-a-change-to-an-eigenvector-basis" title="Link to this heading">#</a></h2>
+<p>Suppose <span class="math notranslate nohighlight">\(A\)</span> has <span class="math notranslate nohighlight">\(n\)</span> independent eigenvectors <span class="math notranslate nohighlight">\(x_1,\ldots,x_n\)</span>, with corresponding eigenvalues <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_n\)</span>. Form</p>
 <div class="math notranslate nohighlight">
 \[
-A = Q T Q^{-1}
+X=[x_1,\ldots,x_n],\qquad
+\Lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_n).
 \]</div>
-<section id="components-of-the-schur-decomposition">
-<h3>Components of the Schur Decomposition<a class="headerlink" href="#components-of-the-schur-decomposition" title="Link to this heading">#</a></h3>
+<p>The eigenvalue equations combine into</p>
+<div class="math notranslate nohighlight">
+\[AX=X\Lambda.\]</div>
+<p>Since the columns of <span class="math notranslate nohighlight">\(X\)</span> are independent, <span class="math notranslate nohighlight">\(X\)</span> is invertible. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\boxed{A=X\Lambda X^{-1}.}\]</div>
+<p>This is an <strong>eigendecomposition</strong>, or <strong>diagonalization</strong>, of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>Conversely, if <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> with <span class="math notranslate nohighlight">\(X\)</span> invertible and <span class="math notranslate nohighlight">\(\Lambda\)</span> diagonal, then <span class="math notranslate nohighlight">\(AX=X\Lambda\)</span> shows that each column of <span class="math notranslate nohighlight">\(X\)</span> is an eigenvector. Hence:</p>
+<blockquote>
+<div><p>A matrix is diagonalizable exactly when it has a basis of eigenvectors.</p>
+</div></blockquote>
+<p>Over <span class="math notranslate nohighlight">\(\mathbb{R}\)</span>, this requires a basis of real eigenvectors and real eigenvalues. A real matrix can be diagonalizable over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span> without being diagonalizable over <span class="math notranslate nohighlight">\(\mathbb{R}\)</span>, as the rotation example illustrates.</p>
+<section id="what-the-three-factors-do">
+<h3>What the Three Factors Do<a class="headerlink" href="#what-the-three-factors-do" title="Link to this heading">#</a></h3>
+<p>For any vector <span class="math notranslate nohighlight">\(v\)</span>, write</p>
+<div class="math notranslate nohighlight">
+\[v=Xc=\sum_{j=1}^n c_jx_j.\]</div>
+<p>The factors in <span class="math notranslate nohighlight">\(X\Lambda X^{-1}\)</span> act from right to left:</p>
 <ol class="arabic simple">
-<li><p><strong><span class="math notranslate nohighlight">\(T\)</span></strong>: This is an <strong>upper triangular matrix</strong>.</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(Q\)</span></strong>: This is a <strong>unitary matrix</strong>. A unitary matrix means that its inverse is equal to its conjugate transpose (<span class="math notranslate nohighlight">\(Q^{-1} = Q^H\)</span>). The columns of <span class="math notranslate nohighlight">\(Q\)</span> form an orthonormal basis for the space <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(X^{-1}\)</span> finds the coordinates <span class="math notranslate nohighlight">\(c\)</span> in the eigenvector basis.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Lambda\)</span> multiplies coordinate <span class="math notranslate nohighlight">\(c_j\)</span> by <span class="math notranslate nohighlight">\(\lambda_j\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(X\)</span> converts back to the original coordinates.</p></li>
 </ol>
-<p>This decomposition establishes that <span class="math notranslate nohighlight">\(A\)</span> is unitarily similar to an upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span>. The use of unitary transformations (<span class="math notranslate nohighlight">\(Q\)</span>) ensures numerical stability, as these transformations preserve lengths and do not amplify errors. This makes the Schur decomposition one of the most reliable methods for computing eigenvalues in practice.</p>
+<p>Thus</p>
+<div class="math notranslate nohighlight">
+\[Av=\sum_{j=1}^n\lambda_jc_jx_j.\]</div>
+<p>The eigenvectors need not be orthogonal, so in general <span class="math notranslate nohighlight">\(X^{-1}\ne X^H\)</span>. Normalizing the columns of <span class="math notranslate nohighlight">\(X\)</span> does not make them orthogonal.</p>
 </section>
-<section id="relationship-to-eigenvalues">
-<h3>Relationship to Eigenvalues<a class="headerlink" href="#relationship-to-eigenvalues" title="Link to this heading">#</a></h3>
-<p>The <strong>eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are exactly the diagonal entries of the triangular matrix <span class="math notranslate nohighlight">\(T\)</span></strong>.</p>
+<section id="a-worked-diagonalization">
+<h3>A Worked Diagonalization<a class="headerlink" href="#a-worked-diagonalization" title="Link to this heading">#</a></h3>
+<p>For the earlier example, take</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix},\qquad
+X=\begin{pmatrix}1&amp;-1\\0&amp;1\end{pmatrix}.
+\end{split}\]</div>
+<p>Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\Lambda=\begin{pmatrix}2&amp;0\\0&amp;1\end{pmatrix},\qquad
+X^{-1}=\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix},
+\end{split}\]</div>
+<p>and direct multiplication verifies <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>.</p>
+<p>For <span class="math notranslate nohighlight">\(v=(0,1)^T\)</span>, the eigenvector coordinates are <span class="math notranslate nohighlight">\(c=X^{-1}v=(1,1)^T\)</span>. Hence <span class="math notranslate nohighlight">\(v=x_1+x_2\)</span> and</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}Av=2x_1+x_2=\begin{pmatrix}1\\1\end{pmatrix}.\end{split}\]</div>
+<p>The decomposition is not unique. Eigenvectors can be rescaled, the eigenpairs can be reordered together, and any basis can be chosen within a repeated eigenvalue’s eigenspace.</p>
 </section>
-<section id="proof-of-existence">
-<h3>Proof of Existence<a class="headerlink" href="#proof-of-existence" title="Link to this heading">#</a></h3>
-<p>The existence of one eigenvalue for a square matrix <span class="math notranslate nohighlight">\(A\)</span> in the complex domain leads to the decomposition <span class="math notranslate nohighlight">\(A = Q T Q^{-1}\)</span>.</p>
+</section>
+<section id="when-are-there-enough-eigenvectors">
+<h2>When Are There Enough Eigenvectors?<a class="headerlink" href="#when-are-there-enough-eigenvectors" title="Link to this heading">#</a></h2>
+<section id="distinct-eigenvalues-give-independent-eigenvectors">
+<h3>Distinct Eigenvalues Give Independent Eigenvectors<a class="headerlink" href="#distinct-eigenvalues-give-independent-eigenvectors" title="Link to this heading">#</a></h3>
+<p>More generally, eigenspaces for distinct eigenvalues form a direct sum.</p>
 <div class="proof admonition" id="proof">
-<p>Proof. Existence of the Schur Decomposition</p>
-<p>The existence of the Schur decomposition can be proven by induction on the size of the matrix, <span class="math notranslate nohighlight">\(n\)</span>.</p>
-<ul>
-<li><p><strong>Base Case (n=1)</strong>: The result is trivially true, as a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix is already in upper triangular form.</p></li>
-<li><p><strong>Inductive Step</strong>: Assume the decomposition exists for all matrices of size <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span>.</p>
-<ol class="arabic">
-<li><p>We know every <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> has at least one eigenvalue, <span class="math notranslate nohighlight">\(\lambda_1\)</span>, with a corresponding unit eigenvector, <span class="math notranslate nohighlight">\(x_1\)</span>.</p></li>
-<li><p>We can extend this vector <span class="math notranslate nohighlight">\(x_1\)</span> to form an orthonormal basis for <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>. Let the matrix with these basis vectors as its columns be <span class="math notranslate nohighlight">\(Q_1 = [x_1, v_2, \dots, v_n]\)</span>. By construction, <span class="math notranslate nohighlight">\(Q_1\)</span> is unitary.</p></li>
-<li><p>Consider the transformation <span class="math notranslate nohighlight">\(Q_1^H A Q_1\)</span>. Its first column is <span class="math notranslate nohighlight">\(Q_1^H A x_1 = Q_1^H (\lambda_1 x_1) = \lambda_1 (Q_1^H x_1)\)</span>. Since <span class="math notranslate nohighlight">\(x_1\)</span> is the first column of <span class="math notranslate nohighlight">\(Q_1\)</span>, <span class="math notranslate nohighlight">\(Q_1^H x_1\)</span> is the vector <span class="math notranslate nohighlight">\((1, 0, \dots, 0)^T\)</span>.</p></li>
-<li><p>This means the transformed matrix has a block structure:</p>
+<p>Proof. Let <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_s\)</span> be distinct, and let <span class="math notranslate nohighlight">\(v_j\in E_{\lambda_j}\)</span> satisfy</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-        Q_1^H A Q_1 = \begin{pmatrix}
-        \lambda_1 &amp; \mathbf{w}^H \\
-        \mathbf{0} &amp; A_2
-        \end{pmatrix}
-        \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(A_2\)</span> is an <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> matrix.</p>
-</li>
-<li><p>By our induction hypothesis, the smaller matrix <span class="math notranslate nohighlight">\(A_2\)</span> has its own Schur decomposition, <span class="math notranslate nohighlight">\(A_2 = Q_2 T_2 Q_2^H\)</span>.</p></li>
-<li><p>We can now “embed” this smaller decomposition back into the larger matrix structure. Define a new unitary matrix <span class="math notranslate nohighlight">\(Q\)</span> as <span class="math notranslate nohighlight">\(Q = Q_1 \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2 \end{pmatrix}\)</span>.</p></li>
-<li><p>This choice of <span class="math notranslate nohighlight">\(Q\)</span> transforms <span class="math notranslate nohighlight">\(A\)</span> into an upper triangular matrix, completing the induction:</p>
+\[v_1+\cdots+v_s=0.\]</div>
+<p>We prove by induction on <span class="math notranslate nohighlight">\(s\)</span> that every <span class="math notranslate nohighlight">\(v_j\)</span> is zero. The case <span class="math notranslate nohighlight">\(s=1\)</span> is immediate. Apply <span class="math notranslate nohighlight">\(A-\lambda_sI\)</span> to the relation:</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-        Q^H A Q = \begin{pmatrix}
-        \lambda_1 &amp; \mathbf{w}^H Q_2 \\
-        \mathbf{0} &amp; Q_2^H A_2 Q_2
-        \end{pmatrix} = \begin{pmatrix}
-        \lambda_1 &amp; \mathbf{w}^H Q_2 \\
-        \mathbf{0} &amp; T_2
-        \end{pmatrix}
-        \end{split}\]</div>
-</li>
-</ol>
-</li>
-</ul>
+\[\sum_{j=1}^{s-1}(\lambda_j-\lambda_s)v_j=0.\]</div>
+<p>By the induction hypothesis, every term is zero. Since <span class="math notranslate nohighlight">\(\lambda_j\ne\lambda_s\)</span>, this gives <span class="math notranslate nohighlight">\(v_1=\cdots=v_{s-1}=0\)</span>, and the original relation then gives <span class="math notranslate nohighlight">\(v_s=0\)</span>.</p>
 </div>
+<p>In particular, a matrix with <span class="math notranslate nohighlight">\(n\)</span> distinct eigenvalues is diagonalizable. Distinct eigenvalues are sufficient, but not necessary: the identity matrix has just one eigenvalue, yet every nonzero vector is an eigenvector.</p>
 </section>
-<section id="why-it-s-so-important-for-computation">
-<h3>Why It’s So Important for Computation<a class="headerlink" href="#why-it-s-so-important-for-computation" title="Link to this heading">#</a></h3>
+<section id="repeated-eigenvalues-two-different-multiplicities">
+<h3>Repeated Eigenvalues: Two Different Multiplicities<a class="headerlink" href="#repeated-eigenvalues-two-different-multiplicities" title="Link to this heading">#</a></h3>
+<p>For an eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span>:</p>
 <ul class="simple">
-<li><p><strong>It’s How We Actually Find Eigenvalues:</strong> State-of-the-art numerical methods (like the famous QR algorithm) do not try to compute the eigendecomposition directly. Instead, they are designed to reliably and stably compute the <strong>Schur decomposition</strong>.</p></li>
-<li><p><strong>A Stable Pathway:</strong> Once the Schur form is found, the eigenvalues can be simply read off the diagonal of <span class="math notranslate nohighlight">\(T\)</span>. If the eigenvectors are also needed, they can be calculated from <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(T\)</span>. The Schur decomposition is the practical and stable <strong>pathway</strong> to finding eigenvalues and eigenvectors.</p></li>
-<li><p><strong>The Power of <span class="math notranslate nohighlight">\(Q\)</span>:</strong> The reason this approach works so well is the presence of the orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>. Because orthogonal transformations preserve length, they don’t amplify rounding errors during computation. This makes the entire process <strong>numerically stable</strong> and trustworthy.</p></li>
+<li><p>Its <strong>algebraic multiplicity</strong> <span class="math notranslate nohighlight">\(a_\lambda\)</span> is its multiplicity as a root of <span class="math notranslate nohighlight">\(p_A\)</span>.</p></li>
+<li><p>Its <strong>geometric multiplicity</strong> <span class="math notranslate nohighlight">\(g_\lambda=\dim E_\lambda\)</span> counts the independent eigenvectors available for that eigenvalue.</p></li>
 </ul>
+<p>These satisfy</p>
+<div class="math notranslate nohighlight">
+\[1\le g_\lambda\le a_\lambda.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Let <span class="math notranslate nohighlight">\(g=g_\lambda\)</span>. If <span class="math notranslate nohighlight">\(g=n\)</span>, then <span class="math notranslate nohighlight">\(A=\lambda I\)</span> and the result follows directly. Otherwise, extend a basis of <span class="math notranslate nohighlight">\(E_\lambda\)</span> to a basis of the whole space, and put these basis vectors in the columns of an invertible matrix <span class="math notranslate nohighlight">\(P\)</span>. In this basis,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P^{-1}AP=\begin{pmatrix}\lambda I_g&amp;B\\0&amp;C\end{pmatrix}.\end{split}\]</div>
+<p>A change of basis preserves the characteristic polynomial, because</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\det(P^{-1}AP-tI)
+&amp;=\det\bigl(P^{-1}(A-tI)P\bigr)\\
+&amp;=\det(A-tI).
+\end{aligned}
+\end{split}\]</div>
+<p>The block triangular determinant formula therefore gives</p>
+<div class="math notranslate nohighlight">
+\[p_A(t)=(\lambda-t)^g\det(C-tI).\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(\lambda\)</span> occurs at least <span class="math notranslate nohighlight">\(g\)</span> times as a root.</p>
+</div>
+<p>Because eigenspaces for distinct eigenvalues form a direct sum, their bases together provide <span class="math notranslate nohighlight">\(\sum_\lambda g_\lambda\)</span> independent eigenvectors. The algebraic multiplicities sum to <span class="math notranslate nohighlight">\(n\)</span>. Therefore, over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[A\text{ is diagonalizable}
+\quad\Longleftrightarrow\quad
+ g_\lambda=a_\lambda\text{ for every eigenvalue }\lambda.\]</div>
+</section>
+<section id="a-matrix-that-cannot-be-diagonalized">
+<h3>A Matrix That Cannot Be Diagonalized<a class="headerlink" href="#a-matrix-that-cannot-be-diagonalized" title="Link to this heading">#</a></h3>
+<p>Consider</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}J=\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix}.\end{split}\]</div>
+<p>Its characteristic polynomial is <span class="math notranslate nohighlight">\((1-t)^2\)</span>, so the eigenvalue <span class="math notranslate nohighlight">\(1\)</span> has algebraic multiplicity two. But</p>
+<div class="math notranslate nohighlight">
+\[
+(J-I)x=0
+\quad\Longleftrightarrow\quad x_2=0.
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(E_1=\operatorname{span}\{(1,0)^T\}\)</span> has dimension one. There is no eigenvector basis, so <span class="math notranslate nohighlight">\(J\)</span> is not diagonalizable. Such a matrix is called <strong>defective</strong>.</p>
+<p>Compare <span class="math notranslate nohighlight">\(J\)</span> with <span class="math notranslate nohighlight">\(I_2\)</span>: both have eigenvalues <span class="math notranslate nohighlight">\(1,1\)</span>, but only <span class="math notranslate nohighlight">\(I_2\)</span> is diagonalizable. Also, <span class="math notranslate nohighlight">\(J\)</span> is invertible. Invertibility and diagonalizability are different properties.</p>
+</section>
+</section>
+<section id="matrix-powers-and-repeated-application">
+<h2>Matrix Powers and Repeated Application<a class="headerlink" href="#matrix-powers-and-repeated-application" title="Link to this heading">#</a></h2>
+<p>Eigenvalues are useful in science and engineering because they describe how a system evolves in time. A vector <span class="math notranslate nohighlight">\(v_k\)</span> can record its state at time step <span class="math notranslate nohighlight">\(k\)</span>: temperatures, displacements, or concentrations, for example. A linear model advances that state according to</p>
+<div class="math notranslate nohighlight">
+\[v_{k+1}=Av_k.\]</div>
+<p>Applying the same rule repeatedly gives <span class="math notranslate nohighlight">\(v_k=A^kv_0\)</span>. Thus understanding powers of <span class="math notranslate nohighlight">\(A\)</span> tells us how the initial state changes over time.</p>
+<p>Linear models also help us understand nonlinear systems. Near an equilibrium, the evolution of small deviations can often be approximated by a linear equation. In that setting, <span class="math notranslate nohighlight">\(v_k\)</span> represents the deviation from the equilibrium, and the approximation describes local behavior.</p>
+<section id="evolution-in-an-eigenvector-basis">
+<h3>Evolution in an Eigenvector Basis<a class="headerlink" href="#evolution-in-an-eigenvector-basis" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, adjacent factors <span class="math notranslate nohighlight">\(X^{-1}X\)</span> cancel when we multiply copies of <span class="math notranslate nohighlight">\(A\)</span>. For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A^2&amp;=X\Lambda(X^{-1}X)\Lambda X^{-1}\\
+&amp;=X\Lambda^2X^{-1}.
+\end{aligned}
+\end{split}\]</div>
+<p>Continuing in the same way gives, for integers <span class="math notranslate nohighlight">\(k\ge1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[A^k=X\Lambda^kX^{-1},\qquad
+\Lambda^k=\operatorname{diag}(\lambda_1^k,\ldots,\lambda_n^k).\]</div>
+<p>Write the initial state as <span class="math notranslate nohighlight">\(v_0=\sum_jc_jx_j\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[v_k=A^kv_0=\sum_{j=1}^n c_j\lambda_j^kx_j.\]</div>
+<p>Each eigenvector describes a pattern in the state, often called a <strong>mode</strong>. Its eigenvalue tells us how that mode changes during one time step: its coefficient is multiplied by <span class="math notranslate nohighlight">\(\lambda_j\)</span>. The initial state determines which modes are present through the coefficients <span class="math notranslate nohighlight">\(c_j\)</span>.</p>
+</section>
+<section id="example-two-bodies-exchanging-heat">
+<h3>Example: Two Bodies Exchanging Heat<a class="headerlink" href="#example-two-bodies-exchanging-heat" title="Link to this heading">#</a></h3>
+<p>Consider two bodies with equal heat capacities that exchange heat with each other but not with their surroundings. In a simple discrete-time approximation, each temperature moves <span class="math notranslate nohighlight">\(10\%\)</span> of the way toward the other body’s previous temperature during each step:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}T_{1,k+1}\\T_{2,k+1}\end{pmatrix}
+=\underbrace{\begin{pmatrix}0.9&amp;0.1\\0.1&amp;0.9\end{pmatrix}}_{A}
+\begin{pmatrix}T_{1,k}\\T_{2,k}\end{pmatrix}.
+\end{split}\]</div>
+<p>The two eigenvectors and eigenvalues are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+x_1&amp;=\begin{pmatrix}1\\1\end{pmatrix}, &amp; \lambda_1&amp;=1,\\
+x_2&amp;=\begin{pmatrix}1\\-1\end{pmatrix}, &amp; \lambda_2&amp;=0.8.
+\end{aligned}
+\end{split}\]</div>
+<p>The first mode gives both bodies the same temperature. Its eigenvalue is one, so this common temperature remains unchanged. The second mode raises one temperature and lowers the other by the same amount. Its eigenvalue is <span class="math notranslate nohighlight">\(0.8\)</span>, so the temperature difference decreases by <span class="math notranslate nohighlight">\(20\%\)</span> per step.</p>
+<p>Starting from <span class="math notranslate nohighlight">\(80\)</span> and <span class="math notranslate nohighlight">\(20\)</span> degrees,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+v_0=\begin{pmatrix}80\\20\end{pmatrix}=50x_1+30x_2.
+\end{split}\]</div>
+<p>After <span class="math notranslate nohighlight">\(k\)</span> steps,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+v_k=50x_1+30(0.8)^kx_2
+=\begin{pmatrix}50+30(0.8)^k\\50-30(0.8)^k\end{pmatrix}.
+\end{split}\]</div>
+<p>Both temperatures approach <span class="math notranslate nohighlight">\(50\)</span> degrees. The eigenvalues explain both the preserved average and the rate at which the temperatures equalize.</p>
+</section>
+<section id="growth-decay-and-oscillation">
+<h3>Growth, Decay, and Oscillation<a class="headerlink" href="#growth-decay-and-oscillation" title="Link to this heading">#</a></h3>
+<p>For a diagonalizable matrix, the expansion above gives:</p>
+<ul class="simple">
+<li><p>If every <span class="math notranslate nohighlight">\(|\lambda_j|&lt;1\)</span>, then <span class="math notranslate nohighlight">\(v_k\to0\)</span> for every initial vector.</p></li>
+<li><p>If some <span class="math notranslate nohighlight">\(|\lambda_j|&gt;1\)</span>, initial vectors with a nonzero component in a corresponding eigendirection grow without bound. Other initial vectors may still decay.</p></li>
+<li><p>If every <span class="math notranslate nohighlight">\(|\lambda_j|\le1\)</span>, the sequence is bounded, but components with <span class="math notranslate nohighlight">\(|\lambda_j|=1\)</span> need not decay or converge.</p></li>
+</ul>
+<p>A negative real eigenvalue makes its component alternate sign. For a complex eigenvalue <span class="math notranslate nohighlight">\(\lambda=re^{i\theta}\)</span>, the factor <span class="math notranslate nohighlight">\(\lambda^k=r^ke^{ik\theta}\)</span> combines growth or decay with oscillation.</p>
+<p>These conclusions follow here from the assumption that <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable. Without it, repeated eigenvalues can produce additional behavior. For the defective matrix above,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}J^k=\begin{pmatrix}1&amp;k\\0&amp;1\end{pmatrix}.\end{split}\]</div>
+<p>Both eigenvalues equal one, yet <span class="math notranslate nohighlight">\(J^k(0,1)^T=(k,1)^T\)</span> grows. Eigenvalues alone do not describe every aspect of repeated application.</p>
+</section>
+<section id="continuous-time-systems">
+<h3>Continuous-Time Systems<a class="headerlink" href="#continuous-time-systems" title="Link to this heading">#</a></h3>
+<p>The same idea applies to a linear differential equation</p>
+<div class="math notranslate nohighlight">
+\[\frac{dv}{dt}=Av.\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(A\)</span> in this equation maps the state to its rate of change.</p>
+<p>If <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> and <span class="math notranslate nohighlight">\(v(t)=Xc(t)\)</span>, then <span class="math notranslate nohighlight">\(c'(t)=\Lambda c(t)\)</span>. Each coordinate therefore satisfies <span class="math notranslate nohighlight">\(c_j'(t)=\lambda_jc_j(t)\)</span>, giving</p>
+<div class="math notranslate nohighlight">
+\[v(t)=\sum_{j=1}^n c_j(0)e^{\lambda_jt}x_j.\]</div>
+<p>In continuous time, the real part of <span class="math notranslate nohighlight">\(\lambda_j\)</span> determines exponential growth or decay, and its imaginary part determines oscillation. In discrete time, the magnitude <span class="math notranslate nohighlight">\(|\lambda_j|\)</span> determines growth or decay per step. In both cases, an eigenvector basis separates the evolution into individual modes.</p>
+</section>
+</section>
+<section id="the-complex-schur-decomposition">
+<h2>The Complex Schur Decomposition<a class="headerlink" href="#the-complex-schur-decomposition" title="Link to this heading">#</a></h2>
+<p>Diagonalization requires an eigenvector basis. Every complex square matrix does, however, admit a triangular representation in an orthonormal basis:</p>
+<div class="math notranslate nohighlight">
+\[\boxed{A=QTQ^H,}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. This is the <strong>complex Schur decomposition</strong>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Existence of the Complex Schur Decomposition.
+We use induction on <span class="math notranslate nohighlight">\(n\)</span>. For <span class="math notranslate nohighlight">\(n=1\)</span>, take <span class="math notranslate nohighlight">\(Q=[1]\)</span> and <span class="math notranslate nohighlight">\(T=A\)</span>.</p>
+<p>Choose a unit eigenvector <span class="math notranslate nohighlight">\(q_1\)</span> with eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span> and extend it to an orthonormal basis. Let <span class="math notranslate nohighlight">\(U\)</span> contain these basis vectors as columns. Since <span class="math notranslate nohighlight">\(Aq_1=\lambda_1q_1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+U^HAU=\begin{pmatrix}\lambda_1&amp;w^H\\0&amp;A_2\end{pmatrix}.
+\end{split}\]</div>
+<p>By induction, <span class="math notranslate nohighlight">\(A_2=VT_2V^H\)</span> for some unitary <span class="math notranslate nohighlight">\(V\)</span> and upper triangular <span class="math notranslate nohighlight">\(T_2\)</span>. Set</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}Q=U\begin{pmatrix}1&amp;0\\0&amp;V\end{pmatrix}.\end{split}\]</div>
+<p>Then <span class="math notranslate nohighlight">\(Q\)</span> is unitary, and block multiplication gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}Q^HAQ=\begin{pmatrix}\lambda_1&amp;w^HV\\0&amp;T_2\end{pmatrix}.\end{split}\]</div>
+<p>This matrix is upper triangular, completing the induction.</p>
+</div>
+<section id="what-schur-form-tells-us">
+<h3>What Schur Form Tells Us<a class="headerlink" href="#what-schur-form-tells-us" title="Link to this heading">#</a></h3>
+<p>Similarity preserves the characteristic polynomial, and the determinant of a triangular matrix is the product of its diagonal entries. Hence</p>
+<div class="math notranslate nohighlight">
+\[p_A(t)=\det(T-tI)=\prod_{j=1}^n(t_{jj}-t).\]</div>
+<p>The diagonal entries of <span class="math notranslate nohighlight">\(T\)</span> are therefore the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, counted with algebraic multiplicity. This also proves, even when <span class="math notranslate nohighlight">\(A\)</span> is defective, that</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{tr}(A)=\sum_{j=1}^n\lambda_j,
+\qquad \det(A)=\prod_{j=1}^n\lambda_j.\]</div>
+<p>In particular, <span class="math notranslate nohighlight">\(A\)</span> is invertible exactly when zero is not an eigenvalue.</p>
+<p>The columns of <span class="math notranslate nohighlight">\(Q\)</span> are called <strong>Schur vectors</strong>. They need not be eigenvectors. From <span class="math notranslate nohighlight">\(AQ=QT\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[Aq_j=\sum_{i=1}^j t_{ij}q_i.\]</div>
+<p>Thus the first column is an eigenvector, and the span of the first <span class="math notranslate nohighlight">\(j\)</span> columns is an <strong>invariant subspace</strong>: applying <span class="math notranslate nohighlight">\(A\)</span> to a vector in that subspace keeps it there.</p>
+<p>An eigendecomposition permits a general invertible basis matrix <span class="math notranslate nohighlight">\(X\)</span>. Schur form requires an orthonormal basis and permits nonzero entries above the diagonal of <span class="math notranslate nohighlight">\(T\)</span>. Even a diagonalizable matrix can have a nondiagonal Schur form: our example <span class="math notranslate nohighlight">\(\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix}\)</span> is already in Schur form with <span class="math notranslate nohighlight">\(Q=I\)</span>.</p>
+<p>The stronger property of having an orthonormal eigenvector basis is called <strong>unitary diagonalization</strong>. The next section on <a class="reference internal" href="normal_matrices.html"><span class="std std-doc">normal matrices</span></a> characterizes exactly when this is possible.</p>
 </section>
 </section>
 <section id="the-real-schur-decomposition">
 <h2>The Real Schur Decomposition<a class="headerlink" href="#the-real-schur-decomposition" title="Link to this heading">#</a></h2>
-<p>When dealing exclusively with real matrices, a complication arises if the matrix <span class="math notranslate nohighlight">\(A\)</span> possesses complex eigenvalues. Since complex eigenvalues of real matrices always occur in conjugate pairs, it is impossible for the matrix <span class="math notranslate nohighlight">\(T\)</span> in the decomposition <span class="math notranslate nohighlight">\(A = Q T Q^T\)</span> to be both real and triangular, because its diagonal must contain the complex eigenvalues.</p>
-<p>The <strong>real Schur decomposition</strong> provides a mechanism to keep the entire decomposition within the real numbers.</p>
-<p>The real Schur form, often denoted <span class="math notranslate nohighlight">\(S\)</span>, is achieved through a real orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> (where <span class="math notranslate nohighlight">\(Q^T = Q^{-1}\)</span>) such that <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span>. The resulting matrix <span class="math notranslate nohighlight">\(S\)</span> is <strong>block upper triangular</strong>.</p>
-<p>This form replaces the complex eigenvalues on the diagonal with <span class="math notranslate nohighlight">\(2 \times 2\)</span> blocks that contain the information needed for the complex conjugate pairs.</p>
-<p>For example, a <span class="math notranslate nohighlight">\(5 \times 5\)</span> real matrix with one real eigenvalue (<span class="math notranslate nohighlight">\(\lambda_1\)</span>) and two pairs of complex conjugate eigenvalues (<span class="math notranslate nohighlight">\(a \pm ib\)</span> and <span class="math notranslate nohighlight">\(c \pm id\)</span>) would have the following real Schur form:</p>
+<p>Every real square matrix has a decomposition</p>
+<div class="math notranslate nohighlight">
+\[A=QSQ^T,\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is real orthogonal and <span class="math notranslate nohighlight">\(S\)</span> is real block upper triangular, with diagonal blocks of size <span class="math notranslate nohighlight">\(1\times1\)</span> or <span class="math notranslate nohighlight">\(2\times2\)</span>. The <span class="math notranslate nohighlight">\(1\times1\)</span> blocks are real eigenvalues; each <span class="math notranslate nohighlight">\(2\times2\)</span> block has a nonreal conjugate pair as its eigenvalues. This is the <strong>real Schur decomposition</strong>.</p>
+<p>For example, a <span class="math notranslate nohighlight">\(3\times3\)</span> real Schur form with one real eigenvalue and one nonreal pair has the structure</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-S = \begin{pmatrix} \lambda_1 &amp; * &amp; * &amp; * &amp; * \\ 0 &amp; a &amp; b &amp; * &amp; * \\ 0 &amp; -b &amp; a &amp; * &amp; * \\ 0 &amp; 0 &amp; 0 &amp; c &amp; d \\ 0 &amp; 0 &amp; 0 &amp; -d &amp; c \end{pmatrix}
+S=\begin{pmatrix}
+\lambda&amp;*&amp;*\\
+0&amp;b_{11}&amp;b_{12}\\
+0&amp;b_{21}&amp;b_{22}
+\end{pmatrix},
 \end{split}\]</div>
-</section>
-<section id="id1">
-<h2>Proof of Existence<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>where the stars denote unrestricted entries. The nonreal eigenvalues belong to the entire bottom-right block; they cannot be read from its diagonal entries alone.</p>
 <div class="proof admonition" id="proof">
-<p>Proof. Real Schur Decomposition</p>
-<p><strong>Proof by Induction.</strong> We prove the theorem by induction on the dimension <span class="math notranslate nohighlight">\(n\)</span> of the matrix.</p>
-<h3 class="rubric" id="base-case-n-1">Base Case (n=1)</h3>
-<p>For <span class="math notranslate nohighlight">\(n=1\)</span>, the matrix <span class="math notranslate nohighlight">\(A = [a]\)</span> is a scalar. The decomposition is trivial: <span class="math notranslate nohighlight">\(A = [1][a][1]^T\)</span>, where <span class="math notranslate nohighlight">\(Q = [1]\)</span> is orthogonal and <span class="math notranslate nohighlight">\(S = [a]\)</span> is quasi-upper triangular. The theorem holds.</p>
-<h3 class="rubric" id="inductive-hypothesis">Inductive Hypothesis</h3>
-<p>Assume that the Real Schur Decomposition exists for all real matrices of size <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> or smaller.</p>
-<h3 class="rubric" id="inductive-step">Inductive Step</h3>
-<p>Let <span class="math notranslate nohighlight">\(A\)</span> be an <span class="math notranslate nohighlight">\(n \times n\)</span> real matrix. The characteristic polynomial of <span class="math notranslate nohighlight">\(A\)</span> has real coefficients. Therefore, its roots (the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>) are either real or appear in complex conjugate pairs. We consider two cases.</p>
-<h4 class="rubric" id="case-1-a-has-a-real-eigenvalue">Case 1: <span class="math notranslate nohighlight">\(A\)</span> has a real eigenvalue</h4>
-<p>Let <span class="math notranslate nohighlight">\(\lambda_1\)</span> be a real eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>, and let <span class="math notranslate nohighlight">\(q_1\)</span> be a corresponding real eigenvector with unit norm (<span class="math notranslate nohighlight">\(\|q_1\|_2 = 1\)</span>).</p>
-<ol class="arabic">
-<li><p>We can extend this single vector <span class="math notranslate nohighlight">\(q_1\)</span> to form a full orthonormal basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Let the matrix containing these basis vectors as its columns be <span class="math notranslate nohighlight">\(Q_1 = [q_1, v_2, \dots, v_n]\)</span>. By construction, <span class="math notranslate nohighlight">\(Q_1\)</span> is a real orthogonal matrix.</p></li>
-<li><p>Now, consider the similarity transformation <span class="math notranslate nohighlight">\(Q_1^T A Q_1\)</span>. The first column of this new matrix is:</p>
+<p>Proof. Existence of the Real Schur Decomposition.
+We again use induction, with the scalar case immediate.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> has a real eigenvalue, choose a real unit eigenvector. The complex Schur argument can then be carried out with real orthogonal matrices, leaving a smaller real matrix to which induction applies.</p>
+<p>Otherwise, choose a nonreal eigenvalue <span class="math notranslate nohighlight">\(\lambda=a+ib\)</span>, with <span class="math notranslate nohighlight">\(b\ne0\)</span>, and an eigenvector <span class="math notranslate nohighlight">\(z=u+iv\)</span>, where <span class="math notranslate nohighlight">\(u,v\)</span> are real. Separating the real and imaginary parts of <span class="math notranslate nohighlight">\(Az=\lambda z\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    Q_1^T A q_1 = Q_1^T (\lambda_1 q_1) = \lambda_1 (Q_1^T q_1) = \lambda_1 \begin{pmatrix} 1 \\ 0 \\ \vdots \\ 0 \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p>This means the transformation results in a block upper triangular matrix:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    Q_1^T A Q_1 = \begin{pmatrix}
-    \lambda_1 &amp; \mathbf{w}^T \\
-    \mathbf{0} &amp; A_2
-    \end{pmatrix}
-    \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(A_2\)</span> is a real matrix of size <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span>.</p>
-</li>
-<li><p>By the inductive hypothesis, there exists a real orthogonal matrix <span class="math notranslate nohighlight">\(Q_2\)</span> and a quasi-upper triangular matrix <span class="math notranslate nohighlight">\(S_2\)</span> such that <span class="math notranslate nohighlight">\(A_2 = Q_2 S_2 Q_2^T\)</span>.</p></li>
-<li><p>Define a new <span class="math notranslate nohighlight">\(n \times n\)</span> orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    Q = Q_1 \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2 \end{pmatrix}
-    \end{split}\]</div>
-<p>This matrix is orthogonal as it is the product of two orthogonal matrices.</p>
-</li>
-<li><p>Finally, applying this transformation to <span class="math notranslate nohighlight">\(A\)</span> yields the desired form:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    Q^T A Q = \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2^T \end{pmatrix} (Q_1^T A Q_1) \begin{pmatrix} 1 &amp; \mathbf{0}^T \\ \mathbf{0} &amp; Q_2 \end{pmatrix} = \begin{pmatrix} \lambda_1 &amp; \mathbf{w}^T Q_2 \\ \mathbf{0} &amp; Q_2^T A_2 Q_2 \end{pmatrix} = \begin{pmatrix} \lambda_1 &amp; \mathbf{w}^T Q_2 \\ \mathbf{0} &amp; S_2 \end{pmatrix}
-    \end{split}\]</div>
-<p>This matrix, which we call <span class="math notranslate nohighlight">\(S\)</span>, is quasi-upper triangular. Thus, <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span>.</p>
-</li>
-</ol>
-<h4 class="rubric" id="case-2-a-has-no-real-eigenvalues">Case 2: <span class="math notranslate nohighlight">\(A\)</span> has no real eigenvalues</h4>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> has no real eigenvalues, it must have a pair of complex conjugate eigenvalues, <span class="math notranslate nohighlight">\(\lambda = a + ib\)</span> and <span class="math notranslate nohighlight">\(\bar{\lambda} = a - ib\)</span>, where <span class="math notranslate nohighlight">\(b \neq 0\)</span>.</p>
-<ol class="arabic">
-<li><p>Let the complex eigenvector for <span class="math notranslate nohighlight">\(\lambda\)</span> be <span class="math notranslate nohighlight">\(z = x + iy\)</span>, where <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> are real vectors. From <span class="math notranslate nohighlight">\(Az = \lambda z\)</span>, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-    A(x+iy) = (a+ib)(x+iy) = (ax - by) + i(bx + ay)
-    \]</div>
-</li>
-<li><p>Equating the real and imaginary parts gives two real vector equations:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(Ax = ax - by\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(Ay = bx + ay\)</span></p></li>
-</ul>
-</li>
-<li><p>These equations show that the subspace <span class="math notranslate nohighlight">\(W = \text{span}\{x, y\}\)</span> is a two-dimensional invariant subspace under <span class="math notranslate nohighlight">\(A\)</span>. (The vectors <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> must be linearly independent, otherwise <span class="math notranslate nohighlight">\(\lambda\)</span> would be real).</p></li>
-<li><p>Use the Gram-Schmidt process (this will be covered later, please accept this result for now) to find an orthonormal basis <span class="math notranslate nohighlight">\(\{q_1, q_2\}\)</span> for the subspace <span class="math notranslate nohighlight">\(W\)</span>. Extend this to a full orthonormal basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> and form the real orthogonal matrix <span class="math notranslate nohighlight">\(Q_1 = [q_1, q_2, \dots, q_n]\)</span>.</p></li>
-<li><p>Because <span class="math notranslate nohighlight">\(W\)</span> is an invariant subspace, <span class="math notranslate nohighlight">\(Aq_1\)</span> and <span class="math notranslate nohighlight">\(Aq_2\)</span> are linear combinations of only <span class="math notranslate nohighlight">\(q_1\)</span> and <span class="math notranslate nohighlight">\(q_2\)</span>. This means that the transformation <span class="math notranslate nohighlight">\(Q_1^T A Q_1\)</span> will have a block structure:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    Q_1^T A Q_1 = \begin{pmatrix}
-    B &amp; C \\
-    0 &amp; D
-    \end{pmatrix}
-    \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(B\)</span> is a <span class="math notranslate nohighlight">\(2 \times 2\)</span> real matrix whose eigenvalues are the pair <span class="math notranslate nohighlight">\(\lambda, \bar{\lambda}\)</span>, and <span class="math notranslate nohighlight">\(D\)</span> is a real matrix of size <span class="math notranslate nohighlight">\((n-2) \times (n-2)\)</span>.</p>
-</li>
-<li><p>By the inductive hypothesis, there is a real Schur decomposition for <span class="math notranslate nohighlight">\(D\)</span>, so <span class="math notranslate nohighlight">\(D = Q_2 S_2 Q_2^T\)</span>.</p></li>
-<li><p>Define a new orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    Q = Q_1 \begin{pmatrix} I_2 &amp; 0 \\ 0 &amp; Q_2 \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p>This transformation yields the final quasi-upper triangular form:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    Q^T A Q = \begin{pmatrix} B &amp; C Q_2 \\ 0 &amp; S_2 \end{pmatrix}
-    \end{split}\]</div>
-<p>This matrix <span class="math notranslate nohighlight">\(S\)</span> has a <span class="math notranslate nohighlight">\(2 \times 2\)</span> block and a quasi-upper triangular block on its diagonal, and is therefore itself quasi-upper triangular.</p>
-</li>
-</ol>
-<p>Since both cases lead to the desired decomposition, the proof is complete by induction.</p>
-</div>
-</section>
-<section id="the-eigendecomposition-diagonalization">
-<h2>The Eigendecomposition (Diagonalization)<a class="headerlink" href="#the-eigendecomposition-diagonalization" title="Link to this heading">#</a></h2>
-<p>The eigendecomposition is a special, highly useful case of the Schur form. It is guaranteed to exist only when the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>diagonalizable</strong>. A matrix is diagonalizable if and only if it possesses a full set of <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors.</p>
-<p>When <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, the upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span> becomes a diagonal matrix, commonly written as <span class="math notranslate nohighlight">\(\Lambda\)</span>. The unitary matrix <span class="math notranslate nohighlight">\(Q\)</span> becomes <span class="math notranslate nohighlight">\(X\)</span>, a matrix whose columns are the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>The decomposition takes the form:</p>
-<div class="math notranslate nohighlight">
-\[
-A = X \Lambda X^{-1}
-\]</div>
-<section id="components-of-the-eigendecomposition">
-<h3>Components of the Eigendecomposition<a class="headerlink" href="#components-of-the-eigendecomposition" title="Link to this heading">#</a></h3>
-<ol class="arabic simple">
-<li><p><strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: A diagonal matrix containing the eigenvalues (<span class="math notranslate nohighlight">\(\lambda_i\)</span>).</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(X\)</span></strong>: A matrix whose columns are the <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-</ol>
-</section>
-</section>
-<section id="interpretation-application-and-connection-to-time-a-n">
-<h2>Interpretation, Application, and Connection to Time (<span class="math notranslate nohighlight">\(A^n\)</span>)<a class="headerlink" href="#interpretation-application-and-connection-to-time-a-n" title="Link to this heading">#</a></h2>
-<p>The true utility of the eigendecomposition is revealed in the analysis of dynamical systems, which are systems that evolve over time. This conceptual link leads to the association of eigendecomposition with <strong>“Time”</strong>.</p>
-<section id="application-calculating-powers-of-a-matrix">
-<h3>Application: Calculating Powers of a Matrix<a class="headerlink" href="#application-calculating-powers-of-a-matrix" title="Link to this heading">#</a></h3>
-<p>Consider a system whose state at time <span class="math notranslate nohighlight">\(k+1\)</span>, denoted <span class="math notranslate nohighlight">\(x_{k+1}\)</span>, is derived from its state at time <span class="math notranslate nohighlight">\(k\)</span>, <span class="math notranslate nohighlight">\(x_k\)</span>, by the linear rule <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>. To find the state after <span class="math notranslate nohighlight">\(k\)</span> steps, we must calculate <span class="math notranslate nohighlight">\(x_k = A^k x_0\)</span>.</p>
-<p>Calculating <span class="math notranslate nohighlight">\(A^k\)</span> directly is often computationally complex. However, if <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, the computation simplifies immensely:</p>
-<div class="proof admonition" id="proof">
-<p>Proof. Computing Matrix Powers <span class="math notranslate nohighlight">\(A^k\)</span></p>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable such that <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span>, then calculating the <span class="math notranslate nohighlight">\(k\)</span>-th power of <span class="math notranslate nohighlight">\(A\)</span> involves a simple simplification due to the telescoping nature of the product:</p>
-<div class="math notranslate nohighlight">
-\[
-A^k = (X \Lambda X^{-1})^k = (X \Lambda X^{-1})(X \Lambda X^{-1})\cdots(X \Lambda X^{-1}) = X \Lambda^k X^{-1}
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\Lambda\)</span> is a diagonal matrix, calculating <span class="math notranslate nohighlight">\(\Lambda^k\)</span> only requires raising its diagonal entries (the eigenvalues) to the <span class="math notranslate nohighlight">\(k\)</span>-th power:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\Lambda^k = \begin{pmatrix} \lambda_1^k &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; \lambda_2^k &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; \lambda_n^k \end{pmatrix}
+\begin{aligned}
+Au&amp;=au-bv,\\
+Av&amp;=bu+av.
+\end{aligned}
 \end{split}\]</div>
+<p>The vectors <span class="math notranslate nohighlight">\(u,v\)</span> are independent. Otherwise, <span class="math notranslate nohighlight">\(z\)</span> would be a nonzero complex multiple of a real vector, and the eigenvalue equation would force <span class="math notranslate nohighlight">\(\lambda\)</span> to be real.</p>
+<p>Therefore <span class="math notranslate nohighlight">\(W=\operatorname{span}\{u,v\}\)</span> is a two-dimensional real invariant subspace. Choose an orthonormal basis for <span class="math notranslate nohighlight">\(W\)</span> and extend it to an orthonormal basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. With these vectors in the columns of <span class="math notranslate nohighlight">\(U\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}U^TAU=\begin{pmatrix}B&amp;C\\0&amp;D\end{pmatrix}.\end{split}\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(B\)</span> represents the restriction of <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(W\)</span>. In the basis <span class="math notranslate nohighlight">\(u,v\)</span>, that restriction has matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix}a&amp;b\\-b&amp;a\end{pmatrix},\end{split}\]</div>
+<p>so <span class="math notranslate nohighlight">\(B\)</span> has eigenvalues <span class="math notranslate nohighlight">\(a\pm ib\)</span>. The change to an orthonormal basis can change the entries of this <span class="math notranslate nohighlight">\(2\times2\)</span> matrix.</p>
+<p>If <span class="math notranslate nohighlight">\(n=2\)</span>, the proof is complete. Otherwise, apply induction to <span class="math notranslate nohighlight">\(D=VS_2V^T\)</span> and set <span class="math notranslate nohighlight">\(Q=U\operatorname{diag}(I_2,V)\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}Q^TAQ=\begin{pmatrix}B&amp;CV\\0&amp;S_2\end{pmatrix},\end{split}\]</div>
+<p>which has the required block upper triangular form.</p>
 </div>
-</section>
-<section id="interpretation-dynamics-and-stability">
-<h3>Interpretation: Dynamics and Stability<a class="headerlink" href="#interpretation-dynamics-and-stability" title="Link to this heading">#</a></h3>
-<p>This simplification shows that the <strong>long-term behavior</strong> (the system’s dynamics over “time”) is governed entirely by the magnitudes of its eigenvalues, <span class="math notranslate nohighlight">\(|\lambda_i|\)</span>.</p>
-<ul class="simple">
-<li><p>If the magnitude of all eigenvalues is less than 1 (<span class="math notranslate nohighlight">\(|\lambda_i| &lt; 1\)</span>), the system is <strong>stable</strong>, meaning the state approaches zero as <span class="math notranslate nohighlight">\(k\)</span> approaches infinity.</p></li>
-<li><p>If the magnitude of any eigenvalue is greater than 1 (<span class="math notranslate nohighlight">\(|\lambda_i| &gt; 1\)</span>), the system is <strong>unstable</strong> and will diverge.</p></li>
-</ul>
-<p>This governing principle also applies to continuous systems described by differential equations, where the matrix exponential <span class="math notranslate nohighlight">\(e^{At}\)</span> is computed using the eigendecomposition, showing how eigenvalues control the exponential growth or decay of the system’s modes over time.</p>
-</section>
+<p>A real <span class="math notranslate nohighlight">\(2\times2\)</span> Schur block need not have off-diagonal entries of equal magnitude and opposite sign. For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}B=\begin{pmatrix}0&amp;-2\\1&amp;0\end{pmatrix}\end{split}\]</div>
+<p>is a valid block with eigenvalues <span class="math notranslate nohighlight">\(\pm i\sqrt{2}\)</span>.</p>
+<p>The distinction to retain is that <strong>Schur form always exists, whereas an eigenvector basis may not</strong>. Numerical methods for computing these decompositions will be developed in the later chapter on <a class="reference internal" href="eigenvalues.html"><span class="std std-doc">eigenvalue computations</span></a>.</p>
 </section>
 </section>
 
@@ -817,26 +918,34 @@ A^k = (X \Lambda X^{-1})^k = (X \Lambda X^{-1})(X \Lambda X^{-1})\cdots(X \Lambd
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-an-eigenvalue">What is an Eigenvalue?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-of-eigenvalues">Existence of Eigenvalues</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-schur-decomposition">The (Complex) Schur Decomposition</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-of-the-schur-decomposition">Components of the Schur Decomposition</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#relationship-to-eigenvalues">Relationship to Eigenvalues</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-existence">Proof of Existence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-it-s-so-important-for-computation">Why It’s So Important for Computation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalues-eigenvectors-and-eigenspaces">Eigenvalues, Eigenvectors, and Eigenspaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-of-eigenvalues">Existence of Eigenvalues</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#real-matrices-can-have-complex-eigenvalues">Real Matrices Can Have Complex Eigenvalues</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonalization-a-change-to-an-eigenvector-basis">Diagonalization: A Change to an Eigenvector Basis</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-three-factors-do">What the Three Factors Do</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-worked-diagonalization">A Worked Diagonalization</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-are-there-enough-eigenvectors">When Are There Enough Eigenvectors?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#distinct-eigenvalues-give-independent-eigenvectors">Distinct Eigenvalues Give Independent Eigenvectors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#repeated-eigenvalues-two-different-multiplicities">Repeated Eigenvalues: Two Different Multiplicities</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-matrix-that-cannot-be-diagonalized">A Matrix That Cannot Be Diagonalized</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#matrix-powers-and-repeated-application">Matrix Powers and Repeated Application</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evolution-in-an-eigenvector-basis">Evolution in an Eigenvector Basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-two-bodies-exchanging-heat">Example: Two Bodies Exchanging Heat</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#growth-decay-and-oscillation">Growth, Decay, and Oscillation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-time-systems">Continuous-Time Systems</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complex-schur-decomposition">The Complex Schur Decomposition</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-schur-form-tells-us">What Schur Form Tells Us</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-schur-decomposition">The Real Schur Decomposition</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Proof of Existence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-eigendecomposition-diagonalization">The Eigendecomposition (Diagonalization)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#components-of-the-eigendecomposition">Components of the Eigendecomposition</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-application-and-connection-to-time-a-n">Interpretation, Application, and Connection to Time (<span class="math notranslate nohighlight">\(A^n\)</span>)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#application-calculating-powers-of-a-matrix">Application: Calculating Powers of a Matrix</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpretation-dynamics-and-stability">Interpretation: Dynamics and Stability</a></li>
-</ul>
-</li>
 </ul>
   </nav></div>
 
