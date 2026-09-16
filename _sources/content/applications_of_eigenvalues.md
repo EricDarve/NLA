@@ -1,42 +1,107 @@
 # Applications of Eigenvalues
 
-The determinant of a matrix is the product of its eigenvalues, and the trace is the sum of its eigenvalues. This relationship provides a powerful theoretical and computational shortcut, connecting a matrix's overall properties to its fundamental modes of action.
+Eigenvectors identify directions or patterns that a matrix acts on by scaling. The interpretation of the eigenvalues depends on the model: they can describe growth rates, squared vibration frequencies, variances, or measurable energies. The examples below show how these quantities arise.
 
-## Computing Determinant and Trace
+## Connections to the Previous Sections
 
-For any $n \times n$ square matrix $A$ with eigenvalues $\lambda_1, \lambda_2, \dots, \lambda_n$ (counted with multiplicity), the following relationships hold:
+We have already seen how eigenvalues describe [time evolution](eigendecomposition.md): a mode evolves through $\lambda^k$ in discrete time and $e^{\lambda t}$ in continuous time. The heat-exchange example illustrates how this separates a preserved quantity from a decaying difference.
 
-* **Determinant**: The determinant is the product of the eigenvalues.
+We also established, with eigenvalues counted with algebraic multiplicity,
 
-    $$
-    \det(A) = \prod_{i=1}^n \lambda_i = \lambda_1 \cdot \lambda_2 \cdots \lambda_n
-    $$
+$$\det(A)=\prod_{j=1}^n\lambda_j,\qquad
+\operatorname{tr}(A)=\sum_{j=1}^n\lambda_j.$$
 
-* **Trace**: The trace is the sum of the eigenvalues.
+These identities hold even for defective matrices; their proof uses [Schur form](eigendecomposition.md). They connect eigenvalues to familiar matrix properties, without requiring us to compute eigenvalues just to find a determinant or trace.
 
-    $$
-    \text{tr}(A) = \sum_{i=1}^n \lambda_i = \lambda_1 + \lambda_2 + \cdots + \lambda_n
-    $$
+## Vibrations: Mode Shapes and Natural Frequencies
 
-These formulas follow from the **Schur decomposition** ($A = QTQ^H$), where $T$ is an upper triangular matrix with the eigenvalues of $A$ on its diagonal. The determinant of $A$ is equal to the determinant of $T$, which is simply the product of its diagonal entries. Similarly, the trace of $A$ is equal to the trace of $T$, which is the sum of its diagonal entries.
+Consider small displacements $u(t)$ of a system of unit masses connected by springs. An undamped linear model has the form
 
-## Other Applications of Eigenvalues
+$$u''(t)+Ku(t)=0,$$
 
-Eigenvalues and their corresponding eigenvectors are among the most important concepts in applied mathematics, revealing the deep structure of linear transformations. 🗺️
+where $K$ is the **stiffness matrix**, describing the restoring forces. Assume $K$ is real symmetric positive definite. Look for a motion with a fixed spatial pattern $q$:
 
-### Stability of Dynamical Systems
-For systems that evolve over time, such as $x_{k+1} = Ax_k$, the magnitudes of the eigenvalues of $A$ determine the system's long-term behavior. If all eigenvalues have a magnitude less than 1, the system is stable and converges to zero. If any eigenvalue has a magnitude greater than 1, the system is unstable and diverges.
+$$u(t)=q\cos(\omega t).$$
 
+Substitution gives
 
+$$Kq=\omega^2q.$$
 
-### Principal Component Analysis (PCA)
-In data science and statistics, PCA is a technique used to reduce the dimensionality of data. It works by finding the eigenvalues and eigenvectors of the data's covariance matrix. The eigenvectors (principal components) define the directions of greatest variance in the data, and the corresponding eigenvalues measure how much variance lies along each of those directions. By keeping only the components with the largest eigenvalues, one can simplify the data with minimal loss of information.
+Thus the eigenvector $q$ describes a **mode shape**, and its eigenvalue is the **square of the natural angular frequency**. If $\lambda>0$, then $\omega=\sqrt{\lambda}$, measured in radians per unit time.
 
-### Vibrational Analysis and Resonance
-In physics and engineering, eigenvalues determine the natural vibrational frequencies of a mechanical structure, like a bridge or an airplane wing. When an external force is applied at a frequency matching one of these eigenvalues, **resonance** occurs, leading to potentially catastrophic vibrations. This is why engineers design structures to avoid these natural frequencies.
+For two unit masses connected to each other and to fixed walls by three springs of unit stiffness,
 
-### Quantum Mechanics
-In quantum mechanics, physical properties like energy, momentum, and spin are represented by mathematical operators (matrices). The **eigenvalues** of these operators correspond to the possible, measurable values of that property. For example, the eigenvalues of the Hamiltonian operator give the discrete energy levels of an atom.
+$$K=\begin{pmatrix}2&-1\\-1&2\end{pmatrix}.$$
 
-### Google's PageRank Algorithm
-The original algorithm that powered Google's search engine uses the concept of eigenvectors. The entire World Wide Web is modeled as a massive matrix, where an entry $A_{ij}$ is non-zero if page $j$ links to page $i$. The eigenvector corresponding to the largest eigenvalue of this matrix is the **PageRank vector**. The entries of this vector assign an importance score to every page on the web, which is then used to rank search results.
+The mode $(1,1)^T$ has eigenvalue $1$: the masses move together with angular frequency $1$. The mode $(1,-1)^T$ has eigenvalue $3$: they move in opposite directions with angular frequency $\sqrt3$.
+
+For a general mass matrix $M$, the equation is $Mu''+Ku=0$, and the mode equation becomes
+
+$$Kq=\omega^2Mq.$$
+
+This is a **generalized eigenvalue problem**. External forcing near a natural frequency can produce large oscillations if it excites the corresponding mode. This is resonance; its response also depends on damping and the applied force.
+
+## Principal Component Analysis: Directions of Greatest Variation
+
+Suppose $z_1,\ldots,z_N\in\mathbb{R}^d$ are data vectors after subtracting their mean. Define the covariance matrix using the averaging convention
+
+$$C=\frac1N\sum_{i=1}^N z_i z_i^T.$$
+
+For a unit vector $q$, the scalar $q^Tz_i$ is the coordinate of observation $i$ along $q$. Its variance is
+
+$$\frac1N\sum_{i=1}^N(q^Tz_i)^2=q^TCq.$$
+
+The matrix $C$ is symmetric positive semidefinite. Write its orthonormal eigendecomposition as $C=Q\Lambda Q^T$, with $\lambda_1\ge\cdots\ge\lambda_d\ge0$. For $q=Qc$ with $\|c\|_2=1$,
+
+$$q^TCq=\sum_{j=1}^d\lambda_jc_j^2\le\lambda_1.$$
+
+Equality is attained by a leading eigenvector. This is the first **principal component direction**: the direction along which the data vary most. Successive eigenvectors maximize the remaining variance subject to orthogonality to the earlier directions.
+
+Keeping the first $r$ eigenvectors gives the approximation
+
+$$\widehat z_i=Q_rQ_r^Tz_i.$$
+
+It preserves variance $\sum_{j=1}^r\lambda_j$, while the average squared reconstruction error is
+
+$$\frac1N\sum_{i=1}^N\|z_i-\widehat z_i\|_2^2
+=\sum_{j=r+1}^d\lambda_j.$$
+
+For example, if $C=\begin{pmatrix}5&4\\4&5\end{pmatrix}$, its eigenvalues are $9$ and $1$. Projecting onto the leading direction $(1,1)^T/\sqrt2$ retains $90\%$ of the total variance. This quantifies what is retained; large variance need not mean importance for every scientific question. The [SVD](singular_value_decomposition.md) provides another way to describe this approximation.
+
+## Quantum Mechanics: Measurement Outcomes
+
+In a finite-dimensional quantum model, a measurable quantity is represented by a Hermitian matrix. For energy, this matrix is the **Hamiltonian** $H$. Its eigenvalue equation is
+
+$$Hq_j=E_jq_j.$$
+
+The real numbers $E_j$ are the possible measured energies, and the eigenvectors are corresponding **energy eigenstates**.
+
+A normalized state $\psi$ can be expanded in an orthonormal eigenvector basis:
+
+$$\psi=\sum_j c_jq_j,\qquad \sum_j|c_j|^2=1.$$
+
+For a nonrepeated eigenvalue $E_j$, the probability of measuring $E_j$ is $|c_j|^2$. If an energy is repeated, add the squared coefficients in its eigenspace. Equivalently,
+
+$$\Pr(E)=\|P_E\psi\|_2^2,$$
+
+where $P_E$ is the orthogonal projection onto the eigenspace for energy $E$.
+
+For example, let $H=\operatorname{diag}(0,2)$ and $\psi=(\sqrt3/2,1/2)^T$. The measured energy is $0$ with probability $3/4$ and $2$ with probability $1/4$. Here eigenvalues describe possible outcomes, while projections onto eigenspaces determine their probabilities.
+
+## PageRank: A Stationary Distribution on a Network
+
+PageRank models a user moving among web pages. Let $L_{ij}$ be the probability of following a link from page $j$ to page $i$. Divide each page's outgoing links equally among its destinations. If a page has no outgoing links, assign a uniform distribution over all $n$ pages. Thus every entry is nonnegative and every column sums to one.
+
+To allow movement between otherwise disconnected parts of the network, suppose the user follows this link rule with probability $\alpha$, where $0<\alpha<1$, and otherwise jumps to a uniformly chosen page. The resulting transition matrix is
+
+$$G=\alpha L+\frac{1-\alpha}{n}\mathbf{1}\mathbf{1}^T,$$
+
+where $\mathbf{1}$ is the vector of all ones. For a column vector $p_k$ of page probabilities, $p_{k+1}=Gp_k$.
+
+The PageRank vector is the stationary probability distribution:
+
+$$Gp=p,\qquad p_i\ge0,\qquad \sum_i p_i=1.$$
+
+Thus it is an eigenvector for eigenvalue $1$. The positive jump probability makes this stationary distribution unique and ensures convergence to it from any initial probability distribution. Its entries give the long-run fractions of visits to the pages, which serve as ranking scores.
+
+Numerical methods for finding such eigenvectors will be discussed later in the course.

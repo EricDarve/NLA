@@ -64,7 +64,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Singular Value Decomposition" href="singular_value_decomposition.html" />
-    <link rel="prev" title="Normal matrices" href="normal_matrices.html" />
+    <link rel="prev" title="Normal Matrices" href="normal_matrices.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -191,7 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normal_matrices.html">Normal Matrices</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
@@ -425,15 +425,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-determinant-and-trace">Computing Determinant and Trace</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-applications-of-eigenvalues">Other Applications of Eigenvalues</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-of-dynamical-systems">Stability of Dynamical Systems</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-component-analysis-pca">Principal Component Analysis (PCA)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vibrational-analysis-and-resonance">Vibrational Analysis and Resonance</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-mechanics">Quantum Mechanics</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#google-s-pagerank-algorithm">Google’s PageRank Algorithm</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connections-to-the-previous-sections">Connections to the Previous Sections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vibrations-mode-shapes-and-natural-frequencies">Vibrations: Mode Shapes and Natural Frequencies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-component-analysis-directions-of-greatest-variation">Principal Component Analysis: Directions of Greatest Variation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-mechanics-measurement-outcomes">Quantum Mechanics: Measurement Outcomes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pagerank-a-stationary-distribution-on-a-network">PageRank: A Stationary Distribution on a Network</a></li>
 </ul>
             </nav>
         </div>
@@ -447,49 +443,85 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="applications-of-eigenvalues">
 <h1>Applications of Eigenvalues<a class="headerlink" href="#applications-of-eigenvalues" title="Link to this heading">#</a></h1>
-<p>The determinant of a matrix is the product of its eigenvalues, and the trace is the sum of its eigenvalues. This relationship provides a powerful theoretical and computational shortcut, connecting a matrix’s overall properties to its fundamental modes of action.</p>
-<section id="computing-determinant-and-trace">
-<h2>Computing Determinant and Trace<a class="headerlink" href="#computing-determinant-and-trace" title="Link to this heading">#</a></h2>
-<p>For any <span class="math notranslate nohighlight">\(n \times n\)</span> square matrix <span class="math notranslate nohighlight">\(A\)</span> with eigenvalues <span class="math notranslate nohighlight">\(\lambda_1, \lambda_2, \dots, \lambda_n\)</span> (counted with multiplicity), the following relationships hold:</p>
-<ul>
-<li><p><strong>Determinant</strong>: The determinant is the product of the eigenvalues.</p>
+<p>Eigenvectors identify directions or patterns that a matrix acts on by scaling. The interpretation of the eigenvalues depends on the model: they can describe growth rates, squared vibration frequencies, variances, or measurable energies. The examples below show how these quantities arise.</p>
+<section id="connections-to-the-previous-sections">
+<h2>Connections to the Previous Sections<a class="headerlink" href="#connections-to-the-previous-sections" title="Link to this heading">#</a></h2>
+<p>We have already seen how eigenvalues describe <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">time evolution</span></a>: a mode evolves through <span class="math notranslate nohighlight">\(\lambda^k\)</span> in discrete time and <span class="math notranslate nohighlight">\(e^{\lambda t}\)</span> in continuous time. The heat-exchange example illustrates how this separates a preserved quantity from a decaying difference.</p>
+<p>We also established, with eigenvalues counted with algebraic multiplicity,</p>
 <div class="math notranslate nohighlight">
-\[
-    \det(A) = \prod_{i=1}^n \lambda_i = \lambda_1 \cdot \lambda_2 \cdots \lambda_n
-    \]</div>
-</li>
-<li><p><strong>Trace</strong>: The trace is the sum of the eigenvalues.</p>
+\[\det(A)=\prod_{j=1}^n\lambda_j,\qquad
+\operatorname{tr}(A)=\sum_{j=1}^n\lambda_j.\]</div>
+<p>These identities hold even for defective matrices; their proof uses <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">Schur form</span></a>. They connect eigenvalues to familiar matrix properties, without requiring us to compute eigenvalues just to find a determinant or trace.</p>
+</section>
+<section id="vibrations-mode-shapes-and-natural-frequencies">
+<h2>Vibrations: Mode Shapes and Natural Frequencies<a class="headerlink" href="#vibrations-mode-shapes-and-natural-frequencies" title="Link to this heading">#</a></h2>
+<p>Consider small displacements <span class="math notranslate nohighlight">\(u(t)\)</span> of a system of unit masses connected by springs. An undamped linear model has the form</p>
 <div class="math notranslate nohighlight">
-\[
-    \text{tr}(A) = \sum_{i=1}^n \lambda_i = \lambda_1 + \lambda_2 + \cdots + \lambda_n
-    \]</div>
-</li>
-</ul>
-<p>These formulas follow from the <strong>Schur decomposition</strong> (<span class="math notranslate nohighlight">\(A = QTQ^H\)</span>), where <span class="math notranslate nohighlight">\(T\)</span> is an upper triangular matrix with the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> on its diagonal. The determinant of <span class="math notranslate nohighlight">\(A\)</span> is equal to the determinant of <span class="math notranslate nohighlight">\(T\)</span>, which is simply the product of its diagonal entries. Similarly, the trace of <span class="math notranslate nohighlight">\(A\)</span> is equal to the trace of <span class="math notranslate nohighlight">\(T\)</span>, which is the sum of its diagonal entries.</p>
+\[u''(t)+Ku(t)=0,\]</div>
+<p>where <span class="math notranslate nohighlight">\(K\)</span> is the <strong>stiffness matrix</strong>, describing the restoring forces. Assume <span class="math notranslate nohighlight">\(K\)</span> is real symmetric positive definite. Look for a motion with a fixed spatial pattern <span class="math notranslate nohighlight">\(q\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[u(t)=q\cos(\omega t).\]</div>
+<p>Substitution gives</p>
+<div class="math notranslate nohighlight">
+\[Kq=\omega^2q.\]</div>
+<p>Thus the eigenvector <span class="math notranslate nohighlight">\(q\)</span> describes a <strong>mode shape</strong>, and its eigenvalue is the <strong>square of the natural angular frequency</strong>. If <span class="math notranslate nohighlight">\(\lambda&gt;0\)</span>, then <span class="math notranslate nohighlight">\(\omega=\sqrt{\lambda}\)</span>, measured in radians per unit time.</p>
+<p>For two unit masses connected to each other and to fixed walls by three springs of unit stiffness,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}K=\begin{pmatrix}2&amp;-1\\-1&amp;2\end{pmatrix}.\end{split}\]</div>
+<p>The mode <span class="math notranslate nohighlight">\((1,1)^T\)</span> has eigenvalue <span class="math notranslate nohighlight">\(1\)</span>: the masses move together with angular frequency <span class="math notranslate nohighlight">\(1\)</span>. The mode <span class="math notranslate nohighlight">\((1,-1)^T\)</span> has eigenvalue <span class="math notranslate nohighlight">\(3\)</span>: they move in opposite directions with angular frequency <span class="math notranslate nohighlight">\(\sqrt3\)</span>.</p>
+<p>For a general mass matrix <span class="math notranslate nohighlight">\(M\)</span>, the equation is <span class="math notranslate nohighlight">\(Mu''+Ku=0\)</span>, and the mode equation becomes</p>
+<div class="math notranslate nohighlight">
+\[Kq=\omega^2Mq.\]</div>
+<p>This is a <strong>generalized eigenvalue problem</strong>. External forcing near a natural frequency can produce large oscillations if it excites the corresponding mode. This is resonance; its response also depends on damping and the applied force.</p>
 </section>
-<section id="other-applications-of-eigenvalues">
-<h2>Other Applications of Eigenvalues<a class="headerlink" href="#other-applications-of-eigenvalues" title="Link to this heading">#</a></h2>
-<p>Eigenvalues and their corresponding eigenvectors are among the most important concepts in applied mathematics, revealing the deep structure of linear transformations. 🗺️</p>
-<section id="stability-of-dynamical-systems">
-<h3>Stability of Dynamical Systems<a class="headerlink" href="#stability-of-dynamical-systems" title="Link to this heading">#</a></h3>
-<p>For systems that evolve over time, such as <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>, the magnitudes of the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> determine the system’s long-term behavior. If all eigenvalues have a magnitude less than 1, the system is stable and converges to zero. If any eigenvalue has a magnitude greater than 1, the system is unstable and diverges.</p>
+<section id="principal-component-analysis-directions-of-greatest-variation">
+<h2>Principal Component Analysis: Directions of Greatest Variation<a class="headerlink" href="#principal-component-analysis-directions-of-greatest-variation" title="Link to this heading">#</a></h2>
+<p>Suppose <span class="math notranslate nohighlight">\(z_1,\ldots,z_N\in\mathbb{R}^d\)</span> are data vectors after subtracting their mean. Define the covariance matrix using the averaging convention</p>
+<div class="math notranslate nohighlight">
+\[C=\frac1N\sum_{i=1}^N z_i z_i^T.\]</div>
+<p>For a unit vector <span class="math notranslate nohighlight">\(q\)</span>, the scalar <span class="math notranslate nohighlight">\(q^Tz_i\)</span> is the coordinate of observation <span class="math notranslate nohighlight">\(i\)</span> along <span class="math notranslate nohighlight">\(q\)</span>. Its variance is</p>
+<div class="math notranslate nohighlight">
+\[\frac1N\sum_{i=1}^N(q^Tz_i)^2=q^TCq.\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(C\)</span> is symmetric positive semidefinite. Write its orthonormal eigendecomposition as <span class="math notranslate nohighlight">\(C=Q\Lambda Q^T\)</span>, with <span class="math notranslate nohighlight">\(\lambda_1\ge\cdots\ge\lambda_d\ge0\)</span>. For <span class="math notranslate nohighlight">\(q=Qc\)</span> with <span class="math notranslate nohighlight">\(\|c\|_2=1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[q^TCq=\sum_{j=1}^d\lambda_jc_j^2\le\lambda_1.\]</div>
+<p>Equality is attained by a leading eigenvector. This is the first <strong>principal component direction</strong>: the direction along which the data vary most. Successive eigenvectors maximize the remaining variance subject to orthogonality to the earlier directions.</p>
+<p>Keeping the first <span class="math notranslate nohighlight">\(r\)</span> eigenvectors gives the approximation</p>
+<div class="math notranslate nohighlight">
+\[\widehat z_i=Q_rQ_r^Tz_i.\]</div>
+<p>It preserves variance <span class="math notranslate nohighlight">\(\sum_{j=1}^r\lambda_j\)</span>, while the average squared reconstruction error is</p>
+<div class="math notranslate nohighlight">
+\[\frac1N\sum_{i=1}^N\|z_i-\widehat z_i\|_2^2
+=\sum_{j=r+1}^d\lambda_j.\]</div>
+<p>For example, if <span class="math notranslate nohighlight">\(C=\begin{pmatrix}5&amp;4\\4&amp;5\end{pmatrix}\)</span>, its eigenvalues are <span class="math notranslate nohighlight">\(9\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Projecting onto the leading direction <span class="math notranslate nohighlight">\((1,1)^T/\sqrt2\)</span> retains <span class="math notranslate nohighlight">\(90\%\)</span> of the total variance. This quantifies what is retained; large variance need not mean importance for every scientific question. The <a class="reference internal" href="singular_value_decomposition.html"><span class="std std-doc">SVD</span></a> provides another way to describe this approximation.</p>
 </section>
-<section id="principal-component-analysis-pca">
-<h3>Principal Component Analysis (PCA)<a class="headerlink" href="#principal-component-analysis-pca" title="Link to this heading">#</a></h3>
-<p>In data science and statistics, PCA is a technique used to reduce the dimensionality of data. It works by finding the eigenvalues and eigenvectors of the data’s covariance matrix. The eigenvectors (principal components) define the directions of greatest variance in the data, and the corresponding eigenvalues measure how much variance lies along each of those directions. By keeping only the components with the largest eigenvalues, one can simplify the data with minimal loss of information.</p>
+<section id="quantum-mechanics-measurement-outcomes">
+<h2>Quantum Mechanics: Measurement Outcomes<a class="headerlink" href="#quantum-mechanics-measurement-outcomes" title="Link to this heading">#</a></h2>
+<p>In a finite-dimensional quantum model, a measurable quantity is represented by a Hermitian matrix. For energy, this matrix is the <strong>Hamiltonian</strong> <span class="math notranslate nohighlight">\(H\)</span>. Its eigenvalue equation is</p>
+<div class="math notranslate nohighlight">
+\[Hq_j=E_jq_j.\]</div>
+<p>The real numbers <span class="math notranslate nohighlight">\(E_j\)</span> are the possible measured energies, and the eigenvectors are corresponding <strong>energy eigenstates</strong>.</p>
+<p>A normalized state <span class="math notranslate nohighlight">\(\psi\)</span> can be expanded in an orthonormal eigenvector basis:</p>
+<div class="math notranslate nohighlight">
+\[\psi=\sum_j c_jq_j,\qquad \sum_j|c_j|^2=1.\]</div>
+<p>For a nonrepeated eigenvalue <span class="math notranslate nohighlight">\(E_j\)</span>, the probability of measuring <span class="math notranslate nohighlight">\(E_j\)</span> is <span class="math notranslate nohighlight">\(|c_j|^2\)</span>. If an energy is repeated, add the squared coefficients in its eigenspace. Equivalently,</p>
+<div class="math notranslate nohighlight">
+\[\Pr(E)=\|P_E\psi\|_2^2,\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_E\)</span> is the orthogonal projection onto the eigenspace for energy <span class="math notranslate nohighlight">\(E\)</span>.</p>
+<p>For example, let <span class="math notranslate nohighlight">\(H=\operatorname{diag}(0,2)\)</span> and <span class="math notranslate nohighlight">\(\psi=(\sqrt3/2,1/2)^T\)</span>. The measured energy is <span class="math notranslate nohighlight">\(0\)</span> with probability <span class="math notranslate nohighlight">\(3/4\)</span> and <span class="math notranslate nohighlight">\(2\)</span> with probability <span class="math notranslate nohighlight">\(1/4\)</span>. Here eigenvalues describe possible outcomes, while projections onto eigenspaces determine their probabilities.</p>
 </section>
-<section id="vibrational-analysis-and-resonance">
-<h3>Vibrational Analysis and Resonance<a class="headerlink" href="#vibrational-analysis-and-resonance" title="Link to this heading">#</a></h3>
-<p>In physics and engineering, eigenvalues determine the natural vibrational frequencies of a mechanical structure, like a bridge or an airplane wing. When an external force is applied at a frequency matching one of these eigenvalues, <strong>resonance</strong> occurs, leading to potentially catastrophic vibrations. This is why engineers design structures to avoid these natural frequencies.</p>
-</section>
-<section id="quantum-mechanics">
-<h3>Quantum Mechanics<a class="headerlink" href="#quantum-mechanics" title="Link to this heading">#</a></h3>
-<p>In quantum mechanics, physical properties like energy, momentum, and spin are represented by mathematical operators (matrices). The <strong>eigenvalues</strong> of these operators correspond to the possible, measurable values of that property. For example, the eigenvalues of the Hamiltonian operator give the discrete energy levels of an atom.</p>
-</section>
-<section id="google-s-pagerank-algorithm">
-<h3>Google’s PageRank Algorithm<a class="headerlink" href="#google-s-pagerank-algorithm" title="Link to this heading">#</a></h3>
-<p>The original algorithm that powered Google’s search engine uses the concept of eigenvectors. The entire World Wide Web is modeled as a massive matrix, where an entry <span class="math notranslate nohighlight">\(A_{ij}\)</span> is non-zero if page <span class="math notranslate nohighlight">\(j\)</span> links to page <span class="math notranslate nohighlight">\(i\)</span>. The eigenvector corresponding to the largest eigenvalue of this matrix is the <strong>PageRank vector</strong>. The entries of this vector assign an importance score to every page on the web, which is then used to rank search results.</p>
-</section>
+<section id="pagerank-a-stationary-distribution-on-a-network">
+<h2>PageRank: A Stationary Distribution on a Network<a class="headerlink" href="#pagerank-a-stationary-distribution-on-a-network" title="Link to this heading">#</a></h2>
+<p>PageRank models a user moving among web pages. Let <span class="math notranslate nohighlight">\(L_{ij}\)</span> be the probability of following a link from page <span class="math notranslate nohighlight">\(j\)</span> to page <span class="math notranslate nohighlight">\(i\)</span>. Divide each page’s outgoing links equally among its destinations. If a page has no outgoing links, assign a uniform distribution over all <span class="math notranslate nohighlight">\(n\)</span> pages. Thus every entry is nonnegative and every column sums to one.</p>
+<p>To allow movement between otherwise disconnected parts of the network, suppose the user follows this link rule with probability <span class="math notranslate nohighlight">\(\alpha\)</span>, where <span class="math notranslate nohighlight">\(0&lt;\alpha&lt;1\)</span>, and otherwise jumps to a uniformly chosen page. The resulting transition matrix is</p>
+<div class="math notranslate nohighlight">
+\[G=\alpha L+\frac{1-\alpha}{n}\mathbf{1}\mathbf{1}^T,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{1}\)</span> is the vector of all ones. For a column vector <span class="math notranslate nohighlight">\(p_k\)</span> of page probabilities, <span class="math notranslate nohighlight">\(p_{k+1}=Gp_k\)</span>.</p>
+<p>The PageRank vector is the stationary probability distribution:</p>
+<div class="math notranslate nohighlight">
+\[Gp=p,\qquad p_i\ge0,\qquad \sum_i p_i=1.\]</div>
+<p>Thus it is an eigenvector for eigenvalue <span class="math notranslate nohighlight">\(1\)</span>. The positive jump probability makes this stationary distribution unique and ensures convergence to it from any initial probability distribution. Its entries give the long-run fractions of visits to the pages, which serve as ranking scores.</p>
+<p>Numerical methods for finding such eigenvectors will be discussed later in the course.</p>
 </section>
 </section>
 
@@ -529,7 +561,7 @@ document.write(`
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Normal matrices</p>
+        <p class="prev-next-title">Normal Matrices</p>
       </div>
     </a>
     <a class="right-next"
@@ -557,15 +589,11 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-determinant-and-trace">Computing Determinant and Trace</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-applications-of-eigenvalues">Other Applications of Eigenvalues</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-of-dynamical-systems">Stability of Dynamical Systems</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-component-analysis-pca">Principal Component Analysis (PCA)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vibrational-analysis-and-resonance">Vibrational Analysis and Resonance</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-mechanics">Quantum Mechanics</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#google-s-pagerank-algorithm">Google’s PageRank Algorithm</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connections-to-the-previous-sections">Connections to the Previous Sections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vibrations-mode-shapes-and-natural-frequencies">Vibrations: Mode Shapes and Natural Frequencies</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#principal-component-analysis-directions-of-greatest-variation">Principal Component Analysis: Directions of Greatest Variation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quantum-mechanics-measurement-outcomes">Quantum Mechanics: Measurement Outcomes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pagerank-a-stationary-distribution-on-a-network">PageRank: A Stationary Distribution on a Network</a></li>
 </ul>
   </nav></div>
 

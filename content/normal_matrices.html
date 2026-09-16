@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Normal matrices &#8212; CME 302 Numerical Linear Algebra</title>
+    <title>Normal Matrices &#8212; CME 302 Numerical Linear Algebra</title>
   
   
   
@@ -191,7 +191,7 @@
 <li class="toctree-l2"><a class="reference internal" href="block_matrices.html">Block Matrix Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigendecomposition.html">Eigendecomposition</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Normal matrices</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Normal Matrices</a></li>
 <li class="toctree-l2"><a class="reference internal" href="applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="singular_value_decomposition.html">Singular Value Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
@@ -415,7 +415,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Normal matrices</h1>
+    <h1>Normal Matrices</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -425,18 +425,19 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-normal-matrix">What is a Normal Matrix?</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-normal-matrices">Examples of Normal Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-examples">Definition and Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-normal-matrices">The Spectral Theorem for Normal Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-of-eigenspaces">Orthogonality of Eigenspaces</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-normal-matrices">The Spectral Theorem for Normal Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-real-symmetric-matrices">The Spectral Theorem for Real Symmetric Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-of-symmetric-matrices">Key Properties of Symmetric Matrices</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalues-of-a-symmetric-matrix-are-always-real">1. Eigenvalues of a Symmetric Matrix are Always Real</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvectors-for-distinct-eigenvalues-are-orthogonal">2. Eigenvectors for Distinct Eigenvalues are Orthogonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hermitian-skew-hermitian-and-unitary-matrices">Hermitian, Skew-Hermitian, and Unitary Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-real-symmetric-matrices">The Spectral Theorem for Real Symmetric Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geometry-and-a-worked-example">Geometry and a Worked Example</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectral-decomposition-into-orthogonal-projections">Spectral Decomposition into Orthogonal Projections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#norms-and-time-evolution">Norms and Time Evolution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-definite-matrices">Positive Definite Matrices</a></li>
 </ul>
             </nav>
         </div>
@@ -449,132 +450,249 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="normal-matrices">
-<h1>Normal matrices<a class="headerlink" href="#normal-matrices" title="Link to this heading">#</a></h1>
-<p>A normal matrix is unitarily diagonalizable because the algebraic condition of being normal is precisely what guarantees that the matrix has a complete set of orthogonal eigenvectors. This fundamental result is known as the <strong>Spectral Theorem</strong>.</p>
-<section id="what-is-a-normal-matrix">
-<h2>What is a Normal Matrix?<a class="headerlink" href="#what-is-a-normal-matrix" title="Link to this heading">#</a></h2>
-<p>A square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>normal</strong> if it commutes with its conjugate transpose, <span class="math notranslate nohighlight">\(A^H\)</span>. The conjugate transpose is the result of taking the transpose of the matrix and then taking the complex conjugate of each entry.</p>
-<p>The defining property of a normal matrix is:</p>
+<h1>Normal Matrices<a class="headerlink" href="#normal-matrices" title="Link to this heading">#</a></h1>
+<p>An eigendecomposition <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> uses a basis of eigenvectors, but that basis need not be orthogonal. <strong>Normal matrices</strong> are exactly the matrices for which an orthonormal eigenvector basis exists. This makes both their geometry and their time evolution easier to describe.</p>
+<section id="definition-and-examples">
+<h2>Definition and Examples<a class="headerlink" href="#definition-and-examples" title="Link to this heading">#</a></h2>
+<p>A matrix <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span> is <strong>normal</strong> if it commutes with its conjugate transpose:</p>
 <div class="math notranslate nohighlight">
-\[A A^H = A^H A\]</div>
-<p>While this definition seems purely algebraic, it has a profound geometric meaning: the linear transformation represented by <span class="math notranslate nohighlight">\(A\)</span> does not “shear” space in a way that misaligns its eigenvectors.</p>
-<section id="examples-of-normal-matrices">
-<h3>Examples of Normal Matrices<a class="headerlink" href="#examples-of-normal-matrices" title="Link to this heading">#</a></h3>
-<p>Several important families of matrices are normal, which is why this property is so useful.</p>
+\[A^HA=AA^H.\]</div>
+<p>For a real matrix, the condition is <span class="math notranslate nohighlight">\(A^TA=AA^T\)</span>.</p>
+<p>Several familiar classes satisfy this condition:</p>
 <ul class="simple">
-<li><p><strong>Hermitian matrices</strong>: These are the complex equivalent of real symmetric matrices and satisfy <span class="math notranslate nohighlight">\(A^H = A\)</span>. They are clearly normal since <span class="math notranslate nohighlight">\(A \cdot A = A \cdot A\)</span>. Their eigenvalues are always real.</p></li>
-<li><p><strong>Unitary matrices</strong>: These matrices represent rotations and reflections in complex space and satisfy <span class="math notranslate nohighlight">\(Q^H Q = I\)</span>. Since <span class="math notranslate nohighlight">\(Q^{-1} = Q^H\)</span>, they also satisfy <span class="math notranslate nohighlight">\(Q Q^H = I\)</span>, so <span class="math notranslate nohighlight">\(Q Q^H = Q^H Q\)</span>.</p></li>
-<li><p><strong>Skew-Hermitian matrices</strong>: These satisfy <span class="math notranslate nohighlight">\(A^H = -A\)</span>. They are normal because <span class="math notranslate nohighlight">\(A(-A) = (-A)A = -A^2\)</span>. Their eigenvalues are purely imaginary.</p></li>
-<li><p><strong>Diagonal matrices</strong>: Any diagonal matrix is normal because diagonal matrices always commute with each other, and the conjugate transpose of a diagonal matrix is also diagonal.</p></li>
+<li><p><strong>Hermitian matrices</strong>, <span class="math notranslate nohighlight">\(A^H=A\)</span>, are normal because both products equal <span class="math notranslate nohighlight">\(A^2\)</span>. Real Hermitian matrices are precisely real symmetric matrices.</p></li>
+<li><p><strong>Skew-Hermitian matrices</strong>, <span class="math notranslate nohighlight">\(A^H=-A\)</span>, are normal because both products equal <span class="math notranslate nohighlight">\(-A^2\)</span>. Their real counterparts are skew-symmetric matrices.</p></li>
+<li><p><strong>Unitary matrices</strong>, <span class="math notranslate nohighlight">\(A^HA=AA^H=I\)</span>, are normal. Their real counterparts are orthogonal matrices.</p></li>
+<li><p><strong>Diagonal matrices</strong> are normal, even with complex diagonal entries, because <span class="math notranslate nohighlight">\(A^HA=AA^H=\operatorname{diag}(|a_{11}|^2,\ldots,|a_{nn}|^2)\)</span>.</p></li>
 </ul>
-</section>
+<p>Normality does not require symmetry or preservation of lengths. For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}A=\begin{pmatrix}1&amp;-2\\2&amp;1\end{pmatrix}\end{split}\]</div>
+<p>satisfies <span class="math notranslate nohighlight">\(A^TA=AA^T=5I\)</span>. It is normal, but neither symmetric nor orthogonal. Its eigenvalues are <span class="math notranslate nohighlight">\(1\pm2i\)</span>.</p>
+<p>Conversely, a diagonalizable matrix need not be normal. The example from the <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">previous section</span></a>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}B=\begin{pmatrix}2&amp;1\\0&amp;1\end{pmatrix},\end{split}\]</div>
+<p>has two distinct eigenvalues, but</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+B^TB=\begin{pmatrix}4&amp;2\\2&amp;2\end{pmatrix},\qquad
+BB^T=\begin{pmatrix}5&amp;1\\1&amp;1\end{pmatrix}.
+\end{split}\]</div>
+<p>Its eigenvectors form a basis, but no orthonormal eigenvector basis exists.</p>
 </section>
 <section id="the-spectral-theorem-for-normal-matrices">
 <h2>The Spectral Theorem for Normal Matrices<a class="headerlink" href="#the-spectral-theorem-for-normal-matrices" title="Link to this heading">#</a></h2>
-<p>The <strong>Spectral Theorem</strong> provides the crucial link between the algebraic property of normality and the geometric property of its eigenvectors.</p>
 <div class="proof theorem admonition" id="thm:spectral_theorem">
 <p class="admonition-title"><span class="caption-number">Theorem 4 </span> (Spectral Theorem)</p>
 <section class="theorem-content" id="proof-content">
-<p>A complex square matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>unitarily diagonalizable</strong> if and only if it is <strong>normal</strong>.</p>
+<p>A complex square matrix <span class="math notranslate nohighlight">\(A\)</span> is normal if and only if it is unitarily diagonalizable:</p>
+<div class="math notranslate nohighlight">
+\[A=Q\Lambda Q^H,\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is unitary and <span class="math notranslate nohighlight">\(\Lambda\)</span> is diagonal. The columns of <span class="math notranslate nohighlight">\(Q\)</span> form an orthonormal basis of eigenvectors, and the diagonal entries of <span class="math notranslate nohighlight">\(\Lambda\)</span> are their corresponding eigenvalues.</p>
 </section>
-</div><p>To be <strong>unitarily diagonalizable</strong> means that <span class="math notranslate nohighlight">\(A\)</span> can be decomposed into the form:</p>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Spectral Theorem.
+First suppose <span class="math notranslate nohighlight">\(A=Q\Lambda Q^H\)</span>. Then <span class="math notranslate nohighlight">\(A^H=Q\Lambda^HQ^H\)</span>, so</p>
 <div class="math notranslate nohighlight">
-\[A = Q \Lambda Q^H\]</div>
-<p>This decomposition has a beautiful interpretation:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\Lambda\)</span> is a <strong>diagonal matrix</strong> whose entries are the <strong>eigenvalues</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>unitary matrix</strong> whose columns are the corresponding <strong>eigenvectors</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p>The fact that <span class="math notranslate nohighlight">\(Q\)</span> is unitary means its columns form an <strong>orthonormal basis</strong> for the vector space <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>.</p></li>
-</ul>
-<p>In short, the Spectral Theorem guarantees that for any normal matrix, we can find a set of perpendicular axes (the eigenvectors) along which the transformation acts simply as a stretch or compression (the eigenvalues).</p>
-<div class="proof admonition" id="proof">
-<p>Proof. Spectral Theorem</p>
-<p>The proof of the Spectral Theorem has two parts.</p>
-<p><em>Unitarily Diagonalizable <span class="math notranslate nohighlight">\(\implies\)</span> Normal.</em> This is the straightforward direction. Assume <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span>. We check if it commutes with its conjugate transpose:</p>
+\[\begin{split}
+\begin{aligned}
+A^HA&amp;=Q\Lambda^H\Lambda Q^H,\\
+AA^H&amp;=Q\Lambda\Lambda^HQ^H.
+\end{aligned}
+\end{split}\]</div>
+<p>The diagonal matrices <span class="math notranslate nohighlight">\(\Lambda\)</span> and <span class="math notranslate nohighlight">\(\Lambda^H\)</span> commute. Hence <span class="math notranslate nohighlight">\(A\)</span> is normal.</p>
+<p>Conversely, suppose <span class="math notranslate nohighlight">\(A\)</span> is normal. Its complex Schur decomposition is <span class="math notranslate nohighlight">\(A=QTQ^H\)</span>, with <span class="math notranslate nohighlight">\(T\)</span> upper triangular. Normality is preserved by this unitary change of basis:</p>
 <div class="math notranslate nohighlight">
-\[A^H = (Q \Lambda Q^H)^H = Q \Lambda^H Q^H\]</div>
-<p>Now we compute the two products:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(A A^H = (Q \Lambda Q^H)(Q \Lambda^H Q^H) = Q \Lambda (Q^H Q) \Lambda^H Q^H = Q (\Lambda \Lambda^H) Q^H\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(A^H A = (Q \Lambda^H Q^H)(Q \Lambda Q^H) = Q \Lambda^H (Q^H Q) \Lambda Q^H = Q (\Lambda^H \Lambda) Q^H\)</span></p></li>
-</ul>
-<p>Since diagonal matrices always commute (<span class="math notranslate nohighlight">\(\Lambda \Lambda^H = \Lambda^H \Lambda\)</span>), the two results are identical. Thus, <span class="math notranslate nohighlight">\(A\)</span> is normal.</p>
-<p><strong>Normal <span class="math notranslate nohighlight">\(\implies\)</span> Unitarily Diagonalizable.</strong> This direction is more involved but reveals the core of the theorem.</p>
-<ol class="arabic simple">
-<li><p>Start with the <strong>Schur Decomposition</strong>, which states that <em>any</em> square matrix <span class="math notranslate nohighlight">\(A\)</span> can be written as <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular.</p></li>
-<li><p>Now, we use the fact that <span class="math notranslate nohighlight">\(A\)</span> is normal. As shown in the first part, if <span class="math notranslate nohighlight">\(A\)</span> is normal, then <span class="math notranslate nohighlight">\(T\)</span> must also be normal, meaning <span class="math notranslate nohighlight">\(T T^H = T^H T\)</span>.</p></li>
-<li><p>The final step is to prove that an <strong>upper triangular matrix that is also normal must be a diagonal matrix</strong>. We can show this by comparing the diagonal entries of the product <span class="math notranslate nohighlight">\(T T^H\)</span> and <span class="math notranslate nohighlight">\(T^H T\)</span>. For the first entry on the diagonal, <span class="math notranslate nohighlight">\((1,1)\)</span>:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\((T^H T)_{11} = |T_{11}|^2\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\((T T^H)_{11} = |T_{11}|^2 + |T_{12}|^2 + \dots + |T_{1n}|^2\)</span></p></li>
-</ul>
-</li>
-<li><p>For these to be equal, the sum of the squares of the off-diagonal elements in the first row (<span class="math notranslate nohighlight">\(|T_{12}|^2 + \dots\)</span>) must be zero. This forces all those elements to be zero.</p></li>
-<li><p>By continuing this process down the diagonal, we can prove that all off-diagonal elements of <span class="math notranslate nohighlight">\(T\)</span> must be zero.</p></li>
-<li><p>Therefore, <span class="math notranslate nohighlight">\(T\)</span> is a diagonal matrix (we’ll call it <span class="math notranslate nohighlight">\(\Lambda\)</span>), and the Schur decomposition becomes <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span>. This shows that <span class="math notranslate nohighlight">\(A\)</span> is unitarily diagonalizable.</p></li>
-</ol>
+\[T^HT-TT^H=Q^H(A^HA-AA^H)Q=0.\]</div>
+<p>We show that an upper triangular normal matrix must be diagonal. Comparing the <span class="math notranslate nohighlight">\((1,1)\)</span> entries gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+(T^HT)_{11}&amp;=|t_{11}|^2,\\
+(TT^H)_{11}&amp;=|t_{11}|^2+\sum_{j=2}^n|t_{1j}|^2.
+\end{aligned}
+\end{split}\]</div>
+<p>Equality forces <span class="math notranslate nohighlight">\(t_{12}=\cdots=t_{1n}=0\)</span>. Therefore <span class="math notranslate nohighlight">\(T\)</span> is block diagonal:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}T=\begin{pmatrix}t_{11}&amp;0\\0&amp;T_2\end{pmatrix}.\end{split}\]</div>
+<p>The equation <span class="math notranslate nohighlight">\(T^HT=TT^H\)</span> now implies <span class="math notranslate nohighlight">\(T_2^HT_2=T_2T_2^H\)</span>. Thus <span class="math notranslate nohighlight">\(T_2\)</span> is also upper triangular and normal. Repeating the argument, or using induction with the scalar case as the base, proves that <span class="math notranslate nohighlight">\(T\)</span> is diagonal. Set <span class="math notranslate nohighlight">\(\Lambda=T\)</span>.</p>
 </div>
+<p>This is the precise link between Schur form and eigendecomposition: <strong>normality forces the triangular Schur factor to be diagonal</strong>.</p>
+<section id="orthogonality-of-eigenspaces">
+<h3>Orthogonality of Eigenspaces<a class="headerlink" href="#orthogonality-of-eigenspaces" title="Link to this heading">#</a></h3>
+<p>For a normal matrix, eigenvectors belonging to distinct eigenvalues are orthogonal. This is stronger than the linear independence guaranteed for a general matrix.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Orthogonal Eigenvectors.
+The spectral theorem gives <span class="math notranslate nohighlight">\(A=Q\Lambda Q^H\)</span> and <span class="math notranslate nohighlight">\(A^H=Q\Lambda^HQ^H\)</span>. If <span class="math notranslate nohighlight">\(Ax=\lambda x\)</span>, the coordinates <span class="math notranslate nohighlight">\(Q^Hx\)</span> can be nonzero only at indices whose diagonal entry in <span class="math notranslate nohighlight">\(\Lambda\)</span> equals <span class="math notranslate nohighlight">\(\lambda\)</span>. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[A^Hx=\overline{\lambda}x.\]</div>
+<p>Now let <span class="math notranslate nohighlight">\(Ay=\mu y\)</span>, with <span class="math notranslate nohighlight">\(\lambda\ne\mu\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\lambda x^Hy
+&amp;=(A^Hx)^Hy\\
+&amp;=x^HAy\\
+&amp;=\mu x^Hy.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\((\lambda-\mu)x^Hy=0\)</span>, so <span class="math notranslate nohighlight">\(x^Hy=0\)</span>.</p>
+</div>
+<p>Vectors in the same eigenspace need not be orthogonal. We can choose an orthonormal basis within each eigenspace, including when an eigenvalue is repeated. Normal matrices are always diagonalizable and therefore never defective.</p>
+</section>
+</section>
+<section id="hermitian-skew-hermitian-and-unitary-matrices">
+<h2>Hermitian, Skew-Hermitian, and Unitary Matrices<a class="headerlink" href="#hermitian-skew-hermitian-and-unitary-matrices" title="Link to this heading">#</a></h2>
+<p>Normality allows arbitrary complex eigenvalues. The additional structure of these special classes restricts where their eigenvalues lie:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Class</p></th>
+<th class="head"><p>Defining condition</p></th>
+<th class="head"><p>Eigenvalues</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Hermitian</p></td>
+<td><p><span class="math notranslate nohighlight">\(A^H=A\)</span></p></td>
+<td><p>Real</p></td>
+</tr>
+<tr class="row-odd"><td><p>Skew-Hermitian</p></td>
+<td><p><span class="math notranslate nohighlight">\(A^H=-A\)</span></p></td>
+<td><p>Purely imaginary, including zero</p></td>
+</tr>
+<tr class="row-even"><td><p>Unitary</p></td>
+<td><p><span class="math notranslate nohighlight">\(A^HA=I\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\lvert\lambda\rvert=1\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For a <strong>normal</strong> matrix, each eigenvalue condition also implies the corresponding matrix condition. Indeed, using <span class="math notranslate nohighlight">\(A=Q\Lambda Q^H\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A^H=A&amp;\quad\Longleftrightarrow\quad\Lambda^H=\Lambda,\\
+A^H=-A&amp;\quad\Longleftrightarrow\quad\Lambda^H=-\Lambda,\\
+A^HA=I&amp;\quad\Longleftrightarrow\quad\Lambda^H\Lambda=I.
+\end{aligned}
+\end{split}\]</div>
+<p>The normality assumption matters in these converses: the nonnormal matrix <span class="math notranslate nohighlight">\(B\)</span> above has real eigenvalues but is not Hermitian.</p>
+<p>The reality of Hermitian eigenvalues also has a short direct proof.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Real Eigenvalues.
+Let <span class="math notranslate nohighlight">\(A^H=A\)</span> and <span class="math notranslate nohighlight">\(Ax=\lambda x\)</span>, with <span class="math notranslate nohighlight">\(x\ne0\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[\lambda=\frac{x^HAx}{x^Hx}.\]</div>
+<p>The denominator is positive and real. The numerator is real because</p>
+<div class="math notranslate nohighlight">
+\[\overline{x^HAx}=x^HA^Hx=x^HAx.\]</div>
+<p>Therefore <span class="math notranslate nohighlight">\(\lambda\in\mathbb{R}\)</span>.</p>
+</div>
+<p>For complex matrices, <strong>symmetric</strong> means <span class="math notranslate nohighlight">\(A^T=A\)</span>, whereas <strong>Hermitian</strong> means <span class="math notranslate nohighlight">\(A^H=A\)</span>. These are different conditions. For example, <span class="math notranslate nohighlight">\(\operatorname{diag}(i,1)\)</span> is complex symmetric, but one of its eigenvalues is <span class="math notranslate nohighlight">\(i\)</span>. The real-eigenvalue conclusion applies to Hermitian matrices, including real symmetric matrices.</p>
 </section>
 <section id="the-spectral-theorem-for-real-symmetric-matrices">
 <h2>The Spectral Theorem for Real Symmetric Matrices<a class="headerlink" href="#the-spectral-theorem-for-real-symmetric-matrices" title="Link to this heading">#</a></h2>
-<p>The Spectral Theorem for real symmetric matrices is a more specific and powerful version of the general theorem for normal matrices. It guarantees that any real symmetric matrix can be diagonalized by a real orthogonal matrix, which has a profound geometric meaning.</p>
 <div class="proof theorem admonition" id="thm:spectral_theorem_real">
 <p class="admonition-title"><span class="caption-number">Theorem 5 </span> (Spectral Theorem for Real Symmetric Matrices)</p>
 <section class="theorem-content" id="proof-content">
-<p>The theorem states that a real matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>orthogonally diagonalizable</strong> if and only if it is <strong>symmetric</strong>.</p>
+<p>A real square matrix <span class="math notranslate nohighlight">\(A\)</span> is symmetric if and only if it is orthogonally diagonalizable:</p>
+<div class="math notranslate nohighlight">
+\[A=Q\Lambda Q^T,\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is real orthogonal and <span class="math notranslate nohighlight">\(\Lambda\)</span> is real diagonal.</p>
 </section>
-</div><p>This means that for any real symmetric matrix <span class="math notranslate nohighlight">\(A\)</span> (where <span class="math notranslate nohighlight">\(A^T = A\)</span>), there exists a decomposition:</p>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Real Spectral Theorem.
+Suppose <span class="math notranslate nohighlight">\(A\)</span> is real symmetric. It is Hermitian, so all its eigenvalues are real. Its real Schur decomposition therefore has only <span class="math notranslate nohighlight">\(1\times1\)</span> diagonal blocks:</p>
 <div class="math notranslate nohighlight">
-\[A = Q \Lambda Q^T\]</div>
-<p>Here, the components have special real-valued properties:</p>
-<ul class="simple">
-<li><p><strong><span class="math notranslate nohighlight">\(A\)</span></strong> is an <span class="math notranslate nohighlight">\(n \times n\)</span> real symmetric matrix.</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(Q\)</span></strong> is an <span class="math notranslate nohighlight">\(n \times n\)</span> <strong>real orthogonal matrix</strong>. This means its columns are a set of <span class="math notranslate nohighlight">\(n\)</span> mutually perpendicular unit vectors (an orthonormal basis), and its inverse is simply its transpose (<span class="math notranslate nohighlight">\(Q^{-1} = Q^T\)</span>). The columns of <span class="math notranslate nohighlight">\(Q\)</span> are the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong> is an <span class="math notranslate nohighlight">\(n \times n\)</span> <strong>real diagonal matrix</strong>. Its diagonal entries are the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-</ul>
-</section>
-<section id="key-properties-of-symmetric-matrices">
-<h2>Key Properties of Symmetric Matrices<a class="headerlink" href="#key-properties-of-symmetric-matrices" title="Link to this heading">#</a></h2>
-<p>This special result emerges from two crucial properties that all real symmetric matrices possess.</p>
-<section id="eigenvalues-of-a-symmetric-matrix-are-always-real">
-<h3>1. Eigenvalues of a Symmetric Matrix are Always Real<a class="headerlink" href="#eigenvalues-of-a-symmetric-matrix-are-always-real" title="Link to this heading">#</a></h3>
-<p>A symmetric matrix, even if it has complex entries in theory, will always have purely real eigenvalues.</p>
-<div class="proof admonition" id="proof">
-<p>Proof. Real Eigenvalues</p>
-<p>Start with the eigenvalue equation, <span class="math notranslate nohighlight">\(Ax = \lambda x\)</span>. Taking the conjugate transpose of both sides gives <span class="math notranslate nohighlight">\(x^H A^H = \bar{\lambda} x^H\)</span>. Since <span class="math notranslate nohighlight">\(A\)</span> is real and symmetric, <span class="math notranslate nohighlight">\(A^H = A\)</span>. Thus, <span class="math notranslate nohighlight">\(x^H A = \bar{\lambda} x^H\)</span>. Right-multiplying by <span class="math notranslate nohighlight">\(x\)</span> gives:</p>
+\[A=QTQ^T,\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is real orthogonal and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. Also,</p>
 <div class="math notranslate nohighlight">
-\[x^H A x = \bar{\lambda} x^H x = \bar{\lambda} \|x\|^2\]</div>
-<p>Now, if we left-multiply the original equation <span class="math notranslate nohighlight">\(Ax = \lambda x\)</span> by <span class="math notranslate nohighlight">\(x^H\)</span>, we get:</p>
+\[T^T=(Q^TAQ)^T=Q^TA^TQ=T.\]</div>
+<p>A matrix that is both symmetric and upper triangular must be diagonal. Taking <span class="math notranslate nohighlight">\(\Lambda=T\)</span> proves the decomposition.</p>
+<p>Conversely, if <span class="math notranslate nohighlight">\(A=Q\Lambda Q^T\)</span> with real diagonal <span class="math notranslate nohighlight">\(\Lambda\)</span>, then</p>
 <div class="math notranslate nohighlight">
-\[x^H A x = \lambda x^H x = \lambda \|x\|^2\]</div>
-<p>Equating the two expressions shows that <span class="math notranslate nohighlight">\(\lambda \|x\|^2 = \bar{\lambda} \|x\|^2\)</span>. Since eigenvectors are non-zero, we can conclude that <span class="math notranslate nohighlight">\(\lambda = \bar{\lambda}\)</span>, meaning the eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> must be a real number.</p>
+\[A^T=Q\Lambda^TQ^T=Q\Lambda Q^T=A.\]</div>
 </div>
-</section>
-<section id="eigenvectors-for-distinct-eigenvalues-are-orthogonal">
-<h3>2. Eigenvectors for Distinct Eigenvalues are Orthogonal<a class="headerlink" href="#eigenvectors-for-distinct-eigenvalues-are-orthogonal" title="Link to this heading">#</a></h3>
-<p>For a symmetric matrix, eigenvectors corresponding to different eigenvalues are always perpendicular to each other.</p>
-<div class="proof admonition" id="proof">
-<p>Proof. Orthogonal Eigenvectors</p>
-<p>Let <span class="math notranslate nohighlight">\(\lambda_1 \neq \lambda_2\)</span> be two distinct eigenvalues with corresponding eigenvectors <span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x_2\)</span>. We start with the expression <span class="math notranslate nohighlight">\(\lambda_1(x_1^T x_2)\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\lambda_1(x_1^T x_2) = (\lambda_1 x_1)^T x_2 = (Ax_1)^T x_2 = x_1^T A^T x_2\]</div>
-<p>Since <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A^T = A\)</span>), this becomes:</p>
-<div class="math notranslate nohighlight">
-\[x_1^T A x_2 = x_1^T (\lambda_2 x_2) = \lambda_2 (x_1^T x_2)\]</div>
-<p>So, we have <span class="math notranslate nohighlight">\(\lambda_1 (x_1^T x_2) = \lambda_2 (x_1^T x_2)\)</span>, which rearranges to <span class="math notranslate nohighlight">\((\lambda_1 - \lambda_2) (x_1^T x_2) = 0\)</span>. Because the eigenvalues are distinct, <span class="math notranslate nohighlight">\(\lambda_1 - \lambda_2 \neq 0\)</span>, which forces the dot product <span class="math notranslate nohighlight">\(x_1^T x_2\)</span> to be zero. Thus, the eigenvectors are orthogonal.</p>
-</div>
-<p>Even if eigenvalues are repeated, it is always possible to find an orthonormal basis for the corresponding eigenspace.</p>
-</section>
-</section>
-<section id="geometric-interpretation">
-<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
-<p>The decomposition <span class="math notranslate nohighlight">\(A = Q \Lambda Q^T\)</span> describes the action of a symmetric matrix as a sequence of three simple geometric steps:</p>
+<p>A real normal matrix need not have real eigenvalues, so it need not be diagonalizable by a real orthogonal matrix. The normal matrix with eigenvalues <span class="math notranslate nohighlight">\(1\pm2i\)</span> at the start of this section is one example. It has an orthonormal eigenvector basis over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>.</p>
+<section id="geometry-and-a-worked-example">
+<h3>Geometry and a Worked Example<a class="headerlink" href="#geometry-and-a-worked-example" title="Link to this heading">#</a></h3>
+<p>For a real symmetric matrix, the factors in <span class="math notranslate nohighlight">\(Q\Lambda Q^T\)</span> have a concrete meaning:</p>
 <ol class="arabic simple">
-<li><p><strong>Rotation (<span class="math notranslate nohighlight">\(Q^T x\)</span>)</strong>: The space is rotated by the orthogonal matrix <span class="math notranslate nohighlight">\(Q^T\)</span> so that the standard axes align with the orthogonal eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><strong>Scaling (<span class="math notranslate nohighlight">\(\Lambda (Q^T x)\)</span>)</strong>: In this new, rotated orientation, the transformation is a simple scaling along each axis. The scaling factors are the real eigenvalues on the diagonal of <span class="math notranslate nohighlight">\(\Lambda\)</span>. There is no “shear” or rotation in this step.</p></li>
-<li><p><strong>Rotation Back (<span class="math notranslate nohighlight">\(Q (\Lambda Q^T x)\)</span>)</strong>: The space is rotated back to its original orientation by <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q^Tv\)</span> gives the coordinates of <span class="math notranslate nohighlight">\(v\)</span> in the orthonormal eigenvector basis.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\Lambda\)</span> scales each coordinate by its eigenvalue.</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q\)</span> converts the result back to the original coordinates.</p></li>
 </ol>
-<p>This means that any transformation by a symmetric matrix can be thought of as a pure stretch or compression along a set of perpendicular axes. The eigenvectors define these <strong>principal axes</strong>, and the eigenvalues define the amount of stretching along them.</p>
+<p>Orthogonal coordinate changes can involve rotations or reflections. The scaling step stretches or compresses by <span class="math notranslate nohighlight">\(|\lambda_j|\)</span>, reverses the corresponding direction if <span class="math notranslate nohighlight">\(\lambda_j&lt;0\)</span>, and removes it if <span class="math notranslate nohighlight">\(\lambda_j=0\)</span>.</p>
+<p>For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}2&amp;1\\1&amp;2\end{pmatrix}
+\end{split}\]</div>
+<p>has the orthonormal eigenvectors</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+q_1=\frac{1}{\sqrt2}\begin{pmatrix}1\\1\end{pmatrix},\qquad
+q_2=\frac{1}{\sqrt2}\begin{pmatrix}1\\-1\end{pmatrix},
+\end{split}\]</div>
+<p>with eigenvalues <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(1\)</span>. Thus <span class="math notranslate nohighlight">\(Q=[q_1,q_2]\)</span> and <span class="math notranslate nohighlight">\(\Lambda=\operatorname{diag}(3,1)\)</span>. Along the line <span class="math notranslate nohighlight">\(v_1=v_2\)</span>, the matrix triples lengths; along the perpendicular line <span class="math notranslate nohighlight">\(v_1=-v_2\)</span>, it leaves vectors unchanged.</p>
+</section>
+</section>
+<section id="spectral-decomposition-into-orthogonal-projections">
+<h2>Spectral Decomposition into Orthogonal Projections<a class="headerlink" href="#spectral-decomposition-into-orthogonal-projections" title="Link to this heading">#</a></h2>
+<p>Write <span class="math notranslate nohighlight">\(Q=[q_1,\ldots,q_n]\)</span>. Expanding <span class="math notranslate nohighlight">\(A=Q\Lambda Q^H\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[A=\sum_{j=1}^n\lambda_jq_jq_j^H.\]</div>
+<p>Each <span class="math notranslate nohighlight">\(q_jq_j^H\)</span> is the orthogonal projection onto the line spanned by <span class="math notranslate nohighlight">\(q_j\)</span>. Thus applying <span class="math notranslate nohighlight">\(A\)</span> means separating a vector into orthogonal eigenvector components and scaling each component by its eigenvalue.</p>
+<p>For a repeated eigenvalue, group all its eigenvectors together. Let <span class="math notranslate nohighlight">\(Q_\lambda\)</span> contain an orthonormal basis of its eigenspace. Then <span class="math notranslate nohighlight">\(P_\lambda=Q_\lambda Q_\lambda^H\)</span> is the <strong>orthogonal projection onto the eigenspace associated with <span class="math notranslate nohighlight">\(\lambda\)</span></strong>. These projections satisfy</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A&amp;=\sum_{\lambda}\lambda P_\lambda,\\
+I&amp;=\sum_{\lambda}P_\lambda,\\
+P_\lambda^2&amp;=P_\lambda=P_\lambda^H,\\
+P_\lambda P_\mu&amp;=0\quad(\lambda\ne\mu).
+\end{aligned}
+\end{split}\]</div>
+<p>The sums run over distinct eigenvalues. These identities follow from orthonormality of the columns of <span class="math notranslate nohighlight">\(Q\)</span>. Although the basis within an eigenspace is not unique, its orthogonal projection <span class="math notranslate nohighlight">\(P_\lambda\)</span> is unique.</p>
+<p>The null space is spanned by the eigenvectors with eigenvalue zero, and the range by those with nonzero eigenvalues. Since <span class="math notranslate nohighlight">\(A^H\)</span> has the same eigenvectors with conjugate eigenvalues,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+N(A)&amp;=N(A^H),\\
+R(A)&amp;=R(A^H)=N(A)^\perp.
+\end{aligned}
+\end{split}\]</div>
+</section>
+<section id="norms-and-time-evolution">
+<h2>Norms and Time Evolution<a class="headerlink" href="#norms-and-time-evolution" title="Link to this heading">#</a></h2>
+<p>For a normal matrix, write <span class="math notranslate nohighlight">\(v=Qc\)</span>. Since <span class="math notranslate nohighlight">\(Q\)</span> preserves the Euclidean norm,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|v\|_2^2&amp;=\sum_{j=1}^n|c_j|^2,\\
+\|Av\|_2^2&amp;=\sum_{j=1}^n|\lambda_j|^2|c_j|^2.
+\end{aligned}
+\end{split}\]</div>
+<p>It follows that</p>
+<div class="math notranslate nohighlight">
+\[\|Av\|_2\le\left(\max_j|\lambda_j|\right)\|v\|_2.\]</div>
+<p>Equality is attained by a unit eigenvector corresponding to an eigenvalue of largest magnitude. Hence the operator 2-norm is</p>
+<div class="math notranslate nohighlight">
+\[\boxed{\|A\|_2=\max_j|\lambda_j|.}\]</div>
+<p>This equality need not hold for a nonnormal matrix. For <span class="math notranslate nohighlight">\(B\)</span> above, the unit vector <span class="math notranslate nohighlight">\(v=(1,1)^T/\sqrt2\)</span> satisfies <span class="math notranslate nohighlight">\(\|Bv\|_2=\sqrt5&gt;2\)</span>, even though the largest eigenvalue magnitude is <span class="math notranslate nohighlight">\(2\)</span>.</p>
+<p>The same reasoning applies to repeated evolution <span class="math notranslate nohighlight">\(v_{k+1}=Av_k\)</span>. If <span class="math notranslate nohighlight">\(v_0=\sum_jc_jq_j\)</span>, then for <span class="math notranslate nohighlight">\(k\ge1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\|v_k\|_2^2=\sum_{j=1}^n|c_j|^2|\lambda_j|^{2k}.\]</div>
+<p>For normal matrices, the orthogonality of the modes lets us add their squared magnitudes directly. If all <span class="math notranslate nohighlight">\(|\lambda_j|\le1\)</span>, the state norm never increases; if all <span class="math notranslate nohighlight">\(|\lambda_j|&lt;1\)</span>, every state tends to zero. If <span class="math notranslate nohighlight">\(A\)</span> is unitary, every <span class="math notranslate nohighlight">\(|\lambda_j|=1\)</span> and the state norm is preserved.</p>
+</section>
+<section id="positive-definite-matrices">
+<h2>Positive Definite Matrices<a class="headerlink" href="#positive-definite-matrices" title="Link to this heading">#</a></h2>
+<p>A Hermitian matrix is <strong>positive definite</strong> if <span class="math notranslate nohighlight">\(v^HAv&gt;0\)</span> for every nonzero <span class="math notranslate nohighlight">\(v\)</span>, and <strong>positive semidefinite</strong> if <span class="math notranslate nohighlight">\(v^HAv\ge0\)</span> for every <span class="math notranslate nohighlight">\(v\)</span>. These quantities are real because <span class="math notranslate nohighlight">\(A\)</span> is Hermitian.</p>
+<p>In orthonormal eigenvector coordinates, <span class="math notranslate nohighlight">\(v=Qc\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[v^HAv=c^H\Lambda c=\sum_{j=1}^n\lambda_j|c_j|^2.\]</div>
+<p>Therefore, a Hermitian matrix is positive definite exactly when every eigenvalue is positive, and positive semidefinite exactly when every eigenvalue is nonnegative. The forward implications follow by choosing <span class="math notranslate nohighlight">\(v=q_j\)</span>; the reverse implications follow from the sum above.</p>
+<p>For real symmetric matrices, replace <span class="math notranslate nohighlight">\(H\)</span> by <span class="math notranslate nohighlight">\(T\)</span>. We will use these characterizations when studying <a class="reference internal" href="cholesky.html"><span class="std std-doc">Cholesky factorization</span></a> and <a class="reference internal" href="conjugate_gradient.html"><span class="std std-doc">conjugate gradients</span></a>.</p>
 </section>
 </section>
 
@@ -642,18 +760,19 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-normal-matrix">What is a Normal Matrix?</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-normal-matrices">Examples of Normal Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-examples">Definition and Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-normal-matrices">The Spectral Theorem for Normal Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-of-eigenspaces">Orthogonality of Eigenspaces</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-normal-matrices">The Spectral Theorem for Normal Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-real-symmetric-matrices">The Spectral Theorem for Real Symmetric Matrices</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-properties-of-symmetric-matrices">Key Properties of Symmetric Matrices</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalues-of-a-symmetric-matrix-are-always-real">1. Eigenvalues of a Symmetric Matrix are Always Real</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvectors-for-distinct-eigenvalues-are-orthogonal">2. Eigenvectors for Distinct Eigenvalues are Orthogonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hermitian-skew-hermitian-and-unitary-matrices">Hermitian, Skew-Hermitian, and Unitary Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-spectral-theorem-for-real-symmetric-matrices">The Spectral Theorem for Real Symmetric Matrices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geometry-and-a-worked-example">Geometry and a Worked Example</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spectral-decomposition-into-orthogonal-projections">Spectral Decomposition into Orthogonal Projections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#norms-and-time-evolution">Norms and Time Evolution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-definite-matrices">Positive Definite Matrices</a></li>
 </ul>
   </nav></div>
 
