@@ -1,108 +1,191 @@
 # Orthogonal Matrices
 
-An **orthogonal matrix** is a square matrix whose columns and rows are orthonormal vectors. These matrices represent rigid transformations, like rotations and reflections, that preserve lengths and angles. They are fundamental in many areas of mathematics and computer science, especially in numerical linear algebra, where they contribute to the stability and accuracy of algorithms.
+Orthogonal matrices describe linear transformations of real Euclidean space that preserve lengths and angles. Rotations and reflections are examples. These transformations fix the origin; translations are not represented by orthogonal matrices.
 
 ## Definition and Core Properties
 
-A real square matrix $Q \in \mathbb{R}^{n \times n}$ is **orthogonal** if its transpose is equal to its inverse:
+A real square matrix $Q\in\mathbb{R}^{n\times n}$ is **orthogonal** if
+
+$$Q^TQ=I_n.$$
+
+Writing its columns as $q_1,\ldots,q_n$, we have $(Q^TQ)_{ij}=q_i^Tq_j$. Thus the definition says exactly that the columns are **orthonormal**: each column has length one, and distinct columns are perpendicular.
+
+The columns are therefore linearly independent, so $Q$ is invertible. Multiplying $Q^TQ=I_n$ on the right by $Q^{-1}$ gives
+
+$$Q^{-1}=Q^T,\qquad QQ^T=I_n.$$
+
+The second identity says that the rows are orthonormal as well. Conversely, $QQ^T=I_n$ implies the same properties, so for square matrices either identity is sufficient.
+
+### Rectangular Matrices with Orthonormal Columns
+
+A matrix $Q\in\mathbb{R}^{m\times n}$ with $m>n$ can also satisfy $Q^TQ=I_n$. We will call this a **matrix with orthonormal columns**, reserving *orthogonal matrix* for the square case. Such a matrix preserves lengths when mapping $\mathbb{R}^n$ into $\mathbb{R}^m$, but it has no two-sided inverse and $QQ^T\neq I_m$.
+
+For example,
 
 $$
-Q^T = Q^{-1}
+Q=\begin{pmatrix}1&0\\0&1\\0&0\end{pmatrix}
+\quad\Longrightarrow\quad
+Q^TQ=I_2,\qquad
+QQ^T=\begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix}.
 $$
 
-This leads to the more common definition:
+In general, $QQ^T$ is the orthogonal projection onto the column space of $Q$. It leaves vectors in that space unchanged and sends vectors perpendicular to it to zero. We will discuss this in the next section on [projections](projections.md).
 
-$$
-Q^T Q = Q Q^T = I
-$$
+### Unitary Matrices
 
-where $I$ is the identity matrix.
+The complex counterpart is a **unitary matrix**: a square matrix $Q\in\mathbb{C}^{n\times n}$ satisfying
 
-This defining property implies that the columns (and rows) of $Q$ form an **orthonormal set**. This means:
-1.  **Orthogonality**: The dot product of any two distinct columns (or rows) is zero.
-2.  **Unit Norm**: The length (Euclidean norm) of each column (or row) is one.
+$$Q^HQ=QQ^H=I_n,\qquad Q^{-1}=Q^H,$$
 
-A non-square matrix $Q \in \mathbb{R}^{m \times n}$ with $m > n$ is also called orthogonal if its columns are orthonormal, satisfying $Q^T Q = I_n$. However, in this case, $Q Q^T \neq I_m$.
-
-**Unitary Matrix**: The equivalent concept for complex matrices is a **unitary matrix**, which satisfies $Q^H Q = I$, where $Q^H$ is the conjugate transpose of $Q$.
+where $Q^H$ denotes the conjugate transpose. The conjugation is essential for preserving complex inner products and lengths.
 
 ## Key Results and Mathematical Formulas
 
-Orthogonal matrices have several important properties that make them incredibly useful.
+### Length, Distance, and Angle Preservation
 
-### Isometry (Length and Angle Preservation)
-Orthogonal transformations are **isometries**, meaning they preserve the Euclidean norm (length) of a vector.
-
-$$
-\|Qx\|_2^2 = (Qx)^T(Qx) = x^T Q^T Q x = x^T I x = x^T x = \|x\|_2^2
-$$
-
-Therefore, $\|Qx\|_2 = \|x\|_2$. They also preserve the dot product, and thus the angles between vectors:
+For real vectors $x,y$ and an orthogonal matrix $Q$,
 
 $$
-(Qx) \cdot (Qy) = (Qx)^T(Qy) = x^T Q^T Q y = x^T y = x \cdot y
+\begin{aligned}
+(Qx)^T(Qy)
+&=x^TQ^TQy \\
+&=x^Ty.
+\end{aligned}
 $$
 
-### Determinant
-The determinant of an orthogonal matrix is always either **+1** or **-1**.
+Thus inner products are preserved. Taking $y=x$ gives
+
+$$\|Qx\|_2^2=x^Tx=\|x\|_2^2,$$
+
+so $\|Qx\|_2=\|x\|_2$. Applying this to $x-y$ also gives
+
+$$\|Qx-Qy\|_2=\|x-y\|_2.$$
+
+Because both inner products and lengths are unchanged, the angle between any two nonzero vectors is unchanged. A distance-preserving map is called an **isometry**. These arguments also apply to rectangular matrices with orthonormal columns. For unitary matrices, replace each transpose by a conjugate transpose.
+
+In particular, the operator 2-norm of an orthogonal or unitary matrix is $1$:
+
+$$\|Q\|_2=\max_{x\neq 0}\frac{\|Qx\|_2}{\|x\|_2}=1.$$
+
+### Products and Inverses
+
+The product of two orthogonal matrices of the same size is orthogonal:
 
 $$
-\det(Q^T Q) = \det(Q^T)\det(Q) = (\det(Q))^2 = \det(I) = 1 \implies \det(Q) = \pm 1
+\begin{aligned}
+(Q_1Q_2)^T(Q_1Q_2)
+&=Q_2^TQ_1^TQ_1Q_2 \\
+&=Q_2^TQ_2=I_n.
+\end{aligned}
 $$
 
-* $\det(Q) = +1$: The transformation is a **rotation** (a proper rotation). It preserves the orientation of the space. The set of these matrices forms the **special orthogonal group SO(n)**.
-* $\det(Q) = -1$: The transformation is a **reflection** or an **improper rotation** (e.g., a reflection followed by a rotation). It reverses the orientation of the space.
+The inverse $Q^{-1}=Q^T$ is also orthogonal, since $QQ^T=I_n$. Together with the identity matrix, these properties make the orthogonal matrices a group, denoted $O(n)$. The corresponding statements hold for unitary matrices using conjugate transposes.
 
-**Why They Are So Important in NLA**
+### Determinant and Orientation
 
-* **Numerical Stability:** This is their most critical application. Because orthogonal matrices don't amplify the magnitude of vectors, they also don't amplify numerical rounding errors that occur during computations. Algorithms built with orthogonal matrices (like QR factorization and SVD) are exceptionally stable and reliable.
-* **Computational Efficiency:** As mentioned, finding the inverse is trivial. This makes any algorithm that would otherwise require a matrix inversion much faster if orthogonal matrices are involved.
-* **Problem Simplification:** They are the perfect tool for rotating a coordinate system to simplify a problem. In NLA, they are used to transform complex matrices into simpler (e.g., triangular or diagonal) forms while preserving essential properties like eigenvalues, which is a core strategy for solving many difficult problems.
+For a real orthogonal matrix,
+
+$$
+\begin{aligned}
+1=\det(Q^TQ)
+&=\det(Q^T)\det(Q) \\
+&=\det(Q)^2.
+\end{aligned}
+$$
+
+Hence $\det(Q)=\pm1$. Both cases preserve volume, because $|\det(Q)|=1$.
+
+- If $\det(Q)=1$, the transformation preserves orientation. These matrices form the **special orthogonal group**, denoted $SO(n)$. In two dimensions they are rotations about the origin; in three dimensions they are rotations about an axis through the origin.
+- If $\det(Q)=-1$, the transformation reverses orientation. It can be a reflection, but need not be a single reflection across a hyperplane. For example, $-I_3$ reverses all three coordinate directions and has determinant $-1$; a reflection across a plane leaves that plane fixed.
+
+For a complex unitary matrix, the corresponding conclusion is
+
+$$
+1=\det(Q^HQ)
+=\overline{\det(Q)}\det(Q)
+=|\det(Q)|^2.
+$$
+
+Thus $|\det(Q)|=1$, although the determinant need not be real.
+
+## Why Orthogonal Matrices Are Useful in Numerical Linear Algebra
+
+Orthogonal transformations preserve the size of an error already present in a vector. If $x$ is replaced by $x+e$, then, in exact arithmetic,
+
+$$\|Q(x+e)-Qx\|_2=\|Qe\|_2=\|e\|_2.$$
+
+Computing the transformation can introduce additional rounding errors, so this identity alone does not guarantee the accuracy of an algorithm. We will study those questions in the next chapter, [Solving Linear Systems](solving_linear_systems.md).
+
+Orthogonal matrices also make changes of coordinates convenient. Applying the inverse means applying $Q^T$, without computing a general matrix inverse. For a square matrix $A$, changing to an orthonormal basis gives $Q^TAQ$, which is similar to $A$. Later chapters use orthogonal transformations in QR factorization, the singular value decomposition, and eigenvalue algorithms.
+
+## Reflections Across Hyperplanes
+
+Let $w\in\mathbb{R}^n$ be nonzero. The reflection across the hyperplane perpendicular to $w$ is
+
+$$H=I_n-2\frac{ww^T}{w^Tw}.$$
+
+To see its action, write $x=x_{\perp}+\alpha w$, where $w^Tx_{\perp}=0$. Then
+
+$$Hx=x_{\perp}-\alpha w.$$
+
+Thus $H$ leaves the hyperplane fixed and reverses the perpendicular component. Applying it twice returns the original vector, so $H^2=I_n$. The formula also gives $H^T=H$, and therefore
+
+$$H^TH=H^2=I_n.$$
+
+Hence $H$ is orthogonal and $H^{-1}=H$. In an orthonormal basis consisting of $w/\|w\|_2$ and vectors perpendicular to $w$, its matrix is $\operatorname{diag}(-1,1,\ldots,1)$, so $\det(H)=-1$.
+
+These are **Householder reflections**. Their computational use is developed later in the section on [Householder transformations](householder_reflections.md).
 
 ## The Cartan–Dieudonné Theorem
 
-The **Cartan–Dieudonné theorem** is a fundamental result in geometry that provides a simple, constructive way to think about orthogonal transformations. It states that any orthogonal transformation can be broken down into a series of simpler reflections.
+The [Cartan–Dieudonné theorem](https://www.cis.upenn.edu/~jean/math-deep.pdf) shows that hyperplane reflections suffice to construct every real orthogonal transformation.
 
 ````{prf:theorem} Cartan–Dieudonné theorem
 :label: thm:cartan_dieudonne
-Every orthogonal transformation in an $n$-dimensional Euclidean space ($\mathbb{R}^n$) can be described as the composition of at most **n** reflections.
+Every orthogonal transformation of $\mathbb{R}^n$ is a composition of at most $n$ reflections across hyperplanes through the origin. Equivalently,
+
+$$Q=H_1H_2\cdots H_k,\qquad k\leq n,$$
+
+where each $H_i$ is a hyperplane reflection. For $k=0$, the product is the identity matrix.
 ````
-
-This means for any orthogonal matrix $Q$, we can write:
-
-$$
-Q = H_1 H_2 \cdots H_k
-$$
-
-where each $H_i$ is a reflection matrix (like a Householder matrix) and $k \le n$. If $k=0$, $Q$ is the identity matrix.
 
 ### Proof by Induction
 
 ````{prf:proof}
+For $n=1$, an orthogonal matrix is either $[1]$ or $[-1]$. These require zero or one reflection, respectively.
 
-The proof works by showing that we can use one reflection to simplify the problem to a lower-dimensional space.
+Assume the theorem holds in dimension $n-1$, and let $Q$ be orthogonal on $\mathbb{R}^n$. Write $e_1=(1,0,\ldots,0)^T$ and $v=Qe_1$. Length preservation gives $\|v\|_2=1$.
 
-* **Base Case (n=1)**: In a 1-dimensional space ($\mathbb{R}$), an orthogonal transformation is either $x \mapsto x$ (the identity, 0 reflections) or $x \mapsto -x$ (a reflection, 1 reflection). The theorem holds.
+**Case 1: $v=e_1$.** Then $Q$ fixes $e_1$. The subspace
 
-* **Inductive Step**: Assume the theorem is true for transformations in $\mathbb{R}^{n-1}$. Let $Q$ be an orthogonal transformation in $\mathbb{R}^n$.
-    1.  Consider the first basis vector $e_1 = (1, 0, \dots, 0)^T$. Let $v = Qe_1$.
-    2.  **Case 1**: If $v = e_1$, then $Q$ fixes the first basis vector. This means that the $(n-1)$-dimensional subspace $S$ orthogonal to $e_1$ is invariant under $Q$. By our induction hypothesis, this transformation on $S$ can be achieved with at most $n-1$ reflections. So, the theorem holds for $Q$.
-    3.  **Case 2**: If $v \neq e_1$, we can find a reflection $H_1$ that maps $v$ back to $e_1$. The specific reflection is the one across the hyperplane that is orthogonal to the vector $(v - e_1)$. This gives us $H_1 v = e_1$.
-    4.  Now consider the new transformation $Q' = H_1 Q$. It is also orthogonal since it's a product of two orthogonal transformations. And importantly, it fixes the vector $e_1$:
-        
-        $$
-        Q'e_1 = (H_1 Q)e_1 = H_1(Qe_1) = H_1 v = e_1
-        $$
-        
-    5.  Since $Q'$ fixes $e_1$, it behaves like an $(n-1)$-dimensional orthogonal transformation on the subspace orthogonal to $e_1$. By the induction hypothesis, $Q'$ can be written as the composition of at most $n-1$ reflections, say $Q' = H_2 H_3 \cdots H_k$ where $k-1 \le n-1$.
-    6.  Substituting back, we get $H_1 Q = H_2 H_3 \cdots H_k$.
-    7.  Since $H_1$ is a reflection, its inverse is itself ($H_1^{-1} = H_1$). We can solve for $Q$:
-        
-        $$
-        Q = H_1^{-1} (H_2 H_3 \cdots H_k) = H_1 H_2 H_3 \cdots H_k
-        $$
-        
-    8.  This expresses $Q$ as a product of $k$ reflections, where $k \le (n-1)+1 = n$.
+$$S=\{x\in\mathbb{R}^n:e_1^Tx=0\}$$
 
-Thus, the theorem is proven.
+is preserved by $Q$, because for $x\in S$,
+
+$$e_1^TQx=(Qe_1)^TQx=e_1^Tx=0.$$
+
+The restriction of $Q$ to $S$ is therefore an orthogonal transformation of an $(n-1)$-dimensional Euclidean space. By induction, it is a product of at most $n-1$ reflections on $S$.
+
+Each such reflection has a normal vector $w\in S$. Using the same formula $I_n-2ww^T/(w^Tw)$ extends it to a reflection on $\mathbb{R}^n$ that fixes $e_1$. The product of these extended reflections agrees with $Q$ on both $S$ and $e_1$, so it equals $Q$ on all of $\mathbb{R}^n$.
+
+**Case 2: $v\neq e_1$.** Set $w=v-e_1$ and define
+
+$$H=I_n-2\frac{ww^T}{w^Tw}.$$
+
+We verify that $Hv=e_1$. Since $v^Tv=1$, writing $v_1=e_1^Tv$ gives
+
+$$
+\begin{aligned}
+w^Tv&=1-v_1, \\
+w^Tw&=2(1-v_1)>0.
+\end{aligned}
+$$
+
+Consequently,
+
+$$Hv=v-2w\frac{1-v_1}{2(1-v_1)}=v-w=e_1.$$
+
+The matrix $HQ$ is orthogonal and fixes $e_1$. By Case 1, it is a product of at most $n-1$ reflections. Since $H^{-1}=H$, multiplying by $H$ expresses $Q$ as a product of at most $n$ reflections.
 ````
+
+Because each reflection has determinant $-1$, a product of $k$ reflections has determinant $(-1)^k$. Thus orientation-preserving orthogonal transformations require an even number of reflections, and orientation-reversing ones require an odd number.

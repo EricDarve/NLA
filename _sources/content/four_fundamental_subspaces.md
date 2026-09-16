@@ -1,56 +1,195 @@
 # The Four Fundamental Subspaces
 
-Every $m \times n$ matrix $A$ defines a linear transformation and is associated with four fundamental vector subspaces. These spaces provide a complete geometric understanding of the matrix's behavior, revealing what happens to vectors when they are transformed by $A$. 🗺️
+Let $A\in\mathbb{R}^{m\times n}$ represent a linear map from $\mathbb{R}^n$ to $\mathbb{R}^m$. Its four fundamental subspaces describe which outputs are possible, which inputs map to zero, and how these spaces fit together. Two lie in the input space $\mathbb{R}^n$, and two lie in the output space $\mathbb{R}^m$.
 
-
+We use $R(A)$ for the range and $N(A)$ for the null space. These are also written $\operatorname{range}(A)$ and $\ker(A)$.
 
 ## 1. The Column Space (Range)
 
-The **column space**, also known as the **range**, is the set of all possible output vectors of the transformation. It consists of all vectors that can be formed by multiplying the matrix $A$ by an input vector $x$.
+The **column space**, or **range**, consists of all possible outputs:
 
-$$R(A) = \{y \in \mathbb{R}^m \,|\, y = Ax \text{ for some } x \in \mathbb{R}^n\}$$
+$$R(A)=\{Ax:x\in\mathbb{R}^n\}\subseteq\mathbb{R}^m.$$
 
-Geometrically, the column space is the **span of the column vectors** of $A$. It is a subspace of the output space, $\mathbb{R}^m$. The dimension of the column space is the **rank** of the matrix, denoted by $r$. The rank represents the number of linearly independent columns in the matrix.
+If the columns of $A$ are $a_1,\ldots,a_n$, then
+
+$$Ax=x_1a_1+\cdots+x_na_n.$$
+
+Thus $R(A)=\operatorname{span}(a_1,\ldots,a_n)$. Its dimension is the **rank** $r$ of $A$: the maximum number of linearly independent columns.
 
 ## 2. The Null Space (Kernel)
 
-The **null space**, also known as the **kernel**, is the set of all input vectors that are mapped to the zero vector by the transformation.
+The **null space**, or **kernel**, consists of all inputs mapped to zero:
 
-$$N(A) = \{x \in \mathbb{R}^n \,|\, Ax = 0\}$$
+$$N(A)=\{x\in\mathbb{R}^n:Ax=0\}.$$
 
-The null space is a subspace of the input space, $\mathbb{R}^n$. If the null space contains vectors other than the zero vector, it means the transformation is "many-to-one"—multiple different input vectors are "squashed" onto the same output vector (zero). The dimension of the null space is called the **nullity**.
+Its dimension is called the **nullity**. A vector in $N(A)$ can be added to any input without changing its output. More precisely,
+
+$$Ax=Ay\quad\Longleftrightarrow\quad x-y\in N(A).$$
+
+Therefore, the map is one-to-one exactly when $N(A)=\{0\}$.
 
 ## 3. The Row Space
 
-The **row space** is the set of all linear combinations of the row vectors of $A$. It is equivalent to the column space of the transpose of $A$.
+The **row space** is the span of the rows of $A$, written as column vectors. Equivalently, it is the range of the transpose:
 
-$$R(A^T)$$
+$$R(A^T)=\{A^Ty:y\in\mathbb{R}^m\}\subseteq\mathbb{R}^n.$$
 
-The row space is a subspace of the input space, $\mathbb{R}^n$. A fundamental result in linear algebra is that the dimension of the row space is also equal to the **rank** ($r$) of the matrix. This means a matrix always has the same number of linearly independent rows as it does linearly independent columns.
+Its dimension is also $r$. We will prove below that row rank and column rank are equal.
 
 ## 4. The Left Null Space
 
-The **left null space** is the null space of the transpose of $A$.
+The **left null space** is the null space of the transpose:
 
-$$N(A^T) = \{y \in \mathbb{R}^m \,|\, A^T y = 0\}$$
+$$N(A^T)=\{y\in\mathbb{R}^m:A^Ty=0\}.$$
 
-It is called the "left" null space because the equation can be transposed to $y^T A = 0^T$, showing that the vectors $y$ act on $A$ from the left. The left null space is a subspace of the output space, $\mathbb{R}^m$.
+The name comes from the equivalent equation $y^TA=0^T$. Such a vector gives a linear combination of the rows of $A$ that equals zero.
 
-## The Fundamental Theorem of Linear Algebra
+## Orthogonal Complements
 
-This theorem connects the dimensions and relationships of the four subspaces.
+The four subspaces form two pairs of orthogonal complements:
 
-### The Rank-Nullity Theorem
-This theorem relates the dimensions of the column space and the null space. It states that the rank of a matrix plus its nullity is equal to the number of columns in the matrix.
+$$
+\begin{aligned}
+N(A)&=R(A^T)^\perp,\\
+N(A^T)&=R(A)^\perp.
+\end{aligned}
+$$
 
-$$\text{dim}(R(A)) + \text{dim}(N(A)) = n$$
+````{prf:proof}
+The equation $Ax=0$ says that the dot product of $x$ with every row of $A$ is zero. This holds exactly when $x$ is perpendicular to every vector in the row space. Hence $N(A)=R(A^T)^\perp$.
 
-Or more simply: **rank + nullity = number of columns**.
+Applying the same argument to $A^T$ gives $N(A^T)=R(A)^\perp$.
+````
 
-This theorem provides a beautiful intuition: the dimension of the input space ($n$) is split. Part of it is preserved and forms the output image (the rank), and the other part is collapsed to zero (the nullity).
+Being orthogonal complements means both that the two spaces are perpendicular and that together they span the entire input or output space:
 
-### Orthogonal Complements
-The subspaces come in orthogonal pairs:
+$$
+\begin{aligned}
+\mathbb{R}^n&=R(A^T)\oplus N(A),\\
+\mathbb{R}^m&=R(A)\oplus N(A^T).
+\end{aligned}
+$$
 
-* The **row space** and the **null space** are orthogonal complements in the input space $\mathbb{R}^n$. This means every vector in the row space is perpendicular to every vector in the null space.
-* The **column space** and the **left null space** are orthogonal complements in the output space $\mathbb{R}^m$.
+Here $\oplus$ denotes a direct sum. Every vector has a unique decomposition into components in the two indicated spaces, and these components are orthogonal. For example, every input can be written uniquely as
+
+$$x=x_{\mathrm{row}}+x_{\mathrm{null}},$$
+
+with $x_{\mathrm{row}}\in R(A^T)$ and $x_{\mathrm{null}}\in N(A)$. Then
+
+$$Ax=Ax_{\mathrm{row}}.$$
+
+The null-space component has no effect on the output.
+
+## Dimensions and the Rank-Nullity Theorem
+
+The **rank-nullity theorem** states that
+
+$$\dim R(A)+\dim N(A)=n.$$
+
+````{prf:proof}
+Choose a basis $z_1,\ldots,z_k$ of $N(A)$ and extend it to a basis
+
+$$z_1,\ldots,z_k,v_1,\ldots,v_{n-k}$$
+
+of $\mathbb{R}^n$. Since $Az_i=0$, the vectors $Av_1,\ldots,Av_{n-k}$ span $R(A)$.
+
+They are also linearly independent. Indeed, if
+
+$$\sum_{j=1}^{n-k}c_jAv_j=0,$$
+
+then $\sum_j c_jv_j$ belongs to $N(A)$ and is therefore a linear combination of the $z_i$. Independence of the extended basis forces every $c_j$ to be zero. Thus $\dim R(A)=n-k$, proving the result.
+````
+
+Since $R(A^T)$ and $N(A)$ are orthogonal complements, their dimensions also add to $n$. Consequently,
+
+$$\dim R(A^T)=n-\dim N(A)=r.$$
+
+This proves equality of row and column rank. The output-space decomposition then gives $\dim N(A^T)=m-r$.
+
+| Subspace | Ambient space | Dimension |
+|---|---|---|
+| Column space $R(A)$ | $\mathbb{R}^m$ | $r$ |
+| Null space $N(A)$ | $\mathbb{R}^n$ | $n-r$ |
+| Row space $R(A^T)$ | $\mathbb{R}^n$ | $r$ |
+| Left null space $N(A^T)$ | $\mathbb{R}^m$ | $m-r$ |
+
+In particular, $0\le r\le\min(m,n)$. These dimension and orthogonality statements are often called the **fundamental theorem of linear algebra**.
+
+The restriction of $A$ to its row space is a one-to-one map onto its column space. It reaches every output because $Ax=Ax_{\mathrm{row}}$, and it is one-to-one because $R(A^T)\cap N(A)=\{0\}$. This does not mean that $A$ preserves lengths or angles.
+
+## A Rectangular Example
+
+Consider
+
+$$
+A=\begin{pmatrix}
+1&0&1&0\\
+0&1&0&1\\
+1&1&1&1
+\end{pmatrix}.
+$$
+
+The first two columns are independent, and the last two repeat them, so $r=2$. Bases for the column and row spaces are
+
+$$
+\begin{aligned}
+R(A)&=\operatorname{span}\left\{
+\begin{pmatrix}1\\0\\1\end{pmatrix},
+\begin{pmatrix}0\\1\\1\end{pmatrix}\right\},\\
+R(A^T)&=\operatorname{span}\left\{
+\begin{pmatrix}1\\0\\1\\0\end{pmatrix},
+\begin{pmatrix}0\\1\\0\\1\end{pmatrix}\right\}.
+\end{aligned}
+$$
+
+To find the null space, $Ax=0$ gives $x_1+x_3=0$ and $x_2+x_4=0$; the third equation is their sum. Therefore,
+
+$$
+N(A)=\operatorname{span}\left\{
+\begin{pmatrix}-1\\0\\1\\0\end{pmatrix},
+\begin{pmatrix}0\\-1\\0\\1\end{pmatrix}\right\}.
+$$
+
+Similarly, $A^Ty=0$ gives $y_1+y_3=y_2+y_3=0$, so
+
+$$
+N(A^T)=\operatorname{span}\left\{
+\begin{pmatrix}-1\\-1\\1\end{pmatrix}\right\}.
+$$
+
+The dimensions are $2,2,2,1$, respectively. Taking dot products verifies that the displayed row-space basis is perpendicular to the null-space basis, and the column-space basis is perpendicular to the left-null-space basis.
+
+## What the Subspaces Tell Us about $Ax=b$
+
+A solution exists exactly when $b\in R(A)$. Equivalently,
+
+$$y^Tb=0\quad\text{for every }y\in N(A^T).$$
+
+This follows from $R(A)=N(A^T)^\perp$. In the example above, the condition is $b_3=b_1+b_2$.
+
+If $x_0$ is one solution, then all solutions have the form
+
+$$x=x_0+z,\qquad z\in N(A).$$
+
+Thus a consistent system has a unique solution exactly when $r=n$ (**full column rank**). Every right-hand side has a solution exactly when $r=m$ (**full row rank**). For a square matrix, both conditions are equivalent to invertibility.
+
+For each consistent right-hand side, there is exactly one solution $x_{\mathrm{row}}$ in the row space. It also has the smallest Euclidean norm among all solutions, since orthogonality gives
+
+$$\|x_{\mathrm{row}}+z\|_2^2
+=\|x_{\mathrm{row}}\|_2^2+\|z\|_2^2,
+\qquad z\in N(A).$$
+
+When $b\notin R(A)$, its orthogonal projection onto $R(A)$ is the closest attainable output. We will use this observation in the chapter on [least squares](least_squares.md).
+
+## Complex Matrices
+
+For $A\in\mathbb{C}^{m\times n}$, use the conjugate transpose $A^H$ and the inner product $x^Hy$. The orthogonal decompositions become
+
+$$
+\begin{aligned}
+\mathbb{C}^n&=R(A^H)\oplus N(A),\\
+\mathbb{C}^m&=R(A)\oplus N(A^H).
+\end{aligned}
+$$
+
+Here $R(A^H)$ is spanned by the conjugate transposes of the rows of $A$, and $N(A^H)$ consists of vectors satisfying $y^HA=0$. The dimension formulas remain the same, with dimensions taken over $\mathbb{C}$.

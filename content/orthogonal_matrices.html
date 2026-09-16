@@ -425,12 +425,19 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-core-properties">Definition and Core Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-mathematical-formulas">Key Results and Mathematical Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isometry-length-and-angle-preservation">Isometry (Length and Angle Preservation)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant">Determinant</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-core-properties">Definition and Core Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rectangular-matrices-with-orthonormal-columns">Rectangular Matrices with Orthonormal Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unitary-matrices">Unitary Matrices</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-mathematical-formulas">Key Results and Mathematical Formulas</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#length-distance-and-angle-preservation">Length, Distance, and Angle Preservation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#products-and-inverses">Products and Inverses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant-and-orientation">Determinant and Orientation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-orthogonal-matrices-are-useful-in-numerical-linear-algebra">Why Orthogonal Matrices Are Useful in Numerical Linear Algebra</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflections-across-hyperplanes">Reflections Across Hyperplanes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cartandieudonne-theorem">The Cartan–Dieudonné Theorem</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-by-induction">Proof by Induction</a></li>
 </ul>
@@ -448,108 +455,164 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="orthogonal-matrices">
 <h1>Orthogonal Matrices<a class="headerlink" href="#orthogonal-matrices" title="Link to this heading">#</a></h1>
-<p>An <strong>orthogonal matrix</strong> is a square matrix whose columns and rows are orthonormal vectors. These matrices represent rigid transformations, like rotations and reflections, that preserve lengths and angles. They are fundamental in many areas of mathematics and computer science, especially in numerical linear algebra, where they contribute to the stability and accuracy of algorithms.</p>
+<p>Orthogonal matrices describe linear transformations of real Euclidean space that preserve lengths and angles. Rotations and reflections are examples. These transformations fix the origin; translations are not represented by orthogonal matrices.</p>
 <section id="definition-and-core-properties">
 <h2>Definition and Core Properties<a class="headerlink" href="#definition-and-core-properties" title="Link to this heading">#</a></h2>
-<p>A real square matrix <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{n \times n}\)</span> is <strong>orthogonal</strong> if its transpose is equal to its inverse:</p>
+<p>A real square matrix <span class="math notranslate nohighlight">\(Q\in\mathbb{R}^{n\times n}\)</span> is <strong>orthogonal</strong> if</p>
 <div class="math notranslate nohighlight">
-\[
-Q^T = Q^{-1}
-\]</div>
-<p>This leads to the more common definition:</p>
+\[Q^TQ=I_n.\]</div>
+<p>Writing its columns as <span class="math notranslate nohighlight">\(q_1,\ldots,q_n\)</span>, we have <span class="math notranslate nohighlight">\((Q^TQ)_{ij}=q_i^Tq_j\)</span>. Thus the definition says exactly that the columns are <strong>orthonormal</strong>: each column has length one, and distinct columns are perpendicular.</p>
+<p>The columns are therefore linearly independent, so <span class="math notranslate nohighlight">\(Q\)</span> is invertible. Multiplying <span class="math notranslate nohighlight">\(Q^TQ=I_n\)</span> on the right by <span class="math notranslate nohighlight">\(Q^{-1}\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[
-Q^T Q = Q Q^T = I
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p>
-<p>This defining property implies that the columns (and rows) of <span class="math notranslate nohighlight">\(Q\)</span> form an <strong>orthonormal set</strong>. This means:</p>
-<ol class="arabic simple">
-<li><p><strong>Orthogonality</strong>: The dot product of any two distinct columns (or rows) is zero.</p></li>
-<li><p><strong>Unit Norm</strong>: The length (Euclidean norm) of each column (or row) is one.</p></li>
-</ol>
-<p>A non-square matrix <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{m \times n}\)</span> with <span class="math notranslate nohighlight">\(m &gt; n\)</span> is also called orthogonal if its columns are orthonormal, satisfying <span class="math notranslate nohighlight">\(Q^T Q = I_n\)</span>. However, in this case, <span class="math notranslate nohighlight">\(Q Q^T \neq I_m\)</span>.</p>
-<p><strong>Unitary Matrix</strong>: The equivalent concept for complex matrices is a <strong>unitary matrix</strong>, which satisfies <span class="math notranslate nohighlight">\(Q^H Q = I\)</span>, where <span class="math notranslate nohighlight">\(Q^H\)</span> is the conjugate transpose of <span class="math notranslate nohighlight">\(Q\)</span>.</p>
+\[Q^{-1}=Q^T,\qquad QQ^T=I_n.\]</div>
+<p>The second identity says that the rows are orthonormal as well. Conversely, <span class="math notranslate nohighlight">\(QQ^T=I_n\)</span> implies the same properties, so for square matrices either identity is sufficient.</p>
+<section id="rectangular-matrices-with-orthonormal-columns">
+<h3>Rectangular Matrices with Orthonormal Columns<a class="headerlink" href="#rectangular-matrices-with-orthonormal-columns" title="Link to this heading">#</a></h3>
+<p>A matrix <span class="math notranslate nohighlight">\(Q\in\mathbb{R}^{m\times n}\)</span> with <span class="math notranslate nohighlight">\(m&gt;n\)</span> can also satisfy <span class="math notranslate nohighlight">\(Q^TQ=I_n\)</span>. We will call this a <strong>matrix with orthonormal columns</strong>, reserving <em>orthogonal matrix</em> for the square case. Such a matrix preserves lengths when mapping <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> into <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>, but it has no two-sided inverse and <span class="math notranslate nohighlight">\(QQ^T\neq I_m\)</span>.</p>
+<p>For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q=\begin{pmatrix}1&amp;0\\0&amp;1\\0&amp;0\end{pmatrix}
+\quad\Longrightarrow\quad
+Q^TQ=I_2,\qquad
+QQ^T=\begin{pmatrix}1&amp;0&amp;0\\0&amp;1&amp;0\\0&amp;0&amp;0\end{pmatrix}.
+\end{split}\]</div>
+<p>In general, <span class="math notranslate nohighlight">\(QQ^T\)</span> is the orthogonal projection onto the column space of <span class="math notranslate nohighlight">\(Q\)</span>. It leaves vectors in that space unchanged and sends vectors perpendicular to it to zero. We will discuss this in the next section on <a class="reference internal" href="projections.html"><span class="std std-doc">projections</span></a>.</p>
+</section>
+<section id="unitary-matrices">
+<h3>Unitary Matrices<a class="headerlink" href="#unitary-matrices" title="Link to this heading">#</a></h3>
+<p>The complex counterpart is a <strong>unitary matrix</strong>: a square matrix <span class="math notranslate nohighlight">\(Q\in\mathbb{C}^{n\times n}\)</span> satisfying</p>
+<div class="math notranslate nohighlight">
+\[Q^HQ=QQ^H=I_n,\qquad Q^{-1}=Q^H,\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q^H\)</span> denotes the conjugate transpose. The conjugation is essential for preserving complex inner products and lengths.</p>
+</section>
 </section>
 <section id="key-results-and-mathematical-formulas">
 <h2>Key Results and Mathematical Formulas<a class="headerlink" href="#key-results-and-mathematical-formulas" title="Link to this heading">#</a></h2>
-<p>Orthogonal matrices have several important properties that make them incredibly useful.</p>
-<section id="isometry-length-and-angle-preservation">
-<h3>Isometry (Length and Angle Preservation)<a class="headerlink" href="#isometry-length-and-angle-preservation" title="Link to this heading">#</a></h3>
-<p>Orthogonal transformations are <strong>isometries</strong>, meaning they preserve the Euclidean norm (length) of a vector.</p>
+<section id="length-distance-and-angle-preservation">
+<h3>Length, Distance, and Angle Preservation<a class="headerlink" href="#length-distance-and-angle-preservation" title="Link to this heading">#</a></h3>
+<p>For real vectors <span class="math notranslate nohighlight">\(x,y\)</span> and an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[
-\|Qx\|_2^2 = (Qx)^T(Qx) = x^T Q^T Q x = x^T I x = x^T x = \|x\|_2^2
-\]</div>
-<p>Therefore, <span class="math notranslate nohighlight">\(\|Qx\|_2 = \|x\|_2\)</span>. They also preserve the dot product, and thus the angles between vectors:</p>
+\[\begin{split}
+\begin{aligned}
+(Qx)^T(Qy)
+&amp;=x^TQ^TQy \\
+&amp;=x^Ty.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus inner products are preserved. Taking <span class="math notranslate nohighlight">\(y=x\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[
-(Qx) \cdot (Qy) = (Qx)^T(Qy) = x^T Q^T Q y = x^T y = x \cdot y
-\]</div>
+\[\|Qx\|_2^2=x^Tx=\|x\|_2^2,\]</div>
+<p>so <span class="math notranslate nohighlight">\(\|Qx\|_2=\|x\|_2\)</span>. Applying this to <span class="math notranslate nohighlight">\(x-y\)</span> also gives</p>
+<div class="math notranslate nohighlight">
+\[\|Qx-Qy\|_2=\|x-y\|_2.\]</div>
+<p>Because both inner products and lengths are unchanged, the angle between any two nonzero vectors is unchanged. A distance-preserving map is called an <strong>isometry</strong>. These arguments also apply to rectangular matrices with orthonormal columns. For unitary matrices, replace each transpose by a conjugate transpose.</p>
+<p>In particular, the operator 2-norm of an orthogonal or unitary matrix is <span class="math notranslate nohighlight">\(1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\|Q\|_2=\max_{x\neq 0}\frac{\|Qx\|_2}{\|x\|_2}=1.\]</div>
 </section>
-<section id="determinant">
-<h3>Determinant<a class="headerlink" href="#determinant" title="Link to this heading">#</a></h3>
-<p>The determinant of an orthogonal matrix is always either <strong>+1</strong> or <strong>-1</strong>.</p>
+<section id="products-and-inverses">
+<h3>Products and Inverses<a class="headerlink" href="#products-and-inverses" title="Link to this heading">#</a></h3>
+<p>The product of two orthogonal matrices of the same size is orthogonal:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+(Q_1Q_2)^T(Q_1Q_2)
+&amp;=Q_2^TQ_1^TQ_1Q_2 \\
+&amp;=Q_2^TQ_2=I_n.
+\end{aligned}
+\end{split}\]</div>
+<p>The inverse <span class="math notranslate nohighlight">\(Q^{-1}=Q^T\)</span> is also orthogonal, since <span class="math notranslate nohighlight">\(QQ^T=I_n\)</span>. Together with the identity matrix, these properties make the orthogonal matrices a group, denoted <span class="math notranslate nohighlight">\(O(n)\)</span>. The corresponding statements hold for unitary matrices using conjugate transposes.</p>
+</section>
+<section id="determinant-and-orientation">
+<h3>Determinant and Orientation<a class="headerlink" href="#determinant-and-orientation" title="Link to this heading">#</a></h3>
+<p>For a real orthogonal matrix,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+1=\det(Q^TQ)
+&amp;=\det(Q^T)\det(Q) \\
+&amp;=\det(Q)^2.
+\end{aligned}
+\end{split}\]</div>
+<p>Hence <span class="math notranslate nohighlight">\(\det(Q)=\pm1\)</span>. Both cases preserve volume, because <span class="math notranslate nohighlight">\(|\det(Q)|=1\)</span>.</p>
+<ul class="simple">
+<li><p>If <span class="math notranslate nohighlight">\(\det(Q)=1\)</span>, the transformation preserves orientation. These matrices form the <strong>special orthogonal group</strong>, denoted <span class="math notranslate nohighlight">\(SO(n)\)</span>. In two dimensions they are rotations about the origin; in three dimensions they are rotations about an axis through the origin.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(\det(Q)=-1\)</span>, the transformation reverses orientation. It can be a reflection, but need not be a single reflection across a hyperplane. For example, <span class="math notranslate nohighlight">\(-I_3\)</span> reverses all three coordinate directions and has determinant <span class="math notranslate nohighlight">\(-1\)</span>; a reflection across a plane leaves that plane fixed.</p></li>
+</ul>
+<p>For a complex unitary matrix, the corresponding conclusion is</p>
 <div class="math notranslate nohighlight">
 \[
-\det(Q^T Q) = \det(Q^T)\det(Q) = (\det(Q))^2 = \det(I) = 1 \implies \det(Q) = \pm 1
+1=\det(Q^HQ)
+=\overline{\det(Q)}\det(Q)
+=|\det(Q)|^2.
 \]</div>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\det(Q) = +1\)</span>: The transformation is a <strong>rotation</strong> (a proper rotation). It preserves the orientation of the space. The set of these matrices forms the <strong>special orthogonal group SO(n)</strong>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(\det(Q) = -1\)</span>: The transformation is a <strong>reflection</strong> or an <strong>improper rotation</strong> (e.g., a reflection followed by a rotation). It reverses the orientation of the space.</p></li>
-</ul>
-<p><strong>Why They Are So Important in NLA</strong></p>
-<ul class="simple">
-<li><p><strong>Numerical Stability:</strong> This is their most critical application. Because orthogonal matrices don’t amplify the magnitude of vectors, they also don’t amplify numerical rounding errors that occur during computations. Algorithms built with orthogonal matrices (like QR factorization and SVD) are exceptionally stable and reliable.</p></li>
-<li><p><strong>Computational Efficiency:</strong> As mentioned, finding the inverse is trivial. This makes any algorithm that would otherwise require a matrix inversion much faster if orthogonal matrices are involved.</p></li>
-<li><p><strong>Problem Simplification:</strong> They are the perfect tool for rotating a coordinate system to simplify a problem. In NLA, they are used to transform complex matrices into simpler (e.g., triangular or diagonal) forms while preserving essential properties like eigenvalues, which is a core strategy for solving many difficult problems.</p></li>
-</ul>
+<p>Thus <span class="math notranslate nohighlight">\(|\det(Q)|=1\)</span>, although the determinant need not be real.</p>
 </section>
+</section>
+<section id="why-orthogonal-matrices-are-useful-in-numerical-linear-algebra">
+<h2>Why Orthogonal Matrices Are Useful in Numerical Linear Algebra<a class="headerlink" href="#why-orthogonal-matrices-are-useful-in-numerical-linear-algebra" title="Link to this heading">#</a></h2>
+<p>Orthogonal transformations preserve the size of an error already present in a vector. If <span class="math notranslate nohighlight">\(x\)</span> is replaced by <span class="math notranslate nohighlight">\(x+e\)</span>, then, in exact arithmetic,</p>
+<div class="math notranslate nohighlight">
+\[\|Q(x+e)-Qx\|_2=\|Qe\|_2=\|e\|_2.\]</div>
+<p>Computing the transformation can introduce additional rounding errors, so this identity alone does not guarantee the accuracy of an algorithm. We will study those questions in the next chapter, <a class="reference internal" href="solving_linear_systems.html"><span class="std std-doc">Solving Linear Systems</span></a>.</p>
+<p>Orthogonal matrices also make changes of coordinates convenient. Applying the inverse means applying <span class="math notranslate nohighlight">\(Q^T\)</span>, without computing a general matrix inverse. For a square matrix <span class="math notranslate nohighlight">\(A\)</span>, changing to an orthonormal basis gives <span class="math notranslate nohighlight">\(Q^TAQ\)</span>, which is similar to <span class="math notranslate nohighlight">\(A\)</span>. Later chapters use orthogonal transformations in QR factorization, the singular value decomposition, and eigenvalue algorithms.</p>
+</section>
+<section id="reflections-across-hyperplanes">
+<h2>Reflections Across Hyperplanes<a class="headerlink" href="#reflections-across-hyperplanes" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(w\in\mathbb{R}^n\)</span> be nonzero. The reflection across the hyperplane perpendicular to <span class="math notranslate nohighlight">\(w\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[H=I_n-2\frac{ww^T}{w^Tw}.\]</div>
+<p>To see its action, write <span class="math notranslate nohighlight">\(x=x_{\perp}+\alpha w\)</span>, where <span class="math notranslate nohighlight">\(w^Tx_{\perp}=0\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[Hx=x_{\perp}-\alpha w.\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(H\)</span> leaves the hyperplane fixed and reverses the perpendicular component. Applying it twice returns the original vector, so <span class="math notranslate nohighlight">\(H^2=I_n\)</span>. The formula also gives <span class="math notranslate nohighlight">\(H^T=H\)</span>, and therefore</p>
+<div class="math notranslate nohighlight">
+\[H^TH=H^2=I_n.\]</div>
+<p>Hence <span class="math notranslate nohighlight">\(H\)</span> is orthogonal and <span class="math notranslate nohighlight">\(H^{-1}=H\)</span>. In an orthonormal basis consisting of <span class="math notranslate nohighlight">\(w/\|w\|_2\)</span> and vectors perpendicular to <span class="math notranslate nohighlight">\(w\)</span>, its matrix is <span class="math notranslate nohighlight">\(\operatorname{diag}(-1,1,\ldots,1)\)</span>, so <span class="math notranslate nohighlight">\(\det(H)=-1\)</span>.</p>
+<p>These are <strong>Householder reflections</strong>. Their computational use is developed later in the section on <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder transformations</span></a>.</p>
 </section>
 <section id="the-cartandieudonne-theorem">
 <h2>The Cartan–Dieudonné Theorem<a class="headerlink" href="#the-cartandieudonne-theorem" title="Link to this heading">#</a></h2>
-<p>The <strong>Cartan–Dieudonné theorem</strong> is a fundamental result in geometry that provides a simple, constructive way to think about orthogonal transformations. It states that any orthogonal transformation can be broken down into a series of simpler reflections.</p>
+<p>The <a class="reference external" href="https://www.cis.upenn.edu/~jean/math-deep.pdf">Cartan–Dieudonné theorem</a> shows that hyperplane reflections suffice to construct every real orthogonal transformation.</p>
 <div class="proof theorem admonition" id="thm:cartan_dieudonne">
 <p class="admonition-title"><span class="caption-number">Theorem 2 </span> (Cartan–Dieudonné theorem)</p>
 <section class="theorem-content" id="proof-content">
-<p>Every orthogonal transformation in an <span class="math notranslate nohighlight">\(n\)</span>-dimensional Euclidean space (<span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>) can be described as the composition of at most <strong>n</strong> reflections.</p>
-</section>
-</div><p>This means for any orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>, we can write:</p>
+<p>Every orthogonal transformation of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> is a composition of at most <span class="math notranslate nohighlight">\(n\)</span> reflections across hyperplanes through the origin. Equivalently,</p>
 <div class="math notranslate nohighlight">
-\[
-Q = H_1 H_2 \cdots H_k
-\]</div>
-<p>where each <span class="math notranslate nohighlight">\(H_i\)</span> is a reflection matrix (like a Householder matrix) and <span class="math notranslate nohighlight">\(k \le n\)</span>. If <span class="math notranslate nohighlight">\(k=0\)</span>, <span class="math notranslate nohighlight">\(Q\)</span> is the identity matrix.</p>
-<section id="proof-by-induction">
+\[Q=H_1H_2\cdots H_k,\qquad k\leq n,\]</div>
+<p>where each <span class="math notranslate nohighlight">\(H_i\)</span> is a hyperplane reflection. For <span class="math notranslate nohighlight">\(k=0\)</span>, the product is the identity matrix.</p>
+</section>
+</div><section id="proof-by-induction">
 <h3>Proof by Induction<a class="headerlink" href="#proof-by-induction" title="Link to this heading">#</a></h3>
 <div class="proof admonition" id="proof">
-<p>Proof. The proof works by showing that we can use one reflection to simplify the problem to a lower-dimensional space.</p>
-<ul>
-<li><p><strong>Base Case (n=1)</strong>: In a 1-dimensional space (<span class="math notranslate nohighlight">\(\mathbb{R}\)</span>), an orthogonal transformation is either <span class="math notranslate nohighlight">\(x \mapsto x\)</span> (the identity, 0 reflections) or <span class="math notranslate nohighlight">\(x \mapsto -x\)</span> (a reflection, 1 reflection). The theorem holds.</p></li>
-<li><p><strong>Inductive Step</strong>: Assume the theorem is true for transformations in <span class="math notranslate nohighlight">\(\mathbb{R}^{n-1}\)</span>. Let <span class="math notranslate nohighlight">\(Q\)</span> be an orthogonal transformation in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
-<ol class="arabic">
-<li><p>Consider the first basis vector <span class="math notranslate nohighlight">\(e_1 = (1, 0, \dots, 0)^T\)</span>. Let <span class="math notranslate nohighlight">\(v = Qe_1\)</span>.</p></li>
-<li><p><strong>Case 1</strong>: If <span class="math notranslate nohighlight">\(v = e_1\)</span>, then <span class="math notranslate nohighlight">\(Q\)</span> fixes the first basis vector. This means that the <span class="math notranslate nohighlight">\((n-1)\)</span>-dimensional subspace <span class="math notranslate nohighlight">\(S\)</span> orthogonal to <span class="math notranslate nohighlight">\(e_1\)</span> is invariant under <span class="math notranslate nohighlight">\(Q\)</span>. By our induction hypothesis, this transformation on <span class="math notranslate nohighlight">\(S\)</span> can be achieved with at most <span class="math notranslate nohighlight">\(n-1\)</span> reflections. So, the theorem holds for <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
-<li><p><strong>Case 2</strong>: If <span class="math notranslate nohighlight">\(v \neq e_1\)</span>, we can find a reflection <span class="math notranslate nohighlight">\(H_1\)</span> that maps <span class="math notranslate nohighlight">\(v\)</span> back to <span class="math notranslate nohighlight">\(e_1\)</span>. The specific reflection is the one across the hyperplane that is orthogonal to the vector <span class="math notranslate nohighlight">\((v - e_1)\)</span>. This gives us <span class="math notranslate nohighlight">\(H_1 v = e_1\)</span>.</p></li>
-<li><p>Now consider the new transformation <span class="math notranslate nohighlight">\(Q' = H_1 Q\)</span>. It is also orthogonal since it’s a product of two orthogonal transformations. And importantly, it fixes the vector <span class="math notranslate nohighlight">\(e_1\)</span>:</p>
+<p>Proof. For <span class="math notranslate nohighlight">\(n=1\)</span>, an orthogonal matrix is either <span class="math notranslate nohighlight">\([1]\)</span> or <span class="math notranslate nohighlight">\([-1]\)</span>. These require zero or one reflection, respectively.</p>
+<p>Assume the theorem holds in dimension <span class="math notranslate nohighlight">\(n-1\)</span>, and let <span class="math notranslate nohighlight">\(Q\)</span> be orthogonal on <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Write <span class="math notranslate nohighlight">\(e_1=(1,0,\ldots,0)^T\)</span> and <span class="math notranslate nohighlight">\(v=Qe_1\)</span>. Length preservation gives <span class="math notranslate nohighlight">\(\|v\|_2=1\)</span>.</p>
+<p><strong>Case 1: <span class="math notranslate nohighlight">\(v=e_1\)</span>.</strong> Then <span class="math notranslate nohighlight">\(Q\)</span> fixes <span class="math notranslate nohighlight">\(e_1\)</span>. The subspace</p>
 <div class="math notranslate nohighlight">
-\[
-        Q'e_1 = (H_1 Q)e_1 = H_1(Qe_1) = H_1 v = e_1
-        \]</div>
-</li>
-<li><p>Since <span class="math notranslate nohighlight">\(Q'\)</span> fixes <span class="math notranslate nohighlight">\(e_1\)</span>, it behaves like an <span class="math notranslate nohighlight">\((n-1)\)</span>-dimensional orthogonal transformation on the subspace orthogonal to <span class="math notranslate nohighlight">\(e_1\)</span>. By the induction hypothesis, <span class="math notranslate nohighlight">\(Q'\)</span> can be written as the composition of at most <span class="math notranslate nohighlight">\(n-1\)</span> reflections, say <span class="math notranslate nohighlight">\(Q' = H_2 H_3 \cdots H_k\)</span> where <span class="math notranslate nohighlight">\(k-1 \le n-1\)</span>.</p></li>
-<li><p>Substituting back, we get <span class="math notranslate nohighlight">\(H_1 Q = H_2 H_3 \cdots H_k\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(H_1\)</span> is a reflection, its inverse is itself (<span class="math notranslate nohighlight">\(H_1^{-1} = H_1\)</span>). We can solve for <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+\[S=\{x\in\mathbb{R}^n:e_1^Tx=0\}\]</div>
+<p>is preserved by <span class="math notranslate nohighlight">\(Q\)</span>, because for <span class="math notranslate nohighlight">\(x\in S\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[
-        Q = H_1^{-1} (H_2 H_3 \cdots H_k) = H_1 H_2 H_3 \cdots H_k
-        \]</div>
-</li>
-<li><p>This expresses <span class="math notranslate nohighlight">\(Q\)</span> as a product of <span class="math notranslate nohighlight">\(k\)</span> reflections, where <span class="math notranslate nohighlight">\(k \le (n-1)+1 = n\)</span>.</p></li>
-</ol>
-</li>
-</ul>
-<p>Thus, the theorem is proven.</p>
+\[e_1^TQx=(Qe_1)^TQx=e_1^Tx=0.\]</div>
+<p>The restriction of <span class="math notranslate nohighlight">\(Q\)</span> to <span class="math notranslate nohighlight">\(S\)</span> is therefore an orthogonal transformation of an <span class="math notranslate nohighlight">\((n-1)\)</span>-dimensional Euclidean space. By induction, it is a product of at most <span class="math notranslate nohighlight">\(n-1\)</span> reflections on <span class="math notranslate nohighlight">\(S\)</span>.</p>
+<p>Each such reflection has a normal vector <span class="math notranslate nohighlight">\(w\in S\)</span>. Using the same formula <span class="math notranslate nohighlight">\(I_n-2ww^T/(w^Tw)\)</span> extends it to a reflection on <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> that fixes <span class="math notranslate nohighlight">\(e_1\)</span>. The product of these extended reflections agrees with <span class="math notranslate nohighlight">\(Q\)</span> on both <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(e_1\)</span>, so it equals <span class="math notranslate nohighlight">\(Q\)</span> on all of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
+<p><strong>Case 2: <span class="math notranslate nohighlight">\(v\neq e_1\)</span>.</strong> Set <span class="math notranslate nohighlight">\(w=v-e_1\)</span> and define</p>
+<div class="math notranslate nohighlight">
+\[H=I_n-2\frac{ww^T}{w^Tw}.\]</div>
+<p>We verify that <span class="math notranslate nohighlight">\(Hv=e_1\)</span>. Since <span class="math notranslate nohighlight">\(v^Tv=1\)</span>, writing <span class="math notranslate nohighlight">\(v_1=e_1^Tv\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+w^Tv&amp;=1-v_1, \\
+w^Tw&amp;=2(1-v_1)&gt;0.
+\end{aligned}
+\end{split}\]</div>
+<p>Consequently,</p>
+<div class="math notranslate nohighlight">
+\[Hv=v-2w\frac{1-v_1}{2(1-v_1)}=v-w=e_1.\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(HQ\)</span> is orthogonal and fixes <span class="math notranslate nohighlight">\(e_1\)</span>. By Case 1, it is a product of at most <span class="math notranslate nohighlight">\(n-1\)</span> reflections. Since <span class="math notranslate nohighlight">\(H^{-1}=H\)</span>, multiplying by <span class="math notranslate nohighlight">\(H\)</span> expresses <span class="math notranslate nohighlight">\(Q\)</span> as a product of at most <span class="math notranslate nohighlight">\(n\)</span> reflections.</p>
 </div>
+<p>Because each reflection has determinant <span class="math notranslate nohighlight">\(-1\)</span>, a product of <span class="math notranslate nohighlight">\(k\)</span> reflections has determinant <span class="math notranslate nohighlight">\((-1)^k\)</span>. Thus orientation-preserving orthogonal transformations require an even number of reflections, and orientation-reversing ones require an odd number.</p>
 </section>
 </section>
 </section>
@@ -618,12 +681,19 @@ Q = H_1 H_2 \cdots H_k
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-core-properties">Definition and Core Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-mathematical-formulas">Key Results and Mathematical Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#isometry-length-and-angle-preservation">Isometry (Length and Angle Preservation)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant">Determinant</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-and-core-properties">Definition and Core Properties</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rectangular-matrices-with-orthonormal-columns">Rectangular Matrices with Orthonormal Columns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unitary-matrices">Unitary Matrices</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-mathematical-formulas">Key Results and Mathematical Formulas</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#length-distance-and-angle-preservation">Length, Distance, and Angle Preservation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#products-and-inverses">Products and Inverses</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#determinant-and-orientation">Determinant and Orientation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-orthogonal-matrices-are-useful-in-numerical-linear-algebra">Why Orthogonal Matrices Are Useful in Numerical Linear Algebra</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflections-across-hyperplanes">Reflections Across Hyperplanes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cartandieudonne-theorem">The Cartan–Dieudonné Theorem</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-by-induction">Proof by Induction</a></li>
 </ul>

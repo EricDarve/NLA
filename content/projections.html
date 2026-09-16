@@ -425,26 +425,24 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-projections-orthogonal-vs-oblique">Types of Projections: Orthogonal vs. Oblique</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projections">Orthogonal Projections</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projections">Oblique Projections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#projection-onto-a-subspace-along-a-complement">Projection onto a Subspace along a Complement</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complementary-projection">The Complementary Projection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-basis-adapted-to-the-projection">A Basis Adapted to the Projection</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-formulas">Mathematical Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projection-formula">Orthogonal Projection Formula</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#special-case-projection-onto-a-line">Special Case: Projection onto a Line</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-and-oblique-projections">Orthogonal and Oblique Projections</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetry-characterizes-orthogonal-projections">Symmetry Characterizes Orthogonal Projections</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projection-formula">Oblique Projection Formula</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#formulas-for-orthogonal-projections">Formulas for Orthogonal Projections</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-orthonormal-basis">An Orthonormal Basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#any-basis-of-the-subspace">Any Basis of the Subspace</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-properties">Key Results and Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-matrices-and-projections">Orthogonal Matrices and Projections</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-and-explanation">Derivation and Explanation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-projection-matrix-p-qq-t">Properties of the Projection Matrix <span class="math notranslate nohighlight">\(P = QQ^T\)</span></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-closest-point-property">The Closest-Point Property</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-formula-for-oblique-projections">A Formula for Oblique Projections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-projections-enter-the-course">How Projections Enter the Course</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complex-vectors">Complex Vectors</a></li>
 </ul>
             </nav>
         </div>
@@ -458,105 +456,219 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="projections">
 <h1>Projections<a class="headerlink" href="#projections" title="Link to this heading">#</a></h1>
-<p>A <strong>projection</strong> is a linear transformation that takes a vector and maps it onto a subspace. Intuitively, you can think of it as casting a shadow. If you shine a light on an object (a vector), the shadow it creates on a surface (a subspace) is its projection. Projections are fundamental in areas like computer graphics, statistics (for least-squares regression), and solving systems of linear equations.</p>
-<p>All projections are represented by a square matrix <span class="math notranslate nohighlight">\(P\)</span> that is <strong>idempotent</strong>, meaning that applying the projection more than once has no further effect. Algebraically, this is the defining property of a projection matrix:</p>
+<p>A projection splits a vector into two parts and keeps one of them. The two parts belong to complementary subspaces: one is the space we project <strong>onto</strong>, and the other is the space we project <strong>along</strong>.</p>
+<p>This distinction connects several algorithms in this course. LU factorization removes components using oblique projections. Orthogonal projections select closest approximations and appear in QR factorization, eigenvalue computations, and iterative methods.</p>
+<p>We work first in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> with the usual dot product. The corresponding formulas for complex vectors are given at the end.</p>
+<section id="projection-onto-a-subspace-along-a-complement">
+<h2>Projection onto a Subspace along a Complement<a class="headerlink" href="#projection-onto-a-subspace-along-a-complement" title="Link to this heading">#</a></h2>
+<p>Suppose <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(T\)</span> are complementary subspaces:</p>
 <div class="math notranslate nohighlight">
-\[P^2 = P\]</div>
-<section id="types-of-projections-orthogonal-vs-oblique">
-<h2>Types of Projections: Orthogonal vs. Oblique<a class="headerlink" href="#types-of-projections-orthogonal-vs-oblique" title="Link to this heading">#</a></h2>
-<p>The distinction between the two main types of projections depends on the direction of the projection relative to the target subspace. 📐</p>
-<section id="orthogonal-projections">
-<h3>Orthogonal Projections<a class="headerlink" href="#orthogonal-projections" title="Link to this heading">#</a></h3>
-<p>An <strong>orthogonal projection</strong> is the most common type. Here, the direction of projection is <strong>perpendicular (orthogonal)</strong> to the subspace you are projecting onto. This is like the shadow cast by the sun when it’s directly overhead.</p>
-<p>A key feature of an orthogonal projection is that it finds the point in the subspace that is <strong>geometrically closest</strong> to the original vector. This “best approximation” property is the foundation of least-squares solutions to overdetermined systems of equations.</p>
-</section>
-<section id="oblique-projections">
-<h3>Oblique Projections<a class="headerlink" href="#oblique-projections" title="Link to this heading">#</a></h3>
-<p>An <strong>oblique projection</strong> is one where the direction of projection is <strong>not perpendicular</strong> to the target subspace. This is analogous to the long, angled shadow cast by the sun when it’s low in the sky. While less common than orthogonal projections, they are used in specific applications like perspective projections in computer graphics.</p>
-</section>
-</section>
-<section id="mathematical-formulas">
-<h2>Mathematical Formulas<a class="headerlink" href="#mathematical-formulas" title="Link to this heading">#</a></h2>
-<p>The specific formula for a projection matrix depends on the type of projection and the subspace being projected onto.</p>
-<section id="orthogonal-projection-formula">
-<h3>Orthogonal Projection Formula<a class="headerlink" href="#orthogonal-projection-formula" title="Link to this heading">#</a></h3>
-<p>To project a vector onto the subspace spanned by the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span> (where the columns of <span class="math notranslate nohighlight">\(A\)</span> are linearly independent), the orthogonal projection matrix <span class="math notranslate nohighlight">\(P\)</span> is given by:</p>
+\[\mathbb{R}^n=S\oplus T.\]</div>
+<p>This means that every <span class="math notranslate nohighlight">\(x\in\mathbb{R}^n\)</span> has a unique decomposition</p>
 <div class="math notranslate nohighlight">
-\[P = A(A^T A)^{-1} A^T\]</div>
-<p>The projection of a vector <span class="math notranslate nohighlight">\(b\)</span> onto this subspace is then calculated as <span class="math notranslate nohighlight">\(p = Pb\)</span>.</p>
-<section id="special-case-projection-onto-a-line">
-<h4>Special Case: Projection onto a Line<a class="headerlink" href="#special-case-projection-onto-a-line" title="Link to this heading">#</a></h4>
-<p>If you are projecting onto a line spanned by a single non-zero vector <span class="math notranslate nohighlight">\(a\)</span>, the formula simplifies significantly. In this case, <span class="math notranslate nohighlight">\(A\)</span> is just the column vector <span class="math notranslate nohighlight">\(a\)</span>.</p>
+\[x=s+t,\qquad s\in S,\quad t\in T.\]</div>
+<p>The <strong>projection onto <span class="math notranslate nohighlight">\(S\)</span> along <span class="math notranslate nohighlight">\(T\)</span></strong> is the map</p>
 <div class="math notranslate nohighlight">
-\[P = \frac{aa^T}{a^T a}\]</div>
-<p>The projection of a vector <span class="math notranslate nohighlight">\(b\)</span> onto the line defined by <span class="math notranslate nohighlight">\(a\)</span> is:</p>
+\[Px=s.\]</div>
+<p>It keeps the component in <span class="math notranslate nohighlight">\(S\)</span> and removes the component in <span class="math notranslate nohighlight">\(T\)</span>. Thus <span class="math notranslate nohighlight">\(P\)</span> acts as the identity on <span class="math notranslate nohighlight">\(S\)</span> and as zero on <span class="math notranslate nohighlight">\(T\)</span>. In particular,</p>
 <div class="math notranslate nohighlight">
-\[p = \left(\frac{a \cdot b}{\|a\|^2}\right) a\]</div>
-<p>This formula has a clear geometric meaning: it scales the direction vector <span class="math notranslate nohighlight">\(a\)</span> by a factor determined by the dot product of <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span>.</p>
+\[Px\in S,\qquad x-Px\in T.\]</div>
+<p>The decomposition also shows that <span class="math notranslate nohighlight">\(P\)</span> is linear: adding or scaling two vectors adds or scales their <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(T\)</span> components. Applying <span class="math notranslate nohighlight">\(P\)</span> a second time leaves <span class="math notranslate nohighlight">\(Px\)</span> unchanged, so</p>
+<div class="math notranslate nohighlight">
+\[P^2=P.\]</div>
+<p>A square matrix satisfying this identity is called <strong>idempotent</strong>. Conversely, every idempotent matrix is a projection in the sense just described.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Let <span class="math notranslate nohighlight">\(P^2=P\)</span>, and define its range and null space by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+S&amp;=\operatorname{range}(P)=\{Px:x\in\mathbb{R}^n\}, \\
+T&amp;=\ker(P)=\{x:Px=0\}.
+\end{aligned}
+\end{split}\]</div>
+<p>For every <span class="math notranslate nohighlight">\(x\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[x=Px+(I-P)x.\]</div>
+<p>The first term is in <span class="math notranslate nohighlight">\(S\)</span>, and the second is in <span class="math notranslate nohighlight">\(T\)</span>, because <span class="math notranslate nohighlight">\(P(I-P)x=(P-P^2)x=0\)</span>. If <span class="math notranslate nohighlight">\(s\in S\)</span>, write <span class="math notranslate nohighlight">\(s=Py\)</span>; then <span class="math notranslate nohighlight">\(Ps=P^2y=Py=s\)</span>. A vector belonging to both <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(T\)</span> must therefore satisfy <span class="math notranslate nohighlight">\(Ps=s\)</span> and <span class="math notranslate nohighlight">\(Ps=0\)</span>, so it is zero. This proves <span class="math notranslate nohighlight">\(\mathbb{R}^n=S\oplus T\)</span> and the uniqueness of the decomposition.</p>
+</div>
+<p>Specifying the range alone does not determine a projection: the choice of complementary null space also matters. The zero matrix and the identity matrix are projections onto <span class="math notranslate nohighlight">\(\{0\}\)</span> and <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, respectively.</p>
+<section id="the-complementary-projection">
+<h3>The Complementary Projection<a class="headerlink" href="#the-complementary-projection" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(P\)</span> projects onto <span class="math notranslate nohighlight">\(S\)</span> along <span class="math notranslate nohighlight">\(T\)</span>, then <span class="math notranslate nohighlight">\(I-P\)</span> projects onto <span class="math notranslate nohighlight">\(T\)</span> along <span class="math notranslate nohighlight">\(S\)</span>. Indeed,</p>
+<div class="math notranslate nohighlight">
+\[
+(I-P)^2=I-P,\qquad P(I-P)=(I-P)P=0.
+\]</div>
+<p>The decomposition <span class="math notranslate nohighlight">\(x=Px+(I-P)x\)</span> identifies both components. For a general projection, these components need not be perpendicular.</p>
+<p>Products of projections require care: <span class="math notranslate nohighlight">\(P_1P_2\)</span> need not be a projection. If <span class="math notranslate nohighlight">\(P_1P_2=P_2P_1\)</span>, however, then <span class="math notranslate nohighlight">\((P_1P_2)^2=P_1^2P_2^2=P_1P_2\)</span>. If both projections are orthogonal and commute, their product is also symmetric and hence an orthogonal projection.</p>
+</section>
+<section id="a-basis-adapted-to-the-projection">
+<h3>A Basis Adapted to the Projection<a class="headerlink" href="#a-basis-adapted-to-the-projection" title="Link to this heading">#</a></h3>
+<p>Choose a basis <span class="math notranslate nohighlight">\(s_1,\ldots,s_r\)</span> of <span class="math notranslate nohighlight">\(S\)</span> and a basis <span class="math notranslate nohighlight">\(t_1,\ldots,t_{n-r}\)</span> of <span class="math notranslate nohighlight">\(T\)</span>. Together they form a basis of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. With</p>
+<div class="math notranslate nohighlight">
+\[C=[s_1,\ldots,s_r,t_1,\ldots,t_{n-r}],\]</div>
+<p>we have</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}C^{-1}PC=\begin{pmatrix}I_r&amp;0\\0&amp;0\end{pmatrix}.\end{split}\]</div>
+<p>This follows because <span class="math notranslate nohighlight">\(Ps_i=s_i\)</span> and <span class="math notranslate nohighlight">\(Pt_j=0\)</span>. By invariance of trace under a change of basis,</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{tr}(P)=r=\operatorname{rank}(P).\]</div>
+<p>Also, <span class="math notranslate nohighlight">\(P\)</span> is invertible only when <span class="math notranslate nohighlight">\(P=I_n\)</span>. These statements hold for both orthogonal and oblique projections.</p>
 </section>
 </section>
-<section id="oblique-projection-formula">
-<h3>Oblique Projection Formula<a class="headerlink" href="#oblique-projection-formula" title="Link to this heading">#</a></h3>
-<p>For an oblique projection, you must specify both the subspace to project <strong>onto</strong> (the range) and the direction to project <strong>along</strong> (the null space).</p>
-<p>Let the range be spanned by the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span>. The direction of projection is defined as the subspace orthogonal to the columns of another matrix, <span class="math notranslate nohighlight">\(B\)</span>. The projection matrix <span class="math notranslate nohighlight">\(P\)</span> is then given by:</p>
+<section id="orthogonal-and-oblique-projections">
+<h2>Orthogonal and Oblique Projections<a class="headerlink" href="#orthogonal-and-oblique-projections" title="Link to this heading">#</a></h2>
+<p>The projection onto <span class="math notranslate nohighlight">\(S\)</span> is <strong>orthogonal</strong> when its null space is <span class="math notranslate nohighlight">\(S^\perp\)</span>, the set of vectors perpendicular to every vector in <span class="math notranslate nohighlight">\(S\)</span>. Its defining geometric properties are</p>
 <div class="math notranslate nohighlight">
-\[P = A(B^T A)^{-1} B^T\]</div>
-<p>Here, the null space of the projection <span class="math notranslate nohighlight">\(P\)</span> (the direction of projection) is the set of all vectors orthogonal to the column space of <span class="math notranslate nohighlight">\(B\)</span>.</p>
-<p>Notice that if you choose <span class="math notranslate nohighlight">\(B = A\)</span>, the direction of projection becomes orthogonal to the range (since it’s orthogonal to the columns of <span class="math notranslate nohighlight">\(A\)</span>). This makes the projection orthogonal, and the formula reduces to the standard orthogonal projection formula: <span class="math notranslate nohighlight">\(P = A(A^T A)^{-1} A^T\)</span>.</p>
+\[Px\in S,\qquad x-Px\perp S.\]</div>
+<p>For each subspace <span class="math notranslate nohighlight">\(S\)</span>, there is exactly one orthogonal projection, because <span class="math notranslate nohighlight">\(\mathbb{R}^n=S\oplus S^\perp\)</span>. A projection whose null space is a different complement is called <strong>oblique</strong>.</p>
+<p>For example, both matrices</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+P_{\mathrm{orth}}=\begin{pmatrix}1&amp;0\\0&amp;0\end{pmatrix},\qquad
+P_{\mathrm{obl}}=\begin{pmatrix}1&amp;1\\0&amp;0\end{pmatrix}
+\end{split}\]</div>
+<p>project onto the horizontal axis and satisfy <span class="math notranslate nohighlight">\(P^2=P\)</span>. Their null spaces differ:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\ker(P_{\mathrm{orth}})&amp;=\operatorname{span}\{(0,1)^T\}, \\
+\ker(P_{\mathrm{obl}})&amp;=\operatorname{span}\{(-1,1)^T\}.
+\end{aligned}
+\end{split}\]</div>
+<p>Consequently, they send <span class="math notranslate nohighlight">\(x=(1,2)^T\)</span> to different points: <span class="math notranslate nohighlight">\((1,0)^T\)</span> and <span class="math notranslate nohighlight">\((3,0)^T\)</span>, respectively.</p>
+<figure class="align-default" id="id1">
+<img alt="Orthogonal and oblique projections of x=(1,2) onto the horizontal axis. The orthogonal projection follows a vertical line to (1,0). The oblique projection follows a line parallel to (-1,1) to (3,0)." src="../_images/projection_comparison.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Both projections have the same range <span class="math notranslate nohighlight">\(S\)</span>. The segment from <span class="math notranslate nohighlight">\(x\)</span> to <span class="math notranslate nohighlight">\(Px\)</span> is parallel to the null space <span class="math notranslate nohighlight">\(T\)</span>, shown in orange.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<section id="symmetry-characterizes-orthogonal-projections">
+<h3>Symmetry Characterizes Orthogonal Projections<a class="headerlink" href="#symmetry-characterizes-orthogonal-projections" title="Link to this heading">#</a></h3>
+<p>For a projection matrix <span class="math notranslate nohighlight">\(P\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[P\text{ is orthogonal}\quad\Longleftrightarrow\quad P^T=P.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Suppose first that <span class="math notranslate nohighlight">\(P^T=P\)</span>. For <span class="math notranslate nohighlight">\(s=Px\)</span> in its range and <span class="math notranslate nohighlight">\(t\)</span> in its null space,</p>
+<div class="math notranslate nohighlight">
+\[s^Tt=x^TP^Tt=x^TPt=0.\]</div>
+<p>Thus the range and null space are perpendicular. Since they are complementary, the null space is exactly the orthogonal complement of the range.</p>
+<p>Conversely, suppose <span class="math notranslate nohighlight">\(P\)</span> is an orthogonal projection. Decompose both <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> into their range and null-space components. Perpendicularity gives</p>
+<div class="math notranslate nohighlight">
+\[x^TPy=(Px)^TPy=(Px)^Ty=x^TP^Ty.\]</div>
+<p>This holds for every <span class="math notranslate nohighlight">\(x,y\)</span>, so <span class="math notranslate nohighlight">\(P=P^T\)</span>.</p>
+</div>
+<p>An orthogonal <strong>projection</strong> is different from an orthogonal <strong>matrix</strong>. A projection onto a proper subspace discards nonzero vectors in its null space and is singular. An orthogonal matrix preserves every vector’s length and is invertible. Only <span class="math notranslate nohighlight">\(I_n\)</span> has both properties.</p>
 </section>
 </section>
-<section id="key-results-and-properties">
-<h2>Key Results and Properties<a class="headerlink" href="#key-results-and-properties" title="Link to this heading">#</a></h2>
-<p>Projection matrices have several important and elegant properties.</p>
-<ul class="simple">
-<li><p><strong>Idempotence</strong>: As mentioned, all projection matrices satisfy <span class="math notranslate nohighlight">\(P^2 = P\)</span>.</p></li>
-<li><p><strong>Symmetry</strong>: A projection matrix <span class="math notranslate nohighlight">\(P\)</span> represents an <strong>orthogonal projection</strong> if and only if it is a <strong>symmetric matrix</strong> (<span class="math notranslate nohighlight">\(P = P^T\)</span>). Oblique projection matrices are generally not symmetric.</p></li>
-<li><p><strong>Complementary Projection</strong>: If <span class="math notranslate nohighlight">\(P\)</span> is a projection matrix, then the matrix <span class="math notranslate nohighlight">\(Q = I - P\)</span> is also a projection matrix. <span class="math notranslate nohighlight">\(Q\)</span> is called the <strong>complementary projection</strong>. It projects onto the null space of <span class="math notranslate nohighlight">\(P\)</span> along the range of <span class="math notranslate nohighlight">\(P\)</span>. For an orthogonal projection <span class="math notranslate nohighlight">\(P\)</span>, its complement <span class="math notranslate nohighlight">\(I-P\)</span> is also an orthogonal projection onto the orthogonal complement of the original subspace.</p></li>
-</ul>
+<section id="formulas-for-orthogonal-projections">
+<h2>Formulas for Orthogonal Projections<a class="headerlink" href="#formulas-for-orthogonal-projections" title="Link to this heading">#</a></h2>
+<section id="an-orthonormal-basis">
+<h3>An Orthonormal Basis<a class="headerlink" href="#an-orthonormal-basis" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(Q=[q_1,\ldots,q_r]\in\mathbb{R}^{n\times r}\)</span> have orthonormal columns spanning <span class="math notranslate nohighlight">\(S\)</span>, so <span class="math notranslate nohighlight">\(Q^TQ=I_r\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[P=QQ^T,\qquad Px=\sum_{j=1}^r q_j(q_j^Tx).\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. The vector <span class="math notranslate nohighlight">\(p=QQ^Tx\)</span> belongs to <span class="math notranslate nohighlight">\(S\)</span>. Moreover,</p>
+<div class="math notranslate nohighlight">
+\[Q^T(x-p)=Q^Tx-Q^TQQ^Tx=0,\]</div>
+<p>so the residual <span class="math notranslate nohighlight">\(x-p\)</span> is perpendicular to every column of <span class="math notranslate nohighlight">\(Q\)</span>, and hence to <span class="math notranslate nohighlight">\(S\)</span>. These two conditions identify <span class="math notranslate nohighlight">\(p\)</span> as the orthogonal projection of <span class="math notranslate nohighlight">\(x\)</span>.</p>
+</div>
+<p>The computation has two steps: <span class="math notranslate nohighlight">\(Q^Tx\)</span> finds the coefficients of the projected vector in the basis <span class="math notranslate nohighlight">\(q_1,\ldots,q_r\)</span>, and <span class="math notranslate nohighlight">\(Q(Q^Tx)\)</span> reconstructs that vector. When <span class="math notranslate nohighlight">\(x\)</span> lies outside <span class="math notranslate nohighlight">\(S\)</span>, these are the coordinates of its projection, not coordinates representing all of <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>Here <span class="math notranslate nohighlight">\(Q\)</span> is usually rectangular. If it is square, then <span class="math notranslate nohighlight">\(S=\mathbb{R}^n\)</span> and <span class="math notranslate nohighlight">\(QQ^T=I_n\)</span>. Projection onto the zero subspace is simply <span class="math notranslate nohighlight">\(P=0\)</span>.</p>
 </section>
-<section id="orthogonal-matrices-and-projections">
-<h2>Orthogonal Matrices and Projections<a class="headerlink" href="#orthogonal-matrices-and-projections" title="Link to this heading">#</a></h2>
-<p>The connection is simple and direct: if the columns of a matrix <span class="math notranslate nohighlight">\(A\)</span> are <strong>orthonormal</strong>, meaning they form an <strong>orthogonal matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span>, the formula for the orthogonal projection matrix onto the column space of <span class="math notranslate nohighlight">\(A\)</span> simplifies dramatically.</p>
-<p>Specifically, the projection matrix <span class="math notranslate nohighlight">\(P\)</span> becomes <span class="math notranslate nohighlight">\(P = QQ^T\)</span>.</p>
-<section id="derivation-and-explanation">
-<h3>Derivation and Explanation<a class="headerlink" href="#derivation-and-explanation" title="Link to this heading">#</a></h3>
-<p>The standard formula for an orthogonal projection matrix <span class="math notranslate nohighlight">\(P\)</span> that projects vectors onto the column space of a matrix <span class="math notranslate nohighlight">\(A\)</span> is:</p>
+<section id="any-basis-of-the-subspace">
+<h3>Any Basis of the Subspace<a class="headerlink" href="#any-basis-of-the-subspace" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{n\times r}\)</span> have linearly independent columns spanning <span class="math notranslate nohighlight">\(S\)</span>, with <span class="math notranslate nohighlight">\(1\leq r\leq n\)</span>. Then</p>
 <div class="math notranslate nohighlight">
-\[P = A(A^T A)^{-1} A^T\]</div>
-<p>An <strong>orthogonal matrix</strong> <span class="math notranslate nohighlight">\(Q\)</span> (which must be a tall or square matrix with orthonormal columns) has the defining property that its columns are mutually perpendicular and have a length of one. Algebraically, this means:</p>
+\[P=A(A^TA)^{-1}A^T.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Write the projected vector as <span class="math notranslate nohighlight">\(p=Ac\)</span>. The condition <span class="math notranslate nohighlight">\(x-p\perp S\)</span> becomes</p>
 <div class="math notranslate nohighlight">
-\[Q^T Q = I\]</div>
-<p>where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p>
-<p>If we substitute our orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> for the general matrix <span class="math notranslate nohighlight">\(A\)</span> in the projection formula, the <span class="math notranslate nohighlight">\((Q^T Q)\)</span> term simplifies to the identity matrix <span class="math notranslate nohighlight">\(I\)</span>:</p>
+\[A^T(x-Ac)=0,\qquad A^TAc=A^Tx.\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(A^TA\)</span> is invertible: for any nonzero <span class="math notranslate nohighlight">\(c\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[P = Q(\underbrace{Q^T Q}_{I})^{-1} Q^T = Q(I)^{-1}Q^T = QIQ^T = QQ^T\]</div>
-<p>So, the orthogonal projection matrix onto the subspace spanned by a set of orthonormal vectors (the columns of <span class="math notranslate nohighlight">\(Q\)</span>) is simply <span class="math notranslate nohighlight">\(P = QQ^T\)</span>.</p>
-</section>
-<section id="properties-of-the-projection-matrix-p-qq-t">
-<h3>Properties of the Projection Matrix <span class="math notranslate nohighlight">\(P = QQ^T\)</span><a class="headerlink" href="#properties-of-the-projection-matrix-p-qq-t" title="Link to this heading">#</a></h3>
-<p>This simplified form, <span class="math notranslate nohighlight">\(P=QQ^T\)</span>, neatly demonstrates the two defining properties of an orthogonal projection matrix.</p>
-<ol class="arabic">
-<li><p><strong>Symmetry</strong>: A matrix is symmetric if <span class="math notranslate nohighlight">\(P^T = P\)</span>.</p>
+\[c^TA^TAc=\|Ac\|_2^2&gt;0,\]</div>
+<p>because the columns of <span class="math notranslate nohighlight">\(A\)</span> are linearly independent. Thus</p>
 <div class="math notranslate nohighlight">
-\[P^T = (QQ^T)^T = (Q^T)^T Q^T = QQ^T = P\]</div>
-<p>The matrix is its own transpose, so it is <strong>symmetric</strong>.</p>
-</li>
-<li><p><strong>Idempotence</strong>: A matrix is idempotent if <span class="math notranslate nohighlight">\(P^2 = P\)</span>.</p>
+\[c=(A^TA)^{-1}A^Tx,\qquad p=A(A^TA)^{-1}A^Tx.\]</div>
+</div>
+<p>The projection depends only on <span class="math notranslate nohighlight">\(S\)</span>, not on the chosen basis. If a spanning matrix has dependent columns, its <span class="math notranslate nohighlight">\(A^TA\)</span> is singular; select a basis for its column space before using this formula.</p>
+<p>For a line spanned by a nonzero vector <span class="math notranslate nohighlight">\(a\)</span>, the formula reduces to</p>
 <div class="math notranslate nohighlight">
-\[P^2 = (QQ^T)(QQ^T) = Q(\underbrace{Q^T Q}_{I})Q^T = QIQ^T = QQ^T = P\]</div>
-<p>Projecting a vector twice is the same as projecting it once.</p>
-</li>
-</ol>
+\[P=\frac{aa^T}{a^Ta},\qquad Px=a\frac{a^Tx}{a^Ta}.\]</div>
+<p>These formulas describe the projection mathematically. To apply <span class="math notranslate nohighlight">\(P\)</span>, one can solve the small system <span class="math notranslate nohighlight">\(A^TAc=A^Tx\)</span> and form <span class="math notranslate nohighlight">\(Ac\)</span>; there is no need to form the inverse or the full <span class="math notranslate nohighlight">\(n\times n\)</span> projection matrix. With an orthonormal basis, only the two products <span class="math notranslate nohighlight">\(Q^Tx\)</span> and <span class="math notranslate nohighlight">\(Q(Q^Tx)\)</span> are needed. Later chapters discuss how to compute such bases using QR.</p>
 </section>
 </section>
-<section id="geometric-interpretation">
-<h2>Geometric Interpretation 📐<a class="headerlink" href="#geometric-interpretation" title="Link to this heading">#</a></h2>
-<p>When we project a vector <span class="math notranslate nohighlight">\(x\)</span> onto the column space of an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span>, the operation <span class="math notranslate nohighlight">\(p = Px = QQ^Tx\)</span> can be seen as a two-step process:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(Q^Tx\)</span>: First, we multiply by <span class="math notranslate nohighlight">\(Q^T\)</span>. This calculates the dot products of <span class="math notranslate nohighlight">\(x\)</span> with each orthonormal column of <span class="math notranslate nohighlight">\(Q\)</span>. In essence, it finds the coordinates of <span class="math notranslate nohighlight">\(x\)</span> in the basis defined by the columns of <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(Q(Q^Tx)\)</span>: Next, we multiply the resulting coordinate vector by <span class="math notranslate nohighlight">\(Q\)</span>. This creates a linear combination of the orthonormal basis vectors (the columns of <span class="math notranslate nohighlight">\(Q\)</span>) using those coordinates.</p></li>
-</ol>
-<p>The result is a new vector <span class="math notranslate nohighlight">\(p\)</span> that lives within the column space of <span class="math notranslate nohighlight">\(Q\)</span> and is the closest possible vector in that subspace to the original vector <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<section id="the-closest-point-property">
+<h2>The Closest-Point Property<a class="headerlink" href="#the-closest-point-property" title="Link to this heading">#</a></h2>
+<p>The orthogonal projection <span class="math notranslate nohighlight">\(p=Px\)</span> is the unique vector in <span class="math notranslate nohighlight">\(S\)</span> closest to <span class="math notranslate nohighlight">\(x\)</span> in the 2-norm:</p>
+<div class="math notranslate nohighlight">
+\[p=\underset{y\in S}{\operatorname{argmin}}\ \|x-y\|_2.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. For any <span class="math notranslate nohighlight">\(y\in S\)</span>, write <span class="math notranslate nohighlight">\(x-y=(x-p)+(p-y)\)</span> and expand the squared norm:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|x-y\|_2^2
+&amp;=\|x-p\|_2^2+\|p-y\|_2^2 \\
+&amp;\qquad {}+2(x-p)^T(p-y).
+\end{aligned}
+\end{split}\]</div>
+<p>The cross term is <span class="math notranslate nohighlight">\(2(x-p)^T(p-y)\)</span>. It is zero because <span class="math notranslate nohighlight">\(x-p\)</span> is perpendicular to <span class="math notranslate nohighlight">\(S\)</span> and <span class="math notranslate nohighlight">\(p-y\)</span> belongs to <span class="math notranslate nohighlight">\(S\)</span>. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\|x-y\|_2^2=\|x-p\|_2^2+\|p-y\|_2^2.\]</div>
+<p>The right side is minimized uniquely when <span class="math notranslate nohighlight">\(y=p\)</span>.</p>
+</div>
+<p>Taking <span class="math notranslate nohighlight">\(y=0\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\|x\|_2^2=\|Px\|_2^2+\|(I-P)x\|_2^2.\]</div>
+<p>Thus an orthogonal projection never increases the 2-norm: <span class="math notranslate nohighlight">\(\|Px\|_2\leq\|x\|_2\)</span>. If <span class="math notranslate nohighlight">\(P\neq0\)</span>, then <span class="math notranslate nohighlight">\(\|P\|_2=1\)</span>, because <span class="math notranslate nohighlight">\(Ps=s\)</span> for any nonzero <span class="math notranslate nohighlight">\(s\)</span> in its range. The zero projection has norm zero.</p>
+<p>An oblique projection need not give the closest point and can increase lengths. For instance,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}P_t=\begin{pmatrix}1&amp;t\\0&amp;0\end{pmatrix}\end{split}\]</div>
+<p>satisfies <span class="math notranslate nohighlight">\(P_t^2=P_t\)</span>, but sends the unit vector <span class="math notranslate nohighlight">\((0,1)^T\)</span> to <span class="math notranslate nohighlight">\((t,0)^T\)</span>. Its output can therefore be arbitrarily long as <span class="math notranslate nohighlight">\(|t|\)</span> increases.</p>
+</section>
+<section id="a-formula-for-oblique-projections">
+<h2>A Formula for Oblique Projections<a class="headerlink" href="#a-formula-for-oblique-projections" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(A,B\in\mathbb{R}^{n\times r}\)</span> have linearly independent columns, and assume that <span class="math notranslate nohighlight">\(B^TA\)</span> is invertible. Then</p>
+<div class="math notranslate nohighlight">
+\[P=A(B^TA)^{-1}B^T\]</div>
+<p>is the projection onto <span class="math notranslate nohighlight">\(S=\operatorname{range}(A)\)</span> along <span class="math notranslate nohighlight">\(T=\ker(B^T)\)</span>. The columns of <span class="math notranslate nohighlight">\(B\)</span> span <span class="math notranslate nohighlight">\(T^\perp\)</span>, not <span class="math notranslate nohighlight">\(T\)</span> itself.</p>
+<p>The invertibility condition is essential. It says that no nonzero vector in <span class="math notranslate nohighlight">\(S\)</span> lies in <span class="math notranslate nohighlight">\(T\)</span>; since the dimensions are <span class="math notranslate nohighlight">\(r\)</span> and <span class="math notranslate nohighlight">\(n-r\)</span>, the two spaces are complementary. Linearly independent columns in each matrix alone do not suffice. For example, <span class="math notranslate nohighlight">\(A=(1,0)^T\)</span> and <span class="math notranslate nohighlight">\(B=(0,1)^T\)</span> both have independent columns, but <span class="math notranslate nohighlight">\(B^TA=0\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. We seek <span class="math notranslate nohighlight">\(p=Ac\)</span> such that <span class="math notranslate nohighlight">\(x-p\in\ker(B^T)\)</span>. This condition gives</p>
+<div class="math notranslate nohighlight">
+\[B^T(x-Ac)=0,\qquad B^TAc=B^Tx.\]</div>
+<p>Solving for <span class="math notranslate nohighlight">\(c\)</span> yields the stated formula. It follows directly that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+P^2
+&amp;=A(B^TA)^{-1}(B^TA)(B^TA)^{-1}B^T \\
+&amp;=P.
+\end{aligned}
+\end{split}\]</div>
+<p>Every <span class="math notranslate nohighlight">\(Px\)</span> is in <span class="math notranslate nohighlight">\(\operatorname{range}(A)\)</span>, and <span class="math notranslate nohighlight">\(PA=A\)</span>, so the range is exactly that space. Also, <span class="math notranslate nohighlight">\(B^TP=B^T\)</span>: if <span class="math notranslate nohighlight">\(Px=0\)</span>, then <span class="math notranslate nohighlight">\(B^Tx=0\)</span>, while <span class="math notranslate nohighlight">\(B^Tx=0\)</span> immediately implies <span class="math notranslate nohighlight">\(Px=0\)</span>. Hence <span class="math notranslate nohighlight">\(\ker(P)=\ker(B^T)\)</span>.</p>
+</div>
+<p>Taking <span class="math notranslate nohighlight">\(B=A\)</span> recovers the orthogonal projection formula. More generally, this formula gives an orthogonal projection exactly when the column spaces of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> coincide; otherwise it is oblique.</p>
+</section>
+<section id="how-projections-enter-the-course">
+<h2>How Projections Enter the Course<a class="headerlink" href="#how-projections-enter-the-course" title="Link to this heading">#</a></h2>
+<p>Oblique projections help describe the elimination steps in <a class="reference internal" href="lu_decomposition.html"><span class="std std-doc">LU factorization</span></a>. Orthogonal projections are used to construct orthonormal bases in <a class="reference internal" href="modified_gram_schmidt.html"><span class="std std-doc">QR factorization</span></a>, and to find approximations in smaller subspaces in eigenvalue computations and iterative methods for solving linear systems. We will explain these connections when we develop each method later in the course.</p>
+</section>
+<section id="complex-vectors">
+<h2>Complex Vectors<a class="headerlink" href="#complex-vectors" title="Link to this heading">#</a></h2>
+<p>For the usual complex inner product, replace transposes in the projection formulas by conjugate transposes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+P_{\mathrm{orth}}&amp;=Q Q^H
+                 =A(A^HA)^{-1}A^H, \\
+P_{\mathrm{general}}&amp;=A(B^HA)^{-1}B^H.
+\end{aligned}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(A\)</span> span the same subspace, <span class="math notranslate nohighlight">\(Q^HQ=I\)</span>, and the same rank and invertibility assumptions apply. An orthogonal projection is characterized by <span class="math notranslate nohighlight">\(P^2=P=P^H\)</span>. In the closest-point proof, the cross term becomes <span class="math notranslate nohighlight">\(2\operatorname{Re}((x-p)^H(p-y))\)</span> and vanishes for the same reason.</p>
 </section>
 </section>
 
@@ -624,26 +736,24 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-of-projections-orthogonal-vs-oblique">Types of Projections: Orthogonal vs. Oblique</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projections">Orthogonal Projections</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projections">Oblique Projections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#projection-onto-a-subspace-along-a-complement">Projection onto a Subspace along a Complement</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complementary-projection">The Complementary Projection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-basis-adapted-to-the-projection">A Basis Adapted to the Projection</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mathematical-formulas">Mathematical Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-projection-formula">Orthogonal Projection Formula</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#special-case-projection-onto-a-line">Special Case: Projection onto a Line</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-and-oblique-projections">Orthogonal and Oblique Projections</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetry-characterizes-orthogonal-projections">Symmetry Characterizes Orthogonal Projections</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#oblique-projection-formula">Oblique Projection Formula</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#formulas-for-orthogonal-projections">Formulas for Orthogonal Projections</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-orthonormal-basis">An Orthonormal Basis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#any-basis-of-the-subspace">Any Basis of the Subspace</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-and-properties">Key Results and Properties</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-matrices-and-projections">Orthogonal Matrices and Projections</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-and-explanation">Derivation and Explanation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-the-projection-matrix-p-qq-t">Properties of the Projection Matrix <span class="math notranslate nohighlight">\(P = QQ^T\)</span></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation">Geometric Interpretation 📐</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-closest-point-property">The Closest-Point Property</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-formula-for-oblique-projections">A Formula for Oblique Projections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-projections-enter-the-course">How Projections Enter the Course</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complex-vectors">Complex Vectors</a></li>
 </ul>
   </nav></div>
 

@@ -425,10 +425,13 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-scalar-multiplication-and-transpose">Addition, Scalar Multiplication, and Transpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiplying-a-block-vector">Multiplying a Block Vector</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-diagonal-and-block-triangular-matrices">Block Diagonal and Block Triangular Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-schur-complement-and-block-inversion">The Schur Complement and Block Inversion</a></li>
 </ul>
             </nav>
         </div>
@@ -442,62 +445,198 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="block-matrix-operations">
 <h1>Block Matrix Operations<a class="headerlink" href="#block-matrix-operations" title="Link to this heading">#</a></h1>
-<p>A <strong>block matrix</strong>, or a partitioned matrix, is a matrix that has been divided into smaller rectangular matrices called <strong>blocks</strong>. This approach allows us to perform matrix operations by treating these blocks as if they were individual elements, which can greatly simplify complex calculations and reveal underlying structures. 🧱</p>
-<p>Let’s consider a matrix <span class="math notranslate nohighlight">\(A\)</span> partitioned into a <span class="math notranslate nohighlight">\(2 \times 2\)</span> block structure:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}A = \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix}\end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(A_{11}\)</span>, <span class="math notranslate nohighlight">\(A_{12}\)</span>, <span class="math notranslate nohighlight">\(A_{21}\)</span>, and <span class="math notranslate nohighlight">\(A_{22}\)</span> are matrices themselves.</p>
-<section id="addition-and-scalar-multiplication">
-<h2>Addition and Scalar Multiplication<a class="headerlink" href="#addition-and-scalar-multiplication" title="Link to this heading">#</a></h2>
-<p>Operating on block matrices is highly intuitive for linear operations.</p>
-<ul>
-<li><p><strong>Addition</strong>: To add two block matrices, you add their corresponding blocks. The matrices must have the same dimensions and be partitioned in the same way, so that corresponding blocks <span class="math notranslate nohighlight">\(A_{ij}\)</span> and <span class="math notranslate nohighlight">\(B_{ij}\)</span> are of the same size.</p>
+<p>A <strong>block matrix</strong> is an ordinary matrix whose rows and columns have been grouped into smaller matrices, called <strong>blocks</strong>. The partition changes how we write the matrix, but not its entries or its action on a vector.</p>
+<p>For example,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} + \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11} + B_{11} &amp; A_{12} + B_{12} \\ A_{21} + B_{21} &amp; A_{22} + B_{22} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Scalar Multiplication</strong>: To multiply a block matrix by a scalar, you simply multiply each block by that scalar.</p>
+A=\left(\begin{array}{cc|c}
+1&amp;2&amp;3\\
+4&amp;5&amp;6\\ \hline
+7&amp;8&amp;10
+\end{array}\right)
+=\begin{pmatrix}A_{11}&amp;A_{12}\\A_{21}&amp;A_{22}\end{pmatrix}.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(A_{11}\)</span> is <span class="math notranslate nohighlight">\(2\times2\)</span>, <span class="math notranslate nohighlight">\(A_{12}\)</span> is <span class="math notranslate nohighlight">\(2\times1\)</span>, <span class="math notranslate nohighlight">\(A_{21}\)</span> is <span class="math notranslate nohighlight">\(1\times2\)</span>, and <span class="math notranslate nohighlight">\(A_{22}\)</span> is <span class="math notranslate nohighlight">\(1\times1\)</span>. Blocks need not be square or have the same size. However, blocks in the same block row must have the same number of rows, and blocks in the same block column must have the same number of columns.</p>
+<p>More generally, if the row groups have sizes <span class="math notranslate nohighlight">\(m_1,\ldots,m_p\)</span> and the column groups have sizes <span class="math notranslate nohighlight">\(n_1,\ldots,n_q\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[A_{ij}\in\mathbb{R}^{m_i\times n_j}.\]</div>
+<p>All the rules below also apply to complex matrices.</p>
+<section id="addition-scalar-multiplication-and-transpose">
+<h2>Addition, Scalar Multiplication, and Transpose<a class="headerlink" href="#addition-scalar-multiplication-and-transpose" title="Link to this heading">#</a></h2>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> have the same size and the same partition, addition and scalar multiplication act on each block:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    c \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} = \begin{pmatrix} cA_{11} &amp; cA_{12} \\ cA_{21} &amp; cA_{22} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-</ul>
+\begin{aligned}
+(A+B)_{ij}&amp;=A_{ij}+B_{ij},\\
+(cA)_{ij}&amp;=cA_{ij}.
+\end{aligned}
+\end{split}\]</div>
+<p>Transposing a matrix exchanges its block rows and block columns <strong>and transposes each block</strong>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A^T=\begin{pmatrix}
+A_{11}^T&amp;A_{21}^T\\
+A_{12}^T&amp;A_{22}^T
+\end{pmatrix}.
+\end{split}\]</div>
+<p>The same rule holds for the conjugate transpose, with <span class="math notranslate nohighlight">\(T\)</span> replaced by <span class="math notranslate nohighlight">\(H\)</span>.</p>
 </section>
 <section id="block-matrix-multiplication">
 <h2>Block Matrix Multiplication<a class="headerlink" href="#block-matrix-multiplication" title="Link to this heading">#</a></h2>
-<p>Block multiplication follows the same row-by-column rule as standard matrix multiplication, but with matrix operations inside. For this to work, the partitioning of the matrices must be compatible. For a product <span class="math notranslate nohighlight">\(AB\)</span>, the <strong>column partitioning of <span class="math notranslate nohighlight">\(A\)</span> must match the row partitioning of <span class="math notranslate nohighlight">\(B\)</span></strong>.</p>
+<p>For <span class="math notranslate nohighlight">\(AB\)</span>, the column groups of <span class="math notranslate nohighlight">\(A\)</span> must match the row groups of <span class="math notranslate nohighlight">\(B\)</span>. Specifically, if</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21} &amp; A_{22} \end{pmatrix} \begin{pmatrix} B_{11} &amp; B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix} = \begin{pmatrix} A_{11}B_{11} + A_{12}B_{21} &amp; A_{11}B_{12} + A_{12}B_{22} \\ A_{21}B_{11} + A_{22}B_{21} &amp; A_{21}B_{12} + A_{22}B_{22} \end{pmatrix}\end{split}\]</div>
-<p>It’s crucial to remember that matrix multiplication is not commutative, so the order of the products within each block element (e.g., <span class="math notranslate nohighlight">\(A_{11}B_{11}\)</span>) must be maintained. The result of block multiplication is identical to what you would get with standard element-wise multiplication.</p>
-</section>
-<section id="special-structures-and-inversion">
-<h2>Special Structures and Inversion<a class="headerlink" href="#special-structures-and-inversion" title="Link to this heading">#</a></h2>
-<p>Partitioning is especially powerful for matrices with special structures.</p>
-<ul>
-<li><p><strong>Block Diagonal Matrices</strong>: These are matrices where the off-diagonal blocks are zero matrices.</p>
+\[
+A_{ik}\in\mathbb{R}^{m_i\times n_k},\qquad
+B_{kj}\in\mathbb{R}^{n_k\times \ell_j},
+\]</div>
+<p>then each product <span class="math notranslate nohighlight">\(A_{ik}B_{kj}\)</span> has size <span class="math notranslate nohighlight">\(m_i\times\ell_j\)</span>, and</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-    A = \begin{pmatrix} A_{1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n} \end{pmatrix}
-    \end{split}\]</div>
-<p>For a block diagonal matrix, the determinant is the product of the determinants of the diagonal blocks: <span class="math notranslate nohighlight">\(\det(A) = \det(A_1)\det(A_2)\cdots\det(A_n)\)</span>. Its inverse is also a block diagonal matrix composed of the inverses of the diagonal blocks:</p>
+\[ (AB)_{ij}=\sum_{k=1}^q A_{ik}B_{kj}. \]</div>
+<p>This is ordinary matrix multiplication with its sums grouped according to the partition. The factors must stay in their original order: blocks are matrices, so they generally do not commute.</p>
+<p>For two matrices with compatible <span class="math notranslate nohighlight">\(2\times2\)</span> block partitions, write <span class="math notranslate nohighlight">\(C=AB\)</span>. Its four blocks are</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    A^{-1} = \begin{pmatrix} A_{1}^{-1} &amp; 0 &amp; \cdots &amp; 0 \\ 0 &amp; A_{2}^{-1} &amp; \cdots &amp; 0 \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ 0 &amp; 0 &amp; \cdots &amp; A_{n}^{-1} \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Block Matrix Inversion</strong>: The inverse of a general <span class="math notranslate nohighlight">\(2 \times 2\)</span> block matrix can also be expressed in block form, although the formula is more complex and involves the <strong>Schur complement</strong> of a block (e.g., <span class="math notranslate nohighlight">\(D - CA^{-1}B\)</span>).</p></li>
-</ul>
+\begin{aligned}
+C_{11}&amp;=A_{11}B_{11}+A_{12}B_{21},\\
+C_{12}&amp;=A_{11}B_{12}+A_{12}B_{22},\\
+C_{21}&amp;=A_{21}B_{11}+A_{22}B_{21},\\
+C_{22}&amp;=A_{21}B_{12}+A_{22}B_{22}.
+\end{aligned}
+\end{split}\]</div>
+<section id="multiplying-a-block-vector">
+<h3>Multiplying a Block Vector<a class="headerlink" href="#multiplying-a-block-vector" title="Link to this heading">#</a></h3>
+<p>Partitioning a vector to match the columns of <span class="math notranslate nohighlight">\(A\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A\begin{pmatrix}x_1\\x_2\end{pmatrix}
+=\begin{pmatrix}
+A_{11}x_1+A_{12}x_2\\
+A_{21}x_1+A_{22}x_2
+\end{pmatrix}.
+\end{split}\]</div>
+<p>For the matrix at the start of this section, take <span class="math notranslate nohighlight">\(x_1=(1,-1)^T\)</span> and <span class="math notranslate nohighlight">\(x_2=2\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A_{11}x_1+A_{12}x_2
+&amp;=\begin{pmatrix}-1\\-1\end{pmatrix}
+ +\begin{pmatrix}6\\12\end{pmatrix}
+ =\begin{pmatrix}5\\11\end{pmatrix},\\
+A_{21}x_1+A_{22}x_2&amp;=-1+20=19.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(Ax=(5,11,19)^T\)</span>, exactly as in the usual calculation.</p>
+<p>Another useful partition groups <span class="math notranslate nohighlight">\(A\)</span> by columns and <span class="math notranslate nohighlight">\(B\)</span> by rows. If <span class="math notranslate nohighlight">\(a_k\)</span> is column <span class="math notranslate nohighlight">\(k\)</span> of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b_k^T\)</span> is row <span class="math notranslate nohighlight">\(k\)</span> of <span class="math notranslate nohighlight">\(B\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[AB=\sum_{k=1}^n a_kb_k^T.\]</div>
+<p>Each outer product <span class="math notranslate nohighlight">\(a_kb_k^T\)</span> contributes one term to the matrix product.</p>
 </section>
-<section id="advantages-of-block-matrices">
-<h2>Advantages of Block Matrices<a class="headerlink" href="#advantages-of-block-matrices" title="Link to this heading">#</a></h2>
-<p>Using block notation is more than a convenience; it’s a powerful conceptual and computational tool.</p>
-<ol class="arabic simple">
-<li><p><strong>Simplifies Proofs</strong>: It allows for cleaner and more intuitive algebraic manipulations in theoretical proofs and derivations.</p></li>
-<li><p><strong>Reveals Structure</strong>: Partitioning can expose the underlying structure of a problem, such as how different subsystems in a larger system interact.</p></li>
-<li><p><strong>Computational Efficiency</strong>: It is the foundation for many efficient “divide and conquer” algorithms. Operations on structured matrices (like block diagonal or sparse matrices) can be performed much faster by operating on the smaller blocks. This is critical in parallel computing, where different blocks can be processed simultaneously on different processors.</p></li>
-</ol>
+</section>
+<section id="block-diagonal-and-block-triangular-matrices">
+<h2>Block Diagonal and Block Triangular Matrices<a class="headerlink" href="#block-diagonal-and-block-triangular-matrices" title="Link to this heading">#</a></h2>
+<p>A <strong>block diagonal matrix</strong> has square diagonal blocks and zero blocks elsewhere:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+D=\operatorname{diag}(D_1,\ldots,D_r)
+=\begin{pmatrix}
+D_1&amp;0&amp;\cdots&amp;0\\
+0&amp;D_2&amp;\cdots&amp;0\\
+\vdots&amp;\vdots&amp;\ddots&amp;\vdots\\
+0&amp;0&amp;\cdots&amp;D_r
+\end{pmatrix}.
+\end{split}\]</div>
+<p>The blocks can have different sizes. The system <span class="math notranslate nohighlight">\(Dx=b\)</span> separates into independent systems <span class="math notranslate nohighlight">\(D_ix_i=b_i\)</span>. Consequently, <span class="math notranslate nohighlight">\(D\)</span> is invertible exactly when every <span class="math notranslate nohighlight">\(D_i\)</span> is invertible, and in that case</p>
+<div class="math notranslate nohighlight">
+\[D^{-1}=\operatorname{diag}(D_1^{-1},\ldots,D_r^{-1}).\]</div>
+<p>Multiplying the two block diagonal matrices verifies this formula. Also,</p>
+<div class="math notranslate nohighlight">
+\[
+\det(D)=\prod_{i=1}^r\det(D_i),\qquad
+\operatorname{tr}(D)=\sum_{i=1}^r\operatorname{tr}(D_i).
+\]</div>
+<p>The notation <span class="math notranslate nohighlight">\(D_1\oplus\cdots\oplus D_r\)</span>, called a <strong>direct sum</strong>, is another way to write this block diagonal matrix.</p>
+<p>A <strong>block upper triangular matrix</strong> has zero blocks below its block diagonal. For two square diagonal blocks,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+T=\begin{pmatrix}A&amp;B\\0&amp;D\end{pmatrix},\qquad
+\det(T)=\det(A)\det(D).
+\end{split}\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. In the determinant expansion, a nonzero term must select the entries from the bottom rows in the columns belonging to <span class="math notranslate nohighlight">\(D\)</span>, because the bottom-left block is zero. These selections use all those columns, so the top rows must select entries from <span class="math notranslate nohighlight">\(A\)</span>. The sum therefore factors into <span class="math notranslate nohighlight">\(\det(A)\det(D)\)</span>.</p>
+</div>
+<p>The result extends to any number of diagonal blocks, and to block lower triangular matrices by transposing. It includes the block diagonal determinant formula above. The diagonal blocks themselves need not be triangular.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(D\)</span> are invertible, the system <span class="math notranslate nohighlight">\(Tx=b\)</span> can be solved one block at a time:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Dx_2&amp;=b_2,\\
+Ax_1&amp;=b_1-Bx_2.
+\end{aligned}
+\end{split}\]</div>
+<p>We will develop this procedure further when studying triangular systems.</p>
+</section>
+<section id="the-schur-complement-and-block-inversion">
+<h2>The Schur Complement and Block Inversion<a class="headerlink" href="#the-schur-complement-and-block-inversion" title="Link to this heading">#</a></h2>
+<p>Consider a square matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M=\begin{pmatrix}A&amp;B\\C&amp;D\end{pmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span>, <span class="math notranslate nohighlight">\(D\)</span> is <span class="math notranslate nohighlight">\(q\times q\)</span>, and the other blocks have the corresponding sizes. Assume <span class="math notranslate nohighlight">\(A\)</span> is invertible. The system</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M\begin{pmatrix}x\\y\end{pmatrix}
+=\begin{pmatrix}f\\g\end{pmatrix}
+\end{split}\]</div>
+<p>consists of two equations:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Ax+By&amp;=f,\\
+Cx+Dy&amp;=g.
+\end{aligned}
+\end{split}\]</div>
+<p>Solve the first for <span class="math notranslate nohighlight">\(x\)</span> and substitute into the second:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+x&amp;=A^{-1}(f-By),\\
+(D-CA^{-1}B)y&amp;=g-CA^{-1}f.
+\end{aligned}
+\end{split}\]</div>
+<p>The matrix</p>
+<div class="math notranslate nohighlight">
+\[S=D-CA^{-1}B\]</div>
+<p>is the <strong>Schur complement of <span class="math notranslate nohighlight">\(A\)</span> in <span class="math notranslate nohighlight">\(M\)</span></strong>. It describes the remaining system after eliminating <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>The same elimination can be written as a block factorization:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M=
+\begin{pmatrix}I_p&amp;0\\CA^{-1}&amp;I_q\end{pmatrix}
+\begin{pmatrix}A&amp;B\\0&amp;S\end{pmatrix}.
+\end{split}\]</div>
+<p>Block multiplication verifies the factorization: the bottom-right block is <span class="math notranslate nohighlight">\(CA^{-1}B+S=D\)</span>. Taking determinants gives</p>
+<div class="math notranslate nohighlight">
+\[\det(M)=\det(A)\det(S).\]</div>
+<p>Thus, under the assumption that <span class="math notranslate nohighlight">\(A\)</span> is invertible, <span class="math notranslate nohighlight">\(M\)</span> is invertible exactly when <span class="math notranslate nohighlight">\(S\)</span> is invertible.</p>
+<p>If <span class="math notranslate nohighlight">\(S\)</span> is invertible, the inverse has the block form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M^{-1}=\begin{pmatrix}E&amp;F\\G&amp;H\end{pmatrix},
+\end{split}\]</div>
+<p>where the inverse Schur complement determines all four blocks:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+H&amp;=S^{-1}=(D-CA^{-1}B)^{-1},\\
+E&amp;=A^{-1}(A+BHC)A^{-1},\\
+F&amp;=-A^{-1}BH,\\
+G&amp;=-HCA^{-1}.
+\end{aligned}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(H\)</span> inverts the reduced system, while <span class="math notranslate nohighlight">\(E\)</span> is <span class="math notranslate nohighlight">\(A^{-1}\)</span> plus a correction from the coupling blocks <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(C\)</span>. The off-diagonal formulas have matching forms. In particular, if <span class="math notranslate nohighlight">\(M\)</span> is real symmetric, then <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(H\)</span> are symmetric and <span class="math notranslate nohighlight">\(G=F^T\)</span>. The block inverse can be verified directly by multiplication.</p>
+<p>These formulas require both <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(S\)</span> to be invertible. An invertible matrix need not have invertible diagonal blocks: for example, <span class="math notranslate nohighlight">\(\begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}\)</span> is its own inverse. Also, inverting a general block matrix does not mean inverting its blocks separately.</p>
+<p>In computations, expressions such as <span class="math notranslate nohighlight">\(A^{-1}B\)</span> are evaluated by solving <span class="math notranslate nohighlight">\(AX=B\)</span>. The role of block elimination in <a class="reference internal" href="lu_decomposition.html"><span class="std std-doc">LU factorization</span></a> will be explained later in the course.</p>
 </section>
 </section>
 
@@ -565,10 +704,13 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-and-scalar-multiplication">Addition and Scalar Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#special-structures-and-inversion">Special Structures and Inversion</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-block-matrices">Advantages of Block Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addition-scalar-multiplication-and-transpose">Addition, Scalar Multiplication, and Transpose</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-matrix-multiplication">Block Matrix Multiplication</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiplying-a-block-vector">Multiplying a Block Vector</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-diagonal-and-block-triangular-matrices">Block Diagonal and Block Triangular Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-schur-complement-and-block-inversion">The Schur Complement and Block Inversion</a></li>
 </ul>
   </nav></div>
 

@@ -429,11 +429,11 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-null-space-kernel">2. The Null Space (Kernel)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-row-space">3. The Row Space</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-left-null-space">4. The Left Null Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fundamental-theorem-of-linear-algebra">The Fundamental Theorem of Linear Algebra</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-nullity-theorem">The Rank-Nullity Theorem</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-complements">Orthogonal Complements</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-complements">Orthogonal Complements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensions-and-the-rank-nullity-theorem">Dimensions and the Rank-Nullity Theorem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-rectangular-example">A Rectangular Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-subspaces-tell-us-about-ax-b">What the Subspaces Tell Us about <span class="math notranslate nohighlight">\(Ax=b\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complex-matrices">Complex Matrices</a></li>
 </ul>
             </nav>
         </div>
@@ -447,54 +447,187 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-four-fundamental-subspaces">
 <h1>The Four Fundamental Subspaces<a class="headerlink" href="#the-four-fundamental-subspaces" title="Link to this heading">#</a></h1>
-<p>Every <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> defines a linear transformation and is associated with four fundamental vector subspaces. These spaces provide a complete geometric understanding of the matrix’s behavior, revealing what happens to vectors when they are transformed by <span class="math notranslate nohighlight">\(A\)</span>. 🗺️</p>
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> represent a linear map from <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>. Its four fundamental subspaces describe which outputs are possible, which inputs map to zero, and how these spaces fit together. Two lie in the input space <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, and two lie in the output space <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p>
+<p>We use <span class="math notranslate nohighlight">\(R(A)\)</span> for the range and <span class="math notranslate nohighlight">\(N(A)\)</span> for the null space. These are also written <span class="math notranslate nohighlight">\(\operatorname{range}(A)\)</span> and <span class="math notranslate nohighlight">\(\ker(A)\)</span>.</p>
 <section id="the-column-space-range">
 <h2>1. The Column Space (Range)<a class="headerlink" href="#the-column-space-range" title="Link to this heading">#</a></h2>
-<p>The <strong>column space</strong>, also known as the <strong>range</strong>, is the set of all possible output vectors of the transformation. It consists of all vectors that can be formed by multiplying the matrix <span class="math notranslate nohighlight">\(A\)</span> by an input vector <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>The <strong>column space</strong>, or <strong>range</strong>, consists of all possible outputs:</p>
 <div class="math notranslate nohighlight">
-\[R(A) = \{y \in \mathbb{R}^m \,|\, y = Ax \text{ for some } x \in \mathbb{R}^n\}\]</div>
-<p>Geometrically, the column space is the <strong>span of the column vectors</strong> of <span class="math notranslate nohighlight">\(A\)</span>. It is a subspace of the output space, <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>. The dimension of the column space is the <strong>rank</strong> of the matrix, denoted by <span class="math notranslate nohighlight">\(r\)</span>. The rank represents the number of linearly independent columns in the matrix.</p>
+\[R(A)=\{Ax:x\in\mathbb{R}^n\}\subseteq\mathbb{R}^m.\]</div>
+<p>If the columns of <span class="math notranslate nohighlight">\(A\)</span> are <span class="math notranslate nohighlight">\(a_1,\ldots,a_n\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[Ax=x_1a_1+\cdots+x_na_n.\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(R(A)=\operatorname{span}(a_1,\ldots,a_n)\)</span>. Its dimension is the <strong>rank</strong> <span class="math notranslate nohighlight">\(r\)</span> of <span class="math notranslate nohighlight">\(A\)</span>: the maximum number of linearly independent columns.</p>
 </section>
 <section id="the-null-space-kernel">
 <h2>2. The Null Space (Kernel)<a class="headerlink" href="#the-null-space-kernel" title="Link to this heading">#</a></h2>
-<p>The <strong>null space</strong>, also known as the <strong>kernel</strong>, is the set of all input vectors that are mapped to the zero vector by the transformation.</p>
+<p>The <strong>null space</strong>, or <strong>kernel</strong>, consists of all inputs mapped to zero:</p>
 <div class="math notranslate nohighlight">
-\[N(A) = \{x \in \mathbb{R}^n \,|\, Ax = 0\}\]</div>
-<p>The null space is a subspace of the input space, <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. If the null space contains vectors other than the zero vector, it means the transformation is “many-to-one”—multiple different input vectors are “squashed” onto the same output vector (zero). The dimension of the null space is called the <strong>nullity</strong>.</p>
+\[N(A)=\{x\in\mathbb{R}^n:Ax=0\}.\]</div>
+<p>Its dimension is called the <strong>nullity</strong>. A vector in <span class="math notranslate nohighlight">\(N(A)\)</span> can be added to any input without changing its output. More precisely,</p>
+<div class="math notranslate nohighlight">
+\[Ax=Ay\quad\Longleftrightarrow\quad x-y\in N(A).\]</div>
+<p>Therefore, the map is one-to-one exactly when <span class="math notranslate nohighlight">\(N(A)=\{0\}\)</span>.</p>
 </section>
 <section id="the-row-space">
 <h2>3. The Row Space<a class="headerlink" href="#the-row-space" title="Link to this heading">#</a></h2>
-<p>The <strong>row space</strong> is the set of all linear combinations of the row vectors of <span class="math notranslate nohighlight">\(A\)</span>. It is equivalent to the column space of the transpose of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>The <strong>row space</strong> is the span of the rows of <span class="math notranslate nohighlight">\(A\)</span>, written as column vectors. Equivalently, it is the range of the transpose:</p>
 <div class="math notranslate nohighlight">
-\[R(A^T)\]</div>
-<p>The row space is a subspace of the input space, <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. A fundamental result in linear algebra is that the dimension of the row space is also equal to the <strong>rank</strong> (<span class="math notranslate nohighlight">\(r\)</span>) of the matrix. This means a matrix always has the same number of linearly independent rows as it does linearly independent columns.</p>
+\[R(A^T)=\{A^Ty:y\in\mathbb{R}^m\}\subseteq\mathbb{R}^n.\]</div>
+<p>Its dimension is also <span class="math notranslate nohighlight">\(r\)</span>. We will prove below that row rank and column rank are equal.</p>
 </section>
 <section id="the-left-null-space">
 <h2>4. The Left Null Space<a class="headerlink" href="#the-left-null-space" title="Link to this heading">#</a></h2>
-<p>The <strong>left null space</strong> is the null space of the transpose of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>The <strong>left null space</strong> is the null space of the transpose:</p>
 <div class="math notranslate nohighlight">
-\[N(A^T) = \{y \in \mathbb{R}^m \,|\, A^T y = 0\}\]</div>
-<p>It is called the “left” null space because the equation can be transposed to <span class="math notranslate nohighlight">\(y^T A = 0^T\)</span>, showing that the vectors <span class="math notranslate nohighlight">\(y\)</span> act on <span class="math notranslate nohighlight">\(A\)</span> from the left. The left null space is a subspace of the output space, <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p>
-</section>
-<section id="the-fundamental-theorem-of-linear-algebra">
-<h2>The Fundamental Theorem of Linear Algebra<a class="headerlink" href="#the-fundamental-theorem-of-linear-algebra" title="Link to this heading">#</a></h2>
-<p>This theorem connects the dimensions and relationships of the four subspaces.</p>
-<section id="the-rank-nullity-theorem">
-<h3>The Rank-Nullity Theorem<a class="headerlink" href="#the-rank-nullity-theorem" title="Link to this heading">#</a></h3>
-<p>This theorem relates the dimensions of the column space and the null space. It states that the rank of a matrix plus its nullity is equal to the number of columns in the matrix.</p>
-<div class="math notranslate nohighlight">
-\[\text{dim}(R(A)) + \text{dim}(N(A)) = n\]</div>
-<p>Or more simply: <strong>rank + nullity = number of columns</strong>.</p>
-<p>This theorem provides a beautiful intuition: the dimension of the input space (<span class="math notranslate nohighlight">\(n\)</span>) is split. Part of it is preserved and forms the output image (the rank), and the other part is collapsed to zero (the nullity).</p>
+\[N(A^T)=\{y\in\mathbb{R}^m:A^Ty=0\}.\]</div>
+<p>The name comes from the equivalent equation <span class="math notranslate nohighlight">\(y^TA=0^T\)</span>. Such a vector gives a linear combination of the rows of <span class="math notranslate nohighlight">\(A\)</span> that equals zero.</p>
 </section>
 <section id="orthogonal-complements">
-<h3>Orthogonal Complements<a class="headerlink" href="#orthogonal-complements" title="Link to this heading">#</a></h3>
-<p>The subspaces come in orthogonal pairs:</p>
-<ul class="simple">
-<li><p>The <strong>row space</strong> and the <strong>null space</strong> are orthogonal complements in the input space <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. This means every vector in the row space is perpendicular to every vector in the null space.</p></li>
-<li><p>The <strong>column space</strong> and the <strong>left null space</strong> are orthogonal complements in the output space <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>.</p></li>
-</ul>
+<h2>Orthogonal Complements<a class="headerlink" href="#orthogonal-complements" title="Link to this heading">#</a></h2>
+<p>The four subspaces form two pairs of orthogonal complements:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+N(A)&amp;=R(A^T)^\perp,\\
+N(A^T)&amp;=R(A)^\perp.
+\end{aligned}
+\end{split}\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. The equation <span class="math notranslate nohighlight">\(Ax=0\)</span> says that the dot product of <span class="math notranslate nohighlight">\(x\)</span> with every row of <span class="math notranslate nohighlight">\(A\)</span> is zero. This holds exactly when <span class="math notranslate nohighlight">\(x\)</span> is perpendicular to every vector in the row space. Hence <span class="math notranslate nohighlight">\(N(A)=R(A^T)^\perp\)</span>.</p>
+<p>Applying the same argument to <span class="math notranslate nohighlight">\(A^T\)</span> gives <span class="math notranslate nohighlight">\(N(A^T)=R(A)^\perp\)</span>.</p>
+</div>
+<p>Being orthogonal complements means both that the two spaces are perpendicular and that together they span the entire input or output space:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{R}^n&amp;=R(A^T)\oplus N(A),\\
+\mathbb{R}^m&amp;=R(A)\oplus N(A^T).
+\end{aligned}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\oplus\)</span> denotes a direct sum. Every vector has a unique decomposition into components in the two indicated spaces, and these components are orthogonal. For example, every input can be written uniquely as</p>
+<div class="math notranslate nohighlight">
+\[x=x_{\mathrm{row}}+x_{\mathrm{null}},\]</div>
+<p>with <span class="math notranslate nohighlight">\(x_{\mathrm{row}}\in R(A^T)\)</span> and <span class="math notranslate nohighlight">\(x_{\mathrm{null}}\in N(A)\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[Ax=Ax_{\mathrm{row}}.\]</div>
+<p>The null-space component has no effect on the output.</p>
 </section>
+<section id="dimensions-and-the-rank-nullity-theorem">
+<h2>Dimensions and the Rank-Nullity Theorem<a class="headerlink" href="#dimensions-and-the-rank-nullity-theorem" title="Link to this heading">#</a></h2>
+<p>The <strong>rank-nullity theorem</strong> states that</p>
+<div class="math notranslate nohighlight">
+\[\dim R(A)+\dim N(A)=n.\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Choose a basis <span class="math notranslate nohighlight">\(z_1,\ldots,z_k\)</span> of <span class="math notranslate nohighlight">\(N(A)\)</span> and extend it to a basis</p>
+<div class="math notranslate nohighlight">
+\[z_1,\ldots,z_k,v_1,\ldots,v_{n-k}\]</div>
+<p>of <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Since <span class="math notranslate nohighlight">\(Az_i=0\)</span>, the vectors <span class="math notranslate nohighlight">\(Av_1,\ldots,Av_{n-k}\)</span> span <span class="math notranslate nohighlight">\(R(A)\)</span>.</p>
+<p>They are also linearly independent. Indeed, if</p>
+<div class="math notranslate nohighlight">
+\[\sum_{j=1}^{n-k}c_jAv_j=0,\]</div>
+<p>then <span class="math notranslate nohighlight">\(\sum_j c_jv_j\)</span> belongs to <span class="math notranslate nohighlight">\(N(A)\)</span> and is therefore a linear combination of the <span class="math notranslate nohighlight">\(z_i\)</span>. Independence of the extended basis forces every <span class="math notranslate nohighlight">\(c_j\)</span> to be zero. Thus <span class="math notranslate nohighlight">\(\dim R(A)=n-k\)</span>, proving the result.</p>
+</div>
+<p>Since <span class="math notranslate nohighlight">\(R(A^T)\)</span> and <span class="math notranslate nohighlight">\(N(A)\)</span> are orthogonal complements, their dimensions also add to <span class="math notranslate nohighlight">\(n\)</span>. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[\dim R(A^T)=n-\dim N(A)=r.\]</div>
+<p>This proves equality of row and column rank. The output-space decomposition then gives <span class="math notranslate nohighlight">\(\dim N(A^T)=m-r\)</span>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Subspace</p></th>
+<th class="head"><p>Ambient space</p></th>
+<th class="head"><p>Dimension</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Column space <span class="math notranslate nohighlight">\(R(A)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Null space <span class="math notranslate nohighlight">\(N(A)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(n-r\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>Row space <span class="math notranslate nohighlight">\(R(A^T)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Left null space <span class="math notranslate nohighlight">\(N(A^T)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(m-r\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In particular, <span class="math notranslate nohighlight">\(0\le r\le\min(m,n)\)</span>. These dimension and orthogonality statements are often called the <strong>fundamental theorem of linear algebra</strong>.</p>
+<p>The restriction of <span class="math notranslate nohighlight">\(A\)</span> to its row space is a one-to-one map onto its column space. It reaches every output because <span class="math notranslate nohighlight">\(Ax=Ax_{\mathrm{row}}\)</span>, and it is one-to-one because <span class="math notranslate nohighlight">\(R(A^T)\cap N(A)=\{0\}\)</span>. This does not mean that <span class="math notranslate nohighlight">\(A\)</span> preserves lengths or angles.</p>
+</section>
+<section id="a-rectangular-example">
+<h2>A Rectangular Example<a class="headerlink" href="#a-rectangular-example" title="Link to this heading">#</a></h2>
+<p>Consider</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}
+1&amp;0&amp;1&amp;0\\
+0&amp;1&amp;0&amp;1\\
+1&amp;1&amp;1&amp;1
+\end{pmatrix}.
+\end{split}\]</div>
+<p>The first two columns are independent, and the last two repeat them, so <span class="math notranslate nohighlight">\(r=2\)</span>. Bases for the column and row spaces are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+R(A)&amp;=\operatorname{span}\left\{
+\begin{pmatrix}1\\0\\1\end{pmatrix},
+\begin{pmatrix}0\\1\\1\end{pmatrix}\right\},\\
+R(A^T)&amp;=\operatorname{span}\left\{
+\begin{pmatrix}1\\0\\1\\0\end{pmatrix},
+\begin{pmatrix}0\\1\\0\\1\end{pmatrix}\right\}.
+\end{aligned}
+\end{split}\]</div>
+<p>To find the null space, <span class="math notranslate nohighlight">\(Ax=0\)</span> gives <span class="math notranslate nohighlight">\(x_1+x_3=0\)</span> and <span class="math notranslate nohighlight">\(x_2+x_4=0\)</span>; the third equation is their sum. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+N(A)=\operatorname{span}\left\{
+\begin{pmatrix}-1\\0\\1\\0\end{pmatrix},
+\begin{pmatrix}0\\-1\\0\\1\end{pmatrix}\right\}.
+\end{split}\]</div>
+<p>Similarly, <span class="math notranslate nohighlight">\(A^Ty=0\)</span> gives <span class="math notranslate nohighlight">\(y_1+y_3=y_2+y_3=0\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+N(A^T)=\operatorname{span}\left\{
+\begin{pmatrix}-1\\-1\\1\end{pmatrix}\right\}.
+\end{split}\]</div>
+<p>The dimensions are <span class="math notranslate nohighlight">\(2,2,2,1\)</span>, respectively. Taking dot products verifies that the displayed row-space basis is perpendicular to the null-space basis, and the column-space basis is perpendicular to the left-null-space basis.</p>
+</section>
+<section id="what-the-subspaces-tell-us-about-ax-b">
+<h2>What the Subspaces Tell Us about <span class="math notranslate nohighlight">\(Ax=b\)</span><a class="headerlink" href="#what-the-subspaces-tell-us-about-ax-b" title="Link to this heading">#</a></h2>
+<p>A solution exists exactly when <span class="math notranslate nohighlight">\(b\in R(A)\)</span>. Equivalently,</p>
+<div class="math notranslate nohighlight">
+\[y^Tb=0\quad\text{for every }y\in N(A^T).\]</div>
+<p>This follows from <span class="math notranslate nohighlight">\(R(A)=N(A^T)^\perp\)</span>. In the example above, the condition is <span class="math notranslate nohighlight">\(b_3=b_1+b_2\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(x_0\)</span> is one solution, then all solutions have the form</p>
+<div class="math notranslate nohighlight">
+\[x=x_0+z,\qquad z\in N(A).\]</div>
+<p>Thus a consistent system has a unique solution exactly when <span class="math notranslate nohighlight">\(r=n\)</span> (<strong>full column rank</strong>). Every right-hand side has a solution exactly when <span class="math notranslate nohighlight">\(r=m\)</span> (<strong>full row rank</strong>). For a square matrix, both conditions are equivalent to invertibility.</p>
+<p>For each consistent right-hand side, there is exactly one solution <span class="math notranslate nohighlight">\(x_{\mathrm{row}}\)</span> in the row space. It also has the smallest Euclidean norm among all solutions, since orthogonality gives</p>
+<div class="math notranslate nohighlight">
+\[\|x_{\mathrm{row}}+z\|_2^2
+=\|x_{\mathrm{row}}\|_2^2+\|z\|_2^2,
+\qquad z\in N(A).\]</div>
+<p>When <span class="math notranslate nohighlight">\(b\notin R(A)\)</span>, its orthogonal projection onto <span class="math notranslate nohighlight">\(R(A)\)</span> is the closest attainable output. We will use this observation in the chapter on <a class="reference internal" href="least_squares.html"><span class="std std-doc">least squares</span></a>.</p>
+</section>
+<section id="complex-matrices">
+<h2>Complex Matrices<a class="headerlink" href="#complex-matrices" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{m\times n}\)</span>, use the conjugate transpose <span class="math notranslate nohighlight">\(A^H\)</span> and the inner product <span class="math notranslate nohighlight">\(x^Hy\)</span>. The orthogonal decompositions become</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathbb{C}^n&amp;=R(A^H)\oplus N(A),\\
+\mathbb{C}^m&amp;=R(A)\oplus N(A^H).
+\end{aligned}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(R(A^H)\)</span> is spanned by the conjugate transposes of the rows of <span class="math notranslate nohighlight">\(A\)</span>, and <span class="math notranslate nohighlight">\(N(A^H)\)</span> consists of vectors satisfying <span class="math notranslate nohighlight">\(y^HA=0\)</span>. The dimension formulas remain the same, with dimensions taken over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>.</p>
 </section>
 </section>
 
@@ -566,11 +699,11 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-null-space-kernel">2. The Null Space (Kernel)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-row-space">3. The Row Space</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-left-null-space">4. The Left Null Space</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-fundamental-theorem-of-linear-algebra">The Fundamental Theorem of Linear Algebra</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-nullity-theorem">The Rank-Nullity Theorem</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-complements">Orthogonal Complements</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonal-complements">Orthogonal Complements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensions-and-the-rank-nullity-theorem">Dimensions and the Rank-Nullity Theorem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-rectangular-example">A Rectangular Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-subspaces-tell-us-about-ax-b">What the Subspaces Tell Us about <span class="math notranslate nohighlight">\(Ax=b\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complex-matrices">Complex Matrices</a></li>
 </ul>
   </nav></div>
 
