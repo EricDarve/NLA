@@ -590,7 +590,7 @@ document.write(`
 <h2>The General Perturbation Theorem<a class="headerlink" href="#the-general-perturbation-theorem" title="Link to this heading">#</a></h2>
 <p>We have now explored the individual concepts of forward error, backward error, and the condition number. The following theorem synthesizes these ideas into a single, powerful bound that is a cornerstone of numerical linear algebra. It provides a worst-case bound on the forward error of a computed solution as a function of the backward error and the problem’s conditioning.</p>
 <div class="proof theorem admonition" id="thm:perturbation_bound">
-<p class="admonition-title"><span class="caption-number">Theorem 12 </span> (Perturbation Bound for Linear Systems)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 13 </span> (Perturbation Bound for Linear Systems)</p>
 <section class="theorem-content" id="proof-content">
 <p>Let <span class="math notranslate nohighlight">\(x\)</span> be the solution to <span class="math notranslate nohighlight">\(Ax=b\)</span> and <span class="math notranslate nohighlight">\(\tilde{x}\)</span> be the solution to the perturbed system <span class="math notranslate nohighlight">\((A+E)\tilde{x} = b+e\)</span>. Assume <span class="math notranslate nohighlight">\(A\)</span> is invertible and that <span class="math notranslate nohighlight">\(\|A^{-1}\|\|E\| &lt; 1\)</span>. Then the relative forward error is bounded by:</p>
 <div class="math notranslate nohighlight">
@@ -704,7 +704,7 @@ We use the fact that</p>
 <section id="the-backward-error-bound">
 <h3>The Backward Error Bound<a class="headerlink" href="#the-backward-error-bound" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="thm:backward_error_lu">
-<p class="admonition-title"><span class="caption-number">Theorem 13 </span> (Backward Error of LU Factorization)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Backward Error of LU Factorization)</p>
 <section class="theorem-content" id="proof-content">
 <p>The result of a careful backward error analysis of the LU factorization is the following component-wise bound on the error matrix <span class="math notranslate nohighlight">\(E\)</span>:</p>
 <div class="math notranslate nohighlight">
@@ -747,7 +747,7 @@ U = \begin{pmatrix}
 </section>
 <section id="an-intuitive-parallel-with-summation-error">
 <h3>An Intuitive Parallel with Summation Error<a class="headerlink" href="#an-intuitive-parallel-with-summation-error" title="Link to this heading">#</a></h3>
-<p>This result for the backward error of LU factorization should feel familiar. It’s a direct reflection of our earlier analysis of roundoff errors in simple summation, where we found the error bound (see <a class="reference internal" href="floating_point.html#thm:summation_error">Theorem 11</a>):</p>
+<p>This result for the backward error of LU factorization should feel familiar. It’s a direct reflection of our earlier analysis of roundoff errors in simple summation, where we found the error bound (see <a class="reference internal" href="floating_point.html#thm:summation_error">Theorem 12</a>):</p>
 <div class="math notranslate nohighlight">
 \[|\Delta S_n| \le n u \sum_{i=1}^n |x_i| + \mathcal{O}(u^2)\]</div>
 <p>This bound taught us a crucial lesson: the accuracy of a sum depends on the <strong>magnitude of the numbers being added</strong>, not just the magnitude of the final result.</p>
@@ -850,7 +850,7 @@ U = \begin{pmatrix}
 <h3>Proof of the Existence of LU Factorization with Row Pivoting<a class="headerlink" href="#proof-of-the-existence-of-lu-factorization-with-row-pivoting" title="Link to this heading">#</a></h3>
 <p>The use of row pivoting not only stabilizes the LU factorization algorithm against the growth of roundoff error, but it also provides a powerful theoretical guarantee: the factorization is guaranteed to exist for <em>any</em> square matrix, whether it is invertible or not. This is a significant improvement over the basic LU factorization, which can fail even for invertible matrices if a zero pivot is encountered.</p>
 <div class="proof theorem admonition" id="thm:existence_lu_pivoting">
-<p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Existence of LU Factorization with Row Pivoting)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 15 </span> (Existence of LU Factorization with Row Pivoting)</p>
 <section class="theorem-content" id="proof-content">
 <p>For any square matrix <span class="math notranslate nohighlight">\(A\in\mathbb{F}^{n\times n}\)</span> (where <span class="math notranslate nohighlight">\(\mathbb{F}=\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>), there exist a permutation matrix <span class="math notranslate nohighlight">\(P\)</span>, a unit lower–triangular matrix <span class="math notranslate nohighlight">\(L\)</span>, and an upper–triangular matrix <span class="math notranslate nohighlight">\(U\)</span> such that</p>
 <div class="math notranslate nohighlight">

@@ -425,10 +425,15 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-setup-an-illustrative-example">The Setup: An Illustrative Example</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-analysis">Eigenvalue Analysis 🔬</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singular-value-analysis">Singular Value Analysis 🧐</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-takeaway-normality-is-key">The Takeaway: Normality is Key</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-with-nearly-parallel-eigenvectors">An Example with Nearly Parallel Eigenvectors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-singular-values-show">What the Singular Values Show</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-eigenvector-expansion-allows-this">Why the Eigenvector Expansion Allows This</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-happens-over-several-steps">What Happens over Several Steps</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#large-amplification-before-eventual-decay">Large Amplification before Eventual Decay</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-do-eigenvalue-magnitudes-equal-singular-values">When Do Eigenvalue Magnitudes Equal Singular Values?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bounds-that-hold-for-every-square-matrix">Bounds That Hold for Every Square Matrix</a></li>
 </ul>
             </nav>
         </div>
@@ -442,82 +447,181 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="eigenvalues-and-singular-values">
 <h1>Eigenvalues and Singular Values<a class="headerlink" href="#eigenvalues-and-singular-values" title="Link to this heading">#</a></h1>
-<p>The fundamental difference between eigenvalues and singular values is this: <strong>eigenvalues</strong> tell you about the long-term behavior of a system (<span class="math notranslate nohighlight">\(A^n\)</span>), while <strong>singular values</strong> tell you about the immediate, one-time amplification or “stretching” of a matrix. A matrix can have small, stable eigenvalues but produce enormous transient growth, a phenomenon captured by its singular values.</p>
-<section id="the-setup-an-illustrative-example">
-<h2>The Setup: An Illustrative Example<a class="headerlink" href="#the-setup-an-illustrative-example" title="Link to this heading">#</a></h2>
-<p>Let’s construct a matrix <span class="math notranslate nohighlight">\(A\)</span> whose eigenvalues are well-behaved, but whose singular values indicate a potential for massive amplification.</p>
-<ol class="arabic">
-<li><p><strong>Start with two nearly-aligned vectors</strong>, where <span class="math notranslate nohighlight">\(\epsilon\)</span> is a small positive number:</p>
+<p>Eigenvalues and singular values answer different questions about a matrix. An eigenvalue describes how the matrix acts along an eigenvector: <span class="math notranslate nohighlight">\(Ax=\lambda x\)</span>. A singular value describes how it maps one orthonormal direction to another: <span class="math notranslate nohighlight">\(Av_i=\sigma_i u_i\)</span>.</p>
+<p>Eigenvalues are defined for square matrices and may be complex. Singular values exist for rectangular matrices as well and are always real and nonnegative.</p>
+<p>For an evolving system <span class="math notranslate nohighlight">\(x_{k+1}=Ax_k\)</span>, eigenvalues describe the growth, decay, and oscillation of individual modes. Singular values describe size and scale in space: they measure stretching in the Euclidean norm. The largest stretching factor is</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma_1(A)=\max_{\|x\|_2=1}\|Ax\|_2.
+\]</div>
+<p>The distinction matters when eigenvectors are not orthogonal: a combination of modes can grow much more than the eigenvalue magnitudes suggest.</p>
+<section id="an-example-with-nearly-parallel-eigenvectors">
+<h2>An Example with Nearly Parallel Eigenvectors<a class="headerlink" href="#an-example-with-nearly-parallel-eigenvectors" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(0&lt;\epsilon&lt;1\)</span> and define</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    u = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix}, \quad v = \begin{bmatrix} 1 \\ -\epsilon \end{bmatrix}
-    \end{split}\]</div>
-<p>We use these to form the matrix <span class="math notranslate nohighlight">\(X = [u, v]\)</span>. As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the columns become nearly parallel, making <span class="math notranslate nohighlight">\(X\)</span> very <strong>ill-conditioned</strong>.</p>
+u=\begin{pmatrix}1\\\epsilon\end{pmatrix},
+\qquad
+v=\begin{pmatrix}1\\-\epsilon\end{pmatrix}.
+\end{split}\]</div>
+<p>These vectors are linearly independent, but become nearly parallel as <span class="math notranslate nohighlight">\(\epsilon\)</span> decreases. We construct a matrix with eigenvector <span class="math notranslate nohighlight">\(u\)</span> for eigenvalue <span class="math notranslate nohighlight">\(1\)</span> and eigenvector <span class="math notranslate nohighlight">\(v\)</span> for eigenvalue <span class="math notranslate nohighlight">\(-1\)</span>. Set</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    X = \begin{bmatrix} 1 &amp; 1 \\ \epsilon &amp; -\epsilon \end{bmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Define a simple diagonal matrix</strong> <span class="math notranslate nohighlight">\(D\)</span>:</p>
+X=\begin{pmatrix}1&amp;1\\\epsilon&amp;-\epsilon\end{pmatrix},
+\qquad
+D=\begin{pmatrix}1&amp;0\\0&amp;-1\end{pmatrix}.
+\end{split}\]</div>
+<p>Then</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    D = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Construct our matrix</strong> <span class="math notranslate nohighlight">\(A\)</span> using a similarity transform: <span class="math notranslate nohighlight">\(A = XDX^{-1}\)</span>. Let’s compute this explicitly. The inverse of <span class="math notranslate nohighlight">\(X\)</span> is:</p>
+X^{-1}=\frac12
+\begin{pmatrix}1&amp;1/\epsilon\\1&amp;-1/\epsilon\end{pmatrix},
+\end{split}\]</div>
+<p>and multiplication gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    X^{-1} = \frac{1}{\det(X)} \begin{bmatrix} -\epsilon &amp; -1 \\ -\epsilon &amp; 1 \end{bmatrix} = \frac{1}{-2\epsilon} \begin{bmatrix} -\epsilon &amp; -1 \\ -\epsilon &amp; 1 \end{bmatrix} = \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix}
-    \end{split}\]</div>
-<p>Notice that as <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the entries of <span class="math notranslate nohighlight">\(X^{-1}\)</span> blow up. Now, we find <span class="math notranslate nohighlight">\(A\)</span>:</p>
+A=XDX^{-1}
+=\begin{pmatrix}0&amp;1/\epsilon\\\epsilon&amp;0\end{pmatrix}.
+\end{split}\]</div>
+<p>The eigenvalues remain <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(-1\)</span> for every <span class="math notranslate nohighlight">\(\epsilon\)</span> in this range. Yet some vectors can be stretched by a very large factor.</p>
+<section id="what-the-singular-values-show">
+<h3>What the Singular Values Show<a class="headerlink" href="#what-the-singular-values-show" title="Link to this heading">#</a></h3>
+<p>We have</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    \begin{gathered}
-    A = \begin{bmatrix} 1 &amp; 1 \\ \epsilon &amp; -\epsilon \end{bmatrix} \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; -1 \end{bmatrix} \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix} = \begin{bmatrix} 1 &amp; -1 \\ \epsilon &amp; \epsilon \end{bmatrix} \begin{bmatrix} 1/2 &amp; 1/(2\epsilon) \\ 1/2 &amp; -1/(2\epsilon) \end{bmatrix} \\[1em]
-    A = \begin{bmatrix} 0 &amp; 1/\epsilon \\ \epsilon &amp; 0 \end{bmatrix}
-    \end{gathered}
-    \end{split}\]</div>
-</li>
-</ol>
-<p>Now we have a simple matrix <span class="math notranslate nohighlight">\(A\)</span> that depends on our small parameter <span class="math notranslate nohighlight">\(\epsilon\)</span>. Let’s analyze its eigenvalues and singular values.</p>
+A^TA=\begin{pmatrix}\epsilon^2&amp;0\\0&amp;1/\epsilon^2\end{pmatrix}.
+\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(0&lt;\epsilon&lt;1\)</span>, the singular values in decreasing order are</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma_1=\frac1\epsilon,
+\qquad
+\sigma_2=\epsilon.
+\]</div>
+<p>The corresponding directions are especially simple:</p>
+<div class="math notranslate nohighlight">
+\[
+Ae_2=\frac1\epsilon e_1,
+\qquad
+Ae_1=\epsilon e_2.
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(e_2\)</span> is stretched by <span class="math notranslate nohighlight">\(1/\epsilon\)</span> and sent along <span class="math notranslate nohighlight">\(e_1\)</span>, while <span class="math notranslate nohighlight">\(e_1\)</span> is contracted by <span class="math notranslate nohighlight">\(\epsilon\)</span> and sent along <span class="math notranslate nohighlight">\(e_2\)</span>. In particular, <span class="math notranslate nohighlight">\(\|A\|_2=1/\epsilon\)</span> even though both eigenvalues have magnitude one.</p>
 </section>
-<section id="eigenvalue-analysis">
-<h2>Eigenvalue Analysis 🔬<a class="headerlink" href="#eigenvalue-analysis" title="Link to this heading">#</a></h2>
-<p>By construction (<span class="math notranslate nohighlight">\(A = XDX^{-1}\)</span>), the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are the diagonal entries of <span class="math notranslate nohighlight">\(D\)</span>.</p>
+<section id="why-the-eigenvector-expansion-allows-this">
+<h3>Why the Eigenvector Expansion Allows This<a class="headerlink" href="#why-the-eigenvector-expansion-allows-this" title="Link to this heading">#</a></h3>
+<p>The unit vector <span class="math notranslate nohighlight">\(e_2\)</span> can be written as</p>
 <div class="math notranslate nohighlight">
-\[\lambda_1 = 1, \quad \lambda_2 = -1\]</div>
-<p>The eigenvalues are perfectly stable and have a magnitude of 1, regardless of how small <span class="math notranslate nohighlight">\(\epsilon\)</span> gets. From an eigenvalue perspective, this matrix looks completely harmless. If we consider the discrete dynamical system <span class="math notranslate nohighlight">\(x_{k+1} = Ax_k\)</span>, the magnitudes of the eigenvalues (<span class="math notranslate nohighlight">\(|\lambda_i|=1\)</span>) suggest that the system will not blow up over time. In fact, <span class="math notranslate nohighlight">\(A^2=I\)</span>, so the system is <strong>stable and periodic.</strong></p>
+\[
+e_2=\frac{u-v}{2\epsilon}.
+\]</div>
+<p>The two terms on the right are large when <span class="math notranslate nohighlight">\(\epsilon\)</span> is small, but their first components cancel. Applying <span class="math notranslate nohighlight">\(A\)</span> changes the sign of the second eigenvector contribution:</p>
+<div class="math notranslate nohighlight">
+\[
+Ae_2=\frac{Au-Av}{2\epsilon}
+=\frac{u+v}{2\epsilon}
+=\frac1\epsilon e_1.
+\]</div>
+<p>The cancellation has disappeared. Neither eigenmode has increased in magnitude, but their sum has become much larger. Orthogonal eigenvectors cannot produce this effect, because the squared norm of their sum is the sum of the squared component magnitudes.</p>
 </section>
-<section id="singular-value-analysis">
-<h2>Singular Value Analysis 🧐<a class="headerlink" href="#singular-value-analysis" title="Link to this heading">#</a></h2>
-<p>The singular values (<span class="math notranslate nohighlight">\(\sigma_i\)</span>) are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span>.</p>
+<section id="what-happens-over-several-steps">
+<h3>What Happens over Several Steps<a class="headerlink" href="#what-happens-over-several-steps" title="Link to this heading">#</a></h3>
+<p>Direct multiplication gives <span class="math notranslate nohighlight">\(A^2=I\)</span>. Therefore,</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}A^T A = \begin{bmatrix} 0 &amp; \epsilon \\ 1/\epsilon &amp; 0 \end{bmatrix} \begin{bmatrix} 0 &amp; 1/\epsilon \\ \epsilon &amp; 0 \end{bmatrix} = \begin{bmatrix} \epsilon^2 &amp; 0 \\ 0 &amp; 1/\epsilon^2 \end{bmatrix}\end{split}\]</div>
-<p>The eigenvalues of this diagonal matrix are clearly <span class="math notranslate nohighlight">\(\epsilon^2\)</span> and <span class="math notranslate nohighlight">\(1/\epsilon^2\)</span>. The singular values of <span class="math notranslate nohighlight">\(A\)</span> are their square roots:</p>
+\[
+A^{2j}=I,
+\qquad
+A^{2j+1}=A,
+\qquad j\geq0.
+\]</div>
+<p>Starting from <span class="math notranslate nohighlight">\(x_0=e_2\)</span>, the sequence alternates between <span class="math notranslate nohighlight">\(e_2\)</span> and <span class="math notranslate nohighlight">\(e_1/\epsilon\)</span>. It is bounded for each fixed <span class="math notranslate nohighlight">\(\epsilon\)</span>, but its size can be much larger than that of the initial state. In norm,</p>
 <div class="math notranslate nohighlight">
-\[\sigma_1 = \sqrt{1/\epsilon^2} = 1/\epsilon, \quad \sigma_2 = \sqrt{\epsilon^2} = \epsilon\]</div>
-<p>As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, the largest singular value <strong><span class="math notranslate nohighlight">\(\sigma_1 \to \infty\)</span></strong>.</p>
-<p>The largest singular value is the 2-norm of the matrix, <span class="math notranslate nohighlight">\(\|A\|_2 = \sigma_{max}\)</span>. So, even though the eigenvalues are 1 and -1, the norm of the matrix is huge! This tells us that applying the matrix <span class="math notranslate nohighlight">\(A\)</span> just <em>once</em> can stretch a vector by an enormous factor of <span class="math notranslate nohighlight">\(1/\epsilon\)</span>.</p>
+\[
+\|A^{2j}\|_2=1,
+\qquad
+\|A^{2j+1}\|_2=\frac1\epsilon.
+\]</div>
+<p>This also shows why singular values cannot generally be raised to powers to find the singular values of <span class="math notranslate nohighlight">\(A^k\)</span>: here <span class="math notranslate nohighlight">\(\sigma_1(A^2)=1\)</span>, whereas <span class="math notranslate nohighlight">\(\sigma_1(A)^2=1/\epsilon^2\)</span>.</p>
 </section>
-<section id="the-takeaway-normality-is-key">
-<h2>The Takeaway: Normality is Key<a class="headerlink" href="#the-takeaway-normality-is-key" title="Link to this heading">#</a></h2>
-<p>So, why the dramatic difference? The answer lies in the <strong>non-normality</strong> of matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<ul>
-<li><p>A matrix is <strong>normal</strong> if <span class="math notranslate nohighlight">\(A^T A = AA^T\)</span>. For normal matrices, the singular values are simply the absolute values of the eigenvalues (<span class="math notranslate nohighlight">\(\sigma_i = |\lambda_i|\)</span>), and their eigenvectors are orthogonal.</p></li>
-<li><p>Our matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>not normal</strong>:</p>
+</section>
+<section id="large-amplification-before-eventual-decay">
+<h2>Large Amplification before Eventual Decay<a class="headerlink" href="#large-amplification-before-eventual-decay" title="Link to this heading">#</a></h2>
+<p>A small modification gives an example in which every initial state eventually tends to zero. Let</p>
+<div class="math notranslate nohighlight">
+\[
+B=\alpha A,
+\qquad 0&lt;\alpha&lt;1.
+\]</div>
+<p>Its eigenvalues are <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(-\alpha\)</span>, and</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    A^T A = \begin{bmatrix} \epsilon^2 &amp; 0 \\ 0 &amp; 1/\epsilon^2 \end{bmatrix} \quad \neq \quad AA^T = \begin{bmatrix} 1/\epsilon^2 &amp; 0 \\ 0 &amp; \epsilon^2 \end{bmatrix}
-    \end{split}\]</div>
-</li>
-</ul>
-<p>This non-normality has a critical geometric consequence: the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span> (the columns of <span class="math notranslate nohighlight">\(X\)</span>) are <strong>not orthogonal</strong>. As <span class="math notranslate nohighlight">\(\epsilon \to 0\)</span>, they become nearly parallel. In contrast, the singular vectors of <span class="math notranslate nohighlight">\(A\)</span> form an orthogonal basis.</p>
-<p><strong>In summary:</strong></p>
-<ul class="simple">
-<li><p><strong>Eigenvalues</strong> describe the behavior of <span class="math notranslate nohighlight">\(A\)</span> with respect to its (possibly non-orthogonal) eigenvectors. They reveal long-term, asymptotic behavior but can hide short-term transient effects.</p></li>
-<li><p><strong>Singular values</strong> describe the behavior of <span class="math notranslate nohighlight">\(A\)</span> with respect to an optimal, orthonormal basis. They reveal the maximum possible amplification the matrix can produce in a single application, defining its norm and its potential for creating large transient growth.</p></li>
-</ul>
-<p>This example starkly illustrates that for non-normal matrices, the eigenvalues alone give an incomplete and potentially misleading picture of the matrix’s behavior. You must also consider the singular values to understand the full story.</p>
+\begin{aligned}
+B^{2j}&amp;=\alpha^{2j}I,\\
+B^{2j+1}&amp;=\alpha^{2j+1}A.
+\end{aligned}
+\end{split}\]</div>
+<p>Both expressions tend to zero as <span class="math notranslate nohighlight">\(j\to\infty\)</span>. Nevertheless, the first step amplifies <span class="math notranslate nohighlight">\(e_2\)</span> by <span class="math notranslate nohighlight">\(\alpha/\epsilon\)</span>, which can be arbitrarily large. For example, with <span class="math notranslate nohighlight">\(\alpha=1/2\)</span> and <span class="math notranslate nohighlight">\(\epsilon=1/100\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+e_2\ \longmapsto\ 50e_1\ \longmapsto\ \frac14e_2
+\ \longmapsto\ \frac{25}{2}e_1\ \longmapsto\ \frac1{16}e_2\ \longmapsto\cdots.
+\]</div>
+<p>This is <strong>transient growth</strong>: a state becomes larger before eventually decaying. The eigenvalues describe the eventual decay of the modes; the singular values of <span class="math notranslate nohighlight">\(B^k\)</span> give the largest possible amplification at each step.</p>
+<p>As discussed in <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">Eigendecomposition</span></a>, for a diagonalizable matrix, eigenvalues of magnitude less than one imply decay of every state. They do not imply that the norm decreases at every step. Also, eigenvalues of magnitude exactly one do not by themselves guarantee bounded powers when the matrix is not diagonalizable.</p>
+</section>
+<section id="when-do-eigenvalue-magnitudes-equal-singular-values">
+<h2>When Do Eigenvalue Magnitudes Equal Singular Values?<a class="headerlink" href="#when-do-eigenvalue-magnitudes-equal-singular-values" title="Link to this heading">#</a></h2>
+<p>Recall that a complex square matrix is <strong>normal</strong> if <span class="math notranslate nohighlight">\(A^HA=AA^H\)</span>. For a real matrix this becomes <span class="math notranslate nohighlight">\(A^TA=AA^T\)</span>.</p>
+<div class="proof theorem admonition" id="theorem-0">
+<p class="admonition-title"><span class="caption-number">Theorem 9 </span> (Singular Values of a Normal Matrix)</p>
+<section class="theorem-content" id="proof-content">
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is normal, its singular values are the magnitudes of its eigenvalues, counted with multiplicity and placed in decreasing order.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. The Normal Case.
+By the spectral theorem, <span class="math notranslate nohighlight">\(A=Q\Lambda Q^H\)</span> with <span class="math notranslate nohighlight">\(Q\)</span> unitary. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+A^HA=Q\Lambda^H\Lambda Q^H.
+\]</div>
+<p>The diagonal entries of <span class="math notranslate nohighlight">\(\Lambda^H\Lambda\)</span> are <span class="math notranslate nohighlight">\(|\lambda_i|^2\)</span>. Taking their nonnegative square roots gives the singular values.</p>
+</div>
+<p>For a Hermitian positive semidefinite matrix, the eigenvalues are already nonnegative, so the eigenvalues and singular values coincide.</p>
+<p>A normal matrix admits an orthonormal eigenvector basis over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>. This is an existence statement: arbitrary eigenvectors chosen within a repeated eigenspace need not be orthogonal. For a real normal matrix, an eigenvector basis may require complex vectors.</p>
+<p>For normal <span class="math notranslate nohighlight">\(A\)</span>, the same unitary basis diagonalizes every power. Hence, for integers <span class="math notranslate nohighlight">\(k\geq1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|A^k\|_2=\max_i|\lambda_i|^k.
+\]</div>
+<p>If all eigenvalues have magnitude at most one, no initial state can increase in Euclidean norm. In particular, the growth seen above cannot occur in this case.</p>
+<p>Our example is not normal: for <span class="math notranslate nohighlight">\(0&lt;\epsilon&lt;1\)</span>, the following matrices differ.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A^TA&amp;=\begin{pmatrix}\epsilon^2&amp;0\\0&amp;1/\epsilon^2\end{pmatrix},\\
+AA^T&amp;=\begin{pmatrix}1/\epsilon^2&amp;0\\0&amp;\epsilon^2\end{pmatrix},
+\end{aligned}
+\end{split}\]</div>
+</section>
+<section id="bounds-that-hold-for-every-square-matrix">
+<h2>Bounds That Hold for Every Square Matrix<a class="headerlink" href="#bounds-that-hold-for-every-square-matrix" title="Link to this heading">#</a></h2>
+<p>Even without normality, every eigenvalue satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma_n(A)\leq|\lambda|\leq\sigma_1(A).
+\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Bounds on Eigenvalue Magnitudes.
+For a square matrix, the SVD gives</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma_n(A)\|x\|_2\leq\|Ax\|_2
+\leq\sigma_1(A)\|x\|_2.
+\]</div>
+<p>Apply this to a unit eigenvector. Since <span class="math notranslate nohighlight">\(\|Ax\|_2=|\lambda|\)</span>, the result follows. For a real matrix with a complex eigenvalue, use its eigenvector in <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span>; the same norm inequalities hold.</p>
+</div>
+<p>The <strong>spectral radius</strong> is <span class="math notranslate nohighlight">\(\rho(A)=\max_i|\lambda_i|\)</span>. The upper bound says <span class="math notranslate nohighlight">\(\rho(A)\leq\|A\|_2\)</span>, with equality for normal matrices. In our example the ratio <span class="math notranslate nohighlight">\(\|A\|_2/\rho(A)=1/\epsilon\)</span> can be arbitrarily large.</p>
+<p>The distinction also appears under a change of coordinates. Similarity preserves eigenvalues, but a general change of basis can change Euclidean lengths and therefore singular values: <span class="math notranslate nohighlight">\(D\)</span> has singular values <span class="math notranslate nohighlight">\(1,1\)</span>, while <span class="math notranslate nohighlight">\(A=XDX^{-1}\)</span> has singular values <span class="math notranslate nohighlight">\(1/\epsilon,\epsilon\)</span>. An orthogonal or unitary change of basis preserves lengths and preserves both sets of values.</p>
+<p>Eigenvalues describe time evolution along individual modes; singular values describe size and scale in space. The geometry of the eigenvectors explains why eigenvalue magnitudes alone may not capture how much a matrix can stretch a vector.</p>
 </section>
 </section>
 
@@ -585,10 +689,15 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-setup-an-illustrative-example">The Setup: An Illustrative Example</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-analysis">Eigenvalue Analysis 🔬</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singular-value-analysis">Singular Value Analysis 🧐</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-takeaway-normality-is-key">The Takeaway: Normality is Key</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-with-nearly-parallel-eigenvectors">An Example with Nearly Parallel Eigenvectors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-singular-values-show">What the Singular Values Show</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-eigenvector-expansion-allows-this">Why the Eigenvector Expansion Allows This</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-happens-over-several-steps">What Happens over Several Steps</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#large-amplification-before-eventual-decay">Large Amplification before Eventual Decay</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-do-eigenvalue-magnitudes-equal-singular-values">When Do Eigenvalue Magnitudes Equal Singular Values?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bounds-that-hold-for-every-square-matrix">Bounds That Hold for Every Square Matrix</a></li>
 </ul>
   </nav></div>
 

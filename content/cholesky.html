@@ -560,7 +560,7 @@ L_{22} L_{22}^T &amp;= A_{22} - \mathbf{l}_{21}\mathbf{l}_{21}^T.
 <h2>Existence and Uniqueness<a class="headerlink" href="#existence-and-uniqueness" title="Link to this heading">#</a></h2>
 <p>The previous derivation assumed that all the pivots are positive. This is true for SPD matrices, as we now prove.</p>
 <div class="proof theorem admonition" id="theorem-1">
-<p class="admonition-title"><span class="caption-number">Theorem 15 </span> (Existence and Uniqueness of Cholesky Factorization)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 16 </span> (Existence and Uniqueness of Cholesky Factorization)</p>
 <section class="theorem-content" id="proof-content">
 <p>If <span class="math notranslate nohighlight">\(A ∈ \mathbb R^{n×n}\)</span> is SPD, then there exists a unique lower triangular matrix <span class="math notranslate nohighlight">\(L\)</span> with positive diagonal such that <span class="math notranslate nohighlight">\(A = LL^T\)</span>.</p>
 </section>
@@ -690,7 +690,7 @@ a_{11} &amp; \mathbf{c}^T \\
 <div class="math notranslate nohighlight">
 \[|l_{ik}| \le \sqrt{a_{ii}}\]</div>
 <p>This is a powerful result. It guarantees that the elements of <span class="math notranslate nohighlight">\(L\)</span> can never grow large. The magnitude of any entry in <span class="math notranslate nohighlight">\(L\)</span> is bounded by the square root of the corresponding diagonal entry of the original matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>In numerical analysis, an algorithm is considered stable if it does not amplify the rounding errors that are inherent in floating-point arithmetic. The absence of element growth is the hallmark of a stable factorization. See for example our previous section (<a class="reference internal" href="lu_pivoting.html#thm:backward_error_lu">Theorem 13</a>) on the stability of the LU decomposition.</p>
+<p>In numerical analysis, an algorithm is considered stable if it does not amplify the rounding errors that are inherent in floating-point arithmetic. The absence of element growth is the hallmark of a stable factorization. See for example our previous section (<a class="reference internal" href="lu_pivoting.html#thm:backward_error_lu">Theorem 14</a>) on the stability of the LU decomposition.</p>
 <p>Because the entries of <span class="math notranslate nohighlight">\(L\)</span> remain controlled, the algorithm is not susceptible to catastrophic cancellation or error amplification.</p>
 </section>
 </section>

@@ -1,86 +1,205 @@
 # Eigenvalues and Singular Values
 
-The fundamental difference between eigenvalues and singular values is this: **eigenvalues** tell you about the long-term behavior of a system ($A^n$), while **singular values** tell you about the immediate, one-time amplification or "stretching" of a matrix. A matrix can have small, stable eigenvalues but produce enormous transient growth, a phenomenon captured by its singular values.
+Eigenvalues and singular values answer different questions about a matrix. An eigenvalue describes how the matrix acts along an eigenvector: $Ax=\lambda x$. A singular value describes how it maps one orthonormal direction to another: $Av_i=\sigma_i u_i$.
 
+Eigenvalues are defined for square matrices and may be complex. Singular values exist for rectangular matrices as well and are always real and nonnegative.
 
-## The Setup: An Illustrative Example
+For an evolving system $x_{k+1}=Ax_k$, eigenvalues describe the growth, decay, and oscillation of individual modes. Singular values describe size and scale in space: they measure stretching in the Euclidean norm. The largest stretching factor is
 
-Let's construct a matrix $A$ whose eigenvalues are well-behaved, but whose singular values indicate a potential for massive amplification.
+$$
+\sigma_1(A)=\max_{\|x\|_2=1}\|Ax\|_2.
+$$
 
-1.  **Start with two nearly-aligned vectors**, where $\epsilon$ is a small positive number:
+The distinction matters when eigenvectors are not orthogonal: a combination of modes can grow much more than the eigenvalue magnitudes suggest.
 
-    $$
-    u = \begin{bmatrix} 1 \\ \epsilon \end{bmatrix}, \quad v = \begin{bmatrix} 1 \\ -\epsilon \end{bmatrix}
-    $$
+## An Example with Nearly Parallel Eigenvectors
 
-    We use these to form the matrix $X = [u, v]$. As $\epsilon \to 0$, the columns become nearly parallel, making $X$ very **ill-conditioned**.
+Let $0<\epsilon<1$ and define
 
-    $$
-    X = \begin{bmatrix} 1 & 1 \\ \epsilon & -\epsilon \end{bmatrix}
-    $$
+$$
+u=\begin{pmatrix}1\\\epsilon\end{pmatrix},
+\qquad
+v=\begin{pmatrix}1\\-\epsilon\end{pmatrix}.
+$$
 
-2.  **Define a simple diagonal matrix** $D$:
+These vectors are linearly independent, but become nearly parallel as $\epsilon$ decreases. We construct a matrix with eigenvector $u$ for eigenvalue $1$ and eigenvector $v$ for eigenvalue $-1$. Set
 
-    $$
-    D = \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}
-    $$
+$$
+X=\begin{pmatrix}1&1\\\epsilon&-\epsilon\end{pmatrix},
+\qquad
+D=\begin{pmatrix}1&0\\0&-1\end{pmatrix}.
+$$
 
-3.  **Construct our matrix** $A$ using a similarity transform: $A = XDX^{-1}$. Let's compute this explicitly. The inverse of $X$ is:
+Then
 
-    $$
-    X^{-1} = \frac{1}{\det(X)} \begin{bmatrix} -\epsilon & -1 \\ -\epsilon & 1 \end{bmatrix} = \frac{1}{-2\epsilon} \begin{bmatrix} -\epsilon & -1 \\ -\epsilon & 1 \end{bmatrix} = \begin{bmatrix} 1/2 & 1/(2\epsilon) \\ 1/2 & -1/(2\epsilon) \end{bmatrix}
-    $$
+$$
+X^{-1}=\frac12
+\begin{pmatrix}1&1/\epsilon\\1&-1/\epsilon\end{pmatrix},
+$$
 
-    Notice that as $\epsilon \to 0$, the entries of $X^{-1}$ blow up. Now, we find $A$:
+and multiplication gives
 
-    $$
-    \begin{gathered}
-    A = \begin{bmatrix} 1 & 1 \\ \epsilon & -\epsilon \end{bmatrix} \begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix} \begin{bmatrix} 1/2 & 1/(2\epsilon) \\ 1/2 & -1/(2\epsilon) \end{bmatrix} = \begin{bmatrix} 1 & -1 \\ \epsilon & \epsilon \end{bmatrix} \begin{bmatrix} 1/2 & 1/(2\epsilon) \\ 1/2 & -1/(2\epsilon) \end{bmatrix} \\[1em]
-    A = \begin{bmatrix} 0 & 1/\epsilon \\ \epsilon & 0 \end{bmatrix}
-    \end{gathered}
-    $$
+$$
+A=XDX^{-1}
+=\begin{pmatrix}0&1/\epsilon\\\epsilon&0\end{pmatrix}.
+$$
 
-Now we have a simple matrix $A$ that depends on our small parameter $\epsilon$. Let's analyze its eigenvalues and singular values.
+The eigenvalues remain $1$ and $-1$ for every $\epsilon$ in this range. Yet some vectors can be stretched by a very large factor.
 
-## Eigenvalue Analysis 🔬
+### What the Singular Values Show
 
-By construction ($A = XDX^{-1}$), the eigenvalues of $A$ are the diagonal entries of $D$.
+We have
 
-$$\lambda_1 = 1, \quad \lambda_2 = -1$$
+$$
+A^TA=\begin{pmatrix}\epsilon^2&0\\0&1/\epsilon^2\end{pmatrix}.
+$$
 
-The eigenvalues are perfectly stable and have a magnitude of 1, regardless of how small $\epsilon$ gets. From an eigenvalue perspective, this matrix looks completely harmless. If we consider the discrete dynamical system $x_{k+1} = Ax_k$, the magnitudes of the eigenvalues ($|\lambda_i|=1$) suggest that the system will not blow up over time. In fact, $A^2=I$, so the system is **stable and periodic.**
+Since $0<\epsilon<1$, the singular values in decreasing order are
 
-## Singular Value Analysis 🧐
+$$
+\sigma_1=\frac1\epsilon,
+\qquad
+\sigma_2=\epsilon.
+$$
 
-The singular values ($\sigma_i$) are the square roots of the eigenvalues of $A^T A$.
+The corresponding directions are especially simple:
 
-$$A^T A = \begin{bmatrix} 0 & \epsilon \\ 1/\epsilon & 0 \end{bmatrix} \begin{bmatrix} 0 & 1/\epsilon \\ \epsilon & 0 \end{bmatrix} = \begin{bmatrix} \epsilon^2 & 0 \\ 0 & 1/\epsilon^2 \end{bmatrix}$$
+$$
+Ae_2=\frac1\epsilon e_1,
+\qquad
+Ae_1=\epsilon e_2.
+$$
 
-The eigenvalues of this diagonal matrix are clearly $\epsilon^2$ and $1/\epsilon^2$. The singular values of $A$ are their square roots:
+Thus $e_2$ is stretched by $1/\epsilon$ and sent along $e_1$, while $e_1$ is contracted by $\epsilon$ and sent along $e_2$. In particular, $\|A\|_2=1/\epsilon$ even though both eigenvalues have magnitude one.
 
-$$\sigma_1 = \sqrt{1/\epsilon^2} = 1/\epsilon, \quad \sigma_2 = \sqrt{\epsilon^2} = \epsilon$$
+### Why the Eigenvector Expansion Allows This
 
-As $\epsilon \to 0$, the largest singular value **$\sigma_1 \to \infty$**.
+The unit vector $e_2$ can be written as
 
-The largest singular value is the 2-norm of the matrix, $\|A\|_2 = \sigma_{max}$. So, even though the eigenvalues are 1 and -1, the norm of the matrix is huge! This tells us that applying the matrix $A$ just *once* can stretch a vector by an enormous factor of $1/\epsilon$.
+$$
+e_2=\frac{u-v}{2\epsilon}.
+$$
 
+The two terms on the right are large when $\epsilon$ is small, but their first components cancel. Applying $A$ changes the sign of the second eigenvector contribution:
 
-## The Takeaway: Normality is Key
+$$
+Ae_2=\frac{Au-Av}{2\epsilon}
+=\frac{u+v}{2\epsilon}
+=\frac1\epsilon e_1.
+$$
 
-So, why the dramatic difference? The answer lies in the **non-normality** of matrix $A$.
+The cancellation has disappeared. Neither eigenmode has increased in magnitude, but their sum has become much larger. Orthogonal eigenvectors cannot produce this effect, because the squared norm of their sum is the sum of the squared component magnitudes.
 
-* A matrix is **normal** if $A^T A = AA^T$. For normal matrices, the singular values are simply the absolute values of the eigenvalues ($\sigma_i = |\lambda_i|$), and their eigenvectors are orthogonal.
-* Our matrix $A$ is **not normal**:
+### What Happens over Several Steps
 
-    $$
-    A^T A = \begin{bmatrix} \epsilon^2 & 0 \\ 0 & 1/\epsilon^2 \end{bmatrix} \quad \neq \quad AA^T = \begin{bmatrix} 1/\epsilon^2 & 0 \\ 0 & \epsilon^2 \end{bmatrix}
-    $$
+Direct multiplication gives $A^2=I$. Therefore,
 
-This non-normality has a critical geometric consequence: the eigenvectors of $A$ (the columns of $X$) are **not orthogonal**. As $\epsilon \to 0$, they become nearly parallel. In contrast, the singular vectors of $A$ form an orthogonal basis.
+$$
+A^{2j}=I,
+\qquad
+A^{2j+1}=A,
+\qquad j\geq0.
+$$
 
-**In summary:**
+Starting from $x_0=e_2$, the sequence alternates between $e_2$ and $e_1/\epsilon$. It is bounded for each fixed $\epsilon$, but its size can be much larger than that of the initial state. In norm,
 
-* **Eigenvalues** describe the behavior of $A$ with respect to its (possibly non-orthogonal) eigenvectors. They reveal long-term, asymptotic behavior but can hide short-term transient effects.
-* **Singular values** describe the behavior of $A$ with respect to an optimal, orthonormal basis. They reveal the maximum possible amplification the matrix can produce in a single application, defining its norm and its potential for creating large transient growth.
+$$
+\|A^{2j}\|_2=1,
+\qquad
+\|A^{2j+1}\|_2=\frac1\epsilon.
+$$
 
-This example starkly illustrates that for non-normal matrices, the eigenvalues alone give an incomplete and potentially misleading picture of the matrix's behavior. You must also consider the singular values to understand the full story.
+This also shows why singular values cannot generally be raised to powers to find the singular values of $A^k$: here $\sigma_1(A^2)=1$, whereas $\sigma_1(A)^2=1/\epsilon^2$.
+
+## Large Amplification before Eventual Decay
+
+A small modification gives an example in which every initial state eventually tends to zero. Let
+
+$$
+B=\alpha A,
+\qquad 0<\alpha<1.
+$$
+
+Its eigenvalues are $\alpha$ and $-\alpha$, and
+
+$$
+\begin{aligned}
+B^{2j}&=\alpha^{2j}I,\\
+B^{2j+1}&=\alpha^{2j+1}A.
+\end{aligned}
+$$
+
+Both expressions tend to zero as $j\to\infty$. Nevertheless, the first step amplifies $e_2$ by $\alpha/\epsilon$, which can be arbitrarily large. For example, with $\alpha=1/2$ and $\epsilon=1/100$,
+
+$$
+e_2\ \longmapsto\ 50e_1\ \longmapsto\ \frac14e_2
+\ \longmapsto\ \frac{25}{2}e_1\ \longmapsto\ \frac1{16}e_2\ \longmapsto\cdots.
+$$
+
+This is **transient growth**: a state becomes larger before eventually decaying. The eigenvalues describe the eventual decay of the modes; the singular values of $B^k$ give the largest possible amplification at each step.
+
+As discussed in [Eigendecomposition](eigendecomposition.md), for a diagonalizable matrix, eigenvalues of magnitude less than one imply decay of every state. They do not imply that the norm decreases at every step. Also, eigenvalues of magnitude exactly one do not by themselves guarantee bounded powers when the matrix is not diagonalizable.
+
+## When Do Eigenvalue Magnitudes Equal Singular Values?
+
+Recall that a complex square matrix is **normal** if $A^HA=AA^H$. For a real matrix this becomes $A^TA=AA^T$.
+
+````{prf:theorem} Singular Values of a Normal Matrix
+If $A$ is normal, its singular values are the magnitudes of its eigenvalues, counted with multiplicity and placed in decreasing order.
+````
+
+````{prf:proof} The Normal Case.
+By the spectral theorem, $A=Q\Lambda Q^H$ with $Q$ unitary. Consequently,
+
+$$
+A^HA=Q\Lambda^H\Lambda Q^H.
+$$
+
+The diagonal entries of $\Lambda^H\Lambda$ are $|\lambda_i|^2$. Taking their nonnegative square roots gives the singular values.
+````
+
+For a Hermitian positive semidefinite matrix, the eigenvalues are already nonnegative, so the eigenvalues and singular values coincide.
+
+A normal matrix admits an orthonormal eigenvector basis over $\mathbb{C}$. This is an existence statement: arbitrary eigenvectors chosen within a repeated eigenspace need not be orthogonal. For a real normal matrix, an eigenvector basis may require complex vectors.
+
+For normal $A$, the same unitary basis diagonalizes every power. Hence, for integers $k\geq1$,
+
+$$
+\|A^k\|_2=\max_i|\lambda_i|^k.
+$$
+
+If all eigenvalues have magnitude at most one, no initial state can increase in Euclidean norm. In particular, the growth seen above cannot occur in this case.
+
+Our example is not normal: for $0<\epsilon<1$, the following matrices differ.
+
+$$
+\begin{aligned}
+A^TA&=\begin{pmatrix}\epsilon^2&0\\0&1/\epsilon^2\end{pmatrix},\\
+AA^T&=\begin{pmatrix}1/\epsilon^2&0\\0&\epsilon^2\end{pmatrix},
+\end{aligned}
+$$
+
+## Bounds That Hold for Every Square Matrix
+
+Even without normality, every eigenvalue satisfies
+
+$$
+\sigma_n(A)\leq|\lambda|\leq\sigma_1(A).
+$$
+
+````{prf:proof} Bounds on Eigenvalue Magnitudes.
+For a square matrix, the SVD gives
+
+$$
+\sigma_n(A)\|x\|_2\leq\|Ax\|_2
+\leq\sigma_1(A)\|x\|_2.
+$$
+
+Apply this to a unit eigenvector. Since $\|Ax\|_2=|\lambda|$, the result follows. For a real matrix with a complex eigenvalue, use its eigenvector in $\mathbb{C}^n$; the same norm inequalities hold.
+````
+
+The **spectral radius** is $\rho(A)=\max_i|\lambda_i|$. The upper bound says $\rho(A)\leq\|A\|_2$, with equality for normal matrices. In our example the ratio $\|A\|_2/\rho(A)=1/\epsilon$ can be arbitrarily large.
+
+The distinction also appears under a change of coordinates. Similarity preserves eigenvalues, but a general change of basis can change Euclidean lengths and therefore singular values: $D$ has singular values $1,1$, while $A=XDX^{-1}$ has singular values $1/\epsilon,\epsilon$. An orthogonal or unitary change of basis preserves lengths and preserves both sets of values.
+
+Eigenvalues describe time evolution along individual modes; singular values describe size and scale in space. The geometry of the eigenvectors explains why eigenvalue magnitudes alone may not capture how much a matrix can stretch a vector.
