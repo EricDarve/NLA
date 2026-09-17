@@ -402,7 +402,9 @@ document.write(`
   </button>
 `);
 </script>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -418,6 +420,16 @@ document.write(`
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-main-decompositions">The Main Decompositions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-decompositions-relate">How the Decompositions Relate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-consequences">Key Consequences</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -429,50 +441,80 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="summary-of-matrix-decompositions">
 <h1>Summary of Matrix Decompositions<a class="headerlink" href="#summary-of-matrix-decompositions" title="Link to this heading">#</a></h1>
-<p>Here is a comparison of the key matrix decompositions related to eigenvalues and singular values.</p>
+<p>The decompositions in this chapter describe a matrix in coordinates that reveal its structure. Eigenvalues describe <strong>time evolution</strong> along individual modes; singular values describe <strong>size and scale in space</strong>.</p>
+<p>Here <span class="math notranslate nohighlight">\(H\)</span> denotes conjugate transpose. A unitary matrix satisfies <span class="math notranslate nohighlight">\(Q^HQ=I\)</span>; for real matrices, the corresponding condition is orthogonality, <span class="math notranslate nohighlight">\(Q^TQ=I\)</span>.</p>
+<section id="the-main-decompositions">
+<h2>The Main Decompositions<a class="headerlink" href="#the-main-decompositions" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Decomposition</p></th>
-<th class="head text-left"><p>Requirements for Existence</p></th>
-<th class="head text-left"><p>Components &amp; Properties</p></th>
-<th class="head text-left"><p>Interpretation &amp; Applications</p></th>
-<th class="head text-left"><p>Relation to Others</p></th>
+<th class="head text-left"><p>When it exists</p></th>
+<th class="head text-left"><p>Structure of the factors</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square complex matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>). <br> <strong>T</strong>: Upper triangular. <br> Diagonal of T contains the eigenvalues of A.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Any linear transformation is unitarily similar to a triangular one. <br> <strong>Applications</strong>: Numerically stable computation of all eigenvalues.</p></td>
-<td class="text-left"><p>This is the general form from which eigendecomposition is a special case.</p></td>
+<tr class="row-even"><td class="text-left"><p><strong>Complex Schur</strong><br><span class="math notranslate nohighlight">\(A=QTQ^H\)</span></p></td>
+<td class="text-left"><p>Every square complex matrix, including real matrices viewed over <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>.</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(Q\)</span> is unitary; <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. Its diagonal entries are the eigenvalues. The columns of <span class="math notranslate nohighlight">\(Q\)</span> need not be eigenvectors.</p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Real Schur Decomposition</strong> <br> <span class="math notranslate nohighlight">\(A = Q S Q^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> square real matrix <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p><strong>Q</strong>: Real orthogonal (<span class="math notranslate nohighlight">\(Q^T Q = I\)</span>). <br> <strong>S</strong>: Real quasi-triangular (block upper triangular). <br> 1x1 diagonal blocks are real eigenvalues; 2x2 blocks correspond to complex conjugate eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Represents any real transformation in a basis that makes it “as triangular as possible” using only real numbers. <br> <strong>Applications</strong>: Stable eigenvalue computation in real arithmetic.</p></td>
-<td class="text-left"><p>The real-valued equivalent of the complex Schur decomposition.</p></td>
+<tr class="row-odd"><td class="text-left"><p><strong>Real Schur</strong><br><span class="math notranslate nohighlight">\(A=QSQ^T\)</span></p></td>
+<td class="text-left"><p>Every square real matrix.</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(Q\)</span> is real orthogonal; <span class="math notranslate nohighlight">\(S\)</span> is real block upper triangular. Its <span class="math notranslate nohighlight">\(1\times1\)</span> diagonal blocks contain real eigenvalues; its <span class="math notranslate nohighlight">\(2\times2\)</span> diagonal blocks have nonreal conjugate eigenvalue pairs.</p></td>
 </tr>
-<tr class="row-even"><td class="text-left"><p><strong>Eigendecomposition</strong> <br> <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>diagonalizable</strong> matrices (those with <span class="math notranslate nohighlight">\(n\)</span> linearly independent eigenvectors).</p></td>
-<td class="text-left"><p><strong>X</strong>: Invertible matrix whose columns are the eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues. <br> <span class="math notranslate nohighlight">\(X\)</span> is not guaranteed to be unitary.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along the eigenvector axes. Associated with “Time” and the evolution of dynamical systems (<span class="math notranslate nohighlight">\(A^k\)</span>). <br> <strong>Applications</strong>: Solving linear differential equations, analyzing stability, computing matrix powers.</p></td>
-<td class="text-left"><p>A special case of the Schur decomposition where the triangular matrix <span class="math notranslate nohighlight">\(T\)</span> is diagonal.</p></td>
+<tr class="row-even"><td class="text-left"><p><strong>Eigendecomposition</strong><br><span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span></p></td>
+<td class="text-left"><p>Exactly when a square matrix has a basis of eigenvectors over the chosen field.</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(X\)</span> is invertible and contains the eigenvectors; <span class="math notranslate nohighlight">\(\Lambda\)</span> is diagonal and contains their eigenvalues. The eigenvectors need not be orthogonal.</p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Unitary Diagonalization</strong> <br> <span class="math notranslate nohighlight">\(A = Q \Lambda Q^H\)</span></p></td>
-<td class="text-left"><p>Exists only for <strong>normal</strong> matrices (<span class="math notranslate nohighlight">\(A A^H = A^H A\)</span>).</p></td>
-<td class="text-left"><p><strong>Q</strong>: Unitary matrix whose columns are an orthonormal basis of eigenvectors. <br> <strong><span class="math notranslate nohighlight">\(\Lambda\)</span></strong>: Diagonal matrix of eigenvalues.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: The transformation is a pure scaling along a set of <em>orthogonal</em> axes. <br> <strong>Applications</strong>: Quantum mechanics, signal processing.</p></td>
-<td class="text-left"><p>The ideal form of both the Schur and eigendecomposition. Occurs when the matrix is normal.</p></td>
+<tr class="row-odd"><td class="text-left"><p><strong>Unitary diagonalization</strong><br><span class="math notranslate nohighlight">\(A=Q\Lambda Q^H\)</span></p></td>
+<td class="text-left"><p>Exactly when a complex square matrix is normal: <span class="math notranslate nohighlight">\(A^HA=AA^H\)</span>.</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(Q\)</span> contains an orthonormal eigenvector basis; <span class="math notranslate nohighlight">\(\Lambda\)</span> contains the eigenvalues. For real symmetric matrices, <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(\Lambda\)</span> can both be real.</p></td>
 </tr>
-<tr class="row-even"><td class="text-left"><p><strong>Singular Value Decomposition (SVD)</strong> <br> <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span></p></td>
-<td class="text-left"><p>Exists for <strong>any</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, real or complex.</p></td>
-<td class="text-left"><p><strong>U</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(m \times m\)</span>) of left singular vectors. <br> <strong>V</strong>: Unitary/Orthogonal matrix (<span class="math notranslate nohighlight">\(n \times n\)</span>) of right singular vectors. <br> <strong><span class="math notranslate nohighlight">\(\Sigma\)</span></strong>: Rectangular diagonal matrix of non-negative singular values.</p></td>
-<td class="text-left"><p><strong>Interpretation</strong>: Decomposes any transformation into rotation, scaling, and another rotation. Associated with “Space” and the geometry of the transformation. <br> <strong>Applications</strong>: PCA, low-rank approximation, computing pseudoinverses, determining rank and condition number.</p></td>
-<td class="text-left"><p>Generalizes eigendecomposition to any matrix. The singular values of A are the square roots of the eigenvalues of <span class="math notranslate nohighlight">\(A^T A\)</span> and <span class="math notranslate nohighlight">\(A A^T\)</span>.</p></td>
+<tr class="row-even"><td class="text-left"><p><strong>Singular value decomposition</strong><br><span class="math notranslate nohighlight">\(A=U\Sigma V^H\)</span></p></td>
+<td class="text-left"><p>Every <span class="math notranslate nohighlight">\(m\times n\)</span> real or complex matrix.</p></td>
+<td class="text-left"><p>In the full SVD, <span class="math notranslate nohighlight">\(U\)</span> is <span class="math notranslate nohighlight">\(m\times m\)</span> and <span class="math notranslate nohighlight">\(V\)</span> is <span class="math notranslate nohighlight">\(n\times n\)</span>, both unitary. The <span class="math notranslate nohighlight">\(m\times n\)</span> matrix <span class="math notranslate nohighlight">\(\Sigma\)</span> is rectangular diagonal with nonnegative entries. For real <span class="math notranslate nohighlight">\(A\)</span>, the factors can be real and the formula is <span class="math notranslate nohighlight">\(A=U\Sigma V^T\)</span>.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+</section>
+<section id="how-the-decompositions-relate">
+<h2>How the Decompositions Relate<a class="headerlink" href="#how-the-decompositions-relate" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Schur form always exists; an eigenvector basis may not.</strong> A diagonal Schur form is a unitary diagonalization and exists exactly for normal matrices. A general eigendecomposition allows a nonorthogonal basis, so it is not a special case of Schur form.</p></li>
+<li><p><strong>Real and complex diagonalization differ.</strong> A real matrix may need complex eigenvectors. In particular, real orthogonal diagonalization is possible exactly for real symmetric matrices; real normality alone is not enough.</p></li>
+<li><p><strong>The SVD uses separate input and output bases.</strong> It pairs directions through <span class="math notranslate nohighlight">\(Av_i=\sigma_i u_i\)</span>. Its positive singular values are the square roots of the positive eigenvalues of both <span class="math notranslate nohighlight">\(A^HA\)</span> and <span class="math notranslate nohighlight">\(AA^H\)</span>; the numbers of zero eigenvalues can differ when <span class="math notranslate nohighlight">\(A\)</span> is rectangular. For normal matrices, the singular values are the eigenvalue magnitudes, arranged in decreasing order.</p></li>
+</ul>
+</section>
+<section id="key-consequences">
+<h2>Key Consequences<a class="headerlink" href="#key-consequences" title="Link to this heading">#</a></h2>
+<p><strong>Time evolution.</strong> If <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+A^k=X\Lambda^kX^{-1}.
+\]</div>
+<p>Each mode is multiplied by <span class="math notranslate nohighlight">\(\lambda_i^k\)</span>. The geometry of the eigenvectors matters too: nonorthogonal modes can combine to produce large amplification even when each eigenvalue has magnitude less than one.</p>
+<p><strong>Size, scale, and rank.</strong> With <span class="math notranslate nohighlight">\(p=\min(m,n)\)</span> and <span class="math notranslate nohighlight">\(\sigma_1\geq\cdots\geq\sigma_p\geq0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|A\|_2=\sigma_1,
+\qquad
+\|A\|_F^2=\sum_{i=1}^p\sigma_i^2.
+\]</div>
+<p>The rank is the number <span class="math notranslate nohighlight">\(r\)</span> of positive singular values. The first <span class="math notranslate nohighlight">\(r\)</span> left and right singular vectors span <span class="math notranslate nohighlight">\(R(A)\)</span> and <span class="math notranslate nohighlight">\(R(A^H)\)</span>; the remaining vectors in the full SVD span <span class="math notranslate nohighlight">\(N(A^H)\)</span> and <span class="math notranslate nohighlight">\(N(A)\)</span>, respectively.</p>
+<p><strong>Low-rank approximation.</strong> The compact SVD keeps all <span class="math notranslate nohighlight">\(r\)</span> positive singular values and is exact. Keeping only the largest <span class="math notranslate nohighlight">\(k&lt;r\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+A_k=\sum_{i=1}^k\sigma_i u_i v_i^H,
+\]</div>
+<p>the best approximation among matrices of rank at most <span class="math notranslate nohighlight">\(k\)</span> in both the spectral and Frobenius norms. Its errors are</p>
+<div class="math notranslate nohighlight">
+\[
+\|A-A_k\|_2=\sigma_{k+1},
+\qquad
+\|A-A_k\|_F^2=\sum_{i=k+1}^p\sigma_i^2.
+\]</div>
+<p>The preceding sections give the proofs and examples for <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">eigendecomposition and Schur forms</span></a>, <a class="reference internal" href="normal_matrices.html"><span class="std std-doc">normal matrices</span></a>, and the <a class="reference internal" href="singular_value_decomposition.html"><span class="std std-doc">SVD</span></a>. Later chapters develop the numerical methods for computing and using these decompositions.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -529,6 +571,23 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-main-decompositions">The Main Decompositions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-decompositions-relate">How the Decompositions Relate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-consequences">Key Consequences</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

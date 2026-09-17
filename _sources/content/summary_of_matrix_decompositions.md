@@ -1,11 +1,57 @@
 # Summary of Matrix Decompositions
 
-Here is a comparison of the key matrix decompositions related to eigenvalues and singular values.
+The decompositions in this chapter describe a matrix in coordinates that reveal its structure. Eigenvalues describe **time evolution** along individual modes; singular values describe **size and scale in space**.
 
-| Decomposition | Requirements for Existence | Components & Properties | Interpretation & Applications | Relation to Others |
-| :--- | :--- | :--- | :--- | :--- |
-| **Schur Decomposition** <br> $A = Q T Q^H$ | Exists for **any** square complex matrix $A$. | **Q**: Unitary ($Q^H Q = I$). <br> **T**: Upper triangular. <br> Diagonal of T contains the eigenvalues of A. | **Interpretation**: Any linear transformation is unitarily similar to a triangular one. <br> **Applications**: Numerically stable computation of all eigenvalues. | This is the general form from which eigendecomposition is a special case. |
-| **Real Schur Decomposition** <br> $A = Q S Q^T$ | Exists for **any** square real matrix $A$. | **Q**: Real orthogonal ($Q^T Q = I$). <br> **S**: Real quasi-triangular (block upper triangular). <br> 1x1 diagonal blocks are real eigenvalues; 2x2 blocks correspond to complex conjugate eigenvalues. | **Interpretation**: Represents any real transformation in a basis that makes it "as triangular as possible" using only real numbers. <br> **Applications**: Stable eigenvalue computation in real arithmetic. | The real-valued equivalent of the complex Schur decomposition. |
-| **Eigendecomposition** <br> $A = X \Lambda X^{-1}$ | Exists only for **diagonalizable** matrices (those with $n$ linearly independent eigenvectors). | **X**: Invertible matrix whose columns are the eigenvectors. <br> **$\Lambda$**: Diagonal matrix of eigenvalues. <br> $X$ is not guaranteed to be unitary. | **Interpretation**: The transformation is a pure scaling along the eigenvector axes. Associated with "Time" and the evolution of dynamical systems ($A^k$). <br> **Applications**: Solving linear differential equations, analyzing stability, computing matrix powers. | A special case of the Schur decomposition where the triangular matrix $T$ is diagonal. |
-| **Unitary Diagonalization** <br> $A = Q \Lambda Q^H$ | Exists only for **normal** matrices ($A A^H = A^H A$). | **Q**: Unitary matrix whose columns are an orthonormal basis of eigenvectors. <br> **$\Lambda$**: Diagonal matrix of eigenvalues. | **Interpretation**: The transformation is a pure scaling along a set of *orthogonal* axes. <br> **Applications**: Quantum mechanics, signal processing. | The ideal form of both the Schur and eigendecomposition. Occurs when the matrix is normal. |
-| **Singular Value Decomposition (SVD)** <br> $A = U \Sigma V^T$ | Exists for **any** $m \times n$ matrix $A$, real or complex. | **U**: Unitary/Orthogonal matrix ($m \times m$) of left singular vectors. <br> **V**: Unitary/Orthogonal matrix ($n \times n$) of right singular vectors. <br> **$\Sigma$**: Rectangular diagonal matrix of non-negative singular values. | **Interpretation**: Decomposes any transformation into rotation, scaling, and another rotation. Associated with "Space" and the geometry of the transformation. <br> **Applications**: PCA, low-rank approximation, computing pseudoinverses, determining rank and condition number. | Generalizes eigendecomposition to any matrix. The singular values of A are the square roots of the eigenvalues of $A^T A$ and $A A^T$. |
+Here $H$ denotes conjugate transpose. A unitary matrix satisfies $Q^HQ=I$; for real matrices, the corresponding condition is orthogonality, $Q^TQ=I$.
+
+## The Main Decompositions
+
+| Decomposition | When it exists | Structure of the factors |
+| :--- | :--- | :--- |
+| **Complex Schur**<br>$A=QTQ^H$ | Every square complex matrix, including real matrices viewed over $\mathbb{C}$. | $Q$ is unitary; $T$ is upper triangular. Its diagonal entries are the eigenvalues. The columns of $Q$ need not be eigenvectors. |
+| **Real Schur**<br>$A=QSQ^T$ | Every square real matrix. | $Q$ is real orthogonal; $S$ is real block upper triangular. Its $1\times1$ diagonal blocks contain real eigenvalues; its $2\times2$ diagonal blocks have nonreal conjugate eigenvalue pairs. |
+| **Eigendecomposition**<br>$A=X\Lambda X^{-1}$ | Exactly when a square matrix has a basis of eigenvectors over the chosen field. | $X$ is invertible and contains the eigenvectors; $\Lambda$ is diagonal and contains their eigenvalues. The eigenvectors need not be orthogonal. |
+| **Unitary diagonalization**<br>$A=Q\Lambda Q^H$ | Exactly when a complex square matrix is normal: $A^HA=AA^H$. | $Q$ contains an orthonormal eigenvector basis; $\Lambda$ contains the eigenvalues. For real symmetric matrices, $Q$ and $\Lambda$ can both be real. |
+| **Singular value decomposition**<br>$A=U\Sigma V^H$ | Every $m\times n$ real or complex matrix. | In the full SVD, $U$ is $m\times m$ and $V$ is $n\times n$, both unitary. The $m\times n$ matrix $\Sigma$ is rectangular diagonal with nonnegative entries. For real $A$, the factors can be real and the formula is $A=U\Sigma V^T$. |
+
+## How the Decompositions Relate
+
+- **Schur form always exists; an eigenvector basis may not.** A diagonal Schur form is a unitary diagonalization and exists exactly for normal matrices. A general eigendecomposition allows a nonorthogonal basis, so it is not a special case of Schur form.
+- **Real and complex diagonalization differ.** A real matrix may need complex eigenvectors. In particular, real orthogonal diagonalization is possible exactly for real symmetric matrices; real normality alone is not enough.
+- **The SVD uses separate input and output bases.** It pairs directions through $Av_i=\sigma_i u_i$. Its positive singular values are the square roots of the positive eigenvalues of both $A^HA$ and $AA^H$; the numbers of zero eigenvalues can differ when $A$ is rectangular. For normal matrices, the singular values are the eigenvalue magnitudes, arranged in decreasing order.
+
+## Key Consequences
+
+**Time evolution.** If $A=X\Lambda X^{-1}$, then
+
+$$
+A^k=X\Lambda^kX^{-1}.
+$$
+
+Each mode is multiplied by $\lambda_i^k$. The geometry of the eigenvectors matters too: nonorthogonal modes can combine to produce large amplification even when each eigenvalue has magnitude less than one.
+
+**Size, scale, and rank.** With $p=\min(m,n)$ and $\sigma_1\geq\cdots\geq\sigma_p\geq0$,
+
+$$
+\|A\|_2=\sigma_1,
+\qquad
+\|A\|_F^2=\sum_{i=1}^p\sigma_i^2.
+$$
+
+The rank is the number $r$ of positive singular values. The first $r$ left and right singular vectors span $R(A)$ and $R(A^H)$; the remaining vectors in the full SVD span $N(A^H)$ and $N(A)$, respectively.
+
+**Low-rank approximation.** The compact SVD keeps all $r$ positive singular values and is exact. Keeping only the largest $k<r$ gives
+
+$$
+A_k=\sum_{i=1}^k\sigma_i u_i v_i^H,
+$$
+
+the best approximation among matrices of rank at most $k$ in both the spectral and Frobenius norms. Its errors are
+
+$$
+\|A-A_k\|_2=\sigma_{k+1},
+\qquad
+\|A-A_k\|_F^2=\sum_{i=k+1}^p\sigma_i^2.
+$$
+
+The preceding sections give the proofs and examples for [eigendecomposition and Schur forms](eigendecomposition.md), [normal matrices](normal_matrices.md), and the [SVD](singular_value_decomposition.md). Later chapters develop the numerical methods for computing and using these decompositions.
