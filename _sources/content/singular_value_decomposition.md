@@ -1,286 +1,386 @@
 # Singular Value Decomposition
 
-The Singular Value Decomposition (SVD) is one of the most important matrix factorizations used in data science and machine learning. It is a vital tool used in methods like Principal Component Analysis (PCA) and Latent Semantic Analysis (LSA).
+The singular value decomposition (SVD) describes a matrix through orthonormal input directions, orthonormal output directions, and the factors by which those directions are stretched. It exists for every matrix, including rectangular and rank-deficient matrices. This makes it useful for understanding linear transformations, solving least-squares problems, and approximating data by a matrix of lower rank.
 
-## Explanation of Singular Value Decomposition (SVD)
+## The Full SVD
 
-````{prf:theorem}
+````{prf:theorem} Singular Value Decomposition
 :label: thm:svd
-The SVD expresses any $m \times n$ real matrix $A$ as the product of three specific matrices:
+Every matrix $A\in\mathbb{R}^{m\times n}$ can be written as
 
-$$ A = U \Sigma V^T $$
+$$
+A=U\Sigma V^T,
+$$
 
-*   $A$ is an $m \times n$ matrix.
-*   $U$ is an orthogonal matrix ($m \times m$), whose columns are the **left singular vectors**.
-*   $V$ is an orthogonal matrix ($n \times n$), whose columns are the **right singular vectors**.
-*   $\Sigma$ (or $\Lambda$) is an $m \times n$ rectangular diagonal matrix. Its diagonal elements, $\sigma_i$, are real, non-negative numbers called **singular values**. These singular values are arranged in descending order: $\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_p \geq 0$, where $p = \min(m, n)$.
+where:
 
+- $U\in\mathbb{R}^{m\times m}$ is orthogonal. Its columns $u_1,\ldots,u_m$ are **left singular vectors**.
+- $V\in\mathbb{R}^{n\times n}$ is orthogonal. Its columns $v_1,\ldots,v_n$ are **right singular vectors**.
+- $\Sigma\in\mathbb{R}^{m\times n}$ is rectangular diagonal: its only possibly nonzero entries are $\Sigma_{ii}=\sigma_i$ for $1\leq i\leq p$, where $p=\min(m,n)$.
+
+The **singular values** are ordered so that
+
+$$
+\sigma_1\geq\sigma_2\geq\cdots\geq\sigma_p\geq0.
+$$
 ````
 
-The SVD exists for any real matrix, even if it is not a square matrix. It can be regarded as a generalization of the diagonalization of a square matrix.
+The factorization gives the paired relations
 
-## SVD and the Association with "Space" (Scales of the Matrix)
+$$
+Av_i=\sigma_i u_i,
+\qquad
+A^Tu_i=\sigma_i v_i,
+\qquad 1\leq i\leq p.
+$$
 
-SVD is conceptually associated with **"Space"** because it describes the geometry of a transformation, unlike eigendecomposition, which is associated with "Time". SVD systematically represents the **multiple scales** involved when the matrix $A$ is applied to a vector.
+Thus, $A$ maps the input direction $v_i$ to the output direction $u_i$, with scale factor $\sigma_i$. An eigenvector describes a direction that stays on the same line under a square matrix. The SVD allows the input and output directions to differ, and even to belong to spaces of different dimensions.
 
-Geometrically, an $m \times n$ matrix $A$ represents a linear transformation from the $n$-dimensional space $\mathbb{R}^n$ to the $m$-dimensional space $\mathbb{R}^m$. The SVD decomposes this complex transformation into three simple, sequential transformations:
+For a complex matrix, the corresponding factorization is $A=U\Sigma V^H$, with $U$ and $V$ unitary and the same real, nonnegative singular values. We develop the real case below; the results extend to complex matrices by using conjugate transposes and complex inner products.
 
-1.  **Rotation/Reflection ($V^T$):** A rotation or reflection transformation of the orthogonal coordinate system in $\mathbb{R}^n$.
-2.  **Scaling ($\Sigma$):** A scaling transformation of the coordinate axes by the factors $\sigma_1, \sigma_2, \ldots$. These singular values ($\sigma_i$) represent the pure scaling applied by the matrix.
-3.  **Rotation/Reflection ($U$):** A final rotation or reflection transformation of the coordinate system in $\mathbb{R}^m$.
+## Geometry: Directions and Stretching
 
-If $A$ transforms a unit ball in $\mathbb{R}^n$ into an ellipsoid, **the lengths of the axes of this ellipsoid are the singular values of $A$**.
+Let $r$ be the number of positive singular values. Multiplying out the SVD gives the **outer-product expansion**
 
-## Connection between SVD and the Four Fundamental Spaces
+$$
+A=\sum_{i=1}^r\sigma_i u_i v_i^T.
+$$
 
-The vectors composing the orthogonal matrices $U$ and $V$ provide orthonormal bases for the four fundamental subspaces associated with matrix $A$:
+Consequently, for any input $x$,
 
-Let $r$ be the rank of matrix $A$, which is equal to the number of non-zero singular values ($\sigma_r > 0$, $\sigma_{r+1} = 0$, etc.).
+$$
+Ax=\sum_{i=1}^r\sigma_i(v_i^Tx)u_i.
+$$
 
-| Subspace | Basis Vectors (Dimension $r$) | Orthonormal Bases Constituted by SVD Vectors |
+The scalar $v_i^Tx$ is the component of $x$ along $v_i$. The matrix scales this component by $\sigma_i$ and sends it along $u_i$. Components along $v_{r+1},\ldots,v_n$ are sent to zero.
+
+This gives a geometric interpretation of the three factors:
+
+1. $V^T$ expresses the input in an orthonormal coordinate system.
+2. $\Sigma$ scales the first $p$ coordinates. If $n>m$, it discards the remaining input coordinates; if $m>n$, it appends zeros.
+3. $U$ expresses the result in the output coordinate system.
+
+The image of the unit ball is an ellipsoid in $R(A)$ with **semiaxis lengths** $\sigma_1,\ldots,\sigma_r$ and directions $u_1,\ldots,u_r$. If $r<m$, this ellipsoid lies in a lower-dimensional subspace of the output space.
+
+### A Rectangular Example
+
+Consider
+
+$$
+A=\begin{pmatrix}
+0&3&0&0\\
+0&0&-2&0\\
+0&0&0&0
+\end{pmatrix},
+\qquad
+Ax=\begin{pmatrix}3x_2\\-2x_3\\0\end{pmatrix}.
+$$
+
+The second input coordinate is stretched by $3$, the third by $2$ with a reversal of direction, and the first and fourth are lost. Writing $e_i$ for standard basis vectors in the appropriate space, take
+
+$$
+U=[e_1,-e_2,e_3],
+\qquad
+V=[e_2,e_3,e_1,e_4],
+$$
+
+and
+
+$$
+\Sigma=\begin{pmatrix}
+3&0&0&0\\
+0&2&0&0\\
+0&0&0&0
+\end{pmatrix}.
+$$
+
+Then $A=U\Sigma V^T$. The singular values are $3,2,0$, and the rank is $2$. The unit ball in $\mathbb{R}^4$ maps to a filled ellipse in the first two output coordinates, with semiaxes $3$ and $2$.
+
+## Why the SVD Always Exists
+
+The proof uses the spectral theorem for real symmetric matrices, established in [Normal Matrices](normal_matrices.md).
+
+````{prf:proof} Existence of the SVD.
+The matrix $A^TA$ is symmetric and positive semidefinite because
+
+$$
+x^TA^TAx=\|Ax\|_2^2\geq0.
+$$
+
+It therefore has an orthonormal eigenbasis $v_1,\ldots,v_n$, with eigenvalues $\mu_1\geq\cdots\geq\mu_n\geq0$. Let $r$ be the number of positive eigenvalues. For $1\leq i\leq r$, define
+
+$$
+\sigma_i=\sqrt{\mu_i},
+\qquad
+u_i=\frac{Av_i}{\sigma_i}.
+$$
+
+These vectors are orthonormal, since
+
+$$
+u_i^Tu_j
+=\frac{v_i^TA^TAv_j}{\sigma_i\sigma_j}
+=\frac{\mu_j v_i^Tv_j}{\sigma_i\sigma_j}
+=\delta_{ij}.
+$$
+
+In particular, $r\leq m$. Complete $u_1,\ldots,u_r$ to an orthonormal basis of $\mathbb{R}^m$ and form $U=[u_1,\ldots,u_m]$ and $V=[v_1,\ldots,v_n]$.
+
+For $i>r$, we have
+
+$$
+\|Av_i\|_2^2=v_i^TA^TAv_i=\mu_i=0,
+$$
+
+so $Av_i=0$. Thus the columns of $AV$ are $\sigma_i u_i$ for $i\leq r$ and zero otherwise. Equivalently, $AV=U\Sigma$, where $\Sigma$ is rectangular diagonal with these $r$ positive entries and zeros elsewhere. Multiplying by $V^T$ gives $A=U\Sigma V^T$.
+
+Since $U$ and $V$ are invertible, $\operatorname{rank}(A)=\operatorname{rank}(\Sigma)=r$. The argument also covers $A=0$: there are no positive singular values, and any orthonormal bases give an SVD with $\Sigma=0$.
+````
+
+This is an existence proof. Methods for computing the SVD will be developed later in the course.
+
+## Singular Values and Eigenvalues
+
+Multiplying the factors gives
+
+$$
+\begin{aligned}
+A^TA&=V(\Sigma^T\Sigma)V^T,\\
+AA^T&=U(\Sigma\Sigma^T)U^T.
+\end{aligned}
+$$
+
+The matrices $\Sigma^T\Sigma$ and $\Sigma\Sigma^T$ are diagonal, but their sizes differ: they are $n\times n$ and $m\times m$, respectively. Both have positive eigenvalues $\sigma_1^2,\ldots,\sigma_r^2$. The remaining eigenvalues are zero: $n-r$ for $A^TA$ and $m-r$ for $AA^T$.
+
+Thus the right singular vectors are eigenvectors of $A^TA$, and the left singular vectors are eigenvectors of $AA^T$. For a positive singular value, the two vectors are linked by $u_i=Av_i/\sigma_i$; they cannot be chosen independently.
+
+The singular values are uniquely determined, but the singular vectors need not be. A positive pair $(u_i,v_i)$ may have both signs reversed. Within a repeated positive singular value, the left and right bases may undergo the same orthogonal change of basis. The bases for the two null spaces may be chosen independently.
+
+### A Symmetric Block Matrix
+
+There is also a direct connection with the symmetric matrix
+
+$$
+H=\begin{pmatrix}0&A\\A^T&0\end{pmatrix}.
+$$
+
+For every positive singular value, the paired relations give
+
+$$
+\begin{aligned}
+H\frac{1}{\sqrt{2}}\begin{pmatrix}u_i\\v_i\end{pmatrix}
+&=\sigma_i\frac{1}{\sqrt{2}}\begin{pmatrix}u_i\\v_i\end{pmatrix},\\
+H\frac{1}{\sqrt{2}}\begin{pmatrix}u_i\\-v_i\end{pmatrix}
+&=-\sigma_i\frac{1}{\sqrt{2}}\begin{pmatrix}u_i\\-v_i\end{pmatrix}.
+\end{aligned}
+$$
+
+The remaining eigenvectors are
+
+$$
+\begin{pmatrix}u_i\\0\end{pmatrix}\quad(r<i\leq m),
+\qquad
+\begin{pmatrix}0\\v_j\end{pmatrix}\quad(r<j\leq n),
+$$
+
+all with eigenvalue zero. Together these form an orthonormal basis of $\mathbb{R}^{m+n}$. Hence the eigenvalues of $H$ are $\pm\sigma_1,\ldots,\pm\sigma_r$, together with $m+n-2r$ zeros. Including these zero directions is essential for rectangular or rank-deficient matrices.
+
+## The Four Fundamental Subspaces
+
+The SVD provides orthonormal bases for all [four fundamental subspaces](four_fundamental_subspaces.md):
+
+| Subspace | Dimension | Orthonormal basis |
 | :--- | :--- | :--- |
-| **Row Space** ($R(A^T)$) | Subspace of $\mathbb{R}^n$ | The first $r$ right singular vectors: $v_1, \ldots, v_r$ |
-| **Null Space** ($N(A)$) | Subspace of $\mathbb{R}^n$ | The remaining $n-r$ right singular vectors: $v_{r+1}, \ldots, v_n$ |
-| **Column Space** ($R(A)$) | Subspace of $\mathbb{R}^m$ | The first $r$ left singular vectors: $u_1, \ldots, u_r$ |
-| **Left Null Space** ($N(A^T)$) | Subspace of $\mathbb{R}^m$ | The remaining $m-r$ left singular vectors: $u_{r+1}, \ldots, u_m$ |
+| Column space $R(A)$ | $r$ | $u_1,\ldots,u_r$ |
+| Left null space $N(A^T)$ | $m-r$ | $u_{r+1},\ldots,u_m$ |
+| Row space $R(A^T)$ | $r$ | $v_1,\ldots,v_r$ |
+| Null space $N(A)$ | $n-r$ | $v_{r+1},\ldots,v_n$ |
 
-The SVD bases demonstrate that the row space ($R(A^T)$) and the null space ($N(A)$) are orthogonal complements in $\mathbb{R}^n$, while the column space ($R(A)$) and the left null space ($N(A^T)$) are orthogonal complements in $\mathbb{R}^m$.
-
-## Connection with Rank and the Rank-Nullity Theorem
-
-The **rank** of matrix $A$ is precisely equal to $r$, the number of positive singular values $\sigma_i$.
-
-The SVD provides orthonormal bases that explicitly recover the **Rank-Nullity Theorem**, which states that the dimension of the column space (rank) plus the dimension of the null space (nullity) equals the number of columns ($n$).
-*   $\text{dim}(R(A^T)) = r$ (Rank).
-*   $\text{dim}(N(A)) = n - r$ (Nullity).
-*   $r + (n-r) = n$.
-
-## Main Applications
-
-The properties of SVD lead to a wide range of applications, particularly in data analysis and machine learning.
-
-* **Data Compression and Dimensionality Reduction**: The truncated SVD allows for a form of "lossy compression." By retaining only the largest $k$ singular values, one can construct a lower-rank matrix ($A_k$) that is the closest approximation to the original matrix $A$. This is the core principle behind its use for reducing the size of datasets while preserving the most significant information.
-* **Noise Reduction**: In many datasets, smaller singular values are associated with noise. By truncating these values, the SVD can be used to "clean" the data and highlight the underlying signal.
-* **Machine Learning**: SVD is a vital tool in methods like Principal Component Analysis (PCA) and Latent Semantic Analysis (LSA). It is also used in matrix completion tasks where the goal is to fill in missing entries in a data matrix.
-
-## Proof of the Existence of the SVD
-
-The existence of the SVD for any $m \times n$ real matrix $A$ is guaranteed by a basic theorem (Theorem 15.1). A constructive proof can be derived by analyzing the related symmetric matrices. Another approach involves diagonalizing a related symmetric matrix:
-
-````{prf:proof}
-
-Let $A$ be an $m \times n$ matrix. Define the symmetric matrix $B$ as:
-
-$$ B = \begin{bmatrix} 0 & A \\ A^T & 0 \end{bmatrix} $$
-
-Since $B$ is symmetric, it is unitarily diagonalizable:
-
-$$ B = Q \Lambda Q^T $$
-
-where $\Lambda$ is a diagonal matrix of eigenvalues and $Q$ is an orthogonal matrix of eigenvectors.
-We consider an eigenvector $[x; y]$ of $B$ corresponding to a non-zero eigenvalue $\lambda$. The definition of the eigenvalue/eigenvector relationship $B [x; y] = \lambda [x; y]$ yields the equations:
+An empty list is the basis of the zero subspace. To see the null-space statement directly, use the orthonormality of the $u_i$ to obtain
 
 $$
-\begin{gather}
-A y = \lambda x \\
-A^T x = \lambda y
-\end{gather}
+\|Ax\|_2^2=\sum_{i=1}^r\sigma_i^2(v_i^Tx)^2.
 $$
 
-Applying $A^T$ to the first equation and $A$ to the second, we find:
+This is zero exactly when $x$ is orthogonal to $v_1,\ldots,v_r$. The column-space statement follows from the outer-product expansion and $Av_i=\sigma_i u_i$. Applying the same reasoning to $A^T$ gives the other two spaces.
+
+Write $U_r=[u_1,\ldots,u_r]$ and $V_r=[v_1,\ldots,v_r]$. Then
 
 $$
-\begin{gather}
-A^T A y = \lambda (A^T x) = \lambda (\lambda y) = \lambda^2 y \\
-A A^T x = \lambda (A y) = \lambda (\lambda x) = \lambda^2 x
-\end{gather}
+P_{R(A)}=U_rU_r^T,
+\qquad
+P_{R(A^T)}=V_rV_r^T
 $$
 
-This shows that $\lambda^2$ is an eigenvalue of both $A^T A$ and $A A^T$. We define the singular values $\Sigma$ such that the diagonal elements are the positive square roots of these eigenvalues: $\sigma_i = \sqrt{\lambda_i^2}$.
+are the **orthogonal projections** onto the column and row spaces. Their complementary projections, $I_m-U_rU_r^T$ and $I_n-V_rV_r^T$, project orthogonally onto the left null space and null space.
 
-It can also be shown that $[x; -y]$ is an eigenvector corresponding to the eigenvalue $-\lambda$.
+## Reduced, Compact, and Truncated Forms
 
-If $X$ denotes the eigenvectors of $A A^T$ and $Y$ denotes the eigenvectors of $A^T A$ (corresponding to non-zero $\lambda^2$), we can structure the matrices $Q$ and $\Lambda$ related to $B$ as:
+The full SVD includes complete bases for both spaces. Often only some columns are needed. For $0\leq k\leq p$, let $U_k$ and $V_k$ contain the first $k$ columns, and let $\Sigma_k=\operatorname{diag}(\sigma_1,\ldots,\sigma_k)$.
 
-$$ Q = \frac{1}{\sqrt{2}} \begin{bmatrix} X & X \\ Y & -Y \end{bmatrix}, \quad \Lambda = \begin{bmatrix} \Sigma & 0 \\ 0 & -\Sigma \end{bmatrix} $$
+- The **reduced SVD** (also called the economy SVD) keeps $p=\min(m,n)$ columns:
 
-By substitution into $B = Q \Lambda Q^T$, the decomposition $A = X \Sigma Y^T$ is recovered. If we identify $U=X$ and $V=Y$, the SVD $A = U \Sigma V^T$ is established.
-````
+  $$A=U_p\Sigma_pV_p^T.$$
 
-## Relation of SVD with Eigendecomposition of Symmetric Matrices
+  The factor sizes are $m\times p$, $p\times p$, and $n\times p$ for $U_p$, $\Sigma_p$, and $V_p$. This factorization is exact, including when some singular values are zero.
 
-The SVD is intimately linked to the eigendecomposition of the symmetric matrices $A^T A$ and $A A^T$.
+- The **compact SVD** keeps only the $r$ positive singular values:
 
-1.  **Right Singular Vectors ($V$):** The columns of $V$ (the right singular vectors) are the **eigenvectors of $A^T A$**. The diagonalization of $A^T A$ is given by:
-2.  
-    $$ A^T A = V \Sigma^T \Sigma V^T = V \Sigma^2 V^T $$
+  $$A=U_r\Sigma_rV_r^T.$$
 
-3.  **Left Singular Vectors ($U$):** The columns of $U$ (the left singular vectors) are the **eigenvectors of $A A^T$**. The diagonalization of $A A^T$ is given by:
-4.  
-    $$ A A^T = U \Sigma \Sigma^T U^T = U \Sigma^2 U^T $$
+  It is also exact. When $r<p$, it omits additional zero singular directions. The term *thin SVD* is used for either of these forms in different references, so check the stated dimensions.
 
-5.  **Singular Values ($\Sigma$):** The squares of the singular values ($\sigma_i^2$) are the **eigenvalues of both $A^T A$ and $A A^T$**. Thus, the singular values $\sigma_j$ are the square roots of these eigenvalues: $\sigma_j = \sqrt{\lambda_j}$.
+- A **truncated SVD** retains just the first $k<r$ terms:
 
-## Thin or Truncated SVD
+  $$A_k=U_k\Sigma_kV_k^T=\sum_{i=1}^k\sigma_i u_i v_i^T.$$
 
-The full SVD, $A = U \Sigma V^T$, is sometimes referred to as the full Singular Value Decomposition. In practice, **compact** and **truncated** forms are commonly used.
+  It has rank $k$ and approximates $A$. We set $A_0=0$; once $k\geq r$, the sum equals $A$ exactly.
 
-1.  **Compact SVD (Thin SVD):**
-    *   This form is obtained when the SVD has a rank equal to the rank $r$ of the original matrix $A$.
-    *   It is represented as $A = U_r \Sigma_r V_r^T$.
-    *   $\Sigma_r$ is an $r$-order diagonal matrix containing only the $r$ positive singular values. $U_r$ contains the first $r$ columns of $U$ (the orthonormal bases for $R(A)$), and $V_r$ contains the first $r$ columns of $V$ (the orthonormal bases for $R(A^T)$).
-    *   Compact SVD corresponds to **lossless compression** of the data.
+Each retained term describes one input-output direction pair. Storing the factors requires $k(m+n+1)$ numbers instead of $mn$, so a small $k$ can reduce storage substantially.
 
-2.  **Truncated SVD:**
-    *   This is the form typically referred to in practical applications.
-    *   It is obtained by taking only the part corresponding to the largest $k$ singular values, where $k < r$ (the rank of $A$).
-    *   The approximation is $A \approx U_k \Sigma_k V_k^T$.
-    *   The matrix $A_k = U_k \Sigma_k V_k^T$ has a rank of $k$, which is lower than the rank of the original matrix. This decomposition provides an optimal low-rank approximation of $A$.
-    *   Truncated SVD corresponds to **lossy compression**.
+## Matrix Norms from Singular Values
 
-We discuss this result further in the next section with the Eckart-Young-Mirsky Theorem.
+The largest singular value measures the maximum stretching of a unit vector:
 
-## The Eckart-Young-Mirsky Theorem: Optimal Low-Rank Approximation
+$$
+\|A\|_2=\max_{\|x\|_2=1}\|Ax\|_2=\sigma_1.
+$$
 
-````{prf:theorem} The Eckart-Young-Mirsky Theorem
+Indeed, the expression for $\|Ax\|_2^2$ above is at most $\sigma_1^2\|x\|_2^2$, with equality at $x=v_1$. This also holds for $A=0$.
+
+The Frobenius norm combines the stretching in all directions. Using the trace identity from [Trace](trace.md),
+
+$$
+\|A\|_F^2
+=\operatorname{tr}(A^TA)
+=\sum_{i=1}^p\sigma_i^2.
+$$
+
+In the rectangular example, $\|A\|_2=3$ whereas $\|A\|_F=\sqrt{13}$. These norms measure different things.
+
+The [Schatten norms](operator_norms.md) apply a vector norm to the singular values. Using $q$ for the norm exponent,
+
+$$
+\|A\|_{S,q}=\left(\sum_{i=1}^p\sigma_i^q\right)^{1/q},
+\qquad 1\leq q<\infty.
+$$
+
+The important special cases are
+
+$$
+\begin{aligned}
+\|A\|_{S,1}&=\sum_{i=1}^p\sigma_i=\|A\|_* &&\text{(nuclear norm)},\\
+\|A\|_{S,2}&=\|A\|_F &&\text{(Frobenius norm)},\\
+\|A\|_{S,\infty}&=\sigma_1=\|A\|_2 &&\text{(spectral norm)}.
+\end{aligned}
+$$
+
+The subscript $S$ matters: the Schatten $2$-norm is the Frobenius norm, while the induced matrix $2$-norm is the spectral norm. Likewise, the nuclear norm is generally different from the induced matrix $1$-norm.
+
+## Best Low-Rank Approximation
+
+Keeping the largest singular values gives the best approximation of a prescribed rank in two common norms.
+
+````{prf:theorem} Eckart–Young–Mirsky Theorem
 :label: thm:eckart-young-mirsky
-Let the SVD of a matrix $A$ be $A = U \Sigma V^T$. Let $A_k$ be the truncated SVD matrix of rank $k$ obtained by keeping only the $k$ largest singular values:
+Let $A_k=\sum_{i=1}^k\sigma_i u_i v_i^T$, with $0\leq k<p$. Among all matrices $B\in\mathbb{R}^{m\times n}$ of rank at most $k$, $A_k$ minimizes both the spectral-norm error and the Frobenius-norm error:
 
 $$
-A_k = U_k \Sigma_k V_k^T
+\begin{aligned}
+\min_{\operatorname{rank}(B)\leq k}\|A-B\|_2
+&=\|A-A_k\|_2=\sigma_{k+1},\\
+\min_{\operatorname{rank}(B)\leq k}\|A-B\|_F
+&=\|A-A_k\|_F
+=\left(\sum_{i=k+1}^p\sigma_i^2\right)^{1/2}.
+\end{aligned}
 $$
 
-The matrix $A_k$ is the best rank-$k$ approximation of $A$ in both the spectral norm and the Frobenius norm. That is, for any matrix $B$ with $\text{rank}(B) = k$:
-
-$$
-\|A - A_k\|_2 \le \|A - B\|_2 \quad \text{and} \quad \|A - A_k\|_F \le \|A - B\|_F
-$$
-
-The approximation error is given by the first neglected singular value: $\|A - A_k\|_2 = \sigma_{k+1}$.
+For $k=p$, $A_p=A$ and both errors are zero.
 ````
 
-This theorem is the theoretical bedrock for using SVD in data compression, noise reduction, and machine learning. It guarantees that truncating the SVD is not just a heuristic but the mathematically optimal way to reduce the dimensionality (rank) of your data while minimizing the error in these important norms.
+````{prf:proof} Spectral-Norm Error.
+Let $B$ have rank at most $k$. The restriction of $B$ to the $(k+1)$-dimensional space $\operatorname{span}(v_1,\ldots,v_{k+1})$ has a nonzero null vector. Normalize it to obtain a unit vector $z=\sum_{i=1}^{k+1}c_iv_i$ with $Bz=0$. Then
 
-## Connection with Matrix Norms and the Determinant of a Matrix
+$$
+\begin{aligned}
+\|A-B\|_2^2
+&\geq\|(A-B)z\|_2^2=\|Az\|_2^2\\
+&=\sum_{i=1}^{k+1}\sigma_i^2c_i^2
+\geq\sigma_{k+1}^2.
+\end{aligned}
+$$
 
-### Matrix Norms (Frobenius Norm)
+On the other hand, $A-A_k=\sum_{i=k+1}^p\sigma_i u_i v_i^T$ has largest singular value $\sigma_{k+1}$. Thus $A_k$ attains the bound.
+````
 
-The SVD provides an optimal method of matrix approximation in the sense of the **Frobenius norm**. The Frobenius norm ($\|A\|_F$) is a generalization of the $L_2$ norm of a vector.
+````{prf:proof} Frobenius-Norm Error.
+Let $B$ have rank at most $k$. Its null space has dimension at least $n-k$, so choose orthonormal vectors $z_1,\ldots,z_{n-k}$ in $N(B)$ and complete them to an orthonormal basis of $\mathbb{R}^n$. The Frobenius norm is unchanged by an orthogonal change of coordinates, so its square is the sum of squared output lengths over this basis. Hence
 
-The Frobenius norm of a matrix $A$ is related directly to its singular values:
+$$
+\|A-B\|_F^2
+\geq\sum_{j=1}^{n-k}\|(A-B)z_j\|_2^2
+=\sum_{j=1}^{n-k}\|Az_j\|_2^2.
+$$
 
-$$ \|A\|_F = \left( \sigma_1^2 + \sigma_2^2 + \cdots + \sigma_n^2 \right)^{1/2} $$
+Set $d_i=\sigma_i^2$ for $i\leq p$ and $d_i=0$ for $p<i\leq n$. Expanding each $z_j$ in the right singular basis gives
 
-Furthermore, the truncated SVD with rank $k$ yields the optimal $k$-rank approximation $X=A_k$ in the sense of the Frobenius norm. The error of this optimal approximation is given by the neglected singular values:
+$$
+\sum_{j=1}^{n-k}\|Az_j\|_2^2
+=\sum_{i=1}^n d_i w_i,
+\qquad
+w_i=\sum_{j=1}^{n-k}(v_i^Tz_j)^2.
+$$
 
-$$ \|A - X\|_F = \left( \sigma_{k+1}^2 + \sigma_{k+2}^2 + \cdots + \sigma_n^2 \right)^{1/2} $$
+Here $0\leq w_i\leq1$: $w_i$ is the squared length of the orthogonal projection of the unit vector $v_i$ onto $\operatorname{span}(z_1,\ldots,z_{n-k})$. Also $\sum_iw_i=n-k$, because each $z_j$ has unit length.
 
-The spectral norm (operator 2-norm) of $A$ is equal to the largest singular value, $\sigma_1(A)$:
+Since $d_1\geq\cdots\geq d_n\geq0$, these weights give a sum no smaller than the sum of the $n-k$ smallest $d_i$. Explicitly,
 
-$$ \|A\|_2 = \sigma_1(A) $$
+$$
+\begin{aligned}
+\sum_{i=1}^n d_iw_i-\sum_{i=k+1}^n d_i
+&=\sum_{i=1}^k d_iw_i-\sum_{i=k+1}^n d_i(1-w_i)\\
+&\geq d_{k+1}\left(\sum_{i=1}^k w_i
+-\sum_{i=k+1}^n(1-w_i)\right)\\
+&=0.
+\end{aligned}
+$$
 
-A key conceptual link exists between the Singular Value Decomposition (SVD) and the definition of various **matrix norms**, especially those used in analyzing low-rank approximations. 
+Therefore $\|A-B\|_F^2\geq\sum_{i=k+1}^p\sigma_i^2$. The discarded terms of the SVD give exactly this squared error for $A_k$, so the bound is attained.
+````
 
-While the Frobenius norm is mentioned as the metric for optimal approximation, SVD is also crucial for defining the **Schatten $p$-norms**.
+In the rectangular example, the best rank-one approximation retains the entry $3$ and replaces the entry $-2$ by zero. Both approximation errors equal $2$. A rank-two approximation is already exact.
 
-### Connection to Schatten $p$-Norms
+These formulas let us choose how many directions to retain for a desired error. A small discarded singular value means a small contribution to this matrix approximation; it does not by itself mean that the corresponding information is noise.
 
-The Schatten $p$-norm is a generalization that uses the singular values $\sigma_i$ in a manner analogous to how the $L_p$ vector norm uses vector elements.
+## Determinant and Volume
 
-The **Schatten $p$-norm** of a matrix $A$, denoted as $\|A\|_p$, is defined using its singular values ($\sigma_i$):
-
-$$ \|A\|_p = \left( \sum_{i=1}^r \sigma_i^p \right)^{1/p} $$
-
-where $r$ is the rank of the matrix $A$ (the number of non-zero singular values).
-
-The Schatten $p$-norms are derived by treating the singular values as a vector and calculating the vector $p$-norm of that vector.
-
-The Schatten $p$-norms generalize three highly important matrix norms derived from SVD:
-
-1.  **Schatten 2-Norm (Frobenius Norm):**
-    When $p=2$, the Schatten norm is equivalent to the **Frobenius norm**.
-
-    $$ \|A\|_F = \|A\|_2 = \left( \sum_{i=1}^r \sigma_i^2 \right)^{1/2} $$
-
-    The Frobenius norm is used to quantify the "square loss" in matrix approximation. The SVD provides the optimal rank-$k$ approximation regarding this norm.
-
-2.  **Schatten 1-Norm (Nuclear Norm or Trace Norm):**
-    When $p=1$, the Schatten norm is called the **Nuclear Norm** (or Trace Norm).
-    
-    $$ \|A\|_* = \|A\|_1 = \sum_{i=1}^r \sigma_i $$
-    
-    This norm is widely used in machine learning for promoting low-rank solutions (known as matrix completion or sparse PCA).
-
-3.  **Schatten $\infty$-Norm (Spectral Norm or Operator 2-Norm):**
-    When $p \to \infty$, the Schatten norm converges to the **Spectral Norm** (also known as the Operator 2-norm, or $\|A\|_2$):
-    
-    $$ \|A\|_2 = \sigma_1(A) $$
-    
-    The spectral norm is equal to the largest singular value, $\sigma_1(A)$. This norm is crucial as it measures the maximum stretching factor of the matrix transformation.
-
-## Determinant and Singular Values
-
-The absolute value of the determinant of a square matrix is equal to the product of its singular values.
-
-````{prf:theorem}
+````{prf:theorem} Determinant and Singular Values
 :label: thm:det-svd
-For any square matrix $A \in \mathbb{C}^{n \times n}$ with singular values $\sigma_1, \sigma_2, \dots, \sigma_n$, the following relationship holds:
+For a square real or complex matrix $A\in\mathbb{C}^{n\times n}$,
 
 $$
-|\det(A)| = \prod_{i=1}^n \sigma_i
-$$
-
-````
-
-````{prf:proof}
-
-Start with the **Singular Value Decomposition (SVD)** of the matrix $A$:
-
-$$
-A = U \Sigma V^H
-$$
-
-where $U$ and $V$ are unitary matrices, and $\Sigma$ is a diagonal matrix containing the singular values $\sigma_i$ on its diagonal.
-
-Take the determinant of both sides of the equation:
-
-$$
-\det(A) = \det(U \Sigma V^H)
-$$
-
-Using the multiplicative property of determinants, $\det(XYZ) = \det(X)\det(Y)\det(Z)$, we can separate the terms:
-
-$$
-\det(A) = \det(U) \det(\Sigma) \det(V^H)
-$$
-
-The determinant of a diagonal matrix is the product of its diagonal entries. The diagonal entries of $\Sigma$ are the singular values:
-
-$$
-\det(\Sigma) = \prod_{i=1}^n \sigma_i
-$$
-
-For any unitary matrix $Q$, its determinant has a magnitude of one, i.e., $|\det(Q)|=1$. Therefore, $|\det(U)| = 1$ and $|\det(V^H)| = 1$.
-
-Now, take the absolute value of the entire determinant equation:
-
-$$
-|\det(A)| = |\det(U)| \cdot |\det(\Sigma)| \cdot |\det(V^H)|
-$$
-
-Substituting the known values gives:
-
-$$
-|\det(A)| = 1 \cdot \left(\prod_{i=1}^n \sigma_i\right) \cdot 1
-$$
-
-This simplifies to the final result:
-
-$$
-|\det(A)| = \prod_{i=1}^n \sigma_i
+|\det(A)|=\prod_{i=1}^n\sigma_i.
 $$
 ````
 
-### Geometric Interpretation 📐
+````{prf:proof} Determinant Formula.
+From $A=U\Sigma V^H$ and the multiplicative property of determinants,
 
-This relationship has a clear geometric meaning. The **singular values** ($\sigma_i$) represent the scaling factors that the matrix applies along its principal axes (the directions of maximum stretch). The **determinant** represents the total volume scaling factor of the transformation. This theorem shows that the total change in volume is simply the product of the individual stretches along these principal, orthogonal directions.
+$$
+|\det(A)|=|\det(U)|\,|\det(\Sigma)|\,|\det(V^H)|.
+$$
+
+The unitary factors have determinants of magnitude one, and $\det(\Sigma)=\prod_i\sigma_i$. This gives the result.
+````
+
+For a real square matrix, $|\det(A)|$ is the volume scaling factor: it is the product of the stretches in the singular directions. The singular values do not record the sign of the determinant, which describes orientation. In particular, a square matrix is invertible exactly when all its singular values are positive.
+
+## Connections to Later Topics
+
+The SVD will recur throughout the course:
+
+- **Least squares:** in singular coordinates, the equations separate into scalar equations $\sigma_i y_i=c_i$. Positive singular values can be inverted, while zero singular values identify directions the matrix cannot determine. We will develop the pseudoinverse and minimum-norm solutions in the least-squares chapter.
+- **Principal component analysis:** if the rows of $Z\in\mathbb{R}^{N\times n}$ are centered observations, the covariance matrix is $C=Z^TZ/N$. Its principal directions are the right singular vectors of $Z$, with variances $\sigma_i^2/N$ (and additional zeros when needed). This connects the SVD to the PCA discussion in [Applications of Eigenvalues](applications_of_eigenvalues.md).
+- **Data compression:** a truncated SVD represents a matrix using a few direction pairs. The approximation theorem gives the error incurred by discarding the remaining pairs.
+
+The algorithms for computing these factorizations and using them in numerical problems will be studied later.
