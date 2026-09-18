@@ -706,7 +706,7 @@ r_0, r_1, \dots, r_{k-1} \in {\mathcal K}_k
 <h2>Key Result: Residual Orthogonality<a class="headerlink" href="#key-result-residual-orthogonality" title="Link to this heading">#</a></h2>
 <p>We now prove a fundamental property of the Conjugate Gradient algorithm: the residual <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> that was used to generate the iterate <span class="math notranslate nohighlight">\(x_k\)</span>. This is a crucial result that will lead to the algorithm’s short recurrences.</p>
 <div class="proof theorem admonition" id="cg_residual_orthogonality">
-<p class="admonition-title"><span class="caption-number">Theorem 37 </span> (Orthogonality of Residuals)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 36 </span> (Orthogonality of Residuals)</p>
 <section class="theorem-content" id="proof-content">
 <p>The residual <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span> is orthogonal to the subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
 <div class="math notranslate nohighlight">
@@ -746,7 +746,7 @@ p_l^T r_k = (p_l^T b) - \mu_l (p_l^T A p_l)
 <h2>The Equivalence of Residual and Search Subspaces<a class="headerlink" href="#the-equivalence-of-residual-and-search-subspaces" title="Link to this heading">#</a></h2>
 <p>We now prove a critical result that provides the “engine” for the CG algorithm’s efficiency: the space spanned by the residuals is the same as the Krylov subspace.</p>
 <div class="proof theorem admonition" id="cg_residual_basis">
-<p class="admonition-title"><span class="caption-number">Theorem 38 </span> (Residuals as a Basis)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 37 </span> (Residuals as a Basis)</p>
 <section class="theorem-content" id="proof-content">
 <p>The subspace spanned by the first <span class="math notranslate nohighlight">\(k\)</span> residuals is the same as the <span class="math notranslate nohighlight">\(k\)</span>-th Krylov subspace, which is spanned by the first <span class="math notranslate nohighlight">\(k\)</span> search directions.</p>
 <div class="math notranslate nohighlight">
@@ -762,7 +762,7 @@ p_l^T r_k = (p_l^T b) - \mu_l (p_l^T A p_l)
 \]</div>
 <p>To prove that these two spaces are equal, we only need to show that their dimensions are equal. By definition, <span class="math notranslate nohighlight">\(\dim({\mathcal K}_k) = \dim(\text{span}(p_1, \dots, p_k)) = k\)</span>.</p>
 <p>Thus, our goal is to prove that <span class="math notranslate nohighlight">\(\dim(\text{span}(r_0, \dots, r_{k-1})) = k\)</span>. This is true if and only if the set <span class="math notranslate nohighlight">\(\{r_0, \dots, r_{k-1}\}\)</span> is linearly independent.</p>
-<p>Let’s use the key orthogonality result from the previous section (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a>), which stated that <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p>
+<p>Let’s use the key orthogonality result from the previous section (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a>), which stated that <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p>
 <ul class="simple">
 <li><p>We know that <span class="math notranslate nohighlight">\(r_l \in {\mathcal K}_{l+1}\)</span> for any <span class="math notranslate nohighlight">\(l\)</span>.</p></li>
 <li><p>This means that for any <span class="math notranslate nohighlight">\(l &lt; k\)</span>, <span class="math notranslate nohighlight">\(r_l \in {\mathcal K}_{l+1} \subset {\mathcal K}_k\)</span>.</p></li>
@@ -795,8 +795,8 @@ r_k^T r_l = 0 \quad \text{for all } l &lt; k
 <p>We are now ready to derive the final, crucial component of the CG algorithm: an efficient way to compute the next search direction <span class="math notranslate nohighlight">\(p_{k+1}\)</span>. We will show that it can be computed using only the current residual <span class="math notranslate nohighlight">\(r_k\)</span> and the previous search direction <span class="math notranslate nohighlight">\(p_k\)</span>.</p>
 <p>We begin with two facts we have already established:</p>
 <ol class="arabic simple">
-<li><p><strong>Equal Subspaces (<a class="reference internal" href="#cg_residual_basis">Theorem 38</a>):</strong> <span class="math notranslate nohighlight">\({\mathcal K}_{k+1} = \text{span}(r_0, \dots, r_k) = \text{span}(p_1, \dots, p_{k+1})\)</span>.</p></li>
-<li><p><strong>Residual Orthogonality (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a>):</strong> <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p></li>
+<li><p><strong>Equal Subspaces (<a class="reference internal" href="#cg_residual_basis">Theorem 37</a>):</strong> <span class="math notranslate nohighlight">\({\mathcal K}_{k+1} = \text{span}(r_0, \dots, r_k) = \text{span}(p_1, \dots, p_{k+1})\)</span>.</p></li>
+<li><p><strong>Residual Orthogonality (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a>):</strong> <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p></li>
 </ol>
 <p>From fact #1, we know that <span class="math notranslate nohighlight">\(r_k \in {\mathcal K}_{k+1}\)</span>. This means we can express <span class="math notranslate nohighlight">\(r_k\)</span> as a linear combination of the A-orthogonal basis vectors <span class="math notranslate nohighlight">\(\{p_l\}\)</span>:</p>
 <div class="math notranslate nohighlight">
@@ -856,7 +856,7 @@ u_{k+1,k+1} = 1, \quad u_{k,k+1} = \frac{p_k^T A r_k}{d_k}, \quad p_{k+1} = r_k 
 <section id="the-residuals-are-orthogonal-to-each-other">
 <h2>The Residuals are Orthogonal to Each Other<a class="headerlink" href="#the-residuals-are-orthogonal-to-each-other" title="Link to this heading">#</a></h2>
 <div class="proof theorem admonition" id="cg_residuals_orthogonal">
-<p class="admonition-title"><span class="caption-number">Theorem 39 </span> (Orthogonality of Residuals to Each Other)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 38 </span> (Orthogonality of Residuals to Each Other)</p>
 <section class="theorem-content" id="proof-content">
 <p>The sequence of residual vectors <span class="math notranslate nohighlight">\(\{r_0, r_1, \ldots\}\)</span> generated by the Conjugate Gradient algorithm is an <strong>orthogonal set</strong>.</p>
 <div class="math notranslate nohighlight">
@@ -869,13 +869,13 @@ r_k^T r_l = 0 \quad \text{for all } k \neq l
 <p>Without loss of generality, let us assume <span class="math notranslate nohighlight">\(l &lt; k\)</span>.</p>
 <p>We will use two facts we have already established:</p>
 <ol class="arabic">
-<li><p><strong>From <a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a>:</strong> The residual <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
+<li><p><strong>From <a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a>:</strong> The residual <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[
     r_k \perp {\mathcal K}_k = \text{span}(p_1, \dots, p_k)
     \]</div>
 </li>
-<li><p><strong>From <a class="reference internal" href="#cg_residual_basis">Theorem 38</a>:</strong> The residual <span class="math notranslate nohighlight">\(r_l\)</span> is an element of the subspace <span class="math notranslate nohighlight">\({\mathcal K}_{l+1}\)</span>.</p>
+<li><p><strong>From <a class="reference internal" href="#cg_residual_basis">Theorem 37</a>:</strong> The residual <span class="math notranslate nohighlight">\(r_l\)</span> is an element of the subspace <span class="math notranslate nohighlight">\({\mathcal K}_{l+1}\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[
     r_l = b - A x_l \quad \text{where } b \in {\mathcal K}_{l+1} \text{ and } x_l \in {\mathcal K}_l \implies A x_l \in {\mathcal K}_{l+1}
@@ -922,7 +922,7 @@ p_k^T b = p_k^T (r_{k-1} + A x_{k-1}) = p_k^T r_{k-1} + p_k^T A x_{k-1}
 \[
 p_k = r_{k-1} - u_{k-1,k}p_{k-1}
 \]</div>
-<p>Using the fact that <span class="math notranslate nohighlight">\(p_{k-1} \perp r_{k-1}\)</span> (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a>), the inner product simplifies:</p>
+<p>Using the fact that <span class="math notranslate nohighlight">\(p_{k-1} \perp r_{k-1}\)</span> (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a>), the inner product simplifies:</p>
 <div class="math notranslate nohighlight">
 \[
 p_k^T r_{k-1} = (r_{k-1} - u_{k-1,k} p_{k-1})^T r_{k-1} = \| r_{k-1} \|_2^2
@@ -961,7 +961,7 @@ u_{k,k+1} = \frac{(A p_k)^T r_k}{d_k} = \frac{1}{d_k \mu_k} (r_{k-1} - r_k)^T r_
 \[
 (r_{k-1} - r_k)^T r_k = r_{k-1}^T r_k - r_k^T r_k
 \]</div>
-<p>By the mutual orthogonality of residuals (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 39</a>), <span class="math notranslate nohighlight">\(r_{k-1}^T r_k = 0\)</span>. Thus:</p>
+<p>By the mutual orthogonality of residuals (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 38</a>), <span class="math notranslate nohighlight">\(r_{k-1}^T r_k = 0\)</span>. Thus:</p>
 <div class="math notranslate nohighlight">
 \[
 (r_{k-1} - r_k)^T r_k = - \| r_k \|_2^2
@@ -1071,7 +1071,7 @@ p_{k+1} &amp;= r_k + \tau_k \, p_k &amp;&amp; \text{Update search direction}
 <p>Let’s look at the “new” vector added at step <span class="math notranslate nohighlight">\(k\)</span>:</p>
 <ol class="arabic simple">
 <li><p><strong>Lanczos:</strong> The Lanczos process constructs <span class="math notranslate nohighlight">\(q_k\)</span> to be in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> and orthonormal to all previous vectors, so <span class="math notranslate nohighlight">\(q_k \perp {\mathcal K}_{k-1}\)</span>.</p></li>
-<li><p><strong>CG:</strong> We proved in <a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a> that <span class="math notranslate nohighlight">\(r_{k-1} \perp {\mathcal K}_{k-1}\)</span>.</p></li>
+<li><p><strong>CG:</strong> We proved in <a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a> that <span class="math notranslate nohighlight">\(r_{k-1} \perp {\mathcal K}_{k-1}\)</span>.</p></li>
 </ol>
 <p>Both <span class="math notranslate nohighlight">\(q_k\)</span> and <span class="math notranslate nohighlight">\(r_{k-1}\)</span> are non-zero vectors in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> that are orthogonal to <span class="math notranslate nohighlight">\({\mathcal K}_{k-1}\)</span>. Since this orthogonal complement (<span class="math notranslate nohighlight">\({\mathcal K}_k \ominus {\mathcal K}_{k-1}\)</span>) is a one-dimensional subspace, the two vectors must be parallel:</p>
 <div class="math notranslate nohighlight">
@@ -1091,7 +1091,7 @@ p_{k+1} &amp;= r_k + \tau_k \, p_k &amp;&amp; \text{Update search direction}
 </li>
 <li><p><strong>Diagonal Matrices:</strong></p>
 <ul>
-<li><p><span class="math notranslate nohighlight">\(R^T R = D_R\)</span>: The residuals are mutually orthogonal (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 39</a>).</p></li>
+<li><p><span class="math notranslate nohighlight">\(R^T R = D_R\)</span>: The residuals are mutually orthogonal (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 38</a>).</p></li>
 <li><p><span class="math notranslate nohighlight">\(P^T A P = D\)</span>: The search directions are A-orthogonal (the central requirement of CG).</p></li>
 </ul>
 </li>
@@ -1108,7 +1108,7 @@ p_{k+1} &amp;= r_k + \tau_k \, p_k &amp;&amp; \text{Update search direction}
 <ol class="arabic simple">
 <li><p>We know that <span class="math notranslate nohighlight">\(r_j \in {\mathcal K}_{j+1}\)</span>.</p></li>
 <li><p>By the property of Krylov subspaces, <span class="math notranslate nohighlight">\(A r_j \in A({\mathcal K}_{j+1}) \subset {\mathcal K}_{j+2}\)</span>.</p></li>
-<li><p>From <a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a>, we know the residual <span class="math notranslate nohighlight">\(r_i\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span> (i.e., <span class="math notranslate nohighlight">\(r_i \perp {\mathcal K}_i\)</span>).</p></li>
+<li><p>From <a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a>, we know the residual <span class="math notranslate nohighlight">\(r_i\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span> (i.e., <span class="math notranslate nohighlight">\(r_i \perp {\mathcal K}_i\)</span>).</p></li>
 <li><p>Assume, without loss of generality, that <span class="math notranslate nohighlight">\(i \ge j+2\)</span>.</p></li>
 <li><p>If <span class="math notranslate nohighlight">\(i \ge j+2\)</span>, then the subspace <span class="math notranslate nohighlight">\({\mathcal K}_{j+2}\)</span> is a subset of <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span>. This means <span class="math notranslate nohighlight">\(A r_j\)</span> (which is in <span class="math notranslate nohighlight">\({\mathcal K}_{j+2}\)</span>) is also a vector in <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span>.</p></li>
 <li><p>Since <span class="math notranslate nohighlight">\(r_i \perp {\mathcal K}_i\)</span>, it must be orthogonal to every vector in it, including <span class="math notranslate nohighlight">\(A r_j\)</span>.</p></li>
@@ -1122,7 +1122,7 @@ p_{k+1} &amp;= r_k + \tau_k \, p_k &amp;&amp; \text{Update search direction}
 <p>The Conjugate Gradient method is not just related to the Lanczos process; it is a direct and efficient implementation of it. We can show that the CG iterate <span class="math notranslate nohighlight">\(x_k\)</span> can be found by implicitly solving the tridiagonal system <span class="math notranslate nohighlight">\(T_k\)</span> generated by the Lanczos iteration.</p>
 <p>Let’s derive this important connection.</p>
 <ol class="arabic">
-<li><p><strong>Start with CG Orthogonality:</strong> We begin with our key result from <a class="reference internal" href="#cg_residual_orthogonality">Theorem 37</a>: the residual <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span> is orthogonal to the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p></li>
+<li><p><strong>Start with CG Orthogonality:</strong> We begin with our key result from <a class="reference internal" href="#cg_residual_orthogonality">Theorem 36</a>: the residual <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span> is orthogonal to the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p></li>
 <li><p><strong>Use the Lanczos Basis:</strong> The Lanczos algorithm generates an orthonormal basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> for <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. The orthogonality condition <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span> can therefore be written in matrix form:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1240,12 +1240,12 @@ p_{k+1} = r_k + \tau_k \, p_k
 <h3>Finite Convergence (A Theoretical Guarantee)<a class="headerlink" href="#finite-convergence-a-theoretical-guarantee" title="Link to this heading">#</a></h3>
 <p>In a world without floating-point errors, the Conjugate Gradient algorithm is a <em>direct method</em>, not an iterative one.</p>
 <div class="proof theorem admonition" id="cg_finite_convergence">
-<p class="admonition-title"><span class="caption-number">Theorem 40 </span> (Finite Convergence of CG)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 39 </span> (Finite Convergence of CG)</p>
 <section class="theorem-content" id="proof-content">
 <p>In exact arithmetic, the CG algorithm is guaranteed to find the exact solution <span class="math notranslate nohighlight">\(x\)</span> in at most <span class="math notranslate nohighlight">\(n\)</span> iterations, where <span class="math notranslate nohighlight">\(n\)</span> is the dimension of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. The algorithm terminates when <span class="math notranslate nohighlight">\(r_k = 0\)</span>. We proved (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 39</a>) that the residuals <span class="math notranslate nohighlight">\(r_0, \dots, r_{k-1}\)</span> are mutually orthogonal. A set of <span class="math notranslate nohighlight">\(n\)</span> non-zero, mutually orthogonal vectors forms a basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Therefore, the algorithm <em>must</em> find a zero residual (the exact solution) in at most <span class="math notranslate nohighlight">\(n\)</span> steps.</p>
+<p>Proof. The algorithm terminates when <span class="math notranslate nohighlight">\(r_k = 0\)</span>. We proved (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 38</a>) that the residuals <span class="math notranslate nohighlight">\(r_0, \dots, r_{k-1}\)</span> are mutually orthogonal. A set of <span class="math notranslate nohighlight">\(n\)</span> non-zero, mutually orthogonal vectors forms a basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Therefore, the algorithm <em>must</em> find a zero residual (the exact solution) in at most <span class="math notranslate nohighlight">\(n\)</span> steps.</p>
 </div>
 <p>This property is not why we use CG. For the large, sparse systems we care about, <span class="math notranslate nohighlight">\(n\)</span> might be in the millions or billions, so <span class="math notranslate nohighlight">\(n\)</span> iterations is impossibly expensive. Furthermore, in floating-point arithmetic, orthogonality is quickly lost, and the <span class="math notranslate nohighlight">\(n\)</span>-step guarantee fails.</p>
 <p>The <em>true</em> goal of CG is not to run <span class="math notranslate nohighlight">\(n\)</span> steps, but to get an excellent approximation in a number of steps <span class="math notranslate nohighlight">\(k \ll n\)</span>. This is why we treat it as an iterative method and analyze its <em>rate</em> of convergence.</p>

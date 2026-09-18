@@ -1,202 +1,129 @@
 # The Method of Deflation
 
-In this section, we will start using the Schur decomposition to compute multiple eigenvalues and eigenvectors of a matrix $A$. We will build on the power method introduced in the previous section. Recall that the Schur decomposition of $A$ is:
+The [power method](power_method.md) finds the dominant eigenvector. To find the next direction, we can remove the component along the one already found and apply the power method again. This is **deflation**.
+
+For a general matrix, this process constructs **Schur vectors**, which need not be eigenvectors of the original matrix. The key fact is that the next Schur vector becomes an eigenvector of the deflated matrix.
+
+## Notation and the Target
+
+Write an ordered Schur decomposition as
 
 $$
-A = Q T Q^H,
+A=Q_\star TQ_\star^H,
+\qquad
+Q_\star=[\boldsymbol q_{\star,1},\ldots,\boldsymbol q_{\star,n}],
 $$
 
-where $Q$ is unitary and $T$ is upper triangular. The diagonal entries of
-$T$ are the eigenvalues of $A$, and the columns of $Q$ are the corresponding Schur vectors.
+where $Q_\star$ is unitary and $T$ is upper triangular with diagonal entries $\lambda_1,\ldots,\lambda_n$. The star in $Q_\star$ marks an **exact Schur basis**. In the next section, $Q_k$ will denote the **computed basis at iteration $k$**.
 
-Assume the power iteration has converged, yielding the dominant eigenvalue $\lambda_1$ and a corresponding Schur vector $\boldsymbol{q}_1$ (which is the same as the eigenvector $\boldsymbol{x}_1$ of $A$). The goal is now to find the second largest eigenvalue, $\lambda_2$, and its corresponding Schur vector, $\boldsymbol{q}_2$. The key idea to find $\lambda_2$ is to "deflate" the matrix $A$, removing the influence of $\lambda_1$ and $\boldsymbol{q}_1$. We can then apply the power method to this new, deflated matrix, which will now have $\lambda_2$ as its dominant eigenvalue.
-
-## Construct the Deflation Projector
-
-We define an orthogonal projector $P$ that maps any vector onto the subspace *orthogonal* to $\boldsymbol{q}_1$. Assuming we have normalized $\boldsymbol{q}_1$ such that $\|\boldsymbol{q}_1\|_2 = 1$, this projector is:
+For the sequential power-method argument, assume
 
 $$
-P = I - \boldsymbol{q}_1 \boldsymbol{q}_1^H
+|\lambda_1|>|\lambda_2|>\cdots>|\lambda_n|>0.
 $$
 
-This matrix has a simple action:
+These strict gaps let us find one direction at a time. The projection identities below do not require these gaps.
 
-* For any vector $\boldsymbol{v}$ parallel to $\boldsymbol{q}_1$ (i.e., $\boldsymbol{v} = c \boldsymbol{q}_1$), $P \boldsymbol{v} = \boldsymbol{0}$.
-* For any vector $\boldsymbol{w}$ orthogonal to $\boldsymbol{q}_1$ (i.e., $\boldsymbol{q}_1^H \boldsymbol{w} = 0$), $P \boldsymbol{w} = \boldsymbol{w}$.
-
-## Define the Deflated Matrix
-
-We create a new matrix, $M$, by applying this projector:
-
-$$M = P A$$
-
-Our strategy is to run the power iteration on $M$. To understand why this works, we must find the eigenvalues of $M$.
-
-## Analyze the Eigenvalues of $M$
-
-We will use the Schur decomposition of $A$, $A = Q T Q^H$, where 
+The Schur relation $AQ_\star=Q_\star T$ says
 
 $$
-Q = [\boldsymbol{q}_1, \boldsymbol{q}_2, \dots, \boldsymbol{q}_n]
-$$ 
-
-is unitary and $T$ is upper triangular. The diagonal of $T$ contains the eigenvalues $\{\lambda_1, \lambda_2, \dots, \lambda_n\}$.
-
-Let's look at the matrix $M$ in the Schur basis by computing the similarity transformation $Q^H M Q$:
-
-$$
-Q^H M Q = Q^H (P A) Q = (Q^H P Q) (Q^H A Q)
+A\boldsymbol q_{\star,j}
+=\sum_{\ell=1}^{j-1}t_{\ell j}\boldsymbol q_{\star,\ell}
++\lambda_j\boldsymbol q_{\star,j}.
 $$
 
-Let's analyze the two parts of this product:
+Thus the first $j$ Schur vectors span an invariant subspace: applying $A$ keeps us within that subspace. Only the first Schur vector is necessarily an eigenvector of $A$.
 
-1.  **$Q^H A Q$**: This is, by definition, the upper triangular matrix $T$.
+## Removing the First Direction
 
-2.  **$Q^H P Q$**: Let's substitute $P = I - \boldsymbol{q}_1 \boldsymbol{q}_1^H$:
-
-$$
-Q^H P Q = Q^H (I - \boldsymbol{q}_1 \boldsymbol{q}_1^H) Q = Q^H I Q - (Q^H \boldsymbol{q}_1) (\boldsymbol{q}_1^H Q)
-$$
-
-* $Q^H I Q = Q^H Q = I$.
-* $Q^H \boldsymbol{q}_1$ is the first column of $Q^H Q$, which is $\boldsymbol{e}_1 = (1, 0, \dots, 0)^T$.
-* $\boldsymbol{q}_1^H Q$ is the first row of $Q^H Q$, which is $\boldsymbol{e}_1^T = (1, 0, \dots, 0)$.
-* Therefore, $(Q^H \boldsymbol{q}_1) (\boldsymbol{q}_1^H Q) = \boldsymbol{e}_1 \boldsymbol{e}_1^T = \text{diag}(1, 0, \dots, 0)$.
-
-This gives us $Q^H P Q = I - \text{diag}(1, 0, \dots, 0) = \text{diag}(0, 1, \dots, 1)$.
-
-Now, we can compute the full transformation:
+Suppose the power method has found the first direction exactly. The matrix
 
 $$
-Q^H M Q = \underbrace{\text{diag}(0, 1, \dots, 1)}_{\tilde{P}} \underbrace{(T)}_{\text{Schur form}}
+P_1=I-\boldsymbol q_{\star,1}\boldsymbol q_{\star,1}^H
 $$
 
-Multiplying the upper-triangular matrix $T$ by this diagonal matrix $\tilde{P}$ simply **zeros out the entire first row of $T$**. Let's call this new matrix $\tilde{T}$:
+is the **orthogonal projection onto the complement** of that direction. For the second Schur vector,
 
 $$
-\tilde{T} = \tilde{P} T =
-\begin{pmatrix}
-0 & 0 & \cdots & 0 \\
-0 & \lambda_2 & t_{23} & \cdots \\
-\vdots & & \ddots & \\
-0 & \cdots & & \lambda_n
-\end{pmatrix}
+A\boldsymbol q_{\star,2}
+=t_{12}\boldsymbol q_{\star,1}
++\lambda_2\boldsymbol q_{\star,2}.
 $$
 
-The matrix $M$ is similar to $\tilde{T}$ (since $M = Q \tilde{T} Q^H$), which means they share the same eigenvalues. The eigenvalues of $\tilde{T}$ are its diagonal entries:
+Projection removes the first term and leaves the second unchanged:
 
 $$
-\text{Eigenvalues}(M) = \{0, \lambda_2, \lambda_3, \dots, \lambda_n\}
+P_1A\boldsymbol q_{\star,2}
+=\lambda_2\boldsymbol q_{\star,2}.
 $$
 
-## Apply the Power Method
+This is the central idea. Although $\boldsymbol q_{\star,2}$ need not be an eigenvector of $A$, it **is** an eigenvector of $P_1A$. Also, $P_1A\boldsymbol q_{\star,1}=0$. The dominant direction has been removed.
 
-We now apply the power iteration to the matrix $M = PA$.
+## Removing Several Directions
 
-* The eigenvalues of $M$ are $\{0, \lambda_2, \dots, \lambda_n\}$.
-* We assumed that $|\lambda_2| > |\lambda_3| \ge \dots \ge |\lambda_n|$.
-* Therefore, the **strictly dominant eigenvalue of $M$ is $\lambda_2$**.
-
-The power method applied to $M$ will converge to its dominant eigenvalue, $\lambda_2$, and its corresponding eigenvector, $\boldsymbol{q}_2$.
-
-We can prove $\boldsymbol{q}_2$ is the eigenvector: 
+Suppose the first $i$ Schur vectors are known. Collect them in
 
 $$
-M \boldsymbol{q}_2 = PA \boldsymbol{q}_2 = P(T_{12}\boldsymbol{q}_1 + \lambda_2 \boldsymbol{q}_2) = \lambda_2 \boldsymbol{q}_2
+Q_{\star,i}=[\boldsymbol q_{\star,1},\ldots,\boldsymbol q_{\star,i}],
+\qquad
+P_i=I-Q_{\star,i}Q_{\star,i}^H.
 $$
 
-This process, called **deflation**, can be repeated. After finding $\boldsymbol{q}_2$, we can form $P_2 = I - \boldsymbol{q}_1 \boldsymbol{q}_1^H - \boldsymbol{q}_2 \boldsymbol{q}_2^H$ and apply the power method to $P_2 A$ to find $\lambda_3$, and so on. This generalization is described next.
+Here the second subscript $i$ counts columns. The deflated matrix is $M_i=P_iA$.
 
-## Deflation: A General Step for $\lambda_{i+1}$
-
-This method of deflation can be applied sequentially to find all the eigenvalues. Let's assume we have already found the first $i$ Schur vectors, $\boldsymbol{q}_1, \dots, \boldsymbol{q}_i$. Our goal is to find $\lambda_{i+1}$.
-
-### Construct the General Deflation Projector
-
-First, we define a projector $P_i$ that maps any vector onto the subspace *orthogonal* to the entire subspace spanned by our known vectors, $\text{span}\{\boldsymbol{q}_1, \dots, \boldsymbol{q}_i\}$.
-
-Let $Q_i = [\boldsymbol{q}_1, \dots, \boldsymbol{q}_i]$ be the $n \times i$ matrix with these vectors as its columns. Since these are orthonormal Schur vectors, $Q_i^H Q_i = I_i$ (the $i \times i$ identity).
-
-The projector *onto* this subspace is $Q_i Q_i^H$. The projector *orthogonal* to this subspace is therefore:
+````{prf:theorem} Exact Schur Deflation
+:label: thm:exact-schur-deflation
+For $1\leq i<n$, the eigenvalues of $M_i$ are $i$ zeros followed by $\lambda_{i+1},\ldots,\lambda_n$, counted with multiplicity. Moreover,
 
 $$
-P_i = I - Q_i Q_i^H
+M_i\boldsymbol q_{\star,i+1}
+=\lambda_{i+1}\boldsymbol q_{\star,i+1}.
 $$
+````
 
-### Define the Deflated Matrix
-
-As before, we create a new deflated matrix, $M_i$, by applying this projector to $A$:
-
-$$
-M_i = P_i A
-$$
-
-We will now run the power iteration on $M_i$.
-
-### Analyze the Eigenvalues of $M_i$
-
-We use the same strategy: find the eigenvalues of $M_i$ by performing a similarity transformation with the full Schur basis $Q = [\boldsymbol{q}_1, \dots, \boldsymbol{q}_n]$.
+````{prf:proof} Deflation in Schur Coordinates.
+Partition the Schur form after its first $i$ rows and columns:
 
 $$
-Q^H M_i Q = Q^H (P_i A) Q = (Q^H P_i Q) (Q^H A Q)
+T=\begin{pmatrix}T_{11}&T_{12}\\0&T_{22}\end{pmatrix}.
 $$
 
-Again, let's analyze the two parts:
-
-1.  **$Q^H A Q$**: This is just the upper triangular matrix $T$.
-2.  **$Q^H P_i Q$**: We substitute the definition of $P_i$:
+In this basis, $P_i$ removes the first $i$ coordinates. Therefore,
 
 $$
-Q^H P_i Q = Q^H (I - Q_i Q_i^H) Q = Q^H Q - (Q^H Q_i) (Q_i^H Q)
+\begin{aligned}
+Q_\star^HP_iQ_\star
+&=\begin{pmatrix}0&0\\0&I_{n-i}\end{pmatrix},\\
+Q_\star^HM_iQ_\star
+&=\begin{pmatrix}0&0\\0&I_{n-i}\end{pmatrix}
+  \begin{pmatrix}T_{11}&T_{12}\\0&T_{22}\end{pmatrix}\\
+&=\begin{pmatrix}0&0\\0&T_{22}\end{pmatrix}.
+\end{aligned}
 $$
 
-* $Q^H Q = I$ (the $n \times n$ identity).
-* $Q^H Q_i = Q^H [\boldsymbol{q}_1, \dots, \boldsymbol{q}_i]$ is the first $i$ columns of $Q^H Q = I$. This is an $n \times i$ matrix, $\begin{pmatrix} I_i \\ 0 \end{pmatrix}$.
-* $Q_i^H Q = [\boldsymbol{q}_1, \dots, \boldsymbol{q}_i]^H Q$ is the first $i$ rows of $Q^H Q = I$. This is an $i \times n$ matrix, $\begin{pmatrix} I_i & 0 \end{pmatrix}$.
-* Their product is:
+This upper triangular matrix has the claimed eigenvalues. Its first remaining coordinate is an eigenvector with eigenvalue $\lambda_{i+1}$. Equivalently, applying $P_i$ to the Schur relation for $\boldsymbol q_{\star,i+1}$ removes all earlier vectors and leaves $\lambda_{i+1}\boldsymbol q_{\star,i+1}$.
+````
+
+The leading Schur subspace is invariant, so $P_iAQ_{\star,i}=0$. Consequently, $P_iA=P_iAP_i$: the deflated matrix discards the known subspace and acts within its orthogonal complement.
+
+## Power Iteration on the Remaining Subspace
+
+Under the strict-gap assumption, $\lambda_{i+1}$ is the unique dominant eigenvalue of $M_i$. Start with a unit vector $\boldsymbol v_0$ orthogonal to the known Schur vectors, and repeat
 
 $$
-(Q^H Q_i) (Q_i^H Q) = \begin{pmatrix} I_i \\ 0 \end{pmatrix} \begin{pmatrix} I_i & 0 \end{pmatrix} = \begin{pmatrix} I_i & 0 \\ 0 & 0 \end{pmatrix}
+\begin{aligned}
+\boldsymbol w_{\ell+1}
+&=A\boldsymbol v_\ell
+-Q_{\star,i}\bigl(Q_{\star,i}^HA\boldsymbol v_\ell\bigr),\\
+\boldsymbol v_{\ell+1}
+&=\frac{\boldsymbol w_{\ell+1}}{\|\boldsymbol w_{\ell+1}\|_2}.
+\end{aligned}
 $$
 
-This is an $n \times n$ block-diagonal matrix, which is $\text{diag}(\underbrace{1, \dots, 1}_{i \text{ times}}, 0, \dots, 0)$.
+There is no need to form $P_i$ or $M_i$. We multiply by $A$, subtract the projection onto the known subspace, and normalize.
 
-This gives us 
+As in the power method, the starting vector must have a nonzero coefficient in the dominant direction when expanded in an eigenvector basis of $M_i$. A random start in the complement satisfies this with probability one in exact arithmetic. Then the line spanned by $\boldsymbol v_\ell$ converges to the line spanned by $\boldsymbol q_{\star,i+1}$. For $i\leq n-2$, the geometric convergence factor is governed by $|\lambda_{i+2}/\lambda_{i+1}|$. Once $n-1$ directions are known, their one-dimensional orthogonal complement supplies the last one.
 
-$$
-Q^H P_i Q = I - \text{diag}(1, \dots, 1, 0, \dots, 0) = \text{diag}(\underbrace{0, \dots, 0}_{i \text{ times}}, 1, \dots, 1).
-$$
+This gives an inductive construction: find the first Schur direction by power iteration, project it out to find the second, and continue. Each new vector is orthogonal to the previous ones, and together they span a larger invariant subspace. The corresponding eigenvalue is $\lambda_j=\boldsymbol q_{\star,j}^HA\boldsymbol q_{\star,j}$.
 
-Let's call this projector $\tilde{P}_i$.
-
-### Apply the Power Method
-
-Now we compute the full transformation:
-
-$$
-Q^H M_i Q = \tilde{P}_i T = \text{diag}(0, \dots, 0, 1, \dots, 1) \cdot T
-$$
-
-Multiplying $T$ by this diagonal matrix $\tilde{P}_i$ **zeros out the first $i$ rows of $T$**. The resulting matrix, $\tilde{T}_i$, looks like this:
-
-$$
-\tilde{T}_i =
-\begin{pmatrix}
-0 & \cdots & 0 & 0 & \cdots & 0 \\
-\vdots & \ddots & \vdots & \vdots & & \vdots \\
-0 & \cdots & 0 & 0 & \cdots & 0 \\
-0 & \cdots & 0 & \lambda_{i+1} & t_{i+1, i+2} & \cdots \\
-\vdots & & \vdots & & \ddots & \\
-0 & \cdots & 0 & 0 & \cdots & \lambda_n
-\end{pmatrix}
-$$
-
-The matrix $M_i$ is similar to $\tilde{T}_i$, so their eigenvalues are the same. The eigenvalues of $\tilde{T}_i$ are its diagonal entries:
-
-$$
-\text{Eigenvalues}(M_i) = \{\underbrace{0, \dots, 0}_{i \text{ times}}, \lambda_{i+1}, \lambda_{i+2}, \dots, \lambda_n\}
-$$
-
-Assuming we have a strict separation, $|\lambda_{i+1}| > |\lambda_{i+2}|$, the **strictly dominant eigenvalue of $M_i$ is $\lambda_{i+1}$**.
-
-Therefore, applying the power iteration to $M_i = P_i A$ will cause the iterates to converge to $\lambda_{i+1}$. The corresponding eigenvector can be shown to be $\boldsymbol{q}_{i+1}$.
+In computation, the preceding vectors are approximate. [Orthogonal iteration](orthogonal_iteration.md) updates all of them at every step, using a QR factorization to perform these projections together. If eigenvalues have equal magnitudes, we may need to follow a subspace containing several directions instead of seeking one direction at a time.

@@ -392,7 +392,6 @@ document.write(`
    <a href="#cap-cg_residual_basis"><strong>cg_residual_basis</strong></a> | 
    <a href="#cap-cg_residual_orthogonality"><strong>cg_residual_orthogonality</strong></a> | 
    <a href="#cap-cg_residuals_orthogonal"><strong>cg_residuals_orthogonal</strong></a> | 
-   <a href="#cap-cor:ritz-per-eig"><strong>cor:ritz-per-eig</strong></a> | 
    <a href="#cap-def:characteristic_polynomial"><strong>def:characteristic_polynomial</strong></a> | 
    <a href="#cap-def:minimal_polynomial"><strong>def:minimal_polynomial</strong></a> | 
    <a href="#cap-def:pseudospectrum1"><strong>def:pseudospectrum1</strong></a> | 
@@ -400,7 +399,6 @@ document.write(`
    <a href="#cap-definition-0"><strong>definition-0</strong></a> | 
    <a href="#cap-gmres_residual_bound"><strong>gmres_residual_bound</strong></a> | 
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
-   <a href="#cap-lemma-4"><strong>lemma-4</strong></a> | 
    <a href="#cap-prop:minimal_polynomial"><strong>prop:minimal_polynomial</strong></a> | 
    <a href="#cap-sor_convergence_conditions"><strong>sor_convergence_conditions</strong></a> | 
    <a href="#cap-sor_necessary_condition"><strong>sor_necessary_condition</strong></a> | 
@@ -419,6 +417,7 @@ document.write(`
    <a href="#cap-thm:det_via_qr"><strong>thm:det_via_qr</strong></a> | 
    <a href="#cap-thm:eckart-young-mirsky"><strong>thm:eckart-young-mirsky</strong></a> | 
    <a href="#cap-thm:eigenvalue_existence"><strong>thm:eigenvalue_existence</strong></a> | 
+   <a href="#cap-thm:exact-schur-deflation"><strong>thm:exact-schur-deflation</strong></a> | 
    <a href="#cap-thm:existence_lu"><strong>thm:existence_lu</strong></a> | 
    <a href="#cap-thm:existence_lu_existence"><strong>thm:existence_lu_existence</strong></a> | 
    <a href="#cap-thm:existence_lu_pivoting"><strong>thm:existence_lu_pivoting</strong></a> | 
@@ -426,11 +425,9 @@ document.write(`
    <a href="#cap-thm:gauss_seidel_convergence"><strong>thm:gauss_seidel_convergence</strong></a> | 
    <a href="#cap-thm:jacobi_convergence"><strong>thm:jacobi_convergence</strong></a> | 
    <a href="#cap-thm:non_hermitian_convergence"><strong>thm:non_hermitian_convergence</strong></a> | 
-   <a href="#cap-thm:orth-it-nh"><strong>thm:orth-it-nh</strong></a> | 
    <a href="#cap-thm:orth-it-nh-rigorous"><strong>thm:orth-it-nh-rigorous</strong></a> | 
    <a href="#cap-thm:perturbation_bound"><strong>thm:perturbation_bound</strong></a> | 
    <a href="#cap-thm:qr-iteration-ak"><strong>thm:qr-iteration-ak</strong></a> | 
-   <a href="#cap-thm:ritz-rate-general"><strong>thm:ritz-rate-general</strong></a> | 
    <a href="#cap-thm:spectral_theorem"><strong>thm:spectral_theorem</strong></a> | 
    <a href="#cap-thm:spectral_theorem_real"><strong>thm:spectral_theorem_real</strong></a> | 
    <a href="#cap-thm:splitting_convergence"><strong>thm:splitting_convergence</strong></a> | 
@@ -481,14 +478,6 @@ document.write(`
        <td>
        <a href="content/conjugate_gradient.html#cg_residuals_orthogonal"><code class="xref">cg_residuals_orthogonal</code></a> <em>(content/conjugate_gradient)</em></td><td>
        <em>theorem</em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-cor:ritz-per-eig"><td></td><td>
-       <strong>cor:ritz-per-eig</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="content/orthogonal_iteration.html#cor:ritz-per-eig"><code class="xref">cor:ritz-per-eig</code></a> <em>(content/orthogonal_iteration)</em></td><td>
-       <em>corollary</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-def:characteristic_polynomial"><td></td><td>
        <strong>def:characteristic_polynomial</strong></td><td></td></tr>
@@ -544,14 +533,6 @@ document.write(`
        <td></td>
        <td>
        <a href="content/lu_pivoting.html#lem:banach"><code class="xref">lem:banach</code></a> <em>(content/lu_pivoting)</em></td><td>
-       <em>lemma</em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-lemma-4"><td></td><td>
-       <strong>lemma-4</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="content/orthogonal_iteration.html#lemma-4"><code class="xref">lemma-4</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>lemma</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-prop:minimal_polynomial"><td></td><td>
@@ -698,6 +679,14 @@ document.write(`
        <a href="content/eigendecomposition.html#thm:eigenvalue_existence"><code class="xref">thm:eigenvalue_existence</code></a> <em>(content/eigendecomposition)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:exact-schur-deflation"><td></td><td>
+       <strong>thm:exact-schur-deflation</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/deflation.html#thm:exact-schur-deflation"><code class="xref">thm:exact-schur-deflation</code></a> <em>(content/deflation)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:existence_lu"><td></td><td>
        <strong>thm:existence_lu</strong></td><td></td></tr>
      <tr>
@@ -754,14 +743,6 @@ document.write(`
        <a href="content/arnoldi_convergence.html#thm:non_hermitian_convergence"><code class="xref">thm:non_hermitian_convergence</code></a> <em>(content/arnoldi_convergence)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-thm:orth-it-nh"><td></td><td>
-       <strong>thm:orth-it-nh</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="content/orthogonal_iteration.html#thm:orth-it-nh"><code class="xref">thm:orth-it-nh</code></a> <em>(content/orthogonal_iteration)</em></td><td>
-       <em>theorem</em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:orth-it-nh-rigorous"><td></td><td>
        <strong>thm:orth-it-nh-rigorous</strong></td><td></td></tr>
      <tr>
@@ -784,14 +765,6 @@ document.write(`
        <td></td>
        <td>
        <a href="content/qr_iteration.html#thm:qr-iteration-ak"><code class="xref">thm:qr-iteration-ak</code></a> <em>(content/qr_iteration)</em></td><td>
-       <em>theorem</em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-thm:ritz-rate-general"><td></td><td>
-       <strong>thm:ritz-rate-general</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="content/orthogonal_iteration.html#thm:ritz-rate-general"><code class="xref">thm:ritz-rate-general</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:spectral_theorem"><td></td><td>

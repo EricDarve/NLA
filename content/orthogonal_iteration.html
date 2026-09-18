@@ -425,29 +425,17 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-the-target-separate-from-the-iterates">Keep the Target Separate from the Iterates</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">The Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works-implicit-deflation">How It Works: Implicit Deflation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-results">Convergence Results</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-convergence">Proof of Convergence</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inductive-proof">The Inductive Proof</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-case-p-1">Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inductive-step-assume-p-i-holds-prove-p-i-1">Inductive Step: Assume <span class="math notranslate nohighlight">\(P(i)\)</span> holds, prove <span class="math notranslate nohighlight">\(P(i+1)\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-performs-the-deflation-steps">QR Performs the Deflation Steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-identity-qr-changes-the-basis-not-the-subspace">The Key Identity: QR Changes the Basis, Not the Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-a-leading-subspace">Convergence of a Leading Subspace</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-error">Measuring the Error</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-theorem">The Convergence Theorem</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#second-proof-of-convergence">Second Proof of Convergence</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-ordered-schur-form-and-the-iteration">Setup (ordered Schur form and the iteration)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-graph-map-and-the-core-recurrence">The graph map and the core recurrence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-linear-convergence">Local linear convergence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-convergence-and-rates">Global convergence and rates</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-notes">Practical notes</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-the-ritz-eigenvalues">Convergence rate of the Ritz eigenvalues</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#block-schur-view">Block-Schur view</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#takeaways">Takeaways</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-principal-angles">Definition of Principal Angles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-the-schur-vectors">From Subspaces to the Schur Vectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-computed-subspace">Using the Computed Subspace</a></li>
 </ul>
             </nav>
         </div>
@@ -461,494 +449,286 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-orthogonal-iteration-algorithm">
 <h1>The Orthogonal Iteration Algorithm<a class="headerlink" href="#the-orthogonal-iteration-algorithm" title="Link to this heading">#</a></h1>
-<p>The process of finding one eigenvector, building a projector, and repeating (a method called deflation) is a great theoretical concept, but it’s complex and numerically difficult to implement. This process can be simplified into a single, powerful iteration: the <strong>orthogonal iteration</strong>. This algorithm essentially performs the “power iteration with deflation” on all eigenvectors simultaneously.</p>
+<p><a class="reference internal" href="deflation.html"><span class="std std-doc">Deflation</span></a> finds successive Schur directions by projecting out those already known. <strong>Orthogonal iteration</strong> performs these power and projection steps together: multiply a set of vectors by <span class="math notranslate nohighlight">\(A\)</span>, then orthonormalize them. The first column follows the power method; each later column removes the directions represented by the preceding columns.</p>
+<p>We first explain this connection to deflation. Then we prove that the leading subspaces converge, with a rate controlled by the ratio of the first unwanted eigenvalue to the last wanted eigenvalue.</p>
+<section id="keep-the-target-separate-from-the-iterates">
+<h2>Keep the Target Separate from the Iterates<a class="headerlink" href="#keep-the-target-separate-from-the-iterates" title="Link to this heading">#</a></h2>
+<p>We use the notation introduced in the deflation section:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Notation</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_\star\)</span></p></td>
+<td class="text-left"><p>A fixed, exact Schur basis: <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_k\)</span></p></td>
+<td class="text-left"><p>The computed <span class="math notranslate nohighlight">\(n\times p\)</span> orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(\boldsymbol q_{\star,j}\)</span>, <span class="math notranslate nohighlight">\(\boldsymbol q_{k,j}\)</span></p></td>
+<td class="text-left"><p>Column <span class="math notranslate nohighlight">\(j\)</span> of the exact and computed bases.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_{\star,i}\)</span>, <span class="math notranslate nohighlight">\(Q_{k,i}\)</span></p></td>
+<td class="text-left"><p>The first <span class="math notranslate nohighlight">\(i\)</span> columns of those bases.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The iteration index is always <span class="math notranslate nohighlight">\(k\)</span>; <span class="math notranslate nohighlight">\(i\)</span> or <span class="math notranslate nohighlight">\(j\)</span> counts directions. We order the Schur form so that <span class="math notranslate nohighlight">\(|\lambda_1|\geq\cdots\geq|\lambda_n|\)</span>. The desired <span class="math notranslate nohighlight">\(p\)</span>-dimensional invariant subspace is</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal S_\star=\operatorname{range}(Q_{\star,p}).
+\]</div>
+<p>The Schur basis is a target for the analysis, not an input to the algorithm.</p>
+</section>
 <section id="the-algorithm">
 <h2>The Algorithm<a class="headerlink" href="#the-algorithm" title="Link to this heading">#</a></h2>
-<p>The iteration is defined by two simple steps. We start with an initial <span class="math notranslate nohighlight">\(n \times p\)</span> (or <span class="math notranslate nohighlight">\(n \times n\)</span>) orthogonal matrix <span class="math notranslate nohighlight">\(Q_0\)</span> (e.g., from a <span class="math notranslate nohighlight">\(QR\)</span> factorization of a random matrix).</p>
-<p>For <span class="math notranslate nohighlight">\(k = 0, 1, 2, \dots\)</span>:</p>
-<ol class="arabic simple">
-<li><p><strong>Multiply (Power Step):</strong> Apply the matrix <span class="math notranslate nohighlight">\(A\)</span> to the current set of orthonormal basis vectors <span class="math notranslate nohighlight">\(Q_k\)</span>.</p></li>
-</ol>
+<p>Choose <span class="math notranslate nohighlight">\(Q_0\in\mathbb C^{n\times p}\)</span> with orthonormal columns, where <span class="math notranslate nohighlight">\(1\leq p\leq n\)</span>. For <span class="math notranslate nohighlight">\(k=0,1,2,\ldots\)</span>, compute</p>
 <div class="math notranslate nohighlight">
 \[
-  Z_{k+1} = A Q_k
-  \]</div>
-<ol class="arabic simple" start="2">
-<li><p><strong>Re-orthogonalize (Deflation Step):</strong> Use the <span class="math notranslate nohighlight">\(QR\)</span> factorization to create a new orthonormal basis <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> from the resulting vectors <span class="math notranslate nohighlight">\(Z_{k+1}\)</span>.</p></li>
-</ol>
-<div class="math notranslate nohighlight">
-\[
-  Q_{k+1} R_{k+1} = Z_{k+1}
-  \]</div>
-<p>Here is the complete algorithm in Python:</p>
+\boxed{Z_{k+1}=AQ_k,\qquad Z_{k+1}=Q_{k+1}R_{k+1}.}
+\]</div>
+<p>The second step is an <strong>unpivoted thin QR factorization</strong>: <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> has <span class="math notranslate nohighlight">\(p\)</span> orthonormal columns and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span> upper triangular. Keeping the column order is important for the connection to successive deflation.</p>
+<p>For now, assume <span class="math notranslate nohighlight">\(AQ_k\)</span> has rank <span class="math notranslate nohighlight">\(p\)</span>, so <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is invertible. The convergence theorem below gives conditions that guarantee this. Full iteration (<span class="math notranslate nohighlight">\(p=n\)</span>) requires <span class="math notranslate nohighlight">\(A\)</span> to be nonsingular for this argument.</p>
+<p>A basic implementation is:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="c1"># Let A be a square matrix of size n x n</span>
+<span class="c1"># A is n x n; choose 1 &lt;= p &lt;= n and a number of steps.</span>
 <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="c1"># Start with a random n x p orthogonal matrix</span>
-<span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>  <span class="c1"># or p = n for full size</span>
-
-<span class="c1"># Set the number of iterations</span>
-<span class="n">num_iterations</span> <span class="o">=</span> <span class="mi">1000</span> 
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">G</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+<span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;reduced&quot;</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
-    <span class="c1"># 1. Multiply by A (the &quot;power&quot; step)</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span>
-    
-    <span class="c1"># 2. Re-orthogonalize (the &quot;deflation&quot; step)</span>
-    <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
-    
-<span class="c1"># After iterating, Q will approximate the Schur vectors.</span>
-<span class="c1"># The matrix T = Q.conj().T @ A @ Q will be approximately upper triangular.</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;reduced&quot;</span><span class="p">)</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span>  <span class="c1"># A represented in the computed subspace</span>
 </pre></div>
 </div>
+<p>QR preserves the span of the columns while keeping them orthonormal. Normalizing each column separately would not remove the dominant directions from the later columns.</p>
 </section>
-<section id="how-it-works-implicit-deflation">
-<h2>How It Works: Implicit Deflation<a class="headerlink" href="#how-it-works-implicit-deflation" title="Link to this heading">#</a></h2>
-<p>The re-orthogonalization step is the key to the algorithm’s power. The QR factorization is equivalent to performing the Gram-Schmidt process on the columns of <span class="math notranslate nohighlight">\(Z_{k+1} = [\boldsymbol{z}_1, \dots, \boldsymbol{z}_p]\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol{z}_j = A \boldsymbol{q}_{k,j}\)</span>.</p>
-<p>Let’s look at how the new columns of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> are formed:</p>
-<ul>
-<li><p><strong>Column 1:</strong> The first new column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 1}\)</span>, is just</p>
-<div class="math notranslate nohighlight">
-\[\boldsymbol{z}_1 / \|\boldsymbol{z}_1\| = (A \boldsymbol{q}_{k, 1}) / \|A \boldsymbol{q}_{k, 1}\|.\]</div>
-<p>This is <strong>exactly the standard power method</strong>. It will converge to the dominant eigenvector.</p>
-</li>
-<li><p><strong>Column 2:</strong> The second new column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 2}\)</span>, is formed by taking <span class="math notranslate nohighlight">\(\boldsymbol{z}_2 = A \boldsymbol{q}_{k, 2}\)</span>, making it orthogonal to the <em>newly computed</em> <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 1}\)</span>, and then normalizing it.</p></li>
-<li><p><strong>Column j:</strong> The <span class="math notranslate nohighlight">\(j\)</span>-th new column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, j}\)</span>, is formed by taking <span class="math notranslate nohighlight">\(A \boldsymbol{q}_{k, j}\)</span> and orthogonalizing it against the <em>entire set of previously computed new vectors</em>, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k+1, 1}, \dots, \boldsymbol{q}_{k+1, j-1}\}\)</span>.</p></li>
-</ul>
-<p>This process is an <strong>implicit deflation</strong>. By continually removing the components of the more dominant vectors, the algorithm forces the <span class="math notranslate nohighlight">\(j\)</span>-th column to converge to the <span class="math notranslate nohighlight">\(j\)</span>-th Schur vector. As a result, the subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the <span class="math notranslate nohighlight">\(j\)</span>-dimensional dominant invariant subspace.</p>
-</section>
-<section id="convergence-results">
-<h2>Convergence Results<a class="headerlink" href="#convergence-results" title="Link to this heading">#</a></h2>
-<p>For this analysis, we will use <span class="math notranslate nohighlight">\(U\)</span> to denote the true Schur basis from the Schur decomposition <span class="math notranslate nohighlight">\(A=UTU^H\)</span>, to avoid confusion with the iterate <span class="math notranslate nohighlight">\(Q_k\)</span>. We also make a simplifying assumption that the eigenvalues are well-separated in magnitude:</p>
+<section id="qr-performs-the-deflation-steps">
+<h2>QR Performs the Deflation Steps<a class="headerlink" href="#qr-performs-the-deflation-steps" title="Link to this heading">#</a></h2>
+<p>To see what QR does, write it column by column as Gram–Schmidt in exact arithmetic. Take the diagonal entries of <span class="math notranslate nohighlight">\(R_{k+1}\)</span> to be positive; other phase choices give the same subspaces.</p>
+<p>The first column satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-|\lambda_1| &gt; \cdots &gt;|\lambda_n| &gt; 0.
+\boldsymbol q_{k+1,1}
+=\frac{A\boldsymbol q_{k,1}}{\|A\boldsymbol q_{k,1}\|_2}.
 \]</div>
-<p>As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the matrix <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur basis <span class="math notranslate nohighlight">\(U\)</span>. (Note: This convergence is not to a unique <span class="math notranslate nohighlight">\(U\)</span>. Since <span class="math notranslate nohighlight">\(U\)</span> can be multiplied by any diagonal unitary matrix <span class="math notranslate nohighlight">\(D\)</span> and still be a valid Schur basis, we say <span class="math notranslate nohighlight">\(Q_k\)</span> converges to <span class="math notranslate nohighlight">\(U\)</span> “up to a diagonal unitary matrix.”)</p>
-<p>A more general analysis considers using the method to find the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues (i.e., <span class="math notranslate nohighlight">\(Q_k\)</span> is an <span class="math notranslate nohighlight">\(n \times p\)</span> matrix). We can partition the true Schur decomposition as:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-U = [U_1, U_2], \quad T = \begin{bmatrix} T_{11} &amp; T_{12} \\ 0 &amp; T_{22} \end{bmatrix},
-\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(U_1\)</span> contains the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors and <span class="math notranslate nohighlight">\(T_{11}\)</span> contains the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues.</p>
-<p>The key convergence results are as follows:</p>
-<ul>
-<li><p><strong>Subspace Convergence Rate:</strong> The subspace spanned by the iterate, <span class="math notranslate nohighlight">\(\text{span}(Q_k)\)</span>, converges to the true <span class="math notranslate nohighlight">\(p\)</span>-dimensional dominant invariant subspace, <span class="math notranslate nohighlight">\(\text{span}(U_1)\)</span>. The convergence rate is linear and is governed by the ratio of the first “unwanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>) to the last “wanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_p\)</span>):</p>
-<div class="math notranslate nohighlight">
-\[
-    \sin \theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1)) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
-    \]</div>
-<p><em>(Here, <span class="math notranslate nohighlight">\(\theta_{\max}\)</span> is the largest principal angle between the two subspaces; see below for the exact definition.)</em></p>
-</li>
-<li><p><strong>Ritz Eigenvalue Convergence Rates:</strong> The <em>Ritz eigenvalues</em> are the eigenvalues of the <span class="math notranslate nohighlight">\(p \times p\)</span> matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>. These converge to the true eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Convergence of the Set:</strong> The error for the entire <em>set</em> of eigenvalues converges at the same rate as the subspace:</p>
-<div class="math notranslate nohighlight">
-\[
-        \mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big) \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_p|} \right)^k
-        \]</div>
-</li>
-<li><p><strong>Convergence of Individual Eigenvalues:</strong> The convergence for an <em>individual</em> Ritz eigenvalue <span class="math notranslate nohighlight">\(\mu_i^{(k)}\)</span> to its corresponding true eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span> (for <span class="math notranslate nohighlight">\(i \le p\)</span>) is often much faster. Its rate is determined by the ratio of <span class="math notranslate nohighlight">\(|\lambda_{p+1}|\)</span> to that specific eigenvalue’s modulus, <span class="math notranslate nohighlight">\(|\lambda_i|\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-        |\mu_i^{(k)} - \lambda_i| \in O \left( \frac{|\lambda_{p+1}|}{|\lambda_i|} \right)^k
-        \]</div>
-</li>
-</ol>
-</li>
-</ul>
-</section>
-<section id="proof-of-convergence">
-<h2>Proof of Convergence<a class="headerlink" href="#proof-of-convergence" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(A\)</span> be an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix with a Schur decomposition <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where <span class="math notranslate nohighlight">\(Q = [\boldsymbol{v}_1 | \dots | \boldsymbol{v}_n]\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. The diagonal entries of <span class="math notranslate nohighlight">\(T\)</span> are the eigenvalues <span class="math notranslate nohighlight">\(\lambda_i = T_{ii}\)</span>.</p>
-<p>Let</p>
-<div class="math notranslate nohighlight">
-\[
-Q_k = [\boldsymbol{q}_{k,1} | \dots | \boldsymbol{q}_{k,n}]
-\]</div>
-<p>be the <span class="math notranslate nohighlight">\(k\)</span>-th iterate of the algorithm. Let</p>
-<div class="math notranslate nohighlight">
-\[
-\mathcal{V}_j = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_j\}
-\]</div>
-<p>be the <span class="math notranslate nohighlight">\(j\)</span>-dimensional dominant invariant subspace (spanned by the first <span class="math notranslate nohighlight">\(j\)</span> Schur vectors with largest moduli). Let</p>
-<div class="math notranslate nohighlight">
-\[
-\mathcal{S}_{k,j} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,j}\}
-\]</div>
-<p>be the subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
-<p><strong>Goal:</strong> We will prove by induction that for each <span class="math notranslate nohighlight">\(j = 1, \dots, n\)</span>, the subspace <span class="math notranslate nohighlight">\(\mathcal{S}_{k,j}\)</span> converges to the subspace <span class="math notranslate nohighlight">\(\mathcal{V}_j\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p>
-<section id="the-inductive-proof">
-<h3>The Inductive Proof<a class="headerlink" href="#the-inductive-proof" title="Link to this heading">#</a></h3>
-<p><strong>Inductive Hypothesis <span class="math notranslate nohighlight">\(P(j)\)</span>:</strong> The subspace</p>
-<div class="math notranslate nohighlight">
-\[
-\mathcal{S}_{k,j} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,j}\}
-\]</div>
-<p>converges to the invariant subspace</p>
-<div class="math notranslate nohighlight">
-\[
-\mathcal{V}_j = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_j\}.
-\]</div>
-</section>
-<section id="base-case-p-1">
-<h3>Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span><a class="headerlink" href="#base-case-p-1" title="Link to this heading">#</a></h3>
-<p>We must show that <span class="math notranslate nohighlight">\(\mathcal{S}_{k,1} = \text{span}\{\boldsymbol{q}_{k,1}\}\)</span> converges to <span class="math notranslate nohighlight">\(\mathcal{V}_1 = \text{span}\{\boldsymbol{v}_1\}\)</span>. We will assume that the start has nonzero overlap with the target subspaces; in particular <span class="math notranslate nohighlight">\(\langle \boldsymbol q_{0,1},\boldsymbol v_1\rangle \neq 0\)</span>.</p>
-<p>Let’s analyze the first column of the iteration:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(\boldsymbol{z}_1 = A \boldsymbol{q}_{k,1}\)</span></p></li>
-<li><p>From <span class="math notranslate nohighlight">\(Q_{k+1} R_{k+1} = Z\)</span>, the first column gives <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1,1} R_{11} = \boldsymbol{z}_1\)</span>.</p></li>
-</ol>
-<p>Since <span class="math notranslate nohighlight">\(R_{11} = \|\boldsymbol{z}_1\|_2\)</span> (as <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1,1}\)</span> is a unit vector), the iteration for the first column is:</p>
-<div class="math notranslate nohighlight">
-\[
-\boldsymbol{q}_{k+1, 1} = \frac{A \boldsymbol{q}_{k, 1}}{\|A \boldsymbol{q}_{k, 1}\|_2}
-\]</div>
-<p>This is precisely the <strong>standard power iteration</strong>. Given our assumption that <span class="math notranslate nohighlight">\(|\lambda_1| &gt; |\lambda_j|\)</span> for all <span class="math notranslate nohighlight">\(j &gt; 1\)</span>, the power iteration converges to the dominant eigenvector, which is the first Schur vector <span class="math notranslate nohighlight">\(\boldsymbol{v}_1\)</span>.</p>
-<p>So, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k,1}\} \to \text{span}\{\boldsymbol{v}_1\}\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>. The base case <span class="math notranslate nohighlight">\(P(1)\)</span> holds.</p>
-</section>
-<section id="inductive-step-assume-p-i-holds-prove-p-i-1">
-<h3>Inductive Step: Assume <span class="math notranslate nohighlight">\(P(i)\)</span> holds, prove <span class="math notranslate nohighlight">\(P(i+1)\)</span><a class="headerlink" href="#inductive-step-assume-p-i-holds-prove-p-i-1" title="Link to this heading">#</a></h3>
-<p><strong>Assumption <span class="math notranslate nohighlight">\(P(i)\)</span>:</strong> We assume that <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,i}\}\)</span> converges to <span class="math notranslate nohighlight">\(\mathcal{V}_i = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_i\}\)</span>.</p>
-<p><strong>Goal:</strong> We must show that <span class="math notranslate nohighlight">\(P(i+1)\)</span> holds, i.e., <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i+1} = \text{span}\{\boldsymbol{q}_{k,1}, \dots, \boldsymbol{q}_{k,i+1}\}\)</span> converges to <span class="math notranslate nohighlight">\(\mathcal{V}_{i+1} = \text{span}\{\boldsymbol{v}_1, \dots, \boldsymbol{v}_{i+1}\}\)</span>.</p>
-<p>Let’s analyze the <span class="math notranslate nohighlight">\((i+1)\)</span>-th column of the iteration, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, i+1}\)</span>. The <span class="math notranslate nohighlight">\(QR\)</span> factorization <span class="math notranslate nohighlight">\(Q_{k+1} R_{k+1} = Z\)</span> is equivalent to the Gram-Schmidt process. The vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, i+1}\)</span> is computed by taking <span class="math notranslate nohighlight">\(\boldsymbol{z}_{i+1} = A \boldsymbol{q}_{k, i+1}\)</span> and orthogonalizing it against the <em>preceding</em> vectors <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, 1}, \dots, \boldsymbol{q}_{k+1, i}\)</span>.</p>
+<p>This is the power method. Under its usual gap and starting-vector assumptions, its direction converges to <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,1}\)</span>.</p>
+<p>For column <span class="math notranslate nohighlight">\(i+1\)</span>, QR subtracts the components along the <strong>newly computed</strong> first <span class="math notranslate nohighlight">\(i\)</span> columns:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\boldsymbol{w} &amp;= A \boldsymbol{q}_{k, i+1} - \sum_{j=1}^{i} (\boldsymbol{q}_{k+1, j}^H (A \boldsymbol{q}_{k, i+1})) \boldsymbol{q}_{k+1, j} \\
-\boldsymbol{q}_{k+1, i+1} &amp;= \frac{\boldsymbol{w}}{\|\boldsymbol{w}\|_2}
+\boldsymbol w_{k+1,i+1}
+&amp;=\bigl(I-Q_{k+1,i}Q_{k+1,i}^H\bigr)
+  A\boldsymbol q_{k,i+1},\\
+\boldsymbol q_{k+1,i+1}
+&amp;=\frac{\boldsymbol w_{k+1,i+1}}{\|\boldsymbol w_{k+1,i+1}\|_2}.
 \end{aligned}
 \end{split}\]</div>
-<p>The vector <span class="math notranslate nohighlight">\(\boldsymbol{w}\)</span> is the component of <span class="math notranslate nohighlight">\(A \boldsymbol{q}_{k, i+1}\)</span> that is orthogonal to <span class="math notranslate nohighlight">\(\mathcal{S}_{k+1, i}\)</span>.</p>
-<ol class="arabic">
-<li><p>Let <span class="math notranslate nohighlight">\(P^{(i)}\)</span> be the true projection onto the orthogonal complement of <span class="math notranslate nohighlight">\(\mathcal{V}_i\)</span>, i.e., <span class="math notranslate nohighlight">\(P^{(i)} = I - \sum_{j=1}^i \boldsymbol{v}_j \boldsymbol{v}_j^H\)</span>. Let <span class="math notranslate nohighlight">\(P_k^{(i)}\)</span> be the projection onto the orthogonal complement of <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i}\)</span>.</p></li>
-<li><p>From our inductive assumption <span class="math notranslate nohighlight">\(P(i)\)</span>, we know <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i} \to \mathcal{V}_i\)</span>. This means the projection <span class="math notranslate nohighlight">\(P_k^{(i)} \to P^{(i)}\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p></li>
-<li><p>Therefore, the iteration for the <span class="math notranslate nohighlight">\((i+1)\)</span>-th column, <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1, i+1} \propto P_{k+1}^{(i)} (A \boldsymbol{q}_{k, i+1})\)</span>, becomes asymptotically equivalent to an iteration of the form:</p>
+<p>Suppose for a moment that these first <span class="math notranslate nohighlight">\(i\)</span> columns span the exact leading Schur subspace. Their complementary projector is then</p>
 <div class="math notranslate nohighlight">
 \[
-    \boldsymbol{v}^{(k+1)} \propto P^{(i)} (A \boldsymbol{v}^{(k)})
-    \]</div>
-<p>where <span class="math notranslate nohighlight">\(\boldsymbol{v}^{(k)}\)</span> represents the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k, i+1}\)</span>.</p>
-</li>
-</ol>
-<p>This is precisely the “power iteration with <span class="math notranslate nohighlight">\(PA\)</span>” that we previously discussed. We are performing a power iteration with the matrix <span class="math notranslate nohighlight">\(P^{(i)} A\)</span> on the subspace <span class="math notranslate nohighlight">\(\mathcal{V}_i^\perp\)</span>. And we previously established that it will converge to <span class="math notranslate nohighlight">\(\boldsymbol{v}_{i+1}\)</span> (with eigenvalue <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span>). Therefore, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k, i+1}\} \to \text{span}\{\boldsymbol{v}_{i+1}\}\)</span>.</p>
-<p>In summary, we have shown:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\mathcal{S}_{k,i} \to \mathcal{V}_i\)</span> (by assumption <span class="math notranslate nohighlight">\(P(i)\)</span>)</p></li>
-<li><p><span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_{k, i+1}\} \to \text{span}\{\boldsymbol{v}_{i+1}\}\)</span> (by our new finding).</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i+1} = \mathcal{S}_{k,i} \oplus \text{span}\{\boldsymbol{q}_{k,i+1}\}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{V}_{i+1} = \mathcal{V}_i \oplus \text{span}\{\boldsymbol{v}_{i+1}\}\)</span> (due to orthogonality), the convergence of the component subspaces implies the convergence of the total subspace.</p></li>
-</ul>
-<p>Thus, <span class="math notranslate nohighlight">\(\mathcal{S}_{k,i+1} \to \mathcal{V}_{i+1}\)</span>. This proves <span class="math notranslate nohighlight">\(P(i+1)\)</span>.</p>
-<p>By induction, the statement <span class="math notranslate nohighlight">\(P(j)\)</span> now holds for all <span class="math notranslate nohighlight">\(j=1, \dots, n\)</span>.</p>
-<p>This means that for each <span class="math notranslate nohighlight">\(j\)</span>, the subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the invariant subspace spanned by the first <span class="math notranslate nohighlight">\(j\)</span> Schur vectors. This implies that the full matrix <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur vector matrix <span class="math notranslate nohighlight">\(Q\)</span> (up to a diagonal unitary matrix, as the phase of each vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k,j}\)</span> is not uniquely determined).</p>
-</section>
-</section>
-<section id="second-proof-of-convergence">
-<h2>Second Proof of Convergence<a class="headerlink" href="#second-proof-of-convergence" title="Link to this heading">#</a></h2>
-<p>We provide another convergence proof that is not based on the use of orthogonal projections and the idea of deflation.</p>
-<p><strong>This proof is more precise but also significantly more technical and is optional.</strong></p>
-<p>It will give us a precise convergence rate for the method depending on the ratio <span class="math notranslate nohighlight">\(\lambda_{p+1} / \lambda_p\)</span>.</p>
-<div class="tip admonition">
-<p class="admonition-title">Summary of key ideas and results</p>
-<ul class="simple">
-<li><p><strong>Coordinates:</strong> Work in a Schur basis <span class="math notranslate nohighlight">\(A=UTU^H\)</span> and express the current iterate <span class="math notranslate nohighlight">\(U^H Q_k\)</span> (where <span class="math notranslate nohighlight">\(Q_k\)</span> is assumed to have <span class="math notranslate nohighlight">\(p\)</span> columns) as a graph</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[\begin{split}\mathrm{span}\!\begin{bmatrix} C_k \\ S_k \end{bmatrix} = \mathrm{span}\!\begin{bmatrix}I\\E_k\end{bmatrix}\end{split}\]</div>
-<p>with <span class="math notranslate nohighlight">\(E_k=S_k C_k^{-1}\)</span>.</p>
-<ul class="simple">
-<li><p><strong>One-step update:</strong> The graph variable obeys</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[
-E_{k+1}=T_{22}\,E_k\,(T_{11}+T_{12}E_k)^{-1}.
+I-Q_{k+1,i}Q_{k+1,i}^H
+=I-Q_{\star,i}Q_{\star,i}^H=P_i.
 \]</div>
-<ul class="simple">
-<li><p><strong>Local convergence:</strong> If the target and unwanted spectra are separated (formally, <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span>) and the start has nonzero overlap with the target subspace (<span class="math notranslate nohighlight">\(C_0\)</span> invertible), then <span class="math notranslate nohighlight">\(E_k\to 0\)</span> <strong>linearly</strong>; asymptotically the factor is about <span class="math notranslate nohighlight">\(\rho(T_{22})\,\rho(T_{11}^{-1})\)</span>.</p></li>
-<li><p><strong>Global rate with a modulus gap:</strong> If <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span>, then the error decays roughly like</p></li>
-</ul>
+<p>The update for column <span class="math notranslate nohighlight">\(i+1\)</span> becomes power iteration on <span class="math notranslate nohighlight">\(P_iA\)</span>. From deflation,</p>
 <div class="math notranslate nohighlight">
 \[
-\|E_k\|\;\lesssim\; C\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
+P_iA\boldsymbol q_{\star,i+1}
+=\lambda_{i+1}\boldsymbol q_{\star,i+1}.
 \]</div>
-<p>up to constants.</p>
-<ul class="simple">
-<li><p><strong>What converges:</strong> The subspace <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> converges to the Schur subspace <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span> and the Ritz values of <span class="math notranslate nohighlight">\(T_k:=Q_k^H A Q_k\)</span> converge to the eigenvalues in <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p></li>
-<li><p><strong>How to measure error:</strong> <span class="math notranslate nohighlight">\(\|E_k\|=\|\tan\Theta_k\|\)</span>, where <span class="math notranslate nohighlight">\(\Theta_k\)</span> are the principal angles (see below for a definition of principal angles) between <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> and <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>; hence those angles go to <span class="math notranslate nohighlight">\(0\)</span> at the same rate.</p></li>
-</ul>
+<p>If <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span> is the unique dominant eigenvalue of <span class="math notranslate nohighlight">\(P_iA\)</span> and the starting direction contains the required eigenvector component, this power iteration finds the next Schur direction. This explains the inductive structure: the first column finds the first direction, the second projects it out to find the next, and so on.</p>
+<p>In the actual algorithm, the earlier columns are still changing. The argument above explains the mechanism; the proof below establishes convergence while accounting for all columns evolving together.</p>
+</section>
+<section id="the-key-identity-qr-changes-the-basis-not-the-subspace">
+<h2>The Key Identity: QR Changes the Basis, Not the Subspace<a class="headerlink" href="#the-key-identity-qr-changes-the-basis-not-the-subspace" title="Link to this heading">#</a></h2>
+<p>Repeatedly substituting <span class="math notranslate nohighlight">\(AQ_k=Q_{k+1}R_{k+1}\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+A^kQ_0=Q_k\bigl(R_kR_{k-1}\cdots R_1\bigr).
+\]</div>
+<p>The factor on the right is invertible, so</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\operatorname{range}(Q_k)
+=\operatorname{range}(A^kQ_0).}
+\]</div>
+<p>The product is also upper triangular. Therefore, for every <span class="math notranslate nohighlight">\(i\leq p\)</span>, its first <span class="math notranslate nohighlight">\(i\)</span> columns involve only the first <span class="math notranslate nohighlight">\(i\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span>, giving</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{range}(Q_{k,i})
+=\operatorname{range}(A^kQ_{0,i}).
+\]</div>
+<p>Each leading subspace undergoes its own power iteration. We can analyze these subspaces without tracking the individual projections inside QR. The <a class="reference internal" href="orthogonal_and_power_iteration.html"><span class="std std-doc">next section</span></a> develops this QR identity further.</p>
+</section>
+<section id="convergence-of-a-leading-subspace">
+<h2>Convergence of a Leading Subspace<a class="headerlink" href="#convergence-of-a-leading-subspace" title="Link to this heading">#</a></h2>
+<p>As in the power-method analysis, assume <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable. The theorem allows equal eigenvalue magnitudes within the wanted group or within the unwanted group; only the gap between the two groups must be strict.</p>
+<section id="measuring-the-error">
+<h3>Measuring the Error<a class="headerlink" href="#measuring-the-error" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(\Pi_\star=Q_{\star,p}Q_{\star,p}^H\)</span> be the orthogonal projection onto <span class="math notranslate nohighlight">\(\mathcal S_\star\)</span>. Define</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+d_k&amp;=\|(I-\Pi_\star)Q_k\|_2\\
+&amp;=\max_{\substack{\boldsymbol z\in\operatorname{range}(Q_k)\\
+                  \|\boldsymbol z\|_2=1}}
+  \|(I-\Pi_\star)\boldsymbol z\|_2.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(d_k\)</span> is the largest component outside the target subspace among unit vectors in the current subspace. It is zero when the two subspaces coincide. Geometrically, it is the sine of their largest principal angle. This measures the subspaces themselves, independent of the orthonormal bases used to represent them.</p>
+</section>
+<section id="the-convergence-theorem">
+<h3>The Convergence Theorem<a class="headerlink" href="#the-convergence-theorem" title="Link to this heading">#</a></h3>
+<div class="proof theorem admonition" id="thm:orth-it-nh-rigorous">
+<p class="admonition-title"><span class="caption-number">Theorem 23 </span> (Convergence of a Dominant Subspace)</p>
+<section class="theorem-content" id="proof-content">
+<p>Suppose <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, and for some <span class="math notranslate nohighlight">\(1\leq p&lt;n\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_1|\geq\cdots\geq|\lambda_p|
+&gt;|\lambda_{p+1}|\geq\cdots\geq|\lambda_n|.
+\]</div>
+<p>Partition the eigenvector basis and the initial coordinates as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+X=[X_1,X_2],
+\qquad
+X^{-1}Q_0=\begin{pmatrix}C_1\\C_2\end{pmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(X_1\)</span> has <span class="math notranslate nohighlight">\(p\)</span> columns and <span class="math notranslate nohighlight">\(C_1\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span>. Assume <span class="math notranslate nohighlight">\(C_1\)</span> is invertible. Then orthogonal iteration is well-defined in exact arithmetic, and its subspace converges to</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{range}(X_1)=\mathcal S_\star.
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(k\geq1\)</span>, its error satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+d_k\leq K\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
+\]</div>
+<p>where one possible constant is</p>
+<div class="math notranslate nohighlight">
+\[
+K=\|X_2\|_2\,\|X^{-1}\|_2\,\|C_2C_1^{-1}\|_2.
+\]</div>
+</section>
+</div><p>The condition on <span class="math notranslate nohighlight">\(C_1\)</span> says that the starting vectors contain enough independent components to capture all <span class="math notranslate nohighlight">\(p\)</span> wanted eigenvector directions. For <span class="math notranslate nohighlight">\(p=1\)</span>, it is exactly the power method’s requirement <span class="math notranslate nohighlight">\(c_1\neq0\)</span>. A random orthonormal start satisfies it with probability one in exact arithmetic.</p>
+<p>For a normal matrix, we may take <span class="math notranslate nohighlight">\(X=Q_\star\)</span>, so the condition becomes invertibility of <span class="math notranslate nohighlight">\(Q_{\star,p}^HQ_0\)</span>. For a nonnormal matrix, the eigenvector coordinates <span class="math notranslate nohighlight">\(X^{-1}Q_0\)</span> matter; ordinary orthogonal overlap with the target is not the same condition.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. The Eigenvalue-Ratio Bound.
+Partition <span class="math notranslate nohighlight">\(\Lambda=\operatorname{diag}(\Lambda_1,\Lambda_2)\)</span> consistently with <span class="math notranslate nohighlight">\(X\)</span>. The gap implies that every diagonal entry of <span class="math notranslate nohighlight">\(\Lambda_1\)</span> is nonzero. Then</p>
+<div class="math notranslate nohighlight">
+\[
+A^kQ_0=X_1\Lambda_1^kC_1+X_2\Lambda_2^kC_2.
+\]</div>
+<p>Its leading eigenvector-coordinate block, <span class="math notranslate nohighlight">\(\Lambda_1^kC_1\)</span>, is invertible. Thus <span class="math notranslate nohighlight">\(A^kQ_0\)</span> has rank <span class="math notranslate nohighlight">\(p\)</span> for every <span class="math notranslate nohighlight">\(k\)</span>, which ensures that all QR steps retain <span class="math notranslate nohighlight">\(p\)</span> independent columns.</p>
+<p><strong>Separate the desired directions from the error.</strong> Right multiplication by <span class="math notranslate nohighlight">\(C_1^{-1}\Lambda_1^{-k}\)</span> changes the basis but not the range. Using the QR identity,</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{range}(Q_k)
+=\operatorname{range}(X_1+X_2F_k),
+\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[
+F_k=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
+\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(F_k\)</span> gives the unwanted eigenvector coordinates when the wanted coordinates are set to the identity. Since <span class="math notranslate nohighlight">\(\Lambda_1\)</span> and <span class="math notranslate nohighlight">\(\Lambda_2\)</span> are diagonal,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|F_k\|_2
+&amp;\leq\|\Lambda_2^k\|_2\,
+       \|C_2C_1^{-1}\|_2\,
+       \|\Lambda_1^{-k}\|_2\\
+&amp;=\|C_2C_1^{-1}\|_2
+  \left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
+\end{aligned}
+\end{split}\]</div>
+<p><strong>Translate this into subspace error.</strong> Any unit vector in the computed subspace has the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boldsymbol z=(X_1+X_2F_k)\boldsymbol c,
+\qquad
+X^{-1}\boldsymbol z
+=\begin{pmatrix}\boldsymbol c\\F_k\boldsymbol c\end{pmatrix}.
+\end{split}\]</div>
+<p>Hence <span class="math notranslate nohighlight">\(\|\boldsymbol c\|_2\leq\|X^{-1}\|_2\)</span>. Also, <span class="math notranslate nohighlight">\((I-\Pi_\star)X_1=0\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|(I-\Pi_\star)\boldsymbol z\|_2
+&amp;=\|(I-\Pi_\star)X_2F_k\boldsymbol c\|_2\\
+&amp;\leq\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
+\end{aligned}
+\end{split}\]</div>
+<p>Maximizing over unit vectors <span class="math notranslate nohighlight">\(\boldsymbol z\)</span> and applying the bound on <span class="math notranslate nohighlight">\(F_k\)</span> proves the result.</p>
 </div>
-<section id="setup-ordered-schur-form-and-the-iteration">
-<h3>Setup (ordered Schur form and the iteration)<a class="headerlink" href="#setup-ordered-schur-form-and-the-iteration" title="Link to this heading">#</a></h3>
-<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{C}^{n\times n}\)</span>. Orthogonal iteration with block size <span class="math notranslate nohighlight">\(p\)</span> (i.e., <span class="math notranslate nohighlight">\(Q_k\)</span> has <span class="math notranslate nohighlight">\(p\)</span> columns) is</p>
-<div class="math notranslate nohighlight">
-\[
-Z_{k+1}=A\,Q_k,\qquad Q_{k+1}=\operatorname{orth}(Z_{k+1}).
-\]</div>
-<p>The notation <span class="math notranslate nohighlight">\(\operatorname{orth}(\cdot)\)</span> means to compute an orthonormal basis for the range (e.g., via <span class="math notranslate nohighlight">\(QR\)</span>).</p>
-<p>We will work with the (unitary) Schur form. Choose a unitary <span class="math notranslate nohighlight">\(U\)</span> so that</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A=U\begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix}U^H=:U T U^H,
-\end{split}\]</div>
-<p>where the <span class="math notranslate nohighlight">\(p\times p\)</span> block <span class="math notranslate nohighlight">\(T_{11}\)</span> holds the eigenvalues we want (e.g., the <span class="math notranslate nohighlight">\(p\)</span> largest in modulus, or any isolated cluster after a reordering), and <span class="math notranslate nohighlight">\(T_{22}\)</span> holds the rest. The convergence we wish to analyze is toward the Schur subspace <span class="math notranslate nohighlight">\(\mathcal{U}_1=\operatorname{span}(U_1)\)</span> (columns of <span class="math notranslate nohighlight">\(U\)</span> corresponding to <span class="math notranslate nohighlight">\(T_{11}\)</span>).</p>
-<p>Write the iterate in Schur coordinates as <span class="math notranslate nohighlight">\(Y_k:=U^H Q_k\)</span> and block it</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-Y_k=\begin{bmatrix}C_k\\ S_k\end{bmatrix},\qquad Y_k^H Y_k=I_p.
-\end{split}\]</div>
-<p>Subspace convergence can be studied through <span class="math notranslate nohighlight">\(Y_k\)</span>.</p>
-</section>
-<section id="the-graph-map-and-the-core-recurrence">
-<h3>The graph map and the core recurrence<a class="headerlink" href="#the-graph-map-and-the-core-recurrence" title="Link to this heading">#</a></h3>
-<p>As long as <span class="math notranslate nohighlight">\(C_k\)</span> is nonsingular (true once the iterate has nonzero overlap with <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>), define the graph variable <span class="math notranslate nohighlight">\(E_k:=S_k C_k^{-1}\)</span> so that</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\operatorname{span}(Y_k)=\operatorname{span}\!\begin{bmatrix}I\\ E_k\end{bmatrix}.
-\end{split}\]</div>
-<p>The name graph variable comes from functional analysis and corresponds to viewing the subspace as the graph of a linear operator from the “top” to the “bottom” space.</p>
-<p>One step of the (unnormalized) iteration in Schur coordinates is</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-U^H Z_{k+1}=T Y_k=\begin{bmatrix}T_{11}C_k+T_{12}S_k\\ T_{22}S_k\end{bmatrix}.
-\end{split}\]</div>
-<p>Since column spaces are what matter, the next subspace can be represented as a graph too:</p>
-<div class="math notranslate nohighlight">
-\[
-E_{k+1} = T_{22} S_k \bigl(T_{11} C_k + T_{12} S_k\bigr)^{-1} =
-T_{22}\,E_k\,\bigl(T_{11}+T_{12}E_k\bigr)^{-1}
-\]</div>
-<p>using <span class="math notranslate nohighlight">\(S_k=E_k C_k\)</span>.</p>
-<p>This “graph transform” is the standard invariant-subspace map for block-upper-triangular <span class="math notranslate nohighlight">\(T\)</span>; <span class="math notranslate nohighlight">\(E=0\)</span> is its fixed point (the exact invariant subspace <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>). Linearizing at <span class="math notranslate nohighlight">\(E=0\)</span> gives</p>
-<div class="math notranslate nohighlight">
-\[
-E_{k+1}=T_{22}\,E_k\,T_{11}^{-1}+ \mathcal{O}(\|E_k\|^2).
-\]</div>
-<p>Hence, locally the contraction factor is governed by <span class="math notranslate nohighlight">\(T_{22}\,(\cdot)\,T_{11}^{-1}\)</span>.</p>
-</section>
-<section id="local-linear-convergence">
-<h3>Local linear convergence<a class="headerlink" href="#local-linear-convergence" title="Link to this heading">#</a></h3>
-<p>From the graph recurrence and a Neumann-series bound,</p>
-<div class="math notranslate nohighlight">
-\[
-\|E_{k+1}\|\;\le\;\|T_{22}\|\,\|T_{11}^{-1}\|\;\frac{\|E_k\|}{\,1-\|T_{11}^{-1}\|\,\|T_{12}\|\,\|E_k\|\,}.
-\]</div>
-<p>Therefore, once <span class="math notranslate nohighlight">\(\|E_k\|\)</span> is small enough (in particular, <span class="math notranslate nohighlight">\(\|T_{11}^{-1}\|\,\|T_{12}\|\,\|E_k\|&lt;1\)</span>), you get linear contraction with asymptotic factor <span class="math notranslate nohighlight">\(\|T_{22}\|\,\|T_{11}^{-1}\|\)</span>. This is the standard local behavior around <span class="math notranslate nohighlight">\(E=0\)</span> in the non-Hermitian case.</p>
-</section>
-<section id="global-convergence-and-rates">
-<h3>Global convergence and rates<a class="headerlink" href="#global-convergence-and-rates" title="Link to this heading">#</a></h3>
-<p>Assume the initial subspace has a nonzero component in <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>. Then the orthogonal-iteration subspaces <span class="math notranslate nohighlight">\(\operatorname{span}(Q_k)\)</span> converge to <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span> (the Schur subspace for <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_p\)</span>). Moreover, the principal-angle (or projector) errors decay essentially like powers of the modulus gap; asymptotically, each column converges at a rate <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|\)</span> (for <span class="math notranslate nohighlight">\(i=1,\dots,p\)</span>):</p>
-<div class="math notranslate nohighlight">
-\[
-\sin\angle\bigl(\mathcal{U}_1,\operatorname{span}(Q_k)\bigr)\;\lesssim\; \kappa \, \Bigl(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\Bigr)^{k}.
-\]</div>
-<p>Here <span class="math notranslate nohighlight">\(\kappa\)</span> reflects conditioning of the eigenbasis (departure from normality). This is the rate one gets from the linearized map <span class="math notranslate nohighlight">\(E_{k+1}\approx T_{22}E_k T_{11}^{-1}\)</span>.</p>
-<div class="proof theorem admonition" id="thm:orth-it-nh">
-<p class="admonition-title"><span class="caption-number">Theorem 22 </span> (Informal theorem)</p>
-<section class="theorem-content" id="proof-content">
-<p>If <span class="math notranslate nohighlight">\(\Lambda(T_{11})\)</span> and <span class="math notranslate nohighlight">\(\Lambda(T_{22})\)</span> are disjoint and <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span>, then for generic <span class="math notranslate nohighlight">\(Q_0\)</span> the iterates <span class="math notranslate nohighlight">\(\operatorname{span}(Q_k)\)</span> converge to <span class="math notranslate nohighlight">\(\mathcal{U}_1\)</span>. Asymptotically, principal angles decay at a linear rate determined by <span class="math notranslate nohighlight">\(|\lambda_{p+1}/\lambda_p|\)</span>, and locally the graph error satisfies <span class="math notranslate nohighlight">\(\|E_{k+1}\|\le \|T_{22}\|\,\|T_{11}^{-1}\|\,\|E_k\|+o(\|E_k\|)\)</span>.</p>
-</section>
-</div><div class="proof theorem admonition" id="thm:orth-it-nh-rigorous">
-<p class="admonition-title"><span class="caption-number">Theorem 23 </span> (Convergence to a Schur invariant subspace)</p>
-<section class="theorem-content" id="proof-content">
-<p>(a) (Local convergence under spectral separation)<br />
-Assume the <strong>separation</strong></p>
-<div class="math notranslate nohighlight">
-\[
-\mathrm{sep}(T_{11},T_{22}) \;:=\; \min_{X\neq 0} \frac{\|T_{11}X - X T_{22}\|}{\|X\|} \;&gt;\; 0.
-\]</div>
-<p>Then there exists <span class="math notranslate nohighlight">\(\varepsilon&gt;0\)</span> such that if <span class="math notranslate nohighlight">\(\|E_0\|&lt;\varepsilon\)</span> the orthogonal iteration is well-defined for all <span class="math notranslate nohighlight">\(k\)</span> (meaning <span class="math notranslate nohighlight">\(C_k\)</span> is invertible so <span class="math notranslate nohighlight">\(E_k=S_k C_k^{-1}\)</span> exists, and <span class="math notranslate nohighlight">\(T_{11}+T_{12}E_k\)</span> is invertible so the update for <span class="math notranslate nohighlight">\(E_{k+1}\)</span> is valid) and the graph iterates satisfy the Riccati map</p>
-<div class="math notranslate nohighlight">
-\[
-E_{k+1} = T_{22}\,E_k\,(T_{11}+T_{12}E_k)^{-1}.
-\]</div>
-<p>Moreover, there are constants <span class="math notranslate nohighlight">\(c\)</span>, <span class="math notranslate nohighlight">\(\delta&gt;0\)</span> so that for all <span class="math notranslate nohighlight">\(\|E_k\|&lt;\delta\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[
-\|E_{k+1}\|\;\le\;\|T_{22}\|\,\|T_{11}^{-1}\|\,\|E_k\| \;+\; c\,\|E_k\|^2,
-\]</div>
-<p>hence <span class="math notranslate nohighlight">\(E_k\to 0\)</span> <strong>linearly</strong>. The asymptotic rate obeys</p>
-<div class="math notranslate nohighlight">
-\[
-\limsup_{k\to\infty}\frac{\|E_{k+1}\|}{\|E_k\|} \;\le\;
-\rho(T_{22})\,\rho(T_{11}^{-1}),
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\rho(\cdot)\)</span> is the spectral radius. Writing <span class="math notranslate nohighlight">\(\Theta_k\)</span> for the principal-angle matrix between <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> and <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>, we have <span class="math notranslate nohighlight">\(\|\tan\Theta_k\| = \|E_k\|\)</span> and <span class="math notranslate nohighlight">\(\|\sin\Theta_k\|\le \|E_k\|\)</span>, so the subspaces converge.</p>
-<p>(b) (Global rate under a modulus gap)<br />
-Assume the eigenvalues are ordered by modulus</p>
-<div class="math notranslate nohighlight">
-\[
-|\lambda_1| &gt; \cdots &gt; |\lambda_p| \;&gt;\; |\lambda_{p+1}| &gt; \cdots &gt;|\lambda_n|.
-\]</div>
-<p>If <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular, then the subspaces <span class="math notranslate nohighlight">\(\mathrm{span}(Q_k)\)</span> converge to the Schur subspace <span class="math notranslate nohighlight">\(\mathrm{span}(U_1)\)</span>. There exist constants <span class="math notranslate nohighlight">\(c&gt;0\)</span> such that, for all sufficiently large <span class="math notranslate nohighlight">\(k\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[
-\|E_k\| \;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
-\]</div>
-<p>Consequently, the largest principal angle satisfies</p>
-<div class="math notranslate nohighlight">
-\[
-\sin\theta_{\max}(\mathrm{span}(Q_k),\mathrm{span}(U_1))
-\;\le\; c\,\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
-\]</div>
-<p>Finally, the Ritz matrix <span class="math notranslate nohighlight">\(T_k:=Q_k^H A Q_k\)</span> has eigenvalues that converge to the eigenvalues of <span class="math notranslate nohighlight">\(T_{11}\)</span>.</p>
-</section>
-</div></section>
-<section id="practical-notes">
-<h3>Practical notes<a class="headerlink" href="#practical-notes" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p><strong>Non-normality can slow convergence.</strong> Poorly conditioned eigenvectors (large departure from normality) can introduce substantial polynomial factors before the geometric rate dominates. It is one reason subspace iteration targets Schur vectors and/or uses accelerations.</p></li>
-<li><p><strong>Acceleration:</strong> shift-and-invert <span class="math notranslate nohighlight">\((A-\sigma I)^{-1}\)</span>, polynomial filters (Chebyshev), and locking/deflation are standard to isolate interior clusters and improve gaps; these plug directly into the subspace iteration framework.</p></li>
-<li><p><strong>Separation and Sylvester equations:</strong> the spectral separation <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> ensures a well-conditioned invariant-subspace problem and appears in error/conditioning bounds (e.g., Schur–Parlett/sign function analyses).</p></li>
-</ul>
+<p>The ratio <span class="math notranslate nohighlight">\(|\lambda_{p+1}/\lambda_p|\)</span> compares the fastest-growing unwanted component with the slowest-growing wanted component. A ratio near one gives slow separation; a smaller ratio gives faster separation. The theorem is an upper bound, and particular starting spaces may converge faster. For nonnormal matrices, the constant <span class="math notranslate nohighlight">\(K\)</span> can be large.</p>
+<p>For example, suppose the three largest eigenvalue magnitudes are <span class="math notranslate nohighlight">\(10\)</span>, <span class="math notranslate nohighlight">\(9.9\)</span>, and <span class="math notranslate nohighlight">\(1\)</span>, and the starting-space conditions hold. The error bound for the first vector decays like <span class="math notranslate nohighlight">\(0.99^k\)</span>, but the bound for the first two columns together decays like <span class="math notranslate nohighlight">\((1/9.9)^k\)</span>. We can capture their two-dimensional invariant subspace long before the individual directions are resolved.</p>
+<p>This proof assumes diagonalizability. The algorithm also applies to matrices that are not diagonalizable, but their convergence analysis can include additional polynomial factors in <span class="math notranslate nohighlight">\(k\)</span>.</p>
 </section>
 </section>
-<section id="convergence-rate-of-the-ritz-eigenvalues">
-<h2>Convergence rate of the Ritz eigenvalues<a class="headerlink" href="#convergence-rate-of-the-ritz-eigenvalues" title="Link to this heading">#</a></h2>
-<p>Let <span class="math notranslate nohighlight">\(T_k := Q_k^H A Q_k \in \mathbb{C}^{p\times p}\)</span> be the Rayleigh–Ritz (Ritz) matrix at step <span class="math notranslate nohighlight">\(k\)</span>, and let its eigenvalues be <span class="math notranslate nohighlight">\(\{\mu_i^{(k)}\}_{i=1}^p\)</span>. We explain why these converge to the target eigenvalues and at what rate. This follows from the subspace convergence analysis above.</p>
-<section id="block-schur-view">
-<h3>Block-Schur view<a class="headerlink" href="#block-schur-view" title="Link to this heading">#</a></h3>
-<p>Work in a Schur basis</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A = U \begin{bmatrix}T_{11}&amp;T_{12}\\0&amp;T_{22}\end{bmatrix} U^H
-\end{split}\]</div>
-<p>with <span class="math notranslate nohighlight">\(T_{11}\in\mathbb{C}^{p\times p}\)</span>. With</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-Y_k := U^H Q_k = \begin{bmatrix}C_k\\ S_k\end{bmatrix}\end{split}\]</div>
-<p>and <span class="math notranslate nohighlight">\(E_k := S_k C_k^{-1}\)</span> (when <span class="math notranslate nohighlight">\(C_k\)</span> is invertible), a short calculation gives</p>
+<section id="from-subspaces-to-the-schur-vectors">
+<h2>From Subspaces to the Schur Vectors<a class="headerlink" href="#from-subspaces-to-the-schur-vectors" title="Link to this heading">#</a></h2>
+<p>To recover all Schur directions, consider full iteration (<span class="math notranslate nohighlight">\(p=n\)</span>) and suppose now that</p>
 <div class="math notranslate nohighlight">
 \[
-T_k = Y_k^H T Y_k
-= (I+E_k^H E_k)^{-\tfrac12}
-\Big(T_{11} + T_{12}E_k + E_k^H T_{22}E_k\Big)
-(I+E_k^H E_k)^{-\tfrac12}.
+|\lambda_1|&gt;\cdots&gt;|\lambda_n|&gt;0,
 \]</div>
-<p>Hence</p>
+<p>and that the starting-space condition holds for each leading set of columns being analyzed: the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_{0,i}\)</span> form an invertible <span class="math notranslate nohighlight">\(i\times i\)</span> matrix. Apply the theorem separately to each <span class="math notranslate nohighlight">\(i&lt;n\)</span>. It gives</p>
 <div class="math notranslate nohighlight">
 \[
-T_k \;=\; T_{11} + \Delta_k,
+\operatorname{range}(Q_{k,i})
+\longrightarrow\operatorname{range}(Q_{\star,i}),
+\]</div>
+<p>with an error bounded by a constant times <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|^k\)</span>.</p>
+<p>Why does this identify column <span class="math notranslate nohighlight">\(i\)</span>? It is the unit direction in the first <span class="math notranslate nohighlight">\(i\)</span> columns that is orthogonal to the first <span class="math notranslate nohighlight">\(i-1\)</span>. More explicitly, let</p>
+<div class="math notranslate nohighlight">
+\[
+\Pi_{k,i}=Q_{k,i}Q_{k,i}^H,
 \qquad
-\|\Delta_k\| \;\le\; \alpha\,\|E_k\| + \beta\,\|E_k\|^2,
+\Pi_{\star,i}=Q_{\star,i}Q_{\star,i}^H.
 \]</div>
-<p>for some constants <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span> depending only on <span class="math notranslate nohighlight">\(\|T_{11}\|\)</span>, <span class="math notranslate nohighlight">\(\|T_{12}\|\)</span>, and <span class="math notranslate nohighlight">\(\|T_{22}\|\)</span>. Standard eigenvalue perturbation then yields</p>
-<div class="proof theorem admonition" id="thm:ritz-rate-general">
-<p class="admonition-title"><span class="caption-number">Theorem 24 </span> (Ritz value rate)</p>
-<section class="theorem-content" id="proof-content">
-<p>Assume <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> so that the invariant subspace is well conditioned; assume <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular (the start has nonzero overlap with <span class="math notranslate nohighlight">\(\mathcal U_1\)</span>), and suppose <span class="math notranslate nohighlight">\(\|E_k\|\)</span> is sufficiently small. Then there exists <span class="math notranslate nohighlight">\(c&gt;0\)</span> such that</p>
+<p>For equal-dimensional subspaces, the error used above also equals the distance between their orthogonal projections:</p>
 <div class="math notranslate nohighlight">
 \[
-\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
-\;\le\; c\,\|E_k\| \;+\; \mathcal{O}\!\big(\|E_k\|^2\big).
+\|\Pi_{k,i}-\Pi_{\star,i}\|_2
+=\|(I-\Pi_{\star,i})Q_{k,i}\|_2.
 \]</div>
-<p>Here <span class="math notranslate nohighlight">\(\Lambda(X)\)</span> denotes the <strong>set of eigenvalues</strong> of <span class="math notranslate nohighlight">\(X\)</span>. The function <span class="math notranslate nohighlight">\(\mathrm{dist}\)</span> denotes the <strong>Hausdorff distance</strong> between (compact) subsets of <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-\mathrm{dist}\big(\Lambda(X),\Lambda(Y)\big)
-\;=\;
-\max\!\Big\{
-  \max_{\lambda\in\Lambda(X)} \min_{\mu\in\Lambda(Y)} |\lambda-\mu|\;,\;
-  \max_{\mu\in\Lambda(Y)} \min_{\lambda\in\Lambda(X)} |\lambda-\mu|
-\Big\}.
-\]</div>
-<p>In particular, if</p>
-<div class="math notranslate nohighlight">
-\[
-\|E_k\|\le C \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k
-\]</div>
-<p>(as proved above), then</p>
-<div class="math notranslate nohighlight">
-\[
-\mathrm{dist}\big(\Lambda(T_k),\Lambda(T_{11})\big)
-\;\le\; C' \, \left(\tfrac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
-\]</div>
-<p>for some constant <span class="math notranslate nohighlight">\(C'\)</span> independent of <span class="math notranslate nohighlight">\(k\)</span>.</p>
-</section>
-</div><div class="proof corollary admonition" id="cor:ritz-per-eig">
-<p class="admonition-title"><span class="caption-number">Corollary 1 </span> (Per eigenvalue Ritz value convergence)</p>
-<section class="corollary-content" id="proof-content">
-<p>If the invariant subspace for <span class="math notranslate nohighlight">\(\Lambda(T_{11})=\{\lambda_1,\dots,\lambda_p\}\)</span> is separated from the rest (e.g., <span class="math notranslate nohighlight">\(\mathrm{sep}(T_{11},T_{22})&gt;0\)</span> in a Schur basis), and <span class="math notranslate nohighlight">\(C_0\)</span> is nonsingular, then the <span class="math notranslate nohighlight">\(i\)</span>-th column of <span class="math notranslate nohighlight">\(E_k\)</span> satisfies</p>
-<div class="math notranslate nohighlight">
-\[
-\|E_k[:,i]\| \le \tilde c_i\,(|\lambda_{p+1}|/|\lambda_i|)^k
-\]</div>
-<p>for large <span class="math notranslate nohighlight">\(k\)</span> (from the linearization <span class="math notranslate nohighlight">\(E_{k+1}\approx T_{22}E_kT_{11}^{-1}\)</span>). Consequently,</p>
-<div class="math notranslate nohighlight">
-\[
-|\mu_i^{(k)}-\lambda_i|\le c_i\Big(\tfrac{|\lambda_{p+1}|}{|\lambda_i|}\Big)^k,
-\]</div>
-<p>for <span class="math notranslate nohighlight">\(i \le p\)</span>. In particular, each leading Ritz value converges <strong>geometrically</strong>, and the <span class="math notranslate nohighlight">\(i\)</span>th one is controlled by the gap to the first unwanted eigenvalue <span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>.</p>
-</section>
-</div></section>
-<section id="takeaways">
-<h3>Takeaways<a class="headerlink" href="#takeaways" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p>In general (non-Hermitian) problems, Ritz eigenvalues converge <strong>geometrically</strong> with the same factor that governs the subspace error <span class="math notranslate nohighlight">\(\|E_k\|\)</span>.</p></li>
-<li><p>Practically, once the principal angles are small, Ritz values stabilize very rapidly; locking/deflation then allows focusing the iteration on remaining eigenvalues.</p></li>
-</ul>
-</section>
-</section>
-<section id="definition-of-principal-angles">
-<h2>Definition of Principal Angles<a class="headerlink" href="#definition-of-principal-angles" title="Link to this heading">#</a></h2>
-<p>We define the concept of principal angles between two subspaces, which were used in the convergence analysis above.</p>
-<p>Let <span class="math notranslate nohighlight">\(\mathcal U\)</span> and <span class="math notranslate nohighlight">\(\mathcal V\)</span> be subspaces of <span class="math notranslate nohighlight">\(\mathbb{C}^n\)</span> (or <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>) with dimensions <span class="math notranslate nohighlight">\(p\)</span> and <span class="math notranslate nohighlight">\(q\)</span>, where <span class="math notranslate nohighlight">\(p \le q\)</span>.</p>
-<p>There exist orthonormal bases</p>
-<div class="math notranslate nohighlight">
-\[
-\{u_1, \dots, u_p\} \text{ for } \mathcal U,
-\qquad
-\{v_1, \dots, v_q\} \text{ for } \mathcal V,
-\]</div>
-<p>and real numbers</p>
-<div class="math notranslate nohighlight">
-\[
-0 \le \theta_1 \le \theta_2 \le \cdots \le \theta_p \le \tfrac{\pi}{2}
-\]</div>
-<p>such that</p>
+<p>Thus these projections converge. Subtract the projections for two consecutive subspaces:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-u_i^H \, v_j =
-\begin{cases}
-\cos(\theta_i), &amp; \text{if } i = j, \\
-0, &amp; \text{if } i \ne j.
-\end{cases}
+\begin{aligned}
+\boldsymbol q_{k,i}\boldsymbol q_{k,i}^H
+&amp;=\Pi_{k,i}-\Pi_{k,i-1}\\
+&amp;\longrightarrow\Pi_{\star,i}-\Pi_{\star,i-1}\\
+&amp;=\boldsymbol q_{\star,i}\boldsymbol q_{\star,i}^H.
+\end{aligned}
 \end{split}\]</div>
-<p>The numbers <span class="math notranslate nohighlight">\(\theta_1, \dots, \theta_p\)</span> are called the <strong>principal angles</strong> (or <strong>canonical angles</strong>) between <span class="math notranslate nohighlight">\(\mathcal U\)</span> and <span class="math notranslate nohighlight">\(\mathcal V\)</span>.</p>
-<p>Alternatively, if <span class="math notranslate nohighlight">\(U \in \mathbb{C}^{n \times p}\)</span> and <span class="math notranslate nohighlight">\(V \in \mathbb{C}^{n \times q}\)</span> have orthonormal columns spanning <span class="math notranslate nohighlight">\(\mathcal U\)</span> and <span class="math notranslate nohighlight">\(\mathcal V\)</span>, then the cosines of the principal angles are the singular values of <span class="math notranslate nohighlight">\(U^* V\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-\cos(\theta_i) = \sigma_i(U^*V), \quad i = 1, \dots, p.
-\]</div>
-<div class="proof lemma admonition" id="lemma-4">
-<p class="admonition-title"><span class="caption-number">Lemma 2 </span> (Relationship with projector norms)</p>
-<section class="lemma-content" id="proof-content">
-<p>Let <span class="math notranslate nohighlight">\(P_{\mathcal U}\)</span> and <span class="math notranslate nohighlight">\(P_{\mathcal V}\)</span> be the orthogonal projectors and <span class="math notranslate nohighlight">\(\Theta=\mathrm{diag}(\theta_1,\dots,\theta_p)\)</span> the principal angles (with <span class="math notranslate nohighlight">\(p=\dim\mathcal U\le \dim\mathcal V\)</span>).</p>
-<p>Then</p>
-<div class="math notranslate nohighlight">
-\[
-\|\sin\Theta\|=\|P_{\mathcal U^\perp}P_{\mathcal V}\|.
-\]</div>
-<p>If in addition <span class="math notranslate nohighlight">\(\dim\mathcal U=\dim\mathcal V\)</span>, then</p>
-<div class="math notranslate nohighlight">
-\[
-\|P_{\mathcal U}-P_{\mathcal V}\|=\|\sin\Theta\|.
-\]</div>
-<p>Finally, if <span class="math notranslate nohighlight">\(\theta_{\max}&lt;\tfrac{\pi}{2}\)</span> (equivalently <span class="math notranslate nohighlight">\(U^H V\)</span> is invertible), then</p>
-<div class="math notranslate nohighlight">
-\[
-\|\tan\Theta\| = \| \, P_{\mathcal U^\perp} V (U^H V)^{-1}\|.
-\]</div>
-<p>In particular, <span class="math notranslate nohighlight">\(\sin \Theta\)</span> and <span class="math notranslate nohighlight">\(\tan \Theta\)</span> provide quantitative measures of the distance or “gap” between the two subspaces.</p>
+<p>Here <span class="math notranslate nohighlight">\(\Pi_{k,0}=\Pi_{\star,0}=0\)</span>. For full iteration, <span class="math notranslate nohighlight">\(\Pi_{k,n}=\Pi_{\star,n}=I\)</span>, so the last column follows too. This proves convergence of all Schur directions. Signs or complex phases may continue to change, as in the power method; the lines converge.</p>
+<p>For <span class="math notranslate nohighlight">\(p=n\)</span>, the full column space is always <span class="math notranslate nohighlight">\(\mathbb C^n\)</span>. It is the convergence of these <strong>nested leading subspaces</strong>, not the full space, that produces Schur form. Under the assumptions above, the diagonal entries of <span class="math notranslate nohighlight">\(Q_k^HAQ_k\)</span> approach the ordered eigenvalues and the entries below the diagonal approach zero.</p>
+<p>For partial iteration (<span class="math notranslate nohighlight">\(p&lt;n\)</span>), if only <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span> holds, the <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace can converge without individual columns settling into Schur directions. This is useful when wanted eigenvalues have equal or nearly equal magnitudes. For real matrices, a nonreal conjugate pair has equal magnitudes and must be treated together when working in real arithmetic.</p>
 </section>
-</div><p><strong>Remarks</strong></p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\theta_1=0\)</span> if and only if <span class="math notranslate nohighlight">\(\mathcal U \cap \mathcal V \neq \{0\}\)</span>.</p></li>
-<li><p>The largest principal angle <span class="math notranslate nohighlight">\(\theta_p\)</span> provides a measure of the worst alignment of <span class="math notranslate nohighlight">\(\mathcal U\)</span> with <span class="math notranslate nohighlight">\(\mathcal V\)</span>.</p></li>
-<li><p>In many numerical analyses (e.g., subspace iteration, perturbation bounds), one works with <span class="math notranslate nohighlight">\(\sin\theta_i\)</span> or <span class="math notranslate nohighlight">\(\tan\theta_i\)</span> rather than <span class="math notranslate nohighlight">\(\theta_i\)</span> itself.</p></li>
-<li><p>When <span class="math notranslate nohighlight">\(p=q=1\)</span> (lines), this notion reduces to the usual angle between two lines.</p></li>
-</ul>
+<section id="using-the-computed-subspace">
+<h2>Using the Computed Subspace<a class="headerlink" href="#using-the-computed-subspace" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, form the projected matrix and its residual:</p>
+<div class="math notranslate nohighlight">
+\[
+T_k=Q_k^HAQ_k,
+\qquad
+E_k=AQ_k-Q_kT_k.
+\]</div>
+<p>A small residual means that applying <span class="math notranslate nohighlight">\(A\)</span> nearly keeps vectors within the computed subspace. The eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span>, called <strong>Ritz values</strong>, then provide approximations to the wanted eigenvalues as the subspace converges. A residual alone does not identify which invariant subspace has been found.</p>
+<p>For full iteration, this residual is always zero because <span class="math notranslate nohighlight">\(Q_k\)</span> is square and unitary. Under the strict-gap assumptions, we instead monitor the entries below the diagonal of <span class="math notranslate nohighlight">\(T_k\)</span>. The following sections develop the connection to eigenvalue computation and the QR algorithm.</p>
 </section>
 </section>
 
@@ -1016,29 +796,17 @@ u_i^H \, v_j =
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-the-target-separate-from-the-iterates">Keep the Target Separate from the Iterates</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">The Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works-implicit-deflation">How It Works: Implicit Deflation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-results">Convergence Results</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-of-convergence">Proof of Convergence</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-inductive-proof">The Inductive Proof</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#base-case-p-1">Base Case: <span class="math notranslate nohighlight">\(P(1)\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inductive-step-assume-p-i-holds-prove-p-i-1">Inductive Step: Assume <span class="math notranslate nohighlight">\(P(i)\)</span> holds, prove <span class="math notranslate nohighlight">\(P(i+1)\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-performs-the-deflation-steps">QR Performs the Deflation Steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-identity-qr-changes-the-basis-not-the-subspace">The Key Identity: QR Changes the Basis, Not the Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-a-leading-subspace">Convergence of a Leading Subspace</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-error">Measuring the Error</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-theorem">The Convergence Theorem</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#second-proof-of-convergence">Second Proof of Convergence</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setup-ordered-schur-form-and-the-iteration">Setup (ordered Schur form and the iteration)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-graph-map-and-the-core-recurrence">The graph map and the core recurrence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-linear-convergence">Local linear convergence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#global-convergence-and-rates">Global convergence and rates</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-notes">Practical notes</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-the-ritz-eigenvalues">Convergence rate of the Ritz eigenvalues</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#block-schur-view">Block-Schur view</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#takeaways">Takeaways</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-principal-angles">Definition of Principal Angles</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-the-schur-vectors">From Subspaces to the Schur Vectors</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-computed-subspace">Using the Computed Subspace</a></li>
 </ul>
   </nav></div>
 
