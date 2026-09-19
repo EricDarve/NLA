@@ -425,24 +425,14 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-breakdown-a-zero-pivot-emerges">Tracing the Breakdown: A Zero Pivot Emerges 🕵️‍♀️</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lu-and-determinants">LU and Determinants</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-for-existence-leading-principal-minors">The Condition for Existence: Leading Principal Minors</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#theorem-existence-and-uniqueness-of-lu"><strong>Theorem: Existence and Uniqueness of LU</strong></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-theorem-to-the-example">Applying the Theorem to the Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-invertible-matrix-with-a-zero-pivot">An Invertible Matrix with a Zero Pivot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leading-principal-minors-and-pivots">Leading Principal Minors and Pivots</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-is-the-factorization-unique">When Is the Factorization Unique?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-changes-for-singular-matrices">What Changes for Singular Matrices?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-with-a-unit-lower-triangular-factor">Existence with a Unit Lower Triangular Factor</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalizations">Generalizations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-if-a-matrix-is-singular">What if a matrix is singular?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-instability">Numerical Instability 📉</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-small-pivot-problem-in-action">The Small Pivot Problem in Action 🔬</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#catastrophic-cancellation-in-floating-point-arithmetic">Catastrophic Cancellation in Floating-Point Arithmetic</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-corrupted-result">The Corrupted Result</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-does-not-guarantee-numerical-accuracy">Existence Does Not Guarantee Numerical Accuracy</a></li>
 </ul>
             </nav>
         </div>
@@ -456,331 +446,176 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="existence-and-uniqueness-of-lu-factorization">
 <h1>Existence and Uniqueness of LU Factorization<a class="headerlink" href="#existence-and-uniqueness-of-lu-factorization" title="Link to this heading">#</a></h1>
-<p>The LU factorization for a matrix <span class="math notranslate nohighlight">\(A\)</span> can break down if the third <strong>leading principal minor</strong> is zero. This mathematical property directly causes a zero to appear on the diagonal (a zero <strong>pivot</strong>) during the elimination process, which halts the standard algorithm because it would require division by zero.</p>
-<p>This process can be explored step-by-step.</p>
-<section id="tracing-the-breakdown-a-zero-pivot-emerges">
-<h2>Tracing the Breakdown: A Zero Pivot Emerges 🕵️‍♀️<a class="headerlink" href="#tracing-the-breakdown-a-zero-pivot-emerges" title="Link to this heading">#</a></h2>
-<p>The LU factorization algorithm proceeds step-by-step, using the diagonal element at step <span class="math notranslate nohighlight">\(k\)</span>, known as the <strong>pivot</strong>, to eliminate all the entries below it. The algorithm fails if it encounters a zero pivot.</p>
-<p>Consider performing elimination on the following example matrix:</p>
+<p>An invertible matrix need not have an LU factorization without row interchanges. A singular matrix may have one, and that factorization may or may not be unique.</p>
+<p>Throughout this section, <strong>LU factorization</strong> means <span class="math notranslate nohighlight">\(A=LU\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> is <strong>unit lower triangular</strong> and <span class="math notranslate nohighlight">\(U\)</span> is upper triangular. Fixing the diagonal of <span class="math notranslate nohighlight">\(L\)</span> is essential when discussing uniqueness. We work over <span class="math notranslate nohighlight">\(\mathbb R\)</span> or <span class="math notranslate nohighlight">\(\mathbb C\)</span>.</p>
+<section id="an-invertible-matrix-with-a-zero-pivot">
+<h2>An Invertible Matrix with a Zero Pivot<a class="headerlink" href="#an-invertible-matrix-with-a-zero-pivot" title="Link to this heading">#</a></h2>
+<p>Consider the matrix</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-A = \begin{pmatrix}
-1 &amp; 6 &amp; 1 &amp; 0 \\
-0 &amp; 1 &amp; 9 &amp; 3 \\
-1 &amp; 6 &amp; 1 &amp; 1 \\
-0 &amp; 0 &amp; 1 &amp; 9
-\end{pmatrix}
+A=\begin{pmatrix}
+1&amp;6&amp;1&amp;0\\
+0&amp;1&amp;9&amp;3\\
+1&amp;6&amp;1&amp;1\\
+0&amp;0&amp;1&amp;9
+\end{pmatrix}.
 \end{split}\]</div>
-<p><strong>Step 1 (<span class="math notranslate nohighlight">\(k=1\)</span>):</strong>
-The first pivot is <span class="math notranslate nohighlight">\(a_{11} = 1\)</span>. It’s non-zero, so the process can proceed. The <span class="math notranslate nohighlight">\(a_{31}\)</span> entry needs to be eliminated. The multiplier is <span class="math notranslate nohighlight">\(l_{31} = a_{31}/a_{11} = 1/1 = 1\)</span>. The computation is: (Row 3) <span class="math notranslate nohighlight">\(\leftarrow\)</span> (Row 3) - <span class="math notranslate nohighlight">\(1 \times\)</span> (Row 1).</p>
-<p>This gives the matrix <span class="math notranslate nohighlight">\(A^{(1)}\)</span>:</p>
+<p>The first pivot is <span class="math notranslate nohighlight">\(1\)</span>. Subtracting the first row from the third gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-A^{(1)} = \begin{pmatrix}
-\mathbf{1} &amp; 6 &amp; 1 &amp; 0 \\
-0 &amp; \mathbf{1} &amp; 9 &amp; 3 \\
-0 &amp; 0 &amp; 0 &amp; 1 \\
-0 &amp; 0 &amp; 1 &amp; 9
-\end{pmatrix}
+\begin{pmatrix}
+1&amp;6&amp;1&amp;0\\
+0&amp;1&amp;9&amp;3\\
+0&amp;0&amp;0&amp;1\\
+0&amp;0&amp;1&amp;9
+\end{pmatrix}.
 \end{split}\]</div>
-<p><strong>Step 2 (<span class="math notranslate nohighlight">\(k=2\)</span>):</strong>
-The second pivot is <span class="math notranslate nohighlight">\(a_{22}^{(1)} = 1\)</span>. It’s also non-zero. The entries below it in the second column are already zero, so no elimination is needed.</p>
-<p><strong>Step 3 (<span class="math notranslate nohighlight">\(k=3\)</span>):</strong>
-The third pivot is <span class="math notranslate nohighlight">\(a_{33}^{(2)} = \mathbf{0}\)</span>. To continue, this pivot would be used to eliminate the entry <span class="math notranslate nohighlight">\(a_{43}^{(2)} = 1\)</span>. This would require calculating the multiplier <span class="math notranslate nohighlight">\(l_{43} = a_{43}^{(2)}/a_{33}^{(2)} = 1/0\)</span>.</p>
-<p>This is an undefined operation. The algorithm cannot proceed. The matrix <span class="math notranslate nohighlight">\(U\)</span> would have a zero on its diagonal (<span class="math notranslate nohighlight">\(u_{33}=0\)</span>), and it cannot be used to complete the elimination.</p>
+<p>The second pivot is also <span class="math notranslate nohighlight">\(1\)</span>, and the entries below it are already zero. At the third step, however, elimination would require dividing the entry <span class="math notranslate nohighlight">\(1\)</span> in position <span class="math notranslate nohighlight">\((4,3)\)</span> by the zero pivot in position <span class="math notranslate nohighlight">\((3,3)\)</span>.</p>
+<p>The matrix itself is invertible: its determinant is <span class="math notranslate nohighlight">\(-1\)</span>. Swapping the third and fourth rows at this step allows elimination to continue. The obstruction concerns the chosen row order, not invertibility of the whole matrix.</p>
 </section>
-<section id="lu-and-determinants">
-<h2>LU and Determinants<a class="headerlink" href="#lu-and-determinants" title="Link to this heading">#</a></h2>
-<p>We will need the following fact in the proof of the theorem below.</p>
-<p>One of the most elegant applications of LU factorization is computing the determinant. Given <span class="math notranslate nohighlight">\(A=LU\)</span>:</p>
+<section id="leading-principal-minors-and-pivots">
+<h2>Leading Principal Minors and Pivots<a class="headerlink" href="#leading-principal-minors-and-pivots" title="Link to this heading">#</a></h2>
+<p>Let</p>
 <div class="math notranslate nohighlight">
-\[\det(A) = \det(L)\det(U)\]</div>
-<ul class="simple">
-<li><p>Since <span class="math notranslate nohighlight">\(L\)</span> is unit lower triangular, <span class="math notranslate nohighlight">\(\det(L) = 1\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(U\)</span> is upper triangular, its determinant is the product of its diagonal entries (the pivots).</p></li>
-</ul>
-<p>Therefore:</p>
+\[
+A_k=A[1:k,1:k],\qquad \Delta_k=\det(A_k),
+\qquad \Delta_0=1,
+\]</div>
+<p>where the index ranges include both endpoints. The matrix <span class="math notranslate nohighlight">\(A_k\)</span> is the <strong>leading principal submatrix</strong> of order <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\(\Delta_k\)</span> is its <strong>leading principal minor</strong>.</p>
+<p>If <span class="math notranslate nohighlight">\(A=LU\)</span>, triangularity gives <span class="math notranslate nohighlight">\(A_k=L_kU_k\)</span>, where <span class="math notranslate nohighlight">\(L_k\)</span> and <span class="math notranslate nohighlight">\(U_k\)</span> are the corresponding leading blocks. Consequently,</p>
 <div class="math notranslate nohighlight">
-\[\det(A) = \prod_{i=1}^n u_{ii}\]</div>
-<p>This reduces the computationally expensive task of calculating a determinant to the cost of performing an LU factorization and then multiplying <span class="math notranslate nohighlight">\(n\)</span> numbers.</p>
+\[
+\Delta_k=\det(L_k)\det(U_k)=\prod_{j=1}^k u_{jj}.
+\]</div>
+<p>Whenever <span class="math notranslate nohighlight">\(\Delta_{k-1}\neq0\)</span>, we can divide two consecutive identities to obtain</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{u_{kk}=\frac{\Delta_k}{\Delta_{k-1}}.}
+\]</div>
+<p>This also describes the pivot reached after the first <span class="math notranslate nohighlight">\(k-1\)</span> elimination steps have succeeded. It does not define a pivot when the denominator is zero.</p>
+<p>For the opening example,</p>
+<div class="math notranslate nohighlight">
+\[
+\Delta_1=1,\qquad\Delta_2=1,\qquad\Delta_3=0,
+\qquad\Delta_4=-1.
+\]</div>
+<p>Thus the third pivot is zero. In fact, no LU factorization in this row order can exist: <span class="math notranslate nohighlight">\(\Delta_3=0\)</span> would force one of the first three diagonal entries of <span class="math notranslate nohighlight">\(U\)</span> to vanish, contradicting <span class="math notranslate nohighlight">\(\det(A)=\prod_{j=1}^4u_{jj}\neq0\)</span>.</p>
+<p>The determinant formula is useful after factorization. We do not compute determinants to choose pivots in the algorithm; the elimination updates already give them.</p>
 </section>
-<section id="the-condition-for-existence-leading-principal-minors">
-<h2>The Condition for Existence: Leading Principal Minors<a class="headerlink" href="#the-condition-for-existence-leading-principal-minors" title="Link to this heading">#</a></h2>
-<p>The breakdown is not a coincidence; it is a direct consequence of a fundamental property of the matrix <span class="math notranslate nohighlight">\(A\)</span>. The existence of a standard LU factorization is completely determined by the <strong>leading principal submatrices</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>The <span class="math notranslate nohighlight">\(k\)</span>-th leading principal submatrix, denoted as <span class="math notranslate nohighlight">\(A_k\)</span>, is the <span class="math notranslate nohighlight">\(k \times k\)</span> matrix in the upper-left corner of <span class="math notranslate nohighlight">\(A\)</span>. Its determinant, <span class="math notranslate nohighlight">\(\det(A_k)\)</span>, is the <span class="math notranslate nohighlight">\(k\)</span>-th <strong>leading principal minor</strong>.</p>
-<section id="theorem-existence-and-uniqueness-of-lu">
-<h3><strong>Theorem: Existence and Uniqueness of LU</strong><a class="headerlink" href="#theorem-existence-and-uniqueness-of-lu" title="Link to this heading">#</a></h3>
+<section id="when-is-the-factorization-unique">
+<h2>When Is the Factorization Unique?<a class="headerlink" href="#when-is-the-factorization-unique" title="Link to this heading">#</a></h2>
 <div class="proof theorem admonition" id="thm:existence_lu">
-<p class="admonition-title"><span class="caption-number">Theorem 10 </span> (Uniqueness and Existence of LU Factorization)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 10 </span> (Existence and Uniqueness of LU Factorization)</p>
 <section class="theorem-content" id="proof-content">
-<p>An <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> has a <strong>unique</strong> LU factorization (where <span class="math notranslate nohighlight">\(L\)</span> has 1s on its diagonal) if and only if all its leading principal minors are non-zero.</p>
+<p>An <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> has a unique factorization <span class="math notranslate nohighlight">\(A=LU\)</span>, with <span class="math notranslate nohighlight">\(L\)</span> unit lower triangular and <span class="math notranslate nohighlight">\(U\)</span> upper triangular, if and only if</p>
 <div class="math notranslate nohighlight">
-\[\det(A_k) \neq 0 \quad \text{for } k = 1, 2, \dots, n-1.\]</div>
+\[
+\Delta_k\neq0,\qquad k=1,\ldots,n-1.
+\]</div>
+<p>No condition on <span class="math notranslate nohighlight">\(\Delta_n=\det(A)\)</span> is needed for this statement.</p>
 </section>
-</div><p>Why is this true? The proof reveals a beautiful connection between the pivots and these minors. From the matrix partition <span class="math notranslate nohighlight">\(A_k = L_k U_k\)</span>, we can take the determinant:</p>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Existence and Uniqueness.
+<strong>Sufficiency.</strong> We use induction on <span class="math notranslate nohighlight">\(n\)</span>. For <span class="math notranslate nohighlight">\(n=1\)</span>, the unique factorization is <span class="math notranslate nohighlight">\([a]=[1][a]\)</span>, including when <span class="math notranslate nohighlight">\(a=0\)</span>.</p>
+<p>For <span class="math notranslate nohighlight">\(n&gt;1\)</span>, partition</p>
 <div class="math notranslate nohighlight">
-\[\det(A_k) = \det(L_k) \det(U_k)\]</div>
-<p>Since <span class="math notranslate nohighlight">\(L_k\)</span> is unit triangular, its determinant is 1. The determinant of the upper triangular <span class="math notranslate nohighlight">\(U_k\)</span> is the product of its diagonal entries:</p>
+\[\begin{split}
+A=\begin{pmatrix}B&amp;b\\c&amp;d\end{pmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(B=A_{n-1}\)</span> and <span class="math notranslate nohighlight">\(c\)</span> is a row vector. By induction, <span class="math notranslate nohighlight">\(B\)</span> has a unique factorization <span class="math notranslate nohighlight">\(B=L_BU_B\)</span>. Also <span class="math notranslate nohighlight">\(\det(B)\neq0\)</span>, so both factors are invertible. Seek factors of the form</p>
 <div class="math notranslate nohighlight">
-\[\det(A_k) = 1 \cdot (u_{11} u_{22} \cdots u_{kk})\]</div>
-<p>From this, any pivot <span class="math notranslate nohighlight">\(u_{kk}\)</span> can be isolated:</p>
+\[\begin{split}
+L=\begin{pmatrix}L_B&amp;0\\\ell&amp;1\end{pmatrix},
+\qquad
+U=\begin{pmatrix}U_B&amp;u\\0&amp;\alpha\end{pmatrix}.
+\end{split}\]</div>
+<p>Block multiplication requires</p>
 <div class="math notranslate nohighlight">
-\[u_{kk} = \frac{u_{11} u_{22} \cdots u_{kk}}{u_{11} u_{22} \cdots u_{k-1,k-1}} = \frac{\det(A_k)}{\det(A_{k-1})} \quad (\text{defining } \det(A_0) = 1)\]</div>
-<p>This formula is the key! It shows that the <span class="math notranslate nohighlight">\(k\)</span>-th pivot, <span class="math notranslate nohighlight">\(u_{kk}\)</span>, is determined entirely by the ratio of two consecutive leading principal minors. The pivot will be well-defined and non-zero if and only if <span class="math notranslate nohighlight">\(\det(A_{k-1})\)</span> and <span class="math notranslate nohighlight">\(\det(A_k)\)</span> are both non-zero. For the entire algorithm to succeed (at least up to the last step), it is required that <span class="math notranslate nohighlight">\(\det(A_k) \neq 0\)</span> for <span class="math notranslate nohighlight">\(k=1, \dots, n-1\)</span>.</p>
-</section>
-<section id="applying-the-theorem-to-the-example">
-<h3>Applying the Theorem to the Example<a class="headerlink" href="#applying-the-theorem-to-the-example" title="Link to this heading">#</a></h3>
-<p>Let’s compute the leading principal minors of the example matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<ul class="simple">
-<li><p><strong><span class="math notranslate nohighlight">\(k=1\)</span></strong>: <span class="math notranslate nohighlight">\(\det(A_1) = \det(1) = 1 \neq 0\)</span>.</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(k=2\)</span></strong>: <span class="math notranslate nohighlight">\(\det(A_2) = \det \begin{pmatrix} 1 &amp; 6 \\ 0 &amp; 1 \end{pmatrix} = 1 \neq 0\)</span>.</p></li>
-<li><p><strong><span class="math notranslate nohighlight">\(k=3\)</span></strong>: <span class="math notranslate nohighlight">\(\det(A_3) = \det \begin{pmatrix} 1 &amp; 6 &amp; 1 \\ 0 &amp; 1 &amp; 9 \\ 1 &amp; 6 &amp; 1 \end{pmatrix} = 0\)</span>. (Note: subtract Row 1 from Row 3, which gives a row of zeros, making the determinant clearly 0).</p></li>
-</ul>
-<p>The theorem predicts the factorization will fail when computing the third pivot, since <span class="math notranslate nohighlight">\(\det(A_3)=0\)</span>. Using the formula:</p>
+\[
+L_Bu=b,\qquad \ell U_B=c,\qquad \alpha=d-\ell u.
+\]</div>
+<p>These equations uniquely determine <span class="math notranslate nohighlight">\(u\)</span>, <span class="math notranslate nohighlight">\(\ell\)</span>, and <span class="math notranslate nohighlight">\(\alpha\)</span>, giving a unique LU factorization of <span class="math notranslate nohighlight">\(A\)</span>. The last pivot <span class="math notranslate nohighlight">\(\alpha\)</span> is allowed to be zero.</p>
+<p><strong>Necessity.</strong> Suppose an LU factorization exists but some <span class="math notranslate nohighlight">\(\Delta_k=0\)</span> with <span class="math notranslate nohighlight">\(k&lt;n\)</span>. The product formula for <span class="math notranslate nohighlight">\(\Delta_k\)</span> implies that the leading <span class="math notranslate nohighlight">\((n-1)\times(n-1)\)</span> block of <span class="math notranslate nohighlight">\(U\)</span> is singular. There is therefore a nonzero row vector <span class="math notranslate nohighlight">\(w\)</span> such that</p>
 <div class="math notranslate nohighlight">
-\[u_{33} = \frac{\det(A_3)}{\det(A_2)} = \frac{0}{1} = 0\]</div>
-<p>This confirms precisely what was observed during the elimination process.</p>
+\[
+wU_{n-1}=0.
+\]</div>
+<p>For any scalar <span class="math notranslate nohighlight">\(t\)</span>, define the unit lower triangular matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M_t=\begin{pmatrix}I_{n-1}&amp;0\\tw&amp;1\end{pmatrix}.
+\end{split}\]</div>
+<p>Then</p>
+<div class="math notranslate nohighlight">
+\[
+A=(LM_t)(M_t^{-1}U).
+\]</div>
+<p>The first factor remains unit lower triangular. The second is upper triangular: it changes only the last row of <span class="math notranslate nohighlight">\(U\)</span>, and its first <span class="math notranslate nohighlight">\(n-1\)</span> entries remain zero because <span class="math notranslate nohighlight">\(wU_{n-1}=0\)</span>. Different values of <span class="math notranslate nohighlight">\(t\)</span> give different first factors, since <span class="math notranslate nohighlight">\(L\)</span> is invertible and <span class="math notranslate nohighlight">\(w\neq0\)</span>. Hence the factorization is not unique.</p>
+</div>
+<p>For a <strong>nonsingular</strong> matrix, the conclusion simplifies: LU exists if and only if the first <span class="math notranslate nohighlight">\(n-1\)</span> leading principal minors are nonzero, and when it exists it is unique. Indeed, any LU factorization of a nonsingular matrix must have every <span class="math notranslate nohighlight">\(u_{jj}\neq0\)</span>.</p>
+<p>The <a class="reference internal" href="lu_decomposition.html"><span class="std std-doc">no-pivoting algorithm</span></a> needs nonzero pivots only through step <span class="math notranslate nohighlight">\(n-1\)</span>. A nonzero final pivot is additionally required to solve arbitrary systems uniquely by backward substitution.</p>
 </section>
-</section>
-<section id="generalizations">
-<h2>Generalizations<a class="headerlink" href="#generalizations" title="Link to this heading">#</a></h2>
-<section id="what-if-a-matrix-is-singular">
-<h3>What if a matrix is singular?<a class="headerlink" href="#what-if-a-matrix-is-singular" title="Link to this heading">#</a></h3>
-<p>Notice the theorem only requires the minors to be non-zero up to <span class="math notranslate nohighlight">\(k=n-1\)</span>. What if <span class="math notranslate nohighlight">\(\det(A_n) = \det(A) = 0\)</span>? The matrix is singular. The factorization can still exist, but the final pivot, <span class="math notranslate nohighlight">\(u_{nn} = \det(A_n)/\det(A_{n-1})\)</span>, will be zero. This is perfectly fine, as no further eliminations depend on <span class="math notranslate nohighlight">\(u_{nn}\)</span>.</p>
-</section>
-<section id="existence">
-<h3>Existence<a class="headerlink" href="#existence" title="Link to this heading">#</a></h3>
-<p>Here is a more precise existence statement:</p>
+<section id="what-changes-for-singular-matrices">
+<h2>What Changes for Singular Matrices?<a class="headerlink" href="#what-changes-for-singular-matrices" title="Link to this heading">#</a></h2>
+<p>A singular matrix can still have a unique LU factorization. For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}1&amp;2\\3&amp;6\end{pmatrix}
+=
+\begin{pmatrix}1&amp;0\\3&amp;1\end{pmatrix}
+\begin{pmatrix}1&amp;2\\0&amp;0\end{pmatrix}.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\Delta_1=1\)</span>, so the theorem guarantees uniqueness even though the final pivot is zero.</p>
+<p>If an earlier leading principal minor vanishes, LU may still exist, but it cannot be unique. For every scalar <span class="math notranslate nohighlight">\(t\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}0&amp;1\\0&amp;1\end{pmatrix}
+=
+\begin{pmatrix}1&amp;0\\t&amp;1\end{pmatrix}
+\begin{pmatrix}0&amp;1\\0&amp;1-t\end{pmatrix}.
+\end{split}\]</div>
+<p>The standard algorithm would attempt a division by zero at its first step, yet these are valid factorizations. In contrast, the singular matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}0&amp;0\\1&amp;0\end{pmatrix}
+\end{split}\]</div>
+<p>has no such factorization: <span class="math notranslate nohighlight">\(u_{11}=a_{11}=0\)</span> would imply <span class="math notranslate nohighlight">\(a_{21}=l_{21}u_{11}=0\)</span>, a contradiction.</p>
+<section id="existence-with-a-unit-lower-triangular-factor">
+<h3>Existence with a Unit Lower Triangular Factor<a class="headerlink" href="#existence-with-a-unit-lower-triangular-factor" title="Link to this heading">#</a></h3>
+<p>For singular matrices, determinants alone cannot decide whether an LU factorization exists. The following criterion applies to the convention used here: <span class="math notranslate nohighlight">\(L\)</span> must be unit lower triangular.</p>
 <div class="proof theorem admonition" id="thm:existence_lu_existence">
 <p class="admonition-title"><span class="caption-number">Theorem 11 </span> (Existence of LU)</p>
 <section class="theorem-content" id="proof-content">
-<p>The LU factorization <strong>exists</strong> if and only if</p>
+<p>A factorization <span class="math notranslate nohighlight">\(A=LU\)</span> with <span class="math notranslate nohighlight">\(L\)</span> unit lower triangular and <span class="math notranslate nohighlight">\(U\)</span> upper triangular exists if and only if</p>
 <div class="math notranslate nohighlight">
 \[
-{\rm rank}(A[1:k,1:k]) = {\rm rank}(A[1:n,1:k])
+\operatorname{rank}(A[1:k,1:k])
+=\operatorname{rank}(A[1:n,1:k]),
+\qquad k=1,\ldots,n-1.
 \]</div>
-<p>for all <span class="math notranslate nohighlight">\(1 \le k \le n-1\)</span>.</p>
 </section>
-</div><!--
-
-```{prf:proof}
-
-**Notation.** To simplify the proof, let's define two submatrices:
-
-* $A_k = A[1:k, 1:k]$: the $k$-th leading principal submatrix of $A$.
-* $B_k = A[1:n, 1:k]$: the first $k$ columns of $A$.
-
-Note that $A_k$ consists of the first $k$ rows of $B_k$. We can write $B_k$ in block form as:
-
-$$
-B_k = \begin{bmatrix} A_k \\ A_{21} \end{bmatrix},
-$$ 
-
-where $A_{21} = A[k+1:n, 1:k].$
-
-The theorem can thus be restated as: 
-
-$$
-\boxed{\text{$A=LU$ exists $\iff \text{rank}(A_k) = \text{rank}(B_k)$ for $k=1, \dots, n-1$.}}
-$$
-
-The condition 
-
-$$
-\text{rank}(A_k) = \text{rank}\left(\begin{bmatrix} A_k \\ A_{21} \end{bmatrix}\right)
-$$
-
-is equivalent to stating that the rows of $A_{21}$ are in the row space of $A_k$.
-
-The proof has two parts: necessity ($\implies$) and sufficiency ($\impliedby$).
-
-**Necessity ($\implies$)**
-
-Assume an LU factorization $A = LU$ exists. We must show that $\text{rank}(A_k) = \text{rank}(B_k)$ for all $k=1, \dots, n-1$.
-
-Let's partition $A, L, U$ at the $k$-th row and column:
-
-$$
-A = \begin{bmatrix} A_k & A_{12} \\ A_{21} & A_{22} \end{bmatrix} = L U = \begin{bmatrix} L_k & 0 \\ L_{21} & L_{22} \end{bmatrix} \begin{bmatrix} U_k & U_{12} \\ 0 & U_{22} \end{bmatrix}
-$$
-
-Here, $L_k = L[1:k, 1:k]$ and $U_k = U[1:k, 1:k]$. $L_k$ is unit lower triangular.
-
-From this block multiplication, we can extract two equations:
-
-$$
-\begin{aligned}
-A_k &= L_k U_k \\
-B_k &= A[1:n, 1:k] = \begin{bmatrix} A_k \\ A_{21} \end{bmatrix} = \begin{bmatrix} L_k U_k \\ L_{21} U_k \end{bmatrix} = \begin{bmatrix} L_k \\ L_{21} \end{bmatrix} U_k
-\end{aligned}
-$$
-
-Let's analyze the ranks of these expressions.
-
-* **From (1):** $L_k$ is a $k \times k$ unit lower triangular matrix, which means $\det(L_k) = 1$. Therefore, $L_k$ is invertible. Since we are multiplying $U_k$ by an invertible matrix, the rank is preserved:
-
-    $$
-    \text{rank}(A_k) = \text{rank}(L_k U_k) = \text{rank}(U_k)
-    $$
-
-* **From (2):** Let 
-
-    $$
-    C_k = \begin{bmatrix} L_k \\ L_{21} \end{bmatrix}.
-    $$
-    
-    This $n \times k$ matrix is composed of the first $k$ columns of $L$. Since $L$ is unit lower triangular, its $j$-th column has a $1$ in the $j$-th position and zeros above it. This structure guarantees that the first $k$ columns of $L$ are linearly independent.
-    Thus, $C_k$ has full column rank, i.e., $\text{rank}(C_k) = k$.
-    Multiplying $U_k$ on the left by a matrix with full column rank preserves the rank of $U_k$:
-
-    $$
-    \text{rank}(B_k) = \text{rank}(C_k U_k) = \text{rank}(U_k)
-    $$
-
-Combining these two results, we have $\text{rank}(A_k) = \text{rank}(U_k)$ and $\text{rank}(B_k) = \text{rank}(U_k)$.
-
-Therefore, $\text{rank}(A_k) = \text{rank}(B_k)$. This holds for all $k=1, \dots, n-1$.
-
-**Sufficiency ($\impliedby$)**
-
-This is a challenging part. We assume $\text{rank}(A_k) = \text{rank}(B_k)$ for $k=1, \dots, n-1$ and show $A=LU$ exists by induction on the matrix size $n$.
-
-**Base Case (n=1):** $A = [a_{11}]$. We can choose $L=[1]$ and $U=[a_{11}]$. The rank condition for $k=1, \dots, n-1$ is empty. The statement holds.
-
-**Inductive Step:** Assume the theorem holds for all $(n-1) \times (n-1)$ matrices. We must show it holds for an $n \times n$ matrix $A$.
-We partition $A$ and seek a corresponding $L$ and $U$:
-
-$$
-A = \begin{bmatrix} a_{11} & \mathbf{w}^T \\ \mathbf{v} & C \end{bmatrix} = \begin{bmatrix} 1 & \mathbf{0}^T \\ \mathbf{l}_{21} & L' \end{bmatrix} \begin{bmatrix} u_{11} & \mathbf{u}_{12}^T \\ \mathbf{0} & U' \end{bmatrix}
-$$
-
-where $C, L', U' \in \mathbb{R}^{(n-1) \times (n-1)}$.
-This requires:
-1.  $u_{11} = a_{11}$
-2.  $\mathbf{u}_{12}^T = \mathbf{w}^T$
-3.  $\mathbf{l}_{21} u_{11} = \mathbf{v} \implies \mathbf{l}_{21} a_{11} = \mathbf{v}$
-4.  $A' = L'U'$, where $A' = C - \mathbf{l}_{21} \mathbf{u}_{12}^T = C - \mathbf{l}_{21} \mathbf{w}^T$
-
-We must find $\mathbf{l}_{21}$ and show that the resulting Schur complement $A'$ *also* satisfies the rank condition, allowing us to apply the inductive hypothesis.
-
-* **Step 1: Find $\mathbf{l}_{21}$**
-    The rank condition for $k=1$ is $\text{rank}(A_1) = \text{rank}(B_1)$, which means $\text{rank}([a_{11}]) = \text{rank}(\begin{bmatrix} a_{11} \\ \mathbf{v} \end{bmatrix})$.
-    * **Case 1: $a_{11} \neq 0$.** $\text{rank}([a_{11}]) = 1$. This implies $\text{rank}(\begin{bmatrix} a_{11} \\ \mathbf{v} \end{bmatrix}) = 1$, which means $\mathbf{v}$ is a multiple of $a_{11}$. We can **uniquely** choose $\mathbf{l}_{21} = \mathbf{v} / a_{11}$.
-    * **Case 2: $a_{11} = 0$.** $\text{rank}([a_{11}]) = 0$. The condition forces $\text{rank}(\begin{bmatrix} 0 \\ \mathbf{v} \end{bmatrix}) = 0$, which means $\mathbf{v} = \mathbf{0}$. The equation $\mathbf{l}_{21} \cdot 0 = \mathbf{0}$ is satisfied by **any** vector $\mathbf{l}_{21}$.
-
-* **Step 2: Show $A'$ satisfies the rank condition**
-    This is the core of the proof. We must show there *exists* an $\mathbf{l}_{21}$ (from Case 1 or 2) such that $A' = C - \mathbf{l}_{21}\mathbf{w}^T$ satisfies $\text{rank}(A'_k) = \text{rank}(B'_k)$ for $k=1, \dots, n-2$.
-
-    * **Case 1: $a_{11} \neq 0$.**
-        We chose the unique $\mathbf{l}_{21} = \mathbf{v}/a_{11}$. Let $L_1 = \begin{bmatrix} 1 & \mathbf{0}^T \\ \mathbf{l}_{21} & I \end{bmatrix}$. $L_1$ is invertible.
-        Let $A^{(2)} = L_1^{-1} A = \begin{bmatrix} 1 & \mathbf{0}^T \\ -\mathbf{l}_{21} & I \end{bmatrix} \begin{bmatrix} a_{11} & \mathbf{w}^T \\ \mathbf{v} & C \end{bmatrix} = \begin{bmatrix} a_{11} & \mathbf{w}^T \\ \mathbf{0} & C - \mathbf{l}_{21}\mathbf{w}^T \end{bmatrix} = \begin{bmatrix} a_{11} & \mathbf{w}^T \\ \mathbf{0} & A' \end{bmatrix}$.
-        Since $L_1^{-1}$ and its principal submatrices are invertible, they preserve the ranks of the submatrices of $A$. So $A$ satisfies the rank condition iff $A^{(2)}$ does.
-        For $k \ge 1$, let $k' = k+1$. The rank condition for $A^{(2)}$ at $k'$ is:
-        $\text{rank}(A^{(2)}_{k'}) = \text{rank}(B^{(2)}_{k'})$
-        $\text{rank}\left(\begin{bmatrix} a_{11} & \mathbf{w}_k^T \\ \mathbf{0} & A'_k \end{bmatrix}\right) = \text{rank}\left(\begin{bmatrix} a_{11} & \mathbf{w}_k^T \\ \mathbf{0} & B'_k \end{bmatrix}\right)$
-        Because $a_{11} \neq 0$, the rank of these block-upper-triangular matrices is $1 + \text{rank}(\text{Schur complement})$. By performing row operations (which preserve rank), this is equivalent to:
-        $\text{rank}\left(\begin{bmatrix} a_{11} & \mathbf{0}^T \\ \mathbf{0} & A'_k \end{bmatrix}\right) = \text{rank}\left(\begin{bmatrix} a_{11} & \mathbf{0}^T \\ \mathbf{0} & B'_k \end{bmatrix}\right)$
-        $1 + \text{rank}(A'_k) = 1 + \text{rank}(B'_k)$
-        This implies $\text{rank}(A'_k) = \text{rank}(B'_k)$ for all $k=1, \dots, n-2$. The inductive hypothesis holds.
-
-    * **Case 2: $a_{11} = 0$ and $\mathbf{v} = \mathbf{0}$.**
-        Here $A = \begin{bmatrix} 0 & \mathbf{w}^T \\ \mathbf{0} & C \end{bmatrix}$. This is where the simple proof fails. It is **not** guaranteed that the choice $\mathbf{l}_{21} = \mathbf{0}$ will work. However, it can be proven (as by Okunev and Johnson) that the rank condition on $A$ is precisely the necessary and sufficient condition to guarantee that **there exists** a vector $\mathbf{l}_{21}$ such that the Schur complement $A' = C - \mathbf{l}_{21}\mathbf{w}^T$ *does* satisfy the rank condition.
-
-        Let's see why this is plausible (a full proof is very technical):
-        * If $\mathbf{w} = \mathbf{0}$, then $A = \begin{bmatrix} 0 & \mathbf{0}^T \\ \mathbf{0} & C \end{bmatrix}$. We can choose $\mathbf{l}_{21} = \mathbf{0}$, so $A' = C$. The rank condition on $A$ for $k \ge 2$ simplifies to $\text{rank}(C_{k-1}) = \text{rank}(D_{k-1})$, which is exactly the rank condition required for $C$. The induction holds.
-        * If $\mathbf{w} \neq \mathbf{0}$, we must find a non-zero $\mathbf{l}_{21}$. The rank condition on $A$, $\text{rank}(\begin{bmatrix} \mathbf{w}_{k-1}^T \\ C_{k-1} \end{bmatrix}) = \text{rank}(\begin{bmatrix} \mathbf{w}_{k-1}^T \\ D_{k-1} \end{bmatrix})$, provides a non-trivial constraint on the relationship between $\mathbf{w}$ and $C$. This constraint is strong enough to prove that a vector $\mathbf{l}_{21}$ exists that "repairs" the rank condition for the sub-problem $A'$.
-
-Since in all cases (Case 1 and Case 2) we can find an $\mathbf{l}_{21}$ that leads to a Schur complement $A'$ satisfying the theorem's conditions, the inductive hypothesis applies. $A' = L'U'$ exists.
-
-We can then construct $L$ and $U$ for $A$, completing the induction.
-
-By induction, the theorem holds for all $n$.
-```
-
--->
+</div><p>The condition says that, within the first <span class="math notranslate nohighlight">\(k\)</span> columns, the first <span class="math notranslate nohighlight">\(k\)</span> rows span all the rows. We state the result without proof; see <a class="reference external" href="https://arxiv.org/pdf/2601.07791#page=10">Theorem 3.1 of <em>Necessary and Sufficient Conditions for the Existence of an LU Factorization for General Rank Deficient Matrices</em></a>.</p>
+<p>This existence criterion does not justify continuing the standard elimination algorithm through a zero pivot. A zero pivot cannot eliminate a nonzero entry below it; even when those entries are already zero, the choice of multipliers can affect later steps. The cited construction uses internal column permutations and proves that the resulting factors retain the required triangular structure in the original ordering. We leave that construction outside the scope of this section.</p>
 </section>
 </section>
-<section id="numerical-instability">
-<h2>Numerical Instability 📉<a class="headerlink" href="#numerical-instability" title="Link to this heading">#</a></h2>
-<p>Small pivots in LU factorization are numerically disastrous because they introduce massive numbers into the <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> factors. In finite-precision computer arithmetic, these large numbers can completely erase the original, smaller-scale information in the matrix, a phenomenon known as <strong>catastrophic cancellation</strong>. This leads to a computed factorization that is wildly inaccurate.</p>
-<p>A core principle in numerical analysis is that if an algorithm fails for a specific input, it will often produce large errors for inputs that are <em>close</em> to that failure point.</p>
-<p>We’ve already seen that the LU algorithm fails when a pivot is exactly zero (e.g., <span class="math notranslate nohighlight">\(a_{11}=0\)</span>). This leads us to a crucial question: what happens if a pivot is not exactly zero, but just very small?</p>
-<p>Let’s investigate with your example. The matrix</p>
+<section id="existence-does-not-guarantee-numerical-accuracy">
+<h2>Existence Does Not Guarantee Numerical Accuracy<a class="headerlink" href="#existence-does-not-guarantee-numerical-accuracy" title="Link to this heading">#</a></h2>
+<p>The results above concern exact arithmetic. Even when LU exists uniquely, rounding can make the computed factors inaccurate. Consider</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-A =
-\begin{pmatrix}
-0 &amp; 1 \\
-1 &amp; \pi
-\end{pmatrix}
+A_\epsilon=\begin{pmatrix}\epsilon&amp;1\\1&amp;\pi\end{pmatrix},
+\qquad \epsilon\neq0.
 \end{split}\]</div>
-<p>has no LU factorization because <span class="math notranslate nohighlight">\(a_{11}=0\)</span>. Now, consider a matrix that is nearly identical by letting the top-left entry be a very small, non-zero number <span class="math notranslate nohighlight">\(\epsilon\)</span>.</p>
-<section id="the-small-pivot-problem-in-action">
-<h3>The Small Pivot Problem in Action 🔬<a class="headerlink" href="#the-small-pivot-problem-in-action" title="Link to this heading">#</a></h3>
-<p>Let’s analyze the LU factorization of the perturbed matrix:</p>
+<p>Its exact factors are</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-A =
-\begin{pmatrix}
-    \epsilon &amp; 1 \\
-    1 &amp; \pi
-\end{pmatrix}
+L=\begin{pmatrix}1&amp;0\\1/\epsilon&amp;1\end{pmatrix},
+\qquad
+U=\begin{pmatrix}\epsilon&amp;1\\0&amp;\pi-1/\epsilon\end{pmatrix}.
 \end{split}\]</div>
-<p>The exact factorization is:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-L = \begin{pmatrix}
-    1 &amp; 0 \\ 1/\epsilon &amp; 1
-\end{pmatrix}, \quad
-U = \begin{pmatrix}
-    \epsilon &amp; 1 \\ 0 &amp; \pi - 1/\epsilon
-\end{pmatrix}
-\end{split}\]</div>
-<p>The first sign of trouble is immediate: a very small number, <span class="math notranslate nohighlight">\(\epsilon\)</span>, in the original matrix <span class="math notranslate nohighlight">\(A\)</span> has created very large numbers, <span class="math notranslate nohighlight">\(1/\epsilon\)</span>, in the factors <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span>. This amplification of magnitudes is a classic red flag for numerical instability.</p>
-</section>
-<section id="catastrophic-cancellation-in-floating-point-arithmetic">
-<h3>Catastrophic Cancellation in Floating-Point Arithmetic<a class="headerlink" href="#catastrophic-cancellation-in-floating-point-arithmetic" title="Link to this heading">#</a></h3>
-<p>Computers cannot store real numbers with infinite precision. They use <strong>floating-point arithmetic</strong>, which typically keeps about 16 significant decimal digits for any number (this is the IEEE 754 double-precision standard).</p>
-<p>Now, let’s examine the term <span class="math notranslate nohighlight">\(u_{22} = \pi - 1/\epsilon\)</span>.</p>
-<p>If <span class="math notranslate nohighlight">\(\epsilon\)</span> is very small, say <span class="math notranslate nohighlight">\(\epsilon = 10^{-18}\)</span>, then <span class="math notranslate nohighlight">\(1/\epsilon = 10^{18}\)</span>. The computer must calculate:</p>
-<div class="math notranslate nohighlight">
-\[3.1415926535... - 1,000,000,000,000,000,000\]</div>
-<p>To perform this subtraction, the computer must align the decimal points. All the significant digits of <span class="math notranslate nohighlight">\(\pi\)</span> are shifted so far to the right that they fall outside the 16-digit precision window. The smaller number is completely overwhelmed by the larger one.</p>
-<p>This effect is called <strong>swamping</strong> or <strong>catastrophic cancellation</strong>. The information contained in <span class="math notranslate nohighlight">\(\pi\)</span> is completely lost. The computer effectively calculates:</p>
-<div class="math notranslate nohighlight">
-\[\pi - 1/\epsilon \approx -1/\epsilon\]</div>
-</section>
-<section id="the-corrupted-result">
-<h3>The Corrupted Result<a class="headerlink" href="#the-corrupted-result" title="Link to this heading">#</a></h3>
-<p>This single roundoff error corrupts the entire factorization. The computed upper triangular matrix, let’s call it <span class="math notranslate nohighlight">\(\tilde{U}\)</span>, becomes:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\tilde{U} = \begin{pmatrix}
-\epsilon &amp; 1 \\ 0 &amp; -1/\epsilon
-\end{pmatrix}
-\end{split}\]</div>
-<p>If we now multiply our computed factors <span class="math notranslate nohighlight">\(\tilde{L}\)</span> (which is just <span class="math notranslate nohighlight">\(L\)</span>) and <span class="math notranslate nohighlight">\(\tilde{U}\)</span> back together, we don’t get our original matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\tilde{L}\tilde{U} =
-\begin{pmatrix}
-    1 &amp; 0 \\ 1/\epsilon &amp; 1
-\end{pmatrix}
-\begin{pmatrix}
-    \epsilon &amp; 1 \\ 0 &amp; -1/\epsilon
-\end{pmatrix}
-=
-\begin{pmatrix}
-    \epsilon &amp; 1 \\ 1 &amp; 0
-\end{pmatrix}
-\neq
-\begin{pmatrix}
-    \epsilon &amp; 1 \\
-    1 &amp; \pi
-\end{pmatrix}
-\end{split}\]</div>
-<p>The original <span class="math notranslate nohighlight">\(\pi\)</span> in the matrix has vanished and been replaced by a 0. Any solution to a linear system <span class="math notranslate nohighlight">\(Ax=b\)</span> based on this incorrect factorization will be completely wrong.</p>
-</section>
+<p>When <span class="math notranslate nohighlight">\(1/\epsilon\)</span> is much larger than <span class="math notranslate nohighlight">\(\pi\)</span>, rounding the subtraction can lose the contribution of <span class="math notranslate nohighlight">\(\pi\)</span>. For example, with <span class="math notranslate nohighlight">\(\epsilon=10^{-18}\)</span>, double-precision arithmetic rounds <span class="math notranslate nohighlight">\(\pi-1/\epsilon\)</span> to the same value as <span class="math notranslate nohighlight">\(-1/\epsilon\)</span>. The <span class="math notranslate nohighlight">\((2,2)\)</span> entry reconstructed from these rounded factor entries is then zero instead of <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+<p>The issue is the loss of a contribution that matters to reconstructing <span class="math notranslate nohighlight">\(A_\epsilon\)</span>. A small pivot or a large multiplier alone does not prove that a result is inaccurate, and the effect on a computed solution also depends on the right-hand side.</p>
+<p>Swapping the two rows puts <span class="math notranslate nohighlight">\(1\)</span> in the first pivot position and avoids the large multiplier in this example. The next sections explain <a class="reference internal" href="floating_point.html"><span class="std std-doc">floating-point arithmetic</span></a> and <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU with row pivoting</span></a>. These separate the question of whether a factorization exists from whether we can compute it accurately.</p>
 </section>
 </section>
 
@@ -848,24 +683,14 @@ U = \begin{pmatrix}
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-breakdown-a-zero-pivot-emerges">Tracing the Breakdown: A Zero Pivot Emerges 🕵️‍♀️</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lu-and-determinants">LU and Determinants</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-for-existence-leading-principal-minors">The Condition for Existence: Leading Principal Minors</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#theorem-existence-and-uniqueness-of-lu"><strong>Theorem: Existence and Uniqueness of LU</strong></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-theorem-to-the-example">Applying the Theorem to the Example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-invertible-matrix-with-a-zero-pivot">An Invertible Matrix with a Zero Pivot</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leading-principal-minors-and-pivots">Leading Principal Minors and Pivots</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-is-the-factorization-unique">When Is the Factorization Unique?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-changes-for-singular-matrices">What Changes for Singular Matrices?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-with-a-unit-lower-triangular-factor">Existence with a Unit Lower Triangular Factor</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generalizations">Generalizations</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-if-a-matrix-is-singular">What if a matrix is singular?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-instability">Numerical Instability 📉</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-small-pivot-problem-in-action">The Small Pivot Problem in Action 🔬</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#catastrophic-cancellation-in-floating-point-arithmetic">Catastrophic Cancellation in Floating-Point Arithmetic</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-corrupted-result">The Corrupted Result</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-does-not-guarantee-numerical-accuracy">Existence Does Not Guarantee Numerical Accuracy</a></li>
 </ul>
   </nav></div>
 

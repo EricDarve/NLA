@@ -1,333 +1,314 @@
 # The LU Decomposition Algorithm
 
-## Solving Triangular Systems: The Building Block
+An **LU factorization** writes a square matrix as
 
-The strategy of solving $Ax = b$ by factoring $A$ into $LU$ is only useful if solving the resulting triangular systems, $Ly = b$ and $Ux = y$, is significantly easier than solving the original problem. Fortunately, it is. The unique structure of triangular matrices—with zeros on one side of the diagonal—allows us to solve for the unknown variables one by one in a straightforward process.
+$$
+A=LU,
+$$
 
-### Lower Triangular Systems: Forward Substitution
+where $L$ is lower triangular and $U$ is upper triangular. We use the convention $l_{ii}=1$, so $L$ is **unit lower triangular**. This is also called the Doolittle convention.
 
-Consider a lower triangular system $Lx = b$. Let's write it out for a small $3 \times 3$ case to see the structure:
+Once the factors are available, solving $Ax=b$ requires two triangular solves:
+
+$$
+Ly=b,\qquad Ux=y.
+$$
+
+We first explain these solves, then derive LU as a sequence of rank-one updates. Throughout this section, we factor without interchanging rows. This requires nonzero pivots at the elimination steps; an invertible matrix need not satisfy this requirement.
+
+## Solving Triangular Systems
+
+### Forward Substitution
+
+For a lower triangular system $Ly=b$, the first equation determines $y_1$, the second determines $y_2$, and so on. For example,
 
 $$
 \begin{pmatrix}
-l_{11} & 0 & 0 \\
-l_{21} & l_{22} & 0 \\
-l_{31} & l_{32} & l_{33}
+l_{11}&0&0\\
+l_{21}&l_{22}&0\\
+l_{31}&l_{32}&l_{33}
 \end{pmatrix}
-\begin{pmatrix}
-x_1 \\
-x_2 \\
-x_3
-\end{pmatrix}
-=
-\begin{pmatrix}
-b_1 \\
-b_2 \\
-b_3
-\end{pmatrix}
+\begin{pmatrix}y_1\\y_2\\y_3\end{pmatrix}
+=\begin{pmatrix}b_1\\b_2\\b_3\end{pmatrix}
 $$
 
-Written as a system of equations, this is:
-1.  $l_{11}x_1 = b_1$
-2.  $l_{21}x_1 + l_{22}x_2 = b_2$
-3.  $l_{31}x_1 + l_{32}x_2 + l_{33}x_3 = b_3$
+gives
 
-The solution process unfolds naturally:
+$$
+\begin{aligned}
+y_1&=b_1/l_{11},\\
+y_2&=(b_2-l_{21}y_1)/l_{22},\\
+y_3&=(b_3-l_{31}y_1-l_{32}y_2)/l_{33}.
+\end{aligned}
+$$
 
--   From the first equation, we can immediately solve for $x_1$, as it's the only unknown: $x_1 = b_1 / l_{11}$.
--   Now that we know $x_1$, we can substitute it into the second equation, which now only has one unknown, $x_2$. We can solve for it: $x_2 = (b_2 - l_{21}x_1) / l_{22}$.
--   Finally, knowing $x_1$ and $x_2$, we substitute them into the third equation to find $x_3$.
+The general formula is
 
-This sequential process is called **forward substitution** because we solve for the variables in the forward order: $x_1, x_2, \dots, x_n$. The general formula for $x_i$, assuming we have already computed $x_1, \dots, x_{i-1}$, is:
+$$
+y_i=\frac{b_i-\sum_{j=1}^{i-1}l_{ij}y_j}{l_{ii}},
+\qquad i=1,\ldots,n.
+$$
 
-$$x_i = \frac{1}{l_{ii}} \Big( b_i - \sum_{j=1}^{i-1} l_{ij} x_j \Big)$$
+All entries on the right have already been computed. We need $l_{ii}\neq0$; for the unit lower triangular factor in LU, every denominator is one.
 
-This process is well-defined as long as all diagonal entries $l_{ii}$ are non-zero, which is guaranteed if $L$ is invertible.
+### Backward Substitution
+
+For an upper triangular system $Ux=y$, start with the last equation and work upward:
+
+$$
+x_i=\frac{y_i-\sum_{j=i+1}^n u_{ij}x_j}{u_{ii}},
+\qquad i=n,n-1,\ldots,1.
+$$
+
+This requires $u_{ii}\neq0$. In both formulas, an empty sum is zero. The order of computation proves correctness: each step solves one equation whose other unknowns have already been determined.
+
+The following functions assume square triangular NumPy arrays and matching one-dimensional right-hand sides. The output uses floating-point or complex storage even when the input right-hand side contains integers.
 
 ```python
 import numpy as np
 
 def forward_substitution(L: np.ndarray, b: np.ndarray) -> np.ndarray:
-    """
-    Solves the lower triangular system Lx = b using forward substitution.
-    """
+    """Solve Ly = b for a nonsingular lower triangular L."""
     n = L.shape[0]
-    x = np.zeros_like(b)
+    y = np.zeros(n, dtype=np.result_type(L.dtype, b.dtype, np.float64))
     for i in range(n):
-        x[i] = (b[i] - L[i, :i] @ x[:i]) / L[i, i]
+        if L[i, i] == 0:
+            raise np.linalg.LinAlgError("Zero diagonal in lower triangular solve")
+        y[i] = (b[i] - L[i, :i] @ y[:i]) / L[i, i]
+    return y
+
+
+def backward_substitution(U: np.ndarray, y: np.ndarray) -> np.ndarray:
+    """Solve Ux = y for a nonsingular upper triangular U."""
+    n = U.shape[0]
+    x = np.zeros(n, dtype=np.result_type(U.dtype, y.dtype, np.float64))
+    for i in range(n - 1, -1, -1):
+        if U[i, i] == 0:
+            raise np.linalg.LinAlgError("Zero diagonal in upper triangular solve")
+        x[i] = (y[i] - U[i, i + 1:] @ x[i + 1:]) / U[i, i]
     return x
 ```
 
+For complex matrices, these are ordinary matrix products; no conjugation is needed.
 
-### Upper Triangular Systems: Backward Substitution
+### Cost of the Two Solves
 
-The exact same logic applies to upper triangular systems of the form $Ux = b$, but the solution is found in the reverse order. Let's look at the $3 \times 3$ case:
+We count each real addition, subtraction, multiplication, or division as one **floating-point operation** (flop). A multiply followed by an addition counts as two flops, even if a processor performs them in one fused instruction.
+
+Row $i$ of forward substitution uses $i-1$ multiplications, $i-1$ subtractions, and one division. Thus a general triangular solve costs
 
 $$
-\begin{pmatrix}
-u_{11} & u_{12} & u_{13} \\
-0 & u_{22} & u_{23} \\
-0 & 0 & u_{33}
-\end{pmatrix}
-\begin{pmatrix}
-x_1 \\
-x_2 \\
-x_3
-\end{pmatrix}
+\sum_{i=1}^n\bigl(2(i-1)+1\bigr)=n^2
+$$
+
+flops. For unit lower triangular $L$, the divisions can be omitted, reducing the count to $n(n-1)$. Together, forward and backward substitution cost approximately $2n^2$ flops. Complex arithmetic has different constants but the same $O(n^2)$ cost.
+
+The factors depend only on $A$. If several right-hand sides must be solved with the same matrix, we reuse $L$ and $U$ and repeat only the triangular solves.
+
+## Deriving LU through Outer Products
+
+Recall the [outer-product view of matrix multiplication](matrix_matrix_multiplication.md):
+
+$$
+A=LU=\sum_{k=1}^n l_{:,k}u_{k,:}.
+$$
+
+Here $l_{:,k}$ is column $k$ of $L$ and $u_{k,:}$ is row $k$ of $U$. Each product has rank at most one. The algorithm determines one such column-row pair at a time, then factors the remainder.
+
+### The First Column and Row
+
+Partition $A$ as
+
+$$
+A=\begin{pmatrix}a_{11}&r\\c&B\end{pmatrix},
+$$
+
+where $r$ is a row vector and $c$ is a column vector. If $a_{11}\neq0$, block multiplication verifies
+
+$$
+\begin{pmatrix}a_{11}&r\\c&B\end{pmatrix}
 =
-\begin{pmatrix}
-b_1 \\
-b_2 \\
-b_3
-\end{pmatrix}
+\begin{pmatrix}1&0\\c/a_{11}&I\end{pmatrix}
+\begin{pmatrix}a_{11}&r\\0&S\end{pmatrix},
+\qquad
+S=B-\frac{c\,r}{a_{11}}.
 $$
 
-The system of equations is:
-1.  $u_{11}x_1 + u_{12}x_2 + u_{13}x_3 = b_1$
-2.  $u_{22}x_2 + u_{23}x_3 = b_2$
-3.  $u_{33}x_3 = b_3$
+The scalar $a_{11}$ is the first **pivot**, and the entries of $c/a_{11}$ are the **elimination multipliers**. The matrix $S$ is the [Schur complement](block_matrices.md) of the pivot.
 
-Here, we start from the bottom and work our way up:
--   The last equation has only one unknown, $x_3$, which we can solve for immediately: $x_3 = b_3 / u_{33}$.
--   Knowing $x_3$, we can plug it into the second-to-last equation to solve for $x_2$.
--   And so on, until we find $x_1$.
-
-This process is called **backward substitution**. The general formula for computing $x_i$, assuming we have already found $x_{n}, x_{n-1}, \dots, x_{i+1}$, is:
-
-$$x_i = \frac{1}{u_{ii}} \left( b_i - \sum_{j=i+1}^{n} u_{ij} x_j \right)$$
-
-
-### Computational Cost 💰
-
-Let's analyze the cost of forward substitution. To compute each $x_i$, the formula requires:
--   $i-1$ multiplications ($l_{ij} x_j$)
--   $i-1$ subtractions
--   $1$ division
-
-In numerical linear algebra, we often count a fused multiplication and addition/subtraction as a single **floating-point operation**, or **flop**. Thus, computing $x_i$ takes approximately $i-1$ flops for the sum and one flop for the division, for a total of $i$ flops. To find the total cost for solving the entire system, we sum this over all $i$:
-
-$$\text{Total Flops} = \sum_{i=1}^{n} (i-1) \approx \sum_{i=1}^{n} i = \frac{n(n+1)}{2} = \frac{1}{2}n^2 + O(n)$$
-*Note: A more precise count yields approximately $n^2$ flops.*
-
-The cost for backward substitution is identical. The key takeaway is that solving a triangular system of size $n$ costs approximately $n^2$ floating-point operations. We say the complexity is **$O(n^2)$**.
-
-This is remarkably efficient. As we will see, general methods for solving $Ax=b$ (like the LU factorization itself) cost $O(n^3)$ flops. For a large matrix, the difference between $n^2$ and $n^3$ is enormous. The cost of the two triangular solves is so low that it's considered negligible compared to the cost of the initial factorization. This is what makes factorization-based methods so powerful.
-
-Once you have the LU factorization of a matrix $A$, solving the linear system $Ax=b$ becomes a straightforward and efficient two-step process involving only triangular solves.
-
-This method transforms one difficult problem into two simple ones.
-
-## The Two-Step Solution Process
-
-The core idea is to substitute the factorization $A=LU$ into the original equation and strategically group the terms.
-
-1.  **Start with the original system:**
-
-    $$Ax = b$$
-
-2.  **Substitute the factorization:**
-   
-    $$(LU)x = b$$
-
-3.  **Group the terms.** Using the associative property of matrix multiplication, we can write:
-   
-    $$L(Ux) = b$$
-
-4.  **Introduce an intermediate vector.** Let's define a temporary vector $z$ such that:
-   
-    $$z = Ux$$
-
-    Substituting $z$ into the equation from step 3 gives us our first problem:
-
-    $$Lz = b$$
-
-This decouples the original system into two manageable triangular systems:
-
-**Step 1: Solve for $z$ using Forward Substitution**
-
-First, we solve the lower triangular system $Lz = b$ for the intermediate vector $z$. As we've seen, this is computationally inexpensive.
-
-**Step 2: Solve for $x$ using Backward Substitution**
-
-Once we have computed $z$, we solve the upper triangular system $Ux = z$ for our final solution vector $x$. This is also computationally inexpensive.
-
-This two-stage process—forward substitution followed by backward substitution—is the standard method for solving a linear system once its LU factorization is known.
-
-### Computational Cost 💰
-
-The efficiency of this approach is its main advantage. Assuming the LU factorization is already available:
-
-* **Cost of Step 1 (Forward Substitution):** Solving $Lz=b$ takes **$n^2$** flops.
-* **Cost of Step 2 (Backward Substitution):** Solving $Ux=z$ also takes **$n^2$** flops.
-
-The **total computational cost** to solve the system is the sum of these two steps: $n^2 + n^2 = \mathbf{2n^2}$ flops. Therefore, the overall complexity is $O(n^2)$.
-
-This provides the core motivation for LU factorization. While finding the factors $L$ and $U$ is an expensive $O(n^3)$ operation, once you have them, you can solve for any right-hand side $b$ very quickly. This is a massive advantage in applications where the same matrix $A$ must be used with many different $b$ vectors.
-
-
-## Two Views of Matrix Multiplication
-
-The product of two matrices can be viewed as a sum of **outer products**. This perspective is a powerful tool for developing and understanding matrix factorization algorithms.
-
-Let's consider the product of two $n \times n$ matrices, $A = BC$.
-
-**1. The Inner Product View (The Standard Method)**
-
-You're likely most familiar with the "inner product" or "dot product" view. To find the entry $a_{ij}$, you take the dot product of the **$i$-th row** of $B$ with the **$j$-th column** of $C$.
-
-$$a_{ij} = (\text{row } i \text{ of } B) \cdot (\text{column } j \text{ of } C) = \sum_{k=1}^n b_{ik}c_{kj}$$
-
-Here, we compute the final matrix $A$ one scalar entry at a time.
-
-**2. The Outer Product View**
-
-The outer product view reframes the entire calculation. Instead of a sum of scalars, we see the matrix $A$ as a **sum of matrices**. Specifically, it's the sum of the outer products of the columns of $B$ with the corresponding rows of $C$.
-
-$$A = \sum_{k=1}^n (\text{column } k \text{ of } B) (\text{row } k \text{ of } C) = \sum_{k=1}^n b_{:,k} c_{k,:}$$
-
-Each term in this sum, $b_{:,k} c_{k,:}$, is an outer product between a column vector (size $n \times 1$) and a row vector (size $1 \times n$). The result of each outer product is a full $n \times n$ matrix, often called a **rank-one matrix**. The final matrix $A$ is constructed by adding these rank-one matrices together.
-
-### A Concrete Example
-
-Let's see this in action for a simple $2 \times 2$ case where $A = BC$.
-
-$$A = \underbrace{\begin{pmatrix} b_{11} \\ b_{21} \end{pmatrix}}_{b_{:,1}} \underbrace{\begin{pmatrix} c_{11} & c_{12} \end{pmatrix}}_{c_{1,:}} + \underbrace{\begin{pmatrix} b_{12} \\ b_{22} \end{pmatrix}}_{b_{:,2}} \underbrace{\begin{pmatrix} c_{21} & c_{22} \end{pmatrix}}_{c_{2,:}}$$
-
-First, compute the two rank-one matrices:
-
-$$\begin{pmatrix} b_{11}c_{11} & b_{11}c_{12} \\ b_{21}c_{11} & b_{21}c_{12} \end{pmatrix} + \begin{pmatrix} b_{12}c_{21} & b_{12}c_{22} \\ b_{22}c_{21} & b_{22}c_{22} \end{pmatrix}$$
-
-Then, sum them to get the final result:
-
-$$A = \begin{pmatrix} b_{11}c_{11} + b_{12}c_{21} & b_{11}c_{12} + b_{12}c_{22} \\ b_{21}c_{11} + b_{22}c_{21} & b_{21}c_{12} + b_{22}c_{22} \end{pmatrix}$$
-
-As you can see, each entry matches the result from the standard inner product definition.
-
-### Why is This View Important? 🤔
-
-While it might seem more complex, the outer product perspective is crucial for algorithm design. It shows us how a matrix can be built up iteratively. Many factorization algorithms, including LU, are based on the idea of "peeling off" or subtracting these rank-one components from the original matrix one at a time to reveal its underlying structure. We will use this exact idea to derive the LU factorization algorithm.
-
-
-## Deriving the Algorithm via Outer Products
-
-The LU factorization algorithm elegantly computes the factors $L$ and $U$ by systematically eliminating entries in the matrix $A$. The outer product perspective provides a clear way to understand this process as a sequence of **rank-one updates**.
-
-The core idea is to build $L$ and $U$ iteratively. We start with the outer product formulation of the factorization:
-
-$$A = \sum_{k=1}^n l_{:,k} u_{k,:} = l_{:,1} u_{1,:} + l_{:,2} u_{2,:} + \dots + l_{:,n} u_{n,:}$$
-
-This expresses the matrix $A$ as a sum of rank-one matrices. Our goal is to determine one pair of vectors—a column of $L$ and a row of $U$—at each step.
-
-### Step 1: Determining $l_{:,1}$ and $u_{1,:}$
-
-Let's isolate the first term ($k=1$). Due to the triangular structures of $L$ and $U$:
-
-* The first column of $U$ is $(u_{11}, 0, \dots, 0)^T$.
-* The first row of $L$ is $(l_{11}, 0, \dots, 0)$.
-
-This structure simplifies the first column and first row of the product $LU$:
-
-* **First Column:** $a_{:,1} = (LU)_{:,1} = L u_{:,1} = l_{:,1}u_{11}$.
-* **First Row:** $a_{1,:} = (LU)_{1,:} = l_{1,:} U = l_{11}u_{1,:}$.
-
-We now have two equations, but more unknowns than constraints. To get a unique solution, we must impose a condition. The standard convention is to require the diagonal entries of $L$ to be 1. This is known as a **Doolittle factorization**.
-
-Setting $l_{11} = 1$:
-
-1.  From $a_{1,:} = l_{11}u_{1,:} = 1 \cdot u_{1,:}$, we immediately get the first row of $U$:
-   
-    $$u_{1,:} = a_{1,:}$$
-2.  From $u_{1,:}$, we know that its first element is $u_{11} = a_{11}$. Substituting this into the column equation $a_{:,1} = l_{:,1} u_{11}$, we can solve for the first column of $L$:
-   
-    $$l_{:,1} = \frac{a_{:,1}}{u_{11}} = \frac{a_{:,1}}{a_{11}}$$
-
-This step completely determines the first column of $L$ and the first row of $U$. This is only possible if our pivot element $a_{11} \neq 0$, an assumption we will revisit later.
-
-### Step 2: The Rank-One Update
-
-We have now successfully "peeled off" the first term of the outer product sum. We can define an updated matrix, $A^{(1)}$, which represents the remainder of the sum:
-
-$$A^{(1)} = A - l_{:,1} u_{1,:} = \sum_{k=2}^n l_{:,k} u_{k,:}$$
-
-By construction, the first row and first column of the matrix $l_{:,1}u_{1,:}$ are identical to the first row and column of $A$. Therefore, the first row and column of $A^{(1)}$ are zero.
+In outer-product terms, we have determined
 
 $$
-A^{(1)} = 
-\begin{pmatrix}
-0 & 0 & \dots & 0 \\
-0 & & & \\
-\vdots & & A' & \\
-0 & & & 
-\end{pmatrix}
+l_{:,1}=\begin{pmatrix}1\\c/a_{11}\end{pmatrix},
+\qquad
+u_{1,:}=\begin{pmatrix}a_{11}&r\end{pmatrix}.
 $$
 
-The problem now reduces to finding the LU factorization of the smaller $(n-1) \times (n-1)$ submatrix $A'$ in the lower-right corner.
+Subtracting their outer product leaves
 
-### The General Algorithm
+$$
+A-l_{:,1}u_{1,:}
+=\begin{pmatrix}0&0\\0&S\end{pmatrix}.
+$$
 
-We can repeat this process iteratively. At each step $k$ (from $1$ to $n-1$), we:
+The first row and column have been accounted for. Only the smaller matrix $S$ remains to be factored. If $S=L_SU_S$, then
 
-1.  **Identify** the $k$-th column of $L$ and $k$-th row of $U$ using the current updated matrix $A^{(k-1)}$.
-2.  **Perform** a rank-one update to compute the next matrix: $A^{(k)} = A^{(k-1)} - l_{:,k} u_{k,:}$.
+$$
+L=\begin{pmatrix}1&0\\c/a_{11}&L_S\end{pmatrix},
+\qquad
+U=\begin{pmatrix}a_{11}&r\\0&U_S\end{pmatrix}
+$$
 
-This process continues until all columns of $L$ and rows of $U$ have been determined.
+satisfy $A=LU$. Repeating this argument proves the recursive construction whenever the required pivots are nonzero.
 
-### Computational Cost 💰
+### Connection to Elimination and Projections
 
-Let's analyze the cost. At each step $k$, the main work is the rank-one update of the lower-right submatrix of size $(n-k) \times (n-k)$. This update requires approximately $2(n-k)^2$ floating-point operations.
+In Gaussian elimination, subtracting $(c_i/a_{11})$ times the first row from each lower row produces $S$ in the trailing block. LU records those multipliers in $L$ and the resulting pivot rows in $U$.
 
-To find the total cost, we sum this over all steps:
+The rank-one remainder also has an [oblique projection](projections.md) interpretation. Set $l=l_{:,1}$ and let $e_1$ be the first coordinate vector. Since $e_1^Tl=1$,
 
-$$\text{Total Flops} \approx \sum_{k=1}^{n-1} 2(n-k)^2 = 2 \sum_{j=1}^{n-1} j^2 \approx 2 \frac{(n-1)^3}{3} \approx \frac{2}{3}n^3$$
+$$
+P=I-le_1^T,\qquad P^2=P,
+\qquad PA=A-lu_{1,:}.
+$$
 
-The computational cost of computing the LU factorization is **$O(n^3)$**. This is significantly more expensive than the $O(n^2)$ triangular solves that follow, which is why we separate the factorization and solving stages.
+This projects onto the vectors whose first coordinate is zero, along the direction $l$. It is generally not an orthogonal projection. This remainder discards the pivot row after saving it in $U$; ordinary row elimination keeps that row.
 
+## The General Elimination Step
 
-## The Algorithm Step-by-Step
+Let $A^{(0)}=A$ and define the mathematical remainder after $k$ steps by
 
-The algorithm constructs the columns of $L$ and the rows of $U$ iteratively, from $k=1$ to $n$. Let's walk through the process for a general step $k$, assuming the first $k-1$ steps are complete. At this point, the first $k-1$ columns of $L$ and rows of $U$ are finalized.
+$$
+A^{(k)}=A-\sum_{j=1}^k l_{:,j}u_{j,:}.
+$$
 
-1.  **Determine Row $k$ of $U$**: The $k$-th row of $U$ is simply the $k$-th row of the *current*, modified matrix $A$. The elements $u_{kj}$ for $j < k$ are zero because $U$ is upper triangular.
-   
-    $$u_{k, k:n} = a_{k, k:n}$$
+Its first $k$ rows and columns are zero. At step $k$, use the trailing block of $A^{(k-1)}$ to compute
 
-2.  **Determine Column $k$ of $L$**: The $k$-th column of $L$ is found by taking the $k$-th column of the current matrix $A$ and scaling it by the diagonal element $a_{kk}$, which we call the **pivot**. By convention, we set $l_{kk}=1$.
-   
-    $$l_{k:n, k} = \frac{a_{k:n, k}}{a_{kk}}$$
+$$
+\begin{aligned}
+u_{kj}&=a_{kj}^{(k-1)}, &&j=k,\ldots,n,\\
+l_{kk}&=1,\\
+l_{ik}&=a_{ik}^{(k-1)}/u_{kk}, &&i=k+1,\ldots,n.
+\end{aligned}
+$$
 
-3.  **Update the Submatrix (Schur Complement)**: This is the core of the algorithm. We form the outer product of the just-computed vectors ($l_{:,k}$ and $u_{k,:}$) and subtract it from the matrix $A$. This update effectively zeroes out the $k$-th row and column's influence on the rest of the matrix, leaving a smaller problem to solve in the next iteration.
-   
-    $$A \leftarrow A - l_{:,k} u_{k,:}$$
-    Specifically, this update only affects the submatrix to the lower right of the pivot, from row and column $k+1$ to $n$.
+The remaining entries are updated by
 
-This loop continues until all columns of $L$ and rows of $U$ are determined. In a typical implementation, the computed values for $L$ (below the diagonal) and $U$ (on and above the diagonal) are stored directly in the matrix $A$ to save space.
+$$
+a_{ij}^{(k)}=a_{ij}^{(k-1)}-l_{ik}u_{kj},
+\qquad i,j=k+1,\ldots,n.
+$$
 
-### In-Place LU Factorization (no pivoting)
+Thus the work at each step is a division to obtain the multipliers, followed by a rank-one update of the trailing block. The pivot is taken from the **current remainder**, not from the original diagonal of $A$.
 
-The factors are stored in A: the strict lower triangle holds L (with unit diagonal), and the upper triangle holds U.
+At $k=n$, only $u_{nn}$ remains to be read off; there are no multipliers or trailing entries to update.
+
+## In-Place Implementation
+
+We can store both factors in one array:
+
+- The entries on and above the diagonal hold $U$.
+- The entries below the diagonal hold the multipliers in $L$.
+- The unit diagonal of $L$ is implicit.
+
+This packed array is different from the mathematical remainder $A^{(k)}$. After storing the multipliers and pivot row, we update **only the trailing block**, so the factors already computed are preserved.
 
 ```python
-import numpy as np
 def lu_inplace(A: np.ndarray) -> np.ndarray:
+    """Overwrite a square floating-point or complex array with packed LU.
+
+    No row pivoting is performed. Return the same array.
     """
-    Performs in-place LU factorization (Doolittle, no pivoting) and overwrites the input matrix A.
-    On exit:
-      - L is in the strict lower triangle with implicit unit diagonal
-      - U is in the upper triangle (including diagonal)
-    Assumes:
-      - All pivots are nonzero
-      - No pivoting is performed (numerically unstable for some matrices)
-    """
+    if A.ndim != 2 or A.shape[0] != A.shape[1]:
+        raise ValueError("A must be square")
+    if not np.issubdtype(A.dtype, np.inexact):
+        raise TypeError("A must have a floating-point or complex dtype")
+
     n = A.shape[0]
-    for k in range(n-1):
-        # Update the k-th column of L
-        A[k+1:n, k] /= A[k, k]
-        # Rank-one update of the trailing submatrix
-        A[k+1:n, k+1:n] -= np.outer(A[k+1:n, k], A[k, k+1:n])
+    for k in range(n - 1):
+        if A[k, k] == 0:
+            raise np.linalg.LinAlgError("Zero pivot: row pivoting may be needed")
+        A[k + 1:, k] /= A[k, k]
+        A[k + 1:, k + 1:] -= np.outer(A[k + 1:, k], A[k, k + 1:])
+    return A
 ```
 
-### The Pivot Problem: When Things Go Wrong 🚧
+The function modifies its argument; pass a copy to retain the original matrix. Its zero-pivot check detects division by zero, but does not guarantee accuracy when pivots are nonzero. We examine the need for pivoting later in this chapter.
 
-The algorithm has a critical weak point: the division by the pivot element $a_{kk}$ in step 2.
+## A Worked Factorization and Solve
 
-The algorithm **fails** if at any step $k$, the pivot element $a_{kk}$ of the *current* matrix is zero. This would require division by zero, bringing the entire process to a halt.
+Consider
+
+$$
+A=\begin{pmatrix}2&1&1\\4&3&3\\8&7&9\end{pmatrix}.
+$$
+
+The first pivot is $2$, with multipliers $l_{21}=2$ and $l_{31}=4$. The trailing block becomes
+
+$$
+\begin{pmatrix}3&3\\7&9\end{pmatrix}
+-\begin{pmatrix}2\\4\end{pmatrix}\begin{pmatrix}1&1\end{pmatrix}
+=\begin{pmatrix}1&1\\3&5\end{pmatrix}.
+$$
+
+The second pivot is $1$, so $l_{32}=3$. The last pivot is $5-3\cdot1=2$. Therefore,
+
+$$
+L=\begin{pmatrix}1&0&0\\2&1&0\\4&3&1\end{pmatrix},
+\qquad
+U=\begin{pmatrix}2&1&1\\0&1&1\\0&0&2\end{pmatrix}.
+$$
+
+For $b=(3,7,17)^T$, forward substitution gives $y=(3,1,2)^T$, and backward substitution gives $x=(1,0,1)^T$.
+
+Here is the complete computation using the functions above:
+
+```python
+A = np.array([[2., 1., 1.],
+              [4., 3., 3.],
+              [8., 7., 9.]])
+b = np.array([3, 7, 17])
+
+packed = lu_inplace(A.copy())
+L = np.tril(packed, k=-1) + np.eye(A.shape[0])
+U = np.triu(packed)
+y = forward_substitution(L, b)
+x = backward_substitution(U, y)
+
+assert np.allclose(L @ U, A)
+assert np.allclose(A @ x, b)
+```
+
+## Cost of LU Factorization
+
+For a dense real matrix, step $k$ uses $n-k$ divisions for the multipliers and $2(n-k)^2$ flops for the trailing update. Summing gives
+
+$$
+\begin{aligned}
+\text{factorization cost}
+&=\sum_{k=1}^{n-1}\bigl((n-k)+2(n-k)^2\bigr)\\
+&=\frac{2}{3}n^3+O(n^2).
+\end{aligned}
+$$
+
+For $s$ right-hand sides, factoring once and reusing the factors costs approximately
+
+$$
+\frac{2}{3}n^3+2sn^2
+$$
+
+flops. The distinction is important: factorization costs $O(n^3)$, while each additional solve costs $O(n^2)$.
+
+## What If a Pivot Is Zero?
+
+The no-pivoting algorithm divides by $u_{kk}$ for $k=1,\ldots,n-1$. If one of these pivots is zero, the stated algorithm stops. This can happen even when $A$ is invertible. For example,
+
+$$
+A=\begin{pmatrix}0&1\\1&0\end{pmatrix}
+$$
+
+has determinant $-1$, but its first pivot is zero. Swapping the two rows removes the difficulty. Row interchanges lead to a factorization $PA=LU$, where $P$ is a permutation matrix; the triangular solves then use $Ly=Pb$ and $Ux=y$.
+
+A zero **last** pivot is different: no elimination step divides by it. LU may still be completed, but $U$ is singular and backward substitution cannot produce a unique solution for arbitrary $b$. More generally, stopping on a zero pivot does not rule out all LU factorizations of a singular matrix.
+
+The [next section](existence_lu.md) establishes the conditions for existence and uniqueness. We then study floating-point arithmetic and [row pivoting](lu_pivoting.md), including why nonzero pivots alone do not ensure an accurate computation.
