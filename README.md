@@ -8,9 +8,14 @@ The book was written using Markdown and [Jupyter Book](https://jupyterbook.org/e
 
 ## Setup
 
+Create a local build environment with Python 3.12:
+
+```sh
+python3.12 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
 ```
-$ pip install -r requirements.txt
-```
+
+The Makefile uses the tools in `.venv/bin` directly; activating the environment is optional. This avoids accidentally using an older global `jupyter-book` installation. The book requires Jupyter Book 1.x, as pinned in `requirements.txt`. To use an environment elsewhere, pass `VENV=/path/to/environment` to `make`.
 
 ## Building and publishing
 
@@ -40,10 +45,10 @@ This rebuilds from scratch and force-pushes `_build/html` to the `gh-pages` bran
 `make pdf` uses the `pdfhtml` builder, which renders the book to HTML and then prints it from a headless Chromium driven by [Playwright](https://playwright.dev/python/). Playwright is installed by `requirements.txt`, but its browser has to be downloaded once:
 
 ```
-$ playwright install chromium
+$ .venv/bin/playwright install chromium
 ```
 
-Equations occasionally render poorly through this path. `jupyter-book build ./ --builder pdflatex` typesets the math properly but needs a LaTeX installation.
+Equations occasionally render poorly through this path. `.venv/bin/jupyter-book build ./ --builder pdflatex` typesets the math properly but needs a LaTeX installation.
 
 ## Repo layout
 

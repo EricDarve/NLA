@@ -9,6 +9,7 @@ copyright: "2026"
 # Files and folders that are kept in the repo but are not part of the book.
 exclude_patterns:
   - README.md
+  - .venv/**        # Local Python build environment, not book content
   - manimations/*      # Manim sources for the animations; rendered separately
   - addl_material/*    # Notes not listed in _toc.yml
 

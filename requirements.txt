@@ -1,5 +1,5 @@
 # Build requirements for the Jupyter Book.
-#   pip install -r requirements.txt
+#   .venv/bin/python -m pip install -r requirements.txt
 
 # Pinned to the 1.x line on purpose. Jupyter Book 2.x is a ground-up rewrite on
 # the Node-based MyST engine: it drops Sphinx entirely, so sphinx-proof, the
@@ -8,6 +8,8 @@
 jupyter-book>=1.0.4,<2
 
 sphinx-proof      # {prf:theorem}, {prf:definition}, ... directives used in content/
+ipykernel         # Executes Python code cells during the book build
+numpy            # Numerical examples executed in the book
 ghp-import        # Publishes _build/html to the gh-pages branch
 
 # Only needed for `make pdf`. The pdfhtml builder prints the book from a
