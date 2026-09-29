@@ -248,36 +248,114 @@ $$
 \end{aligned}
 $$
 
-**Forward error is what we ultimately want to control:** it tells us how accurate our answer is. But we usually do not know $x$, and directly tracking how rounding errors affect the final answer is difficult. Instead, we first derive a backward-error bound, which is often easier to obtain. Sensitivity analysis then relates this change in the input to the forward error in the solution.
+**Forward error is what we ultimately want to control:** it tells us how accurate our answer is.
 
 ### Backward Error
 
-The **backward error** measures how much we must change the input data to make the computed answer exact. For a linear system, the data are $A$ and $b$. We define the relative backward error $\eta(\widehat{x})$ as the smallest $\eta$ for which
+Directly estimating forward error is difficult: the exact solution $x$ is usually unknown, and tracking how rounding errors propagate to the final answer can become complicated. **Backward error is much easier to compute or bound.** It can be determined from the known inputs $A$ and $b$ and the computed answer $\widehat{x}$, by measuring how well that answer satisfies the equations.
+
+This is the reason for taking a detour through backward error. First, bound the input changes needed to explain the computed answer. Then use the problem's sensitivity to bound the resulting change in the solution. Together, these two steps give a forward-error bound.
+
+**1. Interpret the computed answer as an exact solution.** The computed vector $\widehat{x}$ generally does not satisfy $A\widehat{x}=b$ exactly. Backward error starts by keeping $\widehat{x}$ fixed and considering changes to the input data, $A$ and $b$, that would make it an exact solution.
+
+Write the changed inputs as $A+E$ and $b+e$. The matrix $E$ changes the coefficients of the system, and the vector $e$ changes the right-hand side. They must satisfy
 
 $$
-(A+E)\widehat{x}=b+e,
-\qquad
-\|E\|\le\eta\|A\|,
-\qquad
-\|e\|\le\eta\|b\|.
+(A+E)\widehat{x}=b+e.
 $$
 
-Thus $\eta(\widehat{x})=10^{-8}$ means that relative changes of at most $10^{-8}$ in the data suffice to make $\widehat{x}$ exact.
+This equation is exact: $\widehat{x}$ solves the system with the changed inputs. It is a way to interpret the answer already computed; it does not require running the algorithm again.
 
-We can compute this quantity without knowing the true solution $x$. First form the **residual**, which measures how far the computed answer is from satisfying the equations:
+Such changes always exist. For example, keeping $A$ unchanged and replacing $b$ by $A\widehat{x}$ makes the equation hold. What matters is **how much the inputs need to change**. Small changes mean that the computed answer solves a problem close to the one we intended to solve.
+
+**2. Measure the size of a particular change.** For a chosen pair $(E,e)$, the relative changes in the two inputs are $\|E\|/\|A\|$ and $\|e\|/\|b\|$. Dividing by the input norms makes each change relative to the size of the data it modifies. To describe the pair by one number, take the larger relative change:
+
+$$
+\tau=\max\left\{\frac{\|E\|}{\|A\|},
+\frac{\|e\|}{\|b\|}\right\}.
+$$
+
+For example, if the two relative changes are $10^{-8}$ and $3\times10^{-8}$, then $\tau=3\times10^{-8}$. Both inputs have changed by at most this fraction of their original size.
+
+**3. Find the smallest change that works.** Many pairs $(E,e)$ can make $\widehat{x}$ exact, and they can have different sizes. The **relative backward error** $\eta(\widehat{x})$ is the smallest value of $\tau$ among all pairs that satisfy the perturbed equation:
+
+$$
+\boxed{
+\eta(\widehat{x})=
+\min_{\substack{E,e}} \;
+\max\left\{\frac{\|E\|}{\|A\|},
+\frac{\|e\|}{\|b\|}\right\}, \; \text{with} \; (A+E)\widehat{x}=b+e \,.
+}
+$$
+
+The minimum is taken over the pair: changes to $A$ and $b$ can work together to make $\widehat{x}$ exact. Thus $\eta(\widehat{x})=10^{-8}$ means that relative changes of at most $10^{-8}$ in both inputs suffice, and no smaller common bound is possible. A different pair may have much larger changes; $\eta$ measures the best possible pair.
+
+**4. Compute the minimum from the residual.** There is no need to search over possible perturbations or to know the true solution $x$. Form the **residual**
 
 $$
 r=b-A\widehat{x}.
 $$
 
-Then the [relative backward error](https://eprints.maths.manchester.ac.uk/2562/1/paper.pdf#page=6) is exactly
+It measures how far $\widehat{x}$ is from satisfying the original equations. The [relative backward error](https://eprints.maths.manchester.ac.uk/2562/1/paper.pdf#page=6) is exactly
 
 $$
 \boxed{\eta(\widehat{x})=
 \frac{\|r\|}{\|A\|\,\|\widehat{x}\|+\|b\|}.}
 $$
 
-The denominator accounts for changes in both inputs: a perturbation to $A$ acts on $\widehat{x}$, while a perturbation to $b$ changes the right-hand side directly. This scaled residual measures the size of the input changes needed to explain the error in the equations.
+The denominator accounts for both ways to correct the residual: changing $A$ affects the product $A\widehat{x}$, while changing $b$ affects the right-hand side directly. The formula gives the smallest common relative size of these changes.
+
+The proof has two parts: every pair that makes $\widehat{x}$ exact must be at least this large, and a specific pair achieves this size.
+
+````{prf:proof} Residual Formula for Backward Error.
+Let $d=\|A\|\,\|\widehat{x}\|+\|b\|$, which is positive because $b\ne0$.
+
+**Lower bound.** For any pair $(E,e)$ satisfying $(A+E)\widehat{x}=b+e$, set
+
+$$
+\tau=\max\left\{\frac{\|E\|}{\|A\|},
+\frac{\|e\|}{\|b\|}\right\}.
+$$
+
+The perturbed equation gives $r=E\widehat{x}-e$. Hence
+
+$$
+\begin{aligned}
+\|r\|&\le\|E\|\,\|\widehat{x}\|+\|e\|\\
+&\le\tau\bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr)
+=\tau d.
+\end{aligned}
+$$
+
+Every such pair therefore has $\tau\ge\|r\|/d$, so $\eta(\widehat{x})\ge\|r\|/d$.
+
+**Attaining the bound.** If $\widehat{x}\ne0$, choose
+
+$$
+E=\frac{\|A\|}{d}\,\frac{r\widehat{x}^{H}}{\|\widehat{x}\|},
+\qquad
+e=-\frac{\|b\|}{d}\,r.
+$$
+
+Here $H$ denotes conjugate transpose, or ordinary transpose for real vectors. These choices satisfy
+
+$$
+E\widehat{x}-e
+=\frac{\|A\|\,\|\widehat{x}\|+\|b\|}{d}\,r=r,
+$$
+
+so $(A+E)\widehat{x}=b+e$. In the Euclidean norm, the outer product satisfies $\|r\widehat{x}^H\|_2=\|r\|_2\,\|\widehat{x}\|_2$. Consequently,
+
+$$
+\frac{\|E\|}{\|A\|}
+=\frac{\|e\|}{\|b\|}
+=\frac{\|r\|}{d}.
+$$
+
+This pair attains the lower bound, proving the formula. If $\widehat{x}=0$, then $r=b$ and every admissible pair must have $e=-b$. Taking $E=0$ gives $\eta(0)=1=\|r\|/d$, so the formula also holds in this case.
+````
+
+The unit roundoff $u$ sets the scale of relative error in a single rounded arithmetic operation. It provides a natural benchmark for judging the backward error of an algorithm.
 
 ```{admonition} Key definition: Backward stability
 :class: important
@@ -285,7 +363,7 @@ The denominator accounts for changes in both inputs: a perturbation to $A$ acts 
 **A method is backward stable if it guarantees $\eta(\widehat{x})$ of order the unit roundoff $u$**, allowing for a modest factor depending on the dimension.
 ```
 
-Computing the residual costs $O(n^2)$ operations for a dense system. A small backward error tells us that the computed answer solves a nearby problem. To decide whether it is close to the answer we wanted, we must ask how much the solution changes when the data change.
+Backward error describes one computed answer; backward stability requires a guarantee for the method across its intended inputs. Computing the residual costs $O(n^2)$ operations for a dense system, so it provides a practical check on an individual answer. A small backward error tells us that the computed answer solves a nearby problem. To decide whether it is close to the answer we wanted, we must ask how much the solution changes when the data change.
 
 ## Sensitivity: Relating Backward Error to Forward Error
 
@@ -303,11 +381,12 @@ Suppose backward error analysis shows that $\widehat{x}=f(d+\delta d)$. For diff
 
 $$
 \underbrace{\|\widehat{x}-x\|}_{\text{forward error}}
-\le S_f(d)\underbrace{\|\delta d\|}_{\text{backward perturbation}}
-+o(\|\delta d\|).
+\le S_f(d) 
+\hspace{-1.5em} \underbrace{\|\delta d\|}_{\text{backward perturbation}} \hspace{-1.5em} 
++ o(\|\delta d\|).
 $$
 
-Thus, to first order,
+The remainder $o(\|\delta d\|)$ becomes negligible compared with $\|\delta d\|$ as the perturbation tends to zero. Thus, to first order,
 
 $$
 \boxed{\text{forward error}\ \lesssim\ \text{sensitivity}\times\text{backward error}.}
@@ -325,9 +404,31 @@ Sensitivity is a property of the problem $f$ at the input $d$. Backward stabilit
 
 ## Conditioning of Linear Systems
 
-We now apply this framework to $Ax=b$. The input data are $A$ and $b$, and the output is $x=A^{-1}b$. We first relate the residual to the solution error, then prove a bound for perturbations in both inputs.
+For $Ax=b$, the input data are $A$ and $b$, and the output is $x=A^{-1}b$. The matrix condition number measures the sensitivity relevant to this problem. Combining it with backward error gives a simple first-order estimate of solution error, followed by a rigorous bound that removes the approximation.
 
-### The Condition Number and Backward Error
+### The Matrix Condition Number
+
+With $A$ fixed, changing $b$ by $\delta b$ changes the solution by $A^{-1}\delta b$. Thus $\|A^{-1}\|$ bounds the amplification of absolute changes. Converting to relative changes uses $\|b\|/\|x\|\le\|A\|$. This leads to the **matrix condition number**
+
+$$
+\boxed{\kappa(A)=\|A\|\,\|A^{-1}\|.}
+$$
+
+The **condition number** satisfies $\kappa(A)\ge1$, since $1=\|I\|\le\|A\|\,\|A^{-1}\|$. In the 2-norm, the SVD gives
+
+$$
+\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+$$
+
+Geometrically, $\kappa_2(A)$ is the ratio of the largest to the smallest stretching of a unit vector by $A$. A large value means that small relative changes in the data can produce large relative changes in the solution.
+
+For example, take $A=\operatorname{diag}(1,\epsilon)$ with $0<\epsilon\ll1$, and $b=(1,0)^T$. The solution is $x=(1,0)^T$. Changing $b$ by $(0,\epsilon)^T$ changes the solution by $(0,1)^T$: a relative input change of $\epsilon$ causes a relative solution change of 1. Here $\kappa_2(A)=1/\epsilon$.
+
+Row permutations preserve singular values, so $\kappa_2(PA)=\kappa_2(A)$. Pivoting changes the elimination process; it does not remove the sensitivity of the original problem.
+
+### A First-Order Forward-Error Estimate
+
+The goal is to bound forward error using two quantities: the backward error $\eta(\widehat{x})$ of the computed answer and the condition number $\kappa(A)$ of the problem.
 
 Let $\delta x=\widehat{x}-x$. Since $r=b-A\widehat{x}$ and $Ax=b$,
 
@@ -344,12 +445,6 @@ $$
 \bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr).
 $$
 
-Define the **matrix condition number** by
-
-$$
-\boxed{\kappa(A)=\|A\|\,\|A^{-1}\|.}
-$$
-
 Substituting the residual identity and using $\|b\|\le\|A\|\,\|x\|$ yields
 
 $$
@@ -358,32 +453,42 @@ $$
 \left(1+\frac{\|\widehat{x}\|}{\|x\|}\right).
 $$
 
-```{admonition} Key result: Conditioning and backward error
+This inequality is rigorous, but its right-hand side still contains the unknown $\|x\|$. A simple estimate follows if we assume that $\|\widehat{x}\|\approx\|x\|$: the factor in parentheses is then approximately 2.
+
+```{admonition} Key result: First-order forward-error estimate
 :class: important
 
-Here the product **$\kappa(A)\eta(\widehat{x})$** connects the problem's sensitivity to the algorithm's backward error. When $\widehat{x}$ is close to $x$, the factor in parentheses is close to 2, giving the first-order bound
+Under this assumption,
 
 $$
 \frac{\|\widehat{x}-x\|}{\|x\|}
 \lesssim 2\kappa(A)\eta(\widehat{x}).
 $$
+
+This is an approximate estimate. It identifies **$\kappa(A)\eta(\widehat{x})$** as the quantity that controls forward error: the problem's sensitivity multiplies the algorithm's backward error.
 ```
 
-The **condition number** satisfies $\kappa(A)\ge1$, since $1=\|I\|\le\|A\|\,\|A^{-1}\|$. In the 2-norm, the SVD gives
+### A Rigorous Forward-Error Bound
+
+The first-order estimate assumes $\|\widehat{x}\|\approx\|x\|$. A rigorous bound removes this assumption and gives a condition that can be checked using $\kappa(A)$ and $\eta(\widehat{x})$:
+
+```{admonition} Key result: From backward error to forward error
+:class: important
+
+**If $\kappa(A)\eta(\widehat{x})<1$, then**
 
 $$
-\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+\frac{\|\widehat{x}-x\|}{\|x\|}
+\le\frac{2\kappa(A)\eta(\widehat{x})}
+{1-\kappa(A)\eta(\widehat{x})}.
 $$
 
-Geometrically, $\kappa_2(A)$ is the ratio of the largest to the smallest stretching of a unit vector by $A$. A large value means that small relative changes in the data can produce large relative changes in the solution.
+This is a rigorous bound under the stated condition. Its numerator is the same as in the first-order estimate; the denominator $1-\kappa(A)\eta(\widehat{x})$ accounts for the effect of finite perturbations. When $\kappa(A)\eta(\widehat{x})\ll1$, that denominator is close to 1, and the bound reduces to the earlier estimate to first order. This justifies using the first-order estimate when that product is small.
+```
 
-For example, take $A=\operatorname{diag}(1,\epsilon)$ with $0<\epsilon\ll1$, and $b=(1,0)^T$. The solution is $x=(1,0)^T$. Changing $b$ by $(0,\epsilon)^T$ changes the solution by $(0,1)^T$: a relative input change of $\epsilon$ causes a relative solution change of 1. Here $\kappa_2(A)=1/\epsilon$.
+The factor 2 comes from allowing relative changes of size $\eta$ in each of $A$ and $b$.
 
-Row permutations preserve singular values, so $\kappa_2(PA)=\kappa_2(A)$. Pivoting changes the elimination process; it does not remove the sensitivity of the original problem.
-
-### A General Forward-Error Bound
-
-We next consider finite perturbations $E$ and $e$ in $(A+E)\widehat{x}=b+e$. The first step is to show that $A+E$ remains invertible when $E$ is sufficiently small. The following lemma supplies both invertibility and a bound on the inverse.
+To prove the bound, consider the perturbed system $(A+E)\widehat{x}=b+e$. Changes in $A$ also change its inverse, so we first need to control $\|(A+E)^{-1}\|$. The following lemma provides this control and explains where the denominator comes from.
 
 ````{prf:lemma} Banach Lemma
 :label: lem:banach
@@ -408,6 +513,8 @@ $$
 =\frac{1}{1-\|X\|}.
 $$
 ````
+
+Applying the lemma with $X=A^{-1}E$ gives a bound in terms of the perturbations $E$ and $e$. Choosing a pair that minimizes backward error will then give the result in terms of $\eta(\widehat{x})$.
 
 ````{prf:theorem} Perturbation Bound for Linear Systems
 :label: thm:perturbation_bound
@@ -446,13 +553,8 @@ $$
 Use $\|b\|\le\|A\|\,\|x\|$ and $\kappa(A)=\|A\|\,\|A^{-1}\|$ to obtain the stated bound.
 ````
 
-To express the result using our backward error, choose perturbations with
-$\|E\|/\|A\|\le\eta(\widehat{x})$ and $\|e\|/\|b\|\le\eta(\widehat{x})$. Substitution gives the following bound.
-
-```{admonition} Key result: From backward error to forward error
-:class: important
-
-**If $\kappa(A)\eta(\widehat{x})<1$, then**
+For a perturbation pair attaining the minimum in the definition of backward error, both
+$\|E\|/\|A\|\le\eta(\widehat{x})$ and $\|e\|/\|b\|\le\eta(\widehat{x})$. When $\kappa(A)\eta(\widehat{x})<1$, the theorem applies to this pair. Substituting these inequalities gives the stated bound:
 
 $$
 \frac{\|\widehat{x}-x\|}{\|x\|}
@@ -460,20 +562,19 @@ $$
 {1-\kappa(A)\eta(\widehat{x})}.
 $$
 
-When $\kappa(A)\eta(\widehat{x})\ll1$, the denominator is close to 1, recovering the first-order estimate above. Thus a small product of condition number and backward error guarantees a small relative forward error.
-```
-
-The factor 2 comes from allowing relative changes of size $\eta$ in each of $A$ and $b$.
-
 ## Backward Error of LU and the Role of Cancellation
 
-The preceding results apply to any computed solution. We now ask what backward error LU produces. Let $\widehat{L}$ and $\widehat{U}$ be the computed factors; their hats distinguish them from exact factors.
+The residual formula measures the backward error of an answer already computed. To understand the reliability of LU, we also need a bound on the backward error its rounding errors can produce. Combined with the preceding forward-error bound, this will connect the factorization to solution accuracy.
+
+Let $\widehat{L}$ and $\widehat{U}$ be the computed factors; their hats distinguish them from exact factors.
 
 The following theorem gives separate bounds for the factorization and the complete solve. We state the bounds for real arithmetic; complex arithmetic has analogous bounds with different constants.
 
 ````{prf:theorem} Backward Error of LU Factorization and Solution
 :label: thm:backward_error_lu
-Assume real arithmetic with rounding to nearest, no overflow or underflow, and $3nu<1$. If LU with partial pivoting completes, its computed factors satisfy
+Assume real arithmetic with rounding to nearest, no overflow or underflow, and $3nu<1$.
+
+**Factorization.** If LU with partial pivoting completes, its computed factors satisfy
 
 $$
 PA+F=\widehat{L}\widehat{U},
@@ -483,7 +584,7 @@ $$
 
 where $\gamma_m=mu/(1-mu)$.
 
-If the computed $\widehat{U}$ has no zero diagonal entries, the solution $\widehat{x}$ obtained by forward and backward substitution satisfies
+**Complete solve.** If the computed $\widehat{U}$ has no zero diagonal entries, the solution $\widehat{x}$ obtained by forward and backward substitution satisfies
 
 $$
 (A+E)\widehat{x}=b,
@@ -491,10 +592,12 @@ $$
 |PE|\le\gamma_{3n}|\widehat{L}|\,|\widehat{U}|.
 $$
 
+Here $F$ accounts for errors in the factorization, while $E$ accounts for errors in both the factorization and the two triangular solves.
+
 Absolute values and inequalities are entrywise. The product $|\widehat{L}|\,|\widehat{U}|$ is an ordinary matrix product of nonnegative matrices. The factor $P$ in $|PE|$ puts the perturbation in the same row ordering as the factors.
 ````
 
-The solve result fits our definition of $\eta(\widehat{x})$ with the perturbations $E$ and $e=0$. Since $\eta(\widehat{x})$ is the smallest admissible relative perturbation, this particular choice gives $\eta(\widehat{x})\le\|E\|/\|A\|$. Taking norms in the theorem and using $\|PE\|=\|E\|$ yields
+The theorem supplies one admissible pair $(E,0)$. For this pair, the maximum of the two relative changes is $\|E\|/\|A\|$. Since $\eta(\widehat{x})$ is the minimum over all admissible pairs, $\eta(\widehat{x})\le\|E\|/\|A\|$. The theorem's pair need not attain the minimum. Taking norms in the theorem and using $\|PE\|=\|E\|$ yields
 
 $$
 \boxed{
@@ -587,7 +690,7 @@ Thus $u_{in}=2^{i-1}$ and $\rho_n=2^{n-1}$: the growth is exponential in the dim
 
 ### A Right-Hand Side That Produces a Large Backward Error
 
-We can make the **actual backward error** large for this same matrix. Assume binary arithmetic with rounding to nearest, unit roundoff $u$, and no overflow or underflow. Choose
+Large element growth alone does not establish that a computed solution has a large error. To show that **actual backward error** can be large, choose a right-hand side and follow the rounding in the solve. Assume binary arithmetic with rounding to nearest, unit roundoff $u$, and no overflow or underflow. Choose
 
 $$
 b=e_1+\delta_n e_n,
@@ -689,7 +792,7 @@ for n in (10, 20, 30, 40, 50, 60, 70):
     eta = np.linalg.norm(r) / (
         np.linalg.norm(A, 2) * np.linalg.norm(xhat) + np.linalg.norm(b)
     )
-    print(f"n = {n:2d}, eta = {eta:.3e}")
+    print(f"n = {n:2d}, eta = {eta:.1e}")
 ```
 
 Here the residual is computed exactly: the entries of $\widehat{x}$ are zeros and halves, so $A\widehat{x}=e_1$ involves only exactly represented sums. The large backward errors in the output therefore come from the solve, not from inaccurate residual evaluation.

@@ -475,8 +475,9 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sensitivity-relating-backward-error-to-forward-error">Sensitivity: Relating Backward Error to Forward Error</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditioning-of-linear-systems">Conditioning of Linear Systems</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-number-and-backward-error">The Condition Number and Backward Error</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-general-forward-error-bound">A General Forward-Error Bound</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-condition-number">The Matrix Condition Number</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-first-order-forward-error-estimate">A First-Order Forward-Error Estimate</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-rigorous-forward-error-bound">A Rigorous Forward-Error Bound</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-lu-and-the-role-of-cancellation">Backward Error of LU and the Role of Cancellation</a></li>
@@ -730,37 +731,98 @@ LU
 \text{relative forward error}&amp;=\frac{\|\widehat{x}-x\|}{\|x\|}.
 \end{aligned}
 \end{split}\]</div>
-<p><strong>Forward error is what we ultimately want to control:</strong> it tells us how accurate our answer is. But we usually do not know <span class="math notranslate nohighlight">\(x\)</span>, and directly tracking how rounding errors affect the final answer is difficult. Instead, we first derive a backward-error bound, which is often easier to obtain. Sensitivity analysis then relates this change in the input to the forward error in the solution.</p>
+<p><strong>Forward error is what we ultimately want to control:</strong> it tells us how accurate our answer is.</p>
 </section>
 <section id="backward-error">
 <h3>Backward Error<a class="headerlink" href="#backward-error" title="Link to this heading">#</a></h3>
-<p>The <strong>backward error</strong> measures how much we must change the input data to make the computed answer exact. For a linear system, the data are <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>. We define the relative backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> as the smallest <span class="math notranslate nohighlight">\(\eta\)</span> for which</p>
+<p>Directly estimating forward error is difficult: the exact solution <span class="math notranslate nohighlight">\(x\)</span> is usually unknown, and tracking how rounding errors propagate to the final answer can become complicated. <strong>Backward error is much easier to compute or bound.</strong> It can be determined from the known inputs <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> and the computed answer <span class="math notranslate nohighlight">\(\widehat{x}\)</span>, by measuring how well that answer satisfies the equations.</p>
+<p>This is the reason for taking a detour through backward error. First, bound the input changes needed to explain the computed answer. Then use the problem’s sensitivity to bound the resulting change in the solution. Together, these two steps give a forward-error bound.</p>
+<p><strong>1. Interpret the computed answer as an exact solution.</strong> The computed vector <span class="math notranslate nohighlight">\(\widehat{x}\)</span> generally does not satisfy <span class="math notranslate nohighlight">\(A\widehat{x}=b\)</span> exactly. Backward error starts by keeping <span class="math notranslate nohighlight">\(\widehat{x}\)</span> fixed and considering changes to the input data, <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>, that would make it an exact solution.</p>
+<p>Write the changed inputs as <span class="math notranslate nohighlight">\(A+E\)</span> and <span class="math notranslate nohighlight">\(b+e\)</span>. The matrix <span class="math notranslate nohighlight">\(E\)</span> changes the coefficients of the system, and the vector <span class="math notranslate nohighlight">\(e\)</span> changes the right-hand side. They must satisfy</p>
 <div class="math notranslate nohighlight">
 \[
-(A+E)\widehat{x}=b+e,
-\qquad
-\|E\|\le\eta\|A\|,
-\qquad
-\|e\|\le\eta\|b\|.
+(A+E)\widehat{x}=b+e.
 \]</div>
-<p>Thus <span class="math notranslate nohighlight">\(\eta(\widehat{x})=10^{-8}\)</span> means that relative changes of at most <span class="math notranslate nohighlight">\(10^{-8}\)</span> in the data suffice to make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact.</p>
-<p>We can compute this quantity without knowing the true solution <span class="math notranslate nohighlight">\(x\)</span>. First form the <strong>residual</strong>, which measures how far the computed answer is from satisfying the equations:</p>
+<p>This equation is exact: <span class="math notranslate nohighlight">\(\widehat{x}\)</span> solves the system with the changed inputs. It is a way to interpret the answer already computed; it does not require running the algorithm again.</p>
+<p>Such changes always exist. For example, keeping <span class="math notranslate nohighlight">\(A\)</span> unchanged and replacing <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\(A\widehat{x}\)</span> makes the equation hold. What matters is <strong>how much the inputs need to change</strong>. Small changes mean that the computed answer solves a problem close to the one we intended to solve.</p>
+<p><strong>2. Measure the size of a particular change.</strong> For a chosen pair <span class="math notranslate nohighlight">\((E,e)\)</span>, the relative changes in the two inputs are <span class="math notranslate nohighlight">\(\|E\|/\|A\|\)</span> and <span class="math notranslate nohighlight">\(\|e\|/\|b\|\)</span>. Dividing by the input norms makes each change relative to the size of the data it modifies. To describe the pair by one number, take the larger relative change:</p>
+<div class="math notranslate nohighlight">
+\[
+\tau=\max\left\{\frac{\|E\|}{\|A\|},
+\frac{\|e\|}{\|b\|}\right\}.
+\]</div>
+<p>For example, if the two relative changes are <span class="math notranslate nohighlight">\(10^{-8}\)</span> and <span class="math notranslate nohighlight">\(3\times10^{-8}\)</span>, then <span class="math notranslate nohighlight">\(\tau=3\times10^{-8}\)</span>. Both inputs have changed by at most this fraction of their original size.</p>
+<p><strong>3. Find the smallest change that works.</strong> Many pairs <span class="math notranslate nohighlight">\((E,e)\)</span> can make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact, and they can have different sizes. The <strong>relative backward error</strong> <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> is the smallest value of <span class="math notranslate nohighlight">\(\tau\)</span> among all pairs that satisfy the perturbed equation:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\eta(\widehat{x})=
+\min_{\substack{E,e}} \;
+\max\left\{\frac{\|E\|}{\|A\|},
+\frac{\|e\|}{\|b\|}\right\}, \; \text{with} \; (A+E)\widehat{x}=b+e \,.
+}
+\]</div>
+<p>The minimum is taken over the pair: changes to <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> can work together to make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact. Thus <span class="math notranslate nohighlight">\(\eta(\widehat{x})=10^{-8}\)</span> means that relative changes of at most <span class="math notranslate nohighlight">\(10^{-8}\)</span> in both inputs suffice, and no smaller common bound is possible. A different pair may have much larger changes; <span class="math notranslate nohighlight">\(\eta\)</span> measures the best possible pair.</p>
+<p><strong>4. Compute the minimum from the residual.</strong> There is no need to search over possible perturbations or to know the true solution <span class="math notranslate nohighlight">\(x\)</span>. Form the <strong>residual</strong></p>
 <div class="math notranslate nohighlight">
 \[
 r=b-A\widehat{x}.
 \]</div>
-<p>Then the <a class="reference external" href="https://eprints.maths.manchester.ac.uk/2562/1/paper.pdf#page=6">relative backward error</a> is exactly</p>
+<p>It measures how far <span class="math notranslate nohighlight">\(\widehat{x}\)</span> is from satisfying the original equations. The <a class="reference external" href="https://eprints.maths.manchester.ac.uk/2562/1/paper.pdf#page=6">relative backward error</a> is exactly</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{\eta(\widehat{x})=
 \frac{\|r\|}{\|A\|\,\|\widehat{x}\|+\|b\|}.}
 \]</div>
-<p>The denominator accounts for changes in both inputs: a perturbation to <span class="math notranslate nohighlight">\(A\)</span> acts on <span class="math notranslate nohighlight">\(\widehat{x}\)</span>, while a perturbation to <span class="math notranslate nohighlight">\(b\)</span> changes the right-hand side directly. This scaled residual measures the size of the input changes needed to explain the error in the equations.</p>
+<p>The denominator accounts for both ways to correct the residual: changing <span class="math notranslate nohighlight">\(A\)</span> affects the product <span class="math notranslate nohighlight">\(A\widehat{x}\)</span>, while changing <span class="math notranslate nohighlight">\(b\)</span> affects the right-hand side directly. The formula gives the smallest common relative size of these changes.</p>
+<p>The proof has two parts: every pair that makes <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact must be at least this large, and a specific pair achieves this size.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Residual Formula for Backward Error.
+Let <span class="math notranslate nohighlight">\(d=\|A\|\,\|\widehat{x}\|+\|b\|\)</span>, which is positive because <span class="math notranslate nohighlight">\(b\ne0\)</span>.</p>
+<p><strong>Lower bound.</strong> For any pair <span class="math notranslate nohighlight">\((E,e)\)</span> satisfying <span class="math notranslate nohighlight">\((A+E)\widehat{x}=b+e\)</span>, set</p>
+<div class="math notranslate nohighlight">
+\[
+\tau=\max\left\{\frac{\|E\|}{\|A\|},
+\frac{\|e\|}{\|b\|}\right\}.
+\]</div>
+<p>The perturbed equation gives <span class="math notranslate nohighlight">\(r=E\widehat{x}-e\)</span>. Hence</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|r\|&amp;\le\|E\|\,\|\widehat{x}\|+\|e\|\\
+&amp;\le\tau\bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr)
+=\tau d.
+\end{aligned}
+\end{split}\]</div>
+<p>Every such pair therefore has <span class="math notranslate nohighlight">\(\tau\ge\|r\|/d\)</span>, so <span class="math notranslate nohighlight">\(\eta(\widehat{x})\ge\|r\|/d\)</span>.</p>
+<p><strong>Attaining the bound.</strong> If <span class="math notranslate nohighlight">\(\widehat{x}\ne0\)</span>, choose</p>
+<div class="math notranslate nohighlight">
+\[
+E=\frac{\|A\|}{d}\,\frac{r\widehat{x}^{H}}{\|\widehat{x}\|},
+\qquad
+e=-\frac{\|b\|}{d}\,r.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(H\)</span> denotes conjugate transpose, or ordinary transpose for real vectors. These choices satisfy</p>
+<div class="math notranslate nohighlight">
+\[
+E\widehat{x}-e
+=\frac{\|A\|\,\|\widehat{x}\|+\|b\|}{d}\,r=r,
+\]</div>
+<p>so <span class="math notranslate nohighlight">\((A+E)\widehat{x}=b+e\)</span>. In the Euclidean norm, the outer product satisfies <span class="math notranslate nohighlight">\(\|r\widehat{x}^H\|_2=\|r\|_2\,\|\widehat{x}\|_2\)</span>. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|E\|}{\|A\|}
+=\frac{\|e\|}{\|b\|}
+=\frac{\|r\|}{d}.
+\]</div>
+<p>This pair attains the lower bound, proving the formula. If <span class="math notranslate nohighlight">\(\widehat{x}=0\)</span>, then <span class="math notranslate nohighlight">\(r=b\)</span> and every admissible pair must have <span class="math notranslate nohighlight">\(e=-b\)</span>. Taking <span class="math notranslate nohighlight">\(E=0\)</span> gives <span class="math notranslate nohighlight">\(\eta(0)=1=\|r\|/d\)</span>, so the formula also holds in this case.</p>
+</div>
+<p>The unit roundoff <span class="math notranslate nohighlight">\(u\)</span> sets the scale of relative error in a single rounded arithmetic operation. It provides a natural benchmark for judging the backward error of an algorithm.</p>
 <div class="important admonition">
 <p class="admonition-title">Key definition: Backward stability</p>
 <p><strong>A method is backward stable if it guarantees <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> of order the unit roundoff <span class="math notranslate nohighlight">\(u\)</span></strong>, allowing for a modest factor depending on the dimension.</p>
 </div>
-<p>Computing the residual costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations for a dense system. A small backward error tells us that the computed answer solves a nearby problem. To decide whether it is close to the answer we wanted, we must ask how much the solution changes when the data change.</p>
+<p>Backward error describes one computed answer; backward stability requires a guarantee for the method across its intended inputs. Computing the residual costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations for a dense system, so it provides a practical check on an individual answer. A small backward error tells us that the computed answer solves a nearby problem. To decide whether it is close to the answer we wanted, we must ask how much the solution changes when the data change.</p>
 </section>
 </section>
 <section id="sensitivity-relating-backward-error-to-forward-error">
@@ -777,10 +839,11 @@ S_f(d)=\lim_{\varepsilon\to0^+}
 <div class="math notranslate nohighlight">
 \[
 \underbrace{\|\widehat{x}-x\|}_{\text{forward error}}
-\le S_f(d)\underbrace{\|\delta d\|}_{\text{backward perturbation}}
-+o(\|\delta d\|).
+\le S_f(d) 
+\hspace{-1.5em} \underbrace{\|\delta d\|}_{\text{backward perturbation}} \hspace{-1.5em} 
++ o(\|\delta d\|).
 \]</div>
-<p>Thus, to first order,</p>
+<p>The remainder <span class="math notranslate nohighlight">\(o(\|\delta d\|)\)</span> becomes negligible compared with <span class="math notranslate nohighlight">\(\|\delta d\|\)</span> as the perturbation tends to zero. Thus, to first order,</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{\text{forward error}\ \lesssim\ \text{sensitivity}\times\text{backward error}.}
@@ -795,9 +858,26 @@ S_f(d)=\lim_{\varepsilon\to0^+}
 </section>
 <section id="conditioning-of-linear-systems">
 <h2>Conditioning of Linear Systems<a class="headerlink" href="#conditioning-of-linear-systems" title="Link to this heading">#</a></h2>
-<p>We now apply this framework to <span class="math notranslate nohighlight">\(Ax=b\)</span>. The input data are <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>, and the output is <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span>. We first relate the residual to the solution error, then prove a bound for perturbations in both inputs.</p>
-<section id="the-condition-number-and-backward-error">
-<h3>The Condition Number and Backward Error<a class="headerlink" href="#the-condition-number-and-backward-error" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(Ax=b\)</span>, the input data are <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>, and the output is <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span>. The matrix condition number measures the sensitivity relevant to this problem. Combining it with backward error gives a simple first-order estimate of solution error, followed by a rigorous bound that removes the approximation.</p>
+<section id="the-matrix-condition-number">
+<h3>The Matrix Condition Number<a class="headerlink" href="#the-matrix-condition-number" title="Link to this heading">#</a></h3>
+<p>With <span class="math notranslate nohighlight">\(A\)</span> fixed, changing <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\(\delta b\)</span> changes the solution by <span class="math notranslate nohighlight">\(A^{-1}\delta b\)</span>. Thus <span class="math notranslate nohighlight">\(\|A^{-1}\|\)</span> bounds the amplification of absolute changes. Converting to relative changes uses <span class="math notranslate nohighlight">\(\|b\|/\|x\|\le\|A\|\)</span>. This leads to the <strong>matrix condition number</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\kappa(A)=\|A\|\,\|A^{-1}\|.}
+\]</div>
+<p>The <strong>condition number</strong> satisfies <span class="math notranslate nohighlight">\(\kappa(A)\ge1\)</span>, since <span class="math notranslate nohighlight">\(1=\|I\|\le\|A\|\,\|A^{-1}\|\)</span>. In the 2-norm, the SVD gives</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+\]</div>
+<p>Geometrically, <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is the ratio of the largest to the smallest stretching of a unit vector by <span class="math notranslate nohighlight">\(A\)</span>. A large value means that small relative changes in the data can produce large relative changes in the solution.</p>
+<p>For example, take <span class="math notranslate nohighlight">\(A=\operatorname{diag}(1,\epsilon)\)</span> with <span class="math notranslate nohighlight">\(0&lt;\epsilon\ll1\)</span>, and <span class="math notranslate nohighlight">\(b=(1,0)^T\)</span>. The solution is <span class="math notranslate nohighlight">\(x=(1,0)^T\)</span>. Changing <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\((0,\epsilon)^T\)</span> changes the solution by <span class="math notranslate nohighlight">\((0,1)^T\)</span>: a relative input change of <span class="math notranslate nohighlight">\(\epsilon\)</span> causes a relative solution change of 1. Here <span class="math notranslate nohighlight">\(\kappa_2(A)=1/\epsilon\)</span>.</p>
+<p>Row permutations preserve singular values, so <span class="math notranslate nohighlight">\(\kappa_2(PA)=\kappa_2(A)\)</span>. Pivoting changes the elimination process; it does not remove the sensitivity of the original problem.</p>
+</section>
+<section id="a-first-order-forward-error-estimate">
+<h3>A First-Order Forward-Error Estimate<a class="headerlink" href="#a-first-order-forward-error-estimate" title="Link to this heading">#</a></h3>
+<p>The goal is to bound forward error using two quantities: the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> of the computed answer and the condition number <span class="math notranslate nohighlight">\(\kappa(A)\)</span> of the problem.</p>
 <p>Let <span class="math notranslate nohighlight">\(\delta x=\widehat{x}-x\)</span>. Since <span class="math notranslate nohighlight">\(r=b-A\widehat{x}\)</span> and <span class="math notranslate nohighlight">\(Ax=b\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
@@ -811,11 +891,6 @@ A\delta x=-r,
 \|r\|=\eta(\widehat{x})
 \bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr).
 \]</div>
-<p>Define the <strong>matrix condition number</strong> by</p>
-<div class="math notranslate nohighlight">
-\[
-\boxed{\kappa(A)=\|A\|\,\|A^{-1}\|.}
-\]</div>
 <p>Substituting the residual identity and using <span class="math notranslate nohighlight">\(\|b\|\le\|A\|\,\|x\|\)</span> yields</p>
 <div class="math notranslate nohighlight">
 \[
@@ -823,27 +898,34 @@ A\delta x=-r,
 \le \kappa(A)\eta(\widehat{x})
 \left(1+\frac{\|\widehat{x}\|}{\|x\|}\right).
 \]</div>
+<p>This inequality is rigorous, but its right-hand side still contains the unknown <span class="math notranslate nohighlight">\(\|x\|\)</span>. A simple estimate follows if we assume that <span class="math notranslate nohighlight">\(\|\widehat{x}\|\approx\|x\|\)</span>: the factor in parentheses is then approximately 2.</p>
 <div class="important admonition">
-<p class="admonition-title">Key result: Conditioning and backward error</p>
-<p>Here the product <strong><span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})\)</span></strong> connects the problem’s sensitivity to the algorithm’s backward error. When <span class="math notranslate nohighlight">\(\widehat{x}\)</span> is close to <span class="math notranslate nohighlight">\(x\)</span>, the factor in parentheses is close to 2, giving the first-order bound</p>
+<p class="admonition-title">Key result: First-order forward-error estimate</p>
+<p>Under this assumption,</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\|\widehat{x}-x\|}{\|x\|}
 \lesssim 2\kappa(A)\eta(\widehat{x}).
 \]</div>
+<p>This is an approximate estimate. It identifies <strong><span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})\)</span></strong> as the quantity that controls forward error: the problem’s sensitivity multiplies the algorithm’s backward error.</p>
 </div>
-<p>The <strong>condition number</strong> satisfies <span class="math notranslate nohighlight">\(\kappa(A)\ge1\)</span>, since <span class="math notranslate nohighlight">\(1=\|I\|\le\|A\|\,\|A^{-1}\|\)</span>. In the 2-norm, the SVD gives</p>
+</section>
+<section id="a-rigorous-forward-error-bound">
+<h3>A Rigorous Forward-Error Bound<a class="headerlink" href="#a-rigorous-forward-error-bound" title="Link to this heading">#</a></h3>
+<p>The first-order estimate assumes <span class="math notranslate nohighlight">\(\|\widehat{x}\|\approx\|x\|\)</span>. A rigorous bound removes this assumption and gives a condition that can be checked using <span class="math notranslate nohighlight">\(\kappa(A)\)</span> and <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span>:</p>
+<div class="important admonition">
+<p class="admonition-title">Key result: From backward error to forward error</p>
+<p><strong>If <span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})&lt;1\)</span>, then</strong></p>
 <div class="math notranslate nohighlight">
 \[
-\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+\frac{\|\widehat{x}-x\|}{\|x\|}
+\le\frac{2\kappa(A)\eta(\widehat{x})}
+{1-\kappa(A)\eta(\widehat{x})}.
 \]</div>
-<p>Geometrically, <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is the ratio of the largest to the smallest stretching of a unit vector by <span class="math notranslate nohighlight">\(A\)</span>. A large value means that small relative changes in the data can produce large relative changes in the solution.</p>
-<p>For example, take <span class="math notranslate nohighlight">\(A=\operatorname{diag}(1,\epsilon)\)</span> with <span class="math notranslate nohighlight">\(0&lt;\epsilon\ll1\)</span>, and <span class="math notranslate nohighlight">\(b=(1,0)^T\)</span>. The solution is <span class="math notranslate nohighlight">\(x=(1,0)^T\)</span>. Changing <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\((0,\epsilon)^T\)</span> changes the solution by <span class="math notranslate nohighlight">\((0,1)^T\)</span>: a relative input change of <span class="math notranslate nohighlight">\(\epsilon\)</span> causes a relative solution change of 1. Here <span class="math notranslate nohighlight">\(\kappa_2(A)=1/\epsilon\)</span>.</p>
-<p>Row permutations preserve singular values, so <span class="math notranslate nohighlight">\(\kappa_2(PA)=\kappa_2(A)\)</span>. Pivoting changes the elimination process; it does not remove the sensitivity of the original problem.</p>
-</section>
-<section id="a-general-forward-error-bound">
-<h3>A General Forward-Error Bound<a class="headerlink" href="#a-general-forward-error-bound" title="Link to this heading">#</a></h3>
-<p>We next consider finite perturbations <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(e\)</span> in <span class="math notranslate nohighlight">\((A+E)\widehat{x}=b+e\)</span>. The first step is to show that <span class="math notranslate nohighlight">\(A+E\)</span> remains invertible when <span class="math notranslate nohighlight">\(E\)</span> is sufficiently small. The following lemma supplies both invertibility and a bound on the inverse.</p>
+<p>This is a rigorous bound under the stated condition. Its numerator is the same as in the first-order estimate; the denominator <span class="math notranslate nohighlight">\(1-\kappa(A)\eta(\widehat{x})\)</span> accounts for the effect of finite perturbations. When <span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})\ll1\)</span>, that denominator is close to 1, and the bound reduces to the earlier estimate to first order. This justifies using the first-order estimate when that product is small.</p>
+</div>
+<p>The factor 2 comes from allowing relative changes of size <span class="math notranslate nohighlight">\(\eta\)</span> in each of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>.</p>
+<p>To prove the bound, consider the perturbed system <span class="math notranslate nohighlight">\((A+E)\widehat{x}=b+e\)</span>. Changes in <span class="math notranslate nohighlight">\(A\)</span> also change its inverse, so we first need to control <span class="math notranslate nohighlight">\(\|(A+E)^{-1}\|\)</span>. The following lemma provides this control and explains where the denominator comes from.</p>
 <div class="proof lemma admonition" id="lem:banach">
 <p class="admonition-title"><span class="caption-number">Lemma 1 </span> (Banach Lemma)</p>
 <section class="lemma-content" id="proof-content">
@@ -867,6 +949,7 @@ The series <span class="math notranslate nohighlight">\(S=\sum_{j=0}^{\infty}(-X
 =\frac{1}{1-\|X\|}.
 \]</div>
 </div>
+<p>Applying the lemma with <span class="math notranslate nohighlight">\(X=A^{-1}E\)</span> gives a bound in terms of the perturbations <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(e\)</span>. Choosing a pair that minimizes backward error will then give the result in terms of <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span>.</p>
 <div class="proof theorem admonition" id="thm:perturbation_bound">
 <p class="admonition-title"><span class="caption-number">Theorem 15 </span> (Perturbation Bound for Linear Systems)</p>
 <section class="theorem-content" id="proof-content">
@@ -901,30 +984,26 @@ Write <span class="math notranslate nohighlight">\(A+E=A(I+A^{-1}E)\)</span>. Si
 \]</div>
 <p>Use <span class="math notranslate nohighlight">\(\|b\|\le\|A\|\,\|x\|\)</span> and <span class="math notranslate nohighlight">\(\kappa(A)=\|A\|\,\|A^{-1}\|\)</span> to obtain the stated bound.</p>
 </div>
-<p>To express the result using our backward error, choose perturbations with
-<span class="math notranslate nohighlight">\(\|E\|/\|A\|\le\eta(\widehat{x})\)</span> and <span class="math notranslate nohighlight">\(\|e\|/\|b\|\le\eta(\widehat{x})\)</span>. Substitution gives the following bound.</p>
-<div class="important admonition">
-<p class="admonition-title">Key result: From backward error to forward error</p>
-<p><strong>If <span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})&lt;1\)</span>, then</strong></p>
+<p>For a perturbation pair attaining the minimum in the definition of backward error, both
+<span class="math notranslate nohighlight">\(\|E\|/\|A\|\le\eta(\widehat{x})\)</span> and <span class="math notranslate nohighlight">\(\|e\|/\|b\|\le\eta(\widehat{x})\)</span>. When <span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})&lt;1\)</span>, the theorem applies to this pair. Substituting these inequalities gives the stated bound:</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\|\widehat{x}-x\|}{\|x\|}
 \le\frac{2\kappa(A)\eta(\widehat{x})}
 {1-\kappa(A)\eta(\widehat{x})}.
 \]</div>
-<p>When <span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})\ll1\)</span>, the denominator is close to 1, recovering the first-order estimate above. Thus a small product of condition number and backward error guarantees a small relative forward error.</p>
-</div>
-<p>The factor 2 comes from allowing relative changes of size <span class="math notranslate nohighlight">\(\eta\)</span> in each of <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>.</p>
 </section>
 </section>
 <section id="backward-error-of-lu-and-the-role-of-cancellation">
 <h2>Backward Error of LU and the Role of Cancellation<a class="headerlink" href="#backward-error-of-lu-and-the-role-of-cancellation" title="Link to this heading">#</a></h2>
-<p>The preceding results apply to any computed solution. We now ask what backward error LU produces. Let <span class="math notranslate nohighlight">\(\widehat{L}\)</span> and <span class="math notranslate nohighlight">\(\widehat{U}\)</span> be the computed factors; their hats distinguish them from exact factors.</p>
+<p>The residual formula measures the backward error of an answer already computed. To understand the reliability of LU, we also need a bound on the backward error its rounding errors can produce. Combined with the preceding forward-error bound, this will connect the factorization to solution accuracy.</p>
+<p>Let <span class="math notranslate nohighlight">\(\widehat{L}\)</span> and <span class="math notranslate nohighlight">\(\widehat{U}\)</span> be the computed factors; their hats distinguish them from exact factors.</p>
 <p>The following theorem gives separate bounds for the factorization and the complete solve. We state the bounds for real arithmetic; complex arithmetic has analogous bounds with different constants.</p>
 <div class="proof theorem admonition" id="thm:backward_error_lu">
 <p class="admonition-title"><span class="caption-number">Theorem 16 </span> (Backward Error of LU Factorization and Solution)</p>
 <section class="theorem-content" id="proof-content">
-<p>Assume real arithmetic with rounding to nearest, no overflow or underflow, and <span class="math notranslate nohighlight">\(3nu&lt;1\)</span>. If LU with partial pivoting completes, its computed factors satisfy</p>
+<p>Assume real arithmetic with rounding to nearest, no overflow or underflow, and <span class="math notranslate nohighlight">\(3nu&lt;1\)</span>.</p>
+<p><strong>Factorization.</strong> If LU with partial pivoting completes, its computed factors satisfy</p>
 <div class="math notranslate nohighlight">
 \[
 PA+F=\widehat{L}\widehat{U},
@@ -932,16 +1011,17 @@ PA+F=\widehat{L}\widehat{U},
 |F|\le\gamma_n|\widehat{L}|\,|\widehat{U}|,
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(\gamma_m=mu/(1-mu)\)</span>.</p>
-<p>If the computed <span class="math notranslate nohighlight">\(\widehat{U}\)</span> has no zero diagonal entries, the solution <span class="math notranslate nohighlight">\(\widehat{x}\)</span> obtained by forward and backward substitution satisfies</p>
+<p><strong>Complete solve.</strong> If the computed <span class="math notranslate nohighlight">\(\widehat{U}\)</span> has no zero diagonal entries, the solution <span class="math notranslate nohighlight">\(\widehat{x}\)</span> obtained by forward and backward substitution satisfies</p>
 <div class="math notranslate nohighlight">
 \[
 (A+E)\widehat{x}=b,
 \qquad
 |PE|\le\gamma_{3n}|\widehat{L}|\,|\widehat{U}|.
 \]</div>
+<p>Here <span class="math notranslate nohighlight">\(F\)</span> accounts for errors in the factorization, while <span class="math notranslate nohighlight">\(E\)</span> accounts for errors in both the factorization and the two triangular solves.</p>
 <p>Absolute values and inequalities are entrywise. The product <span class="math notranslate nohighlight">\(|\widehat{L}|\,|\widehat{U}|\)</span> is an ordinary matrix product of nonnegative matrices. The factor <span class="math notranslate nohighlight">\(P\)</span> in <span class="math notranslate nohighlight">\(|PE|\)</span> puts the perturbation in the same row ordering as the factors.</p>
 </section>
-</div><p>The solve result fits our definition of <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> with the perturbations <span class="math notranslate nohighlight">\(E\)</span> and <span class="math notranslate nohighlight">\(e=0\)</span>. Since <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> is the smallest admissible relative perturbation, this particular choice gives <span class="math notranslate nohighlight">\(\eta(\widehat{x})\le\|E\|/\|A\|\)</span>. Taking norms in the theorem and using <span class="math notranslate nohighlight">\(\|PE\|=\|E\|\)</span> yields</p>
+</div><p>The theorem supplies one admissible pair <span class="math notranslate nohighlight">\((E,0)\)</span>. For this pair, the maximum of the two relative changes is <span class="math notranslate nohighlight">\(\|E\|/\|A\|\)</span>. Since <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> is the minimum over all admissible pairs, <span class="math notranslate nohighlight">\(\eta(\widehat{x})\le\|E\|/\|A\|\)</span>. The theorem’s pair need not attain the minimum. Taking norms in the theorem and using <span class="math notranslate nohighlight">\(\|PE\|=\|E\|\)</span> yields</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{
@@ -1022,7 +1102,7 @@ U=\begin{pmatrix}
 </section>
 <section id="a-right-hand-side-that-produces-a-large-backward-error">
 <h3>A Right-Hand Side That Produces a Large Backward Error<a class="headerlink" href="#a-right-hand-side-that-produces-a-large-backward-error" title="Link to this heading">#</a></h3>
-<p>We can make the <strong>actual backward error</strong> large for this same matrix. Assume binary arithmetic with rounding to nearest, unit roundoff <span class="math notranslate nohighlight">\(u\)</span>, and no overflow or underflow. Choose</p>
+<p>Large element growth alone does not establish that a computed solution has a large error. To show that <strong>actual backward error</strong> can be large, choose a right-hand side and follow the rounding in the solve. Assume binary arithmetic with rounding to nearest, unit roundoff <span class="math notranslate nohighlight">\(u\)</span>, and no overflow or underflow. Choose</p>
 <div class="math notranslate nohighlight">
 \[
 b=e_1+\delta_n e_n,
@@ -1111,18 +1191,18 @@ r=b-A\widehat{x}=\delta_n e_n,
     <span class="n">eta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xhat</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
     <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"n = </span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">, eta = </span><span class="si">{</span><span class="n">eta</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"n = </span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">, eta = </span><span class="si">{</span><span class="n">eta</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 10, eta = 2.639e-15
-n = 20, eta = 1.480e-12
-n = 30, eta = 1.041e-09
-n = 40, eta = 8.112e-07
-n = 50, eta = 6.704e-04
-n = 60, eta = 3.735e-01
-n = 70, eta = 9.981e-01
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n = 10, eta = 2.6e-15
+n = 20, eta = 1.5e-12
+n = 30, eta = 1.0e-09
+n = 40, eta = 8.1e-07
+n = 50, eta = 6.7e-04
+n = 60, eta = 3.7e-01
+n = 70, eta = 1.0e+00
 </pre></div>
 </div>
 </div>
@@ -1222,8 +1302,9 @@ n = 70, eta = 9.981e-01
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sensitivity-relating-backward-error-to-forward-error">Sensitivity: Relating Backward Error to Forward Error</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditioning-of-linear-systems">Conditioning of Linear Systems</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-condition-number-and-backward-error">The Condition Number and Backward Error</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-general-forward-error-bound">A General Forward-Error Bound</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-condition-number">The Matrix Condition Number</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-first-order-forward-error-estimate">A First-Order Forward-Error Estimate</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-rigorous-forward-error-bound">A Rigorous Forward-Error Bound</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-lu-and-the-role-of-cancellation">Backward Error of LU and the Role of Cancellation</a></li>
