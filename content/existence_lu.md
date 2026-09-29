@@ -2,7 +2,7 @@
 
 An invertible matrix need not have an LU factorization without row interchanges. A singular matrix may have one, and that factorization may or may not be unique.
 
-Throughout this section, **LU factorization** means $A=LU$, where $L$ is **unit lower triangular** and $U$ is upper triangular. Fixing the diagonal of $L$ is essential when discussing uniqueness. We work over $\mathbb R$ or $\mathbb C$.
+Unless stated otherwise, **LU factorization** means $A=LU$, where $L$ is **unit lower triangular** and $U$ is upper triangular. Fixing the diagonal of $L$ is essential when discussing uniqueness. We work over $\mathbb R$ or $\mathbb C$.
 
 ## An Invertible Matrix with a Zero Pivot
 
@@ -127,7 +127,7 @@ $$
 The first factor remains unit lower triangular. The second is upper triangular: it changes only the last row of $U$, and its first $n-1$ entries remain zero because $wU_{n-1}=0$. Different values of $t$ give different first factors, since $L$ is invertible and $w\neq0$. Hence the factorization is not unique.
 ````
 
-For a **nonsingular** matrix, the conclusion simplifies: LU exists if and only if the first $n-1$ leading principal minors are nonzero, and when it exists it is unique. Indeed, any LU factorization of a nonsingular matrix must have every $u_{jj}\neq0$.
+For a **nonsingular** matrix, any LU factorization is automatically unique: $\det(A)=\prod_j u_{jj}\neq0$ forces every pivot, and hence every leading principal minor, to be nonzero. The minor condition is unchanged; in this case it characterizes existence alone as well as existence and uniqueness.
 
 The [no-pivoting algorithm](lu_decomposition.md) needs nonzero pivots only through step $n-1$. A nonzero final pivot is additionally required to solve arbitrary systems uniquely by backward substitution.
 
@@ -144,10 +144,25 @@ $$
 
 Here $\Delta_1=1$, so the theorem guarantees uniqueness even though the final pivot is zero.
 
-If an earlier leading principal minor vanishes, LU may still exist, but it cannot be unique. For every scalar $t$,
+If an earlier leading principal minor vanishes, LU may still exist, but it cannot be unique. To illustrate the construction in the proof, start with
 
 $$
-\begin{pmatrix}0&1\\0&1\end{pmatrix}
+A=\begin{pmatrix}0&1\\0&1\end{pmatrix},
+\qquad L=I,\qquad U=A.
+$$
+
+Here $U_{n-1}=[0]$, so choose $w=[1]$. The matrices from the proof are
+
+$$
+M_t=\begin{pmatrix}1&0\\t&1\end{pmatrix},
+\qquad
+M_t^{-1}=\begin{pmatrix}1&0\\-t&1\end{pmatrix}.
+$$
+
+Thus, for every scalar $t$,
+
+$$
+A=(LM_t)(M_t^{-1}U)
 =
 \begin{pmatrix}1&0\\t&1\end{pmatrix}
 \begin{pmatrix}0&1\\0&1-t\end{pmatrix}.
@@ -159,34 +174,66 @@ $$
 \begin{pmatrix}0&0\\1&0\end{pmatrix}
 $$
 
-has no such factorization: $u_{11}=a_{11}=0$ would imply $a_{21}=l_{21}u_{11}=0$, a contradiction.
+has no factorization with unit lower triangular $L$: $u_{11}=a_{11}=0$ would imply $a_{21}=l_{21}u_{11}=0$, a contradiction.
 
-### Existence with a Unit Lower Triangular Factor
+### Two Existence Criteria
 
-For singular matrices, determinants alone cannot decide whether an LU factorization exists. The following criterion applies to the convention used here: $L$ must be unit lower triangular.
+For singular matrices, leading principal minors alone cannot decide whether an LU factorization exists. The criterion depends on whether $L$ is required to have unit diagonal. Both results below concern $A=LU$ in the original row and column ordering.
 
-````{prf:theorem} Existence of LU
-:label: thm:existence_lu_existence
-A factorization $A=LU$ with $L$ unit lower triangular and $U$ upper triangular exists if and only if
+Write $\operatorname{null}(B)=\dim\{x:Bx=0\}$ for the dimension of the null space of a matrix $B$, and define the leading column and row blocks
 
 $$
-\operatorname{rank}(A[1:k,1:k])
-=\operatorname{rank}(A[1:n,1:k]),
+C_k=A[1:n,1:k],\qquad R_k=A[1:k,1:n].
+$$
+
+Thus $C_k$ and $R_k^T$ each have $k$ columns. Their nullities count linear dependencies among the first $k$ columns and the first $k$ rows of $A$, respectively.
+
+````{prf:theorem} Existence of General LU
+:label: thm:existence_lu_general
+An $n\times n$ matrix $A$ has a factorization $A=LU$, with $L$ lower triangular and $U$ upper triangular, allowing zero diagonal entries in either factor, if and only if
+
+$$
+\operatorname{null}(A_k)
+\le\operatorname{null}(C_k)+\operatorname{null}(R_k^T),
 \qquad k=1,\ldots,n-1.
 $$
 ````
 
-The condition says that, within the first $k$ columns, the first $k$ rows span all the rows. We state the result without proof; see [Theorem 3.1 of *Necessary and Sufficient Conditions for the Existence of an LU Factorization for General Rank Deficient Matrices*](https://arxiv.org/pdf/2601.07791#page=10).
+Requiring $L$ to be unit lower triangular gives a stronger condition:
 
-This existence criterion does not justify continuing the standard elimination algorithm through a zero pivot. A zero pivot cannot eliminate a nonzero entry below it; even when those entries are already zero, the choice of multipliers can affect later steps. The cited construction uses internal column permutations and proves that the resulting factors retain the required triangular structure in the original ordering. We leave that construction outside the scope of this section.
+````{prf:theorem} Existence of LU with Unit Lower Triangular L
+:label: thm:existence_lu_existence
+A factorization $A=LU$ with $L$ unit lower triangular and $U$ upper triangular, allowing zero diagonal entries in $U$, exists if and only if
+
+$$
+\operatorname{null}(A_k)=\operatorname{null}(C_k),
+\qquad k=1,\ldots,n-1.
+$$
+````
+
+Since $C_kx=0$ implies $A_kx=0$, the second condition means that the two null spaces coincide: every linear dependency among the columns of $A_k$ remains valid when those columns are extended to all $n$ rows. In both criteria, $k=n$ adds only a trivial identity or inequality.
+
+The distinction matters for the singular matrix considered above:
+
+$$
+\begin{pmatrix}0&0\\1&0\end{pmatrix}
+=\underbrace{\begin{pmatrix}0&0\\1&0\end{pmatrix}}_{L}
+\underbrace{\begin{pmatrix}1&0\\0&1\end{pmatrix}}_{U}.
+$$
+
+It has a general LU factorization, but no factorization with unit lower triangular $L$.
+
+We state these results without proof; see [Property 2.1 and Theorem 2.5 for general LU](https://arxiv.org/pdf/2601.07791#page=5) and [Theorem 3.1 for unit lower triangular $L$](https://arxiv.org/pdf/2601.07791#page=10).
+
+These existence criteria do not justify continuing the standard elimination algorithm through a zero pivot. A zero pivot cannot eliminate a nonzero entry below it; even when those entries are already zero, the choice of multipliers can affect later steps. The cited construction for unit lower triangular $L$ uses internal column permutations and proves that the resulting factors retain the required triangular structure in the original ordering.
 
 ## Existence Does Not Guarantee Numerical Accuracy
 
-The results above concern exact arithmetic. Even when LU exists uniquely, rounding can make the computed factors inaccurate. Consider
+The results above concern exact arithmetic. Even when LU exists uniquely, the product of the computed factors need not approximate $A$ accurately. Consider
 
 $$
 A_\epsilon=\begin{pmatrix}\epsilon&1\\1&\pi\end{pmatrix},
-\qquad \epsilon\neq0.
+\qquad \epsilon>0.
 $$
 
 Its exact factors are
