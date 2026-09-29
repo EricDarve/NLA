@@ -466,7 +466,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leading-principal-minors-and-pivots">Leading Principal Minors and Pivots</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-is-the-factorization-unique">When Is the Factorization Unique?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-changes-for-singular-matrices">What Changes for Singular Matrices?</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-with-a-unit-lower-triangular-factor">Existence with a Unit Lower Triangular Factor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-existence-criteria">Two Existence Criteria</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-does-not-guarantee-numerical-accuracy">Existence Does Not Guarantee Numerical Accuracy</a></li>
@@ -484,7 +484,7 @@
   <section class="tex2jax_ignore mathjax_ignore" id="existence-and-uniqueness-of-lu-factorization">
 <h1>Existence and Uniqueness of LU Factorization<a class="headerlink" href="#existence-and-uniqueness-of-lu-factorization" title="Link to this heading">#</a></h1>
 <p>An invertible matrix need not have an LU factorization without row interchanges. A singular matrix may have one, and that factorization may or may not be unique.</p>
-<p>Throughout this section, <strong>LU factorization</strong> means <span class="math notranslate nohighlight">\(A=LU\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> is <strong>unit lower triangular</strong> and <span class="math notranslate nohighlight">\(U\)</span> is upper triangular. Fixing the diagonal of <span class="math notranslate nohighlight">\(L\)</span> is essential when discussing uniqueness. We work over <span class="math notranslate nohighlight">\(\mathbb R\)</span> or <span class="math notranslate nohighlight">\(\mathbb C\)</span>.</p>
+<p>Unless stated otherwise, <strong>LU factorization</strong> means <span class="math notranslate nohighlight">\(A=LU\)</span>, where <span class="math notranslate nohighlight">\(L\)</span> is <strong>unit lower triangular</strong> and <span class="math notranslate nohighlight">\(U\)</span> is upper triangular. Fixing the diagonal of <span class="math notranslate nohighlight">\(L\)</span> is essential when discussing uniqueness. We work over <span class="math notranslate nohighlight">\(\mathbb R\)</span> or <span class="math notranslate nohighlight">\(\mathbb C\)</span>.</p>
 <section id="an-invertible-matrix-with-a-zero-pivot">
 <h2>An Invertible Matrix with a Zero Pivot<a class="headerlink" href="#an-invertible-matrix-with-a-zero-pivot" title="Link to this heading">#</a></h2>
 <p>Consider the matrix</p>
@@ -589,7 +589,7 @@ A=(LM_t)(M_t^{-1}U).
 \]</div>
 <p>The first factor remains unit lower triangular. The second is upper triangular: it changes only the last row of <span class="math notranslate nohighlight">\(U\)</span>, and its first <span class="math notranslate nohighlight">\(n-1\)</span> entries remain zero because <span class="math notranslate nohighlight">\(wU_{n-1}=0\)</span>. Different values of <span class="math notranslate nohighlight">\(t\)</span> give different first factors, since <span class="math notranslate nohighlight">\(L\)</span> is invertible and <span class="math notranslate nohighlight">\(w\neq0\)</span>. Hence the factorization is not unique.</p>
 </div>
-<p>For a <strong>nonsingular</strong> matrix, the conclusion simplifies: LU exists if and only if the first <span class="math notranslate nohighlight">\(n-1\)</span> leading principal minors are nonzero, and when it exists it is unique. Indeed, any LU factorization of a nonsingular matrix must have every <span class="math notranslate nohighlight">\(u_{jj}\neq0\)</span>.</p>
+<p>For a <strong>nonsingular</strong> matrix, any LU factorization is automatically unique: <span class="math notranslate nohighlight">\(\det(A)=\prod_j u_{jj}\neq0\)</span> forces every pivot, and hence every leading principal minor, to be nonzero. The minor condition is unchanged; in this case it characterizes existence alone as well as existence and uniqueness.</p>
 <p>The <a class="reference internal" href="lu_decomposition.html"><span class="std std-doc">no-pivoting algorithm</span></a> needs nonzero pivots only through step <span class="math notranslate nohighlight">\(n-1\)</span>. A nonzero final pivot is additionally required to solve arbitrary systems uniquely by backward substitution.</p>
 </section>
 <section id="what-changes-for-singular-matrices">
@@ -603,10 +603,23 @@ A=(LM_t)(M_t^{-1}U).
 \begin{pmatrix}1&amp;2\\0&amp;0\end{pmatrix}.
 \end{split}\]</div>
 <p>Here <span class="math notranslate nohighlight">\(\Delta_1=1\)</span>, so the theorem guarantees uniqueness even though the final pivot is zero.</p>
-<p>If an earlier leading principal minor vanishes, LU may still exist, but it cannot be unique. For every scalar <span class="math notranslate nohighlight">\(t\)</span>,</p>
+<p>If an earlier leading principal minor vanishes, LU may still exist, but it cannot be unique. To illustrate the construction in the proof, start with</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{pmatrix}0&amp;1\\0&amp;1\end{pmatrix}
+A=\begin{pmatrix}0&amp;1\\0&amp;1\end{pmatrix},
+\qquad L=I,\qquad U=A.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(U_{n-1}=[0]\)</span>, so choose <span class="math notranslate nohighlight">\(w=[1]\)</span>. The matrices from the proof are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M_t=\begin{pmatrix}1&amp;0\\t&amp;1\end{pmatrix},
+\qquad
+M_t^{-1}=\begin{pmatrix}1&amp;0\\-t&amp;1\end{pmatrix}.
+\end{split}\]</div>
+<p>Thus, for every scalar <span class="math notranslate nohighlight">\(t\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=(LM_t)(M_t^{-1}U)
 =
 \begin{pmatrix}1&amp;0\\t&amp;1\end{pmatrix}
 \begin{pmatrix}0&amp;1\\0&amp;1-t\end{pmatrix}.
@@ -616,32 +629,58 @@ A=(LM_t)(M_t^{-1}U).
 \[\begin{split}
 \begin{pmatrix}0&amp;0\\1&amp;0\end{pmatrix}
 \end{split}\]</div>
-<p>has no such factorization: <span class="math notranslate nohighlight">\(u_{11}=a_{11}=0\)</span> would imply <span class="math notranslate nohighlight">\(a_{21}=l_{21}u_{11}=0\)</span>, a contradiction.</p>
-<section id="existence-with-a-unit-lower-triangular-factor">
-<h3>Existence with a Unit Lower Triangular Factor<a class="headerlink" href="#existence-with-a-unit-lower-triangular-factor" title="Link to this heading">#</a></h3>
-<p>For singular matrices, determinants alone cannot decide whether an LU factorization exists. The following criterion applies to the convention used here: <span class="math notranslate nohighlight">\(L\)</span> must be unit lower triangular.</p>
-<div class="proof theorem admonition" id="thm:existence_lu_existence">
-<p class="admonition-title"><span class="caption-number">Theorem 11 </span> (Existence of LU)</p>
-<section class="theorem-content" id="proof-content">
-<p>A factorization <span class="math notranslate nohighlight">\(A=LU\)</span> with <span class="math notranslate nohighlight">\(L\)</span> unit lower triangular and <span class="math notranslate nohighlight">\(U\)</span> upper triangular exists if and only if</p>
+<p>has no factorization with unit lower triangular <span class="math notranslate nohighlight">\(L\)</span>: <span class="math notranslate nohighlight">\(u_{11}=a_{11}=0\)</span> would imply <span class="math notranslate nohighlight">\(a_{21}=l_{21}u_{11}=0\)</span>, a contradiction.</p>
+<section id="two-existence-criteria">
+<h3>Two Existence Criteria<a class="headerlink" href="#two-existence-criteria" title="Link to this heading">#</a></h3>
+<p>For singular matrices, leading principal minors alone cannot decide whether an LU factorization exists. The criterion depends on whether <span class="math notranslate nohighlight">\(L\)</span> is required to have unit diagonal. Both results below concern <span class="math notranslate nohighlight">\(A=LU\)</span> in the original row and column ordering.</p>
+<p>Write <span class="math notranslate nohighlight">\(\operatorname{null}(B)=\dim\{x:Bx=0\}\)</span> for the dimension of the null space of a matrix <span class="math notranslate nohighlight">\(B\)</span>, and define the leading column and row blocks</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{rank}(A[1:k,1:k])
-=\operatorname{rank}(A[1:n,1:k]),
+C_k=A[1:n,1:k],\qquad R_k=A[1:k,1:n].
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(C_k\)</span> and <span class="math notranslate nohighlight">\(R_k^T\)</span> each have <span class="math notranslate nohighlight">\(k\)</span> columns. Their nullities count linear dependencies among the first <span class="math notranslate nohighlight">\(k\)</span> columns and the first <span class="math notranslate nohighlight">\(k\)</span> rows of <span class="math notranslate nohighlight">\(A\)</span>, respectively.</p>
+<div class="proof theorem admonition" id="thm:existence_lu_general">
+<p class="admonition-title"><span class="caption-number">Theorem 11 </span> (Existence of General LU)</p>
+<section class="theorem-content" id="proof-content">
+<p>An <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> has a factorization <span class="math notranslate nohighlight">\(A=LU\)</span>, with <span class="math notranslate nohighlight">\(L\)</span> lower triangular and <span class="math notranslate nohighlight">\(U\)</span> upper triangular, allowing zero diagonal entries in either factor, if and only if</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{null}(A_k)
+\le\operatorname{null}(C_k)+\operatorname{null}(R_k^T),
 \qquad k=1,\ldots,n-1.
 \]</div>
 </section>
-</div><p>The condition says that, within the first <span class="math notranslate nohighlight">\(k\)</span> columns, the first <span class="math notranslate nohighlight">\(k\)</span> rows span all the rows. We state the result without proof; see <a class="reference external" href="https://arxiv.org/pdf/2601.07791#page=10">Theorem 3.1 of <em>Necessary and Sufficient Conditions for the Existence of an LU Factorization for General Rank Deficient Matrices</em></a>.</p>
-<p>This existence criterion does not justify continuing the standard elimination algorithm through a zero pivot. A zero pivot cannot eliminate a nonzero entry below it; even when those entries are already zero, the choice of multipliers can affect later steps. The cited construction uses internal column permutations and proves that the resulting factors retain the required triangular structure in the original ordering. We leave that construction outside the scope of this section.</p>
+</div><p>Requiring <span class="math notranslate nohighlight">\(L\)</span> to be unit lower triangular gives a stronger condition:</p>
+<div class="proof theorem admonition" id="thm:existence_lu_existence">
+<p class="admonition-title"><span class="caption-number">Theorem 12 </span> (Existence of LU with Unit Lower Triangular L)</p>
+<section class="theorem-content" id="proof-content">
+<p>A factorization <span class="math notranslate nohighlight">\(A=LU\)</span> with <span class="math notranslate nohighlight">\(L\)</span> unit lower triangular and <span class="math notranslate nohighlight">\(U\)</span> upper triangular, allowing zero diagonal entries in <span class="math notranslate nohighlight">\(U\)</span>, exists if and only if</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{null}(A_k)=\operatorname{null}(C_k),
+\qquad k=1,\ldots,n-1.
+\]</div>
+</section>
+</div><p>Since <span class="math notranslate nohighlight">\(C_kx=0\)</span> implies <span class="math notranslate nohighlight">\(A_kx=0\)</span>, the second condition means that the two null spaces coincide: every linear dependency among the columns of <span class="math notranslate nohighlight">\(A_k\)</span> remains valid when those columns are extended to all <span class="math notranslate nohighlight">\(n\)</span> rows. In both criteria, <span class="math notranslate nohighlight">\(k=n\)</span> adds only a trivial identity or inequality.</p>
+<p>The distinction matters for the singular matrix considered above:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}0&amp;0\\1&amp;0\end{pmatrix}
+=\underbrace{\begin{pmatrix}0&amp;0\\1&amp;0\end{pmatrix}}_{L}
+\underbrace{\begin{pmatrix}1&amp;0\\0&amp;1\end{pmatrix}}_{U}.
+\end{split}\]</div>
+<p>It has a general LU factorization, but no factorization with unit lower triangular <span class="math notranslate nohighlight">\(L\)</span>.</p>
+<p>We state these results without proof; see <a class="reference external" href="https://arxiv.org/pdf/2601.07791#page=5">Property 2.1 and Theorem 2.5 for general LU</a> and <a class="reference external" href="https://arxiv.org/pdf/2601.07791#page=10">Theorem 3.1 for unit lower triangular <span class="math notranslate nohighlight">\(L\)</span></a>.</p>
+<p>These existence criteria do not justify continuing the standard elimination algorithm through a zero pivot. A zero pivot cannot eliminate a nonzero entry below it; even when those entries are already zero, the choice of multipliers can affect later steps. The cited construction for unit lower triangular <span class="math notranslate nohighlight">\(L\)</span> uses internal column permutations and proves that the resulting factors retain the required triangular structure in the original ordering.</p>
 </section>
 </section>
 <section id="existence-does-not-guarantee-numerical-accuracy">
 <h2>Existence Does Not Guarantee Numerical Accuracy<a class="headerlink" href="#existence-does-not-guarantee-numerical-accuracy" title="Link to this heading">#</a></h2>
-<p>The results above concern exact arithmetic. Even when LU exists uniquely, rounding can make the computed factors inaccurate. Consider</p>
+<p>The results above concern exact arithmetic. Even when LU exists uniquely, the product of the computed factors need not approximate <span class="math notranslate nohighlight">\(A\)</span> accurately. Consider</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 A_\epsilon=\begin{pmatrix}\epsilon&amp;1\\1&amp;\pi\end{pmatrix},
-\qquad \epsilon\neq0.
+\qquad \epsilon&gt;0.
 \end{split}\]</div>
 <p>Its exact factors are</p>
 <div class="math notranslate nohighlight">
@@ -726,7 +765,7 @@ U=\begin{pmatrix}\epsilon&amp;1\\0&amp;\pi-1/\epsilon\end{pmatrix}.
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leading-principal-minors-and-pivots">Leading Principal Minors and Pivots</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-is-the-factorization-unique">When Is the Factorization Unique?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-changes-for-singular-matrices">What Changes for Singular Matrices?</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-with-a-unit-lower-triangular-factor">Existence with a Unit Lower Triangular Factor</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#two-existence-criteria">Two Existence Criteria</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence-does-not-guarantee-numerical-accuracy">Existence Does Not Guarantee Numerical Accuracy</a></li>

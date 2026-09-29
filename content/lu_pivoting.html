@@ -582,7 +582,7 @@ Ly=Pb,\qquad Ux=y.
 <section id="why-the-factorization-always-exists">
 <h3>Why the Factorization Always Exists<a class="headerlink" href="#why-the-factorization-always-exists" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="thm:existence_lu_pivoting">
-<p class="admonition-title"><span class="caption-number">Theorem 13 </span> (Existence of LU Factorization with Row Pivoting)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Existence of LU Factorization with Row Pivoting)</p>
 <section class="theorem-content" id="proof-content">
 <p>For every <span class="math notranslate nohighlight">\(A\in\mathbb{F}^{n\times n}\)</span>, where <span class="math notranslate nohighlight">\(\mathbb{F}=\mathbb{R}\)</span> or <span class="math notranslate nohighlight">\(\mathbb{C}\)</span>, there exist a permutation matrix <span class="math notranslate nohighlight">\(P\)</span>, a unit lower triangular matrix <span class="math notranslate nohighlight">\(L\)</span>, and an upper triangular matrix <span class="math notranslate nohighlight">\(U\)</span> such that <span class="math notranslate nohighlight">\(PA=LU\)</span>. No assumption of nonsingularity is needed.</p>
 </section>
@@ -868,7 +868,7 @@ The series <span class="math notranslate nohighlight">\(S=\sum_{j=0}^{\infty}(-X
 \]</div>
 </div>
 <div class="proof theorem admonition" id="thm:perturbation_bound">
-<p class="admonition-title"><span class="caption-number">Theorem 14 </span> (Perturbation Bound for Linear Systems)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 15 </span> (Perturbation Bound for Linear Systems)</p>
 <section class="theorem-content" id="proof-content">
 <p>Let <span class="math notranslate nohighlight">\(A\)</span> be nonsingular, <span class="math notranslate nohighlight">\(b\ne0\)</span>, and <span class="math notranslate nohighlight">\(Ax=b\)</span>. If <span class="math notranslate nohighlight">\(\|A^{-1}\|\,\|E\|&lt;1\)</span>, then <span class="math notranslate nohighlight">\(A+E\)</span> is nonsingular, and the solution of <span class="math notranslate nohighlight">\((A+E)\widehat{x}=b+e\)</span> satisfies</p>
 <div class="math notranslate nohighlight">
@@ -922,7 +922,7 @@ Write <span class="math notranslate nohighlight">\(A+E=A(I+A^{-1}E)\)</span>. Si
 <p>The preceding results apply to any computed solution. We now ask what backward error LU produces. Let <span class="math notranslate nohighlight">\(\widehat{L}\)</span> and <span class="math notranslate nohighlight">\(\widehat{U}\)</span> be the computed factors; their hats distinguish them from exact factors.</p>
 <p>The following theorem gives separate bounds for the factorization and the complete solve. We state the bounds for real arithmetic; complex arithmetic has analogous bounds with different constants.</p>
 <div class="proof theorem admonition" id="thm:backward_error_lu">
-<p class="admonition-title"><span class="caption-number">Theorem 15 </span> (Backward Error of LU Factorization and Solution)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 16 </span> (Backward Error of LU Factorization and Solution)</p>
 <section class="theorem-content" id="proof-content">
 <p>Assume real arithmetic with rounding to nearest, no overflow or underflow, and <span class="math notranslate nohighlight">\(3nu&lt;1\)</span>. If LU with partial pivoting completes, its computed factors satisfy</p>
 <div class="math notranslate nohighlight">
@@ -961,7 +961,7 @@ PA+F=\widehat{L}\widehat{U},
 &amp;=\sum_k|\widehat{l}_{ik}\widehat{u}_{kj}|.
 \end{aligned}
 \end{split}\]</div>
-<p>The first sum allows cancellation; the second measures the sizes of all terms before cancellation. This is the same distinction as in the <a class="reference internal" href="floating_point.html"><span class="std std-doc">summation error bound</span></a>, <a class="reference internal" href="floating_point.html#thm:summation_error">Theorem 12</a>. Large terms that cancel to reproduce a much smaller matrix entry can carry rounding errors that are large relative to that entry.</p>
+<p>The first sum allows cancellation; the second measures the sizes of all terms before cancellation. This is the same distinction as in the <a class="reference internal" href="floating_point.html"><span class="std std-doc">summation error bound</span></a>, <a class="reference internal" href="floating_point.html#thm:summation_error">Theorem 13</a>. Large terms that cancel to reproduce a much smaller matrix entry can carry rounding errors that are large relative to that entry.</p>
 <p>For example, in the unpivoted <span class="math notranslate nohighlight">\(A_\epsilon\)</span> factorization, the two terms reconstructing <span class="math notranslate nohighlight">\(a_{22}\)</span> have total magnitude about <span class="math notranslate nohighlight">\(2/\epsilon\)</span>, although <span class="math notranslate nohighlight">\(a_{22}=\pi\)</span>. After swapping rows, the corresponding products stay moderate, giving a much smaller backward-error bound.</p>
 <p>The full rounding-error derivation is given in <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch9">Higham, <em>Accuracy and Stability of Numerical Algorithms</em>, Chapter 9</a>; the solve bound is also stated in <a class="reference external" href="https://eprints.maths.manchester.ac.uk/2562/1/paper.pdf#page=13">Carson and Higham, equation (7.1)</a>.</p>
 </section>

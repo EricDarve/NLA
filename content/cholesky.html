@@ -578,7 +578,7 @@ y^TSy=x^TAx&gt;0.
 <section id="existence-and-uniqueness">
 <h3>Existence and Uniqueness<a class="headerlink" href="#existence-and-uniqueness" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="thm:cholesky_existence">
-<p class="admonition-title"><span class="caption-number">Theorem 16 </span> (Existence and Uniqueness of Cholesky Factorization)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 17 </span> (Existence and Uniqueness of Cholesky Factorization)</p>
 <section class="theorem-content" id="proof-content">
 <p>A real symmetric matrix <span class="math notranslate nohighlight">\(A\)</span> is positive definite if and only if it has a factorization <span class="math notranslate nohighlight">\(A=LL^T\)</span> with <span class="math notranslate nohighlight">\(L\)</span> lower triangular and <span class="math notranslate nohighlight">\(l_{ii}&gt;0\)</span>. This factor is unique.</p>
 </section>
@@ -800,7 +800,7 @@ L=\begin{pmatrix}1&amp;0\\1&amp;\sqrt{\epsilon}\end{pmatrix},
 <h3>Backward Error of the Factorization<a class="headerlink" href="#backward-error-of-the-factorization" title="Link to this heading">#</a></h3>
 <p>When the algorithm completes, the same control of the factor entries leads to a backward-error bound. The bound must account for rounding in the <strong>computed</strong> factor <span class="math notranslate nohighlight">\(\widehat{L}\)</span>.</p>
 <div class="proof theorem admonition" id="thm:backward_error_cholesky">
-<p class="admonition-title"><span class="caption-number">Theorem 17 </span> (Backward Error of Cholesky Factorization)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 18 </span> (Backward Error of Cholesky Factorization)</p>
 <section class="theorem-content" id="proof-content">
 <p>Assume real arithmetic with rounding to nearest, no overflow or underflow, and <span class="math notranslate nohighlight">\((n+1)u&lt;1\)</span>. If Cholesky factorization of an SPD matrix <span class="math notranslate nohighlight">\(A\)</span> completes with a positive diagonal, the computed factor satisfies</p>
 <div class="math notranslate nohighlight">
