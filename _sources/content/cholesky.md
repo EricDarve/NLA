@@ -12,13 +12,15 @@ kernelspec:
 
 # Cholesky Factorization
 
-For a symmetric positive definite matrix, symmetry and positive definiteness allow elimination to use a single triangular factor:
+For a symmetric positive definite matrix, elimination needs only one triangular factor. The upper triangular factor is the transpose of the lower one:
 
 $$
 \boxed{A=LL^T,\qquad l_{ii}>0.}
 $$
 
-This is the **Cholesky factorization**. It requires about half the arithmetic of general LU factorization and can store the matrix and factor in a single triangle. No pivoting is needed in exact arithmetic. In floating-point arithmetic, a completed Cholesky factorization has a small backward error; as with LU, the accuracy of the solution also depends on conditioning.
+Here $L$ is lower triangular. This is the **Cholesky factorization**. It requires about half the arithmetic of general LU factorization and can store the matrix and factor in a single triangle. Positive definiteness ensures that every pivot is positive in exact arithmetic, so no pivoting is needed.
+
+The block derivation below explains why the factorization exists and how to compute it. The error analysis then explains its numerical advantage: under the stated rounding assumptions, a completed factorization has backward error of order $u$, up to a dimension-dependent factor. As with LU, solution accuracy also depends on conditioning.
 
 ## Symmetric Positive Definite Matrices
 
@@ -80,7 +82,7 @@ $$
 S=B-\frac{cc^T}{a_{11}}.
 $$
 
-The key to continuing the algorithm is that $S$ is also SPD.
+To repeat this step, the remaining matrix must also be SPD. Symmetry is immediate from the formula for $S$; positive definiteness needs a proof. It ensures that the next pivot, and every later pivot, is positive.
 
 ### Why the Schur Complement Remains Positive Definite
 
@@ -223,59 +225,11 @@ $$
 
 Each new right-hand side costs about $2n^2$ flops for the pair of solves; the factorization can be reused. There is no need to form $A^{-1}$.
 
-For a concrete example, take
-
-$$
-A=\begin{pmatrix}4&2&2\\2&5&3\\2&3&6\end{pmatrix}.
-$$
-
-The first column of $L$ is $(2,1,1)^T$, and the first Schur complement is
-
-$$
-\begin{pmatrix}5&3\\3&6\end{pmatrix}
--\begin{pmatrix}1\\1\end{pmatrix}\begin{pmatrix}1&1\end{pmatrix}
-=\begin{pmatrix}4&2\\2&5\end{pmatrix}.
-$$
-
-Continuing gives
-
-$$
-L=\begin{pmatrix}2&0&0\\1&2&0\\1&1&2\end{pmatrix}.
-$$
-
-The next cell factors $A$ and solves for $b=(6,5,8)^T$ using forward and backward substitution. Copies and an explicit $L$ are used here so that we can check the result against the original data.
-
-```{code-cell} ipython3
-A = np.array([[4., 2., 2.],
-              [2., 5., 3.],
-              [2., 3., 6.]])
-b = np.array([6., 5., 8.])
-
-packed = cholesky_in_place(A.copy())
-L = np.tril(packed)
-n = len(b)
-y = np.zeros(n)
-for i in range(n):
-    y[i] = (b[i] - L[i, :i] @ y[:i]) / L[i, i]
-xhat = np.zeros(n)
-for i in range(n - 1, -1, -1):
-    xhat[i] = (y[i] - L[i + 1:, i] @ xhat[i + 1:]) / L[i, i]
-
-r = b - A @ xhat
-eta = np.linalg.norm(r) / (
-    np.linalg.norm(A, 2) * np.linalg.norm(xhat) + np.linalg.norm(b)
-)
-assert np.allclose(L @ L.T, A)
-assert np.allclose(xhat, [1., 0., 1.])
-print("L =")
-print(L)
-print("Computed solution:", xhat)
-print(f"Relative backward error: {eta:.3e}")
-```
-
-The factorization and triangular solves in this example are exact in binary arithmetic, so the backward error is zero. For general data, rounding errors enter both stages. Their effect depends on the sizes of the terms formed during the computation.
-
 ## Backward Stability and Its Limits
+
+In the LU analysis, the main obstacle to a small backward-error bound was growth in the factors. Cholesky avoids that obstacle because positive definiteness controls the factor entries. This gives the route to a solution-error bound: first bound the error in the factorization, then include the two triangular solves, and finally apply the condition number.
+
+These error bounds assume that the computation completes. Cancellation can still cause a nonpositive computed pivot; that limitation is discussed after the error analysis.
 
 ### Why the Factor Entries Stay Controlled
 
@@ -291,7 +245,7 @@ $$
 \boxed{|l_{ik}|\le\sqrt{a_{ii}}.}
 $$
 
-More generally, Cauchy–Schwarz bounds the products that enter the backward-error analysis:
+The LU error bound involved $|L|\,|U|$, which measures the sizes of products before cancellation. For Cholesky, the corresponding matrix is $|L|\,|L|^T$. Cauchy–Schwarz bounds each of its entries:
 
 $$
 \begin{aligned}
@@ -305,28 +259,9 @@ $$
 
 Thus these products remain controlled by the original diagonal entries. There is no counterpart to the exponential growth in the LU example.
 
-### Cancellation and Breakdown
-
-Bounded factor entries do not rule out cancellation during the computation. A diagonal step computes
-
-$$
-l_{kk}=\sqrt{a_{kk}-\sum_{j<k}l_{kj}^2},
-$$
-
-where $a_{kk}$ in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,
-
-$$
-A=\begin{pmatrix}1&1\\1&1+\epsilon\end{pmatrix},
-\qquad
-L=\begin{pmatrix}1&0\\1&\sqrt{\epsilon}\end{pmatrix},
-\qquad \epsilon>0.
-$$
-
-The second pivot is obtained by subtracting $1$ from $1+\epsilon$. If $\epsilon$ is small enough, input rounding alone can replace $1+\epsilon$ by $1$, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
-
 ### Backward Error of the Factorization
 
-When the algorithm completes, the same control of the factor entries leads to a backward-error bound. The bound must account for rounding in the **computed** factor $\widehat{L}$.
+The preceding estimates concern the exact factor $L$. Rounding produces a different factor $\widehat{L}$, so those estimates cannot simply be applied to it. The rounding-error theorem first expresses $\widehat{L}$ as the exact factor of a perturbed matrix. Its diagonal equations then let us control the size of $\widehat{L}$.
 
 ````{prf:theorem} Backward Error of Cholesky Factorization
 :label: thm:backward_error_cholesky
@@ -338,19 +273,19 @@ A+E=\widehat{L}\widehat{L}^T,
 |E|\le\gamma_{n+1}|\widehat{L}|\,|\widehat{L}|^T,
 $$
 
-where $E$ is symmetric, absolute values and inequalities are entrywise, and $\gamma_m=mu/(1-mu)$.
+Here $u$ is the unit roundoff, $\gamma_m=mu/(1-mu)$, and $E$ is symmetric. Absolute values and inequalities are entrywise; $|\widehat{L}|\,|\widehat{L}|^T$ is an ordinary matrix product of nonnegative matrices.
 ````
 
-This is the Cholesky counterpart of the [LU backward-error theorem](lu_pivoting.md); the componentwise bound is stated by [Rump and Jeannerod](https://doi.org/10.1137/130927231). Its right-hand side involves the computed factor. Bounding that factor in terms of $A$ gives a normwise error bound without a growth-factor assumption.
+This is the Cholesky counterpart of the [LU backward-error theorem](lu_pivoting.md); the componentwise bound is stated by [Rump and Jeannerod](https://doi.org/10.1137/130927231). The goal is a normwise bound that depends only on $A$, $n$, and $u$.
 
-Write $\gamma=\gamma_{n+1}$ and assume $\gamma<1$. The diagonal equations imply
+To make the bound useful, the size of the computed factor must be bounded in terms of the original input $A$. Write $\gamma=\gamma_{n+1}$ and assume $\gamma<1$. The diagonal equations imply
 
 $$
 \sum_k\widehat{l}_{ik}^2=a_{ii}+e_{ii}
 \le a_{ii}+\gamma\sum_k\widehat{l}_{ik}^2.
 $$
 
-Summing over $i$ yields
+Moving the last term to the left and summing over $i$ bounds the sum of squares of all factor entries:
 
 $$
 \|\widehat{L}\|_F^2\le\frac{\operatorname{tr}(A)}{1-\gamma}.
@@ -377,12 +312,12 @@ $$
 \le\frac{n\gamma_{n+1}}{1-\gamma_{n+1}}.
 $$
 
-For small $nu$, this bound is approximately $n(n+1)u$. The dimension factor is a worst-case bound; there is no additional factor from uncontrolled element growth.
+For small $nu$, this bound is approximately $n(n+1)u$, so it is small when $n^2u\ll1$. The dimension factor is a worst-case bound; there is no additional factor from uncontrolled element growth.
 ```
 
 ### Backward Error of the Computed Solution
 
-The backward error of the computed solution $\widehat{x}$ accounts for rounding errors in the factorization and both triangular solves. For $b\ne0$, it is
+A small factorization error is only part of the accuracy argument: the two triangular solves introduce further rounding errors. To assess the complete solve, use the backward error $\eta(\widehat{x})$ defined in the [LU section](lu_pivoting.md). It is the smallest common bound on relative changes in $A$ and $b$ that make $\widehat{x}$ exact. For $b\ne0$, it can be computed from the residual:
 
 $$
 \eta(\widehat{x})=
@@ -398,9 +333,9 @@ $$
 |\Delta A|\le\gamma_{3n+1}|\widehat{L}|\,|\widehat{L}|^T.
 $$
 
-The factorization contributes $\gamma_{n+1}$; the two solves add $2\gamma_n+\gamma_n^2$. Their sum is at most $\gamma_{3n+1}$. Here $\Delta A$ includes all three stages and need not be symmetric.
+The factorization contributes $\gamma_{n+1}$; the two solves add $2\gamma_n+\gamma_n^2$. Their sum is at most $\gamma_{3n+1}$. Unlike the factorization perturbation $E$, the combined perturbation $\Delta A$ need not be symmetric, because the two solves introduce different rounding errors.
 
-Since this perturbation makes $\widehat{x}$ exact without changing $b$, the definition of backward error gives
+The pair $(\Delta A,0)$ is one admissible input perturbation. Since $\eta$ is the minimum over all admissible pairs, this pair gives an upper bound on $\eta$:
 
 $$
 \begin{aligned}
@@ -425,12 +360,12 @@ $$
 \beta_n=\frac{n\gamma_{3n+1}}{1-\gamma_{n+1}}.}
 $$
 
-For small $nu$, $\beta_n\approx n(3n+1)u$. This gives an explicit backward-error guarantee for the complete solve, without a growth-factor assumption.
+For small $nu$, $\beta_n\approx n(3n+1)u$. This bounds the error of the complete solve using only the dimension and arithmetic precision. The actual $\eta(\widehat{x})$, measured from the residual, can be much smaller than this worst-case bound.
 ```
 
 ### Forward Error of the Computed Solution
 
-The bound on $\eta(\widehat{x})$ controls the input perturbation needed to explain the computed answer. The condition number determines how much that perturbation can affect the solution. Substituting $\eta(\widehat{x})\le\beta_n$ into the [forward-error bound for linear systems](lu_pivoting.md) gives, when $\kappa_2(A)\beta_n<1$,
+Let $x$ be the exact solution of $Ax=b$. The bound on $\eta(\widehat{x})$ controls the input perturbation needed to explain the computed answer $\widehat{x}$. The condition number determines how much that perturbation can affect the solution. Substituting $\eta(\widehat{x})\le\beta_n$ into the [forward-error bound for linear systems](lu_pivoting.md) gives, when $\kappa_2(A)\beta_n<1$,
 
 $$
 \frac{\|\widehat{x}-x\|_2}{\|x\|_2}
@@ -444,6 +379,25 @@ $$
 $$
 
 An eigenvalue that is small relative to the largest one can therefore make the solution sensitive, despite the backward-error guarantee.
+
+### Cancellation and Breakdown
+
+The backward-error guarantees above assume successful completion. This assumption matters for matrices close to singularity: bounded factor entries still allow cancellation in a small pivot. A diagonal step computes
+
+$$
+l_{kk}=\sqrt{a_{kk}-\sum_{j<k}l_{kj}^2},
+$$
+
+where $a_{kk}$ in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,
+
+$$
+A=\begin{pmatrix}1&1\\1&1+\epsilon\end{pmatrix},
+\qquad
+L=\begin{pmatrix}1&0\\1&\sqrt{\epsilon}\end{pmatrix},
+\qquad \epsilon>0.
+$$
+
+The second pivot is obtained by subtracting $1$ from $1+\epsilon$. If $\epsilon$ is small enough, input rounding alone can replace $1+\epsilon$ by $1$, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
 
 ## Choosing a Direct Solver
 

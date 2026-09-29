@@ -476,10 +476,10 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-a-linear-system">Solving a Linear System</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-stability-and-its-limits">Backward Stability and Its Limits</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-factor-entries-stay-controlled">Why the Factor Entries Stay Controlled</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-and-breakdown">Cancellation and Breakdown</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-factorization">Backward Error of the Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-computed-solution">Backward Error of the Computed Solution</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-error-of-the-computed-solution">Forward Error of the Computed Solution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-and-breakdown">Cancellation and Breakdown</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
@@ -496,12 +496,13 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="cholesky-factorization">
 <h1>Cholesky Factorization<a class="headerlink" href="#cholesky-factorization" title="Link to this heading">#</a></h1>
-<p>For a symmetric positive definite matrix, symmetry and positive definiteness allow elimination to use a single triangular factor:</p>
+<p>For a symmetric positive definite matrix, elimination needs only one triangular factor. The upper triangular factor is the transpose of the lower one:</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{A=LL^T,\qquad l_{ii}&gt;0.}
 \]</div>
-<p>This is the <strong>Cholesky factorization</strong>. It requires about half the arithmetic of general LU factorization and can store the matrix and factor in a single triangle. No pivoting is needed in exact arithmetic. In floating-point arithmetic, a completed Cholesky factorization has a small backward error; as with LU, the accuracy of the solution also depends on conditioning.</p>
+<p>Here <span class="math notranslate nohighlight">\(L\)</span> is lower triangular. This is the <strong>Cholesky factorization</strong>. It requires about half the arithmetic of general LU factorization and can store the matrix and factor in a single triangle. Positive definiteness ensures that every pivot is positive in exact arithmetic, so no pivoting is needed.</p>
+<p>The block derivation below explains why the factorization exists and how to compute it. The error analysis then explains its numerical advantage: under the stated rounding assumptions, a completed factorization has backward error of order <span class="math notranslate nohighlight">\(u\)</span>, up to a dimension-dependent factor. As with LU, solution accuracy also depends on conditioning.</p>
 <section id="symmetric-positive-definite-matrices">
 <h2>Symmetric Positive Definite Matrices<a class="headerlink" href="#symmetric-positive-definite-matrices" title="Link to this heading">#</a></h2>
 <div class="proof definition admonition" id="definition-0">
@@ -556,7 +557,7 @@ L_SL_S^T&amp;=B-\ell\ell^T.
 \[
 S=B-\frac{cc^T}{a_{11}}.
 \]</div>
-<p>The key to continuing the algorithm is that <span class="math notranslate nohighlight">\(S\)</span> is also SPD.</p>
+<p>To repeat this step, the remaining matrix must also be SPD. Symmetry is immediate from the formula for <span class="math notranslate nohighlight">\(S\)</span>; positive definiteness needs a proof. It ensures that the next pivot, and every later pivot, is positive.</p>
 <section id="why-the-schur-complement-remains-positive-definite">
 <h3>Why the Schur Complement Remains Positive Definite<a class="headerlink" href="#why-the-schur-complement-remains-positive-definite" title="Link to this heading">#</a></h3>
 <p>For <span class="math notranslate nohighlight">\(x=(t,y^T)^T\)</span>, completing the square gives</p>
@@ -691,69 +692,11 @@ A=L_0DL_0^T=L_0U,
 Ly=b,\qquad L^Tx=y.
 \]</div>
 <p>Each new right-hand side costs about <span class="math notranslate nohighlight">\(2n^2\)</span> flops for the pair of solves; the factorization can be reused. There is no need to form <span class="math notranslate nohighlight">\(A^{-1}\)</span>.</p>
-<p>For a concrete example, take</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A=\begin{pmatrix}4&amp;2&amp;2\\2&amp;5&amp;3\\2&amp;3&amp;6\end{pmatrix}.
-\end{split}\]</div>
-<p>The first column of <span class="math notranslate nohighlight">\(L\)</span> is <span class="math notranslate nohighlight">\((2,1,1)^T\)</span>, and the first Schur complement is</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{pmatrix}5&amp;3\\3&amp;6\end{pmatrix}
--\begin{pmatrix}1\\1\end{pmatrix}\begin{pmatrix}1&amp;1\end{pmatrix}
-=\begin{pmatrix}4&amp;2\\2&amp;5\end{pmatrix}.
-\end{split}\]</div>
-<p>Continuing gives</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-L=\begin{pmatrix}2&amp;0&amp;0\\1&amp;2&amp;0\\1&amp;1&amp;2\end{pmatrix}.
-\end{split}\]</div>
-<p>The next cell factors <span class="math notranslate nohighlight">\(A\)</span> and solves for <span class="math notranslate nohighlight">\(b=(6,5,8)^T\)</span> using forward and backward substitution. Copies and an explicit <span class="math notranslate nohighlight">\(L\)</span> are used here so that we can check the result against the original data.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">4.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span>
-              <span class="p">[</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span>
-              <span class="p">[</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">,</span> <span class="mf">6.</span><span class="p">]])</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">6.</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">8.</span><span class="p">])</span>
-
-<span class="n">packed</span> <span class="o">=</span> <span class="n">cholesky_in_place</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-<span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">packed</span><span class="p">)</span>
-<span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">y</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
-<span class="n">xhat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-    <span class="n">xhat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">xhat</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span> <span class="o">/</span> <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
-
-<span class="n">r</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">xhat</span>
-<span class="n">eta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xhat</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">L</span> <span class="o">@</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">xhat</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"L ="</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Computed solution:"</span><span class="p">,</span> <span class="n">xhat</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Relative backward error: </span><span class="si">{</span><span class="n">eta</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L =
-[[2. 0. 0.]
- [1. 2. 0.]
- [1. 1. 2.]]
-Computed solution: [1. 0. 1.]
-Relative backward error: 0.000e+00
-</pre></div>
-</div>
-</div>
-</div>
-<p>The factorization and triangular solves in this example are exact in binary arithmetic, so the backward error is zero. For general data, rounding errors enter both stages. Their effect depends on the sizes of the terms formed during the computation.</p>
 </section>
 <section id="backward-stability-and-its-limits">
 <h2>Backward Stability and Its Limits<a class="headerlink" href="#backward-stability-and-its-limits" title="Link to this heading">#</a></h2>
+<p>In the LU analysis, the main obstacle to a small backward-error bound was growth in the factors. Cholesky avoids that obstacle because positive definiteness controls the factor entries. This gives the route to a solution-error bound: first bound the error in the factorization, then include the two triangular solves, and finally apply the condition number.</p>
+<p>These error bounds assume that the computation completes. Cancellation can still cause a nonpositive computed pivot; that limitation is discussed after the error analysis.</p>
 <section id="why-the-factor-entries-stay-controlled">
 <h3>Why the Factor Entries Stay Controlled<a class="headerlink" href="#why-the-factor-entries-stay-controlled" title="Link to this heading">#</a></h3>
 <p>In exact arithmetic, the diagonal of <span class="math notranslate nohighlight">\(A=LL^T\)</span> gives</p>
@@ -766,7 +709,7 @@ a_{ii}=\sum_{k=1}^i l_{ik}^2.
 \[
 \boxed{|l_{ik}|\le\sqrt{a_{ii}}.}
 \]</div>
-<p>More generally, Cauchy–Schwarz bounds the products that enter the backward-error analysis:</p>
+<p>The LU error bound involved <span class="math notranslate nohighlight">\(|L|\,|U|\)</span>, which measures the sizes of products before cancellation. For Cholesky, the corresponding matrix is <span class="math notranslate nohighlight">\(|L|\,|L|^T\)</span>. Cauchy–Schwarz bounds each of its entries:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -779,26 +722,9 @@ a_{ii}=\sum_{k=1}^i l_{ik}^2.
 \end{split}\]</div>
 <p>Thus these products remain controlled by the original diagonal entries. There is no counterpart to the exponential growth in the LU example.</p>
 </section>
-<section id="cancellation-and-breakdown">
-<h3>Cancellation and Breakdown<a class="headerlink" href="#cancellation-and-breakdown" title="Link to this heading">#</a></h3>
-<p>Bounded factor entries do not rule out cancellation during the computation. A diagonal step computes</p>
-<div class="math notranslate nohighlight">
-\[
-l_{kk}=\sqrt{a_{kk}-\sum_{j&lt;k}l_{kj}^2},
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(a_{kk}\)</span> in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A=\begin{pmatrix}1&amp;1\\1&amp;1+\epsilon\end{pmatrix},
-\qquad
-L=\begin{pmatrix}1&amp;0\\1&amp;\sqrt{\epsilon}\end{pmatrix},
-\qquad \epsilon&gt;0.
-\end{split}\]</div>
-<p>The second pivot is obtained by subtracting <span class="math notranslate nohighlight">\(1\)</span> from <span class="math notranslate nohighlight">\(1+\epsilon\)</span>. If <span class="math notranslate nohighlight">\(\epsilon\)</span> is small enough, input rounding alone can replace <span class="math notranslate nohighlight">\(1+\epsilon\)</span> by <span class="math notranslate nohighlight">\(1\)</span>, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see <a class="reference external" href="https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/">Higham’s discussion of Cholesky factorization</a>.</p>
-</section>
 <section id="backward-error-of-the-factorization">
 <h3>Backward Error of the Factorization<a class="headerlink" href="#backward-error-of-the-factorization" title="Link to this heading">#</a></h3>
-<p>When the algorithm completes, the same control of the factor entries leads to a backward-error bound. The bound must account for rounding in the <strong>computed</strong> factor <span class="math notranslate nohighlight">\(\widehat{L}\)</span>.</p>
+<p>The preceding estimates concern the exact factor <span class="math notranslate nohighlight">\(L\)</span>. Rounding produces a different factor <span class="math notranslate nohighlight">\(\widehat{L}\)</span>, so those estimates cannot simply be applied to it. The rounding-error theorem first expresses <span class="math notranslate nohighlight">\(\widehat{L}\)</span> as the exact factor of a perturbed matrix. Its diagonal equations then let us control the size of <span class="math notranslate nohighlight">\(\widehat{L}\)</span>.</p>
 <div class="proof theorem admonition" id="thm:backward_error_cholesky">
 <p class="admonition-title"><span class="caption-number">Theorem 18 </span> (Backward Error of Cholesky Factorization)</p>
 <section class="theorem-content" id="proof-content">
@@ -809,16 +735,16 @@ A+E=\widehat{L}\widehat{L}^T,
 \qquad
 |E|\le\gamma_{n+1}|\widehat{L}|\,|\widehat{L}|^T,
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(E\)</span> is symmetric, absolute values and inequalities are entrywise, and <span class="math notranslate nohighlight">\(\gamma_m=mu/(1-mu)\)</span>.</p>
+<p>Here <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, <span class="math notranslate nohighlight">\(\gamma_m=mu/(1-mu)\)</span>, and <span class="math notranslate nohighlight">\(E\)</span> is symmetric. Absolute values and inequalities are entrywise; <span class="math notranslate nohighlight">\(|\widehat{L}|\,|\widehat{L}|^T\)</span> is an ordinary matrix product of nonnegative matrices.</p>
 </section>
-</div><p>This is the Cholesky counterpart of the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU backward-error theorem</span></a>; the componentwise bound is stated by <a class="reference external" href="https://doi.org/10.1137/130927231">Rump and Jeannerod</a>. Its right-hand side involves the computed factor. Bounding that factor in terms of <span class="math notranslate nohighlight">\(A\)</span> gives a normwise error bound without a growth-factor assumption.</p>
-<p>Write <span class="math notranslate nohighlight">\(\gamma=\gamma_{n+1}\)</span> and assume <span class="math notranslate nohighlight">\(\gamma&lt;1\)</span>. The diagonal equations imply</p>
+</div><p>This is the Cholesky counterpart of the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU backward-error theorem</span></a>; the componentwise bound is stated by <a class="reference external" href="https://doi.org/10.1137/130927231">Rump and Jeannerod</a>. The goal is a normwise bound that depends only on <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(n\)</span>, and <span class="math notranslate nohighlight">\(u\)</span>.</p>
+<p>To make the bound useful, the size of the computed factor must be bounded in terms of the original input <span class="math notranslate nohighlight">\(A\)</span>. Write <span class="math notranslate nohighlight">\(\gamma=\gamma_{n+1}\)</span> and assume <span class="math notranslate nohighlight">\(\gamma&lt;1\)</span>. The diagonal equations imply</p>
 <div class="math notranslate nohighlight">
 \[
 \sum_k\widehat{l}_{ik}^2=a_{ii}+e_{ii}
 \le a_{ii}+\gamma\sum_k\widehat{l}_{ik}^2.
 \]</div>
-<p>Summing over <span class="math notranslate nohighlight">\(i\)</span> yields</p>
+<p>Moving the last term to the left and summing over <span class="math notranslate nohighlight">\(i\)</span> bounds the sum of squares of all factor entries:</p>
 <div class="math notranslate nohighlight">
 \[
 \|\widehat{L}\|_F^2\le\frac{\operatorname{tr}(A)}{1-\gamma}.
@@ -841,12 +767,12 @@ A+E=\widehat{L}\widehat{L}^T,
 \frac{\|E\|_2}{\|A\|_2}
 \le\frac{n\gamma_{n+1}}{1-\gamma_{n+1}}.
 \]</div>
-<p>For small <span class="math notranslate nohighlight">\(nu\)</span>, this bound is approximately <span class="math notranslate nohighlight">\(n(n+1)u\)</span>. The dimension factor is a worst-case bound; there is no additional factor from uncontrolled element growth.</p>
+<p>For small <span class="math notranslate nohighlight">\(nu\)</span>, this bound is approximately <span class="math notranslate nohighlight">\(n(n+1)u\)</span>, so it is small when <span class="math notranslate nohighlight">\(n^2u\ll1\)</span>. The dimension factor is a worst-case bound; there is no additional factor from uncontrolled element growth.</p>
 </div>
 </section>
 <section id="backward-error-of-the-computed-solution">
 <h3>Backward Error of the Computed Solution<a class="headerlink" href="#backward-error-of-the-computed-solution" title="Link to this heading">#</a></h3>
-<p>The backward error of the computed solution <span class="math notranslate nohighlight">\(\widehat{x}\)</span> accounts for rounding errors in the factorization and both triangular solves. For <span class="math notranslate nohighlight">\(b\ne0\)</span>, it is</p>
+<p>A small factorization error is only part of the accuracy argument: the two triangular solves introduce further rounding errors. To assess the complete solve, use the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> defined in the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU section</span></a>. It is the smallest common bound on relative changes in <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> that make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact. For <span class="math notranslate nohighlight">\(b\ne0\)</span>, it can be computed from the residual:</p>
 <div class="math notranslate nohighlight">
 \[
 \eta(\widehat{x})=
@@ -860,8 +786,8 @@ A+E=\widehat{L}\widehat{L}^T,
 \qquad
 |\Delta A|\le\gamma_{3n+1}|\widehat{L}|\,|\widehat{L}|^T.
 \]</div>
-<p>The factorization contributes <span class="math notranslate nohighlight">\(\gamma_{n+1}\)</span>; the two solves add <span class="math notranslate nohighlight">\(2\gamma_n+\gamma_n^2\)</span>. Their sum is at most <span class="math notranslate nohighlight">\(\gamma_{3n+1}\)</span>. Here <span class="math notranslate nohighlight">\(\Delta A\)</span> includes all three stages and need not be symmetric.</p>
-<p>Since this perturbation makes <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact without changing <span class="math notranslate nohighlight">\(b\)</span>, the definition of backward error gives</p>
+<p>The factorization contributes <span class="math notranslate nohighlight">\(\gamma_{n+1}\)</span>; the two solves add <span class="math notranslate nohighlight">\(2\gamma_n+\gamma_n^2\)</span>. Their sum is at most <span class="math notranslate nohighlight">\(\gamma_{3n+1}\)</span>. Unlike the factorization perturbation <span class="math notranslate nohighlight">\(E\)</span>, the combined perturbation <span class="math notranslate nohighlight">\(\Delta A\)</span> need not be symmetric, because the two solves introduce different rounding errors.</p>
+<p>The pair <span class="math notranslate nohighlight">\((\Delta A,0)\)</span> is one admissible input perturbation. Since <span class="math notranslate nohighlight">\(\eta\)</span> is the minimum over all admissible pairs, this pair gives an upper bound on <span class="math notranslate nohighlight">\(\eta\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -882,12 +808,12 @@ A+E=\widehat{L}\widehat{L}^T,
 \qquad
 \beta_n=\frac{n\gamma_{3n+1}}{1-\gamma_{n+1}}.}
 \]</div>
-<p>For small <span class="math notranslate nohighlight">\(nu\)</span>, <span class="math notranslate nohighlight">\(\beta_n\approx n(3n+1)u\)</span>. This gives an explicit backward-error guarantee for the complete solve, without a growth-factor assumption.</p>
+<p>For small <span class="math notranslate nohighlight">\(nu\)</span>, <span class="math notranslate nohighlight">\(\beta_n\approx n(3n+1)u\)</span>. This bounds the error of the complete solve using only the dimension and arithmetic precision. The actual <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span>, measured from the residual, can be much smaller than this worst-case bound.</p>
 </div>
 </section>
 <section id="forward-error-of-the-computed-solution">
 <h3>Forward Error of the Computed Solution<a class="headerlink" href="#forward-error-of-the-computed-solution" title="Link to this heading">#</a></h3>
-<p>The bound on <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> controls the input perturbation needed to explain the computed answer. The condition number determines how much that perturbation can affect the solution. Substituting <span class="math notranslate nohighlight">\(\eta(\widehat{x})\le\beta_n\)</span> into the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">forward-error bound for linear systems</span></a> gives, when <span class="math notranslate nohighlight">\(\kappa_2(A)\beta_n&lt;1\)</span>,</p>
+<p>Let <span class="math notranslate nohighlight">\(x\)</span> be the exact solution of <span class="math notranslate nohighlight">\(Ax=b\)</span>. The bound on <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> controls the input perturbation needed to explain the computed answer <span class="math notranslate nohighlight">\(\widehat{x}\)</span>. The condition number determines how much that perturbation can affect the solution. Substituting <span class="math notranslate nohighlight">\(\eta(\widehat{x})\le\beta_n\)</span> into the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">forward-error bound for linear systems</span></a> gives, when <span class="math notranslate nohighlight">\(\kappa_2(A)\beta_n&lt;1\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\|\widehat{x}-x\|_2}{\|x\|_2}
@@ -899,6 +825,23 @@ A+E=\widehat{L}\widehat{L}^T,
 \kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}.
 \]</div>
 <p>An eigenvalue that is small relative to the largest one can therefore make the solution sensitive, despite the backward-error guarantee.</p>
+</section>
+<section id="cancellation-and-breakdown">
+<h3>Cancellation and Breakdown<a class="headerlink" href="#cancellation-and-breakdown" title="Link to this heading">#</a></h3>
+<p>The backward-error guarantees above assume successful completion. This assumption matters for matrices close to singularity: bounded factor entries still allow cancellation in a small pivot. A diagonal step computes</p>
+<div class="math notranslate nohighlight">
+\[
+l_{kk}=\sqrt{a_{kk}-\sum_{j&lt;k}l_{kj}^2},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(a_{kk}\)</span> in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}1&amp;1\\1&amp;1+\epsilon\end{pmatrix},
+\qquad
+L=\begin{pmatrix}1&amp;0\\1&amp;\sqrt{\epsilon}\end{pmatrix},
+\qquad \epsilon&gt;0.
+\end{split}\]</div>
+<p>The second pivot is obtained by subtracting <span class="math notranslate nohighlight">\(1\)</span> from <span class="math notranslate nohighlight">\(1+\epsilon\)</span>. If <span class="math notranslate nohighlight">\(\epsilon\)</span> is small enough, input rounding alone can replace <span class="math notranslate nohighlight">\(1+\epsilon\)</span> by <span class="math notranslate nohighlight">\(1\)</span>, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see <a class="reference external" href="https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/">Higham’s discussion of Cholesky factorization</a>.</p>
 </section>
 </section>
 <section id="choosing-a-direct-solver">
@@ -987,10 +930,10 @@ A+E=\widehat{L}\widehat{L}^T,
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-a-linear-system">Solving a Linear System</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-stability-and-its-limits">Backward Stability and Its Limits</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-factor-entries-stay-controlled">Why the Factor Entries Stay Controlled</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-and-breakdown">Cancellation and Breakdown</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-factorization">Backward Error of the Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-computed-solution">Backward Error of the Computed Solution</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-error-of-the-computed-solution">Forward Error of the Computed Solution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-and-breakdown">Cancellation and Breakdown</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
