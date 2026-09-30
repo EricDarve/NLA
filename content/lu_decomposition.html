@@ -470,7 +470,11 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-lu-through-outer-products">Deriving LU through Outer Products</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-column-and-row">The First Column and Row</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-elimination-and-projections">Connection to Elimination and Projections</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-elimination-and-projections">Connection to Elimination and Projections</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#why-this-is-a-projection">Why This Is a Projection</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#small-pivots-and-long-shadows">Small Pivots and Long Shadows</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-elimination-step">The General Elimination Step</a></li>
@@ -634,13 +638,86 @@ U=\begin{pmatrix}a_{11}&amp;r\\0&amp;U_S\end{pmatrix}
 <section id="connection-to-elimination-and-projections">
 <h3>Connection to Elimination and Projections<a class="headerlink" href="#connection-to-elimination-and-projections" title="Link to this heading">#</a></h3>
 <p>In Gaussian elimination, subtracting <span class="math notranslate nohighlight">\((c_i/a_{11})\)</span> times the first row from each lower row produces <span class="math notranslate nohighlight">\(S\)</span> in the trailing block. LU records those multipliers in <span class="math notranslate nohighlight">\(L\)</span> and the resulting pivot rows in <span class="math notranslate nohighlight">\(U\)</span>.</p>
-<p>The rank-one remainder also has an <a class="reference internal" href="projections.html"><span class="std std-doc">oblique projection</span></a> interpretation. Set <span class="math notranslate nohighlight">\(l=l_{:,1}\)</span> and let <span class="math notranslate nohighlight">\(e_1\)</span> be the first coordinate vector. Since <span class="math notranslate nohighlight">\(e_1^Tl=1\)</span>,</p>
+<p>The rank-one remainder also has an <a class="reference internal" href="projections.html"><span class="std std-doc">oblique projection</span></a> interpretation. We work in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>, with <span class="math notranslate nohighlight">\(n\geq2\)</span>, for the geometric discussion. Set</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+m=\frac{c}{a_{11}},\qquad l=l_{:,1}=\begin{pmatrix}1\\m\end{pmatrix},
+\qquad P=I-le_1^T=\begin{pmatrix}0&amp;0\\-m&amp;I\end{pmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(e_1\)</span> is the first coordinate vector. To see what <span class="math notranslate nohighlight">\(R\)</span> does, apply it to a vector with first coordinate <span class="math notranslate nohighlight">\(s\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+x=\begin{pmatrix}s\\z\end{pmatrix},\qquad
+Px=\begin{pmatrix}0\\z-ms\end{pmatrix},\qquad
+x-Px=s\begin{pmatrix}1\\m\end{pmatrix}=sl.
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(Px\)</span> lies in the hyperplane <span class="math notranslate nohighlight">\(H=\{x:x_1=0\}\)</span>, and the displacement from <span class="math notranslate nohighlight">\(x\)</span> to <span class="math notranslate nohighlight">\(Px\)</span> is parallel to <span class="math notranslate nohighlight">\(l\)</span>. Geometrically, follow the line through <span class="math notranslate nohighlight">\(x\)</span> parallel to <span class="math notranslate nohighlight">\(l\)</span> until it meets <span class="math notranslate nohighlight">\(H\)</span>.</p>
+<section id="why-this-is-a-projection">
+<h4>Why This Is a Projection<a class="headerlink" href="#why-this-is-a-projection" title="Link to this heading">#</a></h4>
+<p>The formulas above give</p>
 <div class="math notranslate nohighlight">
 \[
-P=I-le_1^T,\qquad P^2=P,
-\qquad PA=A-lu_{1,:}.
+\operatorname{range}(P)=H,\qquad
+\operatorname{null}(P)=\operatorname{span}\{l\},\qquad
+P^2=P.
 \]</div>
-<p>This projects onto the vectors whose first coordinate is zero, along the direction <span class="math notranslate nohighlight">\(l\)</span>. It is generally not an orthogonal projection. This remainder discards the pivot row after saving it in <span class="math notranslate nohighlight">\(U\)</span>; ordinary row elimination keeps that row.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Every output of <span class="math notranslate nohighlight">\(P\)</span> has first coordinate zero, so its range is contained in <span class="math notranslate nohighlight">\(H\)</span>. Conversely, <span class="math notranslate nohighlight">\(P(0,z)^T=(0,z)^T\)</span>: every vector in <span class="math notranslate nohighlight">\(H\)</span> is fixed by <span class="math notranslate nohighlight">\(P\)</span> and is therefore in its range. Also, <span class="math notranslate nohighlight">\(Px=0\)</span> exactly when <span class="math notranslate nohighlight">\(z=ms\)</span>, or <span class="math notranslate nohighlight">\(x=sl\)</span>, proving the null-space statement. In particular, <span class="math notranslate nohighlight">\(Pl=0\)</span>.</p>
+<p>Since <span class="math notranslate nohighlight">\(P\)</span> fixes every vector in its range, applying it twice has the same effect as applying it once. Algebraically, <span class="math notranslate nohighlight">\(e_1^Tl=1\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+P^2=(I-le_1^T)^2
+=I-2le_1^T+l(e_1^Tl)e_1^T
+=I-le_1^T=P.
+\]</div>
+</div>
+<p>This projection is orthogonal exactly when <span class="math notranslate nohighlight">\(l\)</span> is perpendicular to <span class="math notranslate nohighlight">\(H\)</span>. Since <span class="math notranslate nohighlight">\(H^\perp=\operatorname{span}\{e_1\}\)</span> and <span class="math notranslate nohighlight">\(l_1=1\)</span>, this happens exactly when <span class="math notranslate nohighlight">\(m=0\)</span>. Otherwise it is <strong>oblique</strong>: the direction we project along is tilted relative to the normal to <span class="math notranslate nohighlight">\(H\)</span>.</p>
+<p>To recover the LU remainder, observe that <span class="math notranslate nohighlight">\(e_1^TA=u_{1,:}\)</span> is the first row of <span class="math notranslate nohighlight">\(A\)</span>. Hence</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+PA=A-l(e_1^TA)=A-lu_{1,:}
+=\begin{pmatrix}0&amp;0\\c-ma_{11}&amp;B-mr\end{pmatrix}
+=\begin{pmatrix}0&amp;0\\0&amp;S\end{pmatrix}.
+\end{split}\]</div>
+<p>The first column vanishes because it is <span class="math notranslate nohighlight">\(a_{11}l\)</span>, a vector in the null space of <span class="math notranslate nohighlight">\(P\)</span>. Every column is projected into <span class="math notranslate nohighlight">\(H\)</span>, so the first row vanishes as well. The remaining block is the Schur complement.</p>
+</section>
+<section id="small-pivots-and-long-shadows">
+<h4>Small Pivots and Long Shadows<a class="headerlink" href="#small-pivots-and-long-shadows" title="Link to this heading">#</a></h4>
+<p>Think of <span class="math notranslate nohighlight">\(H\)</span> as the ground and of lines parallel to <span class="math notranslate nohighlight">\(l\)</span> as rays of sunlight. The projected point is the shadow of <span class="math notranslate nohighlight">\(x\)</span>. When the rays are nearly perpendicular to the ground, the shadow stays close to the point. When they are nearly parallel to the ground, a small change in height can move the shadow a long distance.</p>
+<p>Let <span class="math notranslate nohighlight">\(\theta\in(0,\pi/2]\)</span> be the angle between the line through <span class="math notranslate nohighlight">\(l\)</span> and <span class="math notranslate nohighlight">\(H\)</span>. Because the component of <span class="math notranslate nohighlight">\(l\)</span> perpendicular to <span class="math notranslate nohighlight">\(H\)</span> is <span class="math notranslate nohighlight">\(e_1\)</span>, of length one,</p>
+<div class="math notranslate nohighlight">
+\[
+\sin\theta=\frac{1}{\|l\|_2},\qquad
+\|l\|_2=\sqrt{1+\|m\|_2^2}
+=\sqrt{1+\frac{\|c\|_2^2}{|a_{11}|^2}}.
+\]</div>
+<p>The normalization <span class="math notranslate nohighlight">\(l_1=1\)</span> matters here: rescaling a direction would not change its angle, but our LU convention fixes its scale. Thus a large <span class="math notranslate nohighlight">\(\|l\|_2\)</span> means a small angle with <span class="math notranslate nohighlight">\(H\)</span>.</p>
+<figure class="align-default" id="id1">
+<img alt="Two projections of the same unit vector x=e1 onto H, drawn horizontally with identical scales. For l=(1,0.5), the shadow is at (0,-0.5) and the projection norm is about 1.12. For l=(1,4), the shadow is at (0,-4) and the norm is about 4.12. The orange displacement from Px to x equals l and makes a smaller angle with H in the second panel." src="../_images/lu_oblique_projection.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">A good case and a bad case for amplification in one projection. In this two-dimensional drawing, <span class="math notranslate nohighlight">\(x_1\)</span> is vertical and <span class="math notranslate nohighlight">\(x_2\)</span> is horizontal, so <span class="math notranslate nohighlight">\(H\)</span> is the ground. Both panels use the same scale and the same input <span class="math notranslate nohighlight">\(x=e_1\)</span>. The orange arrow is <span class="math notranslate nohighlight">\(x-Px=l\)</span>; the blue arrow is the shadow <span class="math notranslate nohighlight">\(Px\)</span>. A larger <span class="math notranslate nohighlight">\(\|l\|_2\)</span> tilts the projection direction toward <span class="math notranslate nohighlight">\(H\)</span> and lengthens the shadow.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The largest possible amplification of a vector is the operator norm of <span class="math notranslate nohighlight">\(P\)</span>, and it has a particularly simple formula:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\|P\|_2=\|l\|_2=\sqrt{1+\|m\|_2^2}=\frac{1}{\sin\theta}.}
+\]</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Using the block form of <span class="math notranslate nohighlight">\(P\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+PP^T=\begin{pmatrix}0&amp;0\\0&amp;I+mm^T\end{pmatrix}.
+\end{split}\]</div>
+<p>If <span class="math notranslate nohighlight">\(m\neq0\)</span>, then <span class="math notranslate nohighlight">\((I+mm^T)m=(1+\|m\|_2^2)m\)</span>, while every vector perpendicular to <span class="math notranslate nohighlight">\(m\)</span> is left unchanged. Thus the largest eigenvalue of <span class="math notranslate nohighlight">\(PP^T\)</span> is <span class="math notranslate nohighlight">\(1+\|m\|_2^2\)</span>. The same formula holds when <span class="math notranslate nohighlight">\(m=0\)</span>, since the trailing block is then <span class="math notranslate nohighlight">\(I\)</span>. The operator norm is the largest singular value, or the square root of this largest eigenvalue. This proves the formula.</p>
+</div>
+<p>For a fixed <span class="math notranslate nohighlight">\(P\)</span>, an input perturbation <span class="math notranslate nohighlight">\(\delta x\)</span> changes the projection by <span class="math notranslate nohighlight">\(P\delta x\)</span>, with</p>
+<div class="math notranslate nohighlight">
+\[
+\|P\delta x\|_2\leq\|l\|_2\,\|\delta x\|_2.
+\]</div>
+<p>This bound is attained for a suitable perturbation direction. Even the simple choice <span class="math notranslate nohighlight">\(\delta x=\varepsilon e_1\)</span> gives <span class="math notranslate nohighlight">\(P\delta x=(0,-\varepsilon m)^T\)</span>: a height change of size <span class="math notranslate nohighlight">\(|\varepsilon|\)</span> moves the shadow by <span class="math notranslate nohighlight">\(|\varepsilon|\,\|m\|_2\)</span>. The bad case is therefore a pivot small <strong>relative to</strong> <span class="math notranslate nohighlight">\(\|c\|_2\)</span>, which makes the multipliers large. This is one reason for <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">row pivoting</span></a>.</p>
+</section>
 </section>
 </section>
 <section id="the-general-elimination-step">
@@ -842,7 +919,11 @@ A=\begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-lu-through-outer-products">Deriving LU through Outer Products</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-column-and-row">The First Column and Row</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-elimination-and-projections">Connection to Elimination and Projections</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-elimination-and-projections">Connection to Elimination and Projections</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#why-this-is-a-projection">Why This Is a Projection</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#small-pivots-and-long-shadows">Small Pivots and Long Shadows</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-general-elimination-step">The General Elimination Step</a></li>

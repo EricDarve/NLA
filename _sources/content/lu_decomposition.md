@@ -165,14 +165,100 @@ satisfy $A=LU$. Repeating this argument proves the recursive construction whenev
 
 In Gaussian elimination, subtracting $(c_i/a_{11})$ times the first row from each lower row produces $S$ in the trailing block. LU records those multipliers in $L$ and the resulting pivot rows in $U$.
 
-The rank-one remainder also has an [oblique projection](projections.md) interpretation. Set $l=l_{:,1}$ and let $e_1$ be the first coordinate vector. Since $e_1^Tl=1$,
+The rank-one remainder also has an [oblique projection](projections.md) interpretation. We work in $\mathbb{R}^n$, with $n\geq2$, for the geometric discussion. Set
 
 $$
-P=I-le_1^T,\qquad P^2=P,
-\qquad PA=A-lu_{1,:}.
+m=\frac{c}{a_{11}},\qquad l=l_{:,1}=\begin{pmatrix}1\\m\end{pmatrix},
+\qquad P=I-le_1^T=\begin{pmatrix}0&0\\-m&I\end{pmatrix},
 $$
 
-This projects onto the vectors whose first coordinate is zero, along the direction $l$. It is generally not an orthogonal projection. This remainder discards the pivot row after saving it in $U$; ordinary row elimination keeps that row.
+where $e_1$ is the first coordinate vector. To see what $R$ does, apply it to a vector with first coordinate $s$:
+
+$$
+x=\begin{pmatrix}s\\z\end{pmatrix},\qquad
+Px=\begin{pmatrix}0\\z-ms\end{pmatrix},\qquad
+x-Px=s\begin{pmatrix}1\\m\end{pmatrix}=sl.
+$$
+
+Thus $Px$ lies in the hyperplane $H=\{x:x_1=0\}$, and the displacement from $x$ to $Px$ is parallel to $l$. Geometrically, follow the line through $x$ parallel to $l$ until it meets $H$.
+
+#### Why This Is a Projection
+
+The formulas above give
+
+$$
+\operatorname{range}(P)=H,\qquad
+\operatorname{null}(P)=\operatorname{span}\{l\},\qquad
+P^2=P.
+$$
+
+````{prf:proof}
+Every output of $P$ has first coordinate zero, so its range is contained in $H$. Conversely, $P(0,z)^T=(0,z)^T$: every vector in $H$ is fixed by $P$ and is therefore in its range. Also, $Px=0$ exactly when $z=ms$, or $x=sl$, proving the null-space statement. In particular, $Pl=0$.
+
+Since $P$ fixes every vector in its range, applying it twice has the same effect as applying it once. Algebraically, $e_1^Tl=1$ gives
+
+$$
+P^2=(I-le_1^T)^2
+=I-2le_1^T+l(e_1^Tl)e_1^T
+=I-le_1^T=P.
+$$
+````
+
+This projection is orthogonal exactly when $l$ is perpendicular to $H$. Since $H^\perp=\operatorname{span}\{e_1\}$ and $l_1=1$, this happens exactly when $m=0$. Otherwise it is **oblique**: the direction we project along is tilted relative to the normal to $H$.
+
+To recover the LU remainder, observe that $e_1^TA=u_{1,:}$ is the first row of $A$. Hence
+
+$$
+PA=A-l(e_1^TA)=A-lu_{1,:}
+=\begin{pmatrix}0&0\\c-ma_{11}&B-mr\end{pmatrix}
+=\begin{pmatrix}0&0\\0&S\end{pmatrix}.
+$$
+
+The first column vanishes because it is $a_{11}l$, a vector in the null space of $P$. Every column is projected into $H$, so the first row vanishes as well. The remaining block is the Schur complement.
+
+#### Small Pivots and Long Shadows
+
+Think of $H$ as the ground and of lines parallel to $l$ as rays of sunlight. The projected point is the shadow of $x$. When the rays are nearly perpendicular to the ground, the shadow stays close to the point. When they are nearly parallel to the ground, a small change in height can move the shadow a long distance.
+
+Let $\theta\in(0,\pi/2]$ be the angle between the line through $l$ and $H$. Because the component of $l$ perpendicular to $H$ is $e_1$, of length one,
+
+$$
+\sin\theta=\frac{1}{\|l\|_2},\qquad
+\|l\|_2=\sqrt{1+\|m\|_2^2}
+=\sqrt{1+\frac{\|c\|_2^2}{|a_{11}|^2}}.
+$$
+
+The normalization $l_1=1$ matters here: rescaling a direction would not change its angle, but our LU convention fixes its scale. Thus a large $\|l\|_2$ means a small angle with $H$.
+
+```{figure} ../_static/lu_oblique_projection.svg
+:alt: Two projections of the same unit vector x=e1 onto H, drawn horizontally with identical scales. For l=(1,0.5), the shadow is at (0,-0.5) and the projection norm is about 1.12. For l=(1,4), the shadow is at (0,-4) and the norm is about 4.12. The orange displacement from Px to x equals l and makes a smaller angle with H in the second panel.
+
+A good case and a bad case for amplification in one projection. In this two-dimensional drawing, $x_1$ is vertical and $x_2$ is horizontal, so $H$ is the ground. Both panels use the same scale and the same input $x=e_1$. The orange arrow is $x-Px=l$; the blue arrow is the shadow $Px$. A larger $\|l\|_2$ tilts the projection direction toward $H$ and lengthens the shadow.
+```
+
+The largest possible amplification of a vector is the operator norm of $P$, and it has a particularly simple formula:
+
+$$
+\boxed{\|P\|_2=\|l\|_2=\sqrt{1+\|m\|_2^2}=\frac{1}{\sin\theta}.}
+$$
+
+````{prf:proof}
+Using the block form of $P$,
+
+$$
+PP^T=\begin{pmatrix}0&0\\0&I+mm^T\end{pmatrix}.
+$$
+
+If $m\neq0$, then $(I+mm^T)m=(1+\|m\|_2^2)m$, while every vector perpendicular to $m$ is left unchanged. Thus the largest eigenvalue of $PP^T$ is $1+\|m\|_2^2$. The same formula holds when $m=0$, since the trailing block is then $I$. The operator norm is the largest singular value, or the square root of this largest eigenvalue. This proves the formula.
+````
+
+For a fixed $P$, an input perturbation $\delta x$ changes the projection by $P\delta x$, with
+
+$$
+\|P\delta x\|_2\leq\|l\|_2\,\|\delta x\|_2.
+$$
+
+This bound is attained for a suitable perturbation direction. Even the simple choice $\delta x=\varepsilon e_1$ gives $P\delta x=(0,-\varepsilon m)^T$: a height change of size $|\varepsilon|$ moves the shadow by $|\varepsilon|\,\|m\|_2$. The bad case is therefore a pivot small **relative to** $\|c\|_2$, which makes the multipliers large. This is one reason for [row pivoting](lu_pivoting.md).
 
 ## The General Elimination Step
 
