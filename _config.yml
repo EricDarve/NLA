@@ -2,7 +2,7 @@
 # Book settings
 # Full reference: https://jupyterbook.org/en/stable/customize/config.html
 
-title: CME 302 Numerical Linear Algebra
+title: Numerical Linear Algebra
 author: Eric Darve
 copyright: "2026"
 
