@@ -2,8 +2,8 @@
 
 Welcome to the Linear Algebra Bootcamp! 🚀
 
-This chapter is your high-speed training ground for the essential concepts of linear algebra that power everything from data science to quantum mechanics. We'll start with a rapid tour of the fundamentals—vector spaces, norms, and dot products—before diving into the core of the action.
+This chapter reviews the essential concepts of linear algebra used in fields from data science to quantum mechanics. We'll start with a quick tour of vector spaces, norms, and dot products before moving on to matrices and their structure.
 
-You'll get reacquainted with matrices and the powerful stories they tell through their four fundamental subspaces. Then, we'll unlock the secrets of a matrix's "DNA" with two of the most important tools in mathematics: the **Eigendecomposition**, which explains how systems evolve, and the **Singular Value Decomposition (SVD)**, which reveals the pure geometry of transformations.
+We'll explore the four fundamental subspaces of a matrix, then introduce two key tools: the **eigendecomposition**, which helps explain how linear systems evolve, and the **singular value decomposition (SVD)**, which reveals the geometry of linear transformations.
 
-Whether you need a quick refresher or are building your foundation from scratch, this bootcamp will get you geared up for the exciting world of numerical linear algebra. Let's get started!
+Whether you need a quick refresher or are building your foundation, this bootcamp will help you prepare for numerical linear algebra. Let's get started!

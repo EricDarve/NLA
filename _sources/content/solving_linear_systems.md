@@ -1,30 +1,30 @@
 # Solving Linear Systems
 
-Welcome to the heart of numerical linear algebra. The problem of solving a system of linear equations, written in matrix form as $Ax = b$, is arguably one of the most fundamental and frequently encountered computational problems in all of science and engineering. From simulating the airflow over a wing and analyzing electrical circuits to training machine learning models and pricing financial derivatives, the need to solve for an unknown vector $x$ is everywhere.
+Solving a system of linear equations, written in matrix form as $Ax = b$, is a central problem in numerical linear algebra. Such systems arise throughout science and engineering, from simulating airflow over a wing and analyzing electrical circuits to training machine learning models and pricing financial derivatives.
 
-At first glance, the problem might seem simple. If $A$ is an invertible square matrix, a unique solution exists, and we can write it formally as $x = A^{-1}b$. So, why not just compute the inverse of $A$ and multiply it by $b$? While mathematically sound, this approach is a computational pitfall. Calculating a matrix inverse is significantly more expensive and, more importantly, often less numerically accurate than solving the system directly. Our first core principle is this: **we almost never compute a matrix inverse explicitly.**
+If $A$ is an invertible square matrix, the unique solution is $x = A^{-1}b$. This formula suggests computing the inverse of $A$ and multiplying it by $b$. In practice, forming the inverse is generally more expensive and can be less accurate than solving the system directly. Our first principle is therefore: **avoid computing a matrix inverse explicitly to solve a linear system.**
 
-So, what's the alternative? The central strategy of this chapter—and a recurring theme in numerical analysis—is **factorization**. The idea is to decompose the often dense and complicated matrix $A$ into a product of simpler matrices. The star of this chapter is the **LU factorization**, where we write $A = LU$, with $L$ being a lower triangular matrix and $U$ being an upper triangular one.
+The central strategy of this chapter is **factorization**: expressing $A$ as a product of simpler matrices. We will focus on the **LU factorization**, where we write $A = LU$, with $L$ lower triangular and $U$ upper triangular.
 
-Why is this so helpful? Because solving triangular systems is computationally cheap and easy. By factoring $A$, we transform the single difficult problem $Ax = b$ into two simple ones:
+Triangular systems are inexpensive to solve. Once we have factored $A$, we can solve $Ax = b$ in two steps:
 
 1.  Solve $Ly = b$ for $y$ (using *forward substitution*).
 2.  Solve $Ux = y$ for $x$ (using *backward substitution*).
 
-This two-step process is dramatically faster and more stable than the inverse-based approach.
+The same factors can be reused to solve systems with different right-hand sides.
 
-However, this elegant strategy brings its own set of challenges that form the core of our study:
+To use this strategy reliably, we need to address three questions:
 
-1.  **Existence and Uniqueness:** Can any invertible matrix $A$ be factored as $A=LU$? As we will see, the answer is no. This leads us to the first practical hurdle.
+1.  **Existence and uniqueness:** Can every invertible matrix $A$ be factored as $A = LU$? The answer is no. We will examine when the factorization exists and what makes it unique.
 
-2.  **Numerical Stability:** This is the most critical challenge. Computers do not work with real numbers; they use finite-precision floating-point arithmetic. This means that every calculation introduces a tiny *roundoff error*. While individual errors are small, they can accumulate catastrophically, rendering our computed solution meaningless. How can we trust our results?
+2.  **Numerical stability:** Computers use finite-precision floating-point arithmetic, so calculations can introduce *roundoff errors*. These errors can accumulate or be amplified enough to make a computed solution inaccurate. How can we assess their effect?
 
-3.  **Efficiency:** For the massive systems that arise in practice, the speed of our algorithm is paramount. We need methods that scale efficiently as the size of the matrix grows.
+3.  **Efficiency:** Large systems require methods that use time and memory efficiently as the matrix size grows.
 
-To navigate these challenges, we will develop a powerful set of tools and concepts. We'll see that the problem of existence can be solved by introducing **row pivoting**, which leads to the more general and robust $PA = LU$ factorization. Pivoting also turns out to be the key to ensuring numerical stability. 
+Introducing **row pivoting** resolves the existence problem for invertible matrices and leads to the more general $PA = LU$ factorization. Pivoting also plays a central role in controlling roundoff error.
 
-To understand *why* it works, we must dive into the world of floating-point arithmetic and develop a rigorous framework for **error analysis**. We will distinguish between *forward error* (how close is our answer to the true answer?) and *backward error* (is our answer the exact solution to a slightly perturbed problem?). The concept of the **condition number** of a matrix will emerge as a crucial indicator of how sensitive a problem is to small perturbations, telling us when we can expect accurate solutions and when the problem is simply too ill-behaved.
+To assess accuracy, we will study floating-point arithmetic and develop a framework for **error analysis**. We will distinguish between *forward error*, which measures how close a computed solution is to the exact solution, and *backward error*, which measures how much the problem must change for the computed solution to be exact. The **condition number** of a matrix describes sensitivity to small perturbations and helps explain when small backward errors imply small forward errors.
 
-This chapter will guide you through this landscape step-by-step. We will begin with the simplest case—solving triangular systems. We will then introduce the LU factorization and its algorithm, investigate its potential for failure, and develop the pivoting strategy that saves it. Following that, we'll take a necessary detour to formalize floating-point arithmetic and backward error analysis. Armed with these tools, we will prove why the LU factorization with pivoting is, in fact, numerically stable in practice. Finally, we will explore a special case for symmetric positive definite matrices, where the even faster and more stable **Cholesky factorization** can be used.
+We will begin with triangular systems, then introduce LU factorization, examine how it can fail, and develop a pivoting strategy. Next, we will use floating-point arithmetic and backward error analysis to understand why LU factorization with pivoting is usually stable in practice and where its guarantees have limits. Finally, we will study **Cholesky factorization**, an efficient and stable method for symmetric positive definite matrices.
 
-By the end of this chapter, you will not only know *how* to solve a linear system effectively but also understand *why* the method works, how to analyze its limitations, and how to trust the results you get from the computer.
+By the end of the chapter, you should be able to solve linear systems efficiently and assess the accuracy and limitations of the computed solutions.
