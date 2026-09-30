@@ -1,17 +1,17 @@
 # CME 302 Numerical Linear Algebra 2026
 
-This GitHub repo contains the class notes for the Numerical Linear Algebra course at Stanford University, Spring 2026. The course is taught by [Eric Darve](https://profiles.stanford.edu/eric-darve).
+This GitHub repo contains notes for the course CME302 Numerical Linear Algebra at Stanford University, Fall 2026. The course is taught by [Eric Darve](https://profiles.stanford.edu/eric-darve).
 
-[Site location](https://ericdarve.github.io/NLA/)
+[Read the course notes](https://ericdarve.github.io/NLA/)
 
-The book was written using Markdown and [Jupyter Book](https://jupyterbook.org/en/stable/intro.html). The book is available online at [Numerical Linear Algebra with Julia](https://epubs.siam.org/doi/book/10.1137/1.9781611976557), and can be purchased on [Amazon](https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545) or [Google Books](https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ).
+These notes are written in MyST Markdown and built with [Jupyter Book 1.x](https://jupyterbook.org/v1/intro.html). The course textbook is [Numerical Linear Algebra with Julia](https://epubs.siam.org/doi/book/10.1137/1.9781611976557), by Eric Darve and Mary Wootters, also available through [Amazon](https://www.amazon.com/Numerical-Linear-Algebra-Julia-Darve/dp/1611976545) and [Google Books](https://play.google.com/store/books/details/Numerical_Linear_Algebra_with_Julia?id=lt9BEAAAQBAJ).
 
 ## Setup
 
-Create a local build environment with Python 3.12:
+From the repository root, create a local Python build environment:
 
 ```sh
-python3.12 -m venv .venv
+python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
@@ -30,6 +30,8 @@ All commands are wrapped in the `Makefile`:
 | `make site` | Full rebuild, then publish to the `gh-pages` branch |
 
 To edit and preview a page, run `make book` and open `_build/html/index.html`. Use `make build` instead of `make book` after editing `_toc.yml` or `_config.yml`, or when cross-references change, since the incremental build reuses cached pages and can leave stale output.
+
+Some Markdown pages contain executable Python cells. The current `_config.yml` uses automatic notebook execution with a 600-second timeout per cell and stops the build if a cell raises an error. The required Python packages are included in `requirements.txt`.
 
 To publish the site:
 
@@ -54,10 +56,12 @@ Equations occasionally render poorly through this path. `.venv/bin/jupyter-book 
 
 | Path | Contents |
 | --- | --- |
-| `content/` | All book pages, as Markdown |
+| `content/` | Book pages in MyST Markdown, including executable Python examples and images in `content/images/` |
+| `content/LICENSE.md` | License for the course notes |
 | `_toc.yml` | Table of contents, which sets the chapter order |
 | `_config.yml` | Book title, execution, and Sphinx settings |
+| `requirements.txt` | Python build dependencies, including the Jupyter Book 1.x constraint |
+| `Makefile` | Build, clean, PDF, and publishing commands |
 | `_static/` | Files copied verbatim into the built site |
 | `manimations/` | Manim sources for the animations, rendered separately; see `manimations/README.md` |
-| `addl_material/` | Notes not currently listed in `_toc.yml` |
 | `_bibliography/` | BibTeX references, not currently cited by any page |
