@@ -479,7 +479,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-factorization">Backward Error of the Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-computed-solution">Backward Error of the Computed Solution</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-error-of-the-computed-solution">Forward Error of the Computed Solution</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-and-breakdown">Cancellation and Breakdown</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#completion-in-floating-point-arithmetic">Completion in Floating-Point Arithmetic</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
@@ -826,22 +826,10 @@ A+E=\widehat{L}\widehat{L}^T,
 \]</div>
 <p>An eigenvalue that is small relative to the largest one can therefore make the solution sensitive, despite the backward-error guarantee.</p>
 </section>
-<section id="cancellation-and-breakdown">
-<h3>Cancellation and Breakdown<a class="headerlink" href="#cancellation-and-breakdown" title="Link to this heading">#</a></h3>
-<p>The backward-error guarantees above assume successful completion. This assumption matters for matrices close to singularity: bounded factor entries still allow cancellation in a small pivot. A diagonal step computes</p>
-<div class="math notranslate nohighlight">
-\[
-l_{kk}=\sqrt{a_{kk}-\sum_{j&lt;k}l_{kj}^2},
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(a_{kk}\)</span> in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-A=\begin{pmatrix}1&amp;1\\1&amp;1+\epsilon\end{pmatrix},
-\qquad
-L=\begin{pmatrix}1&amp;0\\1&amp;\sqrt{\epsilon}\end{pmatrix},
-\qquad \epsilon&gt;0.
-\end{split}\]</div>
-<p>The second pivot is obtained by subtracting <span class="math notranslate nohighlight">\(1\)</span> from <span class="math notranslate nohighlight">\(1+\epsilon\)</span>. If <span class="math notranslate nohighlight">\(\epsilon\)</span> is small enough, input rounding alone can replace <span class="math notranslate nohighlight">\(1+\epsilon\)</span> by <span class="math notranslate nohighlight">\(1\)</span>, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see <a class="reference external" href="https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/">Higham’s discussion of Cholesky factorization</a>.</p>
+<section id="completion-in-floating-point-arithmetic">
+<h3>Completion in Floating-Point Arithmetic<a class="headerlink" href="#completion-in-floating-point-arithmetic" title="Link to this heading">#</a></h3>
+<p>Here <span class="math notranslate nohighlight">\(A\)</span> denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.</p>
+<p>For a stored SPD matrix, standard Cholesky is guaranteed to run to completion when <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is safely below <span class="math notranslate nohighlight">\(u^{-1}\)</span>. If <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is comparable to <span class="math notranslate nohighlight">\(u^{-1}\)</span>, the matrix is numerically singular at the working precision and rounding can produce a nonpositive computed pivot. Thus the backward-error bounds above assume successful completion; see <a class="reference external" href="https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/">Higham’s discussion of Cholesky factorization</a>.</p>
 </section>
 </section>
 <section id="choosing-a-direct-solver">
@@ -933,7 +921,7 @@ L=\begin{pmatrix}1&amp;0\\1&amp;\sqrt{\epsilon}\end{pmatrix},
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-factorization">Backward Error of the Factorization</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-of-the-computed-solution">Backward Error of the Computed Solution</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-error-of-the-computed-solution">Forward Error of the Computed Solution</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cancellation-and-breakdown">Cancellation and Breakdown</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#completion-in-floating-point-arithmetic">Completion in Floating-Point Arithmetic</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>

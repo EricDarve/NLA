@@ -380,24 +380,11 @@ $$
 
 An eigenvalue that is small relative to the largest one can therefore make the solution sensitive, despite the backward-error guarantee.
 
-### Cancellation and Breakdown
+### Completion in Floating-Point Arithmetic
 
-The backward-error guarantees above assume successful completion. This assumption matters for matrices close to singularity: bounded factor entries still allow cancellation in a small pivot. A diagonal step computes
+Here $A$ denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.
 
-$$
-l_{kk}=\sqrt{a_{kk}-\sum_{j<k}l_{kj}^2},
-$$
-
-where $a_{kk}$ in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,
-
-$$
-A=\begin{pmatrix}1&1\\1&1+\epsilon\end{pmatrix},
-\qquad
-L=\begin{pmatrix}1&0\\1&\sqrt{\epsilon}\end{pmatrix},
-\qquad \epsilon>0.
-$$
-
-The second pivot is obtained by subtracting $1$ from $1+\epsilon$. If $\epsilon$ is small enough, input rounding alone can replace $1+\epsilon$ by $1$, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
+For a stored SPD matrix, standard Cholesky is guaranteed to run to completion when $\kappa_2(A)$ is safely below $u^{-1}$. If $\kappa_2(A)$ is comparable to $u^{-1}$, the matrix is numerically singular at the working precision and rounding can produce a nonpositive computed pivot. Thus the backward-error bounds above assume successful completion; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
 
 ## Choosing a Direct Solver
 
