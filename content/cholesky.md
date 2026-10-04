@@ -380,25 +380,354 @@ $$
 
 An eigenvalue that is small relative to the largest one can therefore make the solution sensitive, despite the backward-error guarantee.
 
-### Cancellation and Breakdown
+### Completion in Floating-Point Arithmetic
 
-The backward-error guarantees above assume successful completion. This assumption matters for matrices close to singularity: bounded factor entries still allow cancellation in a small pivot. A diagonal step computes
+Here $A$ denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.
 
-$$
-l_{kk}=\sqrt{a_{kk}-\sum_{j<k}l_{kj}^2},
-$$
-
-where $a_{kk}$ in this formula is the original diagonal entry. The difference inside the square root can be small relative to its terms. For example,
-
-$$
-A=\begin{pmatrix}1&1\\1&1+\epsilon\end{pmatrix},
-\qquad
-L=\begin{pmatrix}1&0\\1&\sqrt{\epsilon}\end{pmatrix},
-\qquad \epsilon>0.
-$$
-
-The second pivot is obtained by subtracting $1$ from $1+\epsilon$. If $\epsilon$ is small enough, input rounding alone can replace $1+\epsilon$ by $1$, making the stored matrix singular. Even for an SPD stored matrix, errors during factorization can produce a nonpositive pivot when the matrix is sufficiently close to singularity. Exact existence and successful floating-point completion are separate statements; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
+For a stored SPD matrix, standard Cholesky is guaranteed to run to completion when $\kappa_2(A)$ is safely below $u^{-1}$. If $\kappa_2(A)$ is comparable to $u^{-1}$, the matrix is numerically singular at the working precision and rounding can produce a nonpositive computed pivot. Thus the backward-error bounds above assume successful completion; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
 
 ## Choosing a Direct Solver
 
 For a general dense nonsingular system, use LU with partial pivoting. When the matrix is known to be symmetric positive definite, Cholesky exploits that structure to reduce arithmetic and storage. In both cases, factor once, solve triangular systems for each right-hand side, and interpret the residual together with the condition number when assessing solution accuracy.
+
+## Optional Advanced Material: Numerical Breakdown
+
+```{warning}
+Reading this section is **not required**. It goes beyond the course and is included only for students who are curious about the limits of the numerical stability guarantees.
+
+This is not covered on the exams or graded assignments.
+```
+
+How well conditioned can a stored SPD matrix be if Cholesky nevertheless produces a zero or negative pivot? This section gives a family with condition number of order $1/(n^{3/2}u)$. Together with a sufficient condition for success, it shows that the power $n^{3/2}$ cannot be improved uniformly in dimension and precision for the algorithm considered here. The exact best multiplicative constant is not determined.
+
+### A Guarantee of Successful Completion
+
+Wilkinson's bound guarantees successful completion when
+
+$$
+20n^{3/2}u\kappa_2(A)\le 1.
+$$
+
+See [Higham and Pranesh, p. A261](https://epubs.siam.org/doi/pdf/10.1137/19M1298263?download=true). A refinement gives the sufficient condition
+
+$$
+\kappa_2(A)\le\frac{1}{3.9n^{3/2}u},
+\qquad n>10,\qquad 3nu<0.1;
+$$
+
+see [Terenin et al., Result 1, p. 4](https://jmlr.org/papers/volume25/22-1170/22-1170.pdf), citing Kiełbasiński. These results assume the usual floating-point error model, with no underflow or overflow.
+
+To state the extremal question precisely, fix an idealized binary floating-point system with a $p$-bit significand, rounding to nearest, and an unbounded exponent range, so that $u=2^{-p}$ and underflow and overflow are excluded. For a fixed algorithm, define
+
+$$
+c^*_{n,u}
+=\inf\left\{
+u\kappa_2(A):
+A\text{ is a stored SPD matrix on which the algorithm fails}
+\right\}.
+$$
+
+Then $\kappa_2(A)<c^*_{n,u}/u$ guarantees success in this model. For a finite-exponent implementation such as binary64, the guarantee applies only to computations without underflow or overflow. The threshold depends on the arithmetic and the order of operations, not just on $n$.
+
+The construction below uses the in-place algorithm given earlier: each update performs one rounded multiplication followed by one rounded subtraction. Changing the accumulation order can change the outcome. This family also breaks down with fused multiply-add updates, as explained below.
+
+### An Exactly Representable Matrix Family
+
+Assume binary rounding to nearest, with unit roundoff $u=2^{-p}$, and no underflow or overflow. Choose
+
+$$
+k=4^q\ge16,\qquad k^3u\le10^{-4},\qquad n=9k.
+$$
+
+Let $H_k$ be the Walsh–Hadamard matrix, defined recursively by
+
+$$
+H_1=[1],\qquad
+H_{2m}=\begin{bmatrix}H_m&H_m\\H_m&-H_m\end{bmatrix},
+\qquad Q=\frac{H_k}{\sqrt{k}}.
+$$
+
+Thus $Q^TQ=I_k$. Because $k$ is a power of four, every entry of $Q$ is a signed power of two and is exactly representable. Write $J_{a,b}$ for the $a\times b$ all-ones matrix, and $J_m=J_{m,m}$.
+
+Set
+
+$$
+h=\frac{2u}{\sqrt{k}},\qquad
+\eta=6kh=12\sqrt{k}\,u,\qquad
+\delta=(k-2)\eta.
+$$
+
+Here $\eta$ is a construction parameter, unrelated to the backward error $\eta(\widehat{x})$ used earlier. Obtain $t$ by rounding $\sqrt h$ and then advancing twice to the next floating-point number toward $+\infty$. This choice ensures
+
+$$
+h<\operatorname{fl}(t^2)\le h(1+12u),\qquad
+0<t^2-h\le12uh.
+$$
+
+Define
+
+$$
+T=\begin{bmatrix}
+tJ_{6k,2k}\\[1mm]
+\frac32[I_k\;\;Q]
+\end{bmatrix},
+\qquad
+G=\frac94\begin{bmatrix}I_k&Q\\Q^T&I_k\end{bmatrix},
+$$
+
+and
+
+$$
+\boxed{
+A_{9k}=\begin{bmatrix}
+4I_{7k}&2T\\
+2T^T&G+\eta J_{2k}+\delta I_{2k}
+\end{bmatrix}.
+}
+$$
+
+All entries of this matrix are exactly representable under the stated size restriction. In particular, $\eta$ and $\delta$ lie on the floating-point grids of the entries to which they are added. The small entries occur first in $T$; their order is essential to the example.
+
+### Positive Definiteness of the Stored Matrix
+
+The exact Schur complement of $4I_{7k}$ is particularly simple:
+
+$$
+\begin{aligned}
+S
+&=G+\eta J_{2k}+\delta I_{2k}-T^TT\\
+&=\delta I_{2k}-\varepsilon J_{2k},
+\qquad \varepsilon=6k(t^2-h).
+\end{aligned}
+$$
+
+The all-ones matrix $J_{2k}$ has eigenvalues $2k$ and $0$, so
+
+$$
+\lambda_{\min}(S)
+=\delta-2k\varepsilon
+\ge\delta-24ku\eta>0.
+$$
+
+Therefore $A_{9k}$ is SPD in exact arithmetic. Positive definiteness holds for the floating-point entries themselves; it is not a property lost while forming or storing the input.
+
+### How Rounding Produces a Nonpositive Pivot
+
+The factorization of the leading block is exact: $4I_{7k}=(2I_{7k})(2I_{7k})^T$, and the divisions below it recover $T$. The first $6k$ rows therefore apply repeated updates of size $\operatorname{fl}(t^2)$ to the trailing block.
+
+In its cross block, the entries start at $\pm9/(4\sqrt{k})+\eta$. Their floating-point spacing is $2h$. Each subtraction of $\operatorname{fl}(t^2)$, which is slightly larger than $h$, rounds to a decrease of $2h$. After $6k$ such updates, those entries are
+
+$$
+\pm\frac{9}{4\sqrt{k}}+\eta-6k(2h)
+=\pm\frac{9}{4\sqrt{k}}-\eta.
+$$
+
+The true decrease would be only slightly larger than $\eta$. Rounding has almost doubled it. The diagonal entries, whose spacing is larger, remain unchanged during these tiny updates.
+
+The next $k$ leading rows cancel $G$. The resulting stored trailing matrix has the form
+
+$$
+\widehat S=
+\begin{bmatrix}
+dI_k+e(J_k-I_k)&-\eta J_k\\
+-\eta J_k&dI_k
+\end{bmatrix},
+\qquad d=(k-1)\eta,
+$$
+
+where $e\le0$ and $|e|\le16ku\eta$. The small residual $e$ does not affect the sign argument. For the normalized all-ones vector $x\in\mathbb R^{2k}$,
+
+$$
+x^T\widehat Sx
+=-\eta+\frac{k-1}{2}e
+\le-\eta.
+$$
+
+````{prf:proof} Details of the stored Schur complement and subsequent breakdown
+Let $y=\operatorname{fl}(t^2)$. A within-group off-diagonal entry starts at $\eta$ and undergoes $6k$ rounded subtractions of $y$. Comparing this recurrence with the exactly representable sequence $\eta-jh$, and using $y>h$ and monotonicity of rounding, shows that its final value $e$ is nonpositive.
+
+The summation error bound controls the distance from $e$ to the exact sum $\eta-6ky$:
+
+$$
+|e-(\eta-6ky)|\le\gamma_{6k}(\eta+6ky).
+$$
+
+We must also bound that exact sum. Since $\eta=6kh$ and $h<y\le h(1+12u)$, we have $|\eta-6ky|\le12u\eta$. Combining the two estimates gives
+
+$$
+|e|\le\left[12u+\gamma_{6k}(2+12u)\right]\eta
+<16ku\eta,
+$$
+
+where the last inequality uses $k\ge16$ and $k^3u\le10^{-4}$.
+
+During the remaining $k$ updates, the left within-group off-diagonal entries receive only zero products, so they retain $e$. In the right group, the first nonzero product has magnitude $9/(4k)$. The residual $e$ is too small to affect its rounding: the condition $k^3u\le10^{-4}$ gives
+
+$$
+|e|\le192k^{3/2}u^2<\frac{u}{k}.
+$$
+
+The subsequent signed products are dyadic numbers whose sums are exact and cancel by Hadamard orthogonality. The cross-block and diagonal cancellations are also exact. This gives the displayed formula for $\widehat S$.
+
+An indefinite intermediate matrix alone does not prove that a floating-point routine must report failure. To finish the argument, suppose the remaining Cholesky factorization completed with positive pivots. Its rounding-error analysis would give
+
+$$
+\widehat L\widehat L^T=\widehat S+E,
+\qquad
+|E|\le\gamma_{2k+1}|\widehat L|\,|\widehat L|^T.
+$$
+
+This algebraic error bound holds whenever the computation completes, even if the input is indefinite. The diagonal equations and the trace argument used earlier imply
+
+$$
+\|E\|_2
+\le\frac{\gamma_{2k+1}}{1-\gamma_{2k+1}}
+\operatorname{tr}(\widehat S)
+<10^{-3}\eta,
+$$
+
+because $\operatorname{tr}(\widehat S)=2k(k-1)\eta$ and $k^3u\le10^{-4}$. But then
+
+$$
+x^T\widehat L\widehat L^Tx
+=x^T\widehat Sx+x^TEx<0,
+$$
+
+which is impossible. The computation must encounter a zero or negative pivot.
+
+For fused multiply-add updates, each tiny update is $\operatorname{fl}(a-t^2)$. Because $t^2$ is slightly larger than $h$, the cross-block entries still decrease by exactly $2h$. Replacing $y$ by the exact $t^2$ in the residual estimates gives the same bounds on $e$; the remaining nonzero products are exact. The breakdown argument therefore also applies to fused updates.
+````
+
+### Condition Number and the Remaining Gap
+
+To bound the condition number, set
+
+$$
+b=\frac92+2k\eta(1+12u),\qquad
+s=\delta-24ku\eta.
+$$
+
+Then $\|T\|_2^2\le b$ and $\lambda_{\min}(S)\ge s$. The block factorization and its inverse give
+
+$$
+\|A_{9k}\|_2\le4+b+\delta,
+\qquad
+\|A_{9k}^{-1}\|_2
+\le\frac14+\frac{1+b/4}{s}.
+$$
+
+Consequently, under the stated restrictions,
+
+$$
+\boxed{
+\kappa_2(A_{9k})
+\le(4+b+\delta)\left(\frac14+\frac{1+b/4}{s}\right)
+<\frac{47}{n^{3/2}u}.
+}
+$$
+
+To prove a matching lower bound, write $A=A_{9k}$ and
+
+$$
+M=[2I_{7k}\;\;T],\qquad
+N=\begin{bmatrix}-T/2\\I_{2k}\end{bmatrix}.
+$$
+
+Here $X\succeq Y$ means that $X-Y$ is positive semidefinite. Since $A\succeq M^TM$ and $MM^T=4I_{7k}+TT^T$,
+
+$$
+\lambda_{\max}(A)\ge4+\|T\|_2^2\ge\frac{17}{2}.
+$$
+
+Also, $0\prec S\preceq\delta I_{2k}$ and the block inverse satisfies
+
+$$
+A^{-1}=\begin{bmatrix}I_{7k}/4&0\\0&0\end{bmatrix}
++NS^{-1}N^T
+\succeq\frac{1}{\delta}NN^T.
+$$
+
+Therefore
+
+$$
+\|A^{-1}\|_2\ge\frac{1+\|T\|_2^2/4}{\delta}
+\ge\frac{17}{8\delta},
+\qquad
+\kappa_2(A)\ge\frac{289}{16\delta}.
+$$
+
+For fixed $k$ as $u\to0$, the upper bound above has the same leading term: $b\to9/2$, $s/\delta\to1$, and $\delta\to0$. Thus the two bounds prove
+
+$$
+u\kappa_2(A_{9k})
+\sim\frac{2601}{64}\frac{k}{k-2}\,n^{-3/2}.
+$$
+
+The coefficient approaches $2601/64=40.640625$ as $k$ grows and the precision increases sufficiently. Thus, for this algorithm and the admissible dimensions,
+
+$$
+\frac{1}{3.9n^{3/2}}\le c^*_{n,u}<\frac{47}{n^{3/2}}.
+$$
+
+These bounds establish the power of $n$, but leave a gap in the multiplicative constant. The claim concerns a joint regime of increasing dimension and decreasing roundoff, with $k^3u\le10^{-4}$; it is not an assertion about arbitrarily large $n$ at fixed precision. Other sufficiently large dimensions can be covered by padding a smaller member with $4I$, preserving its condition number and breakdown but increasing the constant in the bound expressed using the padded dimension.
+
+### A Binary64 Example
+
+The following values were obtained with $u=2^{-53}$ and the same order of operations as `cholesky_in_place`. Positive definiteness was checked using exact rational arithmetic. The condition numbers shown are rounded values from analytic bounds evaluated at 80-digit precision, rather than from a binary64 condition estimator.
+
+| Size $n$ | Approximate $\kappa_2(A_n)$ | Failing pivot (counting from 1) | Computed pivot |
+|---:|---:|---:|---:|
+| 144 | $2.42102\times10^{14}$ | 143 | $-1.19904\times10^{-12}$ |
+| 576 | $2.73341\times10^{13}$ | 575 | $-4.23022\times10^{-11}$ |
+| 2304 | $3.33605\times10^{12}$ | 2303 | $-1.38609\times10^{-9}$ |
+
+This code constructs the smallest example in the table and applies the earlier `cholesky_in_place` function. The exact-fraction check establishes that the stored matrix is SPD before the numerical factorization begins.
+
+```python
+import math
+from fractions import Fraction
+import numpy as np
+
+
+def cholesky_breakdown_matrix(k=16):
+    u = 2.0**-53
+    root_k = math.isqrt(k)
+    assert k >= 16 and root_k * root_k == k and k & (k - 1) == 0
+    assert k**3 * u <= 1e-4
+
+    H = np.ones((1, 1))
+    while H.shape[0] < k:
+        H = np.block([[H, H], [H, -H]])
+    Q = H / root_k
+
+    h = 2 * u / root_k
+    eta = 6 * k * h
+    delta = (k - 2) * eta
+    t = math.nextafter(math.nextafter(math.sqrt(h), math.inf), math.inf)
+
+    T = np.vstack((np.full((6 * k, 2 * k), t),
+                   1.5 * np.hstack((np.eye(k), Q))))
+    G = 2.25 * np.block([[np.eye(k), Q], [Q.T, np.eye(k)]])
+    C = G + eta * np.ones((2 * k, 2 * k)) + delta * np.eye(2 * k)
+
+    # Check every stored entry of C, grouping equal base values in G.
+    for base in np.unique(G):
+        expected = Fraction(float(base)) + Fraction(eta)
+        if base == 2.25:  # Only diagonal entries have this base value.
+            expected += Fraction(delta)
+        for stored in np.unique(C[G == base]):
+            assert Fraction(float(stored)) == expected
+
+    epsilon = 6 * k * Fraction(t)**2 - Fraction(eta)
+    assert epsilon > 0
+    assert Fraction(delta) - 2 * k * epsilon > 0
+    return np.block([[4 * np.eye(7 * k), 2 * T], [2 * T.T, C]])
+
+
+A = cholesky_breakdown_matrix()
+try:
+    cholesky_in_place(A.copy())
+except np.linalg.LinAlgError as error:
+    print(error)
+# Nonpositive or nonfinite pivot at step 143
+```

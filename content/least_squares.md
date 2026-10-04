@@ -1,33 +1,123 @@
 # Least Squares Problems
 
-In this chapter, we're diving into one of the most fundamental and widely applied problems in all of computational science and engineering: the **linear least-squares problem**. This problem arises whenever we have more data than parameters to describe it—a situation that's incredibly common in data fitting, machine learning, and statistical modeling.
+In data fitting, a model often has fewer parameters than there are measurements. The vector $x$ contains the parameters, $Ax$ contains the model's predictions, and $b$ contains the observations. Noise or limitations of the model can make it impossible to match every observation exactly. **Linear least squares chooses the parameters that minimize the sum of squared discrepancies.**
 
-## The Problem: Overdetermined Systems
+## From Linear Equations to Least Squares
 
-Consider the familiar equation $Ax = b$. We've spent some time on cases where $A$ is a square, invertible matrix, which guarantees a unique solution. But what happens when $A$ is a "tall and skinny" matrix, meaning it's an $m \times n$ matrix with more rows than columns ($m > n$)? This is called an **overdetermined system**.
+Let $A\in\mathbb{R}^{m\times n}$ and $b\in\mathbb{R}^m$. When $m>n$, the system $Ax=b$ has more equations than unknowns and is called **overdetermined**. An exact solution exists if and only if $b$ lies in the column space of $A$. Having more equations than unknowns does not by itself rule out a solution, but it is common for these equations to be inconsistent.
 
-In this scenario, the vector $b$ generally does not lie in the column space of $A$. As a result, there is **no exact solution** $x$ that satisfies $Ax = b$. The system is inconsistent.
+The **residual** $r=b-Ax$ measures the discrepancy between the observations and the predictions. The linear least-squares problem is to find a vector $x^*$ satisfying
 
-So, what do we do? We find the next best thing. If we can't find an $x$ that makes the residual vector $r = b - Ax$ exactly zero, we find an $x$ that makes the residual as small as possible. We measure the "size" of the residual using its 2-norm, which leads to the formal definition of the least-squares problem:
+$$
+\boxed{\|Ax^*-b\|_2=\min_{x\in\mathbb{R}^n}\|Ax-b\|_2.}
+$$
 
-Find $x^*$ such that 
+Minimizing this norm is equivalent to minimizing its square,
 
-$$\| Ax^* - b \|_2 = \min_{x \in \mathbb{R}^n} \| Ax - b \|_2.$$
+$$
+\|Ax-b\|_2^2=\sum_{i=1}^m\bigl((Ax)_i-b_i\bigr)^2,
+$$
 
-Geometrically, this means we are seeking the vector $Ax^*$ in the column space of $A$ that is closest to $b$. This vector is, in fact, the orthogonal projection of $b$ onto the column space of $A$.
+which explains the name *least squares*. If the equations are consistent, the minimum is zero and the minimizers are exactly the solutions of $Ax=b$.
 
-## Three Paths to a Solution
+The definition applies to matrices of any shape or rank. The main case in this chapter is $m\ge n$ with linearly independent columns, also called **full column rank**. Later, the SVD will allow us to handle dependent columns and underdetermined systems, where $m<n$.
 
-In this section of the course, we will explore several powerful methods for solving this problem, each with its own strengths and trade-offs. We will cover three main approaches:
+## Geometry, Existence, and Uniqueness
 
-1.  **The Normal Equations**: Our first method is a classic one derived from calculus. By setting the gradient of the squared residual, $\|Ax - b\|_2^2$, to zero, we arrive at the square $n \times n$ linear system $(A^T A) x = A^T b$. These are the **normal equations**. While elegant and conceptually simple, this approach can suffer from numerical instability. The issue is that the condition number of $A^T A$ is the square of the condition number of $A$, which can amplify rounding errors in our computations.
+Every prediction $Ax$ lies in the column space of $A$. Thus least squares asks for the point in this subspace closest to $b$. From the [geometry of orthogonal projections](projections.md), that point is the orthogonal projection $p$ of $b$ onto the column space.
 
-2.  **The QR Factorization**: To develop a more numerically robust method, we will turn to orthogonal factorization. The core idea is to decompose our matrix $A$ into the product of an **orthogonal matrix $Q$** and an **upper triangular matrix $R$**, so that $A = QR$. This is an incredibly powerful approach. Since orthogonal matrices preserve the 2-norm, the least-squares problem is transformed into solving a simple and well-behaved triangular system $Rx = Q^T b$. We will learn three distinct algorithms to compute this factorization:
+To see why this minimizes the residual, write
 
-    * **Householder Reflections**: The stable, efficient workhorse algorithm for QR decomposition of dense matrices.
-    * **Givens Rotations**: A tool for selectively introducing zeros, which is particularly useful for sparse matrices or parallel computing architectures.
-    * **Gram-Schmidt Orthogonalization**: A conceptually straightforward method that builds the orthogonal basis step-by-step. It is most suitable for very thin matrices.
+$$
+b-Ax=(b-p)+(p-Ax).
+$$
 
-3.  **The Singular Value Decomposition (SVD)**: Our final approach is the most powerful and general of all. What if the columns of $A$ are not linearly independent, making the matrix **rank-deficient**? In this case, there are infinitely many solutions to the least-squares problem. The SVD provides a definitive answer. It allows us to solve the least-squares problem for *any* matrix $A$, regardless of its shape or rank. This will lead us to the concept of the **pseudo-inverse**, which gives us the unique solution $x^*$ that not only minimizes the residual but also has the smallest possible 2-norm.
+The first term is perpendicular to the column space, and the second lies in it. By the Pythagorean theorem,
 
-Mastering these techniques will provide you with essential tools used in countless modern applications, from GPS navigation and image processing to the foundations of data science and machine learning.
+$$
+\|b-Ax\|_2^2=\|b-p\|_2^2+\|p-Ax\|_2^2.
+$$
+
+The first term is fixed, and the second is minimized at zero. Since $p$ belongs to the column space, some $x^*$ satisfies $Ax^*=p$. **A least-squares minimizer therefore always exists, and the fitted vector $Ax^*$ is unique.**
+
+The coefficient vector $x^*$ is unique precisely when $A$ has full column rank. Indeed, two minimizers produce the same fitted vector, so their difference lies in the null space of $A$. If this null space contains a nonzero vector $z$, then $x^*+tz$ is another minimizer for every scalar $t$.
+
+The projection also characterizes the minimizer through its residual:
+
+$$
+r^*=b-Ax^*\perp\operatorname{range}(A),
+\qquad A^Tr^*=0.
+$$
+
+Equivalently, every minimizer satisfies the **normal equations**
+
+$$
+A^TAx^*=A^Tb.
+$$
+
+Conversely, these equations make the residual perpendicular to the column space, so they characterize all least-squares minimizers, including when the minimizer is not unique. This geometric condition connects the three solution methods below.
+
+## Three Approaches to Computing a Solution
+
+### QR Factorization
+
+For full column rank $A$, the **reduced QR factorization** is
+
+$$
+A=Q_1R_1,
+\qquad
+Q_1\in\mathbb{R}^{m\times n},
+\quad R_1\in\mathbb{R}^{n\times n}.
+$$
+
+The columns of $Q_1$ are orthonormal, and $R_1$ is upper triangular and nonsingular. Here $Q_1^TQ_1=I_n$; $Q_1$ is rectangular when $m>n$.
+
+Since $p=Q_1Q_1^Tb$, the condition $Ax^*=p$ reduces to the triangular system
+
+$$
+R_1x^*=Q_1^Tb,
+$$
+
+which can be solved by backward substitution. The factor $R_1$ has the same singular values as $A$, so it can still be ill-conditioned. Orthogonal transformations preserve lengths and provide a way to compute the factorization without forming $A^TA$.
+
+The chapter begins with three ways to construct QR:
+
+- **[Householder reflections](householder_reflections.md)** give a backward-stable method for dense QR factorization.
+- **[Givens rotations](givens_rotations.md)** eliminate selected entries by acting on pairs of rows.
+- **[Modified Gram-Schmidt](modified_gram_schmidt.md)** builds an orthonormal basis one vector at a time. This makes it useful when vectors arrive sequentially, as in iterative methods. Rounding can cause a loss of orthogonality, which requires separate attention.
+
+Their properties and error analysis lead to the [QR method for least squares](LS_using_QR.md).
+
+### Normal Equations
+
+The normal equations give a direct connection to the solvers from the preceding chapter. When $A$ has full column rank, $A^TA$ is symmetric positive definite because
+
+$$
+z^TA^TAz=\|Az\|_2^2>0\qquad\text{for }z\ne0.
+$$
+
+Thus we can form $A^TA$ and $A^Tb$ and solve using Cholesky factorization. The [normal-equations method](normal_equations.md) usually requires less arithmetic than Householder QR, but forming $A^TA$ can lose accuracy. For full column rank $A$, define
+
+$$
+\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
+$$
+
+Then
+
+$$
+\kappa_2(A^TA)=\kappa_2(A)^2.
+$$
+
+The singular values are squared when forming $A^TA$, so rounding errors in this matrix can overwhelm information associated with small singular values. This is why a stable Cholesky solve alone does not ensure an accurate least-squares answer. The chapter compares this method with QR in more detail.
+
+### SVD and the Minimum-Norm Solution
+
+If $A$ has dependent columns, there are infinitely many least-squares minimizers. To select one, we can ask for the minimizer with the smallest 2-norm. This **minimum-norm least-squares solution** is unique: it is the minimizer perpendicular to the null space of $A$.
+
+The [SVD method](LS_using_SVD.md) computes this solution for any matrix, regardless of its shape or rank. It leads to the **Moore-Penrose pseudoinverse** $A^\dagger$, with
+
+$$
+x_{\min}=A^\dagger b.
+$$
+
+The two minimizations have a specific order: first minimize the residual, then minimize $\|x\|_2$ among all vectors attaining that residual. The SVD makes both steps explicit by separating the directions associated with positive and zero singular values.
