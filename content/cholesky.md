@@ -715,7 +715,7 @@ $$
 
 for the admissible dimensions. The exact best multiplicative constant remains undetermined.
 
-### Bounded Condition Numbers at the Same Precision
+### Bounded Condition Numbers at Fixed Precision
 
 Assume $p\ge20$ and let $q_*$ be the largest integer satisfying the construction's restrictions. Since admissible values of $q$ differ by $2$, maximality and parity give
 
@@ -753,7 +753,9 @@ $$
 
 This is a theoretical construction; the dense basic block is far too large to store in practice. In binary32, the largest admissible block already has size $2304$ and condition number below $8239$, as verified in the numerical example below.
 
-### Sharpness Across Both Regimes
+### Sharpness for Decreasing and Bounded Condition Numbers
+
+The target bound decreases like $1/(N^{3/2}u)$ when $N^{3/2}u\le1$, and is constant when $N^{3/2}u\ge1$. We now combine these two cases into one bound valid as $N$ increases with $u$ fixed.
 
 For any $p\ge20$ and $N\ge2304$, choose the largest admissible $q$ for which $m=9\cdot4^q\le N$, and form
 
@@ -787,15 +789,21 @@ $$
 
 Here $N\ge2304\ge13$, so the sufficient condition derived from Theorem 2 applies. When $1/(3.9N^{3/2})<u$, the lower bound $c^*_{N,u}\ge u$ suffices.
 
-Thus the smallest condition number permitting failure has order $\max\{1,1/(N^{3/2}u)\}$, with constants independent of dimension and precision in the specified model. This establishes sharpness in order across both regimes. It does not show that the constants are optimal or that failing matrices can have condition numbers arbitrarily close to $1$.
+Thus the smallest condition number permitting failure has order $\max\{1,1/(N^{3/2}u)\}$, with constants independent of dimension and precision in the specified model. This establishes sharpness in order for both the decreasing bound and the constant bound. The constants in these bounds are not claimed to be optimal.
 
-### Interpreting a Guarantee That Suppresses Dimension
+### Operation Order and Condition Numbers Near One
 
-[Higham's introductory article](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/) describes successful completion when the condition number is “safely less than” $u^{-1}$. To turn this into a quantitative guarantee, dimension and operation order must be specified. For the update implementation studied here, $u\kappa_2(A)\ll1$ alone is not a sufficient condition uniformly in dimension. Our theoretical binary64 example has $\kappa_2(A)<532$, hence $u\kappa_2(A)<5.91\times10^{-14}$, yet fails. Its relative distance in the spectral norm to a singular matrix is $1/\kappa_2(A)>1/532$, so it is not close to singularity on the scale of $u$.
+The breakdown proved here depends on the order of operations. Our algorithm subtracts each product from the matrix entry as it is computed. An alternative is to accumulate the products first and then subtract their sum. These evaluations can round differently:
 
-There is an important implementation distinction. Higham displays inner products followed by subtraction; our proof concerns successive updates to the matrix entry. These can round differently, just as $\operatorname{fl}(a-\operatorname{fl}(b+c))$ can differ from $\operatorname{fl}(\operatorname{fl}(a-b)-c)$. Evaluating each inner product sequentially from zero, followed by a single subtraction, succeeds on both numerical examples below. Thus these examples do not establish failure for that evaluation of Higham's displayed algorithm, nor for every library implementation of Cholesky.
+$$
+\operatorname{fl}\!\left(\operatorname{fl}(a-b)-c\right)
+\quad\text{can differ from}\quad
+\operatorname{fl}\!\left(a-\operatorname{fl}(b+c)\right).
+$$
 
-Bounded condition numbers also do not imply condition numbers close to $1$. In fact, the lower bound already proved for our basic blocks gives
+In both numerical examples below, successive updates lead to failure, whereas accumulating each inner product sequentially from zero and then subtracting it succeeds. The counterexamples therefore do not establish failure for every implementation of Cholesky.
+
+Our construction cannot produce condition numbers arbitrarily close to $1$. For all admissible parameters, the lower bound proved above gives
 
 $$
 \kappa_2(A_{9k})\ge\frac{289}{192x}
@@ -803,7 +811,7 @@ $$
 \qquad x=k^{3/2}u\le\frac1{256}.
 $$
 
-Padding preserves this condition number. Consequently this particular family cannot approach condition number $1$ within the established parameter range. Finding failing matrices with $\kappa_2(A)\to1$ would require a different construction or a substantially extended parameter analysis; it is not a consequence of the order estimate above.
+Padding preserves the condition number, so increasing the dimension this way cannot close the gap. Whether a different construction can produce numerical breakdown with $\kappa_2(A)\to1$ is not resolved by this analysis.
 
 ### Numerical Examples
 
