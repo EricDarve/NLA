@@ -384,12 +384,19 @@ An eigenvalue that is small relative to the largest one can therefore make the s
 
 Here $A$ denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.
 
-For a stored SPD matrix, standard Cholesky is guaranteed to run to completion when $\kappa_2(A)$ is safely below $u^{-1}$. If $\kappa_2(A)$ is comparable to $u^{-1}$, the matrix is numerically singular at the working precision and rounding can produce a nonpositive computed pivot. Thus the backward-error bounds above assume successful completion; see [Higham's discussion of Cholesky factorization](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/).
+For a stored SPD matrix, Wilkinson's sufficient condition for successful completion is
+
+$$
+20n^{3/2}u\kappa_2(A)\le1,
+$$
+
+assuming the usual floating-point error model and no underflow or overflow. The dimension factor matters: failure does not by itself imply that $\kappa_2(A)$ is comparable to $u^{-1}$. The backward-error bounds above assume successful completion. See the {ref}`optional advanced section <cholesky-numerical-breakdown>` for the source, a sharper sufficient condition, and examples of numerical breakdown.
 
 ## Choosing a Direct Solver
 
 For a general dense nonsingular system, use LU with partial pivoting. When the matrix is known to be symmetric positive definite, Cholesky exploits that structure to reduce arithmetic and storage. In both cases, factor once, solve triangular systems for each right-hand side, and interpret the residual together with the condition number when assessing solution accuracy.
 
+(cholesky-numerical-breakdown)=
 ## Optional Advanced Material: Numerical Breakdown
 
 ```{warning}
@@ -408,14 +415,36 @@ $$
 20n^{3/2}u\kappa_2(A)\le 1.
 $$
 
-See [Higham and Pranesh, p. A261](https://epubs.siam.org/doi/pdf/10.1137/19M1298263?download=true). A refinement gives the sufficient condition
+See [Higham and Pranesh, p. A261](https://epubs.siam.org/doi/pdf/10.1137/19M1298263?download=true). A sharper result comes from {download}`Kiełbasiński, A Note on Rounding-Error Analysis of Cholesky Factorization (1987) <../addl_material/1-s2.0-0024379587901212-main.pdf>`, Theorem 2, p. 491. Write $\rho_n$ for the paper's $p_n$, to distinguish it from the significand precision:
+
+$$
+\rho_1=2,\qquad \rho_2=3,\qquad
+\rho_n=1+\sqrt{\rho_{n-1}^2+4}\quad(n>2).
+$$
+
+The theorem guarantees completion if
+
+$$
+3u\rho_n\|A^{-1}\|_2\|A\|_F\le1,
+$$
+
+and gives the Frobenius backward-error bound
+
+$$
+\widehat L\widehat L^T=A+E,\qquad
+\|E\|_F<u(1+3u)^n\rho_n\|A\|_F.
+$$
+
+Since $\|A\|_F\le\sqrt n\|A\|_2$, a convenient sufficient condition is
 
 $$
 \kappa_2(A)\le\frac{1}{3.9n^{3/2}u},
-\qquad n>10,\qquad 3nu<0.1;
+\qquad n\ge13.
 $$
 
-see [Terenin et al., Result 1, p. 4](https://jmlr.org/papers/volume25/22-1170/22-1170.pdf), citing Kiełbasiński. These results assume the usual floating-point error model, with no underflow or overflow.
+Indeed, the recurrence gives $\rho_{13}<16.8<1.3\cdot13$. Induction then gives $\rho_n\le1.3n$ for $n\ge13$, using $1+\sqrt{(1.3n)^2+4}\le1.3(n+1)$. This derives the factor $3.9$ directly from the primary source. All dimensions used below satisfy this range. These results assume the usual floating-point error model, with no underflow or overflow.
+
+The extra assumption $3nu\le0.1$ in the paper's Corollary 2 simplifies the backward-error bound; it is not an additional hypothesis of Theorem 2's completion guarantee. The paper's discussion of near-sharpness on p. 494 concerns the Frobenius backward error of a successful factorization. It does not construct matrices on which Cholesky fails, or establish failure with condition numbers close to $1$.
 
 To state the extremal question precisely, fix an idealized binary floating-point system with a $p$-bit significand, rounding to nearest, and an unbounded exponent range, so that $u=2^{-p}$ and underflow and overflow are excluded. For a fixed algorithm, define
 
@@ -441,7 +470,7 @@ $$
 
 with an absolute constant $C$ independent of both $n$ and $u$. Since $\kappa_2(A)\ge1$, the decreasing expression $1/(n^{3/2}u)$ eventually ceases to be an appropriate target. This does not impose a size limit on counterexamples: at dimensions of order $u^{-2/3}$ and beyond, we seek failing matrices with bounded condition numbers.
 
-The construction below achieves this target. Its basic blocks satisfy $k^{3/2}u\le1/256$, replacing the more restrictive $k^3u\le10^{-4}$ used with the earlier construction and its trace-based error estimate. Choosing the largest admissible block gives an absolute condition-number bound; padding then extends failure to every larger dimension at the same precision. Thus the restriction on the basic blocks does not restrict the dimensions of the final family.
+The construction below achieves this target. Its basic blocks satisfy $k^{3/2}u\le1/256$. Choosing the largest admissible block gives an absolute condition-number bound; padding then extends failure to every larger dimension at the same precision. Thus the restriction on the basic blocks does not restrict the dimensions of the final family.
 
 ### An Exactly Representable Matrix Family
 
@@ -530,14 +559,14 @@ Thus the stored matrix itself is SPD. This conclusion follows from an exact iden
 
 The factorization of the leading block is exact: $4I_{7k}=(2I_{7k})(2I_{7k})^T$, and the divisions below it recover $T$. The first $6k$ rows apply repeated updates of size $t^2=9h/8$ to the trailing block.
 
-In its cross block, entries start at $\pm9/(4\sqrt{k})+\eta$ and have floating-point spacing $2h$. Each subtraction of $9h/8$ therefore rounds to a decrease of $2h$. After $6k$ updates, these entries are
+In its cross block, entries start at $\pm9/(4\sqrt{k})+\eta$ and have floating-point spacing $2h$. They remain in the same binade (the interval between consecutive powers of two in magnitude) throughout all $6k$ updates. Indeed, $ku\le1/2048$, so $\eta\sqrt{k}=12ku\le3/512<1/4$: the entire path from $\pm9/(4\sqrt{k})+\eta$ to $\pm9/(4\sqrt{k})-\eta$ has magnitude strictly between $2/\sqrt{k}$ and $4/\sqrt{k}$. Each subtraction of $9h/8$ therefore rounds to a decrease of $2h$. After $6k$ updates, these entries are
 
 $$
 \pm\frac{9}{4\sqrt{k}}+\eta-6k(2h)
 =\pm\frac{9}{4\sqrt{k}}-\eta.
 $$
 
-The diagonal entries have larger spacing and remain unchanged during these tiny updates. Every within-group off-diagonal entry starts at $\eta$; its subtractions are exact and leave
+The diagonal entries have larger spacing and remain unchanged during these tiny updates. Every within-group off-diagonal entry starts at $\eta$. After $j$ updates its exact value is $(48k-9j)h/8$, with $0\le j\le6k$. The integer coefficient has magnitude at most $48k<2^{2q+6}$, so each value requires at most $2q+6\le p$ significand bits. Thus all these subtractions are exact and leave
 
 $$
 \eta-6k\frac98h=-\frac{\eta}{8}.
@@ -566,7 +595,7 @@ $$
 \lambda_{\max}(\widehat S)=\frac{15k+9}{8}\eta.
 $$
 
-The negative eigenvalue is a fixed fraction of the norm, rather than a fraction of order $1/k$. Since $k\ge64$,
+The negative eigenvalue is a fixed fraction of the norm. Since $k\ge64$,
 
 $$
 \frac{-\lambda_{\min}(\widehat S)}{\|\widehat S\|_2}
@@ -575,9 +604,9 @@ $$
 
 ### Why a Nonpositive Pivot Must Follow
 
-An indefinite intermediate matrix alone does not prove that a floating-point routine must report failure. Here its sign pattern gives a stronger error estimate than a trace bound.
+An indefinite intermediate matrix alone does not prove that a floating-point routine must report failure. Here the negative off-diagonal entries let us control the norm of the computed factor and obtain the needed error bound.
 
-````{prf:proof} Breakdown without the cubic size restriction
+````{prf:proof} Breakdown from the sign pattern
 Suppose the remaining Cholesky factorization completes with positive pivots, producing $\widehat L$. Every off-diagonal entry of $\widehat S$ is negative. Each off-diagonal update subtracts a nonnegative product, so every off-diagonal entry of $\widehat L$ is nonpositive.
 
 Let $D$ be the diagonal part of $\widehat L$. Then
@@ -607,7 +636,7 @@ $$
 <\frac1{100}\|\widehat S\|_2.
 $$
 
-For the last inequality, use $ku\le1/2048$, which follows from $k^{3/2}u\le1/256$ and $k\ge64$. More explicitly,
+For the last inequality, use $ku\le1/2048$, which follows from $k^{3/2}u\le1/256$ and $k\ge64$. Also $p\ge3q+8\ge17$, so $u\le2^{-17}$. Together these give $(2k+1)u\le129/131072$, and hence
 
 $$
 \frac{9\gamma}{1-9\gamma}
@@ -662,7 +691,7 @@ M=[2I_{7k}\;\;T],\qquad
 N=\begin{bmatrix}-T/2\\I_{2k}\end{bmatrix}.
 $$
 
-Here $X\succeq Y$ means that $X-Y$ is positive semidefinite. We have $A\succeq M^TM$ and $MM^T=4I_{7k}+TT^T$, so $\lambda_{\max}(A)\ge17/2$. Also,
+Here $X\succeq Y$ means that $X-Y$ is positive semidefinite. Since $T^TT\succeq G$ and $\lambda_{\max}(G)=9/2$, we have $\|T\|_2^2\ge9/2$. Now $A\succeq M^TM$ and $MM^T=4I_{7k}+TT^T$, so $\lambda_{\max}(A)\ge4+9/2=17/2$. Also,
 
 $$
 A^{-1}=\begin{bmatrix}I_{7k}/4&0\\0&0\end{bmatrix}
@@ -756,7 +785,7 @@ $$
 }
 $$
 
-The sufficient condition's side condition $3Nu<0.1$ causes no gap here. Whenever $1/(3.9N^{3/2}u)\ge1$, we have $3Nu\le3(1/3.9)^{2/3}u^{1/3}<0.012$ for $p\ge20$. Otherwise the lower bound $c^*_{N,u}\ge u$ suffices.
+Here $N\ge2304\ge13$, so the sufficient condition derived from Theorem 2 applies. When $1/(3.9N^{3/2})<u$, the lower bound $c^*_{N,u}\ge u$ suffices.
 
 Thus the smallest condition number permitting failure has order $\max\{1,1/(N^{3/2}u)\}$, with constants independent of dimension and precision in the specified model. This establishes sharpness in order across both regimes. It does not show that the constants are optimal or that failing matrices can have condition numbers arbitrarily close to $1$.
 
@@ -785,7 +814,7 @@ These examples use the same order of operations as `cholesky_in_place`. The stor
 | Binary64, $u=2^{-53}$ | 576 | $3.531\times10^{13}$ | 565 | $-1.66255\times10^{-12}$ |
 | Binary32, $u=2^{-24}$ | 2304 | $8239$ | 2252 | $-1.14055\times10^{-3}$ |
 
-The binary32 example has $k^3u=1$, far outside the old cubic restriction, but $k^{3/2}u=1/4096$. This illustrates why that cubic restriction was a limitation of the earlier proof.
+For the binary32 example, $k^{3/2}u=1/4096$, so the construction's size restriction is satisfied at the fixed precision $u=2^{-24}$.
 
 The following code constructs either example and applies the earlier `cholesky_in_place` function.
 
