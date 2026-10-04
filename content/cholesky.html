@@ -483,6 +483,21 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-advanced-material-numerical-breakdown">Optional Advanced Material: Numerical Breakdown</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-guarantee-of-successful-completion">A Guarantee of Successful Completion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-means-to-keep-the-precision-fixed">What It Means to Keep the Precision Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-exactly-representable-matrix-family">An Exactly Representable Matrix Family</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-definiteness-of-the-stored-matrix">Positive Definiteness of the Stored Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-rounding-changes-the-schur-complement">How Rounding Changes the Schur Complement</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-nonpositive-pivot-must-follow">Why a Nonpositive Pivot Must Follow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#condition-number-and-the-remaining-gap">Condition Number and the Remaining Gap</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bounded-condition-numbers-at-fixed-precision">Bounded Condition Numbers at Fixed Precision</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sharpness-for-decreasing-and-bounded-condition-numbers">Sharpness for Decreasing and Bounded Condition Numbers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-order-and-condition-numbers-near-one">Operation Order and Condition Numbers Near One</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-examples">Numerical Examples</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#failure-is-not-monotone-in-precision">Failure Is Not Monotone in Precision</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -501,8 +516,7 @@
 \[
 \boxed{A=LL^T,\qquad l_{ii}&gt;0.}
 \]</div>
-<p>Here <span class="math notranslate nohighlight">\(L\)</span> is lower triangular. This is the <strong>Cholesky factorization</strong>. It requires about half the arithmetic of general LU factorization and can store the matrix and factor in a single triangle. Positive definiteness ensures that every pivot is positive in exact arithmetic, so no pivoting is needed.</p>
-<p>The block derivation below explains why the factorization exists and how to compute it. The error analysis then explains its numerical advantage: under the stated rounding assumptions, a completed factorization has backward error of order <span class="math notranslate nohighlight">\(u\)</span>, up to a dimension-dependent factor. As with LU, solution accuracy also depends on conditioning.</p>
+<p>Here <span class="math notranslate nohighlight">\(L\)</span> is lower triangular. This is the <strong>Cholesky factorization</strong>. It requires about half the arithmetic of general LU factorization. Only one triangle is needed to store the matrix and its factor. Positive definiteness ensures that every pivot is positive in exact arithmetic, so no pivoting is needed.</p>
 <section id="symmetric-positive-definite-matrices">
 <h2>Symmetric Positive Definite Matrices<a class="headerlink" href="#symmetric-positive-definite-matrices" title="Link to this heading">#</a></h2>
 <div class="proof definition admonition" id="definition-0">
@@ -516,13 +530,13 @@ A^T=A,
 x^TAx&gt;0\quad\text{for every }x\ne0.
 \]</div>
 </section>
-</div><p>For a symmetric matrix, positive definiteness is equivalent to having only positive eigenvalues. Indeed, write <span class="math notranslate nohighlight">\(A=Q\Lambda Q^T\)</span> and set <span class="math notranslate nohighlight">\(z=Q^Tx\)</span>. Then</p>
+</div><p>For a symmetric matrix, positive definiteness is equivalent to having only positive eigenvalues. To see this, write <span class="math notranslate nohighlight">\(A=Q\Lambda Q^T\)</span> and set <span class="math notranslate nohighlight">\(z=Q^Tx\)</span>. Then</p>
 <div class="math notranslate nohighlight">
 \[
 x^TAx=z^T\Lambda z=\sum_{i=1}^n\lambda_i z_i^2.
 \]</div>
 <p>If every <span class="math notranslate nohighlight">\(\lambda_i&gt;0\)</span>, this sum is positive for every nonzero <span class="math notranslate nohighlight">\(x\)</span>. Conversely, choosing <span class="math notranslate nohighlight">\(x\)</span> to be an eigenvector gives <span class="math notranslate nohighlight">\(x^TAx=\lambda_i\|x\|_2^2&gt;0\)</span>, so <span class="math notranslate nohighlight">\(\lambda_i&gt;0\)</span>.</p>
-<p>In particular, an SPD matrix is nonsingular, and each diagonal entry is positive because <span class="math notranslate nohighlight">\(a_{ii}=e_i^TAe_i&gt;0\)</span>. Positive diagonal entries alone are not sufficient: for example, <span class="math notranslate nohighlight">\(\begin{pmatrix}1&amp;2\\2&amp;1\end{pmatrix}\)</span> has eigenvalues <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(-1\)</span>.</p>
+<p>An SPD matrix is therefore nonsingular. Each diagonal entry is also positive because <span class="math notranslate nohighlight">\(a_{ii}=e_i^TAe_i&gt;0\)</span>. Positive diagonal entries alone do not imply positive definiteness: <span class="math notranslate nohighlight">\(\begin{pmatrix}1&amp;2\\2&amp;1\end{pmatrix}\)</span> has eigenvalues <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(-1\)</span>.</p>
 <p>For complex matrices, the corresponding condition is <strong>Hermitian positive definiteness</strong>: <span class="math notranslate nohighlight">\(A^H=A\)</span> and <span class="math notranslate nohighlight">\(x^HAx&gt;0\)</span> for every nonzero complex <span class="math notranslate nohighlight">\(x\)</span>. The factorization is then <span class="math notranslate nohighlight">\(A=LL^H\)</span>, again with positive real diagonal entries in <span class="math notranslate nohighlight">\(L\)</span>. The derivation and code below use real arithmetic; conjugate transposes give the analogous formulas in the complex case.</p>
 </section>
 <section id="deriving-the-factorization">
@@ -557,7 +571,7 @@ L_SL_S^T&amp;=B-\ell\ell^T.
 \[
 S=B-\frac{cc^T}{a_{11}}.
 \]</div>
-<p>To repeat this step, the remaining matrix must also be SPD. Symmetry is immediate from the formula for <span class="math notranslate nohighlight">\(S\)</span>; positive definiteness needs a proof. It ensures that the next pivot, and every later pivot, is positive.</p>
+<p>To repeat the elimination step, we need <span class="math notranslate nohighlight">\(S\)</span> to be SPD. Its symmetry follows from the formula. Proving positive definiteness will ensure that the next pivot, and every later pivot, is positive.</p>
 <section id="why-the-schur-complement-remains-positive-definite">
 <h3>Why the Schur Complement Remains Positive Definite<a class="headerlink" href="#why-the-schur-complement-remains-positive-definite" title="Link to this heading">#</a></h3>
 <p>For <span class="math notranslate nohighlight">\(x=(t,y^T)^T\)</span>, completing the square gives</p>
@@ -574,7 +588,7 @@ x^TAx
 \[
 y^TSy=x^TAx&gt;0.
 \]</div>
-<p>Also, <span class="math notranslate nohighlight">\(S\)</span> is symmetric. Therefore <span class="math notranslate nohighlight">\(S\)</span> is SPD: after eliminating one variable, we have a smaller problem with exactly the same structure.</p>
+<p>Together with symmetry, this proves that <span class="math notranslate nohighlight">\(S\)</span> is SPD. We can therefore repeat the same elimination step on the smaller matrix.</p>
 </section>
 <section id="existence-and-uniqueness">
 <h3>Existence and Uniqueness<a class="headerlink" href="#existence-and-uniqueness" title="Link to this heading">#</a></h3>
@@ -637,7 +651,7 @@ A=L_0DL_0^T=L_0U,
    \]</div>
 </li>
 </ol>
-<p>At completion, the lower triangle contains <span class="math notranslate nohighlight">\(L\)</span>. The following real-arithmetic implementation reads and overwrites only that triangle; it leaves the upper triangle untouched. The lower triangle defines the symmetric input matrix, so the routine does not check agreement with the upper triangle.</p>
+<p>At completion, the lower triangle contains <span class="math notranslate nohighlight">\(L\)</span>. The implementation below reads and overwrites only that triangle. It interprets these entries as a symmetric matrix, without checking or changing the upper triangle.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -672,7 +686,7 @@ A=L_0DL_0^T=L_0U,
 </div>
 </div>
 </div>
-<p>A nonpositive computed pivot stops the routine. This can indicate that the input is not positive definite, or that rounding has obscured a very small positive pivot.</p>
+<p>A nonpositive computed pivot stops the routine. The input may not be positive definite, or rounding may have changed the sign of a pivot that is positive in exact arithmetic.</p>
 <section id="arithmetic-and-storage">
 <h3>Arithmetic and Storage<a class="headerlink" href="#arithmetic-and-storage" title="Link to this heading">#</a></h3>
 <p>If the remaining block has size <span class="math notranslate nohighlight">\(m=n-k\)</span>, its lower triangle has <span class="math notranslate nohighlight">\(m(m+1)/2\)</span> entries. Each update uses one multiplication and one subtraction, giving <span class="math notranslate nohighlight">\(m(m+1)\)</span> flops. Thus the updates cost</p>
@@ -680,8 +694,8 @@ A=L_0DL_0^T=L_0U,
 \[
 \sum_{m=1}^{n-1}m(m+1)=\frac{n^3-n}{3}.
 \]</div>
-<p>Including the divisions and <span class="math notranslate nohighlight">\(n\)</span> square roots gives a leading cost of <strong><span class="math notranslate nohighlight">\(n^3/3\)</span> flops</strong>, compared with <span class="math notranslate nohighlight">\(2n^3/3\)</span> for general LU. Updating both triangles would duplicate work and lose this saving. Half the leading arithmetic does not imply exactly half the elapsed time; that also depends on the implementation and hardware.</p>
-<p>Only <span class="math notranslate nohighlight">\(n(n+1)/2\)</span> entries are needed to store the input and factor. The NumPy code above still uses a full <span class="math notranslate nohighlight">\(n\times n\)</span> array, however. To realize the storage saving, the triangle must be stored in a packed format. In either layout, overwriting the input avoids allocating a separate array for the factor.</p>
+<p>Including the divisions and <span class="math notranslate nohighlight">\(n\)</span> square roots gives a leading cost of <strong><span class="math notranslate nohighlight">\(n^3/3\)</span> flops</strong>, compared with <span class="math notranslate nohighlight">\(2n^3/3\)</span> for general LU. Updating both triangles would duplicate work and lose this saving. The elapsed time also depends on the implementation and hardware, so it need not be exactly half that of LU.</p>
+<p>Only <span class="math notranslate nohighlight">\(n(n+1)/2\)</span> entries are needed to store the input and factor. The NumPy code above uses a full <span class="math notranslate nohighlight">\(n\times n\)</span> array. Storing just the triangle in a packed format would save space. In either layout, overwriting the input avoids allocating a separate array for the factor.</p>
 </section>
 </section>
 <section id="solving-a-linear-system">
@@ -695,7 +709,7 @@ Ly=b,\qquad L^Tx=y.
 </section>
 <section id="backward-stability-and-its-limits">
 <h2>Backward Stability and Its Limits<a class="headerlink" href="#backward-stability-and-its-limits" title="Link to this heading">#</a></h2>
-<p>In the LU analysis, the main obstacle to a small backward-error bound was growth in the factors. Cholesky avoids that obstacle because positive definiteness controls the factor entries. This gives the route to a solution-error bound: first bound the error in the factorization, then include the two triangular solves, and finally apply the condition number.</p>
+<p>In the LU analysis, large entries in the factors could amplify rounding errors. For Cholesky, positive definiteness bounds the factor entries in terms of the input matrix. We use this bound to estimate the factorization error, then include the errors from the triangular solves. The condition number converts the resulting backward-error bound into a bound on solution accuracy.</p>
 <p>These error bounds assume that the computation completes. Cancellation can still cause a nonpositive computed pivot; that limitation is discussed after the error analysis.</p>
 <section id="why-the-factor-entries-stay-controlled">
 <h3>Why the Factor Entries Stay Controlled<a class="headerlink" href="#why-the-factor-entries-stay-controlled" title="Link to this heading">#</a></h3>
@@ -724,7 +738,7 @@ a_{ii}=\sum_{k=1}^i l_{ik}^2.
 </section>
 <section id="backward-error-of-the-factorization">
 <h3>Backward Error of the Factorization<a class="headerlink" href="#backward-error-of-the-factorization" title="Link to this heading">#</a></h3>
-<p>The preceding estimates concern the exact factor <span class="math notranslate nohighlight">\(L\)</span>. Rounding produces a different factor <span class="math notranslate nohighlight">\(\widehat{L}\)</span>, so those estimates cannot simply be applied to it. The rounding-error theorem first expresses <span class="math notranslate nohighlight">\(\widehat{L}\)</span> as the exact factor of a perturbed matrix. Its diagonal equations then let us control the size of <span class="math notranslate nohighlight">\(\widehat{L}\)</span>.</p>
+<p>The preceding estimates concern the exact factor <span class="math notranslate nohighlight">\(L\)</span>. To bound the computed factor <span class="math notranslate nohighlight">\(\widehat{L}\)</span>, we first express it as the exact factor of a perturbed matrix. Let <span class="math notranslate nohighlight">\(u\)</span> be the unit roundoff and write <span class="math notranslate nohighlight">\(\gamma_m=mu/(1-mu)\)</span>.</p>
 <div class="proof theorem admonition" id="thm:backward_error_cholesky">
 <p class="admonition-title"><span class="caption-number">Theorem 18 </span> (Backward Error of Cholesky Factorization)</p>
 <section class="theorem-content" id="proof-content">
@@ -735,10 +749,9 @@ A+E=\widehat{L}\widehat{L}^T,
 \qquad
 |E|\le\gamma_{n+1}|\widehat{L}|\,|\widehat{L}|^T,
 \]</div>
-<p>Here <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, <span class="math notranslate nohighlight">\(\gamma_m=mu/(1-mu)\)</span>, and <span class="math notranslate nohighlight">\(E\)</span> is symmetric. Absolute values and inequalities are entrywise; <span class="math notranslate nohighlight">\(|\widehat{L}|\,|\widehat{L}|^T\)</span> is an ordinary matrix product of nonnegative matrices.</p>
+<p>The perturbation <span class="math notranslate nohighlight">\(E\)</span> is symmetric. Absolute values and inequalities are entrywise; <span class="math notranslate nohighlight">\(|\widehat{L}|\,|\widehat{L}|^T\)</span> is an ordinary matrix product of nonnegative matrices.</p>
 </section>
-</div><p>This is the Cholesky counterpart of the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU backward-error theorem</span></a>; the componentwise bound is stated by <a class="reference external" href="https://doi.org/10.1137/130927231">Rump and Jeannerod</a>. The goal is a normwise bound that depends only on <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(n\)</span>, and <span class="math notranslate nohighlight">\(u\)</span>.</p>
-<p>To make the bound useful, the size of the computed factor must be bounded in terms of the original input <span class="math notranslate nohighlight">\(A\)</span>. Write <span class="math notranslate nohighlight">\(\gamma=\gamma_{n+1}\)</span> and assume <span class="math notranslate nohighlight">\(\gamma&lt;1\)</span>. The diagonal equations imply</p>
+</div><p>This is the Cholesky counterpart of the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU backward-error theorem</span></a>. The componentwise bound is stated by <a class="reference external" href="https://doi.org/10.1137/130927231">Rump and Jeannerod</a>. It still depends on <span class="math notranslate nohighlight">\(\widehat{L}\)</span>, so we need to bound that factor using <span class="math notranslate nohighlight">\(A\)</span>. Write <span class="math notranslate nohighlight">\(\gamma=\gamma_{n+1}\)</span> and assume <span class="math notranslate nohighlight">\(\gamma&lt;1\)</span>. The diagonal equations give</p>
 <div class="math notranslate nohighlight">
 \[
 \sum_k\widehat{l}_{ik}^2=a_{ii}+e_{ii}
@@ -772,7 +785,7 @@ A+E=\widehat{L}\widehat{L}^T,
 </section>
 <section id="backward-error-of-the-computed-solution">
 <h3>Backward Error of the Computed Solution<a class="headerlink" href="#backward-error-of-the-computed-solution" title="Link to this heading">#</a></h3>
-<p>A small factorization error is only part of the accuracy argument: the two triangular solves introduce further rounding errors. To assess the complete solve, use the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> defined in the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU section</span></a>. It is the smallest common bound on relative changes in <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> that make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact. For <span class="math notranslate nohighlight">\(b\ne0\)</span>, it can be computed from the residual:</p>
+<p>The two triangular solves introduce rounding errors in addition to those from the factorization. To assess their combined effect, use the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> defined in the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">LU section</span></a>. It is the smallest common bound on relative changes in <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> that make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact. For <span class="math notranslate nohighlight">\(b\ne0\)</span>, the residual gives</p>
 <div class="math notranslate nohighlight">
 \[
 \eta(\widehat{x})=
@@ -787,7 +800,7 @@ A+E=\widehat{L}\widehat{L}^T,
 |\Delta A|\le\gamma_{3n+1}|\widehat{L}|\,|\widehat{L}|^T.
 \]</div>
 <p>The factorization contributes <span class="math notranslate nohighlight">\(\gamma_{n+1}\)</span>; the two solves add <span class="math notranslate nohighlight">\(2\gamma_n+\gamma_n^2\)</span>. Their sum is at most <span class="math notranslate nohighlight">\(\gamma_{3n+1}\)</span>. Unlike the factorization perturbation <span class="math notranslate nohighlight">\(E\)</span>, the combined perturbation <span class="math notranslate nohighlight">\(\Delta A\)</span> need not be symmetric, because the two solves introduce different rounding errors.</p>
-<p>The pair <span class="math notranslate nohighlight">\((\Delta A,0)\)</span> is one admissible input perturbation. Since <span class="math notranslate nohighlight">\(\eta\)</span> is the minimum over all admissible pairs, this pair gives an upper bound on <span class="math notranslate nohighlight">\(\eta\)</span>:</p>
+<p>The perturbation pair <span class="math notranslate nohighlight">\((\Delta A,0)\)</span> changes <span class="math notranslate nohighlight">\(A\)</span> and leaves <span class="math notranslate nohighlight">\(b\)</span> unchanged. It makes <span class="math notranslate nohighlight">\(\widehat{x}\)</span> an exact solution, so its size bounds the minimum perturbation <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -808,12 +821,12 @@ A+E=\widehat{L}\widehat{L}^T,
 \qquad
 \beta_n=\frac{n\gamma_{3n+1}}{1-\gamma_{n+1}}.}
 \]</div>
-<p>For small <span class="math notranslate nohighlight">\(nu\)</span>, <span class="math notranslate nohighlight">\(\beta_n\approx n(3n+1)u\)</span>. This bounds the error of the complete solve using only the dimension and arithmetic precision. The actual <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span>, measured from the residual, can be much smaller than this worst-case bound.</p>
+<p>For small <span class="math notranslate nohighlight">\(nu\)</span>, <span class="math notranslate nohighlight">\(\beta_n\approx n(3n+1)u\)</span>. This bound accounts for both the factorization and the triangular solves. The actual backward error, measured from the residual, can be much smaller.</p>
 </div>
 </section>
 <section id="forward-error-of-the-computed-solution">
 <h3>Forward Error of the Computed Solution<a class="headerlink" href="#forward-error-of-the-computed-solution" title="Link to this heading">#</a></h3>
-<p>Let <span class="math notranslate nohighlight">\(x\)</span> be the exact solution of <span class="math notranslate nohighlight">\(Ax=b\)</span>. The bound on <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> controls the input perturbation needed to explain the computed answer <span class="math notranslate nohighlight">\(\widehat{x}\)</span>. The condition number determines how much that perturbation can affect the solution. Substituting <span class="math notranslate nohighlight">\(\eta(\widehat{x})\le\beta_n\)</span> into the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">forward-error bound for linear systems</span></a> gives, when <span class="math notranslate nohighlight">\(\kappa_2(A)\beta_n&lt;1\)</span>,</p>
+<p>Let <span class="math notranslate nohighlight">\(x\)</span> be the exact solution of <span class="math notranslate nohighlight">\(Ax=b\)</span>. The backward error tells us how much the input must change to make <span class="math notranslate nohighlight">\(\widehat{x}\)</span> exact. The condition number tells us how much that change can affect the solution. When <span class="math notranslate nohighlight">\(\kappa_2(A)\beta_n&lt;1\)</span>, substituting <span class="math notranslate nohighlight">\(\eta(\widehat{x})\le\beta_n\)</span> into the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">forward-error bound for linear systems</span></a> gives</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\|\widehat{x}-x\|_2}{\|x\|_2}
@@ -829,12 +842,498 @@ A+E=\widehat{L}\widehat{L}^T,
 <section id="completion-in-floating-point-arithmetic">
 <h3>Completion in Floating-Point Arithmetic<a class="headerlink" href="#completion-in-floating-point-arithmetic" title="Link to this heading">#</a></h3>
 <p>Here <span class="math notranslate nohighlight">\(A\)</span> denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.</p>
-<p>For a stored SPD matrix, standard Cholesky is guaranteed to run to completion when <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is safely below <span class="math notranslate nohighlight">\(u^{-1}\)</span>. If <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is comparable to <span class="math notranslate nohighlight">\(u^{-1}\)</span>, the matrix is numerically singular at the working precision and rounding can produce a nonpositive computed pivot. Thus the backward-error bounds above assume successful completion; see <a class="reference external" href="https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/">Higham’s discussion of Cholesky factorization</a>.</p>
+<p>For a stored SPD matrix, Wilkinson’s sufficient condition for successful completion is</p>
+<div class="math notranslate nohighlight">
+\[
+20n^{3/2}u\kappa_2(A)\le1,
+\]</div>
+<p>assuming the usual floating-point error model and no underflow or overflow. The dimension factor matters: failure does not by itself imply that <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is comparable to <span class="math notranslate nohighlight">\(u^{-1}\)</span>. The backward-error bounds above assume successful completion. See the <a class="reference internal" href="#cholesky-numerical-breakdown"><span class="std std-ref">optional advanced section</span></a> for the source, a sharper sufficient condition, and examples of numerical breakdown.</p>
 </section>
 </section>
 <section id="choosing-a-direct-solver">
 <h2>Choosing a Direct Solver<a class="headerlink" href="#choosing-a-direct-solver" title="Link to this heading">#</a></h2>
-<p>For a general dense nonsingular system, use LU with partial pivoting. When the matrix is known to be symmetric positive definite, Cholesky exploits that structure to reduce arithmetic and storage. In both cases, factor once, solve triangular systems for each right-hand side, and interpret the residual together with the condition number when assessing solution accuracy.</p>
+<p>For a general dense nonsingular system, use LU with partial pivoting. For a known SPD matrix, use Cholesky to reduce arithmetic and storage. In either case, reuse the factorization for each new right-hand side. Assess solution accuracy using both the residual and the condition number.</p>
+</section>
+<section id="optional-advanced-material-numerical-breakdown">
+<span id="cholesky-numerical-breakdown"></span><h2>Optional Advanced Material: Numerical Breakdown<a class="headerlink" href="#optional-advanced-material-numerical-breakdown" title="Link to this heading">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Reading this section is <strong>not required</strong>. It goes beyond the course and is included only for students who are curious about the limits of the numerical stability guarantees.</p>
+<p><em>This is not covered on the exams or graded assignments.</em></p>
+</div>
+<p>To assess how sharp the completion guarantee is, we need SPD matrices on which Cholesky fails. The family below has condition numbers bounded by a constant times <span class="math notranslate nohighlight">\(\max\{1,1/(n^{3/2}u)\}\)</span>. Combined with a sufficient condition for success, it determines the order of the smallest condition number permitting failure. The best multiplicative constant remains undetermined.</p>
+<section id="a-guarantee-of-successful-completion">
+<h3>A Guarantee of Successful Completion<a class="headerlink" href="#a-guarantee-of-successful-completion" title="Link to this heading">#</a></h3>
+<p>Wilkinson’s bound guarantees successful completion when</p>
+<div class="math notranslate nohighlight">
+\[
+20n^{3/2}u\kappa_2(A)\le 1.
+\]</div>
+<p>See <a class="reference external" href="https://epubs.siam.org/doi/pdf/10.1137/19M1298263?download=true">Higham and Pranesh, p. A261</a>. A sharper result comes from <code class="xref download docutils literal notranslate"><span class="pre">Kiełbasiński,</span> <span class="pre">A</span> <span class="pre">Note</span> <span class="pre">on</span> <span class="pre">Rounding-Error</span> <span class="pre">Analysis</span> <span class="pre">of</span> <span class="pre">Cholesky</span> <span class="pre">Factorization</span> <span class="pre">(1987)</span></code>, Theorem 2, p. 491. Write <span class="math notranslate nohighlight">\(\rho_n\)</span> for the paper’s <span class="math notranslate nohighlight">\(p_n\)</span>, to distinguish it from the significand precision:</p>
+<div class="math notranslate nohighlight">
+\[
+\rho_1=2,\qquad \rho_2=3,\qquad
+\rho_n=1+\sqrt{\rho_{n-1}^2+4}\quad(n&gt;2).
+\]</div>
+<p>The theorem guarantees completion if</p>
+<div class="math notranslate nohighlight">
+\[
+3u\rho_n\|A^{-1}\|_2\|A\|_F\le1,
+\]</div>
+<p>and gives the Frobenius backward-error bound</p>
+<div class="math notranslate nohighlight">
+\[
+\widehat L\widehat L^T=A+E,\qquad
+\|E\|_F&lt;u(1+3u)^n\rho_n\|A\|_F.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\|A\|_F\le\sqrt n\|A\|_2\)</span>, a convenient sufficient condition is</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A)\le\frac{1}{3.9n^{3/2}u},
+\qquad n\ge13.
+\]</div>
+<p>To obtain the factor <span class="math notranslate nohighlight">\(3.9\)</span>, use the recurrence to get <span class="math notranslate nohighlight">\(\rho_{13}&lt;16.8&lt;1.3\cdot13\)</span>. The inequality <span class="math notranslate nohighlight">\(1+\sqrt{(1.3n)^2+4}\le1.3(n+1)\)</span> then gives <span class="math notranslate nohighlight">\(\rho_n\le1.3n\)</span> by induction for <span class="math notranslate nohighlight">\(n\ge13\)</span>. All dimensions used below satisfy this range. These results assume the usual floating-point error model, with no underflow or overflow.</p>
+<p>The extra assumption <span class="math notranslate nohighlight">\(3nu\le0.1\)</span> in the paper’s Corollary 2 simplifies the backward-error bound; it is not an additional hypothesis of Theorem 2’s completion guarantee. The paper’s discussion of near-sharpness on p. 494 concerns the Frobenius backward error of a successful factorization. It does not construct matrices on which Cholesky fails, or establish failure with condition numbers close to <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>To compare a success guarantee with a failing example, we need a precise threshold. Fix binary arithmetic with a <span class="math notranslate nohighlight">\(p\)</span>-bit significand and rounding to nearest, so <span class="math notranslate nohighlight">\(u=2^{-p}\)</span>. Assume an unbounded exponent range to exclude underflow and overflow. For a fixed algorithm, define</p>
+<div class="math notranslate nohighlight">
+\[
+c^*_{n,u}
+=\inf\left\{
+u\kappa_2(A):
+A\text{ is a stored SPD matrix on which the algorithm fails}
+\right\}.
+\]</div>
+<p>Then <span class="math notranslate nohighlight">\(\kappa_2(A)&lt;c^*_{n,u}/u\)</span> guarantees success in this model. For a finite-exponent implementation such as binary64, the guarantee applies only to computations without underflow or overflow. The threshold depends on the arithmetic and the order of operations, not just on <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<p>The construction below uses the in-place algorithm given earlier: each update performs one rounded multiplication followed by one rounded subtraction. Changing the accumulation order can change the outcome. This family also breaks down with fused multiply-add updates, as explained below.</p>
+</section>
+<section id="what-it-means-to-keep-the-precision-fixed">
+<h3>What It Means to Keep the Precision Fixed<a class="headerlink" href="#what-it-means-to-keep-the-precision-fixed" title="Link to this heading">#</a></h3>
+<p>Fix <span class="math notranslate nohighlight">\(u\)</span> throughout the construction. The relevant target across all dimensions is</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A_n)\le C\max\left\{1,\frac{1}{n^{3/2}u}\right\},
+\]</div>
+<p>with a constant <span class="math notranslate nohighlight">\(C\)</span> independent of both <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(u\)</span>. At fixed <span class="math notranslate nohighlight">\(u\)</span>, the expression <span class="math notranslate nohighlight">\(1/(n^{3/2}u)\)</span> eventually drops below <span class="math notranslate nohighlight">\(1\)</span>, while every condition number is at least <span class="math notranslate nohighlight">\(1\)</span>. The maximum accounts for this limit. At dimensions of order <span class="math notranslate nohighlight">\(u^{-2/3}\)</span> and beyond, the target is a failing matrix with a bounded condition number.</p>
+<p>The basic blocks below satisfy <span class="math notranslate nohighlight">\(k^{3/2}u\le1/256\)</span>. Choosing the largest admissible block gives a condition-number bound independent of precision. Adding a diagonal block then produces failing matrices of every larger size without changing the condition number.</p>
+</section>
+<section id="an-exactly-representable-matrix-family">
+<h3>An Exactly Representable Matrix Family<a class="headerlink" href="#an-exactly-representable-matrix-family" title="Link to this heading">#</a></h3>
+<p>We use a diagonal leading block so that its factorization is exact. Rounding in the updates to the remaining block will cause the failure.</p>
+<p>Assume binary rounding to nearest, with fixed unit roundoff <span class="math notranslate nohighlight">\(u=2^{-p}\)</span>, and no underflow or overflow. Choose an integer <span class="math notranslate nohighlight">\(q\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[
+q\ge3,\qquad p+q\text{ is even},\qquad 3q+8\le p,
+\qquad k=4^q,\qquad n=9k.
+\]</div>
+<p>The restriction <span class="math notranslate nohighlight">\(3q+8\le p\)</span> is equivalent to <span class="math notranslate nohighlight">\(k^{3/2}u\le1/256\)</span>. Requiring <span class="math notranslate nohighlight">\(p+q\)</span> to be even makes the small entries below exactly representable powers of two times an integer.</p>
+<p>Let <span class="math notranslate nohighlight">\(H_k\)</span> be the Walsh–Hadamard matrix, defined recursively by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H_1=[1],\qquad
+H_{2m}=\begin{bmatrix}H_m&amp;H_m\\H_m&amp;-H_m\end{bmatrix},
+\qquad Q=\frac{H_k}{\sqrt{k}}.
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(Q^TQ=I_k\)</span>, and every entry of <span class="math notranslate nohighlight">\(Q\)</span> is an exactly representable signed power of two. Write <span class="math notranslate nohighlight">\(J_{a,b}\)</span> for the <span class="math notranslate nohighlight">\(a\times b\)</span> all-ones matrix, and <span class="math notranslate nohighlight">\(J_m=J_{m,m}\)</span>.</p>
+<p>Set</p>
+<div class="math notranslate nohighlight">
+\[
+h=\frac{2u}{\sqrt{k}},\qquad
+\eta=6kh=12\sqrt{k}\,u,\qquad
+\delta=k\eta,\qquad
+t=3\,2^{-(p+q+2)/2}.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\eta\)</span> is a construction parameter, unrelated to the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> used earlier. The choice of <span class="math notranslate nohighlight">\(t\)</span> gives the exact identity</p>
+<div class="math notranslate nohighlight">
+\[
+t^2=\frac98h.
+\]</div>
+<p>Both <span class="math notranslate nohighlight">\(t\)</span> and <span class="math notranslate nohighlight">\(t^2\)</span> are floating-point numbers; no rounded square root is needed to form them. Define</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+T=\begin{bmatrix}
+tJ_{6k,2k}\\[1mm]
+\frac32[I_k\;\;Q]
+\end{bmatrix},
+\qquad
+G=\frac94\begin{bmatrix}I_k&amp;Q\\Q^T&amp;I_k\end{bmatrix},
+\end{split}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+A_{9k}=\begin{bmatrix}
+4I_{7k}&amp;2T\\
+2T^T&amp;G+\eta J_{2k}+\delta I_{2k}
+\end{bmatrix}.
+}
+\end{split}\]</div>
+<p>All entries are exactly representable. The parameters <span class="math notranslate nohighlight">\(\eta\)</span> and <span class="math notranslate nohighlight">\(\delta\)</span> are multiples of <span class="math notranslate nohighlight">\(4u\)</span>, the spacing near the diagonal value <span class="math notranslate nohighlight">\(9/4\)</span>. The shifts in the cross block are multiples of <span class="math notranslate nohighlight">\(4u/\sqrt{k}\)</span>. The size restriction keeps these entries in intervals with the stated spacing. The small rows occur first in <span class="math notranslate nohighlight">\(T\)</span> so that their updates accumulate rounding errors before the larger rows are eliminated.</p>
+</section>
+<section id="positive-definiteness-of-the-stored-matrix">
+<h3>Positive Definiteness of the Stored Matrix<a class="headerlink" href="#positive-definiteness-of-the-stored-matrix" title="Link to this heading">#</a></h3>
+<p>The exact Schur complement of <span class="math notranslate nohighlight">\(4I_{7k}\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+S
+&amp;=G+\eta J_{2k}+\delta I_{2k}-T^TT\\
+&amp;=\delta I_{2k}-\frac{\eta}{8}J_{2k}.
+\end{aligned}
+\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(J_{2k}\)</span> has eigenvalues <span class="math notranslate nohighlight">\(2k\)</span> and <span class="math notranslate nohighlight">\(0\)</span>, and <span class="math notranslate nohighlight">\(\delta=k\eta\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\lambda_{\min}(S)=\frac34k\eta&gt;0,
+\qquad \lambda_{\max}(S)=k\eta.
+}
+\]</div>
+<p>Both <span class="math notranslate nohighlight">\(4I_{7k}\)</span> and its exact Schur complement are positive definite, so the stored matrix is SPD.</p>
+</section>
+<section id="how-rounding-changes-the-schur-complement">
+<h3>How Rounding Changes the Schur Complement<a class="headerlink" href="#how-rounding-changes-the-schur-complement" title="Link to this heading">#</a></h3>
+<p>The factorization of the leading block is exact: <span class="math notranslate nohighlight">\(4I_{7k}=(2I_{7k})(2I_{7k})^T\)</span>, and the divisions below it recover <span class="math notranslate nohighlight">\(T\)</span>. The first <span class="math notranslate nohighlight">\(6k\)</span> rows apply repeated updates of size <span class="math notranslate nohighlight">\(t^2=9h/8\)</span> to the trailing block.</p>
+<p>In the cross block, entries start at <span class="math notranslate nohighlight">\(\pm9/(4\sqrt{k})+\eta\)</span> and have floating-point spacing <span class="math notranslate nohighlight">\(2h\)</span>. To determine how each subtraction rounds, we must check that this spacing stays unchanged throughout the updates.</p>
+<p>The size restriction gives <span class="math notranslate nohighlight">\(ku\le1/2048\)</span>, so <span class="math notranslate nohighlight">\(\eta\sqrt{k}=12ku\le3/512&lt;1/4\)</span>. The path from <span class="math notranslate nohighlight">\(\pm9/(4\sqrt{k})+\eta\)</span> to <span class="math notranslate nohighlight">\(\pm9/(4\sqrt{k})-\eta\)</span> therefore stays strictly between <span class="math notranslate nohighlight">\(2/\sqrt{k}\)</span> and <span class="math notranslate nohighlight">\(4/\sqrt{k}\)</span> in magnitude. These endpoints are consecutive powers of two, so all entries stay in the same <em>binade</em>, where the spacing is <span class="math notranslate nohighlight">\(2h\)</span>. Each subtraction of <span class="math notranslate nohighlight">\(9h/8\)</span> rounds to a decrease of <span class="math notranslate nohighlight">\(2h\)</span>, giving after <span class="math notranslate nohighlight">\(6k\)</span> updates</p>
+<div class="math notranslate nohighlight">
+\[
+\pm\frac{9}{4\sqrt{k}}+\eta-6k(2h)
+=\pm\frac{9}{4\sqrt{k}}-\eta.
+\]</div>
+<p>The diagonal entries have larger spacing and remain unchanged during these tiny updates.</p>
+<p>The off-diagonal entries within each group start at <span class="math notranslate nohighlight">\(\eta\)</span>. After <span class="math notranslate nohighlight">\(j\)</span> updates their exact value is <span class="math notranslate nohighlight">\((48k-9j)h/8\)</span>, with <span class="math notranslate nohighlight">\(0\le j\le6k\)</span>. The integer coefficient has magnitude at most <span class="math notranslate nohighlight">\(48k&lt;2^{2q+6}\)</span>. Each value therefore requires at most <span class="math notranslate nohighlight">\(2q+6\le p\)</span> significand bits. Every subtraction is exact, leaving</p>
+<div class="math notranslate nohighlight">
+\[
+\eta-6k\frac98h=-\frac{\eta}{8}.
+\]</div>
+<p>The next <span class="math notranslate nohighlight">\(k\)</span> leading rows cancel <span class="math notranslate nohighlight">\(G\)</span> exactly and retain the residual <span class="math notranslate nohighlight">\(-\eta/8\)</span> in both groups. Because <span class="math notranslate nohighlight">\(q\ge3\)</span>, this residual is a multiple of <span class="math notranslate nohighlight">\(4u\)</span>, as are the Hadamard products <span class="math notranslate nohighlight">\(9/(4k)\)</span>. All intermediate sums have magnitude less than <span class="math notranslate nohighlight">\(4\)</span>, so they are exactly representable.</p>
+<p>Consequently the actual stored trailing matrix is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\widehat S=
+\begin{bmatrix}
+aI_k-\frac{\eta}{8}J_k&amp;-\eta J_k\\
+-\eta J_k&amp;aI_k-\frac{\eta}{8}J_k
+\end{bmatrix},
+\qquad a=\left(k+\frac98\right)\eta.
+}
+\end{split}\]</div>
+<p>Its extreme eigenvalues are</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_{\min}(\widehat S)=-\frac{k-9}{8}\eta,
+\qquad
+\lambda_{\max}(\widehat S)=\frac{15k+9}{8}\eta.
+\]</div>
+<p>To force breakdown, the negative eigenvalue must be large enough to survive the remaining rounding errors. Here its magnitude is a fixed fraction of the matrix norm: since <span class="math notranslate nohighlight">\(k\ge64\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{-\lambda_{\min}(\widehat S)}{\|\widehat S\|_2}
+=\frac{k-9}{15k+9}&gt;\frac1{18}.
+\]</div>
+</section>
+<section id="why-a-nonpositive-pivot-must-follow">
+<h3>Why a Nonpositive Pivot Must Follow<a class="headerlink" href="#why-a-nonpositive-pivot-must-follow" title="Link to this heading">#</a></h3>
+<p>Rounding could still allow the routine to complete on an indefinite intermediate matrix. We rule this out by using the negative off-diagonal entries to bound the remaining rounding error.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Breakdown from the sign pattern
+Suppose the remaining Cholesky factorization completes with positive pivots, producing <span class="math notranslate nohighlight">\(\widehat L\)</span>. Every off-diagonal entry of <span class="math notranslate nohighlight">\(\widehat S\)</span> is negative. Each off-diagonal update subtracts a nonnegative product, so every off-diagonal entry of <span class="math notranslate nohighlight">\(\widehat L\)</span> is nonpositive.</p>
+<p>Let <span class="math notranslate nohighlight">\(D\)</span> be the diagonal part of <span class="math notranslate nohighlight">\(\widehat L\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[
+|\widehat L|=2D-\widehat L,
+\qquad
+\bigl\||\widehat L|\bigr\|_2
+\le2\|D\|_2+\|\widehat L\|_2
+\le3\|\widehat L\|_2.
+\]</div>
+<p>The componentwise backward-error bound, with <span class="math notranslate nohighlight">\(\gamma=\gamma_{2k+1}\)</span>, gives</p>
+<div class="math notranslate nohighlight">
+\[
+\widehat L\widehat L^T=\widehat S+E,
+\qquad
+\|E\|_2\le\gamma\bigl\||\widehat L|\bigr\|_2^2
+\le9\gamma\|\widehat S+E\|_2.
+\]</div>
+<p>Hence</p>
+<div class="math notranslate nohighlight">
+\[
+\|E\|_2
+\le\frac{9\gamma}{1-9\gamma}\|\widehat S\|_2
+&lt;\frac1{100}\|\widehat S\|_2.
+\]</div>
+<p>For the last inequality, use <span class="math notranslate nohighlight">\(ku\le1/2048\)</span>, which follows from <span class="math notranslate nohighlight">\(k^{3/2}u\le1/256\)</span> and <span class="math notranslate nohighlight">\(k\ge64\)</span>. Also <span class="math notranslate nohighlight">\(p\ge3q+8\ge17\)</span>, so <span class="math notranslate nohighlight">\(u\le2^{-17}\)</span>. Together these give <span class="math notranslate nohighlight">\((2k+1)u\le129/131072\)</span>, and hence</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{9\gamma}{1-9\gamma}
+=\frac{9(2k+1)u}{1-10(2k+1)u}
+\le\frac{1161}{129782}&lt;\frac1{100}.
+\]</div>
+<p>This perturbation is too small to remove an eigenvalue below <span class="math notranslate nohighlight">\(-\|\widehat S\|_2/18\)</span>. It contradicts <span class="math notranslate nohighlight">\(\widehat L\widehat L^T\succeq0\)</span>, so the factorization must encounter a zero or negative pivot.</p>
+<p>All update products during the leading elimination are exactly representable. A fused multiply-add rounds the product and subtraction only once, but here it gives the same stored <span class="math notranslate nohighlight">\(\widehat S\)</span>. The sign and error estimates also imply breakdown for that version of the algorithm.</p>
+</div>
+</section>
+<section id="condition-number-and-the-remaining-gap">
+<h3>Condition Number and the Remaining Gap<a class="headerlink" href="#condition-number-and-the-remaining-gap" title="Link to this heading">#</a></h3>
+<p>Put <span class="math notranslate nohighlight">\(x=k^{3/2}u\)</span>, so that <span class="math notranslate nohighlight">\(\delta=12x\)</span> and <span class="math notranslate nohighlight">\(\lambda_{\min}(S)=9x\)</span>. Since</p>
+<div class="math notranslate nohighlight">
+\[
+T^TT=G+\frac98\eta J_{2k},
+\]</div>
+<p>we have <span class="math notranslate nohighlight">\(\|T\|_2^2\le9/2+27x\)</span>. The block factorization and its inverse give</p>
+<div class="math notranslate nohighlight">
+\[
+\|A_{9k}\|_2\le\frac{17}{2}+39x,
+\qquad
+\|A_{9k}^{-1}\|_2\le1+\frac{17}{72x}.
+\]</div>
+<p>Therefore</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\kappa_2(A_{9k})
+\le\left(\frac{17}{2}+39x\right)
+\left(1+\frac{17}{72x}\right)
+&lt;\frac{57}{n^{3/2}u}.
+}
+\]</div>
+<p>To check the constant <span class="math notranslate nohighlight">\(57\)</span>, use <span class="math notranslate nohighlight">\(n^{3/2}u=27x\)</span>. For <span class="math notranslate nohighlight">\(0&lt;x\le1/256\)</span>, the scaled upper bound satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+27\left(\frac{17}{2}+39x\right)
+\left(x+\frac{17}{72}\right)
+\le\frac{3674685}{65536}&lt;57.
+\]</div>
+<p>We also need a lower bound to see how small this family’s condition number can be. Write <span class="math notranslate nohighlight">\(A=A_{9k}\)</span> and</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+M=[2I_{7k}\;\;T],\qquad
+N=\begin{bmatrix}-T/2\\I_{2k}\end{bmatrix}.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(X\succeq Y\)</span> means that <span class="math notranslate nohighlight">\(X-Y\)</span> is positive semidefinite. Since <span class="math notranslate nohighlight">\(T^TT\succeq G\)</span> and <span class="math notranslate nohighlight">\(\lambda_{\max}(G)=9/2\)</span>, we have <span class="math notranslate nohighlight">\(\|T\|_2^2\ge9/2\)</span>. Now <span class="math notranslate nohighlight">\(A\succeq M^TM\)</span> and <span class="math notranslate nohighlight">\(MM^T=4I_{7k}+TT^T\)</span>, so <span class="math notranslate nohighlight">\(\lambda_{\max}(A)\ge4+9/2=17/2\)</span>. Also,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A^{-1}=\begin{bmatrix}I_{7k}/4&amp;0\\0&amp;0\end{bmatrix}
++NS^{-1}N^T
+\succeq\frac1{\delta}NN^T.
+\end{split}\]</div>
+<p>It follows that <span class="math notranslate nohighlight">\(\|A^{-1}\|_2\ge17/(8\delta)\)</span> and thus</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{2601/64}{n^{3/2}u}
+\le\kappa_2(A_{9k})
+&lt;\frac{57}{n^{3/2}u}.
+\]</div>
+<p>The lower and upper bounds have the same dependence on <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(u\)</span>, but their constants differ. They do not establish an asymptotic equivalence. Combining the upper bound with the sufficient condition for success gives</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{1}{3.9n^{3/2}}\le c^*_{n,u}&lt;\frac{57}{n^{3/2}}
+\]</div>
+<p>for the admissible dimensions. The exact best multiplicative constant remains undetermined.</p>
+</section>
+<section id="bounded-condition-numbers-at-fixed-precision">
+<h3>Bounded Condition Numbers at Fixed Precision<a class="headerlink" href="#bounded-condition-numbers-at-fixed-precision" title="Link to this heading">#</a></h3>
+<p>To obtain a condition-number bound independent of precision, choose the largest admissible basic block. Assume <span class="math notranslate nohighlight">\(p\ge20\)</span>, let <span class="math notranslate nohighlight">\(q_*\)</span> be the largest integer satisfying the construction’s restrictions, and set <span class="math notranslate nohighlight">\(k_*=4^{q_*}\)</span>. The next candidate, <span class="math notranslate nohighlight">\(q_*+2\)</span>, violates <span class="math notranslate nohighlight">\(3q+8\le p\)</span>. Since <span class="math notranslate nohighlight">\(p+q_*\)</span> is even, we get</p>
+<div class="math notranslate nohighlight">
+\[
+r=p-3q_*\in\{8,10,12\},\qquad
+x_*=k_*^{3/2}u=2^{-r}\in\{2^{-8},2^{-10},2^{-12}\}.
+\]</div>
+<p>The smallest possible <span class="math notranslate nohighlight">\(x_*\)</span> is therefore <span class="math notranslate nohighlight">\(2^{-12}\)</span>, regardless of the precision. Substituting these three possible values into the condition-number estimate gives</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A_{9k_*})\le
+\left(\frac{17}{2}+39x_*\right)
+\left(1+\frac{17}{72x_*}\right)
+\le\frac{303691615}{36864}&lt;8239.
+\]</div>
+<p>Expanding the upper bound as <span class="math notranslate nohighlight">\(289/(144x_*)+425/24+39x_*\)</span> shows that its largest value occurs at <span class="math notranslate nohighlight">\(x_*=2^{-12}\)</span>. Thus <span class="math notranslate nohighlight">\(8239\)</span> bounds the condition number independently of both dimension and precision.</p>
+<p>For every <span class="math notranslate nohighlight">\(N\ge9k_*\)</span>, define</p>
+<div class="math notranslate nohighlight">
+\[
+B_N=\operatorname{diag}(A_{9k_*},4I_{N-9k_*}).
+\]</div>
+<p>Cholesky fails within the original block, before reaching the added diagonal block. The new eigenvalues are all <span class="math notranslate nohighlight">\(4\)</span>, which lies between the smallest and largest eigenvalues of the original block. Thus <span class="math notranslate nohighlight">\(\kappa_2(B_N)=\kappa_2(A_{9k_*})&lt;8239\)</span> for every larger size, with <span class="math notranslate nohighlight">\(u\)</span> fixed.</p>
+<p>For binary64, <span class="math notranslate nohighlight">\(p=53\)</span>, <span class="math notranslate nohighlight">\(q_*=15\)</span>, and <span class="math notranslate nohighlight">\(x_*=2^{-8}\)</span>. Hence</p>
+<div class="math notranslate nohighlight">
+\[
+N\ge9\cdot2^{30}
+\quad\Longrightarrow\quad
+\kappa_2(B_N)\le\frac{1224895}{2304}&lt;532.
+\]</div>
+<p>This binary64 block is far too large to store as a dense matrix in practice. For binary32, the largest admissible block has size <span class="math notranslate nohighlight">\(2304\)</span>. The numerical example below verifies its failure, and its condition-number bound is below <span class="math notranslate nohighlight">\(8239\)</span>.</p>
+</section>
+<section id="sharpness-for-decreasing-and-bounded-condition-numbers">
+<h3>Sharpness for Decreasing and Bounded Condition Numbers<a class="headerlink" href="#sharpness-for-decreasing-and-bounded-condition-numbers" title="Link to this heading">#</a></h3>
+<p>At fixed <span class="math notranslate nohighlight">\(u\)</span>, the target bound decreases like <span class="math notranslate nohighlight">\(1/(N^{3/2}u)\)</span> until <span class="math notranslate nohighlight">\(N^{3/2}u=1\)</span>, then stays constant. To cover every dimension, choose the largest admissible block that fits and add a diagonal block as needed.</p>
+<p>For any <span class="math notranslate nohighlight">\(p\ge20\)</span> and <span class="math notranslate nohighlight">\(N\ge2304\)</span>, choose the largest admissible <span class="math notranslate nohighlight">\(q\)</span> for which <span class="math notranslate nohighlight">\(m=9\cdot4^q\le N\)</span>, and form</p>
+<div class="math notranslate nohighlight">
+\[
+B_N=\operatorname{diag}(A_m,4I_{N-m}).
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(q=q_*\)</span>, the preceding bound gives <span class="math notranslate nohighlight">\(\kappa_2(B_N)&lt;8239\)</span>. Otherwise the next admissible size is <span class="math notranslate nohighlight">\(16m&gt;N\)</span>, and therefore</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(B_N)&lt;\frac{57}{m^{3/2}u}
+&lt;\frac{3648}{N^{3/2}u}.
+\]</div>
+<p>Combining the two cases proves the uniform bound</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\kappa_2(B_N)&lt;8239\max\left\{1,\frac{1}{N^{3/2}u}\right\}.}
+\]</div>
+<p>The sufficient condition for success and the inequality <span class="math notranslate nohighlight">\(\kappa_2(A)\ge1\)</span> give lower bounds on <span class="math notranslate nohighlight">\(c^*_{N,u}\)</span>. The failing matrices <span class="math notranslate nohighlight">\(B_N\)</span> give an upper bound. Together,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\max\left\{u,\frac{1}{3.9N^{3/2}}\right\}
+\le c^*_{N,u}
+&lt;8239\max\left\{u,\frac{1}{N^{3/2}}\right\},
+\qquad p\ge20,\quad N\ge2304.
+}
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(N\ge2304\ge13\)</span>, so the sufficient condition derived from Theorem 2 applies. When <span class="math notranslate nohighlight">\(1/(3.9N^{3/2})&lt;u\)</span>, the lower bound <span class="math notranslate nohighlight">\(c^*_{N,u}\ge u\)</span> suffices.</p>
+<p>Dividing by <span class="math notranslate nohighlight">\(u\)</span> shows that the smallest condition number permitting failure has order <span class="math notranslate nohighlight">\(\max\{1,1/(N^{3/2}u)\}\)</span> in the specified model. The constants are independent of dimension and precision, but they are not claimed to be optimal.</p>
+</section>
+<section id="operation-order-and-condition-numbers-near-one">
+<h3>Operation Order and Condition Numbers Near One<a class="headerlink" href="#operation-order-and-condition-numbers-near-one" title="Link to this heading">#</a></h3>
+<p>The breakdown proved here depends on the order of operations. Our algorithm subtracts each product from the matrix entry as it is computed. An alternative is to accumulate the products first and then subtract their sum. These evaluations can round differently:</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{fl}\!\left(\operatorname{fl}(a-b)-c\right)
+\quad\text{can differ from}\quad
+\operatorname{fl}\!\left(a-\operatorname{fl}(b+c)\right).
+\]</div>
+<p>In both numerical examples below, successive updates lead to failure, whereas accumulating each inner product sequentially from zero and then subtracting it succeeds. The counterexamples therefore do not establish failure for every implementation of Cholesky.</p>
+<p>Our construction cannot produce condition numbers arbitrarily close to <span class="math notranslate nohighlight">\(1\)</span>. For all admissible parameters, the lower bound proved above gives</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A_{9k})\ge\frac{289}{192x}
+\ge\frac{1156}{3}&gt;385,
+\qquad x=k^{3/2}u\le\frac1{256}.
+\]</div>
+<p>Padding preserves the condition number, so increasing the dimension this way cannot close the gap. Whether a different construction can produce numerical breakdown with <span class="math notranslate nohighlight">\(\kappa_2(A)\to1\)</span> is not resolved by this analysis.</p>
+</section>
+<section id="numerical-examples">
+<h3>Numerical Examples<a class="headerlink" href="#numerical-examples" title="Link to this heading">#</a></h3>
+<p>These examples use the same order of operations as <code class="docutils literal notranslate"><span class="pre">cholesky_in_place</span></code>. The stored entries and the exact Schur complement were checked using rational arithmetic; the computed trailing block was also checked entry by entry against the formula for <span class="math notranslate nohighlight">\(\widehat S\)</span>. Condition-number bounds in the table are rounded upward.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Arithmetic</p></th>
+<th class="head text-right"><p>Size <span class="math notranslate nohighlight">\(n\)</span></p></th>
+<th class="head text-right"><p>Upper bound on <span class="math notranslate nohighlight">\(\kappa_2(A_n)\)</span></p></th>
+<th class="head text-right"><p>Failing pivot (counting from 1)</p></th>
+<th class="head text-right"><p>Computed pivot</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Binary64, <span class="math notranslate nohighlight">\(u=2^{-53}\)</span></p></td>
+<td class="text-right"><p>576</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(3.531\times10^{13}\)</span></p></td>
+<td class="text-right"><p>565</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(-1.66255\times10^{-12}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Binary32, <span class="math notranslate nohighlight">\(u=2^{-24}\)</span></p></td>
+<td class="text-right"><p>2304</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(8239\)</span></p></td>
+<td class="text-right"><p>2252</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(-1.14055\times10^{-3}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For the binary32 example, <span class="math notranslate nohighlight">\(k^{3/2}u=1/4096\)</span>, so the construction’s size restriction is satisfied at the fixed precision <span class="math notranslate nohighlight">\(u=2^{-24}\)</span>.</p>
+<p>The following code constructs either example and applies the earlier <code class="docutils literal notranslate"><span class="pre">cholesky_in_place</span></code> function.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fractions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fraction</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cholesky_breakdown_matrix</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">nmant</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">**-</span><span class="n">p</span>
+    <span class="k">assert</span> <span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">&lt;=</span> <span class="n">p</span>  <span class="c1"># Equivalent to k**1.5 * u &lt;= 1/256.</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">4</span><span class="o">**</span><span class="n">q</span>
+    <span class="n">root_k</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">q</span>
+
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">k</span><span class="p">:</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">H</span><span class="p">,</span> <span class="n">H</span><span class="p">],</span> <span class="p">[</span><span class="n">H</span><span class="p">,</span> <span class="o">-</span><span class="n">H</span><span class="p">]])</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">H</span> <span class="o">/</span> <span class="n">dtype</span><span class="p">(</span><span class="n">root_k</span><span class="p">)</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">u</span> <span class="o">/</span> <span class="n">root_k</span>
+    <span class="n">eta</span> <span class="o">=</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">k</span> <span class="o">*</span> <span class="n">h</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">eta</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ldexp</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">q</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">==</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span> <span class="o">*</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">6</span> <span class="o">*</span> <span class="n">k</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">),</span> <span class="n">t</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
+                   <span class="n">dtype</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">))))</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="mf">2.25</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">I</span><span class="p">,</span> <span class="n">Q</span><span class="p">],</span> <span class="p">[</span><span class="n">Q</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">I</span><span class="p">]])</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">G</span> <span class="o">+</span> <span class="n">dtype</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">+=</span> <span class="n">dtype</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># Check every stored entry of C, grouping equal base values in G.</span>
+    <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">base</span><span class="p">))</span> <span class="o">+</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="o">==</span> <span class="mf">2.25</span><span class="p">:</span>  <span class="c1"># Only diagonal entries have this base value.</span>
+            <span class="n">expected</span> <span class="o">+=</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="n">G</span> <span class="o">==</span> <span class="n">base</span><span class="p">]):</span>
+            <span class="k">assert</span> <span class="n">Fraction</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">stored</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
+
+    <span class="k">assert</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">-</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">Fraction</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">block</span><span class="p">([[</span><span class="n">dtype</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">k</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span> <span class="n">dtype</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">T</span><span class="p">],</span>
+                     <span class="p">[</span><span class="n">dtype</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">T</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">C</span><span class="p">]])</span>
+
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">cholesky_breakdown_matrix</span><span class="p">()</span>
+<span class="c1"># For the binary32 example: A = cholesky_breakdown_matrix(4, np.float32)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">cholesky_in_place</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+<span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="c1"># Binary64: Nonpositive or nonfinite pivot at step 565</span>
+<span class="c1"># Binary32: Nonpositive or nonfinite pivot at step 2252</span>
+</pre></div>
+</div>
+</section>
+<section id="failure-is-not-monotone-in-precision">
+<h3>Failure Is Not Monotone in Precision<a class="headerlink" href="#failure-is-not-monotone-in-precision" title="Link to this heading">#</a></h3>
+<p>Changing <span class="math notranslate nohighlight">\(u\)</span> in our construction changes the matrix. A smaller <span class="math notranslate nohighlight">\(u\)</span> makes its positive Schur complement smaller as well. This does not describe what happens when we factor the same SPD matrix at higher precision. For a fixed matrix and dimension, sufficiently small <span class="math notranslate nohighlight">\(u\)</span> guarantees success.</p>
+<p>Success at one precision does not guarantee success at the next higher precision. For example, keep the following matrix fixed:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\frac1{32}\begin{bmatrix}4&amp;5\\5&amp;7\end{bmatrix}.
+\end{split}\]</div>
+<p>Its determinant is <span class="math notranslate nohighlight">\(3/1024&gt;0\)</span>, and all entries are exactly representable in both of the following binary formats. With separate rounding of square root, division, multiplication, and subtraction, Cholesky gives</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Significand precision</p></th>
+<th class="head text-right"><p><span class="math notranslate nohighlight">\(\widehat l_{11}\)</span></p></th>
+<th class="head text-right"><p><span class="math notranslate nohighlight">\(\widehat l_{21}\)</span></p></th>
+<th class="head text-right"><p>Computed second pivot</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(p=3\)</span>, <span class="math notranslate nohighlight">\(u=1/8\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(3/8\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(7/16\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(1/32&gt;0\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(p=4\)</span>, <span class="math notranslate nohighlight">\(u=1/16\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(11/32\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(15/32\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(0\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here the coarser calculation succeeds and the finer one fails. Individual rounding errors can cancel differently, so failure at one precision does not imply failure at every coarser precision.</p>
+</section>
 </section>
 </section>
 
@@ -925,6 +1424,21 @@ A+E=\widehat{L}\widehat{L}^T,
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-advanced-material-numerical-breakdown">Optional Advanced Material: Numerical Breakdown</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-guarantee-of-successful-completion">A Guarantee of Successful Completion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-means-to-keep-the-precision-fixed">What It Means to Keep the Precision Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-exactly-representable-matrix-family">An Exactly Representable Matrix Family</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-definiteness-of-the-stored-matrix">Positive Definiteness of the Stored Matrix</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-rounding-changes-the-schur-complement">How Rounding Changes the Schur Complement</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-nonpositive-pivot-must-follow">Why a Nonpositive Pivot Must Follow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#condition-number-and-the-remaining-gap">Condition Number and the Remaining Gap</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bounded-condition-numbers-at-fixed-precision">Bounded Condition Numbers at Fixed Precision</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sharpness-for-decreasing-and-bounded-condition-numbers">Sharpness for Decreasing and Bounded Condition Numbers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-order-and-condition-numbers-near-one">Operation Order and Condition Numbers Near One</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-examples">Numerical Examples</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#failure-is-not-monotone-in-precision">Failure Is Not Monotone in Precision</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
