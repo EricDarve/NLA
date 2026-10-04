@@ -395,10 +395,10 @@ For a general dense nonsingular system, use LU with partial pivoting. When the m
 ```{warning}
 Reading this section is **not required**. It goes beyond the course and is included only for students who are curious about the limits of the numerical stability guarantees.
 
-This is not covered on the exams or graded assignments.
+*This is not covered on the exams or graded assignments.*
 ```
 
-How well conditioned can a stored SPD matrix be if Cholesky nevertheless produces a zero or negative pivot? This section gives a family with condition number of order $1/(n^{3/2}u)$. Together with a sufficient condition for success, it shows that the power $n^{3/2}$ cannot be improved uniformly in dimension and precision for the algorithm considered here. The exact best multiplicative constant is not determined.
+How well conditioned can a stored SPD matrix be if Cholesky nevertheless produces a zero or negative pivot? This section constructs failing matrices with condition numbers bounded by an absolute constant times $\max\{1,1/(n^{3/2}u)\}$. Together with a sufficient condition for success, this establishes the order of the smallest condition number permitting failure, including the regime of bounded condition numbers at large dimensions. The exact best multiplicative constant is not determined.
 
 ### A Guarantee of Successful Completion
 
@@ -431,13 +431,28 @@ Then $\kappa_2(A)<c^*_{n,u}/u$ guarantees success in this model. For a finite-ex
 
 The construction below uses the in-place algorithm given earlier: each update performs one rounded multiplication followed by one rounded subtraction. Changing the accumulation order can change the outcome. This family also breaks down with fused multiply-add updates, as explained below.
 
+### What It Means to Keep the Precision Fixed
+
+Fix $u$ throughout the construction. The relevant target across all dimensions is
+
+$$
+\kappa_2(A_n)\le C\max\left\{1,\frac{1}{n^{3/2}u}\right\},
+$$
+
+with an absolute constant $C$ independent of both $n$ and $u$. Since $\kappa_2(A)\ge1$, the decreasing expression $1/(n^{3/2}u)$ eventually ceases to be an appropriate target. This does not impose a size limit on counterexamples: at dimensions of order $u^{-2/3}$ and beyond, we seek failing matrices with bounded condition numbers.
+
+The construction below achieves this target. Its basic blocks satisfy $k^{3/2}u\le1/256$, replacing the more restrictive $k^3u\le10^{-4}$ used with the earlier construction and its trace-based error estimate. Choosing the largest admissible block gives an absolute condition-number bound; padding then extends failure to every larger dimension at the same precision. Thus the restriction on the basic blocks does not restrict the dimensions of the final family.
+
 ### An Exactly Representable Matrix Family
 
-Assume binary rounding to nearest, with unit roundoff $u=2^{-p}$, and no underflow or overflow. Choose
+Assume binary rounding to nearest, with fixed unit roundoff $u=2^{-p}$, and no underflow or overflow. Choose an integer $q$ such that
 
 $$
-k=4^q\ge16,\qquad k^3u\le10^{-4},\qquad n=9k.
+q\ge3,\qquad p+q\text{ is even},\qquad 3q+8\le p,
+\qquad k=4^q,\qquad n=9k.
 $$
+
+The last inequality is exactly $k^{3/2}u\le1/256$. The parity restriction makes the small entries below simple dyadic numbers.
 
 Let $H_k$ be the Walsh–Hadamard matrix, defined recursively by
 
@@ -447,24 +462,24 @@ H_{2m}=\begin{bmatrix}H_m&H_m\\H_m&-H_m\end{bmatrix},
 \qquad Q=\frac{H_k}{\sqrt{k}}.
 $$
 
-Thus $Q^TQ=I_k$. Because $k$ is a power of four, every entry of $Q$ is a signed power of two and is exactly representable. Write $J_{a,b}$ for the $a\times b$ all-ones matrix, and $J_m=J_{m,m}$.
+Thus $Q^TQ=I_k$, and every entry of $Q$ is an exactly representable signed power of two. Write $J_{a,b}$ for the $a\times b$ all-ones matrix, and $J_m=J_{m,m}$.
 
 Set
 
 $$
 h=\frac{2u}{\sqrt{k}},\qquad
 \eta=6kh=12\sqrt{k}\,u,\qquad
-\delta=(k-2)\eta.
+\delta=k\eta,\qquad
+t=3\,2^{-(p+q+2)/2}.
 $$
 
-Here $\eta$ is a construction parameter, unrelated to the backward error $\eta(\widehat{x})$ used earlier. Obtain $t$ by rounding $\sqrt h$ and then advancing twice to the next floating-point number toward $+\infty$. This choice ensures
+Here $\eta$ is a construction parameter, unrelated to the backward error $\eta(\widehat{x})$ used earlier. The choice of $t$ gives the exact identity
 
 $$
-h<\operatorname{fl}(t^2)\le h(1+12u),\qquad
-0<t^2-h\le12uh.
+t^2=\frac98h.
 $$
 
-Define
+Both $t$ and $t^2$ are floating-point numbers; no rounded square root is needed to form them. Define
 
 $$
 T=\begin{bmatrix}
@@ -486,202 +501,293 @@ A_{9k}=\begin{bmatrix}
 }
 $$
 
-All entries of this matrix are exactly representable under the stated size restriction. In particular, $\eta$ and $\delta$ lie on the floating-point grids of the entries to which they are added. The small entries occur first in $T$; their order is essential to the example.
+All entries are exactly representable. For example, $\eta$ and $\delta$ are multiples of $4u$, the spacing near the diagonal value $9/4$; the cross-block shifts are multiples of $4u/\sqrt{k}$. The size restriction keeps those entries in the same exponent intervals. The small rows occur first in $T$, and this order is essential to the example.
 
 ### Positive Definiteness of the Stored Matrix
 
-The exact Schur complement of $4I_{7k}$ is particularly simple:
+The exact Schur complement of $4I_{7k}$ is
 
 $$
 \begin{aligned}
 S
 &=G+\eta J_{2k}+\delta I_{2k}-T^TT\\
-&=\delta I_{2k}-\varepsilon J_{2k},
-\qquad \varepsilon=6k(t^2-h).
+&=\delta I_{2k}-\frac{\eta}{8}J_{2k}.
 \end{aligned}
 $$
 
-The all-ones matrix $J_{2k}$ has eigenvalues $2k$ and $0$, so
+Since $J_{2k}$ has eigenvalues $2k$ and $0$, and $\delta=k\eta$,
 
 $$
-\lambda_{\min}(S)
-=\delta-2k\varepsilon
-\ge\delta-24ku\eta>0.
+\boxed{
+\lambda_{\min}(S)=\frac34k\eta>0,
+\qquad \lambda_{\max}(S)=k\eta.
+}
 $$
 
-Therefore $A_{9k}$ is SPD in exact arithmetic. Positive definiteness holds for the floating-point entries themselves; it is not a property lost while forming or storing the input.
+Thus the stored matrix itself is SPD. This conclusion follows from an exact identity, without a small residual estimate.
 
-### How Rounding Produces a Nonpositive Pivot
+### How Rounding Changes the Schur Complement
 
-The factorization of the leading block is exact: $4I_{7k}=(2I_{7k})(2I_{7k})^T$, and the divisions below it recover $T$. The first $6k$ rows therefore apply repeated updates of size $\operatorname{fl}(t^2)$ to the trailing block.
+The factorization of the leading block is exact: $4I_{7k}=(2I_{7k})(2I_{7k})^T$, and the divisions below it recover $T$. The first $6k$ rows apply repeated updates of size $t^2=9h/8$ to the trailing block.
 
-In its cross block, the entries start at $\pm9/(4\sqrt{k})+\eta$. Their floating-point spacing is $2h$. Each subtraction of $\operatorname{fl}(t^2)$, which is slightly larger than $h$, rounds to a decrease of $2h$. After $6k$ such updates, those entries are
+In its cross block, entries start at $\pm9/(4\sqrt{k})+\eta$ and have floating-point spacing $2h$. Each subtraction of $9h/8$ therefore rounds to a decrease of $2h$. After $6k$ updates, these entries are
 
 $$
 \pm\frac{9}{4\sqrt{k}}+\eta-6k(2h)
 =\pm\frac{9}{4\sqrt{k}}-\eta.
 $$
 
-The true decrease would be only slightly larger than $\eta$. Rounding has almost doubled it. The diagonal entries, whose spacing is larger, remain unchanged during these tiny updates.
-
-The next $k$ leading rows cancel $G$. The resulting stored trailing matrix has the form
+The diagonal entries have larger spacing and remain unchanged during these tiny updates. Every within-group off-diagonal entry starts at $\eta$; its subtractions are exact and leave
 
 $$
+\eta-6k\frac98h=-\frac{\eta}{8}.
+$$
+
+The next $k$ leading rows cancel $G$ exactly. In particular, the residual $-\eta/8$ is now retained exactly in both groups: because $q\ge3$, it is a multiple of $4u$, as are the Hadamard products $9/(4k)$. The intermediate sums have magnitude less than $4$, so these updates are exact.
+
+Consequently the actual stored trailing matrix is
+
+$$
+\boxed{
 \widehat S=
 \begin{bmatrix}
-dI_k+e(J_k-I_k)&-\eta J_k\\
--\eta J_k&dI_k
+aI_k-\frac{\eta}{8}J_k&-\eta J_k\\
+-\eta J_k&aI_k-\frac{\eta}{8}J_k
 \end{bmatrix},
-\qquad d=(k-1)\eta,
+\qquad a=\left(k+\frac98\right)\eta.
+}
 $$
 
-where $e\le0$ and $|e|\le16ku\eta$. The small residual $e$ does not affect the sign argument. For the normalized all-ones vector $x\in\mathbb R^{2k}$,
+Its extreme eigenvalues are
 
 $$
-x^T\widehat Sx
-=-\eta+\frac{k-1}{2}e
-\le-\eta.
+\lambda_{\min}(\widehat S)=-\frac{k-9}{8}\eta,
+\qquad
+\lambda_{\max}(\widehat S)=\frac{15k+9}{8}\eta.
 $$
 
-````{prf:proof} Details of the stored Schur complement and subsequent breakdown
-Let $y=\operatorname{fl}(t^2)$. A within-group off-diagonal entry starts at $\eta$ and undergoes $6k$ rounded subtractions of $y$. Comparing this recurrence with the exactly representable sequence $\eta-jh$, and using $y>h$ and monotonicity of rounding, shows that its final value $e$ is nonpositive.
-
-The summation error bound controls the distance from $e$ to the exact sum $\eta-6ky$:
+The negative eigenvalue is a fixed fraction of the norm, rather than a fraction of order $1/k$. Since $k\ge64$,
 
 $$
-|e-(\eta-6ky)|\le\gamma_{6k}(\eta+6ky).
+\frac{-\lambda_{\min}(\widehat S)}{\|\widehat S\|_2}
+=\frac{k-9}{15k+9}>\frac1{18}.
 $$
 
-We must also bound that exact sum. Since $\eta=6kh$ and $h<y\le h(1+12u)$, we have $|\eta-6ky|\le12u\eta$. Combining the two estimates gives
+### Why a Nonpositive Pivot Must Follow
+
+An indefinite intermediate matrix alone does not prove that a floating-point routine must report failure. Here its sign pattern gives a stronger error estimate than a trace bound.
+
+````{prf:proof} Breakdown without the cubic size restriction
+Suppose the remaining Cholesky factorization completes with positive pivots, producing $\widehat L$. Every off-diagonal entry of $\widehat S$ is negative. Each off-diagonal update subtracts a nonnegative product, so every off-diagonal entry of $\widehat L$ is nonpositive.
+
+Let $D$ be the diagonal part of $\widehat L$. Then
 
 $$
-|e|\le\left[12u+\gamma_{6k}(2+12u)\right]\eta
-<16ku\eta,
+|\widehat L|=2D-\widehat L,
+\qquad
+\bigl\||\widehat L|\bigr\|_2
+\le2\|D\|_2+\|\widehat L\|_2
+\le3\|\widehat L\|_2.
 $$
 
-where the last inequality uses $k\ge16$ and $k^3u\le10^{-4}$.
-
-During the remaining $k$ updates, the left within-group off-diagonal entries receive only zero products, so they retain $e$. In the right group, the first nonzero product has magnitude $9/(4k)$. The residual $e$ is too small to affect its rounding: the condition $k^3u\le10^{-4}$ gives
-
-$$
-|e|\le192k^{3/2}u^2<\frac{u}{k}.
-$$
-
-The subsequent signed products are dyadic numbers whose sums are exact and cancel by Hadamard orthogonality. The cross-block and diagonal cancellations are also exact. This gives the displayed formula for $\widehat S$.
-
-An indefinite intermediate matrix alone does not prove that a floating-point routine must report failure. To finish the argument, suppose the remaining Cholesky factorization completed with positive pivots. Its rounding-error analysis would give
+The componentwise backward-error bound, with $\gamma=\gamma_{2k+1}$, gives
 
 $$
 \widehat L\widehat L^T=\widehat S+E,
 \qquad
-|E|\le\gamma_{2k+1}|\widehat L|\,|\widehat L|^T.
+\|E\|_2\le\gamma\bigl\||\widehat L|\bigr\|_2^2
+\le9\gamma\|\widehat S+E\|_2.
 $$
 
-This algebraic error bound holds whenever the computation completes, even if the input is indefinite. The diagonal equations and the trace argument used earlier imply
+Hence
 
 $$
 \|E\|_2
-\le\frac{\gamma_{2k+1}}{1-\gamma_{2k+1}}
-\operatorname{tr}(\widehat S)
-<10^{-3}\eta,
+\le\frac{9\gamma}{1-9\gamma}\|\widehat S\|_2
+<\frac1{100}\|\widehat S\|_2.
 $$
 
-because $\operatorname{tr}(\widehat S)=2k(k-1)\eta$ and $k^3u\le10^{-4}$. But then
+For the last inequality, use $ku\le1/2048$, which follows from $k^{3/2}u\le1/256$ and $k\ge64$. More explicitly,
 
 $$
-x^T\widehat L\widehat L^Tx
-=x^T\widehat Sx+x^TEx<0,
+\frac{9\gamma}{1-9\gamma}
+=\frac{9(2k+1)u}{1-10(2k+1)u}
+\le\frac{1161}{129782}<\frac1{100}.
 $$
 
-which is impossible. The computation must encounter a zero or negative pivot.
+This perturbation is too small to remove an eigenvalue below $-\|\widehat S\|_2/18$. It contradicts $\widehat L\widehat L^T\succeq0$, so the factorization must encounter a zero or negative pivot.
 
-For fused multiply-add updates, each tiny update is $\operatorname{fl}(a-t^2)$. Because $t^2$ is slightly larger than $h$, the cross-block entries still decrease by exactly $2h$. Replacing $y$ by the exact $t^2$ in the residual estimates gives the same bounds on $e$; the remaining nonzero products are exact. The breakdown argument therefore also applies to fused updates.
+All update products during the leading elimination are exactly representable. Fused multiply-add updates therefore give the same stored $\widehat S$, and the sign and error estimates also imply breakdown for that version of the algorithm.
 ````
 
 ### Condition Number and the Remaining Gap
 
-To bound the condition number, set
+Put $x=k^{3/2}u$, so that $\delta=12x$ and $\lambda_{\min}(S)=9x$. Since
 
 $$
-b=\frac92+2k\eta(1+12u),\qquad
-s=\delta-24ku\eta.
+T^TT=G+\frac98\eta J_{2k},
 $$
 
-Then $\|T\|_2^2\le b$ and $\lambda_{\min}(S)\ge s$. The block factorization and its inverse give
+we have $\|T\|_2^2\le9/2+27x$. The block factorization and its inverse give
 
 $$
-\|A_{9k}\|_2\le4+b+\delta,
+\|A_{9k}\|_2\le\frac{17}{2}+39x,
 \qquad
-\|A_{9k}^{-1}\|_2
-\le\frac14+\frac{1+b/4}{s}.
+\|A_{9k}^{-1}\|_2\le1+\frac{17}{72x}.
 $$
 
-Consequently, under the stated restrictions,
+Therefore
 
 $$
 \boxed{
 \kappa_2(A_{9k})
-\le(4+b+\delta)\left(\frac14+\frac{1+b/4}{s}\right)
-<\frac{47}{n^{3/2}u}.
+\le\left(\frac{17}{2}+39x\right)
+\left(1+\frac{17}{72x}\right)
+<\frac{57}{n^{3/2}u}.
 }
 $$
 
-To prove a matching lower bound, write $A=A_{9k}$ and
+Indeed, $n^{3/2}u=27x$, and for $0<x\le1/256$ the scaled upper bound satisfies
+
+$$
+27\left(\frac{17}{2}+39x\right)
+\left(x+\frac{17}{72}\right)
+\le\frac{3674685}{65536}<57.
+$$
+
+For comparison, a lower bound follows by writing $A=A_{9k}$ and
 
 $$
 M=[2I_{7k}\;\;T],\qquad
 N=\begin{bmatrix}-T/2\\I_{2k}\end{bmatrix}.
 $$
 
-Here $X\succeq Y$ means that $X-Y$ is positive semidefinite. Since $A\succeq M^TM$ and $MM^T=4I_{7k}+TT^T$,
-
-$$
-\lambda_{\max}(A)\ge4+\|T\|_2^2\ge\frac{17}{2}.
-$$
-
-Also, $0\prec S\preceq\delta I_{2k}$ and the block inverse satisfies
+Here $X\succeq Y$ means that $X-Y$ is positive semidefinite. We have $A\succeq M^TM$ and $MM^T=4I_{7k}+TT^T$, so $\lambda_{\max}(A)\ge17/2$. Also,
 
 $$
 A^{-1}=\begin{bmatrix}I_{7k}/4&0\\0&0\end{bmatrix}
 +NS^{-1}N^T
-\succeq\frac{1}{\delta}NN^T.
+\succeq\frac1{\delta}NN^T.
 $$
 
-Therefore
+It follows that $\|A^{-1}\|_2\ge17/(8\delta)$ and thus
 
 $$
-\|A^{-1}\|_2\ge\frac{1+\|T\|_2^2/4}{\delta}
-\ge\frac{17}{8\delta},
-\qquad
-\kappa_2(A)\ge\frac{289}{16\delta}.
+\frac{2601/64}{n^{3/2}u}
+\le\kappa_2(A_{9k})
+<\frac{57}{n^{3/2}u}.
 $$
 
-For fixed $k$ as $u\to0$, the upper bound above has the same leading term: $b\to9/2$, $s/\delta\to1$, and $\delta\to0$. Thus the two bounds prove
+These are bounds on this family's condition number, not an asymptotic equivalence or a claim of an optimal constant. Together with the sufficient condition for success, they give
 
 $$
-u\kappa_2(A_{9k})
-\sim\frac{2601}{64}\frac{k}{k-2}\,n^{-3/2}.
+\frac{1}{3.9n^{3/2}}\le c^*_{n,u}<\frac{57}{n^{3/2}}
 $$
 
-The coefficient approaches $2601/64=40.640625$ as $k$ grows and the precision increases sufficiently. Thus, for this algorithm and the admissible dimensions,
+for the admissible dimensions. The exact best multiplicative constant remains undetermined.
+
+### Bounded Condition Numbers at the Same Precision
+
+Assume $p\ge20$ and let $q_*$ be the largest integer satisfying the construction's restrictions. Since admissible values of $q$ differ by $2$, maximality and parity give
 
 $$
-\frac{1}{3.9n^{3/2}}\le c^*_{n,u}<\frac{47}{n^{3/2}}.
+r=p-3q_*\in\{8,10,12\},\qquad
+x_*=k_*^{3/2}u=2^{-r}\in\{2^{-8},2^{-10},2^{-12}\}.
 $$
 
-These bounds establish the power of $n$, but leave a gap in the multiplicative constant. The claim concerns a joint regime of increasing dimension and decreasing roundoff, with $k^3u\le10^{-4}$; it is not an assertion about arbitrarily large $n$ at fixed precision. Other sufficiently large dimensions can be covered by padding a smaller member with $4I$, preserving its condition number and breakdown but increasing the constant in the bound expressed using the padded dimension.
+In particular, $x_*$ is bounded away from zero by an absolute constant, independently of the precision. The condition-number estimate above gives
 
-### A Binary64 Example
+$$
+\kappa_2(A_{9k_*})\le
+\left(\frac{17}{2}+39x_*\right)
+\left(1+\frac{17}{72x_*}\right)
+\le\frac{303691615}{36864}<8239.
+$$
 
-The following values were obtained with $u=2^{-53}$ and the same order of operations as `cholesky_in_place`. Positive definiteness was checked using exact rational arithmetic. The condition numbers shown are rounded values from analytic bounds evaluated at 80-digit precision, rather than from a binary64 condition estimator.
+The upper bound takes its largest value at $x_*=2^{-12}$; expanding it as $289/(144x_*)+425/24+39x_*$ verifies this directly. Thus the largest admissible block has a condition number bounded independently of both dimension and precision.
 
-| Size $n$ | Approximate $\kappa_2(A_n)$ | Failing pivot (counting from 1) | Computed pivot |
-|---:|---:|---:|---:|
-| 144 | $2.42102\times10^{14}$ | 143 | $-1.19904\times10^{-12}$ |
-| 576 | $2.73341\times10^{13}$ | 575 | $-4.23022\times10^{-11}$ |
-| 2304 | $3.33605\times10^{12}$ | 2303 | $-1.38609\times10^{-9}$ |
+For every $N\ge9k_*$, define
 
-This code constructs the smallest example in the table and applies the earlier `cholesky_in_place` function. The exact-fraction check establishes that the stored matrix is SPD before the numerical factorization begins.
+$$
+B_N=\operatorname{diag}(A_{9k_*},4I_{N-9k_*}).
+$$
+
+The same failure occurs before the padding is reached. Also, $4$ lies between the smallest and largest eigenvalues of the basic block, so $\kappa_2(B_N)=\kappa_2(A_{9k_*})<8239$. These are arbitrarily large failing SPD matrices with a uniform condition-number bound and fixed $u$.
+
+For binary64, $p=53$, $q_*=15$, and $x_*=2^{-8}$. Hence
+
+$$
+N\ge9\cdot2^{30}
+\quad\Longrightarrow\quad
+\kappa_2(B_N)\le\frac{1224895}{2304}<532.
+$$
+
+This is a theoretical construction; the dense basic block is far too large to store in practice. In binary32, the largest admissible block already has size $2304$ and condition number below $8239$, as verified in the numerical example below.
+
+### Sharpness Across Both Regimes
+
+For any $p\ge20$ and $N\ge2304$, choose the largest admissible $q$ for which $m=9\cdot4^q\le N$, and form
+
+$$
+B_N=\operatorname{diag}(A_m,4I_{N-m}).
+$$
+
+If $q=q_*$, the preceding bound gives $\kappa_2(B_N)<8239$. Otherwise the next admissible size is $16m>N$, and therefore
+
+$$
+\kappa_2(B_N)<\frac{57}{m^{3/2}u}
+<\frac{3648}{N^{3/2}u}.
+$$
+
+Combining the two cases proves the uniform bound
+
+$$
+\boxed{\kappa_2(B_N)<8239\max\left\{1,\frac{1}{N^{3/2}u}\right\}.}
+$$
+
+The sufficient condition for success and the trivial lower bound $\kappa_2(A)\ge1$ give the corresponding bounds on the extremal threshold:
+
+$$
+\boxed{
+\max\left\{u,\frac{1}{3.9N^{3/2}}\right\}
+\le c^*_{N,u}
+<8239\max\left\{u,\frac{1}{N^{3/2}}\right\},
+\qquad p\ge20,\quad N\ge2304.
+}
+$$
+
+The sufficient condition's side condition $3Nu<0.1$ causes no gap here. Whenever $1/(3.9N^{3/2}u)\ge1$, we have $3Nu\le3(1/3.9)^{2/3}u^{1/3}<0.012$ for $p\ge20$. Otherwise the lower bound $c^*_{N,u}\ge u$ suffices.
+
+Thus the smallest condition number permitting failure has order $\max\{1,1/(N^{3/2}u)\}$, with constants independent of dimension and precision in the specified model. This establishes sharpness in order across both regimes. It does not show that the constants are optimal or that failing matrices can have condition numbers arbitrarily close to $1$.
+
+### Interpreting a Guarantee That Suppresses Dimension
+
+[Higham's introductory article](https://nhigham.com/2020/08/11/what-is-a-cholesky-factorization/) describes successful completion when the condition number is “safely less than” $u^{-1}$. To turn this into a quantitative guarantee, dimension and operation order must be specified. For the update implementation studied here, $u\kappa_2(A)\ll1$ alone is not a sufficient condition uniformly in dimension. Our theoretical binary64 example has $\kappa_2(A)<532$, hence $u\kappa_2(A)<5.91\times10^{-14}$, yet fails. Its relative distance in the spectral norm to a singular matrix is $1/\kappa_2(A)>1/532$, so it is not close to singularity on the scale of $u$.
+
+There is an important implementation distinction. Higham displays inner products followed by subtraction; our proof concerns successive updates to the matrix entry. These can round differently, just as $\operatorname{fl}(a-\operatorname{fl}(b+c))$ can differ from $\operatorname{fl}(\operatorname{fl}(a-b)-c)$. Evaluating each inner product sequentially from zero, followed by a single subtraction, succeeds on both numerical examples below. Thus these examples do not establish failure for that evaluation of Higham's displayed algorithm, nor for every library implementation of Cholesky.
+
+Bounded condition numbers also do not imply condition numbers close to $1$. In fact, the lower bound already proved for our basic blocks gives
+
+$$
+\kappa_2(A_{9k})\ge\frac{289}{192x}
+\ge\frac{1156}{3}>385,
+\qquad x=k^{3/2}u\le\frac1{256}.
+$$
+
+Padding preserves this condition number. Consequently this particular family cannot approach condition number $1$ within the established parameter range. Finding failing matrices with $\kappa_2(A)\to1$ would require a different construction or a substantially extended parameter analysis; it is not a consequence of the order estimate above.
+
+### Numerical Examples
+
+These examples use the same order of operations as `cholesky_in_place`. The stored entries and the exact Schur complement were checked using rational arithmetic; the computed trailing block was also checked entry by entry against the formula for $\widehat S$. Condition-number bounds in the table are rounded upward.
+
+| Arithmetic | Size $n$ | Upper bound on $\kappa_2(A_n)$ | Failing pivot (counting from 1) | Computed pivot |
+|---|---:|---:|---:|---:|
+| Binary64, $u=2^{-53}$ | 576 | $3.531\times10^{13}$ | 565 | $-1.66255\times10^{-12}$ |
+| Binary32, $u=2^{-24}$ | 2304 | $8239$ | 2252 | $-1.14055\times10^{-3}$ |
+
+The binary32 example has $k^3u=1$, far outside the old cubic restriction, but $k^{3/2}u=1/4096$. This illustrates why that cubic restriction was a limitation of the earlier proof.
+
+The following code constructs either example and applies the earlier `cholesky_in_place` function.
 
 ```python
 import math
@@ -689,26 +795,32 @@ from fractions import Fraction
 import numpy as np
 
 
-def cholesky_breakdown_matrix(k=16):
-    u = 2.0**-53
-    root_k = math.isqrt(k)
-    assert k >= 16 and root_k * root_k == k and k & (k - 1) == 0
-    assert k**3 * u <= 1e-4
+def cholesky_breakdown_matrix(q=3, dtype=np.float64):
+    assert dtype in (np.float32, np.float64)
+    p = np.finfo(dtype).nmant + 1
+    u = 2.0**-p
+    assert q >= 3 and (p + q) % 2 == 0
+    assert 3 * q + 8 <= p  # Equivalent to k**1.5 * u <= 1/256.
+    k = 4**q
+    root_k = 2**q
 
-    H = np.ones((1, 1))
+    H = np.ones((1, 1), dtype=dtype)
     while H.shape[0] < k:
         H = np.block([[H, H], [H, -H]])
-    Q = H / root_k
+    Q = H / dtype(root_k)
 
     h = 2 * u / root_k
     eta = 6 * k * h
-    delta = (k - 2) * eta
-    t = math.nextafter(math.nextafter(math.sqrt(h), math.inf), math.inf)
+    delta = k * eta
+    t = math.ldexp(3.0, -(p + q + 2) // 2)
+    assert Fraction(t)**2 == Fraction(9, 8) * Fraction(h)
 
-    T = np.vstack((np.full((6 * k, 2 * k), t),
-                   1.5 * np.hstack((np.eye(k), Q))))
-    G = 2.25 * np.block([[np.eye(k), Q], [Q.T, np.eye(k)]])
-    C = G + eta * np.ones((2 * k, 2 * k)) + delta * np.eye(2 * k)
+    I = np.eye(k, dtype=dtype)
+    T = np.vstack((np.full((6 * k, 2 * k), t, dtype=dtype),
+                   dtype(1.5) * np.hstack((I, Q))))
+    G = dtype(2.25) * np.block([[I, Q], [Q.T, I]])
+    C = G + dtype(eta) * np.ones((2 * k, 2 * k), dtype=dtype)
+    C += dtype(delta) * np.eye(2 * k, dtype=dtype)
 
     # Check every stored entry of C, grouping equal base values in G.
     for base in np.unique(G):
@@ -718,16 +830,36 @@ def cholesky_breakdown_matrix(k=16):
         for stored in np.unique(C[G == base]):
             assert Fraction(float(stored)) == expected
 
-    epsilon = 6 * k * Fraction(t)**2 - Fraction(eta)
-    assert epsilon > 0
-    assert Fraction(delta) - 2 * k * epsilon > 0
-    return np.block([[4 * np.eye(7 * k), 2 * T], [2 * T.T, C]])
+    assert Fraction(delta) - Fraction(k, 4) * Fraction(eta) > 0
+    return np.block([[dtype(4) * np.eye(7 * k, dtype=dtype), dtype(2) * T],
+                     [dtype(2) * T.T, C]])
 
 
 A = cholesky_breakdown_matrix()
+# For the binary32 example: A = cholesky_breakdown_matrix(4, np.float32)
 try:
     cholesky_in_place(A.copy())
 except np.linalg.LinAlgError as error:
     print(error)
-# Nonpositive or nonfinite pivot at step 143
+# Binary64: Nonpositive or nonfinite pivot at step 565
+# Binary32: Nonpositive or nonfinite pivot at step 2252
 ```
+
+### Failure Is Not Monotone in Precision
+
+The matrix family above depends on $u$: choosing a smaller $u$ also changes the matrix and makes its positive Schur complement smaller. This is different from recomputing the factorization of one fixed SPD matrix at higher precision. For a fixed matrix and dimension, sufficiently small $u$ guarantees success.
+
+Even for a fixed matrix, however, success need not be monotone between two particular precisions. Consider
+
+$$
+A=\frac1{32}\begin{bmatrix}4&5\\5&7\end{bmatrix}.
+$$
+
+Its determinant is $3/1024>0$, and all entries are exactly representable in both of the following binary formats. With separate rounding of square root, division, multiplication, and subtraction, Cholesky gives
+
+| Significand precision | $\widehat l_{11}$ | $\widehat l_{21}$ | Computed second pivot |
+|---|---:|---:|---:|
+| $p=3$, $u=1/8$ | $3/8$ | $7/16$ | $1/32>0$ |
+| $p=4$, $u=1/16$ | $11/32$ | $15/32$ | $0$ |
+
+Here the coarser calculation succeeds and the finer one fails. Individual rounding errors can cancel differently, so failure at one precision does not imply failure at every coarser precision.
