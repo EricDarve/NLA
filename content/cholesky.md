@@ -380,7 +380,7 @@ An eigenvalue that is small relative to the largest one can therefore make the s
 
 Here $A$ denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.
 
-For a stored SPD matrix, Wilkinson's sufficient condition for successful completion is
+For a stored SPD matrix, Wilkinson's classical sufficient condition for successful completion, in the form stated by Higham, is
 
 $$
 20n^{3/2}u\kappa_2(A)\le1,
@@ -403,7 +403,7 @@ Reading this section is **not required**. It goes beyond the course and is inclu
 
 To assess how sharp the completion guarantee is, we need SPD matrices on which Cholesky fails. The family below has condition numbers bounded by a constant times $\max\{1,1/(n^{3/2}u)\}$. Combined with a sufficient condition for success, it determines the order of the smallest condition number permitting failure. The best multiplicative constant remains undetermined.
 
-### A Guarantee of Successful Completion
+### Guarantees of Successful Completion
 
 Wilkinson's bound guarantees successful completion when
 
@@ -411,7 +411,51 @@ $$
 20n^{3/2}u\kappa_2(A)\le 1.
 $$
 
-See [Higham and Pranesh, p. A261](https://epubs.siam.org/doi/pdf/10.1137/19M1298263?download=true). A sharper result comes from {download}`Kiełbasiński, A Note on Rounding-Error Analysis of Cholesky Factorization (1987) <../addl_material/1-s2.0-0024379587901212-main.pdf>`, Theorem 2, p. 491. Write $\rho_n$ for the paper's $p_n$, to distinguish it from the significand precision:
+This is the form stated in [Higham, Accuracy and Stability of Numerical Algorithms, Chapter 10](https://doi.org/10.1137/1.9780898718027.ch10), p. 200. The original proof is in [Wilkinson, A Priori Error Analysis of Algebraic Processes](https://www.mathunion.org/fileadmin/ICM/Proceedings/ICM1966.1/ICM1966.1.ocr.pdf), Theorem 2, p. 632. Wilkinson uses a slightly enlarged rounding-error parameter, $2^{-t_1}=1.06\,2^{-t}$, so the numerical constants must be read with that convention in mind.
+
+For the successive-update algorithm used here, we can get a stronger guarantee from [Meinguet, Refined Error Analyses of Cholesky Factorization (1983)](https://doi.org/10.1137/0720095), pp. 1248–1249. His proof bounds the perturbation introduced at each elimination step and keeps the accumulated perturbation below $\lambda_{\min}(A)$. Using $u$ as the bound on the relative error of each elementary operation, including square root, define
+
+$$
+f_j=\frac{u}{1-5u}(\sqrt j+2),\qquad
+\mu_n(u)=\prod_{j=1}^{n-1}(1+f_j)-1,
+\qquad 0<u<1/5.
+$$
+
+The argument just before his Theorem 2 gives the sufficient condition
+
+$$
+\boxed{\kappa_2(A)\mu_n(u)<1.}
+$$
+
+The theorem itself replaces the product by the larger quantity $(1+f_{n-1})^{n-1}$. Retaining the product gives the sharper condition above. These are finite-precision inequalities; no higher-order terms have been discarded.
+
+For $n\ge576$ and $u\le2^{-17}$, a convenient sufficient condition is
+
+$$
+\boxed{1.1n^{3/2}u\kappa_2(A)\le1.}
+$$
+
+To verify this consequence, put $\kappa=\kappa_2(A)\ge1$. For $n\ge576$,
+
+$$
+\sum_{j=1}^{n-1}(\sqrt j+2)
+<\frac23n^{3/2}+2n
+\le\frac34n^{3/2}.
+$$
+
+Using $\log(1+s)\le s$ and the assumed bound on $n^{3/2}u\kappa$ gives
+
+$$
+\log(1+\mu_n(u))
+<\frac{3n^{3/2}u}{4(1-5u)}
+\le\frac{3}{4.4(1-5\cdot2^{-17})\kappa}
+<\frac{\log2}{\kappa}
+\le\log(1+1/\kappa).
+$$
+
+The last inequality follows from concavity of $\log(1+s)$ on $0\le s\le1$. This proves $\kappa\mu_n(u)<1$. The factor $1.1$ is a convenient corollary of Meinguet's proof, not an optimal constant claimed in his paper.
+
+A different guarantee, which can be useful when $\|A\|_F$ is much smaller than $\sqrt n\|A\|_2$, comes from [Kiełbasiński, A Note on Rounding-Error Analysis of Cholesky Factorization (1987)](https://doi.org/10.1016/0024-3795(87)90121-2), Theorem 2, p. 491. Write $\rho_n$ for the paper's $p_n$, to distinguish it from the significand precision:
 
 $$
 \rho_1=2,\qquad \rho_2=3,\qquad
@@ -431,16 +475,9 @@ $$
 \|E\|_F<u(1+3u)^n\rho_n\|A\|_F.
 $$
 
-Since $\|A\|_F\le\sqrt n\|A\|_2$, a convenient sufficient condition is
+The extra assumption $3nu\le0.1$ in the paper's Corollary 2 simplifies the backward-error bound; it is not an additional hypothesis of Theorem 2's completion guarantee. The discussion of near-sharpness on p. 494 concerns this Frobenius backward-error bound. It does not establish sharpness of the completion threshold. All these results assume the usual floating-point error model, with no underflow or overflow.
 
-$$
-\kappa_2(A)\le\frac{1}{3.9n^{3/2}u},
-\qquad n\ge13.
-$$
-
-To obtain the factor $3.9$, use the recurrence to get $\rho_{13}<16.8<1.3\cdot13$. The inequality $1+\sqrt{(1.3n)^2+4}\le1.3(n+1)$ then gives $\rho_n\le1.3n$ by induction for $n\ge13$. All dimensions used below satisfy this range. These results assume the usual floating-point error model, with no underflow or overflow.
-
-The extra assumption $3nu\le0.1$ in the paper's Corollary 2 simplifies the backward-error bound; it is not an additional hypothesis of Theorem 2's completion guarantee. The paper's discussion of near-sharpness on p. 494 concerns the Frobenius backward error of a successful factorization. It does not construct matrices on which Cholesky fails, or establish failure with condition numbers close to $1$.
+### The Smallest Condition Number Permitting Failure
 
 To compare a success guarantee with a failing example, we need a precise threshold. Fix binary arithmetic with a $p$-bit significand and rounding to nearest, so $u=2^{-p}$. Assume an unbounded exponent range to exclude underflow and overflow. For a fixed algorithm, define
 
@@ -452,7 +489,7 @@ A\text{ is a stored SPD matrix on which the algorithm fails}
 \right\}.
 $$
 
-Then $\kappa_2(A)<c^*_{n,u}/u$ guarantees success in this model. For a finite-exponent implementation such as binary64, the guarantee applies only to computations without underflow or overflow. The threshold depends on the arithmetic and the order of operations, not just on $n$.
+Then $\kappa_2(A)<c^*_{n,u}/u$ guarantees success in this model. Meinguet's product condition gives $c^*_{n,u}\ge u/\mu_n(u)$ for $n\ge2$ and $u<1/5$. We use the simpler consequence $c^*_{n,u}\ge1/(1.1n^{3/2})$ below, where $n\ge576$ and $u\le2^{-17}$. For a finite-exponent implementation such as binary64, the guarantees apply only to computations without underflow or overflow. The threshold depends on the arithmetic and the order of operations, not just on $n$.
 
 The construction below uses the in-place algorithm given earlier: each update performs one rounded multiplication followed by one rounded subtraction. Changing the accumulation order can change the outcome. This family also breaks down with fused multiply-add updates, as explained below.
 
@@ -621,7 +658,7 @@ $$
 \le3\|\widehat L\|_2.
 $$
 
-The componentwise backward-error bound, with $\gamma=\gamma_{2k+1}$, gives
+The componentwise backward-error bound only needs successful completion with positive pivots; its derivation does not require the input matrix to be SPD. We can therefore apply it to this hypothetical factorization of $\widehat S$. With $\gamma=\gamma_{2k+1}$, it gives
 
 $$
 \widehat L\widehat L^T=\widehat S+E,
@@ -712,7 +749,7 @@ $$
 The lower and upper bounds have the same dependence on $n$ and $u$, but their constants differ. They do not establish an asymptotic equivalence. Combining the upper bound with the sufficient condition for success gives
 
 $$
-\frac{1}{3.9n^{3/2}}\le c^*_{n,u}<\frac{57}{n^{3/2}}
+\frac{1}{1.1n^{3/2}}\le c^*_{n,u}<\frac{57}{n^{3/2}}
 $$
 
 for the admissible dimensions. The exact best multiplicative constant remains undetermined.
@@ -782,14 +819,14 @@ The sufficient condition for success and the inequality $\kappa_2(A)\ge1$ give l
 
 $$
 \boxed{
-\max\left\{u,\frac{1}{3.9N^{3/2}}\right\}
+\max\left\{u,\frac{1}{1.1N^{3/2}}\right\}
 \le c^*_{N,u}
 <8239\max\left\{u,\frac{1}{N^{3/2}}\right\},
 \qquad p\ge20,\quad N\ge2304.
 }
 $$
 
-Here $N\ge2304\ge13$, so the sufficient condition derived from Theorem 2 applies. When $1/(3.9N^{3/2})<u$, the lower bound $c^*_{N,u}\ge u$ suffices.
+Here $N\ge2304\ge576$ and $u\le2^{-20}<2^{-17}$, so the sufficient condition derived from Meinguet's proof applies. When $1/(1.1N^{3/2})<u$, the lower bound $c^*_{N,u}\ge u$ suffices.
 
 Dividing by $u$ shows that the smallest condition number permitting failure has order $\max\{1,1/(N^{3/2}u)\}$ in the specified model. The constants are independent of dimension and precision, but they are not claimed to be optimal.
 
@@ -823,10 +860,17 @@ These examples use the same order of operations as `cholesky_in_place`. The stor
 |---|---:|---:|---:|---:|
 | Binary64, $u=2^{-53}$ | 576 | $3.531\times10^{13}$ | 565 | $-1.66255\times10^{-12}$ |
 | Binary32, $u=2^{-24}$ | 2304 | $8239$ | 2252 | $-1.14055\times10^{-3}$ |
+| Binary64, $u=2^{-53}$ | 9216 | $5.517\times10^{11}$ | 9002 | $-5.04263\times10^{-11}$ |
 
 For the binary32 example, $k^{3/2}u=1/4096$, so the construction's size restriction is satisfied at the fixed precision $u=2^{-24}$.
 
-The following code constructs either example and applies the earlier `cholesky_in_place` function.
+The larger binary64 example uses $q=5$. Its condition-number upper bound is about $64$ times smaller than that of the $576\times576$ example. The next admissible binary64 choice is $q=7$, giving $n=147456$. A full dense matrix of that size needs $162$ GiB, exceeding the $32$ GiB of RAM on the machine used for these tests.
+
+We also tested padded matrices $B_N=\operatorname{diag}(A_{9216},4I_{N-9216})$ at six sizes from $N=12288$ through $N=19456$. The largest full dense allocation used $2.82$ GiB. Every padded case failed at step $9002$, with exactly the same computed pivot as the unpadded matrix. Padding preserves the condition number, so these runs check persistence of failure at larger dimensions. Further allocations were stopped before they would leave less than $2$ GiB of estimated available RAM.
+
+The larger runs used a compiled implementation that skips zero contributions while preserving the order of the remaining operations. Multiplication and subtraction were rounded separately, with fused multiply-add disabled. On the two smaller examples, its output matched the NumPy routine bit for bit. In every run, the stored trailing block matched the formula for $\widehat S$ entry by entry. The reported condition numbers are analytical upper bounds, not numerical estimates.
+
+The following code constructs any of the three unpadded examples and applies the earlier `cholesky_in_place` function.
 
 ```python
 import math
@@ -876,12 +920,14 @@ def cholesky_breakdown_matrix(q=3, dtype=np.float64):
 
 A = cholesky_breakdown_matrix()
 # For the binary32 example: A = cholesky_breakdown_matrix(4, np.float32)
+# For the larger binary64 example: A = cholesky_breakdown_matrix(5, np.float64)
 try:
     cholesky_in_place(A.copy())
 except np.linalg.LinAlgError as error:
     print(error)
 # Binary64: Nonpositive or nonfinite pivot at step 565
 # Binary32: Nonpositive or nonfinite pivot at step 2252
+# Larger binary64: Nonpositive or nonfinite pivot at step 9002
 ```
 
 ### Failure Is Not Monotone in Precision
@@ -902,3 +948,26 @@ Its determinant is $3/1024>0$, and all entries are exactly representable in both
 | $p=4$, $u=1/16$ | $11/32$ | $15/32$ | $0$ |
 
 Here the coarser calculation succeeds and the finer one fails. Individual rounding errors can cancel differently, so failure at one precision does not imply failure at every coarser precision.
+
+### Further Reading: Scaling and Factor Accuracy
+
+The condition number $\kappa_2(A)$ gives a common measure for comparing our counterexamples, but a guarantee for a particular matrix can use more information. Demmel's result in Higham's Chapter 10, Theorem 10.7, p. 200, accounts for diagonal scaling. See also [Demmel's original report, *On Floating Point Errors in Cholesky* (1989)](https://www.netlib.org/lapack/lawnspdf/lawn14.pdf), which is freely available. Write
+
+$$
+D_A=\operatorname{diag}(\sqrt{a_{11}},\ldots,\sqrt{a_{nn}}),
+\qquad H=D_A^{-1}AD_A^{-1}.
+$$
+
+Then $H$ has unit diagonal, and successful completion is guaranteed if
+
+$$
+\lambda_{\min}(H)>
+\frac{n\gamma_{n+1}}{1-\gamma_{n+1}},
+\qquad \gamma_{n+1}<1.
+$$
+
+This can be useful when the diagonal entries of $A$ have very different sizes. For example, a positive diagonal matrix has $H=I$, however large $\kappa_2(A)$ is. The criterion still depends on dimension; it does not give a dimension-independent completion guarantee from $\kappa_2(H)$ alone.
+
+The accuracy of the computed factor is a separate question. [Sun, Rounding-Error and Perturbation Bounds for the Cholesky and LDLᵀ Factorizations (1992)](https://doi.org/10.1016/0024-3795(92)90423-8), §2, gives componentwise backward-error and factor-perturbation bounds for the same outer-product algorithm used here. These bounds describe a computed factor; they do not establish that every stored SPD input permits successful completion.
+
+[Chang, Perturbation Analyses for the Cholesky Factorization with Backward Rounding Errors](https://www.cs.mcgill.ca/~chang/pub/cholc_HK.pdf) restricts the perturbations to the form allowed by backward-error bounds and obtains more informative measures of factor sensitivity. Those measures can change under symmetric pivoting, even though $\kappa_2(PAP^T)=\kappa_2(A)$ for a permutation matrix $P$. Sharpness of a perturbation bound concerns allowed changes to the input. Establishing numerical breakdown also requires showing that actual rounding operations produce the needed errors, as in the construction above.
