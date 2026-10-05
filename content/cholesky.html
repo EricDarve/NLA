@@ -484,7 +484,8 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-advanced-material-numerical-breakdown">Optional Advanced Material: Numerical Breakdown</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-guarantee-of-successful-completion">A Guarantee of Successful Completion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#guarantees-of-successful-completion">Guarantees of Successful Completion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-smallest-condition-number-permitting-failure">The Smallest Condition Number Permitting Failure</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-means-to-keep-the-precision-fixed">What It Means to Keep the Precision Fixed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-exactly-representable-matrix-family">An Exactly Representable Matrix Family</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-definiteness-of-the-stored-matrix">Positive Definiteness of the Stored Matrix</a></li>
@@ -496,6 +497,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-order-and-condition-numbers-near-one">Operation Order and Condition Numbers Near One</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-examples">Numerical Examples</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#failure-is-not-monotone-in-precision">Failure Is Not Monotone in Precision</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading-scaling-and-factor-accuracy">Further Reading: Scaling and Factor Accuracy</a></li>
 </ul>
 </li>
 </ul>
@@ -842,7 +844,7 @@ A+E=\widehat{L}\widehat{L}^T,
 <section id="completion-in-floating-point-arithmetic">
 <h3>Completion in Floating-Point Arithmetic<a class="headerlink" href="#completion-in-floating-point-arithmetic" title="Link to this heading">#</a></h3>
 <p>Here <span class="math notranslate nohighlight">\(A\)</span> denotes the matrix already stored in working precision. If data are converted from a higher precision, positive definiteness must be assessed after that conversion.</p>
-<p>For a stored SPD matrix, Wilkinson’s sufficient condition for successful completion is</p>
+<p>For a stored SPD matrix, Wilkinson’s classical sufficient condition for successful completion, in the form stated by Higham, is</p>
 <div class="math notranslate nohighlight">
 \[
 20n^{3/2}u\kappa_2(A)\le1,
@@ -862,14 +864,50 @@ A+E=\widehat{L}\widehat{L}^T,
 <p><em>This is not covered on the exams or graded assignments.</em></p>
 </div>
 <p>To assess how sharp the completion guarantee is, we need SPD matrices on which Cholesky fails. The family below has condition numbers bounded by a constant times <span class="math notranslate nohighlight">\(\max\{1,1/(n^{3/2}u)\}\)</span>. Combined with a sufficient condition for success, it determines the order of the smallest condition number permitting failure. The best multiplicative constant remains undetermined.</p>
-<section id="a-guarantee-of-successful-completion">
-<h3>A Guarantee of Successful Completion<a class="headerlink" href="#a-guarantee-of-successful-completion" title="Link to this heading">#</a></h3>
+<section id="guarantees-of-successful-completion">
+<h3>Guarantees of Successful Completion<a class="headerlink" href="#guarantees-of-successful-completion" title="Link to this heading">#</a></h3>
 <p>Wilkinson’s bound guarantees successful completion when</p>
 <div class="math notranslate nohighlight">
 \[
 20n^{3/2}u\kappa_2(A)\le 1.
 \]</div>
-<p>See <a class="reference external" href="https://epubs.siam.org/doi/pdf/10.1137/19M1298263?download=true">Higham and Pranesh, p. A261</a>. A sharper result comes from <code class="xref download docutils literal notranslate"><span class="pre">Kiełbasiński,</span> <span class="pre">A</span> <span class="pre">Note</span> <span class="pre">on</span> <span class="pre">Rounding-Error</span> <span class="pre">Analysis</span> <span class="pre">of</span> <span class="pre">Cholesky</span> <span class="pre">Factorization</span> <span class="pre">(1987)</span></code>, Theorem 2, p. 491. Write <span class="math notranslate nohighlight">\(\rho_n\)</span> for the paper’s <span class="math notranslate nohighlight">\(p_n\)</span>, to distinguish it from the significand precision:</p>
+<p>This is the form stated in <a class="reference external" href="https://doi.org/10.1137/1.9780898718027.ch10">Higham, Accuracy and Stability of Numerical Algorithms, Chapter 10</a>, p. 200. The original proof is in <a class="reference external" href="https://www.mathunion.org/fileadmin/ICM/Proceedings/ICM1966.1/ICM1966.1.ocr.pdf">Wilkinson, A Priori Error Analysis of Algebraic Processes</a>, Theorem 2, p. 632. Wilkinson uses a slightly enlarged rounding-error parameter, <span class="math notranslate nohighlight">\(2^{-t_1}=1.06\,2^{-t}\)</span>, so the numerical constants must be read with that convention in mind.</p>
+<p>For the successive-update algorithm used here, we can get a stronger guarantee from <a class="reference external" href="https://doi.org/10.1137/0720095">Meinguet, Refined Error Analyses of Cholesky Factorization (1983)</a>, pp. 1248–1249. His proof bounds the perturbation introduced at each elimination step and keeps the accumulated perturbation below <span class="math notranslate nohighlight">\(\lambda_{\min}(A)\)</span>. Using <span class="math notranslate nohighlight">\(u\)</span> as the bound on the relative error of each elementary operation, including square root, define</p>
+<div class="math notranslate nohighlight">
+\[
+f_j=\frac{u}{1-5u}(\sqrt j+2),\qquad
+\mu_n(u)=\prod_{j=1}^{n-1}(1+f_j)-1,
+\qquad 0&lt;u&lt;1/5.
+\]</div>
+<p>The argument just before his Theorem 2 gives the sufficient condition</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\kappa_2(A)\mu_n(u)&lt;1.}
+\]</div>
+<p>The theorem itself replaces the product by the larger quantity <span class="math notranslate nohighlight">\((1+f_{n-1})^{n-1}\)</span>. Retaining the product gives the sharper condition above. These are finite-precision inequalities; no higher-order terms have been discarded.</p>
+<p>For <span class="math notranslate nohighlight">\(n\ge576\)</span> and <span class="math notranslate nohighlight">\(u\le2^{-17}\)</span>, a convenient sufficient condition is</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{1.1n^{3/2}u\kappa_2(A)\le1.}
+\]</div>
+<p>To verify this consequence, put <span class="math notranslate nohighlight">\(\kappa=\kappa_2(A)\ge1\)</span>. For <span class="math notranslate nohighlight">\(n\ge576\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{j=1}^{n-1}(\sqrt j+2)
+&lt;\frac23n^{3/2}+2n
+\le\frac34n^{3/2}.
+\]</div>
+<p>Using <span class="math notranslate nohighlight">\(\log(1+s)\le s\)</span> and the assumed bound on <span class="math notranslate nohighlight">\(n^{3/2}u\kappa\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+\log(1+\mu_n(u))
+&lt;\frac{3n^{3/2}u}{4(1-5u)}
+\le\frac{3}{4.4(1-5\cdot2^{-17})\kappa}
+&lt;\frac{\log2}{\kappa}
+\le\log(1+1/\kappa).
+\]</div>
+<p>The last inequality follows from concavity of <span class="math notranslate nohighlight">\(\log(1+s)\)</span> on <span class="math notranslate nohighlight">\(0\le s\le1\)</span>. This proves <span class="math notranslate nohighlight">\(\kappa\mu_n(u)&lt;1\)</span>. The factor <span class="math notranslate nohighlight">\(1.1\)</span> is a convenient corollary of Meinguet’s proof, not an optimal constant claimed in his paper.</p>
+<p>A different guarantee, which can be useful when <span class="math notranslate nohighlight">\(\|A\|_F\)</span> is much smaller than <span class="math notranslate nohighlight">\(\sqrt n\|A\|_2\)</span>, comes from <a class="reference external" href="https://doi.org/10.1016/0024-3795(87)90121-2">Kiełbasiński, A Note on Rounding-Error Analysis of Cholesky Factorization (1987)</a>, Theorem 2, p. 491. Write <span class="math notranslate nohighlight">\(\rho_n\)</span> for the paper’s <span class="math notranslate nohighlight">\(p_n\)</span>, to distinguish it from the significand precision:</p>
 <div class="math notranslate nohighlight">
 \[
 \rho_1=2,\qquad \rho_2=3,\qquad
@@ -886,14 +924,10 @@ A+E=\widehat{L}\widehat{L}^T,
 \widehat L\widehat L^T=A+E,\qquad
 \|E\|_F&lt;u(1+3u)^n\rho_n\|A\|_F.
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(\|A\|_F\le\sqrt n\|A\|_2\)</span>, a convenient sufficient condition is</p>
-<div class="math notranslate nohighlight">
-\[
-\kappa_2(A)\le\frac{1}{3.9n^{3/2}u},
-\qquad n\ge13.
-\]</div>
-<p>To obtain the factor <span class="math notranslate nohighlight">\(3.9\)</span>, use the recurrence to get <span class="math notranslate nohighlight">\(\rho_{13}&lt;16.8&lt;1.3\cdot13\)</span>. The inequality <span class="math notranslate nohighlight">\(1+\sqrt{(1.3n)^2+4}\le1.3(n+1)\)</span> then gives <span class="math notranslate nohighlight">\(\rho_n\le1.3n\)</span> by induction for <span class="math notranslate nohighlight">\(n\ge13\)</span>. All dimensions used below satisfy this range. These results assume the usual floating-point error model, with no underflow or overflow.</p>
-<p>The extra assumption <span class="math notranslate nohighlight">\(3nu\le0.1\)</span> in the paper’s Corollary 2 simplifies the backward-error bound; it is not an additional hypothesis of Theorem 2’s completion guarantee. The paper’s discussion of near-sharpness on p. 494 concerns the Frobenius backward error of a successful factorization. It does not construct matrices on which Cholesky fails, or establish failure with condition numbers close to <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>The extra assumption <span class="math notranslate nohighlight">\(3nu\le0.1\)</span> in the paper’s Corollary 2 simplifies the backward-error bound; it is not an additional hypothesis of Theorem 2’s completion guarantee. The discussion of near-sharpness on p. 494 concerns this Frobenius backward-error bound. It does not establish sharpness of the completion threshold. All these results assume the usual floating-point error model, with no underflow or overflow.</p>
+</section>
+<section id="the-smallest-condition-number-permitting-failure">
+<h3>The Smallest Condition Number Permitting Failure<a class="headerlink" href="#the-smallest-condition-number-permitting-failure" title="Link to this heading">#</a></h3>
 <p>To compare a success guarantee with a failing example, we need a precise threshold. Fix binary arithmetic with a <span class="math notranslate nohighlight">\(p\)</span>-bit significand and rounding to nearest, so <span class="math notranslate nohighlight">\(u=2^{-p}\)</span>. Assume an unbounded exponent range to exclude underflow and overflow. For a fixed algorithm, define</p>
 <div class="math notranslate nohighlight">
 \[
@@ -903,7 +937,7 @@ u\kappa_2(A):
 A\text{ is a stored SPD matrix on which the algorithm fails}
 \right\}.
 \]</div>
-<p>Then <span class="math notranslate nohighlight">\(\kappa_2(A)&lt;c^*_{n,u}/u\)</span> guarantees success in this model. For a finite-exponent implementation such as binary64, the guarantee applies only to computations without underflow or overflow. The threshold depends on the arithmetic and the order of operations, not just on <span class="math notranslate nohighlight">\(n\)</span>.</p>
+<p>Then <span class="math notranslate nohighlight">\(\kappa_2(A)&lt;c^*_{n,u}/u\)</span> guarantees success in this model. Meinguet’s product condition gives <span class="math notranslate nohighlight">\(c^*_{n,u}\ge u/\mu_n(u)\)</span> for <span class="math notranslate nohighlight">\(n\ge2\)</span> and <span class="math notranslate nohighlight">\(u&lt;1/5\)</span>. We use the simpler consequence <span class="math notranslate nohighlight">\(c^*_{n,u}\ge1/(1.1n^{3/2})\)</span> below, where <span class="math notranslate nohighlight">\(n\ge576\)</span> and <span class="math notranslate nohighlight">\(u\le2^{-17}\)</span>. For a finite-exponent implementation such as binary64, the guarantees apply only to computations without underflow or overflow. The threshold depends on the arithmetic and the order of operations, not just on <span class="math notranslate nohighlight">\(n\)</span>.</p>
 <p>The construction below uses the in-place algorithm given earlier: each update performs one rounded multiplication followed by one rounded subtraction. Changing the accumulation order can change the outcome. This family also breaks down with fused multiply-add updates, as explained below.</p>
 </section>
 <section id="what-it-means-to-keep-the-precision-fixed">
@@ -1048,7 +1082,7 @@ Suppose the remaining Cholesky factorization completes with positive pivots, pro
 \le2\|D\|_2+\|\widehat L\|_2
 \le3\|\widehat L\|_2.
 \]</div>
-<p>The componentwise backward-error bound, with <span class="math notranslate nohighlight">\(\gamma=\gamma_{2k+1}\)</span>, gives</p>
+<p>The componentwise backward-error bound only needs successful completion with positive pivots; its derivation does not require the input matrix to be SPD. We can therefore apply it to this hypothetical factorization of <span class="math notranslate nohighlight">\(\widehat S\)</span>. With <span class="math notranslate nohighlight">\(\gamma=\gamma_{2k+1}\)</span>, it gives</p>
 <div class="math notranslate nohighlight">
 \[
 \widehat L\widehat L^T=\widehat S+E,
@@ -1128,7 +1162,7 @@ A^{-1}=\begin{bmatrix}I_{7k}/4&amp;0\\0&amp;0\end{bmatrix}
 <p>The lower and upper bounds have the same dependence on <span class="math notranslate nohighlight">\(n\)</span> and <span class="math notranslate nohighlight">\(u\)</span>, but their constants differ. They do not establish an asymptotic equivalence. Combining the upper bound with the sufficient condition for success gives</p>
 <div class="math notranslate nohighlight">
 \[
-\frac{1}{3.9n^{3/2}}\le c^*_{n,u}&lt;\frac{57}{n^{3/2}}
+\frac{1}{1.1n^{3/2}}\le c^*_{n,u}&lt;\frac{57}{n^{3/2}}
 \]</div>
 <p>for the admissible dimensions. The exact best multiplicative constant remains undetermined.</p>
 </section>
@@ -1187,13 +1221,13 @@ B_N=\operatorname{diag}(A_m,4I_{N-m}).
 <div class="math notranslate nohighlight">
 \[
 \boxed{
-\max\left\{u,\frac{1}{3.9N^{3/2}}\right\}
+\max\left\{u,\frac{1}{1.1N^{3/2}}\right\}
 \le c^*_{N,u}
 &lt;8239\max\left\{u,\frac{1}{N^{3/2}}\right\},
 \qquad p\ge20,\quad N\ge2304.
 }
 \]</div>
-<p>Here <span class="math notranslate nohighlight">\(N\ge2304\ge13\)</span>, so the sufficient condition derived from Theorem 2 applies. When <span class="math notranslate nohighlight">\(1/(3.9N^{3/2})&lt;u\)</span>, the lower bound <span class="math notranslate nohighlight">\(c^*_{N,u}\ge u\)</span> suffices.</p>
+<p>Here <span class="math notranslate nohighlight">\(N\ge2304\ge576\)</span> and <span class="math notranslate nohighlight">\(u\le2^{-20}&lt;2^{-17}\)</span>, so the sufficient condition derived from Meinguet’s proof applies. When <span class="math notranslate nohighlight">\(1/(1.1N^{3/2})&lt;u\)</span>, the lower bound <span class="math notranslate nohighlight">\(c^*_{N,u}\ge u\)</span> suffices.</p>
 <p>Dividing by <span class="math notranslate nohighlight">\(u\)</span> shows that the smallest condition number permitting failure has order <span class="math notranslate nohighlight">\(\max\{1,1/(N^{3/2}u)\}\)</span> in the specified model. The constants are independent of dimension and precision, but they are not claimed to be optimal.</p>
 </section>
 <section id="operation-order-and-condition-numbers-near-one">
@@ -1240,11 +1274,20 @@ B_N=\operatorname{diag}(A_m,4I_{N-m}).
 <td class="text-right"><p>2252</p></td>
 <td class="text-right"><p><span class="math notranslate nohighlight">\(-1.14055\times10^{-3}\)</span></p></td>
 </tr>
+<tr class="row-even"><td><p>Binary64, <span class="math notranslate nohighlight">\(u=2^{-53}\)</span></p></td>
+<td class="text-right"><p>9216</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(5.517\times10^{11}\)</span></p></td>
+<td class="text-right"><p>9002</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(-5.04263\times10^{-11}\)</span></p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <p>For the binary32 example, <span class="math notranslate nohighlight">\(k^{3/2}u=1/4096\)</span>, so the construction’s size restriction is satisfied at the fixed precision <span class="math notranslate nohighlight">\(u=2^{-24}\)</span>.</p>
-<p>The following code constructs either example and applies the earlier <code class="docutils literal notranslate"><span class="pre">cholesky_in_place</span></code> function.</p>
+<p>The larger binary64 example uses <span class="math notranslate nohighlight">\(q=5\)</span>. Its condition-number upper bound is about <span class="math notranslate nohighlight">\(64\)</span> times smaller than that of the <span class="math notranslate nohighlight">\(576\times576\)</span> example. The next admissible binary64 choice is <span class="math notranslate nohighlight">\(q=7\)</span>, giving <span class="math notranslate nohighlight">\(n=147456\)</span>. A full dense matrix of that size needs <span class="math notranslate nohighlight">\(162\)</span> GiB, exceeding the <span class="math notranslate nohighlight">\(32\)</span> GiB of RAM on the machine used for these tests.</p>
+<p>We also tested padded matrices <span class="math notranslate nohighlight">\(B_N=\operatorname{diag}(A_{9216},4I_{N-9216})\)</span> at six sizes from <span class="math notranslate nohighlight">\(N=12288\)</span> through <span class="math notranslate nohighlight">\(N=19456\)</span>. The largest full dense allocation used <span class="math notranslate nohighlight">\(2.82\)</span> GiB. Every padded case failed at step <span class="math notranslate nohighlight">\(9002\)</span>, with exactly the same computed pivot as the unpadded matrix. Padding preserves the condition number, so these runs check persistence of failure at larger dimensions. Further allocations were stopped before they would leave less than <span class="math notranslate nohighlight">\(2\)</span> GiB of estimated available RAM.</p>
+<p>The larger runs used a compiled implementation that skips zero contributions while preserving the order of the remaining operations. Multiplication and subtraction were rounded separately, with fused multiply-add disabled. On the two smaller examples, its output matched the NumPy routine bit for bit. In every run, the stored trailing block matched the formula for <span class="math notranslate nohighlight">\(\widehat S\)</span> entry by entry. The reported condition numbers are analytical upper bounds, not numerical estimates.</p>
+<p>The following code constructs any of the three unpadded examples and applies the earlier <code class="docutils literal notranslate"><span class="pre">cholesky_in_place</span></code> function.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fractions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fraction</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -1292,12 +1335,14 @@ B_N=\operatorname{diag}(A_m,4I_{N-m}).
 
 <span class="n">A</span> <span class="o">=</span> <span class="n">cholesky_breakdown_matrix</span><span class="p">()</span>
 <span class="c1"># For the binary32 example: A = cholesky_breakdown_matrix(4, np.float32)</span>
+<span class="c1"># For the larger binary64 example: A = cholesky_breakdown_matrix(5, np.float64)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">cholesky_in_place</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 <span class="c1"># Binary64: Nonpositive or nonfinite pivot at step 565</span>
 <span class="c1"># Binary32: Nonpositive or nonfinite pivot at step 2252</span>
+<span class="c1"># Larger binary64: Nonpositive or nonfinite pivot at step 9002</span>
 </pre></div>
 </div>
 </section>
@@ -1333,6 +1378,25 @@ A=\frac1{32}\begin{bmatrix}4&amp;5\\5&amp;7\end{bmatrix}.
 </table>
 </div>
 <p>Here the coarser calculation succeeds and the finer one fails. Individual rounding errors can cancel differently, so failure at one precision does not imply failure at every coarser precision.</p>
+</section>
+<section id="further-reading-scaling-and-factor-accuracy">
+<h3>Further Reading: Scaling and Factor Accuracy<a class="headerlink" href="#further-reading-scaling-and-factor-accuracy" title="Link to this heading">#</a></h3>
+<p>The condition number <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> gives a common measure for comparing our counterexamples, but a guarantee for a particular matrix can use more information. Demmel’s result in Higham’s Chapter 10, Theorem 10.7, p. 200, accounts for diagonal scaling. See also <a class="reference external" href="https://www.netlib.org/lapack/lawnspdf/lawn14.pdf">Demmel’s original report, <em>On Floating Point Errors in Cholesky</em> (1989)</a>, which is freely available. Write</p>
+<div class="math notranslate nohighlight">
+\[
+D_A=\operatorname{diag}(\sqrt{a_{11}},\ldots,\sqrt{a_{nn}}),
+\qquad H=D_A^{-1}AD_A^{-1}.
+\]</div>
+<p>Then <span class="math notranslate nohighlight">\(H\)</span> has unit diagonal, and successful completion is guaranteed if</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_{\min}(H)&gt;
+\frac{n\gamma_{n+1}}{1-\gamma_{n+1}},
+\qquad \gamma_{n+1}&lt;1.
+\]</div>
+<p>This can be useful when the diagonal entries of <span class="math notranslate nohighlight">\(A\)</span> have very different sizes. For example, a positive diagonal matrix has <span class="math notranslate nohighlight">\(H=I\)</span>, however large <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> is. The criterion still depends on dimension; it does not give a dimension-independent completion guarantee from <span class="math notranslate nohighlight">\(\kappa_2(H)\)</span> alone.</p>
+<p>The accuracy of the computed factor is a separate question. <a class="reference external" href="https://doi.org/10.1016/0024-3795(92)90423-8">Sun, Rounding-Error and Perturbation Bounds for the Cholesky and LDLᵀ Factorizations (1992)</a>, §2, gives componentwise backward-error and factor-perturbation bounds for the same outer-product algorithm used here. These bounds describe a computed factor; they do not establish that every stored SPD input permits successful completion.</p>
+<p><a class="reference external" href="https://www.cs.mcgill.ca/~chang/pub/cholc_HK.pdf">Chang, Perturbation Analyses for the Cholesky Factorization with Backward Rounding Errors</a> restricts the perturbations to the form allowed by backward-error bounds and obtains more informative measures of factor sensitivity. Those measures can change under symmetric pivoting, even though <span class="math notranslate nohighlight">\(\kappa_2(PAP^T)=\kappa_2(A)\)</span> for a permutation matrix <span class="math notranslate nohighlight">\(P\)</span>. Sharpness of a perturbation bound concerns allowed changes to the input. Establishing numerical breakdown also requires showing that actual rounding operations produce the needed errors, as in the construction above.</p>
 </section>
 </section>
 </section>
@@ -1425,7 +1489,8 @@ A=\frac1{32}\begin{bmatrix}4&amp;5\\5&amp;7\end{bmatrix}.
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-a-direct-solver">Choosing a Direct Solver</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-advanced-material-numerical-breakdown">Optional Advanced Material: Numerical Breakdown</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-guarantee-of-successful-completion">A Guarantee of Successful Completion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#guarantees-of-successful-completion">Guarantees of Successful Completion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-smallest-condition-number-permitting-failure">The Smallest Condition Number Permitting Failure</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-it-means-to-keep-the-precision-fixed">What It Means to Keep the Precision Fixed</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-exactly-representable-matrix-family">An Exactly Representable Matrix Family</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#positive-definiteness-of-the-stored-matrix">Positive Definiteness of the Stored Matrix</a></li>
@@ -1437,6 +1502,7 @@ A=\frac1{32}\begin{bmatrix}4&amp;5\\5&amp;7\end{bmatrix}.
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-order-and-condition-numbers-near-one">Operation Order and Condition Numbers Near One</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-examples">Numerical Examples</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#failure-is-not-monotone-in-precision">Failure Is Not Monotone in Precision</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#further-reading-scaling-and-factor-accuracy">Further Reading: Scaling and Factor Accuracy</a></li>
 </ul>
 </li>
 </ul>

@@ -375,7 +375,21 @@ S_f(d)=\lim_{\varepsilon\to0^+}
 \frac{\|f(d+\delta d)-f(d)\|}{\|\delta d\|}.
 $$
 
-The ratio measures the change in the answer per unit change in the input. The supremum selects the perturbation with the largest amplification, and the limit restricts attention to small changes near $d$. If $f$ is differentiable at $d$, then $S_f(d)=\|Df(d)\|$, the induced norm of its derivative. For a scalar function, this is simply $|f'(d)|$.
+The ratio measures the change in the answer per unit change in the input. The supremum selects the perturbation with the largest amplification, and the limit restricts attention to small changes near $d$.
+
+If $f$ is differentiable at $d$, its derivative, denoted $Df(d)$, is the linear map that predicts the change in the output caused by a small input change $\delta d$:
+
+$$
+f(d+\delta d)-f(d)\approx Df(d)\,\delta d.
+$$
+
+For vector inputs and outputs, $Df(d)$ is the **Jacobian matrix**: its $(i,j)$ entry is the partial derivative $\partial f_i/\partial d_j$, evaluated at $d$. Its induced norm measures the largest amplification of an input change by this linear map. Consequently,
+
+$$
+S_f(d)=\|Df(d)\|.
+$$
+
+For a scalar function of one variable, $Df(d)$ is the ordinary derivative $f'(d)$, so $S_f(d)=|f'(d)|$.
 
 Suppose backward error analysis shows that $\widehat{x}=f(d+\delta d)$. For differentiable $f$, the definition gives the local bound
 

@@ -1,0 +1,727 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Lean checks for the optional Cholesky material &#8212; Numerical Linear Algebra</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/proof.css?v=8c6b312c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'formal/Cholesky/README';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../content/intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Numerical Linear Algebra</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../content/intro.html">
+                    Numerical Linear Algebra
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/bootcamp.html">Linear Algebra Bootcamp</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/vector_space.html">Vector spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/dot_product_and_norms.html">Dot Product and Vector Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/linear_transformations.html">Linear Transformations and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/matrix_matrix_multiplication.html">Matrix-Matrix Multiplications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/operator_norms.html">Operator and Matrix Norms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/sherman_morrison_woodbury.html">The Sherman-Morrison-Woodbury Formula</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/determinants.html">The Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/trace.html">The Trace of a Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/orthogonal_matrices.html">Orthogonal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/projections.html">Projections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/block_matrices.html">Block Matrix Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/four_fundamental_subspaces.html">The Four Fundamental Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/eigendecomposition.html">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/normal_matrices.html">Normal Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/applications_of_eigenvalues.html">Applications of Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/singular_value_decomposition.html">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/eigen_vs_singular_values.html">Eigenvalues and Singular Values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/summary_of_matrix_decompositions.html">Summary of Matrix Decompositions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/solving_linear_systems.html">Solving Linear Systems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/lu_decomposition.html">The LU Decomposition Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/existence_lu.html">Existence and Uniqueness of LU Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/floating_point.html">Floating-Point Numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/lu_pivoting.html">LU Factorization with Row Pivoting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/cholesky.html">Cholesky Factorization</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/least_squares.html">Least Squares Problems</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/householder_reflections.html">Householder Reflections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/givens_rotations.html">Givens Rotations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/lu_vs_qr.html">LU vs. QR Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/normal_equations.html">The Method of Normal Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/LS_using_SVD.html">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/LS_summary.html">Summary of LS Solution Methods</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/eigenvalues.html">Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/power_method.html">The Power Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/deflation.html">The Method of Deflation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/qr_iteration.html">QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/arnoldi_iteration.html">The Arnoldi Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
+
+<li class="toctree-l2"><a class="reference internal" href="../../content/lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/classical_iterative_methods.html">Classical Iterative Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/splitting_methods_definition.html">Splitting Methods and Convergence Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/jacobi_method.html">The Jacobi Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/gauss_seidel_method.html">The Gauss-Seidel Iteration Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/sor_method.html">Successive Over-Relaxation (SOR) Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/chebyshev_acceleration.html">The Chebyshev Iteration Method</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../content/krylov_iterative_methods.html">Krylov Subspace Methods</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../content/conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/cg_vs_gmres.html">CG vs. GMRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/minres.html">MINRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/preconditioning.html">Preconditioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../content/pcg.html">Preconditioned Conjugate Gradient</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../content/LICENSE.html">License for this book</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/EricDarve/NLA" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/formal/Cholesky/README.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Lean checks for the optional Cholesky material</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-check">Build and check</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-checked">What is checked</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-1-1-corollary">The 1.1 corollary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-statements">The matrix statements</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-remains-to-prove-for-the-full-counterexample">What remains to prove for the full counterexample</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="lean-checks-for-the-optional-cholesky-material">
+<h1>Lean checks for the optional Cholesky material<a class="headerlink" href="#lean-checks-for-the-optional-cholesky-material" title="Link to this heading">#</a></h1>
+<p>This project formalizes parts of the argument in
+<a class="reference internal" href="../../content/cholesky.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">content/cholesky.md</span></code></span></a>. It includes a complete proof
+of the real inequality behind the <strong>1.1 completion-bound corollary</strong>, together
+with matrix and arithmetic lemmas for the counterexample family.</p>
+<p><strong>This is a partial formalization of numerical breakdown. It does not yet prove
+that a floating-point Cholesky implementation fails on the proposed family.</strong>
+The missing connections are listed below. Compiling this project verifies the
+stated Lean theorems, not every claim in the chapter.</p>
+<section id="build-and-check">
+<h2>Build and check<a class="headerlink" href="#build-and-check" title="Link to this heading">#</a></h2>
+<p>The project pins Lean and mathlib to <strong>v4.24.0</strong>. With Lean’s <code class="docutils literal notranslate"><span class="pre">elan</span></code> toolchain
+manager installed, run from this directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>lake<span class="w"> </span>exe<span class="w"> </span>cache<span class="w"> </span>get
+lake<span class="w"> </span>build
+lake<span class="w"> </span>env<span class="w"> </span>lean<span class="w"> </span>Audit.lean
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://leanprover-community.github.io/install/project.html">mathlib installation instructions</a>
+for installing the tools. <code class="docutils literal notranslate"><span class="pre">lean-toolchain</span></code> selects Lean, and
+<code class="docutils literal notranslate"><span class="pre">lake-manifest.json</span></code> pins the dependency commits. Downloaded dependencies and
+compiled files are kept in the ignored <code class="docutils literal notranslate"><span class="pre">.lake</span></code> directory.</p>
+<p><code class="docutils literal notranslate"><span class="pre">lake</span> <span class="pre">build</span></code> checks the proofs with warnings treated as errors. <code class="docutils literal notranslate"><span class="pre">Audit.lean</span></code>
+prints the axioms used by every theorem in this project. These are limited to
+Lean’s standard <code class="docutils literal notranslate"><span class="pre">propext</span></code>, <code class="docutils literal notranslate"><span class="pre">Classical.choice</span></code>, and <code class="docutils literal notranslate"><span class="pre">Quot.sound</span></code>. There are no
+<code class="docutils literal notranslate"><span class="pre">sorry</span></code> placeholders, added axioms, or proofs by <code class="docutils literal notranslate"><span class="pre">native_decide</span></code> in this project.</p>
+</section>
+<section id="what-is-checked">
+<h2>What is checked<a class="headerlink" href="#what-is-checked" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Result proved in Lean</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference download internal" download="" href="../../_downloads/75ce0776cfe92df5a3cbcf82cbec568f/Completion.lean"><span class="xref download myst">Completion.lean</span></a></p></td>
+<td><p>The exact finite-product inequality behind the constant 1.1, including the square-root sum estimate and logarithmic inequalities.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference download internal" download="" href="../../_downloads/afd2321bb9cbdd7ac45d7e7e75c3a86e/Schur.lean"><span class="xref download myst">Schur.lean</span></a></p></td>
+<td><p>Positive definiteness of the exact Schur complement; the block-matrix implication used to establish SPD; the all-ones eigenvector of the proposed rounded Schur complement; failure of positive semidefiniteness when <span class="math notranslate nohighlight">\(k&gt;9\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference download internal" download="" href="../../_downloads/62d6b48c28d0ba47a0230bdc4479afae/Perturbation.lean"><span class="xref download myst">Perturbation.lean</span></a></p></td>
+<td><p>A negative direction cannot be removed by an error satisfying the stated norm bound. In particular, no Gram factor can satisfy that bound.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference download internal" download="" href="../../_downloads/ad665542ac621bdeafd43b5685b17395/Bounds.lean"><span class="xref download myst">Bounds.lean</span></a></p></td>
+<td><p>The scalar estimates giving 57, 8239, the binary64 bound below 532, the lower bound <span class="math notranslate nohighlight">\(1156/3\)</span>, and the rounding-error margin.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference download internal" download="" href="../../_downloads/e13301f1f5ad877fa5ec0ea2ca9feb8c/Parameters.lean"><span class="xref download myst">Parameters.lean</span></a></p></td>
+<td><p>At each integer precision <span class="math notranslate nohighlight">\(p\ge20\)</span>, the largest admissible <span class="math notranslate nohighlight">\(q\)</span> exists and satisfies <span class="math notranslate nohighlight">\(p-3q\in\{8,10,12\}\)</span>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="the-1-1-corollary">
+<h3>The 1.1 corollary<a class="headerlink" href="#the-1-1-corollary" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Cholesky.meinguet_condition</span></code> proves that, for</p>
+<div class="math notranslate nohighlight">
+\[
+ n\ge576,\qquad 0&lt;u\le2^{-17},\qquad \kappa\ge1,
+ \qquad \frac{11}{10}n\sqrt n\,u\kappa\le1,
+\]</div>
+<p>we have</p>
+<div class="math notranslate nohighlight">
+\[
+ \kappa\left[
+ \prod_{j=1}^{n-1}
+ \left(1+\frac{u}{1-5u}(\sqrt j+2)\right)-1
+ \right]&lt;1.
+\]</div>
+<p>The Lean expression <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">*</span> <span class="pre">Real.sqrt</span> <span class="pre">n</span></code> denotes <span class="math notranslate nohighlight">\(n^{3/2}\)</span>. The product uses
+indices <code class="docutils literal notranslate"><span class="pre">j</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">...,</span> <span class="pre">n</span> <span class="pre">-</span> <span class="pre">2</span></code> and the factor <code class="docutils literal notranslate"><span class="pre">sqrt</span> <span class="pre">(j</span> <span class="pre">+</span> <span class="pre">1)</span></code>.</p>
+<p>This theorem is about real numbers. Meinguet’s theorem connecting this product
+condition to successful floating-point Cholesky completion remains an external
+mathematical result; it is not introduced as an axiom in the Lean project.
+Likewise, the variable <code class="docutils literal notranslate"><span class="pre">κ</span></code> is a real number, not a formally defined matrix
+condition number.</p>
+</section>
+<section id="the-matrix-statements">
+<h3>The matrix statements<a class="headerlink" href="#the-matrix-statements" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">exactSchur_posDef</span></code> proves positive definiteness of</p>
+<div class="math notranslate nohighlight">
+\[
+ S=k\eta I_{2k}-\frac{\eta}{8}J_{2k}
+\]</div>
+<p>for <span class="math notranslate nohighlight">\(k&gt;0\)</span> and <span class="math notranslate nohighlight">\(\eta&gt;0\)</span>, using the quadratic form and Cauchy–Schwarz.
+<code class="docutils literal notranslate"><span class="pre">liftedMatrix_posDef</span></code> proves that, whenever <span class="math notranslate nohighlight">\(S\)</span> is positive definite,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+ \begin{bmatrix}4I&amp;2T\\2T^T&amp;T^TT+S\end{bmatrix}
+\end{split}\]</div>
+<p>is positive definite. Its proof expands the quadratic form as
+<span class="math notranslate nohighlight">\(\|2x+Ty\|_2^2+y^TSy\)</span>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">roundedSchur_ones</span></code> proves that the explicit matrix named <code class="docutils literal notranslate"><span class="pre">roundedSchur</span></code>
+maps the all-ones vector to <span class="math notranslate nohighlight">\(-(k-9)\eta/8\)</span> times itself.
+<code class="docutils literal notranslate"><span class="pre">roundedSchur_not_posSemidef</span></code> uses this direction to prove that the matrix is
+not positive semidefinite when <span class="math notranslate nohighlight">\(k&gt;9\)</span>. The name <code class="docutils literal notranslate"><span class="pre">roundedSchur</span></code> refers to the
+formula in the chapter. The definition does not execute rounding operations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">no_gram_factor</span></code> proves the perturbation contradiction in a real Hilbert space.
+Its hypotheses include a unit vector with quadratic form at most
+<span class="math notranslate nohighlight">\(-\|A\|/18\)</span> and the backward-error estimate</p>
+<div class="math notranslate nohighlight">
+\[
+ \|E\|\le9\frac{s}{1-s}(\|A\|+\|E\|),
+ \qquad 0\le s\le\frac{129}{131072}.
+\]</div>
+<p>The conclusion is that <span class="math notranslate nohighlight">\(A+E\)</span> cannot be a Gram operator <span class="math notranslate nohighlight">\(R^*R\)</span>.
+The backward-error estimate is an explicit hypothesis here; it has not been
+proved for the floating-point algorithm in this project.</p>
+</section>
+</section>
+<section id="what-remains-to-prove-for-the-full-counterexample">
+<h2>What remains to prove for the full counterexample<a class="headerlink" href="#what-remains-to-prove-for-the-full-counterexample" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Define binary rounding and the precise Cholesky update order. Prove exact
+representability of the input and show that the leading updates produce
+<code class="docutils literal notranslate"><span class="pre">roundedSchur</span></code>, including the binade and exact-subtraction arguments.</p></li>
+<li><p>Formalize the Walsh–Hadamard construction and its Gram identity. This is
+needed to identify the chapter’s stored matrix with <code class="docutils literal notranslate"><span class="pre">liftedMatrix</span> <span class="pre">T</span> <span class="pre">S</span></code>.</p></li>
+<li><p>Derive the sign pattern and componentwise backward-error bound from
+hypothetical successful completion. Prove the operator-norm estimates that
+supply the hypotheses of <code class="docutils literal notranslate"><span class="pre">no_gram_factor</span></code>.</p></li>
+<li><p>Prove the spectral and inverse bounds for the actual matrix, connecting its
+condition number to <code class="docutils literal notranslate"><span class="pre">conditionUpper</span> <span class="pre">x</span></code>. The verified inequalities for that
+scalar expression alone are not condition-number theorems.</p></li>
+<li><p>Connect the precision parameters to <span class="math notranslate nohighlight">\(x=k^{3/2}u\)</span>, and prove that diagonal
+padding preserves both the condition number and numerical failure.</p></li>
+</ol>
+<p>None of these missing claims is silently assumed as a project axiom. They are
+separate proof obligations before the full numerical counterexample can be
+called formally verified.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./formal/Cholesky"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-check">Build and check</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-checked">What is checked</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-1-1-corollary">The 1.1 corollary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-matrix-statements">The matrix statements</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-remains-to-prove-for-the-full-counterexample">What remains to prove for the full counterexample</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Eric Darve
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

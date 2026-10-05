@@ -834,7 +834,18 @@ S_f(d)=\lim_{\varepsilon\to0^+}
 \sup_{0&lt;\|\delta d\|\le\varepsilon}
 \frac{\|f(d+\delta d)-f(d)\|}{\|\delta d\|}.
 \]</div>
-<p>The ratio measures the change in the answer per unit change in the input. The supremum selects the perturbation with the largest amplification, and the limit restricts attention to small changes near <span class="math notranslate nohighlight">\(d\)</span>. If <span class="math notranslate nohighlight">\(f\)</span> is differentiable at <span class="math notranslate nohighlight">\(d\)</span>, then <span class="math notranslate nohighlight">\(S_f(d)=\|Df(d)\|\)</span>, the induced norm of its derivative. For a scalar function, this is simply <span class="math notranslate nohighlight">\(|f'(d)|\)</span>.</p>
+<p>The ratio measures the change in the answer per unit change in the input. The supremum selects the perturbation with the largest amplification, and the limit restricts attention to small changes near <span class="math notranslate nohighlight">\(d\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(f\)</span> is differentiable at <span class="math notranslate nohighlight">\(d\)</span>, its derivative, denoted <span class="math notranslate nohighlight">\(Df(d)\)</span>, is the linear map that predicts the change in the output caused by a small input change <span class="math notranslate nohighlight">\(\delta d\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+f(d+\delta d)-f(d)\approx Df(d)\,\delta d.
+\]</div>
+<p>For vector inputs and outputs, <span class="math notranslate nohighlight">\(Df(d)\)</span> is the <strong>Jacobian matrix</strong>: its <span class="math notranslate nohighlight">\((i,j)\)</span> entry is the partial derivative <span class="math notranslate nohighlight">\(\partial f_i/\partial d_j\)</span>, evaluated at <span class="math notranslate nohighlight">\(d\)</span>. Its induced norm measures the largest amplification of an input change by this linear map. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+S_f(d)=\|Df(d)\|.
+\]</div>
+<p>For a scalar function of one variable, <span class="math notranslate nohighlight">\(Df(d)\)</span> is the ordinary derivative <span class="math notranslate nohighlight">\(f'(d)\)</span>, so <span class="math notranslate nohighlight">\(S_f(d)=|f'(d)|\)</span>.</p>
 <p>Suppose backward error analysis shows that <span class="math notranslate nohighlight">\(\widehat{x}=f(d+\delta d)\)</span>. For differentiable <span class="math notranslate nohighlight">\(f\)</span>, the definition gives the local bound</p>
 <div class="math notranslate nohighlight">
 \[
