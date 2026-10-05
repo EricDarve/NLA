@@ -442,44 +442,106 @@ Row permutations preserve singular values, so $\kappa_2(PA)=\kappa_2(A)$. Pivoti
 
 ### A First-Order Forward-Error Estimate
 
-The goal is to bound forward error using two quantities: the backward error $\eta(\widehat{x})$ of the computed answer and the condition number $\kappa(A)$ of the problem.
+The goal is to bound the relative forward error using the backward error $\eta(\widehat{x})$ and the condition number $\kappa(A)$. The connection is the residual: it measures how much the computed answer fails to satisfy the equations, and $A^{-1}$ converts that discrepancy into an error in the solution.
 
-Let $\delta x=\widehat{x}-x$. Since $r=b-A\widehat{x}$ and $Ax=b$,
+**1. Relate the solution error to the residual.** Let $x$ be the exact solution, let $\widehat{x}$ be the computed solution, and write their difference as $\delta x=\widehat{x}-x$. Recall that $Ax=b$ and $r=b-A\widehat{x}$. Multiplying the solution error by $A$ gives
 
 $$
-A\delta x=-r,
-\qquad
+\begin{aligned}
+A\delta x
+&=A(\widehat{x}-x)\\
+&=A\widehat{x}-Ax\\
+&=A\widehat{x}-b=-r.
+\end{aligned}
+$$
+
+Since $A$ is nonsingular, multiplying by $A^{-1}$ yields
+
+$$
 \delta x=-A^{-1}r.
 $$
 
-Therefore $\|\delta x\|\le\|A^{-1}\|\,\|r\|$. Our backward-error formula gives
+Thus the residual and the solution error are related, but they are generally different vectors with different magnitudes.
+
+**2. Bound the relative solution error.** By the defining property of an induced matrix norm, $\|A^{-1}r\|\le\|A^{-1}\|\,\|r\|$. Taking norms in the identity above therefore gives
+
+$$
+\|\delta x\|=\|A^{-1}r\|
+\le\|A^{-1}\|\,\|r\|.
+$$
+
+To measure the error relative to the exact answer, divide by $\|x\|$. This is valid because $b\ne0$ implies $x\ne0$:
+
+$$
+\frac{\|\delta x\|}{\|x\|}
+\le\frac{\|A^{-1}\|\,\|r\|}{\|x\|}.
+$$
+
+**3. Express the residual in terms of backward error.** The formula proved earlier is
+
+$$
+\eta(\widehat{x})=
+\frac{\|r\|}{\|A\|\,\|\widehat{x}\|+\|b\|}.
+$$
+
+Multiplying by its denominator gives
 
 $$
 \|r\|=\eta(\widehat{x})
 \bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr).
 $$
 
-Substituting the residual identity and using $\|b\|\le\|A\|\,\|x\|$ yields
+Substitute this expression for $\|r\|$ into the relative-error bound:
 
 $$
 \frac{\|\delta x\|}{\|x\|}
-\le \kappa(A)\eta(\widehat{x})
-\left(1+\frac{\|\widehat{x}\|}{\|x\|}\right).
+\le\frac{\|A^{-1}\|\,\eta(\widehat{x})}{\|x\|}
+\bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr).
 $$
 
-This inequality is rigorous, but its right-hand side still contains the unknown $\|x\|$. A simple estimate follows if we assume that $\|\widehat{x}\|\approx\|x\|$: the factor in parentheses is then approximately 2.
+**4. Bring in the condition number.** To combine the two terms in parentheses, use the exact equation $b=Ax$ to bound
+
+$$
+\|b\|=\|Ax\|\le\|A\|\,\|x\|.
+$$
+
+Replacing $\|b\|$ by this upper bound and factoring out $\|A\|$ gives
+
+$$
+\begin{aligned}
+\frac{\|\delta x\|}{\|x\|}
+&\le\frac{\|A^{-1}\|\,\eta(\widehat{x})}{\|x\|}
+\bigl(\|A\|\,\|\widehat{x}\|+\|A\|\,\|x\|\bigr)\\
+&=\|A^{-1}\|\,\|A\|\,\eta(\widehat{x})
+\frac{\|\widehat{x}\|+\|x\|}{\|x\|}\\
+&=\kappa(A)\eta(\widehat{x})
+\left(1+\frac{\|\widehat{x}\|}{\|x\|}\right).
+\end{aligned}
+$$
+
+The last line uses $\kappa(A)=\|A\|\,\|A^{-1}\|$. Every step so far is rigorous. The remaining obstacle is the unknown $\|x\|$ on the right-hand side.
+
+**5. Make the first-order approximation.** If the computed answer is close to the exact answer, their norms are close as well. Assuming $\|\widehat{x}\|\approx\|x\|$, we have
+
+$$
+\frac{\|\widehat{x}\|}{\|x\|}\approx1,
+\qquad
+1+\frac{\|\widehat{x}\|}{\|x\|}\approx2.
+$$
+
+This is the only approximation in the derivation. It removes the unknown solution norm from the right-hand side.
 
 ```{admonition} Key result: First-order forward-error estimate
 :class: important
 
-Under this assumption,
+Under the assumption $\|\widehat{x}\|\approx\|x\|$,
 
 $$
 \frac{\|\widehat{x}-x\|}{\|x\|}
 \lesssim 2\kappa(A)\eta(\widehat{x}).
 $$
 
-This is an approximate estimate. It identifies **$\kappa(A)\eta(\widehat{x})$** as the quantity that controls forward error: the problem's sensitivity multiplies the algorithm's backward error.
+This is an approximate estimate. It identifies **$\kappa(A)\eta(\widehat{x})$** as the quantity that controls forward error: the problem's sensitivity multiplies the algorithm's backward error. The next result removes the assumption about the solution norms and gives a rigorous guarantee.
 ```
 
 ### A Rigorous Forward-Error Bound

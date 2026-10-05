@@ -888,37 +888,90 @@ S_f(d)=\|Df(d)\|.
 </section>
 <section id="a-first-order-forward-error-estimate">
 <h3>A First-Order Forward-Error Estimate<a class="headerlink" href="#a-first-order-forward-error-estimate" title="Link to this heading">#</a></h3>
-<p>The goal is to bound forward error using two quantities: the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> of the computed answer and the condition number <span class="math notranslate nohighlight">\(\kappa(A)\)</span> of the problem.</p>
-<p>Let <span class="math notranslate nohighlight">\(\delta x=\widehat{x}-x\)</span>. Since <span class="math notranslate nohighlight">\(r=b-A\widehat{x}\)</span> and <span class="math notranslate nohighlight">\(Ax=b\)</span>,</p>
+<p>The goal is to bound the relative forward error using the backward error <span class="math notranslate nohighlight">\(\eta(\widehat{x})\)</span> and the condition number <span class="math notranslate nohighlight">\(\kappa(A)\)</span>. The connection is the residual: it measures how much the computed answer fails to satisfy the equations, and <span class="math notranslate nohighlight">\(A^{-1}\)</span> converts that discrepancy into an error in the solution.</p>
+<p><strong>1. Relate the solution error to the residual.</strong> Let <span class="math notranslate nohighlight">\(x\)</span> be the exact solution, let <span class="math notranslate nohighlight">\(\widehat{x}\)</span> be the computed solution, and write their difference as <span class="math notranslate nohighlight">\(\delta x=\widehat{x}-x\)</span>. Recall that <span class="math notranslate nohighlight">\(Ax=b\)</span> and <span class="math notranslate nohighlight">\(r=b-A\widehat{x}\)</span>. Multiplying the solution error by <span class="math notranslate nohighlight">\(A\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A\delta x
+&amp;=A(\widehat{x}-x)\\
+&amp;=A\widehat{x}-Ax\\
+&amp;=A\widehat{x}-b=-r.
+\end{aligned}
+\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(A\)</span> is nonsingular, multiplying by <span class="math notranslate nohighlight">\(A^{-1}\)</span> yields</p>
 <div class="math notranslate nohighlight">
 \[
-A\delta x=-r,
-\qquad
 \delta x=-A^{-1}r.
 \]</div>
-<p>Therefore <span class="math notranslate nohighlight">\(\|\delta x\|\le\|A^{-1}\|\,\|r\|\)</span>. Our backward-error formula gives</p>
+<p>Thus the residual and the solution error are related, but they are generally different vectors with different magnitudes.</p>
+<p><strong>2. Bound the relative solution error.</strong> By the defining property of an induced matrix norm, <span class="math notranslate nohighlight">\(\|A^{-1}r\|\le\|A^{-1}\|\,\|r\|\)</span>. Taking norms in the identity above therefore gives</p>
+<div class="math notranslate nohighlight">
+\[
+\|\delta x\|=\|A^{-1}r\|
+\le\|A^{-1}\|\,\|r\|.
+\]</div>
+<p>To measure the error relative to the exact answer, divide by <span class="math notranslate nohighlight">\(\|x\|\)</span>. This is valid because <span class="math notranslate nohighlight">\(b\ne0\)</span> implies <span class="math notranslate nohighlight">\(x\ne0\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|\delta x\|}{\|x\|}
+\le\frac{\|A^{-1}\|\,\|r\|}{\|x\|}.
+\]</div>
+<p><strong>3. Express the residual in terms of backward error.</strong> The formula proved earlier is</p>
+<div class="math notranslate nohighlight">
+\[
+\eta(\widehat{x})=
+\frac{\|r\|}{\|A\|\,\|\widehat{x}\|+\|b\|}.
+\]</div>
+<p>Multiplying by its denominator gives</p>
 <div class="math notranslate nohighlight">
 \[
 \|r\|=\eta(\widehat{x})
 \bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr).
 \]</div>
-<p>Substituting the residual identity and using <span class="math notranslate nohighlight">\(\|b\|\le\|A\|\,\|x\|\)</span> yields</p>
+<p>Substitute this expression for <span class="math notranslate nohighlight">\(\|r\|\)</span> into the relative-error bound:</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\|\delta x\|}{\|x\|}
-\le \kappa(A)\eta(\widehat{x})
-\left(1+\frac{\|\widehat{x}\|}{\|x\|}\right).
+\le\frac{\|A^{-1}\|\,\eta(\widehat{x})}{\|x\|}
+\bigl(\|A\|\,\|\widehat{x}\|+\|b\|\bigr).
 \]</div>
-<p>This inequality is rigorous, but its right-hand side still contains the unknown <span class="math notranslate nohighlight">\(\|x\|\)</span>. A simple estimate follows if we assume that <span class="math notranslate nohighlight">\(\|\widehat{x}\|\approx\|x\|\)</span>: the factor in parentheses is then approximately 2.</p>
+<p><strong>4. Bring in the condition number.</strong> To combine the two terms in parentheses, use the exact equation <span class="math notranslate nohighlight">\(b=Ax\)</span> to bound</p>
+<div class="math notranslate nohighlight">
+\[
+\|b\|=\|Ax\|\le\|A\|\,\|x\|.
+\]</div>
+<p>Replacing <span class="math notranslate nohighlight">\(\|b\|\)</span> by this upper bound and factoring out <span class="math notranslate nohighlight">\(\|A\|\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{\|\delta x\|}{\|x\|}
+&amp;\le\frac{\|A^{-1}\|\,\eta(\widehat{x})}{\|x\|}
+\bigl(\|A\|\,\|\widehat{x}\|+\|A\|\,\|x\|\bigr)\\
+&amp;=\|A^{-1}\|\,\|A\|\,\eta(\widehat{x})
+\frac{\|\widehat{x}\|+\|x\|}{\|x\|}\\
+&amp;=\kappa(A)\eta(\widehat{x})
+\left(1+\frac{\|\widehat{x}\|}{\|x\|}\right).
+\end{aligned}
+\end{split}\]</div>
+<p>The last line uses <span class="math notranslate nohighlight">\(\kappa(A)=\|A\|\,\|A^{-1}\|\)</span>. Every step so far is rigorous. The remaining obstacle is the unknown <span class="math notranslate nohighlight">\(\|x\|\)</span> on the right-hand side.</p>
+<p><strong>5. Make the first-order approximation.</strong> If the computed answer is close to the exact answer, their norms are close as well. Assuming <span class="math notranslate nohighlight">\(\|\widehat{x}\|\approx\|x\|\)</span>, we have</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|\widehat{x}\|}{\|x\|}\approx1,
+\qquad
+1+\frac{\|\widehat{x}\|}{\|x\|}\approx2.
+\]</div>
+<p>This is the only approximation in the derivation. It removes the unknown solution norm from the right-hand side.</p>
 <div class="important admonition">
 <p class="admonition-title">Key result: First-order forward-error estimate</p>
-<p>Under this assumption,</p>
+<p>Under the assumption <span class="math notranslate nohighlight">\(\|\widehat{x}\|\approx\|x\|\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
 \frac{\|\widehat{x}-x\|}{\|x\|}
 \lesssim 2\kappa(A)\eta(\widehat{x}).
 \]</div>
-<p>This is an approximate estimate. It identifies <strong><span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})\)</span></strong> as the quantity that controls forward error: the problem’s sensitivity multiplies the algorithm’s backward error.</p>
+<p>This is an approximate estimate. It identifies <strong><span class="math notranslate nohighlight">\(\kappa(A)\eta(\widehat{x})\)</span></strong> as the quantity that controls forward error: the problem’s sensitivity multiplies the algorithm’s backward error. The next result removes the assumption about the solution norms and gives a rigorous guarantee.</p>
 </div>
 </section>
 <section id="a-rigorous-forward-error-bound">
