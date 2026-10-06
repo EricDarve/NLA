@@ -766,6 +766,10 @@ Thus $u_{in}=2^{i-1}$ and $\rho_n=2^{n-1}$: the growth is exponential in the dim
 
 ### A Right-Hand Side That Produces a Large Backward Error
 
+```{warning}
+Reading this section is **optional. This is not covered on the exams or graded assignments.**
+```
+
 Large element growth alone does not establish that a computed solution has a large error. To show that **actual backward error** can be large, choose a right-hand side and follow the rounding in the solve. Assume binary arithmetic with rounding to nearest, unit roundoff $u$, and no overflow or underflow. Choose
 
 $$
