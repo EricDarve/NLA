@@ -13,3 +13,5 @@ rev = "v4.24.0"
 
 [[lean_lib]]
 name = "Cholesky"
+# The root module `Cholesky` imports every module; the modules live in `src/`.
+globs = ["Cholesky", "src.+"]

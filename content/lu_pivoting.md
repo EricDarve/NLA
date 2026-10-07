@@ -714,6 +714,8 @@ $$
 
 This definition includes all intermediate trailing matrices, beginning with $A$. It excludes the stored multipliers in a packed implementation. In particular, it bounds the size of every entry eventually placed in $U$.
 
+For an overview of growth factors and how they depend on the pivoting strategy, see Nick Higham's note [*What Is the Growth Factor for Gaussian Elimination?*](https://nhigham.com/2020/07/14/what-is-the-growth-factor-for-gaussian-elimination/).
+
 In exact arithmetic, an update satisfies
 
 $$
@@ -765,6 +767,10 @@ $$
 Thus $u_{in}=2^{i-1}$ and $\rho_n=2^{n-1}$: the growth is exponential in the dimension.
 
 ### A Right-Hand Side That Produces a Large Backward Error
+
+```{warning}
+Reading this section is **optional. This is not covered on the exams or graded assignments.**
+```
 
 Large element growth alone does not establish that a computed solution has a large error. To show that **actual backward error** can be large, choose a right-hand side and follow the rounding in the solve. Assume binary arithmetic with rounding to nearest, unit roundoff $u$, and no overflow or underflow. Choose
 
