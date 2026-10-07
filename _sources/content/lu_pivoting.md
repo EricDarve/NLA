@@ -714,6 +714,8 @@ $$
 
 This definition includes all intermediate trailing matrices, beginning with $A$. It excludes the stored multipliers in a packed implementation. In particular, it bounds the size of every entry eventually placed in $U$.
 
+For an overview of growth factors and how they depend on the pivoting strategy, see Nick Higham's note [*What Is the Growth Factor for Gaussian Elimination?*](https://nhigham.com/2020/07/14/what-is-the-growth-factor-for-gaussian-elimination/).
+
 In exact arithmetic, an update satisfies
 
 $$
