@@ -1,6 +1,6 @@
 # Least Squares Problems
 
-In data fitting, a model often has fewer parameters than there are measurements. The vector $x$ contains the parameters, $Ax$ contains the model's predictions, and $b$ contains the observations. Noise or limitations of the model can make it impossible to match every observation exactly. **Linear least squares chooses the parameters that minimize the sum of squared discrepancies.**
+In data fitting, a model often has fewer parameters than there are measurements. The vector $x$ contains the parameters, $Ax$ contains the model's predictions, and $b$ contains the observations. Noise or limitations of the model can make it impossible to match every observation exactly. **Linear least squares seeks the parameters that minimize the sum of squared discrepancies.**
 
 ## From Linear Equations to Least Squares
 
@@ -40,7 +40,7 @@ $$
 
 The first term is fixed, and the second is minimized at zero. Since $p$ belongs to the column space, some $x^*$ satisfies $Ax^*=p$. **A least-squares minimizer therefore always exists, and the fitted vector $Ax^*$ is unique.**
 
-The coefficient vector $x^*$ is unique precisely when $A$ has full column rank. Indeed, two minimizers produce the same fitted vector, so their difference lies in the null space of $A$. If this null space contains a nonzero vector $z$, then $x^*+tz$ is another minimizer for every scalar $t$.
+The coefficient vector $x^*$ is unique precisely when $A$ has full column rank. Two minimizers produce the same fitted vector, so their difference lies in the null space of $A$. If $A$ has full column rank, this null space contains only zero, and the two coefficient vectors must be equal. If it contains a nonzero vector $z$, then $x^*+tz$ is another minimizer for every scalar $t$.
 
 The projection also characterizes the minimizer through its residual:
 
@@ -78,7 +78,7 @@ $$
 R_1x^*=Q_1^Tb,
 $$
 
-which can be solved by backward substitution. The factor $R_1$ has the same singular values as $A$, so it can still be ill-conditioned. Orthogonal transformations preserve lengths and provide a way to compute the factorization without forming $A^TA$.
+which can be solved by backward substitution. The factor $R_1$ has the same singular values as $A$. QR therefore does not make an ill-conditioned least-squares problem well-conditioned. Its numerical advantage is that orthogonal transformations preserve lengths, so QR can be computed without forming $A^TA$ and squaring the condition number.
 
 The chapter begins with three ways to construct QR:
 
@@ -96,7 +96,7 @@ $$
 z^TA^TAz=\|Az\|_2^2>0\qquad\text{for }z\ne0.
 $$
 
-Thus we can form $A^TA$ and $A^Tb$ and solve using Cholesky factorization. The [normal-equations method](normal_equations.md) usually requires less arithmetic than Householder QR, but forming $A^TA$ can lose accuracy. For full column rank $A$, define
+Thus we can form $A^TA$ and $A^Tb$ and solve using Cholesky factorization. This [normal-equations method](normal_equations.md) usually requires less arithmetic than Householder QR, but forming $A^TA$ can lose accuracy. For full column rank $A$, define
 
 $$
 \kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.

@@ -483,7 +483,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="least-squares-problems">
 <h1>Least Squares Problems<a class="headerlink" href="#least-squares-problems" title="Link to this heading">#</a></h1>
-<p>In data fitting, a model often has fewer parameters than there are measurements. The vector <span class="math notranslate nohighlight">\(x\)</span> contains the parameters, <span class="math notranslate nohighlight">\(Ax\)</span> contains the model’s predictions, and <span class="math notranslate nohighlight">\(b\)</span> contains the observations. Noise or limitations of the model can make it impossible to match every observation exactly. <strong>Linear least squares chooses the parameters that minimize the sum of squared discrepancies.</strong></p>
+<p>In data fitting, a model often has fewer parameters than there are measurements. The vector <span class="math notranslate nohighlight">\(x\)</span> contains the parameters, <span class="math notranslate nohighlight">\(Ax\)</span> contains the model’s predictions, and <span class="math notranslate nohighlight">\(b\)</span> contains the observations. Noise or limitations of the model can make it impossible to match every observation exactly. <strong>Linear least squares seeks the parameters that minimize the sum of squared discrepancies.</strong></p>
 <section id="from-linear-equations-to-least-squares">
 <h2>From Linear Equations to Least Squares<a class="headerlink" href="#from-linear-equations-to-least-squares" title="Link to this heading">#</a></h2>
 <p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> and <span class="math notranslate nohighlight">\(b\in\mathbb{R}^m\)</span>. When <span class="math notranslate nohighlight">\(m&gt;n\)</span>, the system <span class="math notranslate nohighlight">\(Ax=b\)</span> has more equations than unknowns and is called <strong>overdetermined</strong>. An exact solution exists if and only if <span class="math notranslate nohighlight">\(b\)</span> lies in the column space of <span class="math notranslate nohighlight">\(A\)</span>. Having more equations than unknowns does not by itself rule out a solution, but it is common for these equations to be inconsistent.</p>
@@ -514,7 +514,7 @@ b-Ax=(b-p)+(p-Ax).
 \|b-Ax\|_2^2=\|b-p\|_2^2+\|p-Ax\|_2^2.
 \]</div>
 <p>The first term is fixed, and the second is minimized at zero. Since <span class="math notranslate nohighlight">\(p\)</span> belongs to the column space, some <span class="math notranslate nohighlight">\(x^*\)</span> satisfies <span class="math notranslate nohighlight">\(Ax^*=p\)</span>. <strong>A least-squares minimizer therefore always exists, and the fitted vector <span class="math notranslate nohighlight">\(Ax^*\)</span> is unique.</strong></p>
-<p>The coefficient vector <span class="math notranslate nohighlight">\(x^*\)</span> is unique precisely when <span class="math notranslate nohighlight">\(A\)</span> has full column rank. Indeed, two minimizers produce the same fitted vector, so their difference lies in the null space of <span class="math notranslate nohighlight">\(A\)</span>. If this null space contains a nonzero vector <span class="math notranslate nohighlight">\(z\)</span>, then <span class="math notranslate nohighlight">\(x^*+tz\)</span> is another minimizer for every scalar <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<p>The coefficient vector <span class="math notranslate nohighlight">\(x^*\)</span> is unique precisely when <span class="math notranslate nohighlight">\(A\)</span> has full column rank. Two minimizers produce the same fitted vector, so their difference lies in the null space of <span class="math notranslate nohighlight">\(A\)</span>. If <span class="math notranslate nohighlight">\(A\)</span> has full column rank, this null space contains only zero, and the two coefficient vectors must be equal. If it contains a nonzero vector <span class="math notranslate nohighlight">\(z\)</span>, then <span class="math notranslate nohighlight">\(x^*+tz\)</span> is another minimizer for every scalar <span class="math notranslate nohighlight">\(t\)</span>.</p>
 <p>The projection also characterizes the minimizer through its residual:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -546,7 +546,7 @@ Q_1\in\mathbb{R}^{m\times n},
 \[
 R_1x^*=Q_1^Tb,
 \]</div>
-<p>which can be solved by backward substitution. The factor <span class="math notranslate nohighlight">\(R_1\)</span> has the same singular values as <span class="math notranslate nohighlight">\(A\)</span>, so it can still be ill-conditioned. Orthogonal transformations preserve lengths and provide a way to compute the factorization without forming <span class="math notranslate nohighlight">\(A^TA\)</span>.</p>
+<p>which can be solved by backward substitution. The factor <span class="math notranslate nohighlight">\(R_1\)</span> has the same singular values as <span class="math notranslate nohighlight">\(A\)</span>. QR therefore does not make an ill-conditioned least-squares problem well-conditioned. Its numerical advantage is that orthogonal transformations preserve lengths, so QR can be computed without forming <span class="math notranslate nohighlight">\(A^TA\)</span> and squaring the condition number.</p>
 <p>The chapter begins with three ways to construct QR:</p>
 <ul class="simple">
 <li><p><strong><a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder reflections</span></a></strong> give a backward-stable method for dense QR factorization.</p></li>
@@ -562,7 +562,7 @@ R_1x^*=Q_1^Tb,
 \[
 z^TA^TAz=\|Az\|_2^2&gt;0\qquad\text{for }z\ne0.
 \]</div>
-<p>Thus we can form <span class="math notranslate nohighlight">\(A^TA\)</span> and <span class="math notranslate nohighlight">\(A^Tb\)</span> and solve using Cholesky factorization. The <a class="reference internal" href="normal_equations.html"><span class="std std-doc">normal-equations method</span></a> usually requires less arithmetic than Householder QR, but forming <span class="math notranslate nohighlight">\(A^TA\)</span> can lose accuracy. For full column rank <span class="math notranslate nohighlight">\(A\)</span>, define</p>
+<p>Thus we can form <span class="math notranslate nohighlight">\(A^TA\)</span> and <span class="math notranslate nohighlight">\(A^Tb\)</span> and solve using Cholesky factorization. This <a class="reference internal" href="normal_equations.html"><span class="std std-doc">normal-equations method</span></a> usually requires less arithmetic than Householder QR, but forming <span class="math notranslate nohighlight">\(A^TA\)</span> can lose accuracy. For full column rank <span class="math notranslate nohighlight">\(A\)</span>, define</p>
 <div class="math notranslate nohighlight">
 \[
 \kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
