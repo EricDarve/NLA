@@ -2,6 +2,8 @@
 
 QR factorization turns a least-squares problem into a triangular system. To compute it, we need a way to introduce zeros below the diagonal while preserving lengths and angles. A **Householder reflection** does exactly this: it can turn a column into a multiple of a coordinate vector. Applying these reflections one column at a time gives the QR factorization.
 
+One reflection can act on the whole active column segment, eliminating all entries below its first entry at once. This is the **global approach** to elimination. The [two-coordinate approach](givens_rotations.md) combines only two rows at a time and can use either a rotation or a reflection. A Householder reflection can therefore be global or local, depending on the coordinates on which it acts.
+
 Throughout this page, $A\in\mathbb{R}^{m\times n}$ with $m\ge n$. We first construct a single reflection, then use it to factor $A$, and finally explain how to store and use the factors efficiently.
 
 ## The Goal: Orthogonal Triangularization
