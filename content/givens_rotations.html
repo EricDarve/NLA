@@ -461,14 +461,24 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-givens-rotation-algorithm">The Givens Rotation Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-comparison-with-householder">Computational Cost &amp; Comparison with Householder</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dense-matrices"><strong>Dense Matrices</strong></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-matrices"><strong>Sparse Matrices</strong></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rotating-two-coordinates">Rotating Two Coordinates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-c-and-s-to-eliminate-b">Choosing <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> to Eliminate <span class="math notranslate nohighlight">\(b\)</span></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-coordinate-versus-global-transformations">Two-Coordinate Versus Global Transformations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-rotation-without-overflow">Computing the Rotation Without Overflow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-a-rotation-to-two-rows">Applying a Rotation to Two Rows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-qr-factorization">Building the QR Factorization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-q-and-q-t-without-forming-them">Applying <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(Q^T\)</span> Without Forming Them</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-for-dense-matrices">Computational Cost for Dense Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-the-local-action-helps">When the Local Action Helps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hessenberg-and-tridiagonal-matrices">Hessenberg and Tridiagonal Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#general-sparse-matrices-and-updates">General Sparse Matrices and Updates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
 </ul>
             </nav>
         </div>
@@ -482,125 +492,281 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="givens-rotations">
 <h1>Givens Rotations<a class="headerlink" href="#givens-rotations" title="Link to this heading">#</a></h1>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>We previously discussed Householder transformations, which use reflections to introduce zeros into a vector or a column of a matrix. We’ll now explore another orthogonal transformation technique: <strong>Givens rotations</strong>.</p>
-<p>A Givens rotation is a rotation within a two-dimensional plane spanned by two coordinate axes. These were introduced to numerical analysts in the 1950s by Wallace Givens. While Householder transformations are like using a large mirror to reflect an entire vector at once, Givens rotations are more like a series of smaller, targeted adjustments. They rotate a vector in a specific 2D plane to zero out a single element, leaving other elements in that plane changed but preserving the vector’s overall length.</p>
-<p>Their main purpose, like Householder transformations, is to create zeros in matrices, most commonly as part of a <strong>QR decomposition</strong>. While generally slower for dense matrices, they have significant advantages in specific scenarios, such as parallel computing and processing sparse matrices.</p>
-</section>
-<section id="the-givens-rotation-algorithm">
-<h2>The Givens Rotation Algorithm<a class="headerlink" href="#the-givens-rotation-algorithm" title="Link to this heading">#</a></h2>
-<p>The core of the method is a <span class="math notranslate nohighlight">\(2 \times 2\)</span> rotation. Suppose we have a vector <span class="math notranslate nohighlight">\(\begin{pmatrix} a \\ b \end{pmatrix}\)</span> and we want to rotate it so that the second component becomes zero. We need to find an orthogonal matrix <span class="math notranslate nohighlight">\(G\)</span> such that:</p>
+<p>A <strong>Givens rotation</strong> introduces a zero by rotating just two coordinates. In QR factorization, this means combining two rows to eliminate one entry below the diagonal. The other rows remain unchanged. This local action is useful when a matrix has only a few entries to eliminate, or when we need to update an existing factorization.</p>
+<p>As in the <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder construction</span></a>, we work with <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span>, where <span class="math notranslate nohighlight">\(m\ge n\)</span>, and seek <span class="math notranslate nohighlight">\(A=QR\)</span> with <span class="math notranslate nohighlight">\(Q\)</span> orthogonal and <span class="math notranslate nohighlight">\(R\)</span> upper trapezoidal. We first construct one rotation, then explain how a sequence of rotations produces QR.</p>
+<p>The algorithmic distinction is how many coordinates each step changes: two coordinates at a time, or a whole active column segment. A two-coordinate step can use either a rotation or a reflection, as we show below.</p>
+<section id="rotating-two-coordinates">
+<h2>Rotating Two Coordinates<a class="headerlink" href="#rotating-two-coordinates" title="Link to this heading">#</a></h2>
+<p>Consider the vector <span class="math notranslate nohighlight">\(x=(a,b)^T\)</span>. To eliminate its second entry, we want</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-G \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} r \\ 0 \end{pmatrix}
+G\begin{pmatrix}a\\b\end{pmatrix}
+=\begin{pmatrix}r\\0\end{pmatrix},
+\qquad
+G=\begin{pmatrix}c&amp;s\\-s&amp;c\end{pmatrix},
+\qquad c^2+s^2=1.
 \end{split}\]</div>
-<p>The rotation matrix that accomplishes this is:</p>
+<p>If <span class="math notranslate nohighlight">\(c=\cos\theta\)</span> and <span class="math notranslate nohighlight">\(s=\sin\theta\)</span>, this matrix rotates vectors through the angle <span class="math notranslate nohighlight">\(-\theta\)</span>. For positive <span class="math notranslate nohighlight">\(\theta\)</span>, the rotation is clockwise. We use this sign convention throughout; no angle needs to be computed in the algorithm.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/givens_rotation.svg"><img alt="A vector x=(a,b) points up and right. A clockwise rotation through theta moves it to r e_1 on the horizontal axis. The vectors have the same length, and a curved arrow shows the direction of rotation." src="../_images/givens_rotation.svg" style="width: 600px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">The rotation moves <span class="math notranslate nohighlight">\(x=(a,b)^T\)</span> onto the horizontal axis, eliminating <span class="math notranslate nohighlight">\(b\)</span> while preserving the length <span class="math notranslate nohighlight">\(r=\sqrt{a^2+b^2}\)</span>.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="proof admonition" id="proof">
+<p>Proof. Orthogonality and the Inverse.
+Multiplying the transpose by the original matrix gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-G = \begin{pmatrix} c &amp; s \\ -s &amp; c \end{pmatrix}
+\begin{aligned}
+G^TG&amp;=
+\begin{pmatrix}c&amp;-s\\s&amp;c\end{pmatrix}
+\begin{pmatrix}c&amp;s\\-s&amp;c\end{pmatrix}\\
+&amp;=
+\begin{pmatrix}c^2+s^2&amp;cs-sc\\sc-cs&amp;s^2+c^2\end{pmatrix}
+=I.
+\end{aligned}
 \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(c = \cos(\theta)\)</span> and <span class="math notranslate nohighlight">\(s = \sin(\theta)\)</span> for some angle <span class="math notranslate nohighlight">\(\theta\)</span>. Applying this transformation, we get:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{pmatrix} c &amp; s \\ -s &amp; c \end{pmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} ca + sb \\ -sa + cb \end{pmatrix} = \begin{pmatrix} r \\ 0 \end{pmatrix}
-\end{split}\]</div>
-<p>For the second entry to be zero, we must have <span class="math notranslate nohighlight">\(cb = sa\)</span>. We also know that for the transformation to be a rotation, we need <span class="math notranslate nohighlight">\(c^2 + s^2 = 1\)</span>. The solution that satisfies these conditions is:</p>
+<p>Thus <span class="math notranslate nohighlight">\(G\)</span> is orthogonal, <span class="math notranslate nohighlight">\(G^{-1}=G^T\)</span>, and</p>
 <div class="math notranslate nohighlight">
 \[
-c = \frac{a}{\sqrt{a^2 + b^2}}, \qquad s = \frac{b}{\sqrt{a^2 + b^2}}, \qquad r = \sqrt{a^2+b^2}
+\|Gz\|_2^2=z^TG^TGz=\|z\|_2^2
 \]</div>
-<p>Notice that the resulting vector length, <span class="math notranslate nohighlight">\(r\)</span>, is the original 2-norm of the vector <span class="math notranslate nohighlight">\((a, b)\)</span>, as expected for an orthogonal transformation.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A common convention is to use a counter-clockwise rotation matrix, which would zero out the second element using <span class="math notranslate nohighlight">\(s \leftarrow -b/r\)</span>. The choice is a matter of convention; both achieve the goal.</p>
+<p>for every vector <span class="math notranslate nohighlight">\(z\)</span>. Its determinant is <span class="math notranslate nohighlight">\(c^2+s^2=1\)</span>, so it is a rotation rather than a reflection. Transposing <span class="math notranslate nohighlight">\(G\)</span> changes <span class="math notranslate nohighlight">\(s\)</span> to <span class="math notranslate nohighlight">\(-s\)</span> and reverses the rotation.</p>
 </div>
-<p>To apply this to a larger matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m \times n}\)</span>, we embed this <span class="math notranslate nohighlight">\(2 \times 2\)</span> rotation into an <span class="math notranslate nohighlight">\(m \times m\)</span> identity matrix. A Givens rotation that acts on rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> (where <span class="math notranslate nohighlight">\(i &lt; j\)</span>) has the form:</p>
+<section id="choosing-c-and-s-to-eliminate-b">
+<h3>Choosing <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> to Eliminate <span class="math notranslate nohighlight">\(b\)</span><a class="headerlink" href="#choosing-c-and-s-to-eliminate-b" title="Link to this heading">#</a></h3>
+<p>Expanding the matrix-vector product gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-G(i, j, \theta) =
+G\begin{pmatrix}a\\b\end{pmatrix}
+=\begin{pmatrix}ca+sb\\-sa+cb\end{pmatrix}.
+\end{split}\]</div>
+<p>The second entry vanishes if <span class="math notranslate nohighlight">\(sa=cb\)</span>. For <span class="math notranslate nohighlight">\((a,b)\ne(0,0)\)</span>, choose</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{r=\sqrt{a^2+b^2},
+\qquad c=\frac{a}{r},
+\qquad s=\frac{b}{r}.}
+\]</div>
+<p>These formulas satisfy both requirements:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+c^2+s^2&amp;=\frac{a^2+b^2}{r^2}=1,\\
+-sa+cb&amp;=-\frac{ba}{r}+\frac{ab}{r}=0,\\
+ca+sb&amp;=\frac{a^2+b^2}{r}=r.
+\end{aligned}
+\end{split}\]</div>
+<p>If <span class="math notranslate nohighlight">\(a=b=0\)</span>, use <span class="math notranslate nohighlight">\(c=1\)</span>, <span class="math notranslate nohighlight">\(s=0\)</span>, and <span class="math notranslate nohighlight">\(r=0\)</span>, so <span class="math notranslate nohighlight">\(G=I\)</span>. If <span class="math notranslate nohighlight">\(b=0\)</span>, there is already no entry to eliminate, and the QR algorithm may skip the rotation. In that case the first entry remains <span class="math notranslate nohighlight">\(a\)</span>, which need not be positive. The signs of the diagonal entries of <span class="math notranslate nohighlight">\(R\)</span> do not affect the validity of QR.</p>
+</section>
+</section>
+<section id="two-coordinate-versus-global-transformations">
+<h2>Two-Coordinate Versus Global Transformations<a class="headerlink" href="#two-coordinate-versus-global-transformations" title="Link to this heading">#</a></h2>
+<p>A two-coordinate reflection can perform the same elimination. For the same nonzero pair <span class="math notranslate nohighlight">\((a,b)\)</span> and coefficients <span class="math notranslate nohighlight">\(c=a/r\)</span>, <span class="math notranslate nohighlight">\(s=b/r\)</span>, define</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H=\begin{pmatrix}c&amp;s\\s&amp;-c\end{pmatrix}.
+\end{split}\]</div>
+<p>It sends the vector to the same target:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H\begin{pmatrix}a\\b\end{pmatrix}
+=\begin{pmatrix}ca+sb\\sa-cb\end{pmatrix}
+=\begin{pmatrix}r\\0\end{pmatrix}.
+\end{split}\]</div>
+<p>This matrix is symmetric, and multiplying it by itself gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H^2=
+\begin{pmatrix}c^2+s^2&amp;cs-sc\\sc-cs&amp;s^2+c^2\end{pmatrix}
+=I.
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(H^TH=I\)</span> and <span class="math notranslate nohighlight">\(H^{-1}=H\)</span>. Its determinant is <span class="math notranslate nohighlight">\(-c^2-s^2=-1\)</span>, so it is a reflection. It is exactly a two-dimensional <a class="reference external" href="https://nhigham.com/2020/09/15/what-is-a-householder-matrix/">Householder reflector</a>.</p>
+<p>The rotation and reflection differ only in the sign of their second output:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H=\begin{pmatrix}1&amp;0\\0&amp;-1\end{pmatrix}G.
+\end{split}\]</div>
+<p>Both eliminate <span class="math notranslate nohighlight">\(b\)</span>. When embedded in a larger matrix, both change only two rows, preserve the other rows, and require the same arithmetic per pair of entries. Symmetry simplifies the inverse, but does not by itself improve numerical accuracy.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For QR, the useful distinction is <strong>two-coordinate versus global transformations</strong>. A two-coordinate rotation or reflection eliminates one selected entry. A global Householder reflection acts on the whole active column segment and eliminates all entries below its first entry in one step.</p>
+<p>A Householder reflection can also act on just two coordinates. The computational difference comes from the number of coordinates involved in each step, rather than from choosing a rotation or a reflection. Rotations acting on more than two coordinates are also possible. Householder reflections are the standard global construction used here.</p>
+</div>
+<p>The QR algorithm below uses the rotation <span class="math notranslate nohighlight">\(G\)</span>. Replacing each rotation by the corresponding two-coordinate reflection gives another valid QR algorithm. The zero-preservation argument is unchanged, and each reflection is its own inverse.</p>
+</section>
+<section id="computing-the-rotation-without-overflow">
+<h2>Computing the Rotation Without Overflow<a class="headerlink" href="#computing-the-rotation-without-overflow" title="Link to this heading">#</a></h2>
+<p>The formulas above explain the mathematics, but evaluating <span class="math notranslate nohighlight">\(a^2+b^2\)</span> directly can fail. For example, squaring a large finite number may overflow even when <span class="math notranslate nohighlight">\(\sqrt{a^2+b^2}\)</span> is representable. Squaring tiny numbers may underflow to zero.</p>
+<p>We avoid these unnecessary squares by scaling the inputs. For a nonzero pair, set</p>
+<div class="math notranslate nohighlight">
+\[
+h=\max(|a|,|b|),
+\qquad
+\alpha=\frac{a}{h},
+\qquad
+\beta=\frac{b}{h},
+\qquad
+d=\sqrt{\alpha^2+\beta^2}.
+\]</div>
+<p>Both scaled inputs have magnitude at most <span class="math notranslate nohighlight">\(1\)</span>, and at least one has magnitude <span class="math notranslate nohighlight">\(1\)</span>. Therefore <span class="math notranslate nohighlight">\(1\le d\le\sqrt{2}\)</span>. Compute</p>
+<div class="math notranslate nohighlight">
+\[
+c=\frac{\alpha}{d},
+\qquad
+s=\frac{\beta}{d},
+\qquad
+r=hd.
+\]</div>
+<p>These are the same formulas as before, since <span class="math notranslate nohighlight">\(r=h\sqrt{(a/h)^2+(b/h)^2}\)</span>. Computing <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> from the scaled inputs also avoids dividing by a very large or very small <span class="math notranslate nohighlight">\(r\)</span>.</p>
+<p>The same scaled coefficients can be used in the two-coordinate reflection <span class="math notranslate nohighlight">\(H\)</span>.</p>
+<p>Scaling cannot prevent overflow if the true <span class="math notranslate nohighlight">\(r\)</span> exceeds the largest representable number. Production routines also handle extreme values and underflow carefully. LAPACK’s <a class="reference external" href="https://www.netlib.org/lapack/explore-html/da/dd3/group__lartg_ga86f8f877eaea0386cdc2c3c175d9ea88.html">DLARTG</a> uses safe scaling. Its sign convention allows a negative <span class="math notranslate nohighlight">\(r\)</span> so that <span class="math notranslate nohighlight">\(c\ge0\)</span>; this differs from our choice <span class="math notranslate nohighlight">\(r\ge0\)</span>, but achieves the same elimination.</p>
+</section>
+<section id="applying-a-rotation-to-two-rows">
+<h2>Applying a Rotation to Two Rows<a class="headerlink" href="#applying-a-rotation-to-two-rows" title="Link to this heading">#</a></h2>
+<p>For indices <span class="math notranslate nohighlight">\(i&lt;j\)</span>, the <span class="math notranslate nohighlight">\(m\times m\)</span> rotation matrix is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+G_{ij}(c,s)=
 \begin{pmatrix}
-1 &amp; \cdots &amp; 0 &amp; \cdots &amp; 0 &amp; \cdots &amp; 0 \\
-\vdots &amp; \ddots &amp; \vdots &amp; &amp; \vdots &amp; &amp; \vdots \\
-0 &amp; \cdots &amp; c &amp; \cdots &amp; s &amp; \cdots &amp; 0 \\
-\vdots &amp; &amp; \vdots &amp; \ddots &amp; \vdots &amp; &amp; \vdots \\
-0 &amp; \cdots &amp; -s &amp; \cdots &amp; c &amp; \cdots &amp; 0 \\
-\vdots &amp; &amp; \vdots &amp; &amp; \vdots &amp; \ddots &amp; \vdots \\
-0 &amp; \cdots &amp; 0 &amp; \cdots &amp; 0 &amp; \cdots &amp; 1
+I_{i-1}&amp;0&amp;0&amp;0&amp;0\\
+0&amp;c&amp;0&amp;s&amp;0\\
+0&amp;0&amp;I_{j-i-1}&amp;0&amp;0\\
+0&amp;-s&amp;0&amp;c&amp;0\\
+0&amp;0&amp;0&amp;0&amp;I_{m-j}
 \end{pmatrix}
 \quad
-\begin{matrix}
- \\ \\ \leftarrow \text{row } i \\ \\ \leftarrow \text{row } j \\ \\ \\
-\end{matrix}
+\begin{array}{l}
+\text{rows }1,\ldots,i-1\\
+\text{row }i\\
+\text{rows }i+1,\ldots,j-1\\
+\text{row }j\\
+\text{rows }j+1,\ldots,m
+\end{array}.
 \end{split}\]</div>
-<p>When you multiply a matrix <span class="math notranslate nohighlight">\(A\)</span> from the left by <span class="math notranslate nohighlight">\(G(i, j, \theta)\)</span>, it only affects rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(A\)</span>. The operation rotates the row vectors in the <span class="math notranslate nohighlight">\((i,j)\)</span>-plane. By selecting the correct <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> based on the entries <span class="math notranslate nohighlight">\(a_{ik}\)</span> and <span class="math notranslate nohighlight">\(a_{jk}\)</span> in a specific column <span class="math notranslate nohighlight">\(k\)</span>, we can introduce a zero at the <span class="math notranslate nohighlight">\((j, k)\)</span> position.</p>
+<p>The columns follow the same grouping as the rows. The identity blocks leave all coordinates except <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> unchanged. Blocks of size zero are omitted.</p>
+<p>Multiplying <span class="math notranslate nohighlight">\(A\)</span> on the left by this matrix changes only rows <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>. For each column <span class="math notranslate nohighlight">\(\ell\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+a_{i\ell}^{\mathrm{new}}&amp;=ca_{i\ell}+sa_{j\ell},\\
+a_{j\ell}^{\mathrm{new}}&amp;=-sa_{i\ell}+ca_{j\ell}.
+\end{aligned}
+\end{split}\]</div>
+<p>Both right-hand sides use the <strong>old</strong> entries. An in-place implementation saves <span class="math notranslate nohighlight">\(a_{i\ell}\)</span> and <span class="math notranslate nohighlight">\(a_{j\ell}\)</span> before overwriting either. This is the update performed by the BLAS routine <a class="reference external" href="https://www.netlib.org/lapack/explore-html/dc/d23/drot_8f_source.html">DROT</a>.</p>
+<p>Each column requires four multiplications and two additions or subtractions. Updating two row segments of length <span class="math notranslate nohighlight">\(t\)</span> therefore costs <span class="math notranslate nohighlight">\(6t\)</span> flops. We store only <span class="math notranslate nohighlight">\(i,j,c,s\)</span>, not the full matrix <span class="math notranslate nohighlight">\(G_{ij}\)</span>.</p>
+</section>
+<section id="building-the-qr-factorization">
+<h2>Building the QR Factorization<a class="headerlink" href="#building-the-qr-factorization" title="Link to this heading">#</a></h2>
+<p>The order of elimination matters: a rotation must preserve the zeros already created. One simple choice uses adjacent rows and works from the bottom of each column upward.</p>
+<p>Starting with <span class="math notranslate nohighlight">\(A^{(0)}=A\)</span>, process columns <span class="math notranslate nohighlight">\(k=1,\ldots,n\)</span>. Within column <span class="math notranslate nohighlight">\(k\)</span>, process rows <span class="math notranslate nohighlight">\(j=m,m-1,\ldots,k+1\)</span>:</p>
+<ol class="arabic simple">
+<li><p>Take <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> to be the current entries in positions <span class="math notranslate nohighlight">\((j-1,k)\)</span> and <span class="math notranslate nohighlight">\((j,k)\)</span>.</p></li>
+<li><p>If <span class="math notranslate nohighlight">\(b=0\)</span>, continue to the next row. Otherwise, construct <span class="math notranslate nohighlight">\(c,s\)</span> to send <span class="math notranslate nohighlight">\((a,b)^T\)</span> to <span class="math notranslate nohighlight">\((r,0)^T\)</span>.</p></li>
+<li><p>Apply the rotation to rows <span class="math notranslate nohighlight">\(j-1,j\)</span>, updating columns <span class="math notranslate nohighlight">\(k\)</span> through <span class="math notranslate nohighlight">\(n\)</span>. Store <span class="math notranslate nohighlight">\(r\)</span> and zero in the two positions of column <span class="math notranslate nohighlight">\(k\)</span>, and retain the rotation parameters for later use.</p></li>
+</ol>
+<p>Why does this preserve the earlier work? In every earlier column, both affected rows lie below its diagonal, so their entries are zero. Rotating the pair <span class="math notranslate nohighlight">\((0,0)^T\)</span> leaves it zero. Within the current column, the entries below row <span class="math notranslate nohighlight">\(j\)</span> have already been eliminated, and this rotation does not touch those rows. Induction therefore shows that each finished column is zero below its diagonal.</p>
+<p>Number the rotations in the order they are applied as <span class="math notranslate nohighlight">\(G_1,\ldots,G_N\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[
+A^{(\ell)}=G_\ell A^{(\ell-1)},
+\qquad
+R=G_N\cdots G_2G_1A.
+\]</div>
+<p>Define</p>
+<div class="math notranslate nohighlight">
+\[
+Q^T=G_N\cdots G_2G_1,
+\qquad
+Q=G_1^TG_2^T\cdots G_N^T.
+\]</div>
+<p>Each rotation is orthogonal, so their product is orthogonal. Since <span class="math notranslate nohighlight">\(R=Q^TA\)</span>, multiplying by <span class="math notranslate nohighlight">\(Q\)</span> gives <span class="math notranslate nohighlight">\(A=QR\)</span>. Together with the zero-preservation argument, this proves the factorization. If no rotations are needed, <span class="math notranslate nohighlight">\(Q=I\)</span>.</p>
+<p><strong>Unlike a Householder reflection, a Givens rotation is generally not symmetric.</strong> The transposes in the formula for <span class="math notranslate nohighlight">\(Q\)</span> are necessary: they reverse each rotation.</p>
+<section id="applying-q-and-q-t-without-forming-them">
+<h3>Applying <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(Q^T\)</span> Without Forming Them<a class="headerlink" href="#applying-q-and-q-t-without-forming-them" title="Link to this heading">#</a></h3>
+<p>To compute <span class="math notranslate nohighlight">\(Q^Tb\)</span>, apply <span class="math notranslate nohighlight">\(G_1\)</span> first, followed by <span class="math notranslate nohighlight">\(G_2,\ldots,G_N\)</span>. Each rotation changes only two entries of the vector. To compute <span class="math notranslate nohighlight">\(Qb\)</span>, apply <span class="math notranslate nohighlight">\(G_N^T\)</span> first and continue in reverse order through <span class="math notranslate nohighlight">\(G_1^T\)</span>, changing <span class="math notranslate nohighlight">\(s\)</span> to <span class="math notranslate nohighlight">\(-s\)</span> for each rotation.</p>
+<p>For least squares, partition the transformed right-hand side as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q^Tb=\begin{pmatrix}c_1\\c_2\end{pmatrix},
+\qquad
+R=\begin{pmatrix}R_1\\0\end{pmatrix},
+\qquad c_1\in\mathbb{R}^n.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(R_1\in\mathbb{R}^{n\times n}\)</span> is upper triangular. As explained in the <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder least-squares construction</span></a>, solve <span class="math notranslate nohighlight">\(R_1x=c_1\)</span> by back substitution. For full column rank <span class="math notranslate nohighlight">\(A\)</span>, this gives the unique minimizer, and the minimum residual norm is <span class="math notranslate nohighlight">\(\|c_2\|_2\)</span>. The algorithm can transform <span class="math notranslate nohighlight">\(b\)</span> alongside <span class="math notranslate nohighlight">\(A\)</span> if that is the only right-hand side needed.</p>
+</section>
+</section>
+<section id="computational-cost-for-dense-matrices">
+<h2>Computational Cost for Dense Matrices<a class="headerlink" href="#computational-cost-for-dense-matrices" title="Link to this heading">#</a></h2>
+<p>In a dense matrix, column <span class="math notranslate nohighlight">\(k\)</span> has <span class="math notranslate nohighlight">\(m-k\)</span> entries to eliminate. For the algorithm above, the number of rotations is at most</p>
+<div class="math notranslate nohighlight">
+\[
+N_{\max}=\sum_{k=1}^n(m-k)
+=mn-\frac{n(n+1)}{2}.
+\]</div>
+<p>The maximum is attained when none of the entries selected for elimination is already zero. A rotation in column <span class="math notranslate nohighlight">\(k\)</span> updates two row segments of length <span class="math notranslate nohighlight">\(n-k+1\)</span>, costing approximately <span class="math notranslate nohighlight">\(6(n-k+1)\)</span> flops. Hence the leading cost of dense Givens QR is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\operatorname{cost}(QR)
+&amp;=6\sum_{k=1}^n(m-k)(n-k+1)+O(mn)\\
+&amp;=3mn^2-n^3+O(mn).
+\end{aligned}
+\end{split}\]</div>
+<p>To evaluate the sum, set <span class="math notranslate nohighlight">\(t=n-k+1\)</span>. Then <span class="math notranslate nohighlight">\(m-k=m-n-1+t\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+6\sum_{t=1}^n(m-n-1+t)t
+&amp;=3(m-n-1)n(n+1)\\
+&amp;\qquad{}+n(n+1)(2n+1)\\
+&amp;=n(n+1)(3m-n-2).
+\end{aligned}
+\end{split}\]</div>
+<p>Constructing the rotations and assigning the eliminated entries adds only lower-order work. This cost does not include forming <span class="math notranslate nohighlight">\(Q\)</span> explicitly.</p>
+<p>For square matrices, the leading cost is <span class="math notranslate nohighlight">\(2n^3\)</span>. Householder QR costs <span class="math notranslate nohighlight">\(\frac43n^3\)</span>, so Givens QR uses about 50% more arithmetic. For tall matrices, the leading costs are <span class="math notranslate nohighlight">\(3mn^2\)</span> and <span class="math notranslate nohighlight">\(2mn^2\)</span>, respectively. Blocked Householder algorithms also group updates into matrix multiplications, which usually makes them the preferred choice for dense QR.</p>
+<p>Applying the stored rotations to one vector costs <span class="math notranslate nohighlight">\(6N=O(mn)\)</span> flops. Back substitution adds <span class="math notranslate nohighlight">\(O(n^2)\)</span> work. Storing a general dense rotation sequence requires <span class="math notranslate nohighlight">\(O(mn)\)</span> space.</p>
+</section>
+<section id="when-the-local-action-helps">
+<h2>When the Local Action Helps<a class="headerlink" href="#when-the-local-action-helps" title="Link to this heading">#</a></h2>
+<section id="hessenberg-and-tridiagonal-matrices">
+<h3>Hessenberg and Tridiagonal Matrices<a class="headerlink" href="#hessenberg-and-tridiagonal-matrices" title="Link to this heading">#</a></h3>
+<p>An <span class="math notranslate nohighlight">\(n\times n\)</span> <strong>upper Hessenberg matrix</strong> satisfies <span class="math notranslate nohighlight">\(a_{ij}=0\)</span> whenever <span class="math notranslate nohighlight">\(i&gt;j+1\)</span>. Each column has at most one entry below the diagonal. Rotate rows <span class="math notranslate nohighlight">\(k,k+1\)</span> to eliminate that entry in column <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<p>This does not create entries to eliminate farther down: both affected rows were already zero in earlier columns, and all lower rows remain untouched. Only <span class="math notranslate nohighlight">\(n-1\)</span> rotations are needed. Each updates at most <span class="math notranslate nohighlight">\(O(n)\)</span> entries, so computing <span class="math notranslate nohighlight">\(R\)</span> and storing the rotations costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p>
+<p>A <strong>tridiagonal matrix</strong> has <span class="math notranslate nohighlight">\(a_{ij}=0\)</span> whenever <span class="math notranslate nohighlight">\(|i-j|&gt;1\)</span>. Here the same adjacent-row construction costs only <span class="math notranslate nohighlight">\(O(n)\)</span>, because each rotation updates a fixed number of entries. The reason is that, before step <span class="math notranslate nohighlight">\(k\)</span>, row <span class="math notranslate nohighlight">\(k\)</span> can be nonzero only through column <span class="math notranslate nohighlight">\(k+1\)</span>, and row <span class="math notranslate nohighlight">\(k+1\)</span> only through column <span class="math notranslate nohighlight">\(k+2\)</span>. Their combination can therefore create a new entry at <span class="math notranslate nohighlight">\((k,k+2)\)</span>, but none farther to the right. The resulting <span class="math notranslate nohighlight">\(R\)</span> has at most two nonzero superdiagonals.</p>
+<p>These costs refer to <span class="math notranslate nohighlight">\(R\)</span> and an implicit representation of <span class="math notranslate nohighlight">\(Q\)</span>. Explicitly forming the full <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(Q\)</span> costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> even in the tridiagonal case.</p>
+<p>The same costs are possible with two-coordinate reflections: they update the same row pairs and create the same pattern of zeros. Householder transformations can also exploit short column segments, so their cost on these structured matrices need not be cubic. What matters here is the local two-row action.</p>
+</section>
+<section id="general-sparse-matrices-and-updates">
+<h3>General Sparse Matrices and Updates<a class="headerlink" href="#general-sparse-matrices-and-updates" title="Link to this heading">#</a></h3>
+<p>For sparse rows, a rotation needs to update only columns where at least one of the two rows is nonzero. However, mixing the rows can create new nonzeros in either row. This is called <strong>fill-in</strong>. Local elimination therefore does not automatically preserve sparsity or make Givens QR the best choice for every sparse matrix.</p>
+<p>Rotations are also useful when a new row is added to a least-squares problem. Suppose <span class="math notranslate nohighlight">\(A=Q_1R_1\)</span> is already available and we append a row <span class="math notranslate nohighlight">\(w^T\)</span>. The original orthogonal transformations turn the old rows into <span class="math notranslate nohighlight">\(R\)</span>, with <span class="math notranslate nohighlight">\(R_1\)</span> above a block of zeros, and leave the added row unchanged. The zero rows need no further elimination, so it remains to triangularize</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}R_1\\w^T\end{pmatrix}.
+\end{split}\]</div>
+<p>Rotations between each pivot row and the added row eliminate its entries one at a time, while preserving the zeros in earlier columns. This requires <span class="math notranslate nohighlight">\(O(n^2)\)</span> work rather than refactoring all the original rows.</p>
+</section>
 </section>
 <section id="numerical-stability">
 <h2>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h2>
-<p>A naive implementation of the formulas for <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> can be numerically unstable. The direct calculation of <span class="math notranslate nohighlight">\(r = \sqrt{a^2+b^2}\)</span> can cause <strong>overflow</strong> if <span class="math notranslate nohighlight">\(a\)</span> or <span class="math notranslate nohighlight">\(b\)</span> are very large, or <strong>underflow</strong> and loss of precision if they are very small.</p>
-<p>A more robust method, often implemented in libraries like LAPACK and as the <code class="docutils literal notranslate"><span class="pre">hypot</span></code> function in many languages, avoids this problem. The key is to factor out the element with the larger magnitude.</p>
-<p>Let’s assume <span class="math notranslate nohighlight">\(|a| \ge |b|\)</span>. The algorithm is as follows:</p>
-<ol class="arabic simple">
-<li><p>If <span class="math notranslate nohighlight">\(b=0\)</span>, then <span class="math notranslate nohighlight">\(c=1, s=0\)</span>, and <span class="math notranslate nohighlight">\(r=a\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(b \ne 0\)</span>, compute <span class="math notranslate nohighlight">\(t = b/a\)</span>. Since <span class="math notranslate nohighlight">\(|a| \ge |b|\)</span>, we know <span class="math notranslate nohighlight">\(|t| \le 1\)</span>.</p></li>
-<li><p>Calculate <span class="math notranslate nohighlight">\(r = |a| \sqrt{1+t^2}\)</span>. This avoids squaring large or small numbers.</p></li>
-<li><p>Then, <span class="math notranslate nohighlight">\(c = \frac{a}{r} = \frac{a}{|a|\sqrt{1+t^2}} = \frac{\text{sign}(a)}{\sqrt{1+t^2}}\)</span> and <span class="math notranslate nohighlight">\(s = \frac{b}{r} = \frac{at}{|a|\sqrt{1+t^2}} = \frac{t \cdot \text{sign}(a)}{\sqrt{1+t^2}}\)</span>.</p></li>
-</ol>
-<p>A similar calculation is performed if <span class="math notranslate nohighlight">\(|b| &gt; |a|\)</span> by setting <span class="math notranslate nohighlight">\(t=a/b\)</span>. This stable procedure is crucial for reliable numerical software.</p>
-</section>
-<section id="computational-cost-comparison-with-householder">
-<h2>Computational Cost &amp; Comparison with Householder<a class="headerlink" href="#computational-cost-comparison-with-householder" title="Link to this heading">#</a></h2>
-<section id="dense-matrices">
-<h3><strong>Dense Matrices</strong><a class="headerlink" href="#dense-matrices" title="Link to this heading">#</a></h3>
-<p>To perform a QR factorization on a dense <span class="math notranslate nohighlight">\(m \times n\)</span> matrix, we must zero out all elements below the main diagonal. This requires applying a sequence of Givens rotations.</p>
-<ul class="simple">
-<li><p>Applying one Givens rotation to an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix (i.e., updating two rows of length <span class="math notranslate nohighlight">\(n\)</span>) costs approximately <span class="math notranslate nohighlight">\(6n\)</span> floating-point operations (flops).</p></li>
-<li><p>To triangularize the matrix, we need to eliminate roughly <span class="math notranslate nohighlight">\(\frac{1}{2} n(2m-n-1)\)</span> entries for <span class="math notranslate nohighlight">\(m \ge n\)</span>.</p></li>
-<li><p>The total cost is approximately <span class="math notranslate nohighlight">\(\approx 3mn^2 - n^3\)</span> flops. For a square <span class="math notranslate nohighlight">\(n \times n\)</span> matrix, this is <span class="math notranslate nohighlight">\(\approx 2n^3\)</span>.</p></li>
-</ul>
-<p>In comparison, the Householder QR algorithm costs <span class="math notranslate nohighlight">\(\approx 2mn^2 - \frac{2}{3}n^3\)</span> flops (<span class="math notranslate nohighlight">\(\approx \frac{4}{3}n^3\)</span> for square matrices). Householder is therefore about twice as fast for dense matrices, not only because of the lower flop count but also because its reliance on matrix-vector products (BLAS-2) is more efficient on modern computer architectures than the vector-scalar operations (BLAS-1) used in Givens rotations.</p>
-</section>
-<section id="sparse-matrices">
-<h3><strong>Sparse Matrices</strong><a class="headerlink" href="#sparse-matrices" title="Link to this heading">#</a></h3>
-<p>The true power of Givens rotations becomes apparent with sparse matrices.</p>
-<ul class="simple">
-<li><p><strong>Targeted Elimination</strong>: Unlike Householder reflections, which alter an entire column below the diagonal, a Givens rotation only affects two rows. If those rows are sparse, the computational cost is proportional to the number of non-zero elements, not the full row length <span class="math notranslate nohighlight">\(n\)</span>.</p></li>
-<li><p><strong>Upper Hessenberg Matrices</strong>: For an <span class="math notranslate nohighlight">\(n \times n\)</span> upper Hessenberg matrix, there is only one non-zero element to eliminate below the diagonal in each of the first <span class="math notranslate nohighlight">\(n-1\)</span> columns. This requires only <span class="math notranslate nohighlight">\(n-1\)</span> Givens rotations. Each rotation costs <span class="math notranslate nohighlight">\(O(n)\)</span>, leading to a total cost of <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong> for the QR factorization—a dramatic improvement over Householder’s <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>
-<li><p><strong>Tridiagonal Matrices</strong>: The situation is even better for a tridiagonal matrix. Eliminating the single subdiagonal element in a column only affects a handful of elements. The cost for the entire QR factorization is just <strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong>.</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>An <strong>upper Hessenberg matrix</strong> is a square matrix where all the entries below the first subdiagonal are zero. In other words, for a matrix <span class="math notranslate nohighlight">\(A\)</span>, if <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>, then the element <span class="math notranslate nohighlight">\(a_{ij} = 0\)</span>.</p>
-<p>A <strong>tridiagonal matrix</strong> is a square matrix where the only non-zero entries are on the main diagonal, the first diagonal below it (the subdiagonal), and the first diagonal above it (the superdiagonal). For a matrix <span class="math notranslate nohighlight">\(A\)</span>, if <span class="math notranslate nohighlight">\(|i-j| &gt; 1\)</span>, then <span class="math notranslate nohighlight">\(a_{ij}=0\)</span>.</p>
-</div>
-<p>In summary:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Method</p></th>
-<th class="head"><p>Dense QR</p></th>
-<th class="head"><p>Hessenberg QR</p></th>
-<th class="head"><p>Tridiagonal QR</p></th>
-<th class="head"><p>Key Feature</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>Householder</strong></p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span> (faster)</p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span></p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span></p></td>
-<td><p>Reflects and zeros entire sub-columns at once</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Givens</strong></p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span> (slower)</p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn)\)</span></p></td>
-<td><p><span class="math notranslate nohighlight">\(O(m)\)</span></p></td>
-<td><p>Rotates and zeros single elements</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>The choice between the two methods is a classic example of a performance trade-off that depends entirely on the structure of the input matrix.</p>
-</section>
+<p>Safe computation of <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> prevents avoidable overflow and underflow. The subsequent QR computation has the same two accuracy guarantees as <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder QR</span></a>. If the full <span class="math notranslate nohighlight">\(Q\)</span> is formed using the stored rotations, the computed factors satisfy bounds of the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+&amp;\le C_1(m,n)u,\\
+\|\widehat Q^T\widehat Q-I\|_2
+&amp;\le C_2(m,n)u.
+\end{aligned}
+}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(A\ne0\)</span>, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, and the factors <span class="math notranslate nohighlight">\(C_1,C_2\)</span> depend on the dimensions and implementation, not on the condition number of <span class="math notranslate nohighlight">\(A\)</span>. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times <span class="math notranslate nohighlight">\(u\)</span> small compared with <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>The first bound controls how well the factors reproduce <span class="math notranslate nohighlight">\(A\)</span>; the second controls the loss of orthogonality. The computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is nearly orthogonal, not exactly orthogonal. A small error in the factorization does not by itself guarantee a small forward error in the least-squares solution, which also depends on the problem’s sensitivity.</p>
+<p>The reason orthogonal transformations help is that they do not amplify errors already present: <span class="math notranslate nohighlight">\(\|Gz\|_2=\|z\|_2\)</span>. Rounding still occurs when forming and applying each rotation, and a complete analysis must bound those new errors and their accumulation. See Nick Higham’s <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">What Is a QR Factorization?</a> for an overview, and Chapter 19 of his <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19">Accuracy and Stability of Numerical Algorithms</a> for the detailed analysis.</p>
 </section>
 </section>
 
@@ -670,14 +836,24 @@ G(i, j, \theta) =
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-givens-rotation-algorithm">The Givens Rotation Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-comparison-with-householder">Computational Cost &amp; Comparison with Householder</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dense-matrices"><strong>Dense Matrices</strong></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-matrices"><strong>Sparse Matrices</strong></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rotating-two-coordinates">Rotating Two Coordinates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-c-and-s-to-eliminate-b">Choosing <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> to Eliminate <span class="math notranslate nohighlight">\(b\)</span></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-coordinate-versus-global-transformations">Two-Coordinate Versus Global Transformations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-rotation-without-overflow">Computing the Rotation Without Overflow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-a-rotation-to-two-rows">Applying a Rotation to Two Rows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-qr-factorization">Building the QR Factorization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-q-and-q-t-without-forming-them">Applying <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(Q^T\)</span> Without Forming Them</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-for-dense-matrices">Computational Cost for Dense Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-the-local-action-helps">When the Local Action Helps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hessenberg-and-tridiagonal-matrices">Hessenberg and Tridiagonal Matrices</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#general-sparse-matrices-and-updates">General Sparse Matrices and Updates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
 </ul>
   </nav></div>
 
