@@ -36,7 +36,6 @@ chapters:
   - file: content/modified_gram_schmidt.md
   - file: content/qr_summary.md
   - file: content/existence_and_uniqueness_qr.md
-  - file: content/backward_stability.md
   - file: content/qr_and_determinant.md
   - file: content/lu_vs_qr.md
   - file: content/normal_equations.md

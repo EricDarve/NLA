@@ -1,195 +1,352 @@
 # Householder Reflections
 
-We now explore methods to solve least-squares problems. The main technique is the **QR factorization**, which decomposes a matrix $A$ into the product of an orthogonal matrix $Q$ and an upper triangular matrix $R$. The most widely used algorithm for computing the QR factorization for dense matrices is based on **Householder transformations**. This method is efficient, numerically stable, and provides a beautiful geometric interpretation of the factorization process.
+QR factorization turns a least-squares problem into a triangular system. To compute it, we need a way to introduce zeros below the diagonal while preserving lengths and angles. A **Householder reflection** does exactly this: it can turn a column into a multiple of a coordinate vector. Applying these reflections one column at a time gives the QR factorization.
 
-## The Big Picture: Orthogonal Triangularization
+Throughout this page, $A\in\mathbb{R}^{m\times n}$ with $m\ge n$. We first construct a single reflection, then use it to factor $A$, and finally explain how to store and use the factors efficiently.
 
-The goal of QR factorization is to decompose an $m \times n$ matrix $A$ into $A = QR$, where $Q$ is an $m \times m$ orthogonal matrix and $R$ is an $m \times n$ upper triangular matrix.
+## The Goal: Orthogonal Triangularization
 
-We can rewrite this as $Q^T A = R$. This gives us a new way to think about the process: we are looking for an orthogonal matrix, $Q^T$, that transforms $A$ into an upper triangular matrix $R$. We won't find this $Q^T$ all at once. Instead, we'll build it as a sequence of simpler orthogonal transformations, $Q_k$, applied one after another.
-
-$$Q^T = Q_n \cdots Q_2 Q_1$$
-
-Each transformation $Q_k$ is strategically designed to introduce zeros below the diagonal in the $k$-th column of the matrix, without disturbing the zeros we created in previous columns. The tool we'll use to build these transformations is the Householder reflection.
-
-## The Tool: Householder Reflections
-
-A **Householder transformation** (or Householder reflector) is a matrix that represents a reflection across a hyperplane. 📐
-
-Geometrically, it's a linear transformation that flips a vector space across a plane or hyperplane. The key properties for our purposes are:
-
-1.  It is **orthogonal**. A reflection preserves the lengths of vectors and the angles between them, just in a mirrored way.
-2.  It is **symmetric** ($P^T = P$) and **involutory** ($P^2 = I$).
-3.  It can transform any given vector $x$ into another vector $y$, as long as they have the same Euclidean norm ($\|x\|_2 = \|y\|_2$).
-
-For QR factorization, we will use a Householder reflection to map a column vector from our matrix onto a standard basis vector, effectively zeroing out most of its components.
-
-## Constructing a Reflection
-
-Let's focus on the first step: zeroing out the subdiagonal elements of the first column of $A$, which we'll call $x = a_1$. Our goal is to find a reflection matrix $P_1$ such that $P_1x$ is a multiple of the first standard basis vector, $e_1$.
-
-$$P_1x = \begin{pmatrix} \sigma \\ 0 \\ \vdots \\ 0 \end{pmatrix} = \sigma e_1$$
-
-Since reflections preserve length, we must have $|\sigma| = \|x\|_2$.
-
-The reflection is performed across a hyperplane. To define this hyperplane, we only need to specify a vector $v$ that is normal to it. Geometrically, the vector normal to the reflection plane must be parallel to the difference between the original vector $x$ and its reflected image $\sigma e_1$.
-
-We can therefore define this normal vector $v$ as the difference between the starting vector and the target vector:
+The full QR factorization has the form
 
 $$
-v = x - \sigma e_1
+A=QR,\qquad Q^TQ=I,\qquad
+R=\begin{pmatrix}R_1\\0\end{pmatrix},
 $$
 
-:::{note}
-The vector that **bisects the angle** between $x$ and $\sigma e_1$ is $x + \sigma e_1$. This bisecting vector lies *within* the reflection hyperplane and is orthogonal to the normal vector $v$.
+where $Q\in\mathbb{R}^{m\times m}$ and $R_1\in\mathbb{R}^{n\times n}$ is upper triangular. The rectangular matrix $R$ is called **upper trapezoidal**: its entries below the diagonal are zero.
+
+Equivalently, $Q^TA=R$. This suggests an algorithm: apply orthogonal transformations to $A$ until its entries below the diagonal vanish. Each transformation must preserve the zeros created by the preceding transformations.
+
+If $Q_1$ consists of the first $n$ columns of $Q$, then $A=Q_1R_1$ is the reduced QR factorization used in [least squares](least_squares.md). No rank assumption is needed to construct QR; full column rank is needed when we solve a system with $R_1$.
+
+## Reflecting Across a Hyperplane
+
+Let $v\in\mathbb{R}^d$ be nonzero. The hyperplane perpendicular to $v$ consists of the vectors $z$ satisfying $v^Tz=0$. To reflect a vector across this hyperplane, we reverse its component parallel to $v$ and leave its perpendicular component unchanged.
+
+The two components of any $z$ are
+
+$$
+z_{\parallel}=v\frac{v^Tz}{v^Tv},
+\qquad
+z_{\perp}=z-z_{\parallel}.
+$$
+
+Thus the reflected vector is
+
+$$
+Pz=z_{\perp}-z_{\parallel}
+=z-2v\frac{v^Tz}{v^Tv}.
+$$
+
+This gives the **Householder matrix**
+
+$$
+\boxed{P=I-2\frac{vv^T}{v^Tv}=I-\beta vv^T,
+\qquad \beta=\frac{2}{v^Tv}.}
+$$
+
+In particular, $Pv=-v$, whereas $Pz=z$ for every $z$ perpendicular to $v$.
+
+:::{prf:proof} Symmetry and Orthogonality.
+Set $B=vv^T/(v^Tv)$. Since $vv^T$ is symmetric, both $B$ and $P=I-2B$ are symmetric. Also,
+
+$$
+B^2
+=\frac{v(v^Tv)v^T}{(v^Tv)^2}
+=\frac{vv^T}{v^Tv}
+=B.
+$$
+
+It follows that
+
+$$
+P^2=(I-2B)^2=I-4B+4B^2=I.
+$$
+
+Because $P^T=P$, this also proves $P^TP=I$: the reflection is orthogonal. Consequently,
+
+$$
+\|Pz\|_2^2=z^TP^TPz=z^Tz=\|z\|_2^2.
+$$
+
+The identity $P^2=I$ says that reflecting twice returns the original vector.
 :::
 
-The Householder matrix that performs the reflection across the hyperplane orthogonal to $v$ is given by the formula:
+## Making a Column Zero Below Its First Entry
+
+For a nonzero vector $x\in\mathbb{R}^d$, we want
 
 $$
-P = I - 2 \frac{vv^T}{v^T v}
+Px=\sigma e_1
+=\begin{pmatrix}\sigma\\0\\\vdots\\0\end{pmatrix}.
 $$
 
-This is the famous **Householder transformation**. We often write it as $P = I - \beta vv^T$, where $\beta = 2/\|v\|_2^2$.
+Here $e_1$ is the first coordinate vector. Since $P$ preserves length, the target must satisfy $|\sigma|=\|x\|_2$. We therefore have two choices: $\sigma=\|x\|_2$ or $\sigma=-\|x\|_2$.
 
-## The Householder QR Algorithm
-
-The algorithm proceeds column by column.
-
-1.  **Step 1:** For the first column $x = a_1$, we compute its corresponding Householder vector $v_1$ and form the matrix $Q_1 = I - \beta_1 v_1 v_1^T$. We then apply this transformation to the entire matrix $A$:
-    $A^{(1)} = Q_1 A$.
-    The result is a matrix where the first column is zero below the diagonal.
-
-    $$
-    A^{(1)} = \begin{pmatrix} r_{11} & r_{12} & \cdots & r_{1n} \\ 0 & & & \\ \vdots & & A' & \\ 0 & & & \end{pmatrix}
-    $$
-
-2.  **Step 2:** Now, we leave the first row and column alone and repeat the process on the smaller submatrix $A'$. We find a Householder vector $v'_2$ for the first column of $A'$. This defines a smaller reflection matrix $Q'_2$. We embed this into the full $m \times m$ identity matrix to form our second transformation, $Q_2$.
-
-    $$
-    Q_2 = \begin{pmatrix} 1 & 0 \\ 0 & Q'_2 \end{pmatrix}
-    $$
-    Applying this yields $A^{(2)} = Q_2 A^{(1)}$, which now has zeros below the diagonal in its first *two* columns.
-
-3.  **Repeat:** We continue this process for $n$ columns (or $m-1$ if $m \le n$), successively creating zeros below the diagonal.
-
-After all steps, we have our upper triangular matrix $R$:
-$R = Q_n \cdots Q_2 Q_1 A$
-
-The final orthogonal matrix is the product of all the individual reflections:
-$Q = Q_1 Q_2 \cdots Q_n$
-
-## Stability and Accuracy: A Crucial Detail
-
-The numerical stability of the Householder method is one of its greatest strengths, but it hinges on a subtle choice in the definition of $v$.
-
-Recall our definition: $v = x - \sigma e_1$. We have two choices for $\sigma$: $\|x\|_2$ or $-\|x\|_2$. If our vector $x$ is already close to $\sigma e_1$, then this calculation involves subtracting two nearly identical numbers. This is a classic recipe for **catastrophic cancellation**, where we lose significant precision.
-
-**The Solution**: We must choose the sign of $\sigma$ to *avoid* this subtraction. We do this by choosing the sign of $\sigma$ to be the opposite of the sign of $x_1$, the first element of $x$. A robust formula is:
+Choose a target different from $x$ and set
 
 $$
-\sigma = - \text{sign}(x_1) \|x\|_2
+v=x-\sigma e_1.
 $$
 
-With this choice, the first component of $v$ becomes $v_1 = x_1 - \sigma = x_1 + \text{sign}(x_1)\|x\|_2$, which is an addition of two numbers of the same sign. This completely avoids the cancellation and makes the algorithm remarkably stable.
+This difference points in the direction that the reflection must reverse.
 
-Because of this property, Householder QR is **backward stable** and is the standard algorithm for solving dense least-squares problems in high-quality numerical software.
+```{figure} ../_static/householder_reflection.svg
+:alt: The vector x points up and right, and its reflected image sigma e_1 points left along the horizontal axis. The reflection line passes through the origin and the midpoint between their tips. The vector v goes from the tip of sigma e_1 to the tip of x and is perpendicular to the reflection line.
+:width: 650px
 
-## A Note on Practical Implementation: Never Form $P$ Explicitly
+A Householder reflection in two dimensions. The vectors $x$ and $\sigma e_1$ have equal length and are mirror images across the reflection line. The orange arrow represents $v=x-\sigma e_1$, drawn from the tip of $\sigma e_1$ to the tip of $x$. It is perpendicular to the reflection line, which becomes a hyperplane in higher dimensions.
+```
 
-A crucial point for both performance and memory is that we **never** explicitly form the Householder matrix $P = I - \beta vv^T$. Forming this $m \times m$ dense matrix would be computationally wasteful and require unnecessary memory storage. 💻
-
-Instead, we exploit its structure to apply the transformation directly.
-
-### Applying the Transformation Efficiently
-
-To apply the transformation $P$ to a matrix $A$, we compute $PA$ not as a full matrix-matrix product, but as a rank-1 update.
-
-Notice that:
+:::{prf:proof} The Reflection Maps $x$ to $\sigma e_1$.
+The choice $\sigma^2=\|x\|_2^2$ gives
 
 $$
-PA = (I - \beta vv^T)A = A - \beta v(v^T A)
+\begin{aligned}
+v^Tx&=\|x\|_2^2-\sigma x_1,\\
+v^Tv&=\|x\|_2^2-2\sigma x_1+\sigma^2\\
+&=2(\|x\|_2^2-\sigma x_1)=2v^Tx.
+\end{aligned}
 $$
 
-This expression gives us a much cheaper way to compute the result:
-
-1.  **Compute the vector-matrix product**: First, calculate the row vector $w^T = v^T A$.
-2.  **Compute the outer product**: Then, form the rank-1 matrix $vw^T$.
-3.  **Update**: Finally, scale the result by $\beta$ and subtract it from $A$: $A_{new} = A - \beta vw^T$.
-
-This procedure is far more efficient than forming $P$ and then multiplying. For an $m \times n$ matrix $A$, this update costs approximately $2mn$ floating-point operations, whereas forming $P$ and multiplying would cost $O(m^2n)$.
-
-### Storing the Factorization
-
-The full orthogonal matrix $Q = Q_1 Q_2 \dots Q_n$ is also typically not formed explicitly. It's an $m \times m$ dense matrix, and we often don't need it. For solving the least-squares problem $Rx = Q^T b$, we only need to compute the product $Q^T b$.
-
-We can do this efficiently by applying the transformations sequentially:
+Since $v\ne0$, we can substitute this identity into the reflection formula:
 
 $$
-Q^T b = (Q_n \dots Q_2 Q_1)b
+Px=x-2v\frac{v^Tx}{v^Tv}
+=x-v
+=\sigma e_1.
 $$
 
-This is just a sequence of cheap Householder updates applied to the vector $b$.
+All entries after the first are therefore zero.
+:::
 
-To do this, we only need to store the essential information for each transformation $Q_k$: the **Householder vector $v_k$** and the scalar $\beta_k$. Conveniently, the vector $v_k$ for each step can be stored in the column of $A$ that it is designed to zero out. Since we are creating zeros below the diagonal, this lower-triangular part of $A$ becomes free real estate for storing the Householder vectors. The $\beta_k$ values can be stored in a separate small array.
+The geometry agrees with this calculation: the midpoint of $x$ and $\sigma e_1$ lies in the reflection hyperplane, because
+
+$$
+v^T(x+\sigma e_1)=\|x\|_2^2-\sigma^2=0.
+$$
+
+If $x=0$, there is nothing to eliminate, so we use $P=I$. We may also use the identity when $x$ already has zeros after its first entry. These cases avoid dividing by zero when constructing a reflector.
+
+### Choosing the Sign to Avoid Cancellation
+
+The two targets are equally valid in exact arithmetic, but their numerical behavior can differ. If $\sigma$ has the same sign as $x_1$ and $x$ is nearly parallel to $e_1$, then
+
+$$
+v_1=x_1-\sigma
+$$
+
+is the difference of two nearly equal numbers. A small error in the computed norm can then cause a large relative error in this small component.
+
+We avoid this by choosing the opposite sign. Define
+
+$$
+\operatorname{sgn}_+(t)=
+\begin{cases}
+1,&t\ge0,\\
+-1,&t<0,
+\end{cases}
+\qquad
+\sigma=-\operatorname{sgn}_+(x_1)\|x\|_2.
+$$
+
+The convention at zero matters: when $x_1=0$ but $x\ne0$, the target still needs a nonzero first entry. With this choice,
+
+$$
+v_1=x_1+\operatorname{sgn}_+(x_1)\|x\|_2,
+\qquad
+|v_1|=|x_1|+\|x\|_2.
+$$
+
+The two terms have the same sign, so this component is formed without cancellation. This sign choice is one ingredient of a reliable implementation. For vectors with very large or very small entries, computing the norm and the reflector also requires scaling to avoid overflow or underflow. The [LAPACK reflector routine](https://www.netlib.org/lapack/explore-html/d8/d0d/group__larfg_gadc154fac2a92ae4c7405169a9d1f5ae9.html) handles these details.
+
+## Applying a Reflection Efficiently
+
+Before using reflections on a matrix, we need an efficient way to apply them. For a block $C\in\mathbb{R}^{d\times t}$,
+
+$$
+PC=(I-\beta vv^T)C=C-\beta v(v^TC).
+$$
+
+There is no need to form the $d\times d$ matrix $P$. Instead:
+
+1. Compute the row vector $w^T=v^TC$.
+2. Update each entry of $C$ using $C_{ij}\leftarrow C_{ij}-(\beta v_i)w_j$.
+
+This update needs only the vector $v$, the scalar $\beta$, and a work vector $w$. It costs approximately $4dt$ floating-point operations, counting multiplication and addition separately. Multiplying by an explicitly formed dense $P$ would cost $O(d^2t)$ and require $O(d^2)$ storage.
+
+## Building the QR Factorization Column by Column
+
+Set $A^{(0)}=A$. At step $k$, suppose the first $k-1$ columns already have zeros below the diagonal. The entries we need to eliminate are in the vector
+
+$$
+x=A^{(k-1)}_{k:m,k},
+$$
+
+the part of column $k$ from row $k$ to row $m$. Construct a local reflector $P_k$ such that $P_kx=\sigma_k e_1$, and extend it to the full matrix by defining
+
+$$
+H_k=
+\begin{pmatrix}
+I_{k-1}&0\\
+0&P_k
+\end{pmatrix},
+\qquad
+A^{(k)}=H_kA^{(k-1)}.
+$$
+
+For $k=1$, this simply means $H_1=P_1$. We use $H_k$ for the individual transformations to distinguish them from the final factor $Q$.
+
+Why do the earlier zeros survive? The first $k-1$ rows are unchanged because of the identity block. In each earlier column, the entries in rows $k$ through $m$ are already all zero, so multiplying that segment by $P_k$ leaves it zero. Meanwhile, the new column segment becomes $\sigma_ke_1$. Thus the first $k$ columns have the required zeros.
+
+Repeat for
+
+$$
+s=\min(n,m-1)
+$$
+
+steps. A square matrix needs no reflection on its last column, since there are no entries below its last diagonal entry. If an active column segment is zero, take $H_k=I$ and continue.
+
+The result is upper trapezoidal:
+
+$$
+R=H_s\cdots H_2H_1A.
+$$
+
+Every $H_k$ is symmetric and orthogonal. Transposing the product reverses its order, so
+
+$$
+Q=H_1H_2\cdots H_s,
+\qquad
+Q^T=H_s\cdots H_2H_1.
+$$
+
+A product of orthogonal matrices is orthogonal: its transpose times itself reduces to $I$ by successively cancelling each $H_k^TH_k$. Therefore $R=Q^TA$, and multiplying by $Q$ gives $A=QR$. This proves the factorization. If $s=0$, the empty product is the identity.
+
+When $A$ has full column rank, $R_1$ is invertible. Indeed, $A=Q_1R_1$ and $Q_1^TQ_1=I$, so $Ax=0$ if and only if $R_1x=0$. Full column rank means that this null space contains only the zero vector.
+
+## Using and Storing the Factors
+
+### Applying $Q^T$ in Least Squares
+
+We usually store the reflections rather than form the full matrix $Q$. To compute
+
+$$
+Q^Tb=H_s\cdots H_2H_1b,
+$$
+
+apply $H_1$ first, then $H_2$, and continue through $H_s$. To apply $Q$ instead, use the reverse order.
+
+For least squares, partition the transformed right-hand side as
+
+$$
+Q^Tb=\begin{pmatrix}c_1\\c_2\end{pmatrix},
+\qquad c_1\in\mathbb{R}^n.
+$$
+
+Orthogonality preserves the residual norm, giving
+
+$$
+\begin{aligned}
+\|Ax-b\|_2^2
+&=\|Q^T(Ax-b)\|_2^2\\
+&=\left\|
+\begin{pmatrix}R_1x-c_1\\-c_2\end{pmatrix}
+\right\|_2^2\\
+&=\|R_1x-c_1\|_2^2+\|c_2\|_2^2.
+\end{aligned}
+$$
+
+The second term does not depend on $x$. If $A$ has full column rank, back substitution solves $R_1x=c_1$, making the first term zero. The minimum residual norm is $\|c_2\|_2$. Thus we solve only the top triangular system; the remaining rows describe the residual.
+
+### Storing Reflections Below the Diagonal
+
+The entries below the diagonal of $R$ are zero, so their locations can store the reflection vectors. To do this without overwriting a diagonal entry of $R$, normalize each nontrivial vector:
+
+$$
+u_k=\frac{v_k}{(v_k)_1},
+\qquad
+\tau_k=\frac{2}{u_k^Tu_k},
+\qquad
+P_k=I-\tau_ku_ku_k^T.
+$$
+
+The first entry of $u_k$ is $1$, so it need not be stored. Store its remaining entries below the diagonal in column $k$, and store $\tau_k$ in a separate array. An identity transformation is represented by $\tau_k=0$.
+
+The resulting array contains $R$ on and above the diagonal and the reflector data below it. These stored entries below the diagonal are not entries of $R$. This representation allows both the factorization and later applications of $Q$ or $Q^T$ without storing a dense orthogonal matrix.
 
 ## Computational Cost
 
-Let’s analyze the computational cost, measured in floating-point operations (flops). Here a "flop" typically refers to one floating-point operation (an addition, subtraction, or multiplication). Note that it is also common to count Mult+Add as one operation, but we will count them separately here.
+We count a multiplication and an addition as separate floating-point operations, or **flops**.
 
-### Cost per Step (Step $k$)
+At step $k$, the active block has $d=m-k+1$ rows and $t=n-k+1$ columns. The product $v^TC$ requires $dt$ multiplications and $t(d-1)$ additions, approximately $2dt$ flops. The update $C-(\beta v)w^T$ requires another $dt$ multiplications and $dt$ subtractions, approximately $2dt$ flops. Computing the reflector and scaling $\beta v$ adds only $O(d)$ operations.
 
-At step $k$, we are applying a Householder transformation to an $(m-k+1) \times (n-k+1)$ submatrix. Let $m' = m-k+1$ and $n' = n-k+1$.
-
-The update $A' \leftarrow (I - \beta \mathbf{v}\mathbf{v}^T) A'$ is computed as:
-
-1.  **$\mathbf{w}^T = \mathbf{v}^T A'$** (vector-matrix product): This requires $m'n'$ multiplications and $m'(n'-1) \approx m'n'$ additions.
-    * *Cost: $\approx 2m'n' \text{ flops}$*
-
-2.  **$A' \leftarrow A' - (\beta \mathbf{v})\mathbf{w}^T$** (outer product update): This requires $m'n'$ multiplications (to form $\beta \mathbf{v}\mathbf{w}^T$) and $m'n'$ subtractions.
-    * *Cost: $\approx 2m'n' \text{ flops}$*
-
-The total cost at step $k$ is the sum of these, which is approximately $\mathbf{4(m-k+1)(n-k+1)}$ **flops**.
-
-### Total Cost
-
-To find the total cost, we sum this from $k=1$ to $n$:
-
-$$\text{Total Cost } \approx \sum_{k=1}^{n} 4(m-k+1)(n-k+1) \text{ flops}$$
-
-We can approximate this sum with an integral. We get:
-
-$$\text{Cost}(A=QR) \approx 2 \times \left( mn^2 - \frac{1}{3}n^3 \right) = \mathbf{2mn^2 - \frac{2}{3}n^3} \text{ flops}$$
-
-**Two important special cases emerge from this formula:**
-
-1.  **Square Matrix ($m=n$):** The cost is $\approx 2n^3 - \frac{2}{3}n^3 = \mathbf{\frac{4}{3}n^3}$ flops. This is about twice the cost of performing an LU factorization, which is $\frac{2}{3}n^3$ flops.
-
-2.  **Tall and Skinny Matrix ($m \gg n$):** The $2mn^2$ term dominates, and the cost is approximately $\mathbf{2mn^2}$ flops.
-
-### Cost of Using the Factors
-
-Once we have the factorization, we use the stored Householder vectors to apply $Q$ or $Q^T$ as needed.
-
-**Applying $Q^T$ to a vector (e.g., forming $Q^T b$).** This is the most critical operation for solving the least-squares problem. We need to compute $y = Q^T b$. We do this by applying the transformations sequentially: $y = Q_n \dots Q_2 Q_1 b$.
-
--   Applying $Q_1$ to $b$ costs $\approx 2m$ flops.
--   Applying $Q_2$ to the result costs $\approx 2(m-1)$ flops.
--   ...and so on, down to $Q_n$, which costs $\approx 2(m-n+1)$ flops.
-
-The total cost is the sum of an arithmetic series:
+Summing the leading update costs gives
 
 $$
-\text{Cost}(Q^T b) \approx \sum_{k=1}^{n} 2(m-k+1) \approx 2mn - n^2 \text{ flops}
+\begin{aligned}
+\operatorname{cost}(QR)
+&=4\sum_{k=1}^{s}(m-k+1)(n-k+1)+O(mn)\\
+&=2mn^2-\frac{2}{3}n^3+O(mn).
+\end{aligned}
 $$
 
-For $m \ge n$, this is an $O(mn)$ operation. This is significantly cheaper than the factorization itself, which is $O(mn^2)$.
+To evaluate the sum, write $j=k-1$ and expand the product as $mn-(m+n)j+j^2$. Summing through $j=n-1$ gives
 
-### Summary of Costs
+$$
+\begin{aligned}
+\sum_{j=0}^{n-1}(m-j)(n-j)
+&=mn^2-(m+n)\frac{n(n-1)}{2}\\
+&\qquad{}+\frac{n(n-1)(2n-1)}{6}\\
+&=\frac12mn^2-\frac16n^3+O(mn).
+\end{aligned}
+$$
 
-Here is a quick reference for an $m \times n$ matrix with $m \ge n$:
+Multiplying by $4$ gives the stated leading cost. Omitting the final step when $m=n$ affects only the lower-order terms. This cost includes storing the reflectors and computing $R$, but not forming $Q$ explicitly.
 
-| Operation                                     | Leading Term Flop Count           | Big O Notation      |
-| --------------------------------------------- | --------------------------------- | ------------------- |
-| **Factorization ($A \rightarrow Q, R$)** | $2mn^2 - \frac{2}{3}n^3$          | $O(mn^2)$           |
-| **Apply $Q^T$ to vector $b$ ($Q^T b$)** | $2mn - n^2$                       | $O(mn)$             |
+For a square matrix, the leading cost is $\frac{4}{3}n^3$, about twice the $\frac{2}{3}n^3$ cost of LU factorization. For a tall matrix with $m\gg n$, it is approximately $2mn^2$.
+
+Applying one reflector to a vector of length $d$ costs approximately $4d$ flops: about $2d$ for the dot product and $2d$ for the update. Hence
+
+$$
+\begin{aligned}
+\operatorname{cost}(Q^Tb)
+&=4\sum_{k=1}^{s}(m-k+1)+O(n)\\
+&=4mn-2n^2+O(n).
+\end{aligned}
+$$
+
+Applying $Q$ has the same cost. These are $O(mn)$ operations; back substitution adds $O(n^2)$ operations. Once QR is available, solving for an additional right-hand side is therefore much cheaper than recomputing the factorization.
+
+## What Numerical Stability Guarantees
+
+In exact arithmetic, QR satisfies both $A=QR$ and $Q^TQ=I$. Rounding affects both identities, so we need to measure two errors. Suppose we form the full matrix $Q$ by applying the stored reflections to the identity. Write $\widehat Q$ and $\widehat R$ for the factors computed in floating-point arithmetic.
+
+For Householder QR, a rounding-error analysis gives bounds of the form
+
+$$
+\boxed{
+\begin{aligned}
+\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+&\le C_1(m,n)u,\\
+\|\widehat Q^T\widehat Q-I\|_2
+&\le C_2(m,n)u.
+\end{aligned}
+}
+$$
+
+Here $A\ne0$, $u$ is the unit roundoff, and $C_1$ and $C_2$ are factors that depend on the dimensions and the implementation, but not on the condition number of $A$. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times $u$ small compared with $1$.
+
+For a readable overview of the stability guarantees, see Nick Higham's [What Is a QR Factorization?](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/). The detailed error analysis is in Chapter 19 of his [Accuracy and Stability of Numerical Algorithms](https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19), second edition.
+
+The first bound says that multiplying the computed factors reproduces $A$ with a small relative error. We can interpret this error as a perturbation of the input: defining $E=\widehat Q\widehat R-A$ gives
+
+$$
+A+E=\widehat Q\widehat R,
+\qquad
+\frac{\|E\|_F}{\|A\|_F}\le C_1(m,n)u.
+$$
+
+The second bound says that $\widehat Q$ is nearly orthogonal. Its diagonal entries in $\widehat Q^T\widehat Q$ are the squared column lengths, and its off-diagonal entries are inner products between different columns. Thus the columns have lengths close to $1$ and are nearly perpendicular. **The computed $\widehat Q$ is generally not exactly orthogonal**, so the displayed factorization of $A+E$ is not an exact QR factorization.
+
+Both guarantees matter: a small factorization error alone does not ensure that the computed columns are nearly orthonormal. Householder QR controls both errors. It does not, however, guarantee that each computed factor is close to a particular exact factor of the original $A$, or that the least-squares solution has a small forward error. Those questions also depend on the sensitivity of the problem.
