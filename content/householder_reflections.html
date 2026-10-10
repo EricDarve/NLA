@@ -252,7 +252,6 @@
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="backward_stability.html">Backward Stability of Householder and Givens QR</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
@@ -462,23 +461,21 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-picture-orthogonal-triangularization">The Big Picture: Orthogonal Triangularization</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tool-householder-reflections">The Tool: Householder Reflections</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-a-reflection">Constructing a Reflection</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-householder-qr-algorithm">The Householder QR Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-and-accuracy-a-crucial-detail">Stability and Accuracy: A Crucial Detail</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-practical-implementation-never-form-p-explicitly">A Note on Practical Implementation: Never Form <span class="math notranslate nohighlight">\(P\)</span> Explicitly</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-transformation-efficiently">Applying the Transformation Efficiently</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-the-factorization">Storing the Factorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-goal-orthogonal-triangularization">The Goal: Orthogonal Triangularization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflecting-across-a-hyperplane">Reflecting Across a Hyperplane</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-a-column-zero-below-its-first-entry">Making a Column Zero Below Its First Entry</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-sign-to-avoid-cancellation">Choosing the Sign to Avoid Cancellation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-per-step-step-k">Cost per Step (Step <span class="math notranslate nohighlight">\(k\)</span>)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#total-cost">Total Cost</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-using-the-factors">Cost of Using the Factors</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-costs">Summary of Costs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-a-reflection-efficiently">Applying a Reflection Efficiently</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-qr-factorization-column-by-column">Building the QR Factorization Column by Column</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-and-storing-the-factors">Using and Storing the Factors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-q-t-in-least-squares">Applying <span class="math notranslate nohighlight">\(Q^T\)</span> in Least Squares</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-reflections-below-the-diagonal">Storing Reflections Below the Diagonal</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-numerical-stability-guarantees">What Numerical Stability Guarantees</a></li>
 </ul>
             </nav>
         </div>
@@ -492,193 +489,305 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="householder-reflections">
 <h1>Householder Reflections<a class="headerlink" href="#householder-reflections" title="Link to this heading">#</a></h1>
-<p>We now explore methods to solve least-squares problems. The main technique is the <strong>QR factorization</strong>, which decomposes a matrix <span class="math notranslate nohighlight">\(A\)</span> into the product of an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> and an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>. The most widely used algorithm for computing the QR factorization for dense matrices is based on <strong>Householder transformations</strong>. This method is efficient, numerically stable, and provides a beautiful geometric interpretation of the factorization process.</p>
-<section id="the-big-picture-orthogonal-triangularization">
-<h2>The Big Picture: Orthogonal Triangularization<a class="headerlink" href="#the-big-picture-orthogonal-triangularization" title="Link to this heading">#</a></h2>
-<p>The goal of QR factorization is to decompose an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper triangular matrix.</p>
-<p>We can rewrite this as <span class="math notranslate nohighlight">\(Q^T A = R\)</span>. This gives us a new way to think about the process: we are looking for an orthogonal matrix, <span class="math notranslate nohighlight">\(Q^T\)</span>, that transforms <span class="math notranslate nohighlight">\(A\)</span> into an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>. We won’t find this <span class="math notranslate nohighlight">\(Q^T\)</span> all at once. Instead, we’ll build it as a sequence of simpler orthogonal transformations, <span class="math notranslate nohighlight">\(Q_k\)</span>, applied one after another.</p>
+<p>QR factorization turns a least-squares problem into a triangular system. To compute it, we need a way to introduce zeros below the diagonal while preserving lengths and angles. A <strong>Householder reflection</strong> does exactly this: it can turn a column into a multiple of a coordinate vector. Applying these reflections one column at a time gives the QR factorization.</p>
+<p>Throughout this page, <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> with <span class="math notranslate nohighlight">\(m\ge n\)</span>. We first construct a single reflection, then use it to factor <span class="math notranslate nohighlight">\(A\)</span>, and finally explain how to store and use the factors efficiently.</p>
+<section id="the-goal-orthogonal-triangularization">
+<h2>The Goal: Orthogonal Triangularization<a class="headerlink" href="#the-goal-orthogonal-triangularization" title="Link to this heading">#</a></h2>
+<p>The full QR factorization has the form</p>
 <div class="math notranslate nohighlight">
-\[Q^T = Q_n \cdots Q_2 Q_1\]</div>
-<p>Each transformation <span class="math notranslate nohighlight">\(Q_k\)</span> is strategically designed to introduce zeros below the diagonal in the <span class="math notranslate nohighlight">\(k\)</span>-th column of the matrix, without disturbing the zeros we created in previous columns. The tool we’ll use to build these transformations is the Householder reflection.</p>
+\[\begin{split}
+A=QR,\qquad Q^TQ=I,\qquad
+R=\begin{pmatrix}R_1\\0\end{pmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\in\mathbb{R}^{m\times m}\)</span> and <span class="math notranslate nohighlight">\(R_1\in\mathbb{R}^{n\times n}\)</span> is upper triangular. The rectangular matrix <span class="math notranslate nohighlight">\(R\)</span> is called <strong>upper trapezoidal</strong>: its entries below the diagonal are zero.</p>
+<p>Equivalently, <span class="math notranslate nohighlight">\(Q^TA=R\)</span>. This suggests an algorithm: apply orthogonal transformations to <span class="math notranslate nohighlight">\(A\)</span> until its entries below the diagonal vanish. Each transformation must preserve the zeros created by the preceding transformations.</p>
+<p>If <span class="math notranslate nohighlight">\(Q_1\)</span> consists of the first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span>, then <span class="math notranslate nohighlight">\(A=Q_1R_1\)</span> is the reduced QR factorization used in <a class="reference internal" href="least_squares.html"><span class="std std-doc">least squares</span></a>. No rank assumption is needed to construct QR; full column rank is needed when we solve a system with <span class="math notranslate nohighlight">\(R_1\)</span>.</p>
 </section>
-<section id="the-tool-householder-reflections">
-<h2>The Tool: Householder Reflections<a class="headerlink" href="#the-tool-householder-reflections" title="Link to this heading">#</a></h2>
-<p>A <strong>Householder transformation</strong> (or Householder reflector) is a matrix that represents a reflection across a hyperplane. 📐</p>
-<p>Geometrically, it’s a linear transformation that flips a vector space across a plane or hyperplane. The key properties for our purposes are:</p>
-<ol class="arabic simple">
-<li><p>It is <strong>orthogonal</strong>. A reflection preserves the lengths of vectors and the angles between them, just in a mirrored way.</p></li>
-<li><p>It is <strong>symmetric</strong> (<span class="math notranslate nohighlight">\(P^T = P\)</span>) and <strong>involutory</strong> (<span class="math notranslate nohighlight">\(P^2 = I\)</span>).</p></li>
-<li><p>It can transform any given vector <span class="math notranslate nohighlight">\(x\)</span> into another vector <span class="math notranslate nohighlight">\(y\)</span>, as long as they have the same Euclidean norm (<span class="math notranslate nohighlight">\(\|x\|_2 = \|y\|_2\)</span>).</p></li>
-</ol>
-<p>For QR factorization, we will use a Householder reflection to map a column vector from our matrix onto a standard basis vector, effectively zeroing out most of its components.</p>
-</section>
-<section id="constructing-a-reflection">
-<h2>Constructing a Reflection<a class="headerlink" href="#constructing-a-reflection" title="Link to this heading">#</a></h2>
-<p>Let’s focus on the first step: zeroing out the subdiagonal elements of the first column of <span class="math notranslate nohighlight">\(A\)</span>, which we’ll call <span class="math notranslate nohighlight">\(x = a_1\)</span>. Our goal is to find a reflection matrix <span class="math notranslate nohighlight">\(P_1\)</span> such that <span class="math notranslate nohighlight">\(P_1x\)</span> is a multiple of the first standard basis vector, <span class="math notranslate nohighlight">\(e_1\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}P_1x = \begin{pmatrix} \sigma \\ 0 \\ \vdots \\ 0 \end{pmatrix} = \sigma e_1\end{split}\]</div>
-<p>Since reflections preserve length, we must have <span class="math notranslate nohighlight">\(|\sigma| = \|x\|_2\)</span>.</p>
-<p>The reflection is performed across a hyperplane. To define this hyperplane, we only need to specify a vector <span class="math notranslate nohighlight">\(v\)</span> that is normal to it. Geometrically, the vector normal to the reflection plane must be parallel to the difference between the original vector <span class="math notranslate nohighlight">\(x\)</span> and its reflected image <span class="math notranslate nohighlight">\(\sigma e_1\)</span>.</p>
-<p>We can therefore define this normal vector <span class="math notranslate nohighlight">\(v\)</span> as the difference between the starting vector and the target vector:</p>
+<section id="reflecting-across-a-hyperplane">
+<h2>Reflecting Across a Hyperplane<a class="headerlink" href="#reflecting-across-a-hyperplane" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(v\in\mathbb{R}^d\)</span> be nonzero. The hyperplane perpendicular to <span class="math notranslate nohighlight">\(v\)</span> consists of the vectors <span class="math notranslate nohighlight">\(z\)</span> satisfying <span class="math notranslate nohighlight">\(v^Tz=0\)</span>. To reflect a vector across this hyperplane, we reverse its component parallel to <span class="math notranslate nohighlight">\(v\)</span> and leave its perpendicular component unchanged.</p>
+<p>The two components of any <span class="math notranslate nohighlight">\(z\)</span> are</p>
 <div class="math notranslate nohighlight">
 \[
-v = x - \sigma e_1
+z_{\parallel}=v\frac{v^Tz}{v^Tv},
+\qquad
+z_{\perp}=z-z_{\parallel}.
 \]</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The vector that <strong>bisects the angle</strong> between <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(\sigma e_1\)</span> is <span class="math notranslate nohighlight">\(x + \sigma e_1\)</span>. This bisecting vector lies <em>within</em> the reflection hyperplane and is orthogonal to the normal vector <span class="math notranslate nohighlight">\(v\)</span>.</p>
+<p>Thus the reflected vector is</p>
+<div class="math notranslate nohighlight">
+\[
+Pz=z_{\perp}-z_{\parallel}
+=z-2v\frac{v^Tz}{v^Tv}.
+\]</div>
+<p>This gives the <strong>Householder matrix</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{P=I-2\frac{vv^T}{v^Tv}=I-\beta vv^T,
+\qquad \beta=\frac{2}{v^Tv}.}
+\]</div>
+<p>In particular, <span class="math notranslate nohighlight">\(Pv=-v\)</span>, whereas <span class="math notranslate nohighlight">\(Pz=z\)</span> for every <span class="math notranslate nohighlight">\(z\)</span> perpendicular to <span class="math notranslate nohighlight">\(v\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Symmetry and Orthogonality.
+Set <span class="math notranslate nohighlight">\(B=vv^T/(v^Tv)\)</span>. Since <span class="math notranslate nohighlight">\(vv^T\)</span> is symmetric, both <span class="math notranslate nohighlight">\(B\)</span> and <span class="math notranslate nohighlight">\(P=I-2B\)</span> are symmetric. Also,</p>
+<div class="math notranslate nohighlight">
+\[
+B^2
+=\frac{v(v^Tv)v^T}{(v^Tv)^2}
+=\frac{vv^T}{v^Tv}
+=B.
+\]</div>
+<p>It follows that</p>
+<div class="math notranslate nohighlight">
+\[
+P^2=(I-2B)^2=I-4B+4B^2=I.
+\]</div>
+<p>Because <span class="math notranslate nohighlight">\(P^T=P\)</span>, this also proves <span class="math notranslate nohighlight">\(P^TP=I\)</span>: the reflection is orthogonal. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+\|Pz\|_2^2=z^TP^TPz=z^Tz=\|z\|_2^2.
+\]</div>
+<p>The identity <span class="math notranslate nohighlight">\(P^2=I\)</span> says that reflecting twice returns the original vector.</p>
 </div>
-<p>The Householder matrix that performs the reflection across the hyperplane orthogonal to <span class="math notranslate nohighlight">\(v\)</span> is given by the formula:</p>
-<div class="math notranslate nohighlight">
-\[
-P = I - 2 \frac{vv^T}{v^T v}
-\]</div>
-<p>This is the famous <strong>Householder transformation</strong>. We often write it as <span class="math notranslate nohighlight">\(P = I - \beta vv^T\)</span>, where <span class="math notranslate nohighlight">\(\beta = 2/\|v\|_2^2\)</span>.</p>
 </section>
-<section id="the-householder-qr-algorithm">
-<h2>The Householder QR Algorithm<a class="headerlink" href="#the-householder-qr-algorithm" title="Link to this heading">#</a></h2>
-<p>The algorithm proceeds column by column.</p>
-<ol class="arabic">
-<li><p><strong>Step 1:</strong> For the first column <span class="math notranslate nohighlight">\(x = a_1\)</span>, we compute its corresponding Householder vector <span class="math notranslate nohighlight">\(v_1\)</span> and form the matrix <span class="math notranslate nohighlight">\(Q_1 = I - \beta_1 v_1 v_1^T\)</span>. We then apply this transformation to the entire matrix <span class="math notranslate nohighlight">\(A\)</span>:
-<span class="math notranslate nohighlight">\(A^{(1)} = Q_1 A\)</span>.
-The result is a matrix where the first column is zero below the diagonal.</p>
+<section id="making-a-column-zero-below-its-first-entry">
+<h2>Making a Column Zero Below Its First Entry<a class="headerlink" href="#making-a-column-zero-below-its-first-entry" title="Link to this heading">#</a></h2>
+<p>For a nonzero vector <span class="math notranslate nohighlight">\(x\in\mathbb{R}^d\)</span>, we want</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    A^{(1)} = \begin{pmatrix} r_{11} &amp; r_{12} &amp; \cdots &amp; r_{1n} \\ 0 &amp; &amp; &amp; \\ \vdots &amp; &amp; A' &amp; \\ 0 &amp; &amp; &amp; \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Step 2:</strong> Now, we leave the first row and column alone and repeat the process on the smaller submatrix <span class="math notranslate nohighlight">\(A'\)</span>. We find a Householder vector <span class="math notranslate nohighlight">\(v'_2\)</span> for the first column of <span class="math notranslate nohighlight">\(A'\)</span>. This defines a smaller reflection matrix <span class="math notranslate nohighlight">\(Q'_2\)</span>. We embed this into the full <span class="math notranslate nohighlight">\(m \times m\)</span> identity matrix to form our second transformation, <span class="math notranslate nohighlight">\(Q_2\)</span>.</p>
+Px=\sigma e_1
+=\begin{pmatrix}\sigma\\0\\\vdots\\0\end{pmatrix}.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(e_1\)</span> is the first coordinate vector. Since <span class="math notranslate nohighlight">\(P\)</span> preserves length, the target must satisfy <span class="math notranslate nohighlight">\(|\sigma|=\|x\|_2\)</span>. We therefore have two choices: <span class="math notranslate nohighlight">\(\sigma=\|x\|_2\)</span> or <span class="math notranslate nohighlight">\(\sigma=-\|x\|_2\)</span>.</p>
+<p>Choose a target different from <span class="math notranslate nohighlight">\(x\)</span> and set</p>
+<div class="math notranslate nohighlight">
+\[
+v=x-\sigma e_1.
+\]</div>
+<p>This difference points in the direction that the reflection must reverse.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/householder_reflection.svg"><img alt="The vector x points up and right, and its reflected image sigma e_1 points left along the horizontal axis. The reflection line passes through the origin and the midpoint between their tips. The vector v goes from the tip of sigma e_1 to the tip of x and is perpendicular to the reflection line." src="../_images/householder_reflection.svg" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">A Householder reflection in two dimensions. The vectors <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(\sigma e_1\)</span> have equal length and are mirror images across the reflection line. The orange arrow represents <span class="math notranslate nohighlight">\(v=x-\sigma e_1\)</span>, drawn from the tip of <span class="math notranslate nohighlight">\(\sigma e_1\)</span> to the tip of <span class="math notranslate nohighlight">\(x\)</span>. It is perpendicular to the reflection line, which becomes a hyperplane in higher dimensions.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="proof admonition" id="proof">
+<p>Proof. The Reflection Maps <span class="math notranslate nohighlight">\(x\)</span> to <span class="math notranslate nohighlight">\(\sigma e_1\)</span>.
+The choice <span class="math notranslate nohighlight">\(\sigma^2=\|x\|_2^2\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    Q_2 = \begin{pmatrix} 1 &amp; 0 \\ 0 &amp; Q'_2 \end{pmatrix}
-    \end{split}\]</div>
-<p>Applying this yields <span class="math notranslate nohighlight">\(A^{(2)} = Q_2 A^{(1)}\)</span>, which now has zeros below the diagonal in its first <em>two</em> columns.</p>
-</li>
-<li><p><strong>Repeat:</strong> We continue this process for <span class="math notranslate nohighlight">\(n\)</span> columns (or <span class="math notranslate nohighlight">\(m-1\)</span> if <span class="math notranslate nohighlight">\(m \le n\)</span>), successively creating zeros below the diagonal.</p></li>
-</ol>
-<p>After all steps, we have our upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>:
-<span class="math notranslate nohighlight">\(R = Q_n \cdots Q_2 Q_1 A\)</span></p>
-<p>The final orthogonal matrix is the product of all the individual reflections:
-<span class="math notranslate nohighlight">\(Q = Q_1 Q_2 \cdots Q_n\)</span></p>
-</section>
-<section id="stability-and-accuracy-a-crucial-detail">
-<h2>Stability and Accuracy: A Crucial Detail<a class="headerlink" href="#stability-and-accuracy-a-crucial-detail" title="Link to this heading">#</a></h2>
-<p>The numerical stability of the Householder method is one of its greatest strengths, but it hinges on a subtle choice in the definition of <span class="math notranslate nohighlight">\(v\)</span>.</p>
-<p>Recall our definition: <span class="math notranslate nohighlight">\(v = x - \sigma e_1\)</span>. We have two choices for <span class="math notranslate nohighlight">\(\sigma\)</span>: <span class="math notranslate nohighlight">\(\|x\|_2\)</span> or <span class="math notranslate nohighlight">\(-\|x\|_2\)</span>. If our vector <span class="math notranslate nohighlight">\(x\)</span> is already close to <span class="math notranslate nohighlight">\(\sigma e_1\)</span>, then this calculation involves subtracting two nearly identical numbers. This is a classic recipe for <strong>catastrophic cancellation</strong>, where we lose significant precision.</p>
-<p><strong>The Solution</strong>: We must choose the sign of <span class="math notranslate nohighlight">\(\sigma\)</span> to <em>avoid</em> this subtraction. We do this by choosing the sign of <span class="math notranslate nohighlight">\(\sigma\)</span> to be the opposite of the sign of <span class="math notranslate nohighlight">\(x_1\)</span>, the first element of <span class="math notranslate nohighlight">\(x\)</span>. A robust formula is:</p>
+\begin{aligned}
+v^Tx&amp;=\|x\|_2^2-\sigma x_1,\\
+v^Tv&amp;=\|x\|_2^2-2\sigma x_1+\sigma^2\\
+&amp;=2(\|x\|_2^2-\sigma x_1)=2v^Tx.
+\end{aligned}
+\end{split}\]</div>
+<p>Since <span class="math notranslate nohighlight">\(v\ne0\)</span>, we can substitute this identity into the reflection formula:</p>
 <div class="math notranslate nohighlight">
 \[
-\sigma = - \text{sign}(x_1) \|x\|_2
+Px=x-2v\frac{v^Tx}{v^Tv}
+=x-v
+=\sigma e_1.
 \]</div>
-<p>With this choice, the first component of <span class="math notranslate nohighlight">\(v\)</span> becomes <span class="math notranslate nohighlight">\(v_1 = x_1 - \sigma = x_1 + \text{sign}(x_1)\|x\|_2\)</span>, which is an addition of two numbers of the same sign. This completely avoids the cancellation and makes the algorithm remarkably stable.</p>
-<p>Because of this property, Householder QR is <strong>backward stable</strong> and is the standard algorithm for solving dense least-squares problems in high-quality numerical software.</p>
-</section>
-<section id="a-note-on-practical-implementation-never-form-p-explicitly">
-<h2>A Note on Practical Implementation: Never Form <span class="math notranslate nohighlight">\(P\)</span> Explicitly<a class="headerlink" href="#a-note-on-practical-implementation-never-form-p-explicitly" title="Link to this heading">#</a></h2>
-<p>A crucial point for both performance and memory is that we <strong>never</strong> explicitly form the Householder matrix <span class="math notranslate nohighlight">\(P = I - \beta vv^T\)</span>. Forming this <span class="math notranslate nohighlight">\(m \times m\)</span> dense matrix would be computationally wasteful and require unnecessary memory storage. 💻</p>
-<p>Instead, we exploit its structure to apply the transformation directly.</p>
-<section id="applying-the-transformation-efficiently">
-<h3>Applying the Transformation Efficiently<a class="headerlink" href="#applying-the-transformation-efficiently" title="Link to this heading">#</a></h3>
-<p>To apply the transformation <span class="math notranslate nohighlight">\(P\)</span> to a matrix <span class="math notranslate nohighlight">\(A\)</span>, we compute <span class="math notranslate nohighlight">\(PA\)</span> not as a full matrix-matrix product, but as a rank-1 update.</p>
-<p>Notice that:</p>
+<p>All entries after the first are therefore zero.</p>
+</div>
+<p>The geometry agrees with this calculation: the midpoint of <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(\sigma e_1\)</span> lies in the reflection hyperplane, because</p>
 <div class="math notranslate nohighlight">
 \[
-PA = (I - \beta vv^T)A = A - \beta v(v^T A)
+v^T(x+\sigma e_1)=\|x\|_2^2-\sigma^2=0.
 \]</div>
-<p>This expression gives us a much cheaper way to compute the result:</p>
+<p>If <span class="math notranslate nohighlight">\(x=0\)</span>, there is nothing to eliminate, so we use <span class="math notranslate nohighlight">\(P=I\)</span>. We may also use the identity when <span class="math notranslate nohighlight">\(x\)</span> already has zeros after its first entry. These cases avoid dividing by zero when constructing a reflector.</p>
+<section id="choosing-the-sign-to-avoid-cancellation">
+<h3>Choosing the Sign to Avoid Cancellation<a class="headerlink" href="#choosing-the-sign-to-avoid-cancellation" title="Link to this heading">#</a></h3>
+<p>The two targets are equally valid in exact arithmetic, but their numerical behavior can differ. If <span class="math notranslate nohighlight">\(\sigma\)</span> has the same sign as <span class="math notranslate nohighlight">\(x_1\)</span> and <span class="math notranslate nohighlight">\(x\)</span> is nearly parallel to <span class="math notranslate nohighlight">\(e_1\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+v_1=x_1-\sigma
+\]</div>
+<p>is the difference of two nearly equal numbers. A small error in the computed norm can then cause a large relative error in this small component.</p>
+<p>We avoid this by choosing the opposite sign. Define</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\operatorname{sgn}_+(t)=
+\begin{cases}
+1,&amp;t\ge0,\\
+-1,&amp;t&lt;0,
+\end{cases}
+\qquad
+\sigma=-\operatorname{sgn}_+(x_1)\|x\|_2.
+\end{split}\]</div>
+<p>The convention at zero matters: when <span class="math notranslate nohighlight">\(x_1=0\)</span> but <span class="math notranslate nohighlight">\(x\ne0\)</span>, the target still needs a nonzero first entry. With this choice,</p>
+<div class="math notranslate nohighlight">
+\[
+v_1=x_1+\operatorname{sgn}_+(x_1)\|x\|_2,
+\qquad
+|v_1|=|x_1|+\|x\|_2.
+\]</div>
+<p>The two terms have the same sign, so this component is formed without cancellation. This sign choice is one ingredient of a reliable implementation. For vectors with very large or very small entries, computing the norm and the reflector also requires scaling to avoid overflow or underflow. The <a class="reference external" href="https://www.netlib.org/lapack/explore-html/d8/d0d/group__larfg_gadc154fac2a92ae4c7405169a9d1f5ae9.html">LAPACK reflector routine</a> handles these details.</p>
+</section>
+</section>
+<section id="applying-a-reflection-efficiently">
+<h2>Applying a Reflection Efficiently<a class="headerlink" href="#applying-a-reflection-efficiently" title="Link to this heading">#</a></h2>
+<p>Before using reflections on a matrix, we need an efficient way to apply them. For a block <span class="math notranslate nohighlight">\(C\in\mathbb{R}^{d\times t}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+PC=(I-\beta vv^T)C=C-\beta v(v^TC).
+\]</div>
+<p>There is no need to form the <span class="math notranslate nohighlight">\(d\times d\)</span> matrix <span class="math notranslate nohighlight">\(P\)</span>. Instead:</p>
 <ol class="arabic simple">
-<li><p><strong>Compute the vector-matrix product</strong>: First, calculate the row vector <span class="math notranslate nohighlight">\(w^T = v^T A\)</span>.</p></li>
-<li><p><strong>Compute the outer product</strong>: Then, form the rank-1 matrix <span class="math notranslate nohighlight">\(vw^T\)</span>.</p></li>
-<li><p><strong>Update</strong>: Finally, scale the result by <span class="math notranslate nohighlight">\(\beta\)</span> and subtract it from <span class="math notranslate nohighlight">\(A\)</span>: <span class="math notranslate nohighlight">\(A_{new} = A - \beta vw^T\)</span>.</p></li>
+<li><p>Compute the row vector <span class="math notranslate nohighlight">\(w^T=v^TC\)</span>.</p></li>
+<li><p>Update each entry of <span class="math notranslate nohighlight">\(C\)</span> using <span class="math notranslate nohighlight">\(C_{ij}\leftarrow C_{ij}-(\beta v_i)w_j\)</span>.</p></li>
 </ol>
-<p>This procedure is far more efficient than forming <span class="math notranslate nohighlight">\(P\)</span> and then multiplying. For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, this update costs approximately <span class="math notranslate nohighlight">\(2mn\)</span> floating-point operations, whereas forming <span class="math notranslate nohighlight">\(P\)</span> and multiplying would cost <span class="math notranslate nohighlight">\(O(m^2n)\)</span>.</p>
+<p>This update needs only the vector <span class="math notranslate nohighlight">\(v\)</span>, the scalar <span class="math notranslate nohighlight">\(\beta\)</span>, and a work vector <span class="math notranslate nohighlight">\(w\)</span>. It costs approximately <span class="math notranslate nohighlight">\(4dt\)</span> floating-point operations, counting multiplication and addition separately. Multiplying by an explicitly formed dense <span class="math notranslate nohighlight">\(P\)</span> would cost <span class="math notranslate nohighlight">\(O(d^2t)\)</span> and require <span class="math notranslate nohighlight">\(O(d^2)\)</span> storage.</p>
 </section>
-<section id="storing-the-factorization">
-<h3>Storing the Factorization<a class="headerlink" href="#storing-the-factorization" title="Link to this heading">#</a></h3>
-<p>The full orthogonal matrix <span class="math notranslate nohighlight">\(Q = Q_1 Q_2 \dots Q_n\)</span> is also typically not formed explicitly. It’s an <span class="math notranslate nohighlight">\(m \times m\)</span> dense matrix, and we often don’t need it. For solving the least-squares problem <span class="math notranslate nohighlight">\(Rx = Q^T b\)</span>, we only need to compute the product <span class="math notranslate nohighlight">\(Q^T b\)</span>.</p>
-<p>We can do this efficiently by applying the transformations sequentially:</p>
+<section id="building-the-qr-factorization-column-by-column">
+<h2>Building the QR Factorization Column by Column<a class="headerlink" href="#building-the-qr-factorization-column-by-column" title="Link to this heading">#</a></h2>
+<p>Set <span class="math notranslate nohighlight">\(A^{(0)}=A\)</span>. At step <span class="math notranslate nohighlight">\(k\)</span>, suppose the first <span class="math notranslate nohighlight">\(k-1\)</span> columns already have zeros below the diagonal. The entries we need to eliminate are in the vector</p>
 <div class="math notranslate nohighlight">
 \[
-Q^T b = (Q_n \dots Q_2 Q_1)b
+x=A^{(k-1)}_{k:m,k},
 \]</div>
-<p>This is just a sequence of cheap Householder updates applied to the vector <span class="math notranslate nohighlight">\(b\)</span>.</p>
-<p>To do this, we only need to store the essential information for each transformation <span class="math notranslate nohighlight">\(Q_k\)</span>: the <strong>Householder vector <span class="math notranslate nohighlight">\(v_k\)</span></strong> and the scalar <span class="math notranslate nohighlight">\(\beta_k\)</span>. Conveniently, the vector <span class="math notranslate nohighlight">\(v_k\)</span> for each step can be stored in the column of <span class="math notranslate nohighlight">\(A\)</span> that it is designed to zero out. Since we are creating zeros below the diagonal, this lower-triangular part of <span class="math notranslate nohighlight">\(A\)</span> becomes free real estate for storing the Householder vectors. The <span class="math notranslate nohighlight">\(\beta_k\)</span> values can be stored in a separate small array.</p>
+<p>the part of column <span class="math notranslate nohighlight">\(k\)</span> from row <span class="math notranslate nohighlight">\(k\)</span> to row <span class="math notranslate nohighlight">\(m\)</span>. Construct a local reflector <span class="math notranslate nohighlight">\(P_k\)</span> such that <span class="math notranslate nohighlight">\(P_kx=\sigma_k e_1\)</span>, and extend it to the full matrix by defining</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H_k=
+\begin{pmatrix}
+I_{k-1}&amp;0\\
+0&amp;P_k
+\end{pmatrix},
+\qquad
+A^{(k)}=H_kA^{(k-1)}.
+\end{split}\]</div>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, this simply means <span class="math notranslate nohighlight">\(H_1=P_1\)</span>. We use <span class="math notranslate nohighlight">\(H_k\)</span> for the individual transformations to distinguish them from the final factor <span class="math notranslate nohighlight">\(Q\)</span>.</p>
+<p>Why do the earlier zeros survive? The first <span class="math notranslate nohighlight">\(k-1\)</span> rows are unchanged because of the identity block. In each earlier column, the entries in rows <span class="math notranslate nohighlight">\(k\)</span> through <span class="math notranslate nohighlight">\(m\)</span> are already all zero, so multiplying that segment by <span class="math notranslate nohighlight">\(P_k\)</span> leaves it zero. Meanwhile, the new column segment becomes <span class="math notranslate nohighlight">\(\sigma_ke_1\)</span>. Thus the first <span class="math notranslate nohighlight">\(k\)</span> columns have the required zeros.</p>
+<p>Repeat for</p>
+<div class="math notranslate nohighlight">
+\[
+s=\min(n,m-1)
+\]</div>
+<p>steps. A square matrix needs no reflection on its last column, since there are no entries below its last diagonal entry. If an active column segment is zero, take <span class="math notranslate nohighlight">\(H_k=I\)</span> and continue.</p>
+<p>The result is upper trapezoidal:</p>
+<div class="math notranslate nohighlight">
+\[
+R=H_s\cdots H_2H_1A.
+\]</div>
+<p>Every <span class="math notranslate nohighlight">\(H_k\)</span> is symmetric and orthogonal. Transposing the product reverses its order, so</p>
+<div class="math notranslate nohighlight">
+\[
+Q=H_1H_2\cdots H_s,
+\qquad
+Q^T=H_s\cdots H_2H_1.
+\]</div>
+<p>A product of orthogonal matrices is orthogonal: its transpose times itself reduces to <span class="math notranslate nohighlight">\(I\)</span> by successively cancelling each <span class="math notranslate nohighlight">\(H_k^TH_k\)</span>. Therefore <span class="math notranslate nohighlight">\(R=Q^TA\)</span>, and multiplying by <span class="math notranslate nohighlight">\(Q\)</span> gives <span class="math notranslate nohighlight">\(A=QR\)</span>. This proves the factorization. If <span class="math notranslate nohighlight">\(s=0\)</span>, the empty product is the identity.</p>
+<p>When <span class="math notranslate nohighlight">\(A\)</span> has full column rank, <span class="math notranslate nohighlight">\(R_1\)</span> is invertible. Indeed, <span class="math notranslate nohighlight">\(A=Q_1R_1\)</span> and <span class="math notranslate nohighlight">\(Q_1^TQ_1=I\)</span>, so <span class="math notranslate nohighlight">\(Ax=0\)</span> if and only if <span class="math notranslate nohighlight">\(R_1x=0\)</span>. Full column rank means that this null space contains only the zero vector.</p>
+</section>
+<section id="using-and-storing-the-factors">
+<h2>Using and Storing the Factors<a class="headerlink" href="#using-and-storing-the-factors" title="Link to this heading">#</a></h2>
+<section id="applying-q-t-in-least-squares">
+<h3>Applying <span class="math notranslate nohighlight">\(Q^T\)</span> in Least Squares<a class="headerlink" href="#applying-q-t-in-least-squares" title="Link to this heading">#</a></h3>
+<p>We usually store the reflections rather than form the full matrix <span class="math notranslate nohighlight">\(Q\)</span>. To compute</p>
+<div class="math notranslate nohighlight">
+\[
+Q^Tb=H_s\cdots H_2H_1b,
+\]</div>
+<p>apply <span class="math notranslate nohighlight">\(H_1\)</span> first, then <span class="math notranslate nohighlight">\(H_2\)</span>, and continue through <span class="math notranslate nohighlight">\(H_s\)</span>. To apply <span class="math notranslate nohighlight">\(Q\)</span> instead, use the reverse order.</p>
+<p>For least squares, partition the transformed right-hand side as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q^Tb=\begin{pmatrix}c_1\\c_2\end{pmatrix},
+\qquad c_1\in\mathbb{R}^n.
+\end{split}\]</div>
+<p>Orthogonality preserves the residual norm, giving</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|Ax-b\|_2^2
+&amp;=\|Q^T(Ax-b)\|_2^2\\
+&amp;=\left\|
+\begin{pmatrix}R_1x-c_1\\-c_2\end{pmatrix}
+\right\|_2^2\\
+&amp;=\|R_1x-c_1\|_2^2+\|c_2\|_2^2.
+\end{aligned}
+\end{split}\]</div>
+<p>The second term does not depend on <span class="math notranslate nohighlight">\(x\)</span>. If <span class="math notranslate nohighlight">\(A\)</span> has full column rank, back substitution solves <span class="math notranslate nohighlight">\(R_1x=c_1\)</span>, making the first term zero. The minimum residual norm is <span class="math notranslate nohighlight">\(\|c_2\|_2\)</span>. Thus we solve only the top triangular system; the remaining rows describe the residual.</p>
+</section>
+<section id="storing-reflections-below-the-diagonal">
+<h3>Storing Reflections Below the Diagonal<a class="headerlink" href="#storing-reflections-below-the-diagonal" title="Link to this heading">#</a></h3>
+<p>The entries below the diagonal of <span class="math notranslate nohighlight">\(R\)</span> are zero, so their locations can store the reflection vectors. To do this without overwriting a diagonal entry of <span class="math notranslate nohighlight">\(R\)</span>, normalize each nontrivial vector:</p>
+<div class="math notranslate nohighlight">
+\[
+u_k=\frac{v_k}{(v_k)_1},
+\qquad
+\tau_k=\frac{2}{u_k^Tu_k},
+\qquad
+P_k=I-\tau_ku_ku_k^T.
+\]</div>
+<p>The first entry of <span class="math notranslate nohighlight">\(u_k\)</span> is <span class="math notranslate nohighlight">\(1\)</span>, so it need not be stored. Store its remaining entries below the diagonal in column <span class="math notranslate nohighlight">\(k\)</span>, and store <span class="math notranslate nohighlight">\(\tau_k\)</span> in a separate array. An identity transformation is represented by <span class="math notranslate nohighlight">\(\tau_k=0\)</span>.</p>
+<p>The resulting array contains <span class="math notranslate nohighlight">\(R\)</span> on and above the diagonal and the reflector data below it. These stored entries below the diagonal are not entries of <span class="math notranslate nohighlight">\(R\)</span>. This representation allows both the factorization and later applications of <span class="math notranslate nohighlight">\(Q\)</span> or <span class="math notranslate nohighlight">\(Q^T\)</span> without storing a dense orthogonal matrix.</p>
 </section>
 </section>
 <section id="computational-cost">
 <h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
-<p>Let’s analyze the computational cost, measured in floating-point operations (flops). Here a “flop” typically refers to one floating-point operation (an addition, subtraction, or multiplication). Note that it is also common to count Mult+Add as one operation, but we will count them separately here.</p>
-<section id="cost-per-step-step-k">
-<h3>Cost per Step (Step <span class="math notranslate nohighlight">\(k\)</span>)<a class="headerlink" href="#cost-per-step-step-k" title="Link to this heading">#</a></h3>
-<p>At step <span class="math notranslate nohighlight">\(k\)</span>, we are applying a Householder transformation to an <span class="math notranslate nohighlight">\((m-k+1) \times (n-k+1)\)</span> submatrix. Let <span class="math notranslate nohighlight">\(m' = m-k+1\)</span> and <span class="math notranslate nohighlight">\(n' = n-k+1\)</span>.</p>
-<p>The update <span class="math notranslate nohighlight">\(A' \leftarrow (I - \beta \mathbf{v}\mathbf{v}^T) A'\)</span> is computed as:</p>
-<ol class="arabic simple">
-<li><p><strong><span class="math notranslate nohighlight">\(\mathbf{w}^T = \mathbf{v}^T A'\)</span></strong> (vector-matrix product): This requires <span class="math notranslate nohighlight">\(m'n'\)</span> multiplications and <span class="math notranslate nohighlight">\(m'(n'-1) \approx m'n'\)</span> additions.</p>
-<ul class="simple">
-<li><p><em>Cost: <span class="math notranslate nohighlight">\(\approx 2m'n' \text{ flops}\)</span></em></p></li>
-</ul>
-</li>
-<li><p><strong><span class="math notranslate nohighlight">\(A' \leftarrow A' - (\beta \mathbf{v})\mathbf{w}^T\)</span></strong> (outer product update): This requires <span class="math notranslate nohighlight">\(m'n'\)</span> multiplications (to form <span class="math notranslate nohighlight">\(\beta \mathbf{v}\mathbf{w}^T\)</span>) and <span class="math notranslate nohighlight">\(m'n'\)</span> subtractions.</p>
-<ul class="simple">
-<li><p><em>Cost: <span class="math notranslate nohighlight">\(\approx 2m'n' \text{ flops}\)</span></em></p></li>
-</ul>
-</li>
-</ol>
-<p>The total cost at step <span class="math notranslate nohighlight">\(k\)</span> is the sum of these, which is approximately <span class="math notranslate nohighlight">\(\mathbf{4(m-k+1)(n-k+1)}\)</span> <strong>flops</strong>.</p>
-</section>
-<section id="total-cost">
-<h3>Total Cost<a class="headerlink" href="#total-cost" title="Link to this heading">#</a></h3>
-<p>To find the total cost, we sum this from <span class="math notranslate nohighlight">\(k=1\)</span> to <span class="math notranslate nohighlight">\(n\)</span>:</p>
+<p>We count a multiplication and an addition as separate floating-point operations, or <strong>flops</strong>.</p>
+<p>At step <span class="math notranslate nohighlight">\(k\)</span>, the active block has <span class="math notranslate nohighlight">\(d=m-k+1\)</span> rows and <span class="math notranslate nohighlight">\(t=n-k+1\)</span> columns. The product <span class="math notranslate nohighlight">\(v^TC\)</span> requires <span class="math notranslate nohighlight">\(dt\)</span> multiplications and <span class="math notranslate nohighlight">\(t(d-1)\)</span> additions, approximately <span class="math notranslate nohighlight">\(2dt\)</span> flops. The update <span class="math notranslate nohighlight">\(C-(\beta v)w^T\)</span> requires another <span class="math notranslate nohighlight">\(dt\)</span> multiplications and <span class="math notranslate nohighlight">\(dt\)</span> subtractions, approximately <span class="math notranslate nohighlight">\(2dt\)</span> flops. Computing the reflector and scaling <span class="math notranslate nohighlight">\(\beta v\)</span> adds only <span class="math notranslate nohighlight">\(O(d)\)</span> operations.</p>
+<p>Summing the leading update costs gives</p>
 <div class="math notranslate nohighlight">
-\[\text{Total Cost } \approx \sum_{k=1}^{n} 4(m-k+1)(n-k+1) \text{ flops}\]</div>
-<p>We can approximate this sum with an integral. We get:</p>
+\[\begin{split}
+\begin{aligned}
+\operatorname{cost}(QR)
+&amp;=4\sum_{k=1}^{s}(m-k+1)(n-k+1)+O(mn)\\
+&amp;=2mn^2-\frac{2}{3}n^3+O(mn).
+\end{aligned}
+\end{split}\]</div>
+<p>To evaluate the sum, write <span class="math notranslate nohighlight">\(j=k-1\)</span> and expand the product as <span class="math notranslate nohighlight">\(mn-(m+n)j+j^2\)</span>. Summing through <span class="math notranslate nohighlight">\(j=n-1\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[\text{Cost}(A=QR) \approx 2 \times \left( mn^2 - \frac{1}{3}n^3 \right) = \mathbf{2mn^2 - \frac{2}{3}n^3} \text{ flops}\]</div>
-<p><strong>Two important special cases emerge from this formula:</strong></p>
-<ol class="arabic simple">
-<li><p><strong>Square Matrix (<span class="math notranslate nohighlight">\(m=n\)</span>):</strong> The cost is <span class="math notranslate nohighlight">\(\approx 2n^3 - \frac{2}{3}n^3 = \mathbf{\frac{4}{3}n^3}\)</span> flops. This is about twice the cost of performing an LU factorization, which is <span class="math notranslate nohighlight">\(\frac{2}{3}n^3\)</span> flops.</p></li>
-<li><p><strong>Tall and Skinny Matrix (<span class="math notranslate nohighlight">\(m \gg n\)</span>):</strong> The <span class="math notranslate nohighlight">\(2mn^2\)</span> term dominates, and the cost is approximately <span class="math notranslate nohighlight">\(\mathbf{2mn^2}\)</span> flops.</p></li>
-</ol>
+\[\begin{split}
+\begin{aligned}
+\sum_{j=0}^{n-1}(m-j)(n-j)
+&amp;=mn^2-(m+n)\frac{n(n-1)}{2}\\
+&amp;\qquad{}+\frac{n(n-1)(2n-1)}{6}\\
+&amp;=\frac12mn^2-\frac16n^3+O(mn).
+\end{aligned}
+\end{split}\]</div>
+<p>Multiplying by <span class="math notranslate nohighlight">\(4\)</span> gives the stated leading cost. Omitting the final step when <span class="math notranslate nohighlight">\(m=n\)</span> affects only the lower-order terms. This cost includes storing the reflectors and computing <span class="math notranslate nohighlight">\(R\)</span>, but not forming <span class="math notranslate nohighlight">\(Q\)</span> explicitly.</p>
+<p>For a square matrix, the leading cost is <span class="math notranslate nohighlight">\(\frac{4}{3}n^3\)</span>, about twice the <span class="math notranslate nohighlight">\(\frac{2}{3}n^3\)</span> cost of LU factorization. For a tall matrix with <span class="math notranslate nohighlight">\(m\gg n\)</span>, it is approximately <span class="math notranslate nohighlight">\(2mn^2\)</span>.</p>
+<p>Applying one reflector to a vector of length <span class="math notranslate nohighlight">\(d\)</span> costs approximately <span class="math notranslate nohighlight">\(4d\)</span> flops: about <span class="math notranslate nohighlight">\(2d\)</span> for the dot product and <span class="math notranslate nohighlight">\(2d\)</span> for the update. Hence</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\operatorname{cost}(Q^Tb)
+&amp;=4\sum_{k=1}^{s}(m-k+1)+O(n)\\
+&amp;=4mn-2n^2+O(n).
+\end{aligned}
+\end{split}\]</div>
+<p>Applying <span class="math notranslate nohighlight">\(Q\)</span> has the same cost. These are <span class="math notranslate nohighlight">\(O(mn)\)</span> operations; back substitution adds <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations. Once QR is available, solving for an additional right-hand side is therefore much cheaper than recomputing the factorization.</p>
 </section>
-<section id="cost-of-using-the-factors">
-<h3>Cost of Using the Factors<a class="headerlink" href="#cost-of-using-the-factors" title="Link to this heading">#</a></h3>
-<p>Once we have the factorization, we use the stored Householder vectors to apply <span class="math notranslate nohighlight">\(Q\)</span> or <span class="math notranslate nohighlight">\(Q^T\)</span> as needed.</p>
-<p><strong>Applying <span class="math notranslate nohighlight">\(Q^T\)</span> to a vector (e.g., forming <span class="math notranslate nohighlight">\(Q^T b\)</span>).</strong> This is the most critical operation for solving the least-squares problem. We need to compute <span class="math notranslate nohighlight">\(y = Q^T b\)</span>. We do this by applying the transformations sequentially: <span class="math notranslate nohighlight">\(y = Q_n \dots Q_2 Q_1 b\)</span>.</p>
-<ul class="simple">
-<li><p>Applying <span class="math notranslate nohighlight">\(Q_1\)</span> to <span class="math notranslate nohighlight">\(b\)</span> costs <span class="math notranslate nohighlight">\(\approx 2m\)</span> flops.</p></li>
-<li><p>Applying <span class="math notranslate nohighlight">\(Q_2\)</span> to the result costs <span class="math notranslate nohighlight">\(\approx 2(m-1)\)</span> flops.</p></li>
-<li><p>…and so on, down to <span class="math notranslate nohighlight">\(Q_n\)</span>, which costs <span class="math notranslate nohighlight">\(\approx 2(m-n+1)\)</span> flops.</p></li>
-</ul>
-<p>The total cost is the sum of an arithmetic series:</p>
+<section id="what-numerical-stability-guarantees">
+<h2>What Numerical Stability Guarantees<a class="headerlink" href="#what-numerical-stability-guarantees" title="Link to this heading">#</a></h2>
+<p>In exact arithmetic, QR satisfies both <span class="math notranslate nohighlight">\(A=QR\)</span> and <span class="math notranslate nohighlight">\(Q^TQ=I\)</span>. Rounding affects both identities, so we need to measure two errors. Suppose we form the full matrix <span class="math notranslate nohighlight">\(Q\)</span> by applying the stored reflections to the identity. Write <span class="math notranslate nohighlight">\(\widehat Q\)</span> and <span class="math notranslate nohighlight">\(\widehat R\)</span> for the factors computed in floating-point arithmetic.</p>
+<p>For Householder QR, a rounding-error analysis gives bounds of the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+&amp;\le C_1(m,n)u,\\
+\|\widehat Q^T\widehat Q-I\|_2
+&amp;\le C_2(m,n)u.
+\end{aligned}
+}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(A\ne0\)</span>, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, and <span class="math notranslate nohighlight">\(C_1\)</span> and <span class="math notranslate nohighlight">\(C_2\)</span> are factors that depend on the dimensions and the implementation, but not on the condition number of <span class="math notranslate nohighlight">\(A\)</span>. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times <span class="math notranslate nohighlight">\(u\)</span> small compared with <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>For a readable overview of the stability guarantees, see Nick Higham’s <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">What Is a QR Factorization?</a>. The detailed error analysis is in Chapter 19 of his <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19">Accuracy and Stability of Numerical Algorithms</a>, second edition.</p>
+<p>The first bound says that multiplying the computed factors reproduces <span class="math notranslate nohighlight">\(A\)</span> with a small relative error. We can interpret this error as a perturbation of the input: defining <span class="math notranslate nohighlight">\(E=\widehat Q\widehat R-A\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[
-\text{Cost}(Q^T b) \approx \sum_{k=1}^{n} 2(m-k+1) \approx 2mn - n^2 \text{ flops}
+A+E=\widehat Q\widehat R,
+\qquad
+\frac{\|E\|_F}{\|A\|_F}\le C_1(m,n)u.
 \]</div>
-<p>For <span class="math notranslate nohighlight">\(m \ge n\)</span>, this is an <span class="math notranslate nohighlight">\(O(mn)\)</span> operation. This is significantly cheaper than the factorization itself, which is <span class="math notranslate nohighlight">\(O(mn^2)\)</span>.</p>
-</section>
-<section id="summary-of-costs">
-<h3>Summary of Costs<a class="headerlink" href="#summary-of-costs" title="Link to this heading">#</a></h3>
-<p>Here is a quick reference for an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with <span class="math notranslate nohighlight">\(m \ge n\)</span>:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Operation</p></th>
-<th class="head"><p>Leading Term Flop Count</p></th>
-<th class="head"><p>Big O Notation</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>Factorization (<span class="math notranslate nohighlight">\(A \rightarrow Q, R\)</span>)</strong></p></td>
-<td><p><span class="math notranslate nohighlight">\(2mn^2 - \frac{2}{3}n^3\)</span></p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn^2)\)</span></p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Apply <span class="math notranslate nohighlight">\(Q^T\)</span> to vector <span class="math notranslate nohighlight">\(b\)</span> (<span class="math notranslate nohighlight">\(Q^T b\)</span>)</strong></p></td>
-<td><p><span class="math notranslate nohighlight">\(2mn - n^2\)</span></p></td>
-<td><p><span class="math notranslate nohighlight">\(O(mn)\)</span></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
+<p>The second bound says that <span class="math notranslate nohighlight">\(\widehat Q\)</span> is nearly orthogonal. Its diagonal entries in <span class="math notranslate nohighlight">\(\widehat Q^T\widehat Q\)</span> are the squared column lengths, and its off-diagonal entries are inner products between different columns. Thus the columns have lengths close to <span class="math notranslate nohighlight">\(1\)</span> and are nearly perpendicular. <strong>The computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is generally not exactly orthogonal</strong>, so the displayed factorization of <span class="math notranslate nohighlight">\(A+E\)</span> is not an exact QR factorization.</p>
+<p>Both guarantees matter: a small factorization error alone does not ensure that the computed columns are nearly orthonormal. Householder QR controls both errors. It does not, however, guarantee that each computed factor is close to a particular exact factor of the original <span class="math notranslate nohighlight">\(A\)</span>, or that the least-squares solution has a small forward error. Those questions also depend on the sensitivity of the problem.</p>
 </section>
 </section>
 
@@ -748,23 +857,21 @@ Q^T b = (Q_n \dots Q_2 Q_1)b
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-picture-orthogonal-triangularization">The Big Picture: Orthogonal Triangularization</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tool-householder-reflections">The Tool: Householder Reflections</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-a-reflection">Constructing a Reflection</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-householder-qr-algorithm">The Householder QR Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stability-and-accuracy-a-crucial-detail">Stability and Accuracy: A Crucial Detail</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-note-on-practical-implementation-never-form-p-explicitly">A Note on Practical Implementation: Never Form <span class="math notranslate nohighlight">\(P\)</span> Explicitly</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-the-transformation-efficiently">Applying the Transformation Efficiently</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-the-factorization">Storing the Factorization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-goal-orthogonal-triangularization">The Goal: Orthogonal Triangularization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflecting-across-a-hyperplane">Reflecting Across a Hyperplane</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-a-column-zero-below-its-first-entry">Making a Column Zero Below Its First Entry</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-sign-to-avoid-cancellation">Choosing the Sign to Avoid Cancellation</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-per-step-step-k">Cost per Step (Step <span class="math notranslate nohighlight">\(k\)</span>)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#total-cost">Total Cost</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-of-using-the-factors">Cost of Using the Factors</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-costs">Summary of Costs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-a-reflection-efficiently">Applying a Reflection Efficiently</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-qr-factorization-column-by-column">Building the QR Factorization Column by Column</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-and-storing-the-factors">Using and Storing the Factors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-q-t-in-least-squares">Applying <span class="math notranslate nohighlight">\(Q^T\)</span> in Least Squares</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#storing-reflections-below-the-diagonal">Storing Reflections Below the Diagonal</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-numerical-stability-guarantees">What Numerical Stability Guarantees</a></li>
 </ul>
   </nav></div>
 
