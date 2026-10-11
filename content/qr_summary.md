@@ -53,15 +53,3 @@ For Householder and Givens, the listed costs compute $R$ and store $Q$ implicitl
 MGS with a second pass is called **reorthogonalization**. It removes components left by rounding in the first pass and can restore orthogonality close to working precision. One-pass MGS can lose substantial orthogonality when the columns are nearly dependent, even while reconstructing $A$ accurately. Classical Gram-Schmidt computes its coefficients from the original column and can lose much more orthogonality.
 
 The preceding sections give the derivations and assumptions. [Higham's QR overview](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/) also summarizes the accuracy guarantees.
-
-## Using the Factorization
-
-Householder and Givens QR remain valid for rank-deficient matrices. Basic Gram-Schmidt stops at a zero residual in exact arithmetic. Thus existence of QR does not require full column rank, although solving with $R^{-1}$ does.
-
-For a full-column-rank least-squares problem, compute $Q^Tb$ and solve
-
-$$
-Rx=Q^Tb
-$$
-
-by back substitution. With Householder or Givens, apply the stored transformations to $b$ and take the first $n$ components; there is no need to form $Q$ explicitly. Small backward errors do not by themselves guarantee a small error in $x$: the sensitivity of the least-squares problem also matters.
