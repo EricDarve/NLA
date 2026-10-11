@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Existence and Uniqueness of QR Decomposition &#8212; Numerical Linear Algebra</title>
+    <title>Existence and Uniqueness of QR Factorization &#8212; Numerical Linear Algebra</title>
   
   
   
@@ -251,7 +251,7 @@
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary of QR Methods</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Existence and Uniqueness of QR Decomposition</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Existence and Uniqueness of QR Factorization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
@@ -451,7 +451,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Existence and Uniqueness of QR Decomposition</h1>
+    <h1>Existence and Uniqueness of QR Factorization</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -462,11 +462,12 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uniqueness">Uniqueness</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-rank-case"><strong>The Full Rank Case</strong></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-deficient-case"><strong>The Rank-Deficient Case</strong></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fixing-the-signs">Fixing the Signs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uniqueness-for-full-column-rank">Uniqueness for Full Column Rank</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-remaining-freedom-in-full-qr">The Remaining Freedom in Full QR</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-deficient-matrices">Rank-Deficient Matrices</a></li>
 </ul>
             </nav>
         </div>
@@ -478,55 +479,121 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="existence-and-uniqueness-of-qr-decomposition">
-<h1>Existence and Uniqueness of QR Decomposition<a class="headerlink" href="#existence-and-uniqueness-of-qr-decomposition" title="Link to this heading">#</a></h1>
-<p>We have now seen three different algorithms (Householder, Givens, and Modified Gram-Schmidt) for computing the QR decomposition of a matrix <span class="math notranslate nohighlight">\(A\)</span>. A natural question arises: does this factorization always exist, and if so, is it unique?</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="existence-and-uniqueness-of-qr-factorization">
+<h1>Existence and Uniqueness of QR Factorization<a class="headerlink" href="#existence-and-uniqueness-of-qr-factorization" title="Link to this heading">#</a></h1>
+<p>The preceding algorithms construct QR in different ways. To understand whether they can produce the same factors, we need to separate three questions: whether QR exists, whether the signs of the basis vectors are fixed, and whether unused orthogonal directions remain to be chosen.</p>
+<p>All statements here concern exact arithmetic.</p>
 <section id="existence">
 <h2>Existence<a class="headerlink" href="#existence" title="Link to this heading">#</a></h2>
 <div class="proof theorem admonition" id="thm:existence_qr">
-<p class="admonition-title"><span class="caption-number">Theorem 19 </span> (Existence of QR Decomposition)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 19 </span> (Existence of QR Factorization)</p>
 <section class="theorem-content" id="proof-content">
-<p>For any real matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m \times n}\)</span>, there exists a QR decomposition such that <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an upper triangular (or upper trapezoidal) matrix.</p>
-</section>
-</div><p>The constructive nature of the algorithms we’ve studied is a proof of this.</p>
-<ul class="simple">
-<li><p><strong>Full QR</strong>: For any <span class="math notranslate nohighlight">\(A\)</span>, we can find an orthogonal matrix <span class="math notranslate nohighlight">\(Q \in \mathbb{R}^{m \times m}\)</span> and an upper trapezoidal matrix <span class="math notranslate nohighlight">\(R \in \mathbb{R}^{m \times n}\)</span> such that <span class="math notranslate nohighlight">\(A=QR\)</span>.</p></li>
-<li><p><strong>Thin QR</strong>: If <span class="math notranslate nohighlight">\(m \ge n\)</span>, we can find a matrix <span class="math notranslate nohighlight">\(Q_1 \in \mathbb{R}^{m \times n}\)</span> with orthonormal columns and an upper triangular matrix <span class="math notranslate nohighlight">\(R_1 \in \mathbb{R}^{n \times n}\)</span> such that <span class="math notranslate nohighlight">\(A=Q_1 R_1\)</span>.</p></li>
-</ul>
-<p>The algorithms we have discussed can always be carried out, guaranteeing existence.</p>
-</section>
-<section id="uniqueness">
-<h2>Uniqueness<a class="headerlink" href="#uniqueness" title="Link to this heading">#</a></h2>
-<p>The uniqueness of the QR decomposition is more nuanced and depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span> and any constraints we place on the matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
-<section id="the-full-rank-case">
-<h3><strong>The Full Rank Case</strong><a class="headerlink" href="#the-full-rank-case" title="Link to this heading">#</a></h3>
-<div class="proof theorem admonition" id="thm:unique_thin_qr">
-<p class="admonition-title"><span class="caption-number">Theorem 20 </span> (Unique Thin QR Decomposition for Full Column Rank Matrices)</p>
-<section class="theorem-content" id="proof-content">
-<p>Let’s assume <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{m \times n}\)</span> with <span class="math notranslate nohighlight">\(m \ge n\)</span> has <strong>full column rank</strong> (i.e., its columns are linearly independent).</p>
-<p>In this case, the <strong>thin QR decomposition</strong> <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span> is <strong>unique</strong> if we impose the condition that all the <strong>diagonal elements of <span class="math notranslate nohighlight">\(R_1\)</span> must be positive</strong> (<span class="math notranslate nohighlight">\(r_{ii} &gt; 0\)</span>).</p>
+<p>Every real matrix <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> has a full QR factorization</p>
+<div class="math notranslate nohighlight">
+\[
+A=QR,\qquad Q\in\mathbb{R}^{m\times m},\qquad Q^TQ=I_m,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(R\in\mathbb{R}^{m\times n}\)</span> is upper trapezoidal: <span class="math notranslate nohighlight">\(r_{ij}=0\)</span> whenever <span class="math notranslate nohighlight">\(i&gt;j\)</span>. No rank assumption is required.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. Consider the product <span class="math notranslate nohighlight">\(A^T A\)</span>:</p>
+<p>Proof. Construction by Householder Reflections.
+At step <span class="math notranslate nohighlight">\(k\)</span>, apply a Householder reflection to rows <span class="math notranslate nohighlight">\(k,\ldots,m\)</span> to eliminate the entries below the diagonal in column <span class="math notranslate nohighlight">\(k\)</span>. If those entries are already zero, use the identity transformation.</p>
+<p>This step preserves earlier columns: they are already zero in rows <span class="math notranslate nohighlight">\(k,\ldots,m\)</span>, so combining those rows does not change their zeros. Continue for <span class="math notranslate nohighlight">\(s=\min(n,m-1)\)</span> steps. Writing <span class="math notranslate nohighlight">\(P_k\)</span> for the full <span class="math notranslate nohighlight">\(m\times m\)</span> transformation at step <span class="math notranslate nohighlight">\(k\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[
-A^T A = (Q_1 R_1)^T (Q_1 R_1) = R_1^T Q_1^T Q_1 R_1
+R=P_s\cdots P_1A.
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(Q_1\)</span> has orthonormal columns, <span class="math notranslate nohighlight">\(Q_1^T Q_1 = I\)</span> (the identity matrix). This simplifies the expression to:</p>
+<p>Each <span class="math notranslate nohighlight">\(P_k\)</span> is orthogonal. Therefore, defining</p>
 <div class="math notranslate nohighlight">
 \[
-A^T A = R_1^T R_1
+Q=P_1^T\cdots P_s^T
 \]</div>
-<p>The matrix <span class="math notranslate nohighlight">\(A^T A\)</span> is symmetric and positive definite (since <span class="math notranslate nohighlight">\(A\)</span> has full rank). The equation above is precisely the <strong>Cholesky decomposition</strong> of <span class="math notranslate nohighlight">\(A^T A\)</span>. The Cholesky decomposition is unique when we require the diagonal elements of the triangular factor (<span class="math notranslate nohighlight">\(R_1\)</span> in this case) to be positive. Therefore, <span class="math notranslate nohighlight">\(R_1\)</span> is uniquely determined.</p>
-<p>Once <span class="math notranslate nohighlight">\(R_1\)</span> is uniquely determined, we can find <span class="math notranslate nohighlight">\(Q_1\)</span> from the relation <span class="math notranslate nohighlight">\(Q_1 = A R_1^{-1}\)</span>. Since <span class="math notranslate nohighlight">\(A\)</span> has full rank and <span class="math notranslate nohighlight">\(R_1\)</span> is nonsingular, <span class="math notranslate nohighlight">\(Q_1\)</span> is also uniquely determined.</p>
+<p>gives <span class="math notranslate nohighlight">\(Q^TQ=I_m\)</span> and <span class="math notranslate nohighlight">\(A=QR\)</span>. If no elimination is needed, the empty product is the identity. The construction never requires division by a matrix pivot or by the norm of a zero column.</p>
 </div>
-<p><em>Note on Full QR</em>: Even in this full-rank case, the <strong>full QR decomposition is not unique</strong>. The first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> are the unique columns of <span class="math notranslate nohighlight">\(Q_1\)</span>, but the remaining <span class="math notranslate nohighlight">\(m-n\)</span> columns only need to form an orthonormal basis for the orthogonal complement of the column space of <span class="math notranslate nohighlight">\(A\)</span>. There are infinitely many ways to choose this basis.</p>
+<p>When <span class="math notranslate nohighlight">\(m\ge n\)</span>, partition the factors as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q=\begin{pmatrix}Q_1&amp;Q_2\end{pmatrix},
+\qquad
+R=\begin{pmatrix}R_1\\0\end{pmatrix}.
+\end{split}\]</div>
+<p>Then</p>
+<div class="math notranslate nohighlight">
+\[
+A=Q_1R_1,\qquad
+Q_1\in\mathbb{R}^{m\times n},\qquad Q_1^TQ_1=I_n,
+\]</div>
+<p>with <span class="math notranslate nohighlight">\(R_1\in\mathbb{R}^{n\times n}\)</span> upper triangular. This is the <strong>reduced (thin) QR factorization</strong>, which also exists for rank-deficient matrices. Moreover, <span class="math notranslate nohighlight">\(\operatorname{rank}(A)=\operatorname{rank}(R_1)\)</span>: multiplication by <span class="math notranslate nohighlight">\(Q_1\)</span> preserves rank because <span class="math notranslate nohighlight">\(Q_1\)</span> has a left inverse <span class="math notranslate nohighlight">\(Q_1^T\)</span>.</p>
+<p>Basic Gram-Schmidt, however, stops when a residual is zero. Continuing that construction requires choosing a new unit vector perpendicular to the previous basis vectors. Such a direction exists because at step <span class="math notranslate nohighlight">\(k\le n\le m\)</span>, only <span class="math notranslate nohighlight">\(k-1&lt;m\)</span> orthonormal vectors have been chosen. Thus existence of QR does not imply that basic Gram-Schmidt completes without modification.</p>
 </section>
-<section id="the-rank-deficient-case">
-<h3><strong>The Rank-Deficient Case</strong><a class="headerlink" href="#the-rank-deficient-case" title="Link to this heading">#</a></h3>
-<p>If the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>rank-deficient</strong> (its columns are linearly dependent), then the QR decomposition is <strong>not unique</strong>.</p>
-<p>In this case, at least one of the diagonal elements of <span class="math notranslate nohighlight">\(R\)</span> will be zero. This introduces degrees of freedom into the system <span class="math notranslate nohighlight">\(A^T A = R^T R\)</span>, and the Cholesky factorization is no longer unique. This lack of uniqueness in <span class="math notranslate nohighlight">\(R\)</span> carries over to <span class="math notranslate nohighlight">\(Q\)</span>.</p>
+<section id="fixing-the-signs">
+<h2>Fixing the Signs<a class="headerlink" href="#fixing-the-signs" title="Link to this heading">#</a></h2>
+<p>Even for independent columns, QR is not unique unless we fix the signs. If <span class="math notranslate nohighlight">\(D\)</span> is diagonal with entries <span class="math notranslate nohighlight">\(d_i\in\{-1,1\}\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+A=Q_1R_1=(Q_1D)(DR_1).
+\]</div>
+<p>The columns of <span class="math notranslate nohighlight">\(Q_1D\)</span> remain orthonormal, and <span class="math notranslate nohighlight">\(DR_1\)</span> remains upper triangular. Changing <span class="math notranslate nohighlight">\(d_i\)</span> reverses both column <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(Q_1\)</span> and row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(R_1\)</span>.</p>
+<p>For full column rank, <span class="math notranslate nohighlight">\(R_1\)</span> is invertible, so none of its diagonal entries is zero. We can fix these sign choices by requiring <span class="math notranslate nohighlight">\(r_{ii}&gt;0\)</span>.</p>
 </section>
+<section id="uniqueness-for-full-column-rank">
+<h2>Uniqueness for Full Column Rank<a class="headerlink" href="#uniqueness-for-full-column-rank" title="Link to this heading">#</a></h2>
+<div class="proof theorem admonition" id="thm:unique_thin_qr">
+<p class="admonition-title"><span class="caption-number">Theorem 20 </span> (Unique Reduced QR Factorization)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> with <span class="math notranslate nohighlight">\(m\ge n\)</span> have full column rank. There is exactly one reduced QR factorization <span class="math notranslate nohighlight">\(A=Q_1R_1\)</span> with <span class="math notranslate nohighlight">\(Q_1^TQ_1=I_n\)</span> and <span class="math notranslate nohighlight">\(R_1\)</span> upper triangular with positive diagonal.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Uniqueness Through Cholesky Factorization.
+The sign adjustment above shows that a factorization with positive diagonal exists. To prove uniqueness, take any such factorization. Then</p>
+<div class="math notranslate nohighlight">
+\[
+A^TA=R_1^TQ_1^TQ_1R_1=R_1^TR_1.
+\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(A^TA\)</span> is positive definite: for every nonzero <span class="math notranslate nohighlight">\(x\in\mathbb{R}^n\)</span>, full column rank gives <span class="math notranslate nohighlight">\(Ax\ne0\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[
+x^TA^TAx=\|Ax\|_2^2&gt;0.
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(R_1\)</span> is the upper triangular Cholesky factor of <span class="math notranslate nohighlight">\(A^TA\)</span>. The <a class="reference internal" href="cholesky.html"><span class="std std-doc">uniqueness of Cholesky factorization</span></a> with positive diagonal determines <span class="math notranslate nohighlight">\(R_1\)</span> uniquely.</p>
+<p>Since <span class="math notranslate nohighlight">\(R_1\)</span> is invertible,</p>
+<div class="math notranslate nohighlight">
+\[
+Q_1=AR_1^{-1},
+\]</div>
+<p>so <span class="math notranslate nohighlight">\(Q_1\)</span> is uniquely determined as well.</p>
+</div>
+<p>Without the positive-diagonal convention, a full-column-rank real matrix has exactly <span class="math notranslate nohighlight">\(2^n\)</span> reduced QR factorizations, corresponding to the sign choices in <span class="math notranslate nohighlight">\(D\)</span>.</p>
+<section id="the-remaining-freedom-in-full-qr">
+<h3>The Remaining Freedom in Full QR<a class="headerlink" href="#the-remaining-freedom-in-full-qr" title="Link to this heading">#</a></h3>
+<p>For a full-column-rank matrix, fixing the positive diagonal determines <span class="math notranslate nohighlight">\(Q_1\)</span> and <span class="math notranslate nohighlight">\(R_1\)</span>. If <span class="math notranslate nohighlight">\(m&gt;n\)</span>, the remaining columns <span class="math notranslate nohighlight">\(Q_2\)</span> form an orthonormal basis for the orthogonal complement of the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>Changing this basis does not change <span class="math notranslate nohighlight">\(A\)</span>. For any orthogonal <span class="math notranslate nohighlight">\(W\in\mathbb{R}^{(m-n)\times(m-n)}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=
+\begin{pmatrix}Q_1&amp;Q_2W\end{pmatrix}
+\begin{pmatrix}R_1\\0\end{pmatrix}.
+\end{split}\]</div>
+<p>Every other orthonormal basis of this complement has the form <span class="math notranslate nohighlight">\(Q_2W\)</span>. Consequently, with the positive-diagonal convention, full QR is unique when <span class="math notranslate nohighlight">\(m=n\)</span>, has exactly two choices when <span class="math notranslate nohighlight">\(m-n=1\)</span>, and has infinitely many choices when <span class="math notranslate nohighlight">\(m-n\ge2\)</span>.</p>
+</section>
+</section>
+<section id="rank-deficient-matrices">
+<h2>Rank-Deficient Matrices<a class="headerlink" href="#rank-deficient-matrices" title="Link to this heading">#</a></h2>
+<p>Suppose <span class="math notranslate nohighlight">\(m\ge n\)</span> and <span class="math notranslate nohighlight">\(A\)</span> has dependent columns. The reduced factor <span class="math notranslate nohighlight">\(R_1\)</span> is singular, so at least one diagonal entry <span class="math notranslate nohighlight">\(r_{kk}\)</span> is zero. Strict positivity of every diagonal entry is therefore impossible.</p>
+<p>Even requiring a <strong>nonnegative</strong> diagonal does not ensure uniqueness. Choose <span class="math notranslate nohighlight">\(D\)</span> with <span class="math notranslate nohighlight">\(d_k=-1\)</span> at a zero diagonal entry and <span class="math notranslate nohighlight">\(d_i=1\)</span> elsewhere. The factorization <span class="math notranslate nohighlight">\((Q_1D)(DR_1)\)</span> has the same nonnegative diagonal as <span class="math notranslate nohighlight">\(Q_1R_1\)</span>, but a different <span class="math notranslate nohighlight">\(Q_1\)</span>.</p>
+<p>For example,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}1&amp;0\\0&amp;0\end{pmatrix}
+=
+\begin{pmatrix}1&amp;0\\0&amp;1\end{pmatrix}
+\begin{pmatrix}1&amp;0\\0&amp;0\end{pmatrix}
+=
+\begin{pmatrix}1&amp;0\\0&amp;-1\end{pmatrix}
+\begin{pmatrix}1&amp;0\\0&amp;0\end{pmatrix}.
+\end{split}\]</div>
+<p>With a nonnegative diagonal, the first column forces <span class="math notranslate nohighlight">\(r_{11}=1\)</span> and <span class="math notranslate nohighlight">\(q_1=e_1\)</span>. The zero second column then forces <span class="math notranslate nohighlight">\(r_{12}=r_{22}=0\)</span>, since the columns of <span class="math notranslate nohighlight">\(Q_1\)</span> are orthonormal. Thus <span class="math notranslate nohighlight">\(R_1\)</span> is unique in this example, but <span class="math notranslate nohighlight">\(Q_1\)</span> is not.</p>
+<p>For complex matrices, replace orthogonal by unitary and <span class="math notranslate nohighlight">\(Q^T\)</span> by <span class="math notranslate nohighlight">\(Q^H\)</span>. Requiring positive real diagonal entries fixes the phase choices and gives the same reduced-QR uniqueness result for full column rank.</p>
 </section>
 </section>
 
@@ -597,11 +664,12 @@ A^T A = R_1^T R_1
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#existence">Existence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uniqueness">Uniqueness</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-rank-case"><strong>The Full Rank Case</strong></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rank-deficient-case"><strong>The Rank-Deficient Case</strong></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fixing-the-signs">Fixing the Signs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uniqueness-for-full-column-rank">Uniqueness for Full Column Rank</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-remaining-freedom-in-full-qr">The Remaining Freedom in Full QR</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rank-deficient-matrices">Rank-Deficient Matrices</a></li>
 </ul>
   </nav></div>
 
