@@ -67,7 +67,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Summary" href="qr_summary.html" />
+    <link rel="next" title="Summary of QR Methods" href="qr_summary.html" />
     <link rel="prev" title="Givens Rotations" href="givens_rotations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -250,7 +250,7 @@
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Modified Gram-Schmidt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary of QR Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
@@ -461,21 +461,16 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-modified-gram-schmidt-algorithm">The Modified Gram-Schmidt Algorithm</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-outer-product-perspective">An Outer-Product Perspective</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-derivation">Algorithm Derivation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complete-algorithm">The Complete Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-one-direction-at-a-time">Removing One Direction at a Time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-in-place-algorithm">The In-Place Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-algorithm-works">Why the Algorithm Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-with-classical-gram-schmidt">Comparison with Classical Gram-Schmidt</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-accuracy-the-condition-number-factor">Numerical Accuracy: The Condition-Number Factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reorthogonalization">Reorthogonalization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-numerical-example">A Numerical Example</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-gram-schmidt-cgs">Classical Gram-Schmidt (CGS)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#difference-from-modified-gram-schmidt-mgs">Difference from Modified Gram-Schmidt (MGS)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Numerical Stability</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Computational Cost</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-and-choice-of-method">Computational Cost and Choice of Method</a></li>
 </ul>
             </nav>
         </div>
@@ -489,181 +484,268 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="modified-gram-schmidt">
 <h1>Modified Gram-Schmidt<a class="headerlink" href="#modified-gram-schmidt" title="Link to this heading">#</a></h1>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>We previously covered the QR factorization using Householder and Givens transformations. These methods fall under the category of <strong>orthogonal triangularization</strong>, where we find an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> and apply it to <span class="math notranslate nohighlight">\(A\)</span> to produce an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span>, such that <span class="math notranslate nohighlight">\(Q^T A = R\)</span>.</p>
-<p>Let’s examine a different approach: the <strong>Gram-Schmidt process</strong>. This method performs <strong>triangular orthogonalization</strong>. Instead of finding <span class="math notranslate nohighlight">\(Q\)</span> first, we find an upper triangular matrix <span class="math notranslate nohighlight">\(R\)</span> such that the columns of <span class="math notranslate nohighlight">\(A R^{-1}\)</span> form an orthonormal matrix <span class="math notranslate nohighlight">\(Q\)</span>. This can be rewritten as our familiar <span class="math notranslate nohighlight">\(A = QR\)</span>. The Gram-Schmidt process is particularly well-suited for matrices that are <strong>tall and thin</strong> (i.e., <span class="math notranslate nohighlight">\(m \gg n\)</span>).</p>
-<p>GS has an advantage in iterative methods. This is a crucial point of comparison with Householder transformations. While Householder methods are generally more stable, the Gram-Schmidt process produces the orthogonalized vectors sequentially. The j-th vector, <span class="math notranslate nohighlight">\(q_j\)</span>, is finalized at the j-th iteration. In contrast, Householder reflections produce the full orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> only at the very end. This sequential nature makes Gram-Schmidt suitable for <strong>iterative methods like the Arnoldi iteration,</strong> which is used for finding eigenvalues of large matrices.</p>
-<p>We will focus exclusively on the <strong>Modified Gram-Schmidt (MGS)</strong> algorithm, which is a numerically stable version of the classical process.</p>
-</section>
-<section id="the-modified-gram-schmidt-algorithm">
-<h2>The Modified Gram-Schmidt Algorithm<a class="headerlink" href="#the-modified-gram-schmidt-algorithm" title="Link to this heading">#</a></h2>
-<p>The core idea of MGS is to build the columns of <span class="math notranslate nohighlight">\(Q\)</span> one by one. At each step <span class="math notranslate nohighlight">\(k\)</span>, we generate the vector <span class="math notranslate nohighlight">\(q_k\)</span> by normalizing the current <span class="math notranslate nohighlight">\(k\)</span>-th column of our working matrix. Then, we immediately make all subsequent columns orthogonal to this new vector <span class="math notranslate nohighlight">\(q_k\)</span>.</p>
-<section id="an-outer-product-perspective">
-<h3>An Outer-Product Perspective<a class="headerlink" href="#an-outer-product-perspective" title="Link to this heading">#</a></h3>
-<p>We will develop MGS from an outer-product point of view. The computational strategy is quite similar to the methods we used for LU and Cholesky factorizations.</p>
-<p>We start by viewing the product <span class="math notranslate nohighlight">\(A=QR\)</span> as a sum of rank-one matrices:</p>
+<p><a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder reflections</span></a> and <a class="reference internal" href="givens_rotations.html"><span class="std std-doc">Givens rotations</span></a> compute QR by introducing zeros in a matrix. Gram-Schmidt takes a different approach: it builds an orthonormal basis for the column space, one vector at a time. The coefficients used to express the original columns in this basis form the triangular factor <span class="math notranslate nohighlight">\(R\)</span>.</p>
+<p>This approach is useful when vectors arrive sequentially. For example, an iterative method may generate its next vector using the basis vectors already computed. Gram-Schmidt can extend that basis without changing the earlier vectors. We will use this construction later in <a class="reference internal" href="arnoldi_iteration.html"><span class="std std-doc">Arnoldi iteration</span></a>. Householder QR can also be extended, but it stores the basis implicitly as a product of transformations.</p>
+<p>Throughout this page, <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> with <span class="math notranslate nohighlight">\(m\ge n\)</span> has linearly independent columns. We seek the <strong>reduced QR factorization</strong></p>
 <div class="math notranslate nohighlight">
 \[
-A = \sum_{k=1}^{n} q_k r_k^T
+A=QR,\qquad Q\in\mathbb{R}^{m\times n},\qquad
+Q^TQ=I_n,
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(q_k\)</span> are the column vectors of <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(r_k^T\)</span> are the row vectors of <span class="math notranslate nohighlight">\(R\)</span>. Our goal is to find one component (<span class="math notranslate nohighlight">\(q_k r_k^T\)</span>) at each step, subtract it from our matrix, and then repeat the process on the remainder.</p>
-</section>
-<section id="algorithm-derivation">
-<h3>Algorithm Derivation<a class="headerlink" href="#algorithm-derivation" title="Link to this heading">#</a></h3>
-<p>Let’s begin with the first column (<span class="math notranslate nohighlight">\(k=1\)</span>). The first term in our sum is <span class="math notranslate nohighlight">\(q_1 r_1^T\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Find <span class="math notranslate nohighlight">\(q_1\)</span> and <span class="math notranslate nohighlight">\(r_{11}\)</span>.</strong>
-From the relationship <span class="math notranslate nohighlight">\(A=QR\)</span>, we know the first column of <span class="math notranslate nohighlight">\(A\)</span> is given by <span class="math notranslate nohighlight">\(a_1 = r_{11} q_1\)</span>. Since <span class="math notranslate nohighlight">\(q_1\)</span> must be a unit vector (<span class="math notranslate nohighlight">\({\|q_1\|}_2 = 1\)</span>), we can determine <span class="math notranslate nohighlight">\(r_{11}\)</span> and <span class="math notranslate nohighlight">\(q_1\)</span> directly by normalizing the first column of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<p>where <span class="math notranslate nohighlight">\(R\in\mathbb{R}^{n\times n}\)</span> is upper triangular with positive diagonal entries. Since <span class="math notranslate nohighlight">\(R\)</span> is invertible, <span class="math notranslate nohighlight">\(Q=AR^{-1}\)</span>. This viewpoint is sometimes called <strong>triangular orthogonalization</strong>, in contrast to applying orthogonal transformations to triangularize <span class="math notranslate nohighlight">\(A\)</span>. The algorithm does not form <span class="math notranslate nohighlight">\(R^{-1}\)</span>.</p>
+<section id="removing-one-direction-at-a-time">
+<h2>Removing One Direction at a Time<a class="headerlink" href="#removing-one-direction-at-a-time" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(a_j\)</span> denote the original <span class="math notranslate nohighlight">\(j\)</span>-th column of <span class="math notranslate nohighlight">\(A\)</span>. The first column of <span class="math notranslate nohighlight">\(A=QR\)</span> satisfies <span class="math notranslate nohighlight">\(a_1=r_{11}q_1\)</span>, so</p>
 <div class="math notranslate nohighlight">
 \[
-    r_{11} = \|a_1\|_2, \qquad q_1 = \frac{a_1}{\|a_1\|_2}
-    \]</div>
-</li>
-<li><p><strong>Find the rest of the first row of R (<span class="math notranslate nohighlight">\(r_1^T\)</span>).</strong>
-To find the other elements of the first row of <span class="math notranslate nohighlight">\(R\)</span> (<span class="math notranslate nohighlight">\(r_{12}, r_{13}, \dots, r_{1n}\)</span>), we consider the equation for any column <span class="math notranslate nohighlight">\(j\)</span> of <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-    a_j = r_{1j} q_1 + r_{2j} q_2 + \cdots + r_{jj} q_j
-    \]</div>
-<p>By using the fact that the columns of <span class="math notranslate nohighlight">\(Q\)</span> are orthogonal (<span class="math notranslate nohighlight">\(q_k^T q_i = 0\)</span> for <span class="math notranslate nohighlight">\(k \ne i\)</span>), we can find <span class="math notranslate nohighlight">\(r_{1j}\)</span> by left-multiplying by <span class="math notranslate nohighlight">\(q_1^T\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-    q_1^T a_j = q_1^T (r_{1j} q_1 + r_{2j} q_2 + \cdots) = r_{1j} (q_1^T q_1) + 0 + \cdots = r_{1j}
-    \]</div>
-<p>Thus, we find each element by <strong>projecting column <span class="math notranslate nohighlight">\(a_j\)</span> onto our new basis vector <span class="math notranslate nohighlight">\(q_1\)</span></strong>. This gives us the complete first row of <span class="math notranslate nohighlight">\(R\)</span>.</p>
-</li>
-<li><p><strong>Subtract the first component and repeat.</strong>
-Now that we have the full first component, <span class="math notranslate nohighlight">\(q_1 r_1^T\)</span>, we can subtract it from <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-    A^{(1)} = A - q_1 r_1^T
-    \]</div>
-<p>This update has a crucial effect: the <strong>first column of the new matrix <span class="math notranslate nohighlight">\(A^{(1)}\)</span> is now zero</strong>, and every subsequent column of <span class="math notranslate nohighlight">\(A^{(1)}\)</span> is now orthogonal to <span class="math notranslate nohighlight">\(q_1\)</span>. We can then <strong>repeat the entire process</strong> on <span class="math notranslate nohighlight">\(A^{(1)}\)</span> to find <span class="math notranslate nohighlight">\(q_2\)</span> and <span class="math notranslate nohighlight">\(r_2^T\)</span>, and so on.</p>
-</li>
-</ol>
-</section>
-<section id="the-complete-algorithm">
-<h3>The Complete Algorithm<a class="headerlink" href="#the-complete-algorithm" title="Link to this heading">#</a></h3>
-<p>This leads to a simple and elegant algorithm where we iteratively build <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span>.</p>
-<p>For <span class="math notranslate nohighlight">\(k = 1, \dots, n\)</span>:</p>
-<ol class="arabic">
-<li><p>Normalize the <span class="math notranslate nohighlight">\(k\)</span>-th column:</p>
-<div class="math notranslate nohighlight">
-\[
-    r_{kk} = \|a_k\|_2, \quad
-    q_k = a_k / r_{kk}
-    \]</div>
-</li>
-<li><p>Calculate the remaining elements of the <span class="math notranslate nohighlight">\(k\)</span>-th row of R:</p>
-<div class="math notranslate nohighlight">
-\[
-    r_{kj} = q_k^T a_j \quad (\text{for } j=k+1, \dots, n)
-    \]</div>
-</li>
-<li><p>Update the subsequent columns of the matrix:</p>
-<div class="math notranslate nohighlight">
-\[
-    a_j \leftarrow a_j - q_k r_{kj} \quad (\text{for } j=k+1, \dots, n)
-    \]</div>
-</li>
-</ol>
-</section>
-</section>
-<section id="numerical-stability">
-<h2>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h2>
-<p>When implemented in finite-precision arithmetic, different algorithms can produce very different results due to rounding errors. The classical version of Gram-Schmidt is known to be <strong>numerically unstable</strong> because the computed vectors <span class="math notranslate nohighlight">\(q_k\)</span> can quickly lose their orthogonality.</p>
-<p>The modified version we have just discussed is significantly more stable. The crucial difference is that when we orthogonalize <span class="math notranslate nohighlight">\(a_j\)</span> against <span class="math notranslate nohighlight">\(q_k\)</span>, the vector <span class="math notranslate nohighlight">\(a_j\)</span> has <em>already</em> been made orthogonal to all previous vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_{k-1}\)</span>. By continuously “cleaning” the remaining vectors at each step, we prevent the accumulation of orthogonality errors that plague the classical method. This makes MGS a much more reliable tool for practical computation.</p>
-</section>
-<section id="computational-cost">
-<h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
-<p>Let’s analyze the cost of the MGS algorithm for an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix.</p>
-<ul class="simple">
-<li><p>The outer loop runs <span class="math notranslate nohighlight">\(n\)</span> times (for each column).</p></li>
-<li><p>Inside the loop for column <span class="math notranslate nohighlight">\(k\)</span>:</p>
-<ul>
-<li><p>Normalizing column <span class="math notranslate nohighlight">\(k\)</span> (a vector of length <span class="math notranslate nohighlight">\(m\)</span>) takes about <span class="math notranslate nohighlight">\(2m\)</span> flops.</p></li>
-<li><p>The inner loop runs for the remaining <span class="math notranslate nohighlight">\(n-k\)</span> columns. For each of these columns <span class="math notranslate nohighlight">\(j\)</span>:</p>
-<ul>
-<li><p>Calculating the dot product <span class="math notranslate nohighlight">\(q_k^T a_j\)</span> costs <span class="math notranslate nohighlight">\(O(m)\)</span> flops.</p></li>
-<li><p>The vector update <span class="math notranslate nohighlight">\(a_j - r_{kj} q_k\)</span> also costs <span class="math notranslate nohighlight">\(O(m)\)</span> flops.</p></li>
-</ul>
-</li>
-<li><p>The cost of the inner loop is roughly <span class="math notranslate nohighlight">\((n-k) \times O(m)\)</span> flops.</p></li>
-</ul>
-</li>
-</ul>
-<p>Summing over the outer loop, the total cost is approximately:</p>
-<div class="math notranslate nohighlight">
-\[
-\sum_{k=1}^{n} (2m + (n-k) \cdot 2m) \approx \sum_{k=1}^{n} 2m(n-k+1) \approx 2m \frac{n(n+1)}{2} \approx mn^2
+r_{11}=\|a_1\|_2,\qquad q_1=\frac{a_1}{r_{11}}.
 \]</div>
-<p>The total computational cost is <strong><span class="math notranslate nohighlight">\(O(mn^2)\)</span> flops</strong>. This is asymptotically the same as the Householder QR algorithm.</p>
-</section>
-<section id="classical-gram-schmidt-cgs">
-<h2>Classical Gram-Schmidt (CGS)<a class="headerlink" href="#classical-gram-schmidt-cgs" title="Link to this heading">#</a></h2>
-<p>The <strong>Classical Gram-Schmidt (CGS)</strong> process is the standard textbook method for generating an orthonormal basis <span class="math notranslate nohighlight">\(\{q_1, \ldots, q_n\}\)</span> from a set of linearly independent vectors <span class="math notranslate nohighlight">\(\{a_1, \ldots, a_n\}\)</span>.</p>
-<p>The core idea is to build the basis one vector at a time. For each new vector <span class="math notranslate nohighlight">\(a_k\)</span>, you make it orthogonal to all <strong>previously computed basis vectors</strong> <span class="math notranslate nohighlight">\(\{q_1, \ldots, q_{k-1}\}\)</span>.</p>
-<p>The algorithm proceeds as follows:</p>
-<p>For <span class="math notranslate nohighlight">\(k = 1, \ldots, n\)</span>:</p>
-<ol class="arabic">
-<li><p><strong>Orthogonalize:</strong> Create an orthogonal vector <span class="math notranslate nohighlight">\(v_k\)</span> by subtracting the projections of <span class="math notranslate nohighlight">\(a_k\)</span> onto all previous basis vectors <span class="math notranslate nohighlight">\(q_j\)</span>.</p>
+<p>For every remaining column, remove its component along <span class="math notranslate nohighlight">\(q_1\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[v_k = a_k - (q_1^T a_k) q_1 - (q_2^T a_k) q_2 - \cdots - (q_{k-1}^T a_k) q_{k-1}\]</div>
-</li>
-<li><p><strong>Normalize:</strong> Normalize this new vector to get the next basis vector <span class="math notranslate nohighlight">\(q_k\)</span>.</p>
+\[
+r_{1j}=q_1^Ta_j,\qquad
+a_j^{(1)}=a_j-q_1r_{1j},\qquad j&gt;1.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(a_j^{(1)}\)</span> is the remaining part of <span class="math notranslate nohighlight">\(a_j\)</span> after the first projection. It is perpendicular to <span class="math notranslate nohighlight">\(q_1\)</span>, because</p>
+<div class="math notranslate nohighlight">
+\[
+q_1^Ta_j^{(1)}
+=q_1^Ta_j-(q_1^Tq_1)r_{1j}=0.
+\]</div>
+<p>Normalize <span class="math notranslate nohighlight">\(a_2^{(1)}\)</span> to obtain <span class="math notranslate nohighlight">\(q_2\)</span>, then remove the <span class="math notranslate nohighlight">\(q_2\)</span> component from each remaining column. Continuing in this way gives <strong>modified Gram-Schmidt (MGS)</strong>. Each projection coefficient is computed from the current residual column, after the preceding components have been removed.</p>
+<p>At step <span class="math notranslate nohighlight">\(k\)</span>, write <span class="math notranslate nohighlight">\(a_j^{(k-1)}\)</span> for this residual, with <span class="math notranslate nohighlight">\(a_j^{(0)}=a_j\)</span>. The formulas are</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    \begin{aligned}
-    r_{kk} &amp;= \|v_k\|_2 \\
-    q_k &amp;= v_k / r_{kk}
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-</ol>
-<section id="difference-from-modified-gram-schmidt-mgs">
-<h3>Difference from Modified Gram-Schmidt (MGS)<a class="headerlink" href="#difference-from-modified-gram-schmidt-mgs" title="Link to this heading">#</a></h3>
-<p>The <strong>Modified Gram-Schmidt (MGS)</strong> algorithm (describe above), is mathematically equivalent to CGS in exact arithmetic but behaves very differently in practice.</p>
-<p>The key difference is the <strong>order of operations</strong>.</p>
-<ul class="simple">
-<li><p><strong>CGS:</strong> For each vector <span class="math notranslate nohighlight">\(a_k\)</span>, it computes all its projections onto the <em>final</em> <span class="math notranslate nohighlight">\(q_j\)</span> vectors (for <span class="math notranslate nohighlight">\(j &lt; k\)</span>) using the <em>original</em> <span class="math notranslate nohighlight">\(a_k\)</span>.</p></li>
-<li><p><strong>MGS:</strong> As soon as a new basis vector <span class="math notranslate nohighlight">\(q_k\)</span> is computed, it is <strong>immediately used to “clean” all subsequent vectors</strong> <span class="math notranslate nohighlight">\(\{a_{k+1}, \ldots, a_n\}\)</span>.</p></li>
-</ul>
-<p>This is best seen in the MGS algorithm:</p>
-<p>For <span class="math notranslate nohighlight">\(k = 1, \ldots, n\)</span>:</p>
-<ol class="arabic">
-<li><p><strong>Normalize:</strong></p>
+\begin{aligned}
+r_{kk}&amp;=\|a_k^{(k-1)}\|_2,\\
+q_k&amp;=\frac{a_k^{(k-1)}}{r_{kk}},\\
+r_{kj}&amp;=q_k^Ta_j^{(k-1)},\qquad j&gt;k,\\
+a_j^{(k)}&amp;=a_j^{(k-1)}-q_kr_{kj},\qquad j&gt;k.
+\end{aligned}
+\end{split}\]</div>
+<p>The update is an orthogonal projection onto the space perpendicular to <span class="math notranslate nohighlight">\(q_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+a_j^{(k)}=(I-q_kq_k^T)a_j^{(k-1)}.
+\]</div>
+<p>There is also an outer-product interpretation. If <span class="math notranslate nohighlight">\(r_k^T\)</span> denotes row <span class="math notranslate nohighlight">\(k\)</span> of <span class="math notranslate nohighlight">\(R\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+A=\sum_{k=1}^n q_kr_k^T.
+\]</div>
+<p>Each step extracts one rank-one term. Since <span class="math notranslate nohighlight">\(r_{kj}=0\)</span> for <span class="math notranslate nohighlight">\(j&lt;k\)</span>, only the remaining columns need to be updated.</p>
+</section>
+<section id="the-in-place-algorithm">
+<h2>The In-Place Algorithm<a class="headerlink" href="#the-in-place-algorithm" title="Link to this heading">#</a></h2>
+<p>The superscripts above explain the derivation. In an implementation, one working array is enough. Its column <span class="math notranslate nohighlight">\(k\)</span> is normalized and stored as <span class="math notranslate nohighlight">\(q_k\)</span>; its later columns hold the current residuals. Initialize <span class="math notranslate nohighlight">\(R\)</span> to zero.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>for k = 1, ..., n:
+    r[k,k] = norm(A[:,k], 2)
+    if r[k,k] == 0:
+        stop: the current column adds no independent direction
+    A[:,k] = A[:,k] / r[k,k]
+    for j = k+1, ..., n:
+        r[k,j] = A[:,k]^T A[:,j]
+        A[:,j] = A[:,j] - A[:,k] r[k,j]
+</pre></div>
+</div>
+<p>On completion, the working array <span class="math notranslate nohighlight">\(A\)</span> contains <span class="math notranslate nohighlight">\(Q\)</span>, and <span class="math notranslate nohighlight">\(R\)</span> is stored separately. The input matrix is overwritten; retain a copy if it is needed later.</p>
+<p>The zero test describes breakdown in exact arithmetic. In floating-point arithmetic, a tiny residual may contain mostly rounding error even when its norm is nonzero. Detecting numerical dependence requires a tolerance relative to the input scale and desired accuracy. A small <span class="math notranslate nohighlight">\(r_{kk}\)</span> alone does not establish that the original columns are dependent.</p>
+</section>
+<section id="why-the-algorithm-works">
+<h2>Why the Algorithm Works<a class="headerlink" href="#why-the-algorithm-works" title="Link to this heading">#</a></h2>
+<p>The proof needs to establish three facts: the vectors are orthonormal, normalization never divides by zero under our rank assumption, and the stored coefficients reconstruct <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Correctness of Modified Gram-Schmidt in Exact Arithmetic.
+Suppose that <span class="math notranslate nohighlight">\(q_1,\ldots,q_{k-1}\)</span> are orthonormal and span the first <span class="math notranslate nohighlight">\(k-1\)</span> original columns. At the start of step <span class="math notranslate nohighlight">\(k\)</span>, each remaining column satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+a_j=\sum_{i=1}^{k-1}q_ir_{ij}+a_j^{(k-1)},
+\qquad q_i^Ta_j^{(k-1)}=0\quad(i&lt;k).
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, the sum is empty and these statements hold with <span class="math notranslate nohighlight">\(a_j^{(0)}=a_j\)</span>.</p>
+<p>The residual <span class="math notranslate nohighlight">\(a_k^{(k-1)}\)</span> cannot be zero. Otherwise, the displayed identity would place <span class="math notranslate nohighlight">\(a_k\)</span> in the span of its preceding columns, contradicting linear independence. Thus <span class="math notranslate nohighlight">\(r_{kk}&gt;0\)</span>, and normalizing gives a unit vector <span class="math notranslate nohighlight">\(q_k\)</span> perpendicular to the previous vectors. Also,</p>
+<div class="math notranslate nohighlight">
+\[
+a_k=\sum_{i=1}^{k-1}q_ir_{ik}+q_kr_{kk},
+\]</div>
+<p>so the first <span class="math notranslate nohighlight">\(k\)</span> basis vectors span the first <span class="math notranslate nohighlight">\(k\)</span> original columns.</p>
+<p>For <span class="math notranslate nohighlight">\(j&gt;k\)</span>, the update removes the component along <span class="math notranslate nohighlight">\(q_k\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+q_k^Ta_j^{(k)}
+=q_k^Ta_j^{(k-1)}-(q_k^Tq_k)r_{kj}=0.
+\]</div>
+<p>It also preserves perpendicularity to every earlier <span class="math notranslate nohighlight">\(q_i\)</span>, since</p>
+<div class="math notranslate nohighlight">
+\[
+q_i^Ta_j^{(k)}
+=q_i^Ta_j^{(k-1)}-(q_i^Tq_k)r_{kj}=0,
+\qquad i&lt;k.
+\]</div>
+<p>Finally, substituting <span class="math notranslate nohighlight">\(a_j^{(k-1)}=q_kr_{kj}+a_j^{(k)}\)</span> into the reconstruction identity extends its sum through <span class="math notranslate nohighlight">\(i=k\)</span>. This proves the induction step.</p>
+<p>At completion, every original column satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+a_j=\sum_{i=1}^j q_ir_{ij}.
+\]</div>
+<p>These column identities give <span class="math notranslate nohighlight">\(A=QR\)</span>, with <span class="math notranslate nohighlight">\(Q^TQ=I_n\)</span> and <span class="math notranslate nohighlight">\(R\)</span> upper triangular with positive diagonal.</p>
+</div>
+<p>If the columns are dependent, the basic algorithm stops at the first zero residual. QR still exists, but completing an orthonormal basis requires an additional choice. This is one reason to distinguish existence of QR from successful completion of this particular algorithm.</p>
+</section>
+<section id="comparison-with-classical-gram-schmidt">
+<h2>Comparison with Classical Gram-Schmidt<a class="headerlink" href="#comparison-with-classical-gram-schmidt" title="Link to this heading">#</a></h2>
+<p><strong>Classical Gram-Schmidt (CGS)</strong> computes all projection coefficients for a column from the original column:</p>
+<div class="math notranslate nohighlight">
+\[
+r_{ij}=q_i^Ta_j\quad(i&lt;j),\qquad
+v=a_j-\sum_{i=1}^{j-1}q_ir_{ij}.
+\]</div>
+<p>It then sets <span class="math notranslate nohighlight">\(r_{jj}=\|v\|_2\)</span> and <span class="math notranslate nohighlight">\(q_j=v/r_{jj}\)</span>. MGS instead uses the successive residuals. For one column, its computation can be written as</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-    \begin{aligned}
-    r_{kk} &amp;= \|a_k\|_2 \\
-    q_k &amp;= \frac{a_k}{r_{kk}}
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Orthogonalize remaining vectors:</strong> For all subsequent vectors <span class="math notranslate nohighlight">\(j = k+1, \ldots, n\)</span>:</p>
-<ul class="simple">
-<li><p>Calculate the projection: <span class="math notranslate nohighlight">\(r_{kj} = q_k^T a_j\)</span></p></li>
-<li><p>Update the vector: <span class="math notranslate nohighlight">\(a_j \leftarrow a_j - q_k r_{kj}\)</span></p></li>
-</ul>
-</li>
-</ol>
-<p>In MGS, when you’re at step <span class="math notranslate nohighlight">\(k\)</span>, the vector <span class="math notranslate nohighlight">\(a_j\)</span> (where <span class="math notranslate nohighlight">\(j &gt; k\)</span>) has <em>already</em> been made orthogonal to <span class="math notranslate nohighlight">\(\{q_1, \ldots, q_{k-1}\}\)</span>. You are projecting out the <span class="math notranslate nohighlight">\(q_k\)</span> component from an already-modified vector. In CGS, you always project the <em>original</em> <span class="math notranslate nohighlight">\(a_j\)</span>.</p>
+\begin{aligned}
+v&amp;=a_j,\\
+r_{ij}&amp;=q_i^Tv,\qquad v\leftarrow v-q_ir_{ij},
+\quad i=1,\ldots,j-1,\\
+r_{jj}&amp;=\|v\|_2,\qquad q_j=v/r_{jj}.
+\end{aligned}
+\end{split}\]</div>
+<p>This column-by-column ordering computes the same MGS projections as the in-place algorithm above. It is convenient when new vectors are generated one at a time.</p>
+<p>In exact arithmetic, CGS and MGS agree. Removing a component along <span class="math notranslate nohighlight">\(q_\ell\)</span> does not change the inner product with another orthogonal vector <span class="math notranslate nohighlight">\(q_i\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+q_i^T(v-q_\ell r_{\ell j})
+=q_i^Tv-(q_i^Tq_\ell)r_{\ell j}=q_i^Tv,
+\qquad i\ne\ell.
+\]</div>
+<p>In floating-point arithmetic, the computed basis vectors are not exactly orthogonal, so this equality no longer holds exactly. The choice of which vector enters each dot product then matters.</p>
 </section>
-<section id="id1">
-<h3>Numerical Stability<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<p>This algorithmic difference has a profound effect on stability.</p>
-<ul class="simple">
-<li><p><strong>Classical Gram-Schmidt (CGS) is numerically unstable.</strong>
-When using floating-point arithmetic, small rounding errors are introduced at each step. In CGS, the projections are all based on the original vectors. These small errors accumulate, and the resulting <span class="math notranslate nohighlight">\(q_k\)</span> vectors quickly lose their orthogonality. The computed <span class="math notranslate nohighlight">\(Q\)</span> matrix will not be truly orthogonal (i.e., <span class="math notranslate nohighlight">\(Q^T Q \neq I\)</span>).</p></li>
-<li><p><strong>Modified Gram-Schmidt (MGS) is numerically stable.</strong>
-MGS is more stable because it continuously “cleans” the remaining vectors. By updating <span class="math notranslate nohighlight">\(a_j\)</span> at every step <span class="math notranslate nohighlight">\(k\)</span>, it removes the component in the <span class="math notranslate nohighlight">\(q_k\)</span> direction. This process prevents the accumulation of rounding errors that plague CGS, and the final <span class="math notranslate nohighlight">\(Q\)</span> matrix is much closer to being perfectly orthogonal.</p></li>
-</ul>
+<section id="numerical-accuracy-the-condition-number-factor">
+<h2>Numerical Accuracy: The Condition-Number Factor<a class="headerlink" href="#numerical-accuracy-the-condition-number-factor" title="Link to this heading">#</a></h2>
+<p>Use the two backward-error measures introduced for <a class="reference internal" href="householder_reflections.html#qr-backward-error"><span class="std std-ref">Householder QR</span></a>. For MGS, <span class="math notranslate nohighlight">\(\widehat Q\)</span> is the computed reduced factor, so its orthogonality equation uses <span class="math notranslate nohighlight">\(I_n\)</span>.</p>
+<p>For a full-column-rank matrix, let</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma_{\max}\)</span> and <span class="math notranslate nohighlight">\(\sigma_{\min}\)</span> are the largest and smallest singular values. Under the same rounding assumptions, MGS gives the bounds</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+&amp;\le C_1(m,n)u,\\
+\|\widehat Q^T\widehat Q-I_n\|_2
+&amp;\le C_2(m,n)u\kappa_2(A).
+\end{aligned}
+}
+\end{split}\]</div>
+<p>The <span class="math notranslate nohighlight">\(C_i(m,n)\)</span> are dimension-dependent factors independent of <span class="math notranslate nohighlight">\(A\)</span>. The orthogonality bound additionally requires <span class="math notranslate nohighlight">\(C_0(m,n)u\kappa_2(A)\)</span> to be sufficiently small, so rounding errors remain below the scale of the smallest singular value.</p>
+<p><strong>The new factor is <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> in the orthogonality bound.</strong> MGS still reconstructs <span class="math notranslate nohighlight">\(A\)</span> accurately, but nearly dependent columns can cause substantial loss of orthogonality. Householder and Givens have no condition-number factor in either bound.</p>
+<p>The reason is cancellation in the projection steps. A nearly dependent column leaves a residual much smaller than the quantities subtracted from it. Errors in those quantities can be large relative to the residual, and normalization turns them into errors in the new basis direction. MGS usually reduces this effect compared with one-pass CGS, but does not eliminate it. This motivates a second orthogonalization pass.</p>
+<p>See <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">Higham’s QR overview</a> for the comparison, and Chapter 19 of his <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19">Accuracy and Stability of Numerical Algorithms</a> for the analysis.</p>
 </section>
-<section id="id2">
-<h3>Computational Cost<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
-<p>Both <strong>Classical Gram-Schmidt</strong> and <strong>Modified Gram-Schmidt</strong> have the same asymptotic computational cost. For an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix, both algorithms perform approximately <span class="math notranslate nohighlight">\(2mn^2\)</span> floating-point operations (flops). Therefore, given that MGS is significantly more stable for the same computational cost, it is the preferred method in practice over CGS.</p>
+<section id="reorthogonalization">
+<h2>Reorthogonalization<a class="headerlink" href="#reorthogonalization" title="Link to this heading">#</a></h2>
+<p>If accurate orthogonality is needed, project each residual against the previous basis vectors a second time before normalizing. This is called <strong>reorthogonalization</strong>. The second pass removes components left by rounding errors in the first pass.</p>
+<p>For column <span class="math notranslate nohighlight">\(j\)</span>, first perform the column-by-column MGS pass above. Then, using its remaining vector <span class="math notranslate nohighlight">\(v\)</span>, compute</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\delta r_{ij}&amp;=q_i^Tv,\\
+v&amp;\leftarrow v-q_i\delta r_{ij},\\
+r_{ij}&amp;\leftarrow r_{ij}+\delta r_{ij},
+\qquad i=1,\ldots,j-1.
+\end{aligned}
+\end{split}\]</div>
+<p>Finally set <span class="math notranslate nohighlight">\(r_{jj}=\|v\|_2\)</span> and <span class="math notranslate nohighlight">\(q_j=v/r_{jj}\)</span>. Adding the correction to <span class="math notranslate nohighlight">\(r_{ij}\)</span> is essential: both passes remove components that must be included in the identity <span class="math notranslate nohighlight">\(a_j=\sum_{i&lt;j}q_ir_{ij}+q_jr_{jj}\)</span>.</p>
+<p>For numerically independent columns, two passes can restore orthogonality to a dimension-dependent multiple of <span class="math notranslate nohighlight">\(u\)</span>. This guarantee requires rounding errors to be small relative to the independent part of each new column; a second pass cannot recover a direction that has already been lost in rounding. See <a class="reference external" href="https://www.cerfacs.fr/algor/reports/2002/TR_PA_02_33.pdf">Giraud, Langou, and Rozloznik’s analysis of reorthogonalization</a> for the precise assumptions and bounds.</p>
+<section id="a-numerical-example">
+<h3>A Numerical Example<a class="headerlink" href="#a-numerical-example" title="Link to this heading">#</a></h3>
+<p>Consider three almost parallel columns:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A_\varepsilon=
+\begin{pmatrix}
+1&amp;1&amp;1\\
+\varepsilon&amp;0&amp;0\\
+0&amp;\varepsilon&amp;0\\
+0&amp;0&amp;\varepsilon
+\end{pmatrix},\qquad \varepsilon&gt;0.
+\end{split}\]</div>
+<p>We have <span class="math notranslate nohighlight">\(A_\varepsilon^TA_\varepsilon=\boldsymbol{1}\boldsymbol{1}^T+\varepsilon^2I_3\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol{1}=(1,1,1)^T\)</span>. The rank-one matrix <span class="math notranslate nohighlight">\(\boldsymbol{1}\boldsymbol{1}^T\)</span> has eigenvalue <span class="math notranslate nohighlight">\(3\)</span> along <span class="math notranslate nohighlight">\(\boldsymbol{1}\)</span> and eigenvalue <span class="math notranslate nohighlight">\(0\)</span> on its perpendicular complement. Adding <span class="math notranslate nohighlight">\(\varepsilon^2I_3\)</span> and taking square roots gives the singular values <span class="math notranslate nohighlight">\(\sqrt{3+\varepsilon^2},\varepsilon,\varepsilon\)</span>. Thus the columns are independent, but <span class="math notranslate nohighlight">\(\kappa_2(A_\varepsilon)=\sqrt{3+\varepsilon^2}/\varepsilon\)</span> becomes large as <span class="math notranslate nohighlight">\(\varepsilon\)</span> decreases.</p>
+<p>The following experiment compares one-pass CGS, one-pass MGS, MGS with a second pass, and Householder QR. It uses the column-by-column ordering so the second pass is easy to identify.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">gram_schmidt</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">classical</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">passes</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">A</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">passes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">classical</span><span class="p">:</span>
+                <span class="c1"># All coefficients use the same vector.</span>
+                <span class="n">coefficients</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span> <span class="p">:</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">v</span>
+                <span class="n">R</span><span class="p">[:</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coefficients</span>
+                <span class="n">v</span> <span class="o">-=</span> <span class="n">Q</span><span class="p">[:,</span> <span class="p">:</span><span class="n">j</span><span class="p">]</span> <span class="o">@</span> <span class="n">coefficients</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Each coefficient uses the updated residual.</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
+                    <span class="n">coefficient</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">v</span>
+                    <span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coefficient</span>
+                    <span class="n">v</span> <span class="o">-=</span> <span class="n">coefficient</span> <span class="o">*</span> <span class="n">Q</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">R</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">R</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Zero residual: cannot normalize this column."</span><span class="p">)</span>
+        <span class="n">Q</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="n">R</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span>
+
+<span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-8</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">epsilon</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span>
+<span class="n">factorizations</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">"CGS"</span><span class="p">,</span> <span class="n">gram_schmidt</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">classical</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">"MGS"</span><span class="p">,</span> <span class="n">gram_schmidt</span><span class="p">(</span><span class="n">A</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">"MGS, two passes"</span><span class="p">,</span> <span class="n">gram_schmidt</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">passes</span><span class="o">=</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s2">"Householder"</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"reduced"</span><span class="p">)),</span>
+<span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Method'</span><span class="si">:</span><span class="s2">&lt;18</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Factorization error'</span><span class="si">:</span><span class="s2">&gt;20</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">'Orthogonality error'</span><span class="si">:</span><span class="s2">&gt;20</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span> <span class="ow">in</span> <span class="n">factorizations</span><span class="p">:</span>
+    <span class="n">residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">R</span><span class="p">,</span> <span class="s2">"fro"</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="s2">"fro"</span><span class="p">)</span>
+    <span class="n">orthogonality</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">-</span> <span class="n">Q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Q</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;18</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">residual</span><span class="si">:</span><span class="s2">20.1e</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">orthogonality</span><span class="si">:</span><span class="s2">20.1e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Method              Factorization error  Orthogonality error
+CGS                             8.3e-26              5.0e-01
+MGS                             1.4e-25              8.2e-09
+MGS, two passes                 6.4e-17              3.7e-17
+Householder                     3.2e-24              6.9e-16
+</pre></div>
+</div>
+</div>
+</div>
+<p>All four methods reconstruct this input accurately. Their orthogonality errors differ substantially: MGS improves on CGS, while the second pass brings MGS close to Householder accuracy. The exact printed values can vary slightly with the numerical library.</p>
 </section>
+</section>
+<section id="computational-cost-and-choice-of-method">
+<h2>Computational Cost and Choice of Method<a class="headerlink" href="#computational-cost-and-choice-of-method" title="Link to this heading">#</a></h2>
+<p>For each pair <span class="math notranslate nohighlight">\(k&lt;j\)</span>, the dot product costs about <span class="math notranslate nohighlight">\(2m\)</span> flops, and the residual update costs another <span class="math notranslate nohighlight">\(2m\)</span>. There are <span class="math notranslate nohighlight">\(n(n-1)/2\)</span> such pairs. Computing a norm and normalizing each column costs about <span class="math notranslate nohighlight">\(3m\)</span> flops, so the total is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\text{cost}
+&amp;=4m\frac{n(n-1)}{2}+O(mn)\\
+&amp;=\boxed{2mn^2+O(mn).}
+\end{aligned}
+\end{split}\]</div>
+<p>CGS has the same leading arithmetic cost. A second MGS pass doubles the projection work, giving <span class="math notranslate nohighlight">\(4mn^2+O(mn)\)</span> flops when used for every column.</p>
+<p>Householder QR costs <span class="math notranslate nohighlight">\(2mn^2-\tfrac23n^3+O(mn)\)</span> flops to compute <span class="math notranslate nohighlight">\(R\)</span> and store <span class="math notranslate nohighlight">\(Q\)</span> implicitly; explicitly forming the reduced <span class="math notranslate nohighlight">\(Q\)</span> requires additional work. MGS produces the reduced <span class="math notranslate nohighlight">\(Q\)</span> directly. Thus being tall and thin does not by itself make MGS the preferred method. Householder QR is the usual choice for a dense matrix available in advance; MGS with reorthogonalization is useful when an explicit basis must be built sequentially.</p>
+<p>For complex matrices, replace transposes in the inner products by conjugate transposes. The projection formulas and exact-arithmetic proof then apply with <span class="math notranslate nohighlight">\(Q^HQ=I_n\)</span>.</p>
 </section>
 </section>
 
@@ -711,7 +793,7 @@ MGS is more stable because it continuously “cleans” the remaining vectors. B
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Summary</p>
+        <p class="prev-next-title">Summary of QR Methods</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -733,21 +815,16 @@ MGS is more stable because it continuously “cleans” the remaining vectors. B
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-modified-gram-schmidt-algorithm">The Modified Gram-Schmidt Algorithm</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-outer-product-perspective">An Outer-Product Perspective</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-derivation">Algorithm Derivation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-complete-algorithm">The Complete Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#removing-one-direction-at-a-time">Removing One Direction at a Time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-in-place-algorithm">The In-Place Algorithm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-algorithm-works">Why the Algorithm Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparison-with-classical-gram-schmidt">Comparison with Classical Gram-Schmidt</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-accuracy-the-condition-number-factor">Numerical Accuracy: The Condition-Number Factor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reorthogonalization">Reorthogonalization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-numerical-example">A Numerical Example</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numerical-stability">Numerical Stability</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-gram-schmidt-cgs">Classical Gram-Schmidt (CGS)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#difference-from-modified-gram-schmidt-mgs">Difference from Modified Gram-Schmidt (MGS)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Numerical Stability</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Computational Cost</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-and-choice-of-method">Computational Cost and Choice of Method</a></li>
 </ul>
   </nav></div>
 

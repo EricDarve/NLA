@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Summary &#8212; Numerical Linear Algebra</title>
+    <title>Summary of QR Methods &#8212; Numerical Linear Algebra</title>
   
   
   
@@ -250,7 +250,7 @@
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Summary of QR Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
@@ -451,7 +451,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Summary</h1>
+    <h1>Summary of QR Methods</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -461,10 +461,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#householder-transformations-the-sledgehammer">Householder Transformations (The Sledgehammer)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#givens-rotations-the-scalpel">Givens Rotations (The Scalpel)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-schmidt-process-the-bricklayer">Gram-Schmidt Process (The Bricklayer)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-table">Summary Table</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-methods-construct-qr">How the Methods Construct QR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accuracy-and-computational-cost">Accuracy and Computational Cost</a></li>
 </ul>
             </nav>
         </div>
@@ -476,61 +474,72 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="summary">
-<h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
-<p>We can think of these three methods as different tools for the same job: making a matrix triangular.</p>
-<section id="householder-transformations-the-sledgehammer">
-<h2>Householder Transformations (The Sledgehammer)<a class="headerlink" href="#householder-transformations-the-sledgehammer" title="Link to this heading">#</a></h2>
-<p>Geometric Intuition: Each Householder transformation is a perfect reflection across a plane or hyperplane. It’s like placing a mirror in space to move an entire vector (and the sub-column of the matrix) onto a specific axis in one single, powerful step.</p>
-<p>The Go-To for Stability: It’s generally considered the most numerically stable of the three methods for QR factorization. When in doubt with a dense matrix, Householder is a robust and efficient choice.</p>
-<p>Efficiency: It’s the fastest method for dense matrices because it operates on entire columns at once, which maps well to modern computer memory and processing (using efficient BLAS-2 operations).</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="summary-of-qr-methods">
+<h1>Summary of QR Methods<a class="headerlink" href="#summary-of-qr-methods" title="Link to this heading">#</a></h1>
+<p>For <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> with <span class="math notranslate nohighlight">\(m\ge n\)</span>, the reduced QR factorization is</p>
+<div class="math notranslate nohighlight">
+\[
+A=QR,\qquad Q\in\mathbb{R}^{m\times n},\qquad
+Q^TQ=I_n,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(R\in\mathbb{R}^{n\times n}\)</span> is upper triangular. The columns of <span class="math notranslate nohighlight">\(Q\)</span> provide orthonormal directions, and <span class="math notranslate nohighlight">\(R\)</span> contains the coefficients expressing the columns of <span class="math notranslate nohighlight">\(A\)</span> in those directions. If <span class="math notranslate nohighlight">\(A\)</span> has full column rank, these directions form a basis for its column space and <span class="math notranslate nohighlight">\(R\)</span> is invertible.</p>
+<section id="how-the-methods-construct-qr">
+<h2>How the Methods Construct QR<a class="headerlink" href="#how-the-methods-construct-qr" title="Link to this heading">#</a></h2>
+<p><strong><a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder reflections</span></a></strong> act on an entire active column segment. One reflection eliminates all entries below the diagonal in that column. The algorithm stores <span class="math notranslate nohighlight">\(Q\)</span> implicitly as a product of reflections. For a dense matrix available in advance, Householder QR is the usual choice. Blocked implementations group reflections into updates that use matrix multiplication efficiently.</p>
+<p><strong><a class="reference internal" href="givens_rotations.html"><span class="std std-doc">Givens rotations</span></a></strong> combine two rows at a time, eliminating one selected entry. This local action is useful for structured matrices, such as upper Hessenberg and tridiagonal matrices, and for updating a factorization when a new row is added. Rotations can also create new nonzeros, so sparsity alone does not guarantee low cost. The algorithm stores <span class="math notranslate nohighlight">\(Q\)</span> implicitly as a sequence of rotations.</p>
+<p>A two-coordinate transformation can also be a reflection. The useful computational distinction is therefore <strong>two-coordinate versus whole-column transformations</strong>, rather than rotation versus reflection.</p>
+<p><strong><a class="reference internal" href="modified_gram_schmidt.html"><span class="std std-doc">Modified Gram-Schmidt</span></a></strong> constructs the columns of <span class="math notranslate nohighlight">\(Q\)</span> explicitly, one at a time. Each projection uses the current residual after the previous components have been removed. This is convenient when an iterative method generates new vectors from the existing basis, as in Arnoldi iteration. Householder and Givens methods also support incremental constructions, but their basis is naturally stored as transformations.</p>
 </section>
-<section id="givens-rotations-the-scalpel">
-<h2>Givens Rotations (The Scalpel)<a class="headerlink" href="#givens-rotations-the-scalpel" title="Link to this heading">#</a></h2>
-<p>Surgical Precision: A Givens rotation is more delicate. It operates on a 2D plane within the larger space, affecting only two rows at a time to zero out a single, specific element. It’s the perfect tool when you don’t want to disturb the whole matrix.</p>
-<p>Great for Parallel Computing: Because Givens rotations can operate on non-overlapping pairs of rows independently (e.g., rotating rows 1-2 and 3-4 simultaneously), the algorithm is much easier to parallelize than Householder.</p>
-<p>Connection to 3D Graphics: The 3D rotation matrices for roll, pitch, and yaw are just specific examples of Givens rotations. Composing these rotations can generate any orientation in 3D space, a fundamental concept in graphics and aerospace engineering.</p>
-</section>
-<section id="gram-schmidt-process-the-bricklayer">
-<h2>Gram-Schmidt Process (The Bricklayer)<a class="headerlink" href="#gram-schmidt-process-the-bricklayer" title="Link to this heading">#</a></h2>
-<p>Sequential Construction: Unlike the other two, which modify the existing matrix, Gram-Schmidt builds the orthonormal basis (Q) one vector at a time. This “brick-by-brick” approach is its most important feature.</p>
-<p>Essential for Iterative Methods: This sequential nature is critical for advanced iterative algorithms like the Arnoldi iteration, which is used to find eigenvalues of very large, sparse matrices. Householder and Givens can’t be used in the same way because they only produce the full orthogonal matrix at the end.</p>
-<p>A Lesson in Stability: The contrast between the unstable Classical Gram-Schmidt and the stable Modified Gram-Schmidt is a classic case study in numerical analysis, showing how a small change in the order of operations can dramatically impact the result due to rounding errors.</p>
-</section>
-<section id="summary-table">
-<h2>Summary Table<a class="headerlink" href="#summary-table" title="Link to this heading">#</a></h2>
+<section id="accuracy-and-computational-cost">
+<h2>Accuracy and Computational Cost<a class="headerlink" href="#accuracy-and-computational-cost" title="Link to this heading">#</a></h2>
+<p>Rounding affects both defining equations of QR. For computed factors, write</p>
+<div class="math notranslate nohighlight">
+\[
+A+\Delta A=\widehat Q\widehat R,\qquad
+\widehat Q^T\widehat Q=I_n+E.
+\]</div>
+<p>Backward accuracy in these equations requires both a small relative factorization error <span class="math notranslate nohighlight">\(\|\Delta A\|_F/\|A\|_F\)</span> and a small orthogonality error <span class="math notranslate nohighlight">\(\|E\|_2\)</span>. The computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is generally not exactly orthonormal.</p>
+<p>For <span class="math notranslate nohighlight">\(A\ne0\)</span>, completed Householder, Givens, and MGS factorizations give bounds of the form</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|\Delta A\|_F}{\|A\|_F}\le C(m,n)u,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff and <span class="math notranslate nohighlight">\(C(m,n)\)</span> is a dimension-dependent factor. Their orthogonality guarantees differ:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Method</p></th>
-<th class="head text-left"><p>Computational Cost (Flops)</p></th>
-<th class="head text-left"><p>Numerical Stability</p></th>
-<th class="head text-left"><p>Key Use Case</p></th>
+<th class="head text-left"><p>Leading cost for dense <span class="math notranslate nohighlight">\(A\)</span></p></th>
+<th class="head text-left"><p>Bound on <span class="math notranslate nohighlight">\(\lVert E\rVert_2\)</span></p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Householder</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 2mn^2 - \frac{2}{3}n^3\)</span></p></td>
-<td class="text-left"><p><strong>Excellent</strong> (Backward Stable)</p></td>
-<td class="text-left"><p>The “go-to” for dense matrices.</p></td>
+<tr class="row-even"><td class="text-left"><p>Householder</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(2mn^2-\frac23n^3\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(C(m,n)u\)</span></p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Givens</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 3mn^2 - n^3\)</span></p></td>
-<td class="text-left"><p><strong>Excellent</strong> (Backward Stable)</p></td>
-<td class="text-left"><p>Parallel computing or sparse matrices.</p></td>
+<tr class="row-odd"><td class="text-left"><p>Givens</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(3mn^2-n^3\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(C(m,n)u\)</span></p></td>
 </tr>
-<tr class="row-even"><td class="text-left"><p><strong>Modified Gram-Schmidt</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 2mn^2\)</span></p></td>
-<td class="text-left"><p><strong>Good</strong> (Stable, but error can depend on <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>)</p></td>
-<td class="text-left"><p>Iterative methods (e.g., Arnoldi).</p></td>
+<tr class="row-even"><td class="text-left"><p>One-pass MGS</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(2mn^2\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(C(m,n)u\kappa_2(A)\)</span></p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Classical Gram-Schmidt</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(\sim 2mn^2\)</span></p></td>
-<td class="text-left"><p><strong>Poor</strong> (Unstable)</p></td>
-<td class="text-left"><p>Pedagogical / illustrative.</p></td>
+<tr class="row-odd"><td class="text-left"><p>MGS with two passes</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(4mn^2\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(C(m,n)u\)</span></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>One-pass classical Gram-Schmidt</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(2mn^2\)</span></p></td>
+<td class="text-left"><p>Can be large</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<p>Here <span class="math notranslate nohighlight">\(\kappa_2(A)=\sigma_{\max}(A)/\sigma_{\min}(A)\)</span> for full-column-rank <span class="math notranslate nohighlight">\(A\)</span>. The constants can differ between methods. The bounds assume the usual rounding model, no overflow or significant underflow, and small dimension factors times <span class="math notranslate nohighlight">\(u\)</span>. The MGS and two-pass guarantees additionally require a dimension-dependent multiple of <span class="math notranslate nohighlight">\(u\kappa_2(A)\)</span> to be sufficiently small.</p>
+<p>For Householder and Givens, the listed costs compute <span class="math notranslate nohighlight">\(R\)</span> and store <span class="math notranslate nohighlight">\(Q\)</span> implicitly. Forming <span class="math notranslate nohighlight">\(Q\)</span> explicitly adds work. Gram-Schmidt produces the reduced <span class="math notranslate nohighlight">\(Q\)</span> directly. All costs omit lower-order terms; structured matrices can require much less work. For dense square matrices, Givens uses about 50% more arithmetic than Householder. Flop counts alone do not determine execution time.</p>
+<p>MGS with a second pass is called <strong>reorthogonalization</strong>. It removes components left by rounding in the first pass and can restore orthogonality close to working precision. One-pass MGS can lose substantial orthogonality when the columns are nearly dependent, even while reconstructing <span class="math notranslate nohighlight">\(A\)</span> accurately. Classical Gram-Schmidt computes its coefficients from the original column and can lose much more orthogonality.</p>
+<p>The preceding sections give the derivations and assumptions. <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">Higham’s QR overview</a> also summarizes the accuracy guarantees.</p>
 </section>
 </section>
 
@@ -600,10 +609,8 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#householder-transformations-the-sledgehammer">Householder Transformations (The Sledgehammer)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#givens-rotations-the-scalpel">Givens Rotations (The Scalpel)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-schmidt-process-the-bricklayer">Gram-Schmidt Process (The Bricklayer)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-table">Summary Table</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-methods-construct-qr">How the Methods Construct QR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accuracy-and-computational-cost">Accuracy and Computational Cost</a></li>
 </ul>
   </nav></div>
 

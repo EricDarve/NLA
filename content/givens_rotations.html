@@ -250,7 +250,7 @@
 <li class="toctree-l2"><a class="reference internal" href="householder_reflections.html">Householder Reflections</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary of QR Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
@@ -752,21 +752,21 @@ N_{\max}=\sum_{k=1}^n(m-k)
 </section>
 <section id="numerical-stability">
 <h2>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h2>
-<p>Safe computation of <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> prevents avoidable overflow and underflow. The subsequent QR computation has the same two accuracy guarantees as <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder QR</span></a>. If the full <span class="math notranslate nohighlight">\(Q\)</span> is formed using the stored rotations, the computed factors satisfy bounds of the form</p>
+<p>Safe computation of <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> prevents avoidable overflow and underflow. For the complete factorization, use the two backward errors introduced in the <a class="reference internal" href="householder_reflections.html#qr-backward-error"><span class="std std-ref">Householder discussion</span></a>: the relative perturbation <span class="math notranslate nohighlight">\(\|\Delta A\|_F/\|A\|_F\)</span> in the factorization equation and the orthogonality defect <span class="math notranslate nohighlight">\(\|E\|_2\)</span>.</p>
+<p>If the full <span class="math notranslate nohighlight">\(\widehat Q\)</span> is formed from the stored rotations, Givens QR satisfies the same form of bounds:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \boxed{
 \begin{aligned}
-\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+\frac{\|\Delta A\|_F}{\|A\|_F}
 &amp;\le C_1(m,n)u,\\
-\|\widehat Q^T\widehat Q-I\|_2
+\|E\|_2
 &amp;\le C_2(m,n)u.
 \end{aligned}
 }
 \end{split}\]</div>
-<p>Here <span class="math notranslate nohighlight">\(A\ne0\)</span>, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, and the factors <span class="math notranslate nohighlight">\(C_1,C_2\)</span> depend on the dimensions and implementation, not on the condition number of <span class="math notranslate nohighlight">\(A\)</span>. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times <span class="math notranslate nohighlight">\(u\)</span> small compared with <span class="math notranslate nohighlight">\(1\)</span>.</p>
-<p>The first bound controls how well the factors reproduce <span class="math notranslate nohighlight">\(A\)</span>; the second controls the loss of orthogonality. The computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is nearly orthogonal, not exactly orthogonal. A small error in the factorization does not by itself guarantee a small forward error in the least-squares solution, which also depends on the problem’s sensitivity.</p>
-<p>The reason orthogonal transformations help is that they do not amplify errors already present: <span class="math notranslate nohighlight">\(\|Gz\|_2=\|z\|_2\)</span>. Rounding still occurs when forming and applying each rotation, and a complete analysis must bound those new errors and their accumulation. See Nick Higham’s <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">What Is a QR Factorization?</a> for an overview, and Chapter 19 of his <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19">Accuracy and Stability of Numerical Algorithms</a> for the detailed analysis.</p>
+<p>These hold under the arithmetic assumptions stated for Householder QR, with dimension-dependent factors that do not involve <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>. Thus Givens QR also controls both defining equations, even though the computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is not exactly orthogonal.</p>
+<p>Orthogonal transformations help because they preserve vector lengths and do not amplify existing errors: <span class="math notranslate nohighlight">\(\|Gz\|_2=\|z\|_2\)</span>. The analysis must still account for new rounding errors in constructing and applying each rotation.</p>
 </section>
 </section>
 

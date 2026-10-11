@@ -250,7 +250,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Householder Reflections</a></li>
 <li class="toctree-l2"><a class="reference internal" href="givens_rotations.html">Givens Rotations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modified_gram_schmidt.html">Modified Gram-Schmidt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_summary.html">Summary of QR Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="existence_and_uniqueness_qr.html">Existence and Uniqueness of QR Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_and_determinant.html">The QR Factorization and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lu_vs_qr.html">LU vs. QR Decomposition</a></li>
@@ -475,7 +475,7 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-numerical-stability-guarantees">What Numerical Stability Guarantees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-and-orthogonality">Backward Error and Orthogonality</a></li>
 </ul>
             </nav>
         </div>
@@ -763,32 +763,41 @@ P_k=I-\tau_ku_ku_k^T.
 \end{split}\]</div>
 <p>Applying <span class="math notranslate nohighlight">\(Q\)</span> has the same cost. These are <span class="math notranslate nohighlight">\(O(mn)\)</span> operations; back substitution adds <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations. Once QR is available, solving for an additional right-hand side is therefore much cheaper than recomputing the factorization.</p>
 </section>
-<section id="what-numerical-stability-guarantees">
-<h2>What Numerical Stability Guarantees<a class="headerlink" href="#what-numerical-stability-guarantees" title="Link to this heading">#</a></h2>
-<p>In exact arithmetic, QR satisfies both <span class="math notranslate nohighlight">\(A=QR\)</span> and <span class="math notranslate nohighlight">\(Q^TQ=I\)</span>. Rounding affects both identities, so we need to measure two errors. Suppose we form the full matrix <span class="math notranslate nohighlight">\(Q\)</span> by applying the stored reflections to the identity. Write <span class="math notranslate nohighlight">\(\widehat Q\)</span> and <span class="math notranslate nohighlight">\(\widehat R\)</span> for the factors computed in floating-point arithmetic.</p>
-<p>For Householder QR, a rounding-error analysis gives bounds of the form</p>
+<section id="backward-error-and-orthogonality">
+<span id="qr-backward-error"></span><h2>Backward Error and Orthogonality<a class="headerlink" href="#backward-error-and-orthogonality" title="Link to this heading">#</a></h2>
+<p>A QR factorization must satisfy two equations: <span class="math notranslate nohighlight">\(A=QR\)</span> and <span class="math notranslate nohighlight">\(Q^TQ=I\)</span>. Rounding can affect both identities. Suppose we form the full <span class="math notranslate nohighlight">\(Q\)</span> by applying the stored reflections to the identity, and write <span class="math notranslate nohighlight">\(\widehat Q\)</span> and <span class="math notranslate nohighlight">\(\widehat R\)</span> for the computed factors.</p>
+<p>Backward error analysis asks how much the defining equations must be perturbed for the computed factors to satisfy them exactly. Perturbing <span class="math notranslate nohighlight">\(A\)</span> accounts for the factorization error, but cannot remove an error in orthogonality: the equation <span class="math notranslate nohighlight">\(Q^TQ=I\)</span> does not involve <span class="math notranslate nohighlight">\(A\)</span>. We therefore allow perturbations in both equations:</p>
+<div class="math notranslate nohighlight">
+\[
+A+\Delta A=\widehat Q\widehat R,
+\qquad
+\widehat Q^T\widehat Q=I_m+E.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\Delta A=\widehat Q\widehat R-A\)</span> is the change in the input matrix, and <span class="math notranslate nohighlight">\(E=\widehat Q^T\widehat Q-I_m\)</span> is the defect in orthogonality. The two backward-error measures are</p>
+<div class="math notranslate nohighlight">
+\[
+\underbrace{\frac{\|\Delta A\|_F}{\|A\|_F}}
+_{\text{relative factorization error}},
+\qquad
+\underbrace{\|E\|_2}_{\text{orthogonality error}}.
+\]</div>
+<p>The first measures how accurately the factors reconstruct <span class="math notranslate nohighlight">\(A\)</span>. The second measures how close the computed columns are to being orthonormal. Since <span class="math notranslate nohighlight">\(\|I_m\|_2=1\)</span>, <span class="math notranslate nohighlight">\(\|E\|_2\)</span> is also the relative size of the perturbation to the identity.</p>
+<p>The diagonal entries of <span class="math notranslate nohighlight">\(E\)</span> are the deviations of the squared column lengths from <span class="math notranslate nohighlight">\(1\)</span>; its off-diagonal entries are inner products between different columns. <strong>A small factorization error alone does not guarantee a small orthogonality error.</strong> Backward accuracy for QR requires both errors to be small.</p>
+<p>For Householder QR, a rounding-error analysis gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \boxed{
 \begin{aligned}
-\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+\frac{\|\Delta A\|_F}{\|A\|_F}
 &amp;\le C_1(m,n)u,\\
-\|\widehat Q^T\widehat Q-I\|_2
+\|E\|_2
 &amp;\le C_2(m,n)u.
 \end{aligned}
 }
 \end{split}\]</div>
-<p>Here <span class="math notranslate nohighlight">\(A\ne0\)</span>, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, and <span class="math notranslate nohighlight">\(C_1\)</span> and <span class="math notranslate nohighlight">\(C_2\)</span> are factors that depend on the dimensions and the implementation, but not on the condition number of <span class="math notranslate nohighlight">\(A\)</span>. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times <span class="math notranslate nohighlight">\(u\)</span> small compared with <span class="math notranslate nohighlight">\(1\)</span>.</p>
-<p>For a readable overview of the stability guarantees, see Nick Higham’s <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">What Is a QR Factorization?</a>. The detailed error analysis is in Chapter 19 of his <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19">Accuracy and Stability of Numerical Algorithms</a>, second edition.</p>
-<p>The first bound says that multiplying the computed factors reproduces <span class="math notranslate nohighlight">\(A\)</span> with a small relative error. We can interpret this error as a perturbation of the input: defining <span class="math notranslate nohighlight">\(E=\widehat Q\widehat R-A\)</span> gives</p>
-<div class="math notranslate nohighlight">
-\[
-A+E=\widehat Q\widehat R,
-\qquad
-\frac{\|E\|_F}{\|A\|_F}\le C_1(m,n)u.
-\]</div>
-<p>The second bound says that <span class="math notranslate nohighlight">\(\widehat Q\)</span> is nearly orthogonal. Its diagonal entries in <span class="math notranslate nohighlight">\(\widehat Q^T\widehat Q\)</span> are the squared column lengths, and its off-diagonal entries are inner products between different columns. Thus the columns have lengths close to <span class="math notranslate nohighlight">\(1\)</span> and are nearly perpendicular. <strong>The computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is generally not exactly orthogonal</strong>, so the displayed factorization of <span class="math notranslate nohighlight">\(A+E\)</span> is not an exact QR factorization.</p>
-<p>Both guarantees matter: a small factorization error alone does not ensure that the computed columns are nearly orthonormal. Householder QR controls both errors. It does not, however, guarantee that each computed factor is close to a particular exact factor of the original <span class="math notranslate nohighlight">\(A\)</span>, or that the least-squares solution has a small forward error. Those questions also depend on the sensitivity of the problem.</p>
+<p>Here <span class="math notranslate nohighlight">\(A\ne0\)</span>, <span class="math notranslate nohighlight">\(u\)</span> is the unit roundoff, and <span class="math notranslate nohighlight">\(C_1,C_2\)</span> depend on the dimensions and implementation, not on the condition number of <span class="math notranslate nohighlight">\(A\)</span>. The bounds assume the usual rounding model, no overflow or significant underflow, and dimension factors times <span class="math notranslate nohighlight">\(u\)</span> small compared with <span class="math notranslate nohighlight">\(1\)</span>. The same form of bounds applies to the reduced factors, with <span class="math notranslate nohighlight">\(I_n\)</span> in the orthogonality equation.</p>
+<p>Thus Householder QR is backward stable in both defining equations. The computed <span class="math notranslate nohighlight">\(\widehat Q\)</span> is nearly orthogonal, but generally not exactly orthogonal. These guarantees do not imply that each factor is close to a particular exact factor of the original <span class="math notranslate nohighlight">\(A\)</span>, or that the least-squares solution has a small forward error. Those questions also depend on the sensitivity of the problem.</p>
+<p>For an overview, see Nick Higham’s <a class="reference external" href="https://nhigham.com/2020/11/10/what-is-a-qr-factorization/">What Is a QR Factorization?</a>. The detailed analysis is in Chapter 19 of his <a class="reference external" href="https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19">Accuracy and Stability of Numerical Algorithms</a>, second edition.</p>
 </section>
 </section>
 
@@ -872,7 +881,7 @@ A+E=\widehat Q\widehat R,
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-numerical-stability-guarantees">What Numerical Stability Guarantees</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-error-and-orthogonality">Backward Error and Orthogonality</a></li>
 </ul>
   </nav></div>
 

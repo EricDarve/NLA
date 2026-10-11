@@ -1,36 +1,55 @@
-# Summary
+# Summary of QR Methods
 
-We can think of these three methods as different tools for the same job: making a matrix triangular.
+For $A\in\mathbb{R}^{m\times n}$ with $m\ge n$, the reduced QR factorization is
 
-## Householder Transformations (The Sledgehammer)
+$$
+A=QR,\qquad Q\in\mathbb{R}^{m\times n},\qquad
+Q^TQ=I_n,
+$$
 
-Geometric Intuition: Each Householder transformation is a perfect reflection across a plane or hyperplane. It's like placing a mirror in space to move an entire vector (and the sub-column of the matrix) onto a specific axis in one single, powerful step.
+where $R\in\mathbb{R}^{n\times n}$ is upper triangular. The columns of $Q$ provide orthonormal directions, and $R$ contains the coefficients expressing the columns of $A$ in those directions. If $A$ has full column rank, these directions form a basis for its column space and $R$ is invertible.
 
-The Go-To for Stability: It's generally considered the most numerically stable of the three methods for QR factorization. When in doubt with a dense matrix, Householder is a robust and efficient choice.
+## How the Methods Construct QR
 
-Efficiency: It's the fastest method for dense matrices because it operates on entire columns at once, which maps well to modern computer memory and processing (using efficient BLAS-2 operations).
+**[Householder reflections](householder_reflections.md)** act on an entire active column segment. One reflection eliminates all entries below the diagonal in that column. The algorithm stores $Q$ implicitly as a product of reflections. For a dense matrix available in advance, Householder QR is the usual choice. Blocked implementations group reflections into updates that use matrix multiplication efficiently.
 
-## Givens Rotations (The Scalpel)
+**[Givens rotations](givens_rotations.md)** combine two rows at a time, eliminating one selected entry. This local action is useful for structured matrices, such as upper Hessenberg and tridiagonal matrices, and for updating a factorization when a new row is added. Rotations can also create new nonzeros, so sparsity alone does not guarantee low cost. The algorithm stores $Q$ implicitly as a sequence of rotations.
 
-Surgical Precision: A Givens rotation is more delicate. It operates on a 2D plane within the larger space, affecting only two rows at a time to zero out a single, specific element. It's the perfect tool when you don't want to disturb the whole matrix.
+A two-coordinate transformation can also be a reflection. The useful computational distinction is therefore **two-coordinate versus whole-column transformations**, rather than rotation versus reflection.
 
-Great for Parallel Computing: Because Givens rotations can operate on non-overlapping pairs of rows independently (e.g., rotating rows 1-2 and 3-4 simultaneously), the algorithm is much easier to parallelize than Householder.
+**[Modified Gram-Schmidt](modified_gram_schmidt.md)** constructs the columns of $Q$ explicitly, one at a time. Each projection uses the current residual after the previous components have been removed. This is convenient when an iterative method generates new vectors from the existing basis, as in Arnoldi iteration. Householder and Givens methods also support incremental constructions, but their basis is naturally stored as transformations.
 
-Connection to 3D Graphics: The 3D rotation matrices for roll, pitch, and yaw are just specific examples of Givens rotations. Composing these rotations can generate any orientation in 3D space, a fundamental concept in graphics and aerospace engineering.
+## Accuracy and Computational Cost
 
-## Gram-Schmidt Process (The Bricklayer)
+Rounding affects both defining equations of QR. For computed factors, write
 
-Sequential Construction: Unlike the other two, which modify the existing matrix, Gram-Schmidt builds the orthonormal basis (Q) one vector at a time. This "brick-by-brick" approach is its most important feature.
+$$
+A+\Delta A=\widehat Q\widehat R,\qquad
+\widehat Q^T\widehat Q=I_n+E.
+$$
 
-Essential for Iterative Methods: This sequential nature is critical for advanced iterative algorithms like the Arnoldi iteration, which is used to find eigenvalues of very large, sparse matrices. Householder and Givens can't be used in the same way because they only produce the full orthogonal matrix at the end.
+Backward accuracy in these equations requires both a small relative factorization error $\|\Delta A\|_F/\|A\|_F$ and a small orthogonality error $\|E\|_2$. The computed $\widehat Q$ is generally not exactly orthonormal.
 
-A Lesson in Stability: The contrast between the unstable Classical Gram-Schmidt and the stable Modified Gram-Schmidt is a classic case study in numerical analysis, showing how a small change in the order of operations can dramatically impact the result due to rounding errors.
+For $A\ne0$, completed Householder, Givens, and MGS factorizations give bounds of the form
 
-## Summary Table
+$$
+\frac{\|\Delta A\|_F}{\|A\|_F}\le C(m,n)u,
+$$
 
-| Method | Computational Cost (Flops) | Numerical Stability | Key Use Case |
-| :--- | :--- | :--- | :--- |
-| **Householder** | $\sim 2mn^2 - \frac{2}{3}n^3$ | **Excellent** (Backward Stable) | The "go-to" for dense matrices. |
-| **Givens** | $\sim 3mn^2 - n^3$ | **Excellent** (Backward Stable) | Parallel computing or sparse matrices. |
-| **Modified Gram-Schmidt** | $\sim 2mn^2$ | **Good** (Stable, but error can depend on $\kappa_2(A)$) | Iterative methods (e.g., Arnoldi). |
-| **Classical Gram-Schmidt** | $\sim 2mn^2$ | **Poor** (Unstable) | Pedagogical / illustrative. |
+where $u$ is the unit roundoff and $C(m,n)$ is a dimension-dependent factor. Their orthogonality guarantees differ:
+
+| Method | Leading cost for dense $A$ | Bound on $\lVert E\rVert_2$ |
+| :--- | :--- | :--- |
+| Householder | $2mn^2-\frac23n^3$ | $C(m,n)u$ |
+| Givens | $3mn^2-n^3$ | $C(m,n)u$ |
+| One-pass MGS | $2mn^2$ | $C(m,n)u\kappa_2(A)$ |
+| MGS with two passes | $4mn^2$ | $C(m,n)u$ |
+| One-pass classical Gram-Schmidt | $2mn^2$ | Can be large |
+
+Here $\kappa_2(A)=\sigma_{\max}(A)/\sigma_{\min}(A)$ for full-column-rank $A$. The constants can differ between methods. The bounds assume the usual rounding model, no overflow or significant underflow, and small dimension factors times $u$. The MGS and two-pass guarantees additionally require a dimension-dependent multiple of $u\kappa_2(A)$ to be sufficiently small.
+
+For Householder and Givens, the listed costs compute $R$ and store $Q$ implicitly. Forming $Q$ explicitly adds work. Gram-Schmidt produces the reduced $Q$ directly. All costs omit lower-order terms; structured matrices can require much less work. For dense square matrices, Givens uses about 50% more arithmetic than Householder. Flop counts alone do not determine execution time.
+
+MGS with a second pass is called **reorthogonalization**. It removes components left by rounding in the first pass and can restore orthogonality close to working precision. One-pass MGS can lose substantial orthogonality when the columns are nearly dependent, even while reconstructing $A$ accurately. Classical Gram-Schmidt computes its coefficients from the original column and can lose much more orthogonality.
+
+The preceding sections give the derivations and assumptions. [Higham's QR overview](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/) also summarizes the accuracy guarantees.

@@ -320,35 +320,47 @@ $$
 
 Applying $Q$ has the same cost. These are $O(mn)$ operations; back substitution adds $O(n^2)$ operations. Once QR is available, solving for an additional right-hand side is therefore much cheaper than recomputing the factorization.
 
-## What Numerical Stability Guarantees
+(qr-backward-error)=
+## Backward Error and Orthogonality
 
-In exact arithmetic, QR satisfies both $A=QR$ and $Q^TQ=I$. Rounding affects both identities, so we need to measure two errors. Suppose we form the full matrix $Q$ by applying the stored reflections to the identity. Write $\widehat Q$ and $\widehat R$ for the factors computed in floating-point arithmetic.
+A QR factorization must satisfy two equations: $A=QR$ and $Q^TQ=I$. Rounding can affect both identities. Suppose we form the full $Q$ by applying the stored reflections to the identity, and write $\widehat Q$ and $\widehat R$ for the computed factors.
 
-For Householder QR, a rounding-error analysis gives bounds of the form
+Backward error analysis asks how much the defining equations must be perturbed for the computed factors to satisfy them exactly. Perturbing $A$ accounts for the factorization error, but cannot remove an error in orthogonality: the equation $Q^TQ=I$ does not involve $A$. We therefore allow perturbations in both equations:
+
+$$
+A+\Delta A=\widehat Q\widehat R,
+\qquad
+\widehat Q^T\widehat Q=I_m+E.
+$$
+
+Here $\Delta A=\widehat Q\widehat R-A$ is the change in the input matrix, and $E=\widehat Q^T\widehat Q-I_m$ is the defect in orthogonality. The two backward-error measures are
+
+$$
+\underbrace{\frac{\|\Delta A\|_F}{\|A\|_F}}
+_{\text{relative factorization error}},
+\qquad
+\underbrace{\|E\|_2}_{\text{orthogonality error}}.
+$$
+
+The first measures how accurately the factors reconstruct $A$. The second measures how close the computed columns are to being orthonormal. Since $\|I_m\|_2=1$, $\|E\|_2$ is also the relative size of the perturbation to the identity.
+
+The diagonal entries of $E$ are the deviations of the squared column lengths from $1$; its off-diagonal entries are inner products between different columns. **A small factorization error alone does not guarantee a small orthogonality error.** Backward accuracy for QR requires both errors to be small.
+
+For Householder QR, a rounding-error analysis gives
 
 $$
 \boxed{
 \begin{aligned}
-\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+\frac{\|\Delta A\|_F}{\|A\|_F}
 &\le C_1(m,n)u,\\
-\|\widehat Q^T\widehat Q-I\|_2
+\|E\|_2
 &\le C_2(m,n)u.
 \end{aligned}
 }
 $$
 
-Here $A\ne0$, $u$ is the unit roundoff, and $C_1$ and $C_2$ are factors that depend on the dimensions and the implementation, but not on the condition number of $A$. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times $u$ small compared with $1$.
+Here $A\ne0$, $u$ is the unit roundoff, and $C_1,C_2$ depend on the dimensions and implementation, not on the condition number of $A$. The bounds assume the usual rounding model, no overflow or significant underflow, and dimension factors times $u$ small compared with $1$. The same form of bounds applies to the reduced factors, with $I_n$ in the orthogonality equation.
 
-For a readable overview of the stability guarantees, see Nick Higham's [What Is a QR Factorization?](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/). The detailed error analysis is in Chapter 19 of his [Accuracy and Stability of Numerical Algorithms](https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19), second edition.
+Thus Householder QR is backward stable in both defining equations. The computed $\widehat Q$ is nearly orthogonal, but generally not exactly orthogonal. These guarantees do not imply that each factor is close to a particular exact factor of the original $A$, or that the least-squares solution has a small forward error. Those questions also depend on the sensitivity of the problem.
 
-The first bound says that multiplying the computed factors reproduces $A$ with a small relative error. We can interpret this error as a perturbation of the input: defining $E=\widehat Q\widehat R-A$ gives
-
-$$
-A+E=\widehat Q\widehat R,
-\qquad
-\frac{\|E\|_F}{\|A\|_F}\le C_1(m,n)u.
-$$
-
-The second bound says that $\widehat Q$ is nearly orthogonal. Its diagonal entries in $\widehat Q^T\widehat Q$ are the squared column lengths, and its off-diagonal entries are inner products between different columns. Thus the columns have lengths close to $1$ and are nearly perpendicular. **The computed $\widehat Q$ is generally not exactly orthogonal**, so the displayed factorization of $A+E$ is not an exact QR factorization.
-
-Both guarantees matter: a small factorization error alone does not ensure that the computed columns are nearly orthonormal. Householder QR controls both errors. It does not, however, guarantee that each computed factor is close to a particular exact factor of the original $A$, or that the least-squares solution has a small forward error. Those questions also depend on the sensitivity of the problem.
+For an overview, see Nick Higham's [What Is a QR Factorization?](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/). The detailed analysis is in Chapter 19 of his [Accuracy and Stability of Numerical Algorithms](https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19), second edition.
