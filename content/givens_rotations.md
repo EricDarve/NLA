@@ -302,21 +302,21 @@ Rotations between each pivot row and the added row eliminate its entries one at 
 
 ## Numerical Stability
 
-Safe computation of $c$ and $s$ prevents avoidable overflow and underflow. The subsequent QR computation has the same two accuracy guarantees as [Householder QR](householder_reflections.md). If the full $Q$ is formed using the stored rotations, the computed factors satisfy bounds of the form
+Safe computation of $c$ and $s$ prevents avoidable overflow and underflow. For the complete factorization, use the two backward errors introduced in the {ref}`Householder discussion <qr-backward-error>`: the relative perturbation $\|\Delta A\|_F/\|A\|_F$ in the factorization equation and the orthogonality defect $\|E\|_2$.
+
+If the full $\widehat Q$ is formed from the stored rotations, Givens QR satisfies the same form of bounds:
 
 $$
 \boxed{
 \begin{aligned}
-\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
+\frac{\|\Delta A\|_F}{\|A\|_F}
 &\le C_1(m,n)u,\\
-\|\widehat Q^T\widehat Q-I\|_2
+\|E\|_2
 &\le C_2(m,n)u.
 \end{aligned}
 }
 $$
 
-Here $A\ne0$, $u$ is the unit roundoff, and the factors $C_1,C_2$ depend on the dimensions and implementation, not on the condition number of $A$. The bounds assume the usual rounding model, no overflow or underflow, and dimension factors times $u$ small compared with $1$.
+These hold under the arithmetic assumptions stated for Householder QR, with dimension-dependent factors that do not involve $\kappa_2(A)$. Thus Givens QR also controls both defining equations, even though the computed $\widehat Q$ is not exactly orthogonal.
 
-The first bound controls how well the factors reproduce $A$; the second controls the loss of orthogonality. The computed $\widehat Q$ is nearly orthogonal, not exactly orthogonal. A small error in the factorization does not by itself guarantee a small forward error in the least-squares solution, which also depends on the problem's sensitivity.
-
-The reason orthogonal transformations help is that they do not amplify errors already present: $\|Gz\|_2=\|z\|_2$. Rounding still occurs when forming and applying each rotation, and a complete analysis must bound those new errors and their accumulation. See Nick Higham's [What Is a QR Factorization?](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/) for an overview, and Chapter 19 of his [Accuracy and Stability of Numerical Algorithms](https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19) for the detailed analysis.
+Orthogonal transformations help because they preserve vector lengths and do not amplify existing errors: $\|Gz\|_2=\|z\|_2$. The analysis must still account for new rounding errors in constructing and applying each rotation.

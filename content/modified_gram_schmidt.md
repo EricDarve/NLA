@@ -175,61 +175,36 @@ $$
 
 In floating-point arithmetic, the computed basis vectors are not exactly orthogonal, so this equality no longer holds exactly. The choice of which vector enters each dot product then matters.
 
-## Numerical Accuracy: Two Different Questions
+## Numerical Accuracy: The Condition-Number Factor
 
-To assess computed factors $\widehat Q$ and $\widehat R$, distinguish reconstruction of the input from orthogonality of the basis:
+Use the two backward-error measures introduced for {ref}`Householder QR <qr-backward-error>`. For MGS, $\widehat Q$ is the computed reduced factor, so its orthogonality equation uses $I_n$.
 
-$$
-\underbrace{\frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}}
-_{\text{relative factorization error}},
-\qquad
-\underbrace{\|I_n-\widehat Q^T\widehat Q\|_2}
-_{\text{loss of orthogonality}}.
-$$
-
-These measures can also be viewed as backward errors in QR's two defining equations:
+For a full-column-rank matrix, let
 
 $$
-A+\Delta A=\widehat Q\widehat R,
-\qquad
-\widehat Q^T\widehat Q=I_n+E.
+\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)},
 $$
 
-The two measures above are $\|\Delta A\|_F/\|A\|_F$ and $\|E\|_2$, respectively. From this viewpoint, backward accuracy requires small perturbations in both equations.
-
-A small factorization error does not imply that the computed basis is nearly orthonormal. Both quantities matter when using QR, for example when replacing $A$ by $R$ in a least-squares problem.
-
-The main difficulty is a nearly dependent column. Its residual is small compared with the original column and the components subtracted from it. Errors in those larger quantities can therefore be large relative to the residual. Normalizing the residual turns these errors into errors in the new basis direction. This is the cancellation mechanism discussed in [floating-point arithmetic](floating_point.md).
-
-MGS reduces this problem by computing each coefficient from the current residual. It usually preserves orthogonality much better than one-pass CGS, but it does not prevent all loss of orthogonality.
-
-For a full-column-rank matrix, define
+where $\sigma_{\max}$ and $\sigma_{\min}$ are the largest and smallest singular values. Under the same rounding assumptions, MGS gives the bounds
 
 $$
-\kappa_2(A)=\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
-$$
-
-Here $\sigma_{\max}$ and $\sigma_{\min}$ are the largest and smallest singular values. A large condition number indicates that some combination of the columns is small relative to the matrix scale.
-
-Under the usual rounding model, with no overflow or significant underflow, a completed MGS factorization satisfies
-
-$$
+\boxed{
+\begin{aligned}
 \frac{\|A-\widehat Q\widehat R\|_F}{\|A\|_F}
-\le C_2(m,n)u.
+&\le C_1(m,n)u,\\
+\|\widehat Q^T\widehat Q-I_n\|_2
+&\le C_2(m,n)u\kappa_2(A).
+\end{aligned}
+}
 $$
 
-Its orthogonality error has the following standard bound, provided $C_0(m,n)u\kappa_2(A)$ is sufficiently small:
+The $C_i(m,n)$ are dimension-dependent factors independent of $A$. The orthogonality bound additionally requires $C_0(m,n)u\kappa_2(A)$ to be sufficiently small, so rounding errors remain below the scale of the smallest singular value.
 
-$$
-\boxed{\|I_n-\widehat Q^T\widehat Q\|_2
-\le C_1(m,n)u\kappa_2(A).}
-$$
+**The new factor is $\kappa_2(A)$ in the orthogonality bound.** MGS still reconstructs $A$ accurately, but nearly dependent columns can cause substantial loss of orthogonality. Householder and Givens have no condition-number factor in either bound.
 
-Here $u$ is the unit roundoff, and the $C_i(m,n)$ are dimension-dependent factors independent of $A$; the bounds assume these factors times $u$ are small. The additional condition involving $\kappa_2(A)$ keeps rounding errors below the scale of the smallest singular value. The full analysis is beyond this page; see [Higham, *Accuracy and Stability of Numerical Algorithms*, Chapter 19](https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19). [Higham's QR overview](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/) summarizes the orthogonality bound and compares it with Householder and Givens QR.
+The reason is cancellation in the projection steps. A nearly dependent column leaves a residual much smaller than the quantities subtracted from it. Errors in those quantities can be large relative to the residual, and normalization turns them into errors in the new basis direction. MGS usually reduces this effect compared with one-pass CGS, but does not eliminate it. This motivates a second orthogonalization pass.
 
-:::{important}
-MGS improves on one-pass CGS, but an ill-conditioned input can still cause substantial loss of orthogonality. Explicitly formed Householder and Givens factors have orthogonality errors bounded by a dimension-dependent multiple of $u$, without the factor $\kappa_2(A)$.
-:::
+See [Higham's QR overview](https://nhigham.com/2020/11/10/what-is-a-qr-factorization/) for the comparison, and Chapter 19 of his [Accuracy and Stability of Numerical Algorithms](https://epubs.siam.org/doi/10.1137/1.9780898718027.ch19) for the analysis.
 
 ## Reorthogonalization
 
