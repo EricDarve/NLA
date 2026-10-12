@@ -179,6 +179,14 @@ This update needs only the vector $v$, the scalar $\beta$, and a work vector $w$
 
 ## Building the QR Factorization Column by Column
 
+```{figure} ../_static/householder_qr.svg
+:alt: Four diagrams show a dense four-by-three matrix becoming upper trapezoidal. The first reflection acts on all four rows and clears all three entries below the first diagonal entry. The next reflection acts on rows 2 through 4 and clears both entries below the second diagonal entry. The final reflection acts on rows 3 and 4 and clears the entry below the third diagonal entry. Blue blocks show the entries changed by the next reflection, orange circles mark its targets, and green zeros show earlier eliminations.
+:width: 780px
+:name: fig-householder-qr
+
+Householder QR for a matrix with four rows and three columns. One reflection clears every circled entry in the current column. The same reflection updates the trailing columns within the blue block. Rows above that block stay unchanged, and the green zeros in earlier columns are preserved. The active block shrinks as we move from left to right. Dots denote entries that may be nonzero.
+```
+
 Set $A^{(0)}=A$. At step $k$, suppose the first $k-1$ columns already have zeros below the diagonal. The entries we need to eliminate are in the vector
 
 $$
