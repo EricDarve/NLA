@@ -1,274 +1,153 @@
-# SVD for Rank-Deficient Least-Squares
+# Least Squares and Minimum Norm Using SVD
 
-In our previous discussions, we assumed $A$ had full column rank. But what happens if it doesn't?
+The QR solve on the preceding page assumes that $A$ has full column rank. If its columns are dependent, different coefficient vectors can produce the same fitted vector. Least squares still has a solution, but the coefficients are no longer unique.
 
-* If rank$(A) = r < n$, the matrix $A$ is **rank-deficient**.
-* This implies $A$ has a non-trivial **null space**, $N(A)$.
-* If $x_p$ is a solution to $\text{argmin}_x \|Ax - b\|_2$, then $x_p + z$ is *also* a solution for *any* vector $z \in N(A)$, because $A(x_p + z) - b = (Ax_p - b) + Az = (Ax_p - b)$.
-* This means the least-squares solution is **not unique**.
+The normal-equations Cholesky solve and ordinary QR back substitution then need to be replaced by methods that account for this dependence. Rank-aware QR can also compute minimum-norm solutions; the [LAPACK guide](https://www.netlib.org/lapack/lug/node27.html) describes both QR-based and SVD-based solvers. Here we use the SVD to separate the directions determined by $A$ from those in its null space.
 
-Our previous methods fail. For example, in the QR factorization $A=QR$, the upper-triangular matrix $R$ will have zeros on its diagonal, making it singular and not invertible.
+Let $A\in\mathbb{R}^{m\times n}$ have rank $r$, and let $b\in\mathbb{R}^m$. The construction applies to any matrix shape or rank.
 
 ## The Minimum Norm Solution
 
-When the solution is not unique, we must add a second criterion to select one of the many possible solutions. The standard choice is the **minimum norm solution**, which is the unique vector $x^*$ that satisfies two conditions:
+The **minimum-norm least-squares solution** $x^*$ is chosen by two successive minimizations: first minimize $\|Ax-b\|_2$, then minimize $\|x\|_2$ among the vectors that achieve that smallest residual. These choices take place in different spaces.
 
-1.  **It solves the LS problem:** $x^* = \text{argmin}_x \|Ax - b\|_2$.
-2.  **It has the minimum 2-norm:** $\|x^*\|_2 \le \|x\|_2$ for any other LS solution $x$.
+### First Choose the Closest Fitted Vector
 
-This second condition is equivalent to requiring the solution to be orthogonal to the null space: $x^* \perp N(A)$. This unique solution can be found robustly using the Singular Value Decomposition (SVD).
+The fitted vector $Ax$ lies in the column space of $A$, a subspace of the **output space** $\mathbb{R}^m$. The closest point to $b$ is its orthogonal projection $p$ onto this subspace. The residual $b-p$ is perpendicular to the column space.
 
-````{prf:proof}
-We prove the fact that the minimum-norm least-squares solution $x^*$ is orthogonal to the null space, $x^* \perp N(A)$.
+:::{figure} ../_static/normal_equations_projection.svg
+:alt: In the output space, the column space is drawn as a horizontal line. The vector b points above it, and its projection p is the closest fitted vector. The residual from p to b is perpendicular to the line. Another fitted vector Ax has a longer distance to b.
+:width: 720px
+:name: fig-svd-least-squares-projection
 
-Let $S$ be the set of all vectors $x$ that solve the least-squares problem. We are looking for a unique vector $x^* \in S$ such that $\|x^*\|_2$ is minimized.
+The first minimization chooses $p$, the fitted vector closest to $b$. Any other fitted vector $Ax$ adds a perpendicular displacement to the residual, increasing its squared length. Every least-squares minimizer therefore satisfies $Ax=p$, even when its coefficients are not unique.
+:::
 
-1.  **Decompose any LS solution:**
-    Let $x_p$ be *any* solution to the least-squares problem. As we've established, the set of all solutions $S$ can be written as:
+Choose any minimizer $x_p$, so $Ax_p=p$. Adding a vector from the null space $N(A)$ leaves the fit unchanged. Conversely, any other minimizer $x$ satisfies $A(x-x_p)=0$. Thus the complete set of minimizers is
 
-    $$
-    S = \{ x_p + z \mid z \in N(A) \}
-    $$
+$$
+S=\{x_p+z:z\in N(A)\}.
+$$
 
-    where $N(A)$ is the null space of $A$. Our goal is to find the vector in this set with the smallest 2-norm.
+### Then Choose the Closest Coefficient Vector to the Origin
 
-2.  **Decompose $x_p$ using Fundamental Subspaces:**
-    By the fundamental theorem of linear algebra, any vector in $\mathbb{R}^n$ (like $x_p$) can be uniquely decomposed into a component in the **row space**, $\text{span}(A^T)$, and a component in the **null space**, $N(A)$.
+The vectors in $S$ belong to the **input space** $\mathbb{R}^n$. They form a translated copy of the null space. Moving along this set changes the coefficients without changing the fitted vector or the residual.
 
-    $$
-    x_p = x_r + x_n
-    $$
+The minimum-norm solution $x^*$ is the point in $S$ closest to the origin. It has no component along the null space: such a component would increase its length without improving the fit.
 
-    where $x_r \in \text{span}(A^T)$ and $x_n \in N(A)$.
+:::{figure} ../_static/least_squares_minimum_norm.svg
+:alt: In the input space, the null space is a vertical line through the origin. All least-squares minimizers lie on a parallel vertical line. The purple vector x star reaches the closest point on that line and is perpendicular to the null space. Another minimizer x equals x star plus a vertical null-space vector z. A circle centered at the origin touches the line of minimizers only at x star.
+:width: 720px
+:name: fig-svd-minimum-norm
 
-3.  **Rewrite the set of all solutions:**
-    Let's substitute this decomposition back into our set $S$:
+The second minimization chooses the shortest coefficient vector among all minimizers. The line of minimizers is parallel to $N(A)$. Its closest point $x^*$ is perpendicular to that direction. Adding any nonzero $z\in N(A)$ gives a longer vector with the same fit. The circle centered at the origin touches the solution set only at $x^*$. The drawing shows a one-dimensional null space; the argument holds in higher dimensions.
+:::
 
-    $$
-    S = \{ x_r + z \mid z \in N(A) \}
-    $$
+:::{prf:proof} Why the Minimum-Norm Solution Is Perpendicular to the Null Space.
+By the [four fundamental subspaces](four_fundamental_subspaces.md), the row space and null space are orthogonal complements. Decompose any minimizer as
 
-    since $x_n$ is also in $N(A)$, we can absorb it into the general $z$ term.
+$$
+x_p=x_{\mathrm{row}}+x_{\mathrm{null}},
+\qquad
+x_{\mathrm{row}}\in\operatorname{range}(A^T),
+\quad x_{\mathrm{null}}\in N(A).
+$$
 
-4.  **Minimize the Norm using Orthogonality:**
-    We want to find $\text{argmin}_{x \in S} \|x\|_2^2$, which is now:
+Since $Ax_{\mathrm{null}}=0$, the row-space part $x_{\mathrm{row}}$ gives the same fit and is also a minimizer. The full solution set can therefore be written as $x_{\mathrm{row}}+N(A)$.
 
-    $$
-    \min_{z' \in N(A)} \|x_r + z'\|_2^2
-    $$
+For any $z\in N(A)$, orthogonality gives
 
-    A key part of the fundamental theorem is that the row space and the null space are **orthogonal complements**. This means that $x_r \perp z'$ for any $z' \in N(A)$.
-    By the Pythagorean theorem, the squared norm becomes:
+$$
+\|x_{\mathrm{row}}+z\|_2^2
+=\|x_{\mathrm{row}}\|_2^2+\|z\|_2^2.
+$$
 
-    $$
-    \|x_r + z'\|_2^2 = \|x_r\|_2^2 + \|z'\|_2^2
-    $$
+The first term is fixed. The second has its unique minimum at $z=0$, so $x^*=x_{\mathrm{row}}$. Thus the minimum-norm minimizer is unique and satisfies
 
-5.  **Find the Minimum:**
-    Our minimization problem is now:
+$$
+\boxed{x^*\in\operatorname{range}(A^T)=N(A)^\perp.}
+$$
+:::
 
-    $$
-    \min_{z' \in N(A)} \left( \|x_r\|_2^2 + \|z'\|_2^2 \right)
-    $$
-
-    The smallest possible value for $\|z'\|_2^2$ is 0, which is achieved when $z' = 0$.
-
-6.  The unique minimum-norm solution $x^*$ occurs when $z' = 0$. This gives:
-
-    $$
-    x^* = x_r + 0 = x_r
-    $$
-
-    By definition, $x_r$ is in the row space, $x_r \in \text{span}(A^T)$. Since the row space is the orthogonal complement of the null space ($\text{span}(A^T) = N(A)^\perp$), this proves that the minimum-norm solution $x^*$ must be **orthogonal to the null space $N(A)$**.
-````
+The two perpendicularity conditions have different roles: $b-Ax^*$ is perpendicular to the **column space** in $\mathbb{R}^m$, while $x^*$ is perpendicular to the **null space** in $\mathbb{R}^n$.
 
 ## Derivation using SVD
 
-Let's now use the **thin SVD** of $A$, which is a factorization $A = U \Sigma V^T$ where:
+If $r=0$, then $A=0$. Every coefficient vector gives the same residual norm $\|b\|_2$, and the minimum-norm solution is $x^*=0$. Otherwise, use the **compact SVD**, keeping only the positive singular values:
 
-* $A$ is $m \times n$ with rank$(A) = r < n$.
-* $U$ is an $m \times r$ matrix with orthonormal columns. Its columns form a basis for $\text{span}(A)$.
-* $\Sigma$ is an $r \times r$ diagonal matrix containing the $r$ non-zero singular values, $\sigma_1 \ge \dots \ge \sigma_r > 0$. It is invertible.
-* $V$ is an $n \times r$ matrix with orthonormal columns. Its columns form a basis for the **row space**, $\text{span}(A^T)$.
+$$
+A=U_r\Sigma_rV_r^T.
+$$
 
-We will now apply our two conditions.
+Here $U_r\in\mathbb{R}^{m\times r}$ and $V_r\in\mathbb{R}^{n\times r}$ have orthonormal columns. They span the column space and row space, respectively. The matrix $\Sigma_r\in\mathbb{R}^{r\times r}$ is diagonal, with $\sigma_1\ge\cdots\ge\sigma_r>0$.
 
 (ls-conditions)=
-### 1. The Least-Squares Condition
+### The Least-Squares Condition
 
-The LS solution must make the residual $r = Ax - b$ orthogonal to the column space, $\text{span}(A)$.
-
-* Since $\text{span}(A) = \text{span}(U)$, this orthogonality condition is:
-
-    $$
-    U^T (Ax - b) = 0
-    $$
-
-* Substitute $A = U \Sigma V^T$:
-
-    $$
-    U^T ( (U \Sigma V^T)x - b ) = 0
-    $$
-
-* Distribute $U^T$. Since $U$ has orthonormal columns, $U^T U = I_r$ (the $r \times r$ identity):
-
-    $$
-    \begin{aligned}
-        (U^T U) \Sigma V^T x - U^T b &= 0 \\
-        \Sigma V^T x &= U^T b
-    \end{aligned}
-    $$
-
-    This equation defines all LS solutions. As $V^T$ is a "wide" $r \times n$ matrix, this system is underdetermined for $x$ and has infinitely many solutions.
-
-### 2. The Minimum Norm Condition
-
-Now we apply our second condition: the solution $x$ must be orthogonal to the null space, $x \perp N(A)$.
-
-* From the SVD, we know the **null space $N(A)$ is the orthogonal complement of the row space $\text{span}(A^T)$**.
-* Since $\text{span}(A^T) = \text{span}(V)$, the condition $x \perp N(A)$ is *equivalent* to $x \in \text{span}(V)$.
-* This means $x$ must be a linear combination of the columns of $V$. We can express this by defining a new, unique vector $y \in \mathbb{R}^r$ such that:
-
-    $$
-    x = V y
-    $$
-
-### 3. Combining and Solving
-
-We now substitute our "minimum norm" form $x = Vy$ into our "least-squares" equation from [Step 1](#ls-conditions):
-
-$$
-\Sigma V^T (Vy) = U^T b
-$$
-
-* Since $V$ has orthonormal columns, $V^T V = I_r$. We can simplify the equation:
-
-    $$
-    \begin{aligned}
-        \Sigma (V^T V) y &= U^T b \\
-        \Sigma y &= U^T b
-    \end{aligned}
-    $$
-
-* This is now a simple $r \times r$ diagonal system. Since $\Sigma$ is invertible (it only contains non-zero singular values), we can solve for the unique $y$:
-
-    $$
-    y = \Sigma^{-1} U^T b
-    $$
-
-* Finally, we substitute $y$ back into $x = Vy$ to get our unique, minimum-norm LS solution:
-
-    $$
-    x = V y = V \Sigma^{-1} U^T b
-    $$
-
-This solution 
-
-$$
-x = \sum_{i=1}^r \frac{u_i^T b}{\sigma_i} \; v_i
-$$
-
-is the most robust and general solution to the linear least-squares problem.
-
-:::{tip}
-**The Moore-Penrose Pseudoinverse**
-
-The matrix we constructed, $A^\dagger = V \Sigma^{-1} U^T$, is known as the **Moore-Penrose Pseudoinverse**.
-
-The minimum-norm least-squares solution to $Ax=b$ is *always* given by:
-
-$$
-x = A^\dagger b
-$$
-
-The SVD provides the most general and numerically stable way to compute $A^\dagger$. It handles all cases:
-
-* $A$ is invertible: $A^\dagger = A^{-1}$.
-* $A$ is overdetermined (full rank): $A^\dagger = (A^T A)^{-1} A^T$.
-* $A$ is rank-deficient (our case): $A^\dagger$ gives the unique minimum-norm solution.
-:::
-
-### Equivalence with the Normal Equations Solution when Full Rank
-
-We will now prove that the minimum-norm least-squares solution using the SVD given by $V \Sigma^{-1} U^T b$ is the same as $(A^T A)^{-1} A^T b$ when $A$ has full column rank.
-
-This proof is valid under the assumption that $A$ has **full column rank** (rank$(A) = n$), which is the same assumption required for $(A^T A)^{-1}$ to exist in the first place.
-
-We will use the **thin SVD**, where $A = U \Sigma V^T$:
-
-* $A$ is $m \times n$.
-* $U$ is $m \times n$ with orthonormal columns, so $U^T U = I_n$.
-* $\Sigma$ is $n \times n$, diagonal, and invertible (since rank$=n$, all $n$ singular values are non-zero).
-* $V$ is $n \times n$ and orthogonal, so $V^T V = V V^T = I_n$ and $V^{-1} = V^T$.
-
-
-````{prf:proof}
-We will start with the normal equations form $A^\dagger = (A^T A)^{-1} A^T$ and substitute $A = U \Sigma V^T$ into it.
-
-**1. Substitute $A$ into $A^T A$:**
-First, let's find the expression for $A^T A$:
-
-$$
-A^T = (U \Sigma V^T)^T = V \Sigma^T U^T
-$$
-
-Since $\Sigma$ is a square diagonal matrix, $\Sigma^T = \Sigma$. So, $A^T = V \Sigma U^T$.
-Now, multiply $A^T$ and $A$:
-
-$$
-A^T A = (V \Sigma U^T) (U \Sigma V^T)
-$$
-
-Group the middle terms: $A^T A = V \Sigma (U^T U) \Sigma V^T$.
-Since $U^T U = I_n$ (the $n \times n$ identity), this simplifies to:
-
-$$
-A^T A = V \Sigma (I_n) \Sigma V^T = V \Sigma^2 V^T
-$$
-
-**2. Invert $A^T A$:**
-Now we find the inverse of the expression from Step 1:
-
-$$
-(A^T A)^{-1} = (V \Sigma^2 V^T)^{-1}
-$$
-
-Using the inverse rule $(XYZ)^{-1} = Z^{-1} Y^{-1} X^{-1}$:
-
-$$
-(A^T A)^{-1} = (V^T)^{-1} (\Sigma^2)^{-1} V^{-1}
-$$
-
-* Since $V$ is orthogonal, $V^{-1} = V^T$ and $(V^T)^{-1} = V$.
-* Since $\Sigma^2$ is diagonal, $(\Sigma^2)^{-1} = \Sigma^{-2}$.
-Substituting these in, we get:
-
-$$
-(A^T A)^{-1} = V \Sigma^{-2} V^T
-$$
-
-**3. Put It All Together:**
-Now we go back to the original formula and substitute our results from Step 1 and Step 2:
+The residual must be perpendicular to every column of $U_r$. Substituting the compact SVD and using $U_r^TU_r=I_r$ gives
 
 $$
 \begin{aligned}
-    A^\dagger &= (A^T A)^{-1} A^T \\
-             &= (V \Sigma^{-2} V^T) (V \Sigma U^T)
+U_r^T(b-Ax)&=0,\\
+\Sigma_rV_r^Tx&=U_r^Tb.
 \end{aligned}
 $$
 
-Group the middle terms: $A^\dagger = V \Sigma^{-2} (V^T V) \Sigma U^T$.
-Since $V^T V = I_n$:
+This determines the row-space coefficients $V_r^Tx$. Components in $N(A)$ remain free because $V_r^Tz=0$ for every null-space vector $z$.
+
+### The Minimum Norm Condition
+
+To remove that freedom, require $x^*$ to lie in the row space. Write $x^*=V_ry$. Since $V_r^TV_r=I_r$, the preceding equation becomes
 
 $$
-A^\dagger = V \Sigma^{-2} (I_n) \Sigma U^T = V (\Sigma^{-2} \Sigma) U^T
+\Sigma_ry=U_r^Tb,
+\qquad
+y=\Sigma_r^{-1}U_r^Tb.
 $$
 
-Finally, simplify the diagonal matrices: $\Sigma^{-2} \Sigma = \Sigma^{-1}$.
+Thus
 
 $$
-A^\dagger = V \Sigma^{-1} U^T
+\boxed{x^*=V_r\Sigma_r^{-1}U_r^Tb
+=\sum_{i=1}^r\frac{u_i^Tb}{\sigma_i}\,v_i.}
 $$
 
-This completes the proof, showing the two expressions are identical.
-````
+The solution lies in the row space because it is a combination of the columns of $V_r$. Its fitted vector and residual are
+
+$$
+Ax^*=U_rU_r^Tb=p,
+\qquad
+b-Ax^*=(I_m-U_rU_r^T)b.
+$$
+
+The SVD therefore makes both geometric choices explicit: $U_r$ determines the closest fit, and $V_r$ determines the coefficient vector perpendicular to the null space.
+
+## The Moore-Penrose Pseudoinverse
+
+Define
+
+$$
+A^\dagger=V_r\Sigma_r^{-1}U_r^T.
+$$
+
+Then $x^*=A^\dagger b$ is the unique minimum-norm least-squares solution. For $A=0$, define $A^\dagger$ to be the $n\times m$ zero matrix. If $A$ is square and invertible, $A^\dagger=A^{-1}$.
+
+### Equivalence with the Normal Equations Solution when Full Rank
+
+If $A$ has full column rank, then $r=n$ and $V_n$ is square and orthogonal. The compact SVD gives $A^TA=V_n\Sigma_n^2V_n^T$ and $A^T=V_n\Sigma_nU_n^T$. Therefore,
+
+$$
+\begin{aligned}
+(A^TA)^{-1}A^T
+&=(V_n\Sigma_n^{-2}V_n^T)(V_n\Sigma_nU_n^T)\\
+&=V_n\Sigma_n^{-1}U_n^T
+=A^\dagger.
+\end{aligned}
+$$
+
+The formulas are identical in exact arithmetic. Their numerical implementations differ: the SVD solve avoids forming $A^TA$ and squaring its condition number.
+
+## Computing the Solution
+
+Compute $U_r^Tb$, divide each entry by its corresponding positive singular value, and multiply the result by $V_r$. There is no need to form the full pseudoinverse.
+
+Small positive singular values can amplify errors in the data. In floating-point arithmetic, deciding which singular values to treat as zero requires a tolerance that reflects rounding and, when relevant, uncertainty in the data. Discarding small singular values gives the minimum-norm solution for a truncated approximation to $A$, not necessarily for the original matrix. The [SVD section](singular_value_decomposition.md) explains this approximation.

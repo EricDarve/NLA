@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>SVD for Rank-Deficient Least-Squares &#8212; Numerical Linear Algebra</title>
+    <title>Least Squares and Minimum Norm Using SVD &#8212; Numerical Linear Algebra</title>
   
   
   
@@ -255,7 +255,7 @@
 <li class="toctree-l2"><a class="reference internal" href="lu_qr_and_determinant.html">LU, QR, and the Determinant</a></li>
 <li class="toctree-l2"><a class="reference internal" href="normal_equations.html">The Method of Normal Equations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_using_QR.html">Solving Least-Squares using QR Factorization</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">SVD for Rank-Deficient Least-Squares</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Least Squares and Minimum Norm Using SVD</a></li>
 <li class="toctree-l2"><a class="reference internal" href="LS_summary.html">Summary of LS Solution Methods</a></li>
 </ul>
 </details></li>
@@ -450,7 +450,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>SVD for Rank-Deficient Least-Squares</h1>
+    <h1>Least Squares and Minimum Norm Using SVD</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -460,14 +460,21 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-solution">The Minimum Norm Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-solution">The Minimum Norm Solution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-choose-the-closest-fitted-vector">First Choose the Closest Fitted Vector</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#then-choose-the-closest-coefficient-vector-to-the-origin">Then Choose the Closest Coefficient Vector to the Origin</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-svd">Derivation using SVD</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-least-squares-condition">1. The Least-Squares Condition</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-condition">2. The Minimum Norm Condition</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-and-solving">3. Combining and Solving</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-least-squares-condition">The Least-Squares Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-condition">The Minimum Norm Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-moore-penrose-pseudoinverse">The Moore-Penrose Pseudoinverse</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-with-the-normal-equations-solution-when-full-rank">Equivalence with the Normal Equations Solution when Full Rank</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-solution">Computing the Solution</a></li>
 </ul>
             </nav>
         </div>
@@ -479,262 +486,139 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="svd-for-rank-deficient-least-squares">
-<h1>SVD for Rank-Deficient Least-Squares<a class="headerlink" href="#svd-for-rank-deficient-least-squares" title="Link to this heading">#</a></h1>
-<p>In our previous discussions, we assumed <span class="math notranslate nohighlight">\(A\)</span> had full column rank. But what happens if it doesn’t?</p>
-<ul class="simple">
-<li><p>If rank<span class="math notranslate nohighlight">\((A) = r &lt; n\)</span>, the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>rank-deficient</strong>.</p></li>
-<li><p>This implies <span class="math notranslate nohighlight">\(A\)</span> has a non-trivial <strong>null space</strong>, <span class="math notranslate nohighlight">\(N(A)\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(x_p\)</span> is a solution to <span class="math notranslate nohighlight">\(\text{argmin}_x \|Ax - b\|_2\)</span>, then <span class="math notranslate nohighlight">\(x_p + z\)</span> is <em>also</em> a solution for <em>any</em> vector <span class="math notranslate nohighlight">\(z \in N(A)\)</span>, because <span class="math notranslate nohighlight">\(A(x_p + z) - b = (Ax_p - b) + Az = (Ax_p - b)\)</span>.</p></li>
-<li><p>This means the least-squares solution is <strong>not unique</strong>.</p></li>
-</ul>
-<p>Our previous methods fail. For example, in the QR factorization <span class="math notranslate nohighlight">\(A=QR\)</span>, the upper-triangular matrix <span class="math notranslate nohighlight">\(R\)</span> will have zeros on its diagonal, making it singular and not invertible.</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="least-squares-and-minimum-norm-using-svd">
+<h1>Least Squares and Minimum Norm Using SVD<a class="headerlink" href="#least-squares-and-minimum-norm-using-svd" title="Link to this heading">#</a></h1>
+<p>The QR solve on the preceding page assumes that <span class="math notranslate nohighlight">\(A\)</span> has full column rank. If its columns are dependent, different coefficient vectors can produce the same fitted vector. Least squares still has a solution, but the coefficients are no longer unique.</p>
+<p>The normal-equations Cholesky solve and ordinary QR back substitution then need to be replaced by methods that account for this dependence. Rank-aware QR can also compute minimum-norm solutions; the <a class="reference external" href="https://www.netlib.org/lapack/lug/node27.html">LAPACK guide</a> describes both QR-based and SVD-based solvers. Here we use the SVD to separate the directions determined by <span class="math notranslate nohighlight">\(A\)</span> from those in its null space.</p>
+<p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> have rank <span class="math notranslate nohighlight">\(r\)</span>, and let <span class="math notranslate nohighlight">\(b\in\mathbb{R}^m\)</span>. The construction applies to any matrix shape or rank.</p>
 <section id="the-minimum-norm-solution">
 <h2>The Minimum Norm Solution<a class="headerlink" href="#the-minimum-norm-solution" title="Link to this heading">#</a></h2>
-<p>When the solution is not unique, we must add a second criterion to select one of the many possible solutions. The standard choice is the <strong>minimum norm solution</strong>, which is the unique vector <span class="math notranslate nohighlight">\(x^*\)</span> that satisfies two conditions:</p>
-<ol class="arabic simple">
-<li><p><strong>It solves the LS problem:</strong> <span class="math notranslate nohighlight">\(x^* = \text{argmin}_x \|Ax - b\|_2\)</span>.</p></li>
-<li><p><strong>It has the minimum 2-norm:</strong> <span class="math notranslate nohighlight">\(\|x^*\|_2 \le \|x\|_2\)</span> for any other LS solution <span class="math notranslate nohighlight">\(x\)</span>.</p></li>
-</ol>
-<p>This second condition is equivalent to requiring the solution to be orthogonal to the null space: <span class="math notranslate nohighlight">\(x^* \perp N(A)\)</span>. This unique solution can be found robustly using the Singular Value Decomposition (SVD).</p>
+<p>The <strong>minimum-norm least-squares solution</strong> <span class="math notranslate nohighlight">\(x^*\)</span> is chosen by two successive minimizations: first minimize <span class="math notranslate nohighlight">\(\|Ax-b\|_2\)</span>, then minimize <span class="math notranslate nohighlight">\(\|x\|_2\)</span> among the vectors that achieve that smallest residual. These choices take place in different spaces.</p>
+<section id="first-choose-the-closest-fitted-vector">
+<h3>First Choose the Closest Fitted Vector<a class="headerlink" href="#first-choose-the-closest-fitted-vector" title="Link to this heading">#</a></h3>
+<p>The fitted vector <span class="math notranslate nohighlight">\(Ax\)</span> lies in the column space of <span class="math notranslate nohighlight">\(A\)</span>, a subspace of the <strong>output space</strong> <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>. The closest point to <span class="math notranslate nohighlight">\(b\)</span> is its orthogonal projection <span class="math notranslate nohighlight">\(p\)</span> onto this subspace. The residual <span class="math notranslate nohighlight">\(b-p\)</span> is perpendicular to the column space.</p>
+<figure class="align-default" id="fig-svd-least-squares-projection">
+<a class="reference internal image-reference" href="../_images/normal_equations_projection.svg"><img alt="In the output space, the column space is drawn as a horizontal line. The vector b points above it, and its projection p is the closest fitted vector. The residual from p to b is perpendicular to the line. Another fitted vector Ax has a longer distance to b." src="../_images/normal_equations_projection.svg" style="width: 720px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 12 </span><span class="caption-text">The first minimization chooses <span class="math notranslate nohighlight">\(p\)</span>, the fitted vector closest to <span class="math notranslate nohighlight">\(b\)</span>. Any other fitted vector <span class="math notranslate nohighlight">\(Ax\)</span> adds a perpendicular displacement to the residual, increasing its squared length. Every least-squares minimizer therefore satisfies <span class="math notranslate nohighlight">\(Ax=p\)</span>, even when its coefficients are not unique.</span><a class="headerlink" href="#fig-svd-least-squares-projection" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Choose any minimizer <span class="math notranslate nohighlight">\(x_p\)</span>, so <span class="math notranslate nohighlight">\(Ax_p=p\)</span>. Adding a vector from the null space <span class="math notranslate nohighlight">\(N(A)\)</span> leaves the fit unchanged. Conversely, any other minimizer <span class="math notranslate nohighlight">\(x\)</span> satisfies <span class="math notranslate nohighlight">\(A(x-x_p)=0\)</span>. Thus the complete set of minimizers is</p>
+<div class="math notranslate nohighlight">
+\[
+S=\{x_p+z:z\in N(A)\}.
+\]</div>
+</section>
+<section id="then-choose-the-closest-coefficient-vector-to-the-origin">
+<h3>Then Choose the Closest Coefficient Vector to the Origin<a class="headerlink" href="#then-choose-the-closest-coefficient-vector-to-the-origin" title="Link to this heading">#</a></h3>
+<p>The vectors in <span class="math notranslate nohighlight">\(S\)</span> belong to the <strong>input space</strong> <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. They form a translated copy of the null space. Moving along this set changes the coefficients without changing the fitted vector or the residual.</p>
+<p>The minimum-norm solution <span class="math notranslate nohighlight">\(x^*\)</span> is the point in <span class="math notranslate nohighlight">\(S\)</span> closest to the origin. It has no component along the null space: such a component would increase its length without improving the fit.</p>
+<figure class="align-default" id="fig-svd-minimum-norm">
+<a class="reference internal image-reference" href="../_images/least_squares_minimum_norm.svg"><img alt="In the input space, the null space is a vertical line through the origin. All least-squares minimizers lie on a parallel vertical line. The purple vector x star reaches the closest point on that line and is perpendicular to the null space. Another minimizer x equals x star plus a vertical null-space vector z. A circle centered at the origin touches the line of minimizers only at x star." src="../_images/least_squares_minimum_norm.svg" style="width: 720px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">The second minimization chooses the shortest coefficient vector among all minimizers. The line of minimizers is parallel to <span class="math notranslate nohighlight">\(N(A)\)</span>. Its closest point <span class="math notranslate nohighlight">\(x^*\)</span> is perpendicular to that direction. Adding any nonzero <span class="math notranslate nohighlight">\(z\in N(A)\)</span> gives a longer vector with the same fit. The circle centered at the origin touches the solution set only at <span class="math notranslate nohighlight">\(x^*\)</span>. The drawing shows a one-dimensional null space; the argument holds in higher dimensions.</span><a class="headerlink" href="#fig-svd-minimum-norm" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 <div class="proof admonition" id="proof">
-<p>Proof. We prove the fact that the minimum-norm least-squares solution <span class="math notranslate nohighlight">\(x^*\)</span> is orthogonal to the null space, <span class="math notranslate nohighlight">\(x^* \perp N(A)\)</span>.</p>
-<p>Let <span class="math notranslate nohighlight">\(S\)</span> be the set of all vectors <span class="math notranslate nohighlight">\(x\)</span> that solve the least-squares problem. We are looking for a unique vector <span class="math notranslate nohighlight">\(x^* \in S\)</span> such that <span class="math notranslate nohighlight">\(\|x^*\|_2\)</span> is minimized.</p>
-<ol class="arabic">
-<li><p><strong>Decompose any LS solution:</strong>
-Let <span class="math notranslate nohighlight">\(x_p\)</span> be <em>any</em> solution to the least-squares problem. As we’ve established, the set of all solutions <span class="math notranslate nohighlight">\(S\)</span> can be written as:</p>
+<p>Proof. Why the Minimum-Norm Solution Is Perpendicular to the Null Space.
+By the <a class="reference internal" href="four_fundamental_subspaces.html"><span class="std std-doc">four fundamental subspaces</span></a>, the row space and null space are orthogonal complements. Decompose any minimizer as</p>
 <div class="math notranslate nohighlight">
 \[
-    S = \{ x_p + z \mid z \in N(A) \}
-    \]</div>
-<p>where <span class="math notranslate nohighlight">\(N(A)\)</span> is the null space of <span class="math notranslate nohighlight">\(A\)</span>. Our goal is to find the vector in this set with the smallest 2-norm.</p>
-</li>
-<li><p><strong>Decompose <span class="math notranslate nohighlight">\(x_p\)</span> using Fundamental Subspaces:</strong>
-By the fundamental theorem of linear algebra, any vector in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span> (like <span class="math notranslate nohighlight">\(x_p\)</span>) can be uniquely decomposed into a component in the <strong>row space</strong>, <span class="math notranslate nohighlight">\(\text{span}(A^T)\)</span>, and a component in the <strong>null space</strong>, <span class="math notranslate nohighlight">\(N(A)\)</span>.</p>
+x_p=x_{\mathrm{row}}+x_{\mathrm{null}},
+\qquad
+x_{\mathrm{row}}\in\operatorname{range}(A^T),
+\quad x_{\mathrm{null}}\in N(A).
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Ax_{\mathrm{null}}=0\)</span>, the row-space part <span class="math notranslate nohighlight">\(x_{\mathrm{row}}\)</span> gives the same fit and is also a minimizer. The full solution set can therefore be written as <span class="math notranslate nohighlight">\(x_{\mathrm{row}}+N(A)\)</span>.</p>
+<p>For any <span class="math notranslate nohighlight">\(z\in N(A)\)</span>, orthogonality gives</p>
 <div class="math notranslate nohighlight">
 \[
-    x_p = x_r + x_n
-    \]</div>
-<p>where <span class="math notranslate nohighlight">\(x_r \in \text{span}(A^T)\)</span> and <span class="math notranslate nohighlight">\(x_n \in N(A)\)</span>.</p>
-</li>
-<li><p><strong>Rewrite the set of all solutions:</strong>
-Let’s substitute this decomposition back into our set <span class="math notranslate nohighlight">\(S\)</span>:</p>
+\|x_{\mathrm{row}}+z\|_2^2
+=\|x_{\mathrm{row}}\|_2^2+\|z\|_2^2.
+\]</div>
+<p>The first term is fixed. The second has its unique minimum at <span class="math notranslate nohighlight">\(z=0\)</span>, so <span class="math notranslate nohighlight">\(x^*=x_{\mathrm{row}}\)</span>. Thus the minimum-norm minimizer is unique and satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-    S = \{ x_r + z \mid z \in N(A) \}
-    \]</div>
-<p>since <span class="math notranslate nohighlight">\(x_n\)</span> is also in <span class="math notranslate nohighlight">\(N(A)\)</span>, we can absorb it into the general <span class="math notranslate nohighlight">\(z\)</span> term.</p>
-</li>
-<li><p><strong>Minimize the Norm using Orthogonality:</strong>
-We want to find <span class="math notranslate nohighlight">\(\text{argmin}_{x \in S} \|x\|_2^2\)</span>, which is now:</p>
-<div class="math notranslate nohighlight">
-\[
-    \min_{z' \in N(A)} \|x_r + z'\|_2^2
-    \]</div>
-<p>A key part of the fundamental theorem is that the row space and the null space are <strong>orthogonal complements</strong>. This means that <span class="math notranslate nohighlight">\(x_r \perp z'\)</span> for any <span class="math notranslate nohighlight">\(z' \in N(A)\)</span>.
-By the Pythagorean theorem, the squared norm becomes:</p>
-<div class="math notranslate nohighlight">
-\[
-    \|x_r + z'\|_2^2 = \|x_r\|_2^2 + \|z'\|_2^2
-    \]</div>
-</li>
-<li><p><strong>Find the Minimum:</strong>
-Our minimization problem is now:</p>
-<div class="math notranslate nohighlight">
-\[
-    \min_{z' \in N(A)} \left( \|x_r\|_2^2 + \|z'\|_2^2 \right)
-    \]</div>
-<p>The smallest possible value for <span class="math notranslate nohighlight">\(\|z'\|_2^2\)</span> is 0, which is achieved when <span class="math notranslate nohighlight">\(z' = 0\)</span>.</p>
-</li>
-<li><p>The unique minimum-norm solution <span class="math notranslate nohighlight">\(x^*\)</span> occurs when <span class="math notranslate nohighlight">\(z' = 0\)</span>. This gives:</p>
-<div class="math notranslate nohighlight">
-\[
-    x^* = x_r + 0 = x_r
-    \]</div>
-<p>By definition, <span class="math notranslate nohighlight">\(x_r\)</span> is in the row space, <span class="math notranslate nohighlight">\(x_r \in \text{span}(A^T)\)</span>. Since the row space is the orthogonal complement of the null space (<span class="math notranslate nohighlight">\(\text{span}(A^T) = N(A)^\perp\)</span>), this proves that the minimum-norm solution <span class="math notranslate nohighlight">\(x^*\)</span> must be <strong>orthogonal to the null space <span class="math notranslate nohighlight">\(N(A)\)</span></strong>.</p>
-</li>
-</ol>
+\boxed{x^*\in\operatorname{range}(A^T)=N(A)^\perp.}
+\]</div>
 </div>
+<p>The two perpendicularity conditions have different roles: <span class="math notranslate nohighlight">\(b-Ax^*\)</span> is perpendicular to the <strong>column space</strong> in <span class="math notranslate nohighlight">\(\mathbb{R}^m\)</span>, while <span class="math notranslate nohighlight">\(x^*\)</span> is perpendicular to the <strong>null space</strong> in <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>.</p>
+</section>
 </section>
 <section id="derivation-using-svd">
 <h2>Derivation using SVD<a class="headerlink" href="#derivation-using-svd" title="Link to this heading">#</a></h2>
-<p>Let’s now use the <strong>thin SVD</strong> of <span class="math notranslate nohighlight">\(A\)</span>, which is a factorization <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span> where:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(m \times n\)</span> with rank<span class="math notranslate nohighlight">\((A) = r &lt; n\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(U\)</span> is an <span class="math notranslate nohighlight">\(m \times r\)</span> matrix with orthonormal columns. Its columns form a basis for <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(\Sigma\)</span> is an <span class="math notranslate nohighlight">\(r \times r\)</span> diagonal matrix containing the <span class="math notranslate nohighlight">\(r\)</span> non-zero singular values, <span class="math notranslate nohighlight">\(\sigma_1 \ge \dots \ge \sigma_r &gt; 0\)</span>. It is invertible.</p></li>
-<li><p><span class="math notranslate nohighlight">\(V\)</span> is an <span class="math notranslate nohighlight">\(n \times r\)</span> matrix with orthonormal columns. Its columns form a basis for the <strong>row space</strong>, <span class="math notranslate nohighlight">\(\text{span}(A^T)\)</span>.</p></li>
-</ul>
-<p>We will now apply our two conditions.</p>
+<p>If <span class="math notranslate nohighlight">\(r=0\)</span>, then <span class="math notranslate nohighlight">\(A=0\)</span>. Every coefficient vector gives the same residual norm <span class="math notranslate nohighlight">\(\|b\|_2\)</span>, and the minimum-norm solution is <span class="math notranslate nohighlight">\(x^*=0\)</span>. Otherwise, use the <strong>compact SVD</strong>, keeping only the positive singular values:</p>
+<div class="math notranslate nohighlight">
+\[
+A=U_r\Sigma_rV_r^T.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(U_r\in\mathbb{R}^{m\times r}\)</span> and <span class="math notranslate nohighlight">\(V_r\in\mathbb{R}^{n\times r}\)</span> have orthonormal columns. They span the column space and row space, respectively. The matrix <span class="math notranslate nohighlight">\(\Sigma_r\in\mathbb{R}^{r\times r}\)</span> is diagonal, with <span class="math notranslate nohighlight">\(\sigma_1\ge\cdots\ge\sigma_r&gt;0\)</span>.</p>
 <section id="the-least-squares-condition">
-<span id="ls-conditions"></span><h3>1. The Least-Squares Condition<a class="headerlink" href="#the-least-squares-condition" title="Link to this heading">#</a></h3>
-<p>The LS solution must make the residual <span class="math notranslate nohighlight">\(r = Ax - b\)</span> orthogonal to the column space, <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p>
-<ul>
-<li><p>Since <span class="math notranslate nohighlight">\(\text{span}(A) = \text{span}(U)\)</span>, this orthogonality condition is:</p>
-<div class="math notranslate nohighlight">
-\[
-    U^T (Ax - b) = 0
-    \]</div>
-</li>
-<li><p>Substitute <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-    U^T ( (U \Sigma V^T)x - b ) = 0
-    \]</div>
-</li>
-<li><p>Distribute <span class="math notranslate nohighlight">\(U^T\)</span>. Since <span class="math notranslate nohighlight">\(U\)</span> has orthonormal columns, <span class="math notranslate nohighlight">\(U^T U = I_r\)</span> (the <span class="math notranslate nohighlight">\(r \times r\)</span> identity):</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-        (U^T U) \Sigma V^T x - U^T b &amp;= 0 \\
-        \Sigma V^T x &amp;= U^T b
-    \end{aligned}
-    \end{split}\]</div>
-<p>This equation defines all LS solutions. As <span class="math notranslate nohighlight">\(V^T\)</span> is a “wide” <span class="math notranslate nohighlight">\(r \times n\)</span> matrix, this system is underdetermined for <span class="math notranslate nohighlight">\(x\)</span> and has infinitely many solutions.</p>
-</li>
-</ul>
-</section>
-<section id="the-minimum-norm-condition">
-<h3>2. The Minimum Norm Condition<a class="headerlink" href="#the-minimum-norm-condition" title="Link to this heading">#</a></h3>
-<p>Now we apply our second condition: the solution <span class="math notranslate nohighlight">\(x\)</span> must be orthogonal to the null space, <span class="math notranslate nohighlight">\(x \perp N(A)\)</span>.</p>
-<ul>
-<li><p>From the SVD, we know the <strong>null space <span class="math notranslate nohighlight">\(N(A)\)</span> is the orthogonal complement of the row space <span class="math notranslate nohighlight">\(\text{span}(A^T)\)</span></strong>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(\text{span}(A^T) = \text{span}(V)\)</span>, the condition <span class="math notranslate nohighlight">\(x \perp N(A)\)</span> is <em>equivalent</em> to <span class="math notranslate nohighlight">\(x \in \text{span}(V)\)</span>.</p></li>
-<li><p>This means <span class="math notranslate nohighlight">\(x\)</span> must be a linear combination of the columns of <span class="math notranslate nohighlight">\(V\)</span>. We can express this by defining a new, unique vector <span class="math notranslate nohighlight">\(y \in \mathbb{R}^r\)</span> such that:</p>
-<div class="math notranslate nohighlight">
-\[
-    x = V y
-    \]</div>
-</li>
-</ul>
-</section>
-<section id="combining-and-solving">
-<h3>3. Combining and Solving<a class="headerlink" href="#combining-and-solving" title="Link to this heading">#</a></h3>
-<p>We now substitute our “minimum norm” form <span class="math notranslate nohighlight">\(x = Vy\)</span> into our “least-squares” equation from <a class="reference internal" href="#ls-conditions">Step 1</a>:</p>
-<div class="math notranslate nohighlight">
-\[
-\Sigma V^T (Vy) = U^T b
-\]</div>
-<ul>
-<li><p>Since <span class="math notranslate nohighlight">\(V\)</span> has orthonormal columns, <span class="math notranslate nohighlight">\(V^T V = I_r\)</span>. We can simplify the equation:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-        \Sigma (V^T V) y &amp;= U^T b \\
-        \Sigma y &amp;= U^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p>This is now a simple <span class="math notranslate nohighlight">\(r \times r\)</span> diagonal system. Since <span class="math notranslate nohighlight">\(\Sigma\)</span> is invertible (it only contains non-zero singular values), we can solve for the unique <span class="math notranslate nohighlight">\(y\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-    y = \Sigma^{-1} U^T b
-    \]</div>
-</li>
-<li><p>Finally, we substitute <span class="math notranslate nohighlight">\(y\)</span> back into <span class="math notranslate nohighlight">\(x = Vy\)</span> to get our unique, minimum-norm LS solution:</p>
-<div class="math notranslate nohighlight">
-\[
-    x = V y = V \Sigma^{-1} U^T b
-    \]</div>
-</li>
-</ul>
-<p>This solution</p>
-<div class="math notranslate nohighlight">
-\[
-x = \sum_{i=1}^r \frac{u_i^T b}{\sigma_i} \; v_i
-\]</div>
-<p>is the most robust and general solution to the linear least-squares problem.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p><strong>The Moore-Penrose Pseudoinverse</strong></p>
-<p>The matrix we constructed, <span class="math notranslate nohighlight">\(A^\dagger = V \Sigma^{-1} U^T\)</span>, is known as the <strong>Moore-Penrose Pseudoinverse</strong>.</p>
-<p>The minimum-norm least-squares solution to <span class="math notranslate nohighlight">\(Ax=b\)</span> is <em>always</em> given by:</p>
-<div class="math notranslate nohighlight">
-\[
-x = A^\dagger b
-\]</div>
-<p>The SVD provides the most general and numerically stable way to compute <span class="math notranslate nohighlight">\(A^\dagger\)</span>. It handles all cases:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(A\)</span> is invertible: <span class="math notranslate nohighlight">\(A^\dagger = A^{-1}\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(A\)</span> is overdetermined (full rank): <span class="math notranslate nohighlight">\(A^\dagger = (A^T A)^{-1} A^T\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(A\)</span> is rank-deficient (our case): <span class="math notranslate nohighlight">\(A^\dagger\)</span> gives the unique minimum-norm solution.</p></li>
-</ul>
-</div>
-</section>
-<section id="equivalence-with-the-normal-equations-solution-when-full-rank">
-<h3>Equivalence with the Normal Equations Solution when Full Rank<a class="headerlink" href="#equivalence-with-the-normal-equations-solution-when-full-rank" title="Link to this heading">#</a></h3>
-<p>We will now prove that the minimum-norm least-squares solution using the SVD given by <span class="math notranslate nohighlight">\(V \Sigma^{-1} U^T b\)</span> is the same as <span class="math notranslate nohighlight">\((A^T A)^{-1} A^T b\)</span> when <span class="math notranslate nohighlight">\(A\)</span> has full column rank.</p>
-<p>This proof is valid under the assumption that <span class="math notranslate nohighlight">\(A\)</span> has <strong>full column rank</strong> (rank<span class="math notranslate nohighlight">\((A) = n\)</span>), which is the same assumption required for <span class="math notranslate nohighlight">\((A^T A)^{-1}\)</span> to exist in the first place.</p>
-<p>We will use the <strong>thin SVD</strong>, where <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span>:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(m \times n\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(U\)</span> is <span class="math notranslate nohighlight">\(m \times n\)</span> with orthonormal columns, so <span class="math notranslate nohighlight">\(U^T U = I_n\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(\Sigma\)</span> is <span class="math notranslate nohighlight">\(n \times n\)</span>, diagonal, and invertible (since rank<span class="math notranslate nohighlight">\(=n\)</span>, all <span class="math notranslate nohighlight">\(n\)</span> singular values are non-zero).</p></li>
-<li><p><span class="math notranslate nohighlight">\(V\)</span> is <span class="math notranslate nohighlight">\(n \times n\)</span> and orthogonal, so <span class="math notranslate nohighlight">\(V^T V = V V^T = I_n\)</span> and <span class="math notranslate nohighlight">\(V^{-1} = V^T\)</span>.</p></li>
-</ul>
-<div class="proof admonition" id="proof">
-<p>Proof. We will start with the normal equations form <span class="math notranslate nohighlight">\(A^\dagger = (A^T A)^{-1} A^T\)</span> and substitute <span class="math notranslate nohighlight">\(A = U \Sigma V^T\)</span> into it.</p>
-<p><strong>1. Substitute <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A^T A\)</span>:</strong>
-First, let’s find the expression for <span class="math notranslate nohighlight">\(A^T A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^T = (U \Sigma V^T)^T = V \Sigma^T U^T
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\Sigma\)</span> is a square diagonal matrix, <span class="math notranslate nohighlight">\(\Sigma^T = \Sigma\)</span>. So, <span class="math notranslate nohighlight">\(A^T = V \Sigma U^T\)</span>.
-Now, multiply <span class="math notranslate nohighlight">\(A^T\)</span> and <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^T A = (V \Sigma U^T) (U \Sigma V^T)
-\]</div>
-<p>Group the middle terms: <span class="math notranslate nohighlight">\(A^T A = V \Sigma (U^T U) \Sigma V^T\)</span>.
-Since <span class="math notranslate nohighlight">\(U^T U = I_n\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity), this simplifies to:</p>
-<div class="math notranslate nohighlight">
-\[
-A^T A = V \Sigma (I_n) \Sigma V^T = V \Sigma^2 V^T
-\]</div>
-<p><strong>2. Invert <span class="math notranslate nohighlight">\(A^T A\)</span>:</strong>
-Now we find the inverse of the expression from Step 1:</p>
-<div class="math notranslate nohighlight">
-\[
-(A^T A)^{-1} = (V \Sigma^2 V^T)^{-1}
-\]</div>
-<p>Using the inverse rule <span class="math notranslate nohighlight">\((XYZ)^{-1} = Z^{-1} Y^{-1} X^{-1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-(A^T A)^{-1} = (V^T)^{-1} (\Sigma^2)^{-1} V^{-1}
-\]</div>
-<ul class="simple">
-<li><p>Since <span class="math notranslate nohighlight">\(V\)</span> is orthogonal, <span class="math notranslate nohighlight">\(V^{-1} = V^T\)</span> and <span class="math notranslate nohighlight">\((V^T)^{-1} = V\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(\Sigma^2\)</span> is diagonal, <span class="math notranslate nohighlight">\((\Sigma^2)^{-1} = \Sigma^{-2}\)</span>.
-Substituting these in, we get:</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[
-(A^T A)^{-1} = V \Sigma^{-2} V^T
-\]</div>
-<p><strong>3. Put It All Together:</strong>
-Now we go back to the original formula and substitute our results from Step 1 and Step 2:</p>
+<span id="ls-conditions"></span><h3>The Least-Squares Condition<a class="headerlink" href="#the-least-squares-condition" title="Link to this heading">#</a></h3>
+<p>The residual must be perpendicular to every column of <span class="math notranslate nohighlight">\(U_r\)</span>. Substituting the compact SVD and using <span class="math notranslate nohighlight">\(U_r^TU_r=I_r\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-    A^\dagger &amp;= (A^T A)^{-1} A^T \\
-             &amp;= (V \Sigma^{-2} V^T) (V \Sigma U^T)
+U_r^T(b-Ax)&amp;=0,\\
+\Sigma_rV_r^Tx&amp;=U_r^Tb.
 \end{aligned}
 \end{split}\]</div>
-<p>Group the middle terms: <span class="math notranslate nohighlight">\(A^\dagger = V \Sigma^{-2} (V^T V) \Sigma U^T\)</span>.
-Since <span class="math notranslate nohighlight">\(V^T V = I_n\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^\dagger = V \Sigma^{-2} (I_n) \Sigma U^T = V (\Sigma^{-2} \Sigma) U^T
-\]</div>
-<p>Finally, simplify the diagonal matrices: <span class="math notranslate nohighlight">\(\Sigma^{-2} \Sigma = \Sigma^{-1}\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-A^\dagger = V \Sigma^{-1} U^T
-\]</div>
-<p>This completes the proof, showing the two expressions are identical.</p>
-</div>
+<p>This determines the row-space coefficients <span class="math notranslate nohighlight">\(V_r^Tx\)</span>. Components in <span class="math notranslate nohighlight">\(N(A)\)</span> remain free because <span class="math notranslate nohighlight">\(V_r^Tz=0\)</span> for every null-space vector <span class="math notranslate nohighlight">\(z\)</span>.</p>
 </section>
+<section id="the-minimum-norm-condition">
+<h3>The Minimum Norm Condition<a class="headerlink" href="#the-minimum-norm-condition" title="Link to this heading">#</a></h3>
+<p>To remove that freedom, require <span class="math notranslate nohighlight">\(x^*\)</span> to lie in the row space. Write <span class="math notranslate nohighlight">\(x^*=V_ry\)</span>. Since <span class="math notranslate nohighlight">\(V_r^TV_r=I_r\)</span>, the preceding equation becomes</p>
+<div class="math notranslate nohighlight">
+\[
+\Sigma_ry=U_r^Tb,
+\qquad
+y=\Sigma_r^{-1}U_r^Tb.
+\]</div>
+<p>Thus</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{x^*=V_r\Sigma_r^{-1}U_r^Tb
+=\sum_{i=1}^r\frac{u_i^Tb}{\sigma_i}\,v_i.}
+\]</div>
+<p>The solution lies in the row space because it is a combination of the columns of <span class="math notranslate nohighlight">\(V_r\)</span>. Its fitted vector and residual are</p>
+<div class="math notranslate nohighlight">
+\[
+Ax^*=U_rU_r^Tb=p,
+\qquad
+b-Ax^*=(I_m-U_rU_r^T)b.
+\]</div>
+<p>The SVD therefore makes both geometric choices explicit: <span class="math notranslate nohighlight">\(U_r\)</span> determines the closest fit, and <span class="math notranslate nohighlight">\(V_r\)</span> determines the coefficient vector perpendicular to the null space.</p>
+</section>
+</section>
+<section id="the-moore-penrose-pseudoinverse">
+<h2>The Moore-Penrose Pseudoinverse<a class="headerlink" href="#the-moore-penrose-pseudoinverse" title="Link to this heading">#</a></h2>
+<p>Define</p>
+<div class="math notranslate nohighlight">
+\[
+A^\dagger=V_r\Sigma_r^{-1}U_r^T.
+\]</div>
+<p>Then <span class="math notranslate nohighlight">\(x^*=A^\dagger b\)</span> is the unique minimum-norm least-squares solution. For <span class="math notranslate nohighlight">\(A=0\)</span>, define <span class="math notranslate nohighlight">\(A^\dagger\)</span> to be the <span class="math notranslate nohighlight">\(n\times m\)</span> zero matrix. If <span class="math notranslate nohighlight">\(A\)</span> is square and invertible, <span class="math notranslate nohighlight">\(A^\dagger=A^{-1}\)</span>.</p>
+<section id="equivalence-with-the-normal-equations-solution-when-full-rank">
+<h3>Equivalence with the Normal Equations Solution when Full Rank<a class="headerlink" href="#equivalence-with-the-normal-equations-solution-when-full-rank" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> has full column rank, then <span class="math notranslate nohighlight">\(r=n\)</span> and <span class="math notranslate nohighlight">\(V_n\)</span> is square and orthogonal. The compact SVD gives <span class="math notranslate nohighlight">\(A^TA=V_n\Sigma_n^2V_n^T\)</span> and <span class="math notranslate nohighlight">\(A^T=V_n\Sigma_nU_n^T\)</span>. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+(A^TA)^{-1}A^T
+&amp;=(V_n\Sigma_n^{-2}V_n^T)(V_n\Sigma_nU_n^T)\\
+&amp;=V_n\Sigma_n^{-1}U_n^T
+=A^\dagger.
+\end{aligned}
+\end{split}\]</div>
+<p>The formulas are identical in exact arithmetic. Their numerical implementations differ: the SVD solve avoids forming <span class="math notranslate nohighlight">\(A^TA\)</span> and squaring its condition number.</p>
+</section>
+</section>
+<section id="computing-the-solution">
+<h2>Computing the Solution<a class="headerlink" href="#computing-the-solution" title="Link to this heading">#</a></h2>
+<p>Compute <span class="math notranslate nohighlight">\(U_r^Tb\)</span>, divide each entry by its corresponding positive singular value, and multiply the result by <span class="math notranslate nohighlight">\(V_r\)</span>. There is no need to form the full pseudoinverse.</p>
+<p>Small positive singular values can amplify errors in the data. In floating-point arithmetic, deciding which singular values to treat as zero requires a tolerance that reflects rounding and, when relevant, uncertainty in the data. Discarding small singular values gives the minimum-norm solution for a truncated approximation to <span class="math notranslate nohighlight">\(A\)</span>, not necessarily for the original matrix. The <a class="reference internal" href="singular_value_decomposition.html"><span class="std std-doc">SVD section</span></a> explains this approximation.</p>
 </section>
 </section>
 
@@ -804,14 +688,21 @@ A^\dagger = V \Sigma^{-1} U^T
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-solution">The Minimum Norm Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-solution">The Minimum Norm Solution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-choose-the-closest-fitted-vector">First Choose the Closest Fitted Vector</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#then-choose-the-closest-coefficient-vector-to-the-origin">Then Choose the Closest Coefficient Vector to the Origin</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-using-svd">Derivation using SVD</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-least-squares-condition">1. The Least-Squares Condition</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-condition">2. The Minimum Norm Condition</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-and-solving">3. Combining and Solving</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-least-squares-condition">The Least-Squares Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-minimum-norm-condition">The Minimum Norm Condition</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-moore-penrose-pseudoinverse">The Moore-Penrose Pseudoinverse</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-with-the-normal-equations-solution-when-full-rank">Equivalence with the Normal Equations Solution when Full Rank</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-solution">Computing the Solution</a></li>
 </ul>
   </nav></div>
 
