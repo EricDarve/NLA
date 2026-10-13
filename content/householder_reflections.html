@@ -642,6 +642,13 @@ PC=(I-\beta vv^T)C=C-\beta v(v^TC).
 </section>
 <section id="building-the-qr-factorization-column-by-column">
 <h2>Building the QR Factorization Column by Column<a class="headerlink" href="#building-the-qr-factorization-column-by-column" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-householder-qr">
+<a class="reference internal image-reference" href="../_images/householder_qr.svg"><img alt="Four diagrams show a dense four-by-three matrix becoming upper trapezoidal. The first reflection acts on all four rows and clears all three entries below the first diagonal entry. The next reflection acts on rows 2 through 4 and clears both entries below the second diagonal entry. The final reflection acts on rows 3 and 4 and clears the entry below the third diagonal entry. Blue blocks show the entries changed by the next reflection, orange circles mark its targets, and green zeros show earlier eliminations." src="../_images/householder_qr.svg" style="width: 780px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Householder QR for a matrix with four rows and three columns. One reflection clears every circled entry in the current column. The same reflection updates the trailing columns within the blue block. Rows above that block stay unchanged, and the green zeros in earlier columns are preserved. The active block shrinks as we move from left to right. Dots denote entries that may be nonzero.</span><a class="headerlink" href="#fig-householder-qr" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 <p>Set <span class="math notranslate nohighlight">\(A^{(0)}=A\)</span>. At step <span class="math notranslate nohighlight">\(k\)</span>, suppose the first <span class="math notranslate nohighlight">\(k-1\)</span> columns already have zeros below the diagonal. The entries we need to eliminate are in the vector</p>
 <div class="math notranslate nohighlight">
 \[

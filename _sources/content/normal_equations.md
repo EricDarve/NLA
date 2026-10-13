@@ -1,163 +1,142 @@
 # The Method of Normal Equations
 
-The first approach we will study for solving the linear least-squares problem is the **method of normal equations**. It's an intuitive method that transforms the problem into a square linear system that we already know how to solve.
+The **method of normal equations** transforms a linear least-squares problem into a square symmetric system. It connects the geometry of orthogonal projection to the Cholesky solver from the preceding chapter.
 
 The linear least-squares problem is defined as finding the vector $x$ that minimizes the 2-norm of the residual:
 
 $$
-x^* = \arg\min_{x \in \mathbb{R}^n} \| Ax - b \|_2
+x^* \in \arg\min_{x \in \mathbb{R}^n} \| Ax - b \|_2,
 $$
 
-where $A$ is an $m \times n$ matrix and $b$ is an $m$-vector. We typically assume $m \ge n$.
+where $A\in\mathbb{R}^{m\times n}$ and $b\in\mathbb{R}^m$. The main case here is $m\ge n$ with full column rank. The geometric derivation also applies when the columns are dependent, so $x^*$ denotes any minimizer until uniqueness has been established.
 
 ## Geometric Derivation
 
-Minimizing the Euclidean distance $\| Ax - b \|_2$ is equivalent to finding the vector $Ax$ in the column space of $A$, denoted $\text{span}(A)$, that is closest to $b$. This occurs when the residual vector, $r = b - Ax$, is **orthogonal** to the column space of $A$.
+Every fitted vector $Ax$ lies in the column space $\operatorname{range}(A)$. Thus least squares asks for the point in this subspace closest to $b$. From the [geometry of orthogonal projections](projections.md), this point is the orthogonal projection $p$ of $b$ onto the column space.
 
-This orthogonality condition can be stated mathematically as:
-
-$$
-A^T (b - Ax) = 0
-$$
-
-Expanding this expression gives:
+Because $p$ belongs to the column space, some coefficient vector $x^*$ satisfies $Ax^*=p$. The corresponding residual is
 
 $$
-A^T b - A^T A x = 0
+r^*=b-p=b-Ax^*.
 $$
 
-Rearranging the terms yields a linear system of equations for $x$.
+The projection separates $b$ into a fitted part $p$ in the column space and a residual $r^*$ perpendicular to it.
+
+```{figure} ../_static/normal_equations_projection.svg
+:alt: A blue vector b points above the column space, drawn as a horizontal line. Its purple projection p equals A x star. The orange residual r star points from p to b and is perpendicular to the line. Another fitted vector A x lies farther to the right. The vector from A x to b is the hypotenuse of a right triangle with sides p minus A x and r star.
+:width: 720px
+:name: fig-normal-equations-projection
+
+The fitted vector $p=Ax^*$ is closest to $b$. For any other fitted vector $Ax$, the discrepancy $b-Ax$ splits into the perpendicular residual $r^*$ and the displacement $p-Ax$ within the column space. The column space is drawn as a line; the same argument holds for subspaces of any dimension.
+```
+
+To see why this projection minimizes the residual, compare $p$ with any other fitted vector $Ax$. Write
+
+$$
+b-Ax=(b-p)+(p-Ax)=r^*+(p-Ax).
+$$
+
+The first term is perpendicular to the column space, while the second lies in it. The Pythagorean theorem therefore gives
+
+$$
+\boxed{\|b-Ax\|_2^2=\|r^*\|_2^2+\|p-Ax\|_2^2.}
+$$
+
+The first term is fixed. The second is nonnegative and is zero precisely when $Ax=p$. Moving away from $p$ within the column space can only increase the squared distance to $b$. This proves that $x^*$ minimizes the residual and that every minimizer has the same fitted vector $p$.
+
+We can express the perpendicularity condition using the columns $a_1,\ldots,a_n$ of $A$. A vector is perpendicular to their span if and only if it is perpendicular to each column:
+
+$$
+a_j^Tr^*=0\quad(j=1,\ldots,n)
+\quad\Longleftrightarrow\quad
+A^Tr^*=0.
+$$
+
+Substituting $r^*=b-Ax^*$ gives $A^T(b-Ax^*)=0$, which yields a square system for the coefficients.
 
 ## The Normal Equations
 
 The resulting system is known as the **normal equations**:
 
 $$
-(A^T A) x = A^T b
+\boxed{(A^T A)x^*=A^T b.}
 $$
 
-This is a fundamental equation in linear algebra and optimization. It transforms the original, often rectangular, least-squares problem into a square $n \times n$ linear system.
+The word *normal* refers to the residual being perpendicular to the column space. These $n$ equations characterize all least-squares minimizers: any solution has a perpendicular residual, and the Pythagorean argument then proves it minimizes the distance. They remain valid when $A$ is rank deficient, although the coefficient vector is then not unique.
+
+### Derivation by Minimizing the Quadratic Form
+
+Minimizing the residual norm is equivalent to minimizing its square. The same equations follow by differentiating this quadratic function.
+
+:::{prf:proof}
+Expanding the squared norm gives
+
+$$
+\begin{aligned}
+f(x)&=\|Ax-b\|_2^2\\
+&=x^TA^TAx-2x^TA^Tb+b^Tb.
+\end{aligned}
+$$
+
+The two cross terms combine because $b^TAx=x^TA^Tb$ is a scalar. Since $A^TA$ is symmetric, the gradient (the vector of partial derivatives) is
+
+$$
+\nabla f(x)=2A^TAx-2A^Tb.
+$$
+
+At a minimizer this gradient is zero, giving $A^TAx^*=A^Tb$. Conversely, a solution of these equations has the perpendicular residual established above, so it is a global minimizer.
+:::
 
 ### Properties of $A^T A$
 
-The matrix $A^T A$ has several important properties:
-1.  It is always **symmetric**, since $(A^T A)^T = A^T (A^T)^T = A^T A$.
-2.  If the columns of $A$ are linearly independent (i.e., $A$ has **full column rank**), then $A^T A$ is **symmetric positive definite (SPD)**. This guarantees that a unique solution $x$ exists.
+To choose a solver for the normal equations, we need the structure of $A^TA$. It is symmetric, since $(A^TA)^T=A^TA$, and positive semidefinite because
 
-Because $A^T A$ is SPD (under the common assumption of full rank), the system can be solved efficiently and stably using **Cholesky factorization**. The explicit solution can be written as:
 $$
-x = (A^T A)^{-1} A^T b
+z^TA^TAz=\|Az\|_2^2\ge0.
 $$
+
+If $A$ has full column rank, then $Az\ne0$ for every nonzero $z$, making this expression strictly positive. Thus $A^TA$ is **symmetric positive definite (SPD)** and the normal equations have a unique solution $x^*$. If the columns are dependent, $A^TA$ is singular. The fitted vector is still unique, but adding any vector in the null space of $A$ to $x^*$ gives another minimizer.
+
+For full column rank, the exact solution can be written as
+
+$$
+x^*=(A^TA)^{-1}A^Tb.
+$$
+
+In computation, we solve using [Cholesky factorization](cholesky.md) rather than form the inverse. Its stability guarantees apply to the matrix supplied to the solver; forming $A^TA$ in floating-point arithmetic introduces a separate source of error.
 
 ## Algorithm Summary
 
-The method can be summarized in three steps:
+For full column rank $A$, the method has three steps:
+
 1.  **Form the Gram matrix:** Compute the $n \times n$ matrix $C = A^T A$.
 2.  **Form the right-hand side:** Compute the $n$-vector $d = A^T b$.
-3.  **Solve the system:** Solve the $n \times n$ symmetric system $Cx = d$ for $x$, typically using a Cholesky factorization of $C$.
+3.  **Solve using Cholesky:** Factor $C=LL^T$, then solve $Ly=d$ and $L^Tx^*=y$.
 
 ## Analysis and Drawbacks
 
 ### Computational Cost
-The computational cost is dominated by the formation of $A^T A$.
--   Computing $A^T A$ takes approximately $m n^2$ floating-point operations (flops).
+
+Counting multiplication and addition as separate flops, the leading costs are:
+
+-   Computing one triangle of $A^TA$ and copying it to the other takes approximately $mn^2$ flops. Computing every entry independently would take about $2mn^2$.
 -   Computing $A^T b$ takes approximately $2mn$ flops.
--   Solving the system with Cholesky factorization takes $\approx \frac{1}{3}n^3$ flops.
+-   Cholesky factorization takes approximately $\frac13n^3$ flops; the two triangular solves add $O(n^2)$.
 
-For a "tall and skinny" matrix where $m \gg n$, the total cost is approximately $O(mn^2)$.
+The total leading cost is $mn^2+\frac13n^3$, compared with $2mn^2-\frac23n^3$ for Householder QR. For $m\gg n$, the normal-equations method uses about half the factorization arithmetic. This saving is the reason to consider it, but it comes with an accuracy risk.
 
-:::{admonition} Potential for Severe Numerical Instability
+:::{admonition} Accuracy Risk: Squaring the Condition Number
 :class: warning
 
-The primary drawback of the normal equations method is its impact on the **condition number** of the problem. The condition number of the Gram matrix $A^T A$ is the square of the condition number of the original matrix $A$:
+For full column rank $A$, the eigenvalues of $A^TA$ are $\sigma_i(A)^2$. Therefore the condition number of the system we form is
 
 $$
 \kappa_2(A^T A) = (\kappa_2(A))^2
 $$
 
-**Implication:** If $A$ is even moderately ill-conditioned (e.g., $\kappa_2(A) \approx 10^6$), the matrix $A^T A$ will be severely ill-conditioned ($\kappa_2(A^T A) \approx 10^{12}$). Solving a system with such a high condition number can lead to a significant loss of precision, potentially rendering the computed solution useless. This squaring of the condition number is the main reason why the normal equations are often avoided in practice in favor of more numerically robust methods like QR factorization.
+Rounding errors in forming $A^TA$ can be large relative to its smallest eigenvalues. These errors can obscure the directions associated with small singular values of $A$, so a stable Cholesky solve does not guarantee an accurate solution of the original least-squares problem. If the columns are nearly dependent, the rounded Gram matrix may even lose positive definiteness and Cholesky can fail.
 :::
 
-## Derivation by Minimizing the Quadratic Form
+For example, $\kappa_2(A)=10^6$ gives $\kappa_2(A^TA)=10^{12}$. This signals a greater risk of losing precision, but does not by itself determine the error in a particular computed solution. The error also depends on $b$ and the rounding errors in forming and solving the system.
 
-````{prf:proof}
-There is another proof based on optimality conditions. It is less elegant than that one given above, but it is more general and can be extended to other problems. This approach treats the least-squares problem as an optimization problem.
-
-The objective is to find the vector $x$ that minimizes the squared 2-norm of the residual:
-
-$$
-f(x) = \| Ax - b \|_2^2
-$$
-
-### Step 1: Expand the Objective Function
-
-First, we rewrite the squared norm as a dot product (or transpose product):
-
-$$
-f(x) = (Ax - b)^T (Ax - b)
-$$
-
-Expanding this product gives:
-
-$$
-\begin{aligned}
-f(x) &= (x^T A^T - b^T)(Ax - b) \\
-&= x^T A^T Ax - x^T A^T b - b^T Ax + b^T b
-\end{aligned}
-$$
-
-Since $b^T A x$ is a scalar quantity, it is equal to its own transpose: $b^T A x = (b^T A x)^T = x^T A^T b$. This allows us to combine the two middle terms:
-
-$$
-f(x) = x^T (A^T A) x - 2 x^T (A^T b) + \|b\|_2^2
-$$
-
-This expression is a **quadratic form** in $x$. It's a multidimensional parabola (a paraboloid). Our goal is to find the value of $x$ at the bottom of this bowl, which is its minimum. 
-
-### Step 2: Find the Minimum using the Gradient
-
-The minimum of a convex function occurs at a stationary point, where its gradient with respect to $x$ is the zero vector. Let's compute the gradient of $f(x)$, which we denote as $\nabla_x f(x)$.
-
-Using the standard rules for matrix calculus:
-
-* The gradient of $x^T C x$ is $2Cx$ (for a symmetric matrix $C$ like $A^TA$).
-* The gradient of $c^T x$ (or $x^T c$) is $c$.
-
-Applying these rules to our objective function:
-
-$$
-\begin{gathered}
-\nabla_x f(x) = \nabla_x \left( x^T (A^T A) x - 2 x^T (A^T b) + \|b\|_2^2 \right) \\
-= 2(A^T A)x - 2(A^T b) + 0
-\end{gathered}
-$$
-
-To find the minimum, we set the gradient to zero:
-
-$$
-2(A^T A)x - 2(A^T b) = 0
-$$
-
-### Step 3: Solve for $x$
-
-Dividing by 2 and rearranging the terms, we arrive at the previous **normal equations**:
-
-$$
-(A^T A)x = A^T b
-$$
-
-The solution $x$ to this system is the vector that minimizes the least-squares objective function $f(x)$.
-
-````
-
-:::{admonition} Confirming a Minimum with the Hessian
-:class: note
-
-To be certain that this stationary point is a minimum (and not a maximum or saddle point), we can examine the second derivative, or the **Hessian matrix** ($\nabla_x^2 f(x)$). The Hessian of our objective function is:
-
-$$
-\nabla_x^2 f(x) = 2(A^T A)
-$$
-
-If the matrix $A$ has full column rank, then $A^T A$ is **positive definite**. A positive definite Hessian confirms that the function is strictly convex, and therefore the stationary point we found is a unique global minimum. 👍
-:::
+The [QR method](LS_using_QR.md) avoids forming $A^TA$ and works with a triangular factor having the same singular values as $A$. It preserves the conditioning of that factorization step, while the original least-squares problem can still be sensitive to perturbations.

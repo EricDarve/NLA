@@ -49,6 +49,14 @@ $$
 
 Normalize $a_2^{(1)}$ to obtain $q_2$, then remove the $q_2$ component from each remaining column. Continuing in this way gives **modified Gram-Schmidt (MGS)**. Each projection coefficient is computed from the current residual column, after the preceding components have been removed.
 
+```{figure} ../_static/gram_schmidt_geometry.svg
+:alt: Two diagrams illustrate Gram-Schmidt in two dimensions. On the left, the vector a2 splits into its horizontal projection along the unit vector q1 and a vertical perpendicular remainder. On the right, that remainder is drawn from the origin and normalized to the unit vector q2. The vectors q1 and q2 both have length one and meet at a right angle.
+:width: 780px
+:name: fig-gram-schmidt-geometry
+
+Remove the component of $a_2$ along $q_1$, then normalize what remains. On the left, the purple arrow represents $a_2^{(1)}$, drawn from the tip of the projection to the tip of $a_2$. On the right, the same remainder is drawn from the origin; normalizing it changes its length but preserves its perpendicular direction. Both $q_1$ and $q_2$ have length $1$.
+```
+
 At step $k$, write $a_j^{(k-1)}$ for this residual, with $a_j^{(0)}=a_j$. The formulas are
 
 $$

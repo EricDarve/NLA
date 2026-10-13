@@ -490,7 +490,8 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="solving-least-squares-using-qr-factorization">
 <h1>Solving Least-Squares using QR Factorization<a class="headerlink" href="#solving-least-squares-using-qr-factorization" title="Link to this heading">#</a></h1>
-<p>While the method of normal equations is straightforward, its numerical instability, caused by squaring the condition number, makes it unsuitable for many practical problems. A more robust and widely used approach is based on the <strong>QR factorization</strong> of the matrix <span class="math notranslate nohighlight">\(A\)</span>. This method is generally the standard for solving dense linear least-squares problems.</p>
+<p>The <strong>QR method</strong> solves a least-squares problem without forming <span class="math notranslate nohighlight">\(A^TA\)</span>. It avoids squaring the condition number of the matrix used in the solve and is a standard approach for dense least-squares problems.</p>
+<p>Throughout this page, <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> has full column rank, <span class="math notranslate nohighlight">\(m\ge n\)</span>, and <span class="math notranslate nohighlight">\(b\in\mathbb{R}^m\)</span>. These assumptions ensure that the least-squares minimizer is unique.</p>
 <section id="derivation-from-the-orthogonality-principle">
 <h2>Derivation from the Orthogonality Principle<a class="headerlink" href="#derivation-from-the-orthogonality-principle" title="Link to this heading">#</a></h2>
 <p>We start from the same geometric principle as before: the residual vector <span class="math notranslate nohighlight">\(r = b - Ax\)</span> must be orthogonal to the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
@@ -498,61 +499,54 @@
 \[
 A^T(Ax - b) = 0
 \]</div>
-<p>Now, let’s introduce the full QR factorization, <span class="math notranslate nohighlight">\(A = QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. The key insight is that the columns of <span class="math notranslate nohighlight">\(A\)</span> and the columns of <span class="math notranslate nohighlight">\(Q\)</span> span the same spaces. Specifically, the first <span class="math notranslate nohighlight">\(n\)</span> columns of <span class="math notranslate nohighlight">\(Q\)</span> form an orthonormal basis for the column space of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>.</p>
-<p>Therefore, the orthogonality condition can be restated as requiring the residual to be orthogonal to the basis vectors in <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<p>Introduce the full QR factorization <span class="math notranslate nohighlight">\(A=QR\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is an <span class="math notranslate nohighlight">\(m\times m\)</span> orthogonal matrix and <span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m\times n\)</span> upper trapezoidal matrix. Partition the factors as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q=\begin{bmatrix}Q_1&amp;Q_2\end{bmatrix},
+\qquad R=\begin{bmatrix}R_1\\0\end{bmatrix}.
+\end{split}\]</div>
+<p>The first <span class="math notranslate nohighlight">\(n\)</span> columns, <span class="math notranslate nohighlight">\(Q_1\)</span>, form an orthonormal basis for the column space of <span class="math notranslate nohighlight">\(A\)</span>. The remaining columns, <span class="math notranslate nohighlight">\(Q_2\)</span>, span its orthogonal complement.</p>
+<p>The residual must be orthogonal to the columns of <span class="math notranslate nohighlight">\(Q_1\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-Q^T(Ax - b) = 0
+Q_1^T(Ax-b)=0.
 \]</div>
-<p>Now, we substitute <span class="math notranslate nohighlight">\(A=QR\)</span> into this equation:</p>
+<p>Since <span class="math notranslate nohighlight">\(A=Q_1R_1\)</span> and <span class="math notranslate nohighlight">\(Q_1^TQ_1=I_n\)</span>, this gives</p>
 <div class="math notranslate nohighlight">
 \[
-Q^T(QRx - b) = 0
+R_1x=Q_1^Tb.
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(Q\)</span> is orthogonal, we know that <span class="math notranslate nohighlight">\(Q^T Q = I\)</span>. Applying this property, we get:</p>
+<section id="the-transformed-system">
+<h3>The Transformed System<a class="headerlink" href="#the-transformed-system" title="Link to this heading">#</a></h3>
+<p>To identify the minimum residual as well as the solution, partition the transformed right-hand side:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+Q^Tb=\begin{bmatrix}b_1\\b_2\end{bmatrix},
+\qquad b_1=Q_1^Tb\in\mathbb{R}^n,
+\qquad b_2=Q_2^Tb\in\mathbb{R}^{m-n}.
+\end{split}\]</div>
+<p>Orthogonality preserves the residual norm, so</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-(Q^T Q)Rx - Q^T b &amp;= 0 \\
-IRx - Q^T b &amp;= 0
+\|Ax-b\|_2^2
+&amp;=\|Q^T(Ax-b)\|_2^2\\
+&amp;=\left\|\begin{bmatrix}R_1x-b_1\\-b_2\end{bmatrix}\right\|_2^2\\
+&amp;=\|R_1x-b_1\|_2^2+\|b_2\|_2^2.
 \end{aligned}
 \end{split}\]</div>
-<p>This simplifies the least-squares problem into a much nicer linear system.</p>
-<section id="the-transformed-system">
-<h3>The Transformed System<a class="headerlink" href="#the-transformed-system" title="Link to this heading">#</a></h3>
-<p>The equation becomes:</p>
-<div class="math notranslate nohighlight">
-\[
-Rx = Q^T b
-\]</div>
-<p>This system is an <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal system. If we partition <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
-\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix and <span class="math notranslate nohighlight">\(b_1\)</span> is an <span class="math notranslate nohighlight">\(n\)</span>-vector, the system becomes:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{bmatrix} R_1 \\ 0 \end{bmatrix} x = \begin{bmatrix} b_1 \\ b_2 \end{bmatrix}
-\end{split}\]</div>
-<p>This gives us two equations:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(R_1 x = b_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(0 \cdot x = b_2\)</span></p></li>
-</ol>
-<p>The solution <span class="math notranslate nohighlight">\(x\)</span> is found by solving the first equation. The norm of the residual is simply <span class="math notranslate nohighlight">\(\|b_2\|_2\)</span>.</p>
-<p>The solution to the least-squares problem is therefore found by solving the <strong>square, upper-triangular system</strong>:</p>
+<p>The term <span class="math notranslate nohighlight">\(\|b_2\|_2^2\)</span> does not depend on <span class="math notranslate nohighlight">\(x\)</span>. Since <span class="math notranslate nohighlight">\(R_1\)</span> is nonsingular, we can make the first term zero by solving the <strong>square, upper-triangular system</strong>:</p>
 <div class="math notranslate nohighlight" id="equation-eq-qr-system">
 <span class="eqno">(1)<a class="headerlink" href="#equation-eq-qr-system" title="Link to this equation">#</a></span>\[R_1 x = b_1\]</div>
-<p>This is easily solved using <strong>back-substitution</strong>.</p>
+<p>Solve this system by <strong>back-substitution</strong>. The minimum residual norm is <span class="math notranslate nohighlight">\(\|b_2\|_2\)</span>, and the residual vector is <span class="math notranslate nohighlight">\(r=Q_2b_2\)</span>. We do not require <span class="math notranslate nohighlight">\(b_2=0\)</span>; a nonzero <span class="math notranslate nohighlight">\(b_2\)</span> is precisely the part of <span class="math notranslate nohighlight">\(b\)</span> that cannot be fitted.</p>
 </section>
 </section>
 <section id="algorithm-summary">
 <h2>Algorithm Summary<a class="headerlink" href="#algorithm-summary" title="Link to this heading">#</a></h2>
-<p>The QR method for solving <span class="math notranslate nohighlight">\(\|Ax - b\|_2\)</span> can be summarized in three steps:</p>
+<p>The QR method for minimizing <span class="math notranslate nohighlight">\(\|Ax-b\|_2\)</span> has three steps:</p>
 <ol class="arabic simple">
-<li><p><strong>Factorize:</strong> Compute the QR factorization of <span class="math notranslate nohighlight">\(A\)</span>, yielding <span class="math notranslate nohighlight">\(Q\)</span> and <span class="math notranslate nohighlight">\(R\)</span>.</p></li>
-<li><p><strong>Transform:</strong> Compute the vector <span class="math notranslate nohighlight">\(Q^T b\)</span>.</p></li>
+<li><p><strong>Factorize:</strong> Compute Householder QR, storing the reflections and the triangular factor <span class="math notranslate nohighlight">\(R_1\)</span>.</p></li>
+<li><p><strong>Transform:</strong> Apply the stored reflections to compute <span class="math notranslate nohighlight">\(Q^Tb\)</span>, without forming <span class="math notranslate nohighlight">\(Q\)</span> explicitly.</p></li>
 <li><p><strong>Solve:</strong> Solve the <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular system <span class="math notranslate nohighlight">\(R_1 x = b_1\)</span> for <span class="math notranslate nohighlight">\(x\)</span> using back-substitution, where <span class="math notranslate nohighlight">\(R_1\)</span> and <span class="math notranslate nohighlight">\(b_1\)</span> are the top <span class="math notranslate nohighlight">\(n\)</span> rows of <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(Q^T b\)</span>, respectively.</p></li>
 </ol>
 </section>
@@ -560,12 +554,13 @@ R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}, \quad Q^T b = \begin{bmatrix} b_1 \\
 <h2>Analysis and Advantages<a class="headerlink" href="#analysis-and-advantages" title="Link to this heading">#</a></h2>
 <section id="numerical-stability">
 <h3>Numerical Stability<a class="headerlink" href="#numerical-stability" title="Link to this heading">#</a></h3>
-<p>This is the <strong>primary advantage</strong> of the QR method. By avoiding the formation of the Gram matrix <span class="math notranslate nohighlight">\(A^T A\)</span>, we work with a system whose condition number is <span class="math notranslate nohighlight">\(\kappa_2(R_1) = \kappa_2(A)\)</span>, not <span class="math notranslate nohighlight">\(\kappa_2(A)^2\)</span>.</p>
+<p>Householder QR has the small factorization and orthogonality errors described in the <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">earlier analysis</span></a>, under the arithmetic assumptions stated there. It also avoids forming the Gram matrix <span class="math notranslate nohighlight">\(A^TA\)</span>. The matrices used in the two approaches have condition numbers</p>
 <div class="math notranslate nohighlight">
 \[
-\kappa_2(\text{Normal Equations}) = \kappa_2(A)^2 \quad \text{vs.} \quad \kappa_2(\text{QR Method}) = \kappa_2(A)
+\kappa_2(A^TA)=\kappa_2(A)^2,
+\qquad \kappa_2(R_1)=\kappa_2(A).
 \]</div>
-<p>This dramatic improvement in conditioning means the solution is far less sensitive to perturbations and rounding errors. It’s the reason QR is the workhorse for least-squares problems. ✅</p>
+<p>The second identity follows because multiplying by <span class="math notranslate nohighlight">\(Q_1\)</span> preserves lengths, so <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(R_1\)</span> have the same singular values. QR avoids the additional accuracy risk of forming <span class="math notranslate nohighlight">\(A^TA\)</span>, but does not remove the sensitivity of the original least-squares problem. A backward-stable method can still have a large forward error when the problem is sensitive to perturbations.</p>
 </section>
 <section id="computational-cost">
 <h3>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h3>
@@ -587,7 +582,7 @@ A_{m \times n} = Q_{m \times m} R_{m \times n}
 \]</div>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(Q\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(m \times m\)</span> orthogonal matrix.</p></li>
-<li><p><span class="math notranslate nohighlight">\(R\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> upper trapezoidal matrix. It has the structure:</p>
+<li><p><span class="math notranslate nohighlight">\(R\)</span> is an <span class="math notranslate nohighlight">\(m\times n\)</span> upper trapezoidal matrix. It has the structure:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
     R = \begin{bmatrix} R_1 \\ 0 \end{bmatrix}
@@ -595,7 +590,7 @@ A_{m \times n} = Q_{m \times m} R_{m \times n}
 <p>where <span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix, and the lower block is an <span class="math notranslate nohighlight">\((m-n) \times n\)</span> matrix of zeros.</p>
 </li>
 </ul>
-<p>In this form, <span class="math notranslate nohighlight">\(R\)</span> is rectangular and <strong>not invertible</strong>. The invertible part is its submatrix <span class="math notranslate nohighlight">\(R_1\)</span>.</p>
+<p>When <span class="math notranslate nohighlight">\(m&gt;n\)</span>, <span class="math notranslate nohighlight">\(R\)</span> is rectangular and has no two-sided inverse. The square factor <span class="math notranslate nohighlight">\(R_1\)</span> is invertible under our full-column-rank assumption. When <span class="math notranslate nohighlight">\(m=n\)</span>, <span class="math notranslate nohighlight">\(R=R_1\)</span>.</p>
 </section>
 <section id="reduced-or-thin-qr-factorization">
 <h3>2. Reduced (or Thin) QR Factorization<a class="headerlink" href="#reduced-or-thin-qr-factorization" title="Link to this heading">#</a></h3>
@@ -605,7 +600,7 @@ A_{m \times n} = Q_{m \times m} R_{m \times n}
 A_{m \times n} = Q_{1, m \times n} R_{1, n \times n}
 \]</div>
 <ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(Q_1\)</span> is a <strong>rectangular</strong> <span class="math notranslate nohighlight">\(m \times n\)</span> matrix with orthonormal columns. (It’s the first <span class="math notranslate nohighlight">\(n\)</span> columns of the full <span class="math notranslate nohighlight">\(Q\)</span>).</p></li>
+<li><p><span class="math notranslate nohighlight">\(Q_1\)</span> is an <span class="math notranslate nohighlight">\(m\times n\)</span> matrix with orthonormal columns, rectangular when <span class="math notranslate nohighlight">\(m&gt;n\)</span>. It consists of the first <span class="math notranslate nohighlight">\(n\)</span> columns of the full <span class="math notranslate nohighlight">\(Q\)</span>.</p></li>
 <li><p><span class="math notranslate nohighlight">\(R_1\)</span> is a <strong>square</strong> <span class="math notranslate nohighlight">\(n \times n\)</span> upper-triangular matrix. (It is identical to the <span class="math notranslate nohighlight">\(R_1\)</span> submatrix from the full QR).</p></li>
 </ul>
 <p>The key takeaway is that <span class="math notranslate nohighlight">\(R_1\)</span> from the reduced factorization <strong>is square and invertible</strong> (assuming <span class="math notranslate nohighlight">\(A\)</span> has full column rank).</p>
@@ -613,47 +608,17 @@ A_{m \times n} = Q_{1, m \times n} R_{1, n \times n}
 </section>
 <section id="derivation-using-reduced-qr">
 <h2>Derivation using Reduced QR<a class="headerlink" href="#derivation-using-reduced-qr" title="Link to this heading">#</a></h2>
-<p>Let’s re-derive the solution starting from the normal equations using the <strong>reduced QR</strong> factorization, <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Start with the normal equations:</strong></p>
+<p>The normal equations lead to the same triangular system. Substitute <span class="math notranslate nohighlight">\(A=Q_1R_1\)</span> into <span class="math notranslate nohighlight">\(A^TAx=A^Tb\)</span>. Since <span class="math notranslate nohighlight">\(Q_1^TQ_1=I_n\)</span>, we obtain</p>
 <div class="math notranslate nohighlight">
 \[
-    A^T A x = A^T b
-    \]</div>
-</li>
-<li><p><strong>Substitute <span class="math notranslate nohighlight">\(A = Q_1 R_1\)</span>:</strong></p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-    (Q_1 R_1)^T (Q_1 R_1) x &amp;= (Q_1 R_1)^T b \\
-    (R_1^T Q_1^T) (Q_1 R_1) x &amp;= R_1^T Q_1^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Simplify using orthogonality:</strong>
-The columns of <span class="math notranslate nohighlight">\(Q_1\)</span> are orthonormal, so <span class="math notranslate nohighlight">\(Q_1^T Q_1 = I_n\)</span> (the <span class="math notranslate nohighlight">\(n \times n\)</span> identity matrix). The equation simplifies:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-    \begin{aligned}
-    (R_1^T I_n R_1) x &amp;= R_1^T Q_1^T b \\
-    R_1^T R_1 x &amp;= R_1^T Q_1^T b
-    \end{aligned}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Cancel the invertible term:</strong>
-Since <span class="math notranslate nohighlight">\(R_1\)</span> is an <span class="math notranslate nohighlight">\(n \times n\)</span> invertible matrix (assuming full rank), its transpose <span class="math notranslate nohighlight">\(R_1^T\)</span> is also invertible. We can now correctly left-multiply both sides by <span class="math notranslate nohighlight">\((R_1^T)^{-1}\)</span>:</p>
+R_1^TR_1x=R_1^TQ_1^Tb.
+\]</div>
+<p>Full column rank makes <span class="math notranslate nohighlight">\(R_1\)</span> and its transpose invertible. Multiplying both sides by <span class="math notranslate nohighlight">\((R_1^T)^{-1}\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[
-    (R_1^T)^{-1} R_1^T R_1 x = (R_1^T)^{-1} R_1^T Q_1^T b
-    \]</div>
-<p>This leaves us with the clean, square, upper-triangular system:</p>
-<div class="math notranslate nohighlight">
-\[
-    R_1 x = Q_1^T b = b_1
-    \]</div>
-<p>This is the same system we derived earlier using the orthogonality principle (see equation <a class="reference internal" href="#equation-eq-qr-system">(1)</a>).</p>
-</li>
-</ol>
+R_1x=Q_1^Tb=b_1,
+\]</div>
+<p>which is the same system as <a class="reference internal" href="#equation-eq-qr-system">(1)</a>. This is an algebraic connection between the methods; the QR algorithm never needs to form <span class="math notranslate nohighlight">\(A^TA\)</span>.</p>
 </section>
 </section>
 

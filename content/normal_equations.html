@@ -462,6 +462,7 @@
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-derivation">Geometric Derivation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-normal-equations">The Normal Equations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-by-minimizing-the-quadratic-form">Derivation by Minimizing the Quadratic Form</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-a-t-a">Properties of <span class="math notranslate nohighlight">\(A^T A\)</span></a></li>
 </ul>
 </li>
@@ -470,7 +471,6 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-by-minimizing-the-quadratic-form">Derivation by Minimizing the Quadratic Form</a></li>
 </ul>
             </nav>
         </div>
@@ -484,146 +484,125 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-method-of-normal-equations">
 <h1>The Method of Normal Equations<a class="headerlink" href="#the-method-of-normal-equations" title="Link to this heading">#</a></h1>
-<p>The first approach we will study for solving the linear least-squares problem is the <strong>method of normal equations</strong>. It’s an intuitive method that transforms the problem into a square linear system that we already know how to solve.</p>
+<p>The <strong>method of normal equations</strong> transforms a linear least-squares problem into a square symmetric system. It connects the geometry of orthogonal projection to the Cholesky solver from the preceding chapter.</p>
 <p>The linear least-squares problem is defined as finding the vector <span class="math notranslate nohighlight">\(x\)</span> that minimizes the 2-norm of the residual:</p>
 <div class="math notranslate nohighlight">
 \[
-x^* = \arg\min_{x \in \mathbb{R}^n} \| Ax - b \|_2
+x^* \in \arg\min_{x \in \mathbb{R}^n} \| Ax - b \|_2,
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(A\)</span> is an <span class="math notranslate nohighlight">\(m \times n\)</span> matrix and <span class="math notranslate nohighlight">\(b\)</span> is an <span class="math notranslate nohighlight">\(m\)</span>-vector. We typically assume <span class="math notranslate nohighlight">\(m \ge n\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> and <span class="math notranslate nohighlight">\(b\in\mathbb{R}^m\)</span>. The main case here is <span class="math notranslate nohighlight">\(m\ge n\)</span> with full column rank. The geometric derivation also applies when the columns are dependent, so <span class="math notranslate nohighlight">\(x^*\)</span> denotes any minimizer until uniqueness has been established.</p>
 <section id="geometric-derivation">
 <h2>Geometric Derivation<a class="headerlink" href="#geometric-derivation" title="Link to this heading">#</a></h2>
-<p>Minimizing the Euclidean distance <span class="math notranslate nohighlight">\(\| Ax - b \|_2\)</span> is equivalent to finding the vector <span class="math notranslate nohighlight">\(Ax\)</span> in the column space of <span class="math notranslate nohighlight">\(A\)</span>, denoted <span class="math notranslate nohighlight">\(\text{span}(A)\)</span>, that is closest to <span class="math notranslate nohighlight">\(b\)</span>. This occurs when the residual vector, <span class="math notranslate nohighlight">\(r = b - Ax\)</span>, is <strong>orthogonal</strong> to the column space of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>This orthogonality condition can be stated mathematically as:</p>
+<p>Every fitted vector <span class="math notranslate nohighlight">\(Ax\)</span> lies in the column space <span class="math notranslate nohighlight">\(\operatorname{range}(A)\)</span>. Thus least squares asks for the point in this subspace closest to <span class="math notranslate nohighlight">\(b\)</span>. From the <a class="reference internal" href="projections.html"><span class="std std-doc">geometry of orthogonal projections</span></a>, this point is the orthogonal projection <span class="math notranslate nohighlight">\(p\)</span> of <span class="math notranslate nohighlight">\(b\)</span> onto the column space.</p>
+<p>Because <span class="math notranslate nohighlight">\(p\)</span> belongs to the column space, some coefficient vector <span class="math notranslate nohighlight">\(x^*\)</span> satisfies <span class="math notranslate nohighlight">\(Ax^*=p\)</span>. The corresponding residual is</p>
 <div class="math notranslate nohighlight">
 \[
-A^T (b - Ax) = 0
+r^*=b-p=b-Ax^*.
 \]</div>
-<p>Expanding this expression gives:</p>
+<p>The projection separates <span class="math notranslate nohighlight">\(b\)</span> into a fitted part <span class="math notranslate nohighlight">\(p\)</span> in the column space and a residual <span class="math notranslate nohighlight">\(r^*\)</span> perpendicular to it.</p>
+<figure class="align-default" id="fig-normal-equations-projection">
+<a class="reference internal image-reference" href="../_images/normal_equations_projection.svg"><img alt="A blue vector b points above the column space, drawn as a horizontal line. Its purple projection p equals A x star. The orange residual r star points from p to b and is perpendicular to the line. Another fitted vector A x lies farther to the right. The vector from A x to b is the hypotenuse of a right triangle with sides p minus A x and r star." src="../_images/normal_equations_projection.svg" style="width: 720px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">The fitted vector <span class="math notranslate nohighlight">\(p=Ax^*\)</span> is closest to <span class="math notranslate nohighlight">\(b\)</span>. For any other fitted vector <span class="math notranslate nohighlight">\(Ax\)</span>, the discrepancy <span class="math notranslate nohighlight">\(b-Ax\)</span> splits into the perpendicular residual <span class="math notranslate nohighlight">\(r^*\)</span> and the displacement <span class="math notranslate nohighlight">\(p-Ax\)</span> within the column space. The column space is drawn as a line; the same argument holds for subspaces of any dimension.</span><a class="headerlink" href="#fig-normal-equations-projection" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>To see why this projection minimizes the residual, compare <span class="math notranslate nohighlight">\(p\)</span> with any other fitted vector <span class="math notranslate nohighlight">\(Ax\)</span>. Write</p>
 <div class="math notranslate nohighlight">
 \[
-A^T b - A^T A x = 0
+b-Ax=(b-p)+(p-Ax)=r^*+(p-Ax).
 \]</div>
-<p>Rearranging the terms yields a linear system of equations for <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>The first term is perpendicular to the column space, while the second lies in it. The Pythagorean theorem therefore gives</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\|b-Ax\|_2^2=\|r^*\|_2^2+\|p-Ax\|_2^2.}
+\]</div>
+<p>The first term is fixed. The second is nonnegative and is zero precisely when <span class="math notranslate nohighlight">\(Ax=p\)</span>. Moving away from <span class="math notranslate nohighlight">\(p\)</span> within the column space can only increase the squared distance to <span class="math notranslate nohighlight">\(b\)</span>. This proves that <span class="math notranslate nohighlight">\(x^*\)</span> minimizes the residual and that every minimizer has the same fitted vector <span class="math notranslate nohighlight">\(p\)</span>.</p>
+<p>We can express the perpendicularity condition using the columns <span class="math notranslate nohighlight">\(a_1,\ldots,a_n\)</span> of <span class="math notranslate nohighlight">\(A\)</span>. A vector is perpendicular to their span if and only if it is perpendicular to each column:</p>
+<div class="math notranslate nohighlight">
+\[
+a_j^Tr^*=0\quad(j=1,\ldots,n)
+\quad\Longleftrightarrow\quad
+A^Tr^*=0.
+\]</div>
+<p>Substituting <span class="math notranslate nohighlight">\(r^*=b-Ax^*\)</span> gives <span class="math notranslate nohighlight">\(A^T(b-Ax^*)=0\)</span>, which yields a square system for the coefficients.</p>
 </section>
 <section id="the-normal-equations">
 <h2>The Normal Equations<a class="headerlink" href="#the-normal-equations" title="Link to this heading">#</a></h2>
 <p>The resulting system is known as the <strong>normal equations</strong>:</p>
 <div class="math notranslate nohighlight">
 \[
-(A^T A) x = A^T b
+\boxed{(A^T A)x^*=A^T b.}
 \]</div>
-<p>This is a fundamental equation in linear algebra and optimization. It transforms the original, often rectangular, least-squares problem into a square <span class="math notranslate nohighlight">\(n \times n\)</span> linear system.</p>
+<p>The word <em>normal</em> refers to the residual being perpendicular to the column space. These <span class="math notranslate nohighlight">\(n\)</span> equations characterize all least-squares minimizers: any solution has a perpendicular residual, and the Pythagorean argument then proves it minimizes the distance. They remain valid when <span class="math notranslate nohighlight">\(A\)</span> is rank deficient, although the coefficient vector is then not unique.</p>
+<section id="derivation-by-minimizing-the-quadratic-form">
+<h3>Derivation by Minimizing the Quadratic Form<a class="headerlink" href="#derivation-by-minimizing-the-quadratic-form" title="Link to this heading">#</a></h3>
+<p>Minimizing the residual norm is equivalent to minimizing its square. The same equations follow by differentiating this quadratic function.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. Expanding the squared norm gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+f(x)&amp;=\|Ax-b\|_2^2\\
+&amp;=x^TA^TAx-2x^TA^Tb+b^Tb.
+\end{aligned}
+\end{split}\]</div>
+<p>The two cross terms combine because <span class="math notranslate nohighlight">\(b^TAx=x^TA^Tb\)</span> is a scalar. Since <span class="math notranslate nohighlight">\(A^TA\)</span> is symmetric, the gradient (the vector of partial derivatives) is</p>
+<div class="math notranslate nohighlight">
+\[
+\nabla f(x)=2A^TAx-2A^Tb.
+\]</div>
+<p>At a minimizer this gradient is zero, giving <span class="math notranslate nohighlight">\(A^TAx^*=A^Tb\)</span>. Conversely, a solution of these equations has the perpendicular residual established above, so it is a global minimizer.</p>
+</div>
+</section>
 <section id="properties-of-a-t-a">
 <h3>Properties of <span class="math notranslate nohighlight">\(A^T A\)</span><a class="headerlink" href="#properties-of-a-t-a" title="Link to this heading">#</a></h3>
-<p>The matrix <span class="math notranslate nohighlight">\(A^T A\)</span> has several important properties:</p>
-<ol class="arabic simple">
-<li><p>It is always <strong>symmetric</strong>, since <span class="math notranslate nohighlight">\((A^T A)^T = A^T (A^T)^T = A^T A\)</span>.</p></li>
-<li><p>If the columns of <span class="math notranslate nohighlight">\(A\)</span> are linearly independent (i.e., <span class="math notranslate nohighlight">\(A\)</span> has <strong>full column rank</strong>), then <span class="math notranslate nohighlight">\(A^T A\)</span> is <strong>symmetric positive definite (SPD)</strong>. This guarantees that a unique solution <span class="math notranslate nohighlight">\(x\)</span> exists.</p></li>
-</ol>
-<p>Because <span class="math notranslate nohighlight">\(A^T A\)</span> is SPD (under the common assumption of full rank), the system can be solved efficiently and stably using <strong>Cholesky factorization</strong>. The explicit solution can be written as:
-$<span class="math notranslate nohighlight">\(
-x = (A^T A)^{-1} A^T b
-\)</span>$</p>
+<p>To choose a solver for the normal equations, we need the structure of <span class="math notranslate nohighlight">\(A^TA\)</span>. It is symmetric, since <span class="math notranslate nohighlight">\((A^TA)^T=A^TA\)</span>, and positive semidefinite because</p>
+<div class="math notranslate nohighlight">
+\[
+z^TA^TAz=\|Az\|_2^2\ge0.
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> has full column rank, then <span class="math notranslate nohighlight">\(Az\ne0\)</span> for every nonzero <span class="math notranslate nohighlight">\(z\)</span>, making this expression strictly positive. Thus <span class="math notranslate nohighlight">\(A^TA\)</span> is <strong>symmetric positive definite (SPD)</strong> and the normal equations have a unique solution <span class="math notranslate nohighlight">\(x^*\)</span>. If the columns are dependent, <span class="math notranslate nohighlight">\(A^TA\)</span> is singular. The fitted vector is still unique, but adding any vector in the null space of <span class="math notranslate nohighlight">\(A\)</span> to <span class="math notranslate nohighlight">\(x^*\)</span> gives another minimizer.</p>
+<p>For full column rank, the exact solution can be written as</p>
+<div class="math notranslate nohighlight">
+\[
+x^*=(A^TA)^{-1}A^Tb.
+\]</div>
+<p>In computation, we solve using <a class="reference internal" href="cholesky.html"><span class="std std-doc">Cholesky factorization</span></a> rather than form the inverse. Its stability guarantees apply to the matrix supplied to the solver; forming <span class="math notranslate nohighlight">\(A^TA\)</span> in floating-point arithmetic introduces a separate source of error.</p>
 </section>
 </section>
 <section id="algorithm-summary">
 <h2>Algorithm Summary<a class="headerlink" href="#algorithm-summary" title="Link to this heading">#</a></h2>
-<p>The method can be summarized in three steps:</p>
+<p>For full column rank <span class="math notranslate nohighlight">\(A\)</span>, the method has three steps:</p>
 <ol class="arabic simple">
 <li><p><strong>Form the Gram matrix:</strong> Compute the <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(C = A^T A\)</span>.</p></li>
 <li><p><strong>Form the right-hand side:</strong> Compute the <span class="math notranslate nohighlight">\(n\)</span>-vector <span class="math notranslate nohighlight">\(d = A^T b\)</span>.</p></li>
-<li><p><strong>Solve the system:</strong> Solve the <span class="math notranslate nohighlight">\(n \times n\)</span> symmetric system <span class="math notranslate nohighlight">\(Cx = d\)</span> for <span class="math notranslate nohighlight">\(x\)</span>, typically using a Cholesky factorization of <span class="math notranslate nohighlight">\(C\)</span>.</p></li>
+<li><p><strong>Solve using Cholesky:</strong> Factor <span class="math notranslate nohighlight">\(C=LL^T\)</span>, then solve <span class="math notranslate nohighlight">\(Ly=d\)</span> and <span class="math notranslate nohighlight">\(L^Tx^*=y\)</span>.</p></li>
 </ol>
 </section>
 <section id="analysis-and-drawbacks">
 <h2>Analysis and Drawbacks<a class="headerlink" href="#analysis-and-drawbacks" title="Link to this heading">#</a></h2>
 <section id="computational-cost">
 <h3>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h3>
-<p>The computational cost is dominated by the formation of <span class="math notranslate nohighlight">\(A^T A\)</span>.</p>
+<p>Counting multiplication and addition as separate flops, the leading costs are:</p>
 <ul class="simple">
-<li><p>Computing <span class="math notranslate nohighlight">\(A^T A\)</span> takes approximately <span class="math notranslate nohighlight">\(m n^2\)</span> floating-point operations (flops).</p></li>
+<li><p>Computing one triangle of <span class="math notranslate nohighlight">\(A^TA\)</span> and copying it to the other takes approximately <span class="math notranslate nohighlight">\(mn^2\)</span> flops. Computing every entry independently would take about <span class="math notranslate nohighlight">\(2mn^2\)</span>.</p></li>
 <li><p>Computing <span class="math notranslate nohighlight">\(A^T b\)</span> takes approximately <span class="math notranslate nohighlight">\(2mn\)</span> flops.</p></li>
-<li><p>Solving the system with Cholesky factorization takes <span class="math notranslate nohighlight">\(\approx \frac{1}{3}n^3\)</span> flops.</p></li>
+<li><p>Cholesky factorization takes approximately <span class="math notranslate nohighlight">\(\frac13n^3\)</span> flops; the two triangular solves add <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p></li>
 </ul>
-<p>For a “tall and skinny” matrix where <span class="math notranslate nohighlight">\(m \gg n\)</span>, the total cost is approximately <span class="math notranslate nohighlight">\(O(mn^2)\)</span>.</p>
+<p>The total leading cost is <span class="math notranslate nohighlight">\(mn^2+\frac13n^3\)</span>, compared with <span class="math notranslate nohighlight">\(2mn^2-\frac23n^3\)</span> for Householder QR. For <span class="math notranslate nohighlight">\(m\gg n\)</span>, the normal-equations method uses about half the factorization arithmetic. This saving is the reason to consider it, but it comes with an accuracy risk.</p>
 <div class="warning admonition">
-<p class="admonition-title">Potential for Severe Numerical Instability</p>
-<p>The primary drawback of the normal equations method is its impact on the <strong>condition number</strong> of the problem. The condition number of the Gram matrix <span class="math notranslate nohighlight">\(A^T A\)</span> is the square of the condition number of the original matrix <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<p class="admonition-title">Accuracy Risk: Squaring the Condition Number</p>
+<p>For full column rank <span class="math notranslate nohighlight">\(A\)</span>, the eigenvalues of <span class="math notranslate nohighlight">\(A^TA\)</span> are <span class="math notranslate nohighlight">\(\sigma_i(A)^2\)</span>. Therefore the condition number of the system we form is</p>
 <div class="math notranslate nohighlight">
 \[
 \kappa_2(A^T A) = (\kappa_2(A))^2
 \]</div>
-<p><strong>Implication:</strong> If <span class="math notranslate nohighlight">\(A\)</span> is even moderately ill-conditioned (e.g., <span class="math notranslate nohighlight">\(\kappa_2(A) \approx 10^6\)</span>), the matrix <span class="math notranslate nohighlight">\(A^T A\)</span> will be severely ill-conditioned (<span class="math notranslate nohighlight">\(\kappa_2(A^T A) \approx 10^{12}\)</span>). Solving a system with such a high condition number can lead to a significant loss of precision, potentially rendering the computed solution useless. This squaring of the condition number is the main reason why the normal equations are often avoided in practice in favor of more numerically robust methods like QR factorization.</p>
+<p>Rounding errors in forming <span class="math notranslate nohighlight">\(A^TA\)</span> can be large relative to its smallest eigenvalues. These errors can obscure the directions associated with small singular values of <span class="math notranslate nohighlight">\(A\)</span>, so a stable Cholesky solve does not guarantee an accurate solution of the original least-squares problem. If the columns are nearly dependent, the rounded Gram matrix may even lose positive definiteness and Cholesky can fail.</p>
 </div>
+<p>For example, <span class="math notranslate nohighlight">\(\kappa_2(A)=10^6\)</span> gives <span class="math notranslate nohighlight">\(\kappa_2(A^TA)=10^{12}\)</span>. This signals a greater risk of losing precision, but does not by itself determine the error in a particular computed solution. The error also depends on <span class="math notranslate nohighlight">\(b\)</span> and the rounding errors in forming and solving the system.</p>
+<p>The <a class="reference internal" href="LS_using_QR.html"><span class="std std-doc">QR method</span></a> avoids forming <span class="math notranslate nohighlight">\(A^TA\)</span> and works with a triangular factor having the same singular values as <span class="math notranslate nohighlight">\(A\)</span>. It preserves the conditioning of that factorization step, while the original least-squares problem can still be sensitive to perturbations.</p>
 </section>
-</section>
-<section id="derivation-by-minimizing-the-quadratic-form">
-<h2>Derivation by Minimizing the Quadratic Form<a class="headerlink" href="#derivation-by-minimizing-the-quadratic-form" title="Link to this heading">#</a></h2>
-<div class="proof admonition" id="proof">
-<p>Proof. There is another proof based on optimality conditions. It is less elegant than that one given above, but it is more general and can be extended to other problems. This approach treats the least-squares problem as an optimization problem.</p>
-<p>The objective is to find the vector <span class="math notranslate nohighlight">\(x\)</span> that minimizes the squared 2-norm of the residual:</p>
-<div class="math notranslate nohighlight">
-\[
-f(x) = \| Ax - b \|_2^2
-\]</div>
-<h3 class="rubric" id="step-1-expand-the-objective-function">Step 1: Expand the Objective Function</h3>
-<p>First, we rewrite the squared norm as a dot product (or transpose product):</p>
-<div class="math notranslate nohighlight">
-\[
-f(x) = (Ax - b)^T (Ax - b)
-\]</div>
-<p>Expanding this product gives:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-f(x) &amp;= (x^T A^T - b^T)(Ax - b) \\
-&amp;= x^T A^T Ax - x^T A^T b - b^T Ax + b^T b
-\end{aligned}
-\end{split}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(b^T A x\)</span> is a scalar quantity, it is equal to its own transpose: <span class="math notranslate nohighlight">\(b^T A x = (b^T A x)^T = x^T A^T b\)</span>. This allows us to combine the two middle terms:</p>
-<div class="math notranslate nohighlight">
-\[
-f(x) = x^T (A^T A) x - 2 x^T (A^T b) + \|b\|_2^2
-\]</div>
-<p>This expression is a <strong>quadratic form</strong> in <span class="math notranslate nohighlight">\(x\)</span>. It’s a multidimensional parabola (a paraboloid). Our goal is to find the value of <span class="math notranslate nohighlight">\(x\)</span> at the bottom of this bowl, which is its minimum.</p>
-<h3 class="rubric" id="step-2-find-the-minimum-using-the-gradient">Step 2: Find the Minimum using the Gradient</h3>
-<p>The minimum of a convex function occurs at a stationary point, where its gradient with respect to <span class="math notranslate nohighlight">\(x\)</span> is the zero vector. Let’s compute the gradient of <span class="math notranslate nohighlight">\(f(x)\)</span>, which we denote as <span class="math notranslate nohighlight">\(\nabla_x f(x)\)</span>.</p>
-<p>Using the standard rules for matrix calculus:</p>
-<ul class="simple">
-<li><p>The gradient of <span class="math notranslate nohighlight">\(x^T C x\)</span> is <span class="math notranslate nohighlight">\(2Cx\)</span> (for a symmetric matrix <span class="math notranslate nohighlight">\(C\)</span> like <span class="math notranslate nohighlight">\(A^TA\)</span>).</p></li>
-<li><p>The gradient of <span class="math notranslate nohighlight">\(c^T x\)</span> (or <span class="math notranslate nohighlight">\(x^T c\)</span>) is <span class="math notranslate nohighlight">\(c\)</span>.</p></li>
-</ul>
-<p>Applying these rules to our objective function:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{gathered}
-\nabla_x f(x) = \nabla_x \left( x^T (A^T A) x - 2 x^T (A^T b) + \|b\|_2^2 \right) \\
-= 2(A^T A)x - 2(A^T b) + 0
-\end{gathered}
-\end{split}\]</div>
-<p>To find the minimum, we set the gradient to zero:</p>
-<div class="math notranslate nohighlight">
-\[
-2(A^T A)x - 2(A^T b) = 0
-\]</div>
-<h3 class="rubric" id="step-3-solve-for-x">Step 3: Solve for <span class="math notranslate nohighlight">\(x\)</span></h3>
-<p>Dividing by 2 and rearranging the terms, we arrive at the previous <strong>normal equations</strong>:</p>
-<div class="math notranslate nohighlight">
-\[
-(A^T A)x = A^T b
-\]</div>
-<p>The solution <span class="math notranslate nohighlight">\(x\)</span> to this system is the vector that minimizes the least-squares objective function <span class="math notranslate nohighlight">\(f(x)\)</span>.</p>
-</div>
-<div class="note admonition">
-<p class="admonition-title">Confirming a Minimum with the Hessian</p>
-<p>To be certain that this stationary point is a minimum (and not a maximum or saddle point), we can examine the second derivative, or the <strong>Hessian matrix</strong> (<span class="math notranslate nohighlight">\(\nabla_x^2 f(x)\)</span>). The Hessian of our objective function is:</p>
-<div class="math notranslate nohighlight">
-\[
-\nabla_x^2 f(x) = 2(A^T A)
-\]</div>
-<p>If the matrix <span class="math notranslate nohighlight">\(A\)</span> has full column rank, then <span class="math notranslate nohighlight">\(A^T A\)</span> is <strong>positive definite</strong>. A positive definite Hessian confirms that the function is strictly convex, and therefore the stationary point we found is a unique global minimum. 👍</p>
-</div>
 </section>
 </section>
 
@@ -695,6 +674,7 @@ f(x) = x^T (A^T A) x - 2 x^T (A^T b) + \|b\|_2^2
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-derivation">Geometric Derivation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-normal-equations">The Normal Equations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-by-minimizing-the-quadratic-form">Derivation by Minimizing the Quadratic Form</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#properties-of-a-t-a">Properties of <span class="math notranslate nohighlight">\(A^T A\)</span></a></li>
 </ul>
 </li>
@@ -703,7 +683,6 @@ f(x) = x^T (A^T A) x - 2 x^T (A^T b) + \|b\|_2^2
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation-by-minimizing-the-quadratic-form">Derivation by Minimizing the Quadratic Form</a></li>
 </ul>
   </nav></div>
 

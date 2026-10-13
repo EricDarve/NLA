@@ -512,6 +512,13 @@ q_1^Ta_j^{(1)}
 =q_1^Ta_j-(q_1^Tq_1)r_{1j}=0.
 \]</div>
 <p>Normalize <span class="math notranslate nohighlight">\(a_2^{(1)}\)</span> to obtain <span class="math notranslate nohighlight">\(q_2\)</span>, then remove the <span class="math notranslate nohighlight">\(q_2\)</span> component from each remaining column. Continuing in this way gives <strong>modified Gram-Schmidt (MGS)</strong>. Each projection coefficient is computed from the current residual column, after the preceding components have been removed.</p>
+<figure class="align-default" id="fig-gram-schmidt-geometry">
+<a class="reference internal image-reference" href="../_images/gram_schmidt_geometry.svg"><img alt="Two diagrams illustrate Gram-Schmidt in two dimensions. On the left, the vector a2 splits into its horizontal projection along the unit vector q1 and a vertical perpendicular remainder. On the right, that remainder is drawn from the origin and normalized to the unit vector q2. The vectors q1 and q2 both have length one and meet at a right angle." src="../_images/gram_schmidt_geometry.svg" style="width: 780px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 10 </span><span class="caption-text">Remove the component of <span class="math notranslate nohighlight">\(a_2\)</span> along <span class="math notranslate nohighlight">\(q_1\)</span>, then normalize what remains. On the left, the purple arrow represents <span class="math notranslate nohighlight">\(a_2^{(1)}\)</span>, drawn from the tip of the projection to the tip of <span class="math notranslate nohighlight">\(a_2\)</span>. On the right, the same remainder is drawn from the origin; normalizing it changes its length but preserves its perpendicular direction. Both <span class="math notranslate nohighlight">\(q_1\)</span> and <span class="math notranslate nohighlight">\(q_2\)</span> have length <span class="math notranslate nohighlight">\(1\)</span>.</span><a class="headerlink" href="#fig-gram-schmidt-geometry" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 <p>At step <span class="math notranslate nohighlight">\(k\)</span>, write <span class="math notranslate nohighlight">\(a_j^{(k-1)}\)</span> for this residual, with <span class="math notranslate nohighlight">\(a_j^{(0)}=a_j\)</span>. The formulas are</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}

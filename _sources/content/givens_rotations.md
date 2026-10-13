@@ -195,6 +195,14 @@ Each column requires four multiplications and two additions or subtractions. Upd
 
 The order of elimination matters: a rotation must preserve the zeros already created. One simple choice uses adjacent rows and works from the bottom of each column upward.
 
+```{figure} ../_static/givens_dense_qr.svg
+:alt: Four diagrams show a dense three-by-three matrix becoming upper triangular. First, rows 2 and 3 are rotated to clear the bottom entry of column 1. Next, rows 1 and 2 are rotated to clear the remaining entry below its diagonal, leaving the bottom zero untouched. Finally, rows 2 and 3 are rotated to clear the entry below the diagonal in column 2, preserving both zeros in column 1. Blue cells mark the active row segments, orange circles mark entries to eliminate, and green zeros mark completed eliminations.
+:width: 780px
+:name: fig-givens-dense-qr
+
+Adjacent-row elimination for a dense matrix. In the first column, begin at the bottom and move upward. Then move to the next column. Blue cells are mixed by the next rotation, the orange circle marks its target, and green zeros show earlier eliminations. In the third panel, both active rows are already zero in the first column, so those zeros survive the final rotation. Dots denote entries that may be nonzero.
+```
+
 Starting with $A^{(0)}=A$, process columns $k=1,\ldots,n$. Within column $k$, process rows $j=m,m-1,\ldots,k+1$:
 
 1. Take $a$ and $b$ to be the current entries in positions $(j-1,k)$ and $(j,k)$.
@@ -280,9 +288,27 @@ Applying the stored rotations to one vector costs $6N=O(mn)$ flops. Back substit
 
 An $n\times n$ **upper Hessenberg matrix** satisfies $a_{ij}=0$ whenever $i>j+1$. Each column has at most one entry below the diagonal. Rotate rows $k,k+1$ to eliminate that entry in column $k$.
 
-This does not create entries to eliminate farther down: both affected rows were already zero in earlier columns, and all lower rows remain untouched. Only $n-1$ rotations are needed. Each updates at most $O(n)$ entries, so computing $R$ and storing the rotations costs $O(n^2)$.
+```{figure} ../_static/givens_hessenberg.svg
+:alt: Four diagrams show a four-by-four upper Hessenberg matrix becoming upper triangular. The first rotation mixes rows 1 and 2 and eliminates the entry below the first pivot. The next mixes rows 2 and 3, preserving that zero while eliminating the next subdiagonal entry. The last mixes rows 3 and 4. Blue cells show the active row segments, orange circles mark entries to eliminate, and green zeros show completed eliminations.
+:width: 780px
+:name: fig-givens-hessenberg
 
-A **tridiagonal matrix** has $a_{ij}=0$ whenever $|i-j|>1$. Here the same adjacent-row construction costs only $O(n)$, because each rotation updates a fixed number of entries. The reason is that, before step $k$, row $k$ can be nonzero only through column $k+1$, and row $k+1$ only through column $k+2$. Their combination can therefore create a new entry at $(k,k+2)$, but none farther to the right. The resulting $R$ has at most two nonzero superdiagonals.
+Upper Hessenberg QR uses adjacent row pairs, moving down the subdiagonal. Each rotation eliminates one circled entry. Blue cells show the row segments mixed by the next rotation, and green zeros show earlier eliminations. Dots denote entries that may be nonzero.
+```
+
+This does not create entries to eliminate farther down: both affected rows were already zero in earlier columns, and all lower rows remain untouched. At most $n-1$ rotations are needed. Each updates at most $O(n)$ entries, so computing $R$ and storing the rotations costs $O(n^2)$.
+
+A **tridiagonal matrix** has $a_{ij}=0$ whenever $|i-j|>1$. The same adjacent-row rotations eliminate its subdiagonal, but now the affected row segments are short.
+
+```{figure} ../_static/givens_tridiagonal.svg
+:alt: Four diagrams show a four-by-four tridiagonal matrix becoming upper triangular. The same row pairs are rotated as in the Hessenberg example, but each rotation touches at most three columns. New blue dots appear in the second superdiagonal in positions formerly occupied by zeros. Green zeros mark the eliminated subdiagonal entries. The final factor has at most two nonzero superdiagonals.
+:width: 780px
+:name: fig-givens-tridiagonal
+
+Tridiagonal QR uses the same rotation order, with at most three active columns per step. The colors have the same meaning as above; blue dots additionally mark **fill-in**, where a zero becomes nonzero. The new entries lie on the second superdiagonal, so the final triangular factor remains narrow.
+```
+
+Here the construction costs only $O(n)$, because each rotation updates a fixed number of entries. Before step $k$, row $k$ can be nonzero only through column $k+1$, and row $k+1$ only through column $k+2$. Their combination can therefore create a new entry at $(k,k+2)$, but none farther to the right. The resulting $R$ has at most two nonzero superdiagonals.
 
 These costs refer to $R$ and an implicit representation of $Q$. Explicitly forming the full $n\times n$ matrix $Q$ costs $O(n^2)$ even in the tridiagonal case.
 
@@ -292,13 +318,23 @@ The same costs are possible with two-coordinate reflections: they update the sam
 
 For sparse rows, a rotation needs to update only columns where at least one of the two rows is nonzero. However, mixing the rows can create new nonzeros in either row. This is called **fill-in**. Local elimination therefore does not automatically preserve sparsity or make Givens QR the best choice for every sparse matrix.
 
-Rotations are also useful when a new row is added to a least-squares problem. Suppose $A=Q_1R_1$ is already available and we append a row $w^T$. The original orthogonal transformations turn the old rows into $R$, with $R_1$ above a block of zeros, and leave the added row unchanged. The zero rows need no further elimination, so it remains to triangularize
+Rotations are also useful when a new row is added to a least-squares problem. Apply the stored QR transformations to the old rows, leaving the added row unchanged. The old rows become a triangular block above a block of zeros. Those zero rows need no further work, so the figure shows only the triangular block and the added row.
 
-$$
-\begin{pmatrix}R_1\\w^T\end{pmatrix}.
-$$
+```{figure} ../_static/givens_row_update.svg
+:alt: Four matrix diagrams show a triangular three-column block with an added row. In the first panel, row 1 and the added row are highlighted, and the added row's first entry is circled. After one rotation that entry is zero, and row 2 and the remaining added-row entries are highlighted. After two rotations the first two added-row entries are zero, and row 3 is paired with the added row. The final panel has a triangular top block and an all-zero added row.
+:width: 780px
+:name: fig-givens-row-update
 
-Rotations between each pivot row and the added row eliminate its entries one at a time, while preserving the zeros in earlier columns. This requires $O(n^2)$ work rather than refactoring all the original rows.
+Updating QR after adding a row, illustrated with three columns. Blue cells are the two row segments mixed by the next rotation. The orange circle marks the entry to eliminate; green zeros mark entries already eliminated. A dot denotes an entry that may be nonzero. The same pattern continues across any number of columns.
+```
+
+Start in the first column. Rotate the first row of the triangular block together with the added row to make the added row's first entry zero. Apply this rotation to all the remaining entries in those two rows as well.
+
+Move to the second column and pair the second row with the added row. Use the **current entries**, since the first rotation changed the added row. Both rows now have zero in the first column, so this rotation preserves that zero. Continue from left to right, pairing each successive row of the triangular block with the added row. If the entry to eliminate is already zero, skip the rotation.
+
+At each stage, both affected rows are zero in the earlier columns, and all other rows stay unchanged. The top block therefore remains triangular. When the added row is entirely zero, the top block is the updated triangular factor. For $n$ columns, at most $n$ rotations are needed, each updating at most $n$ entries in each of two rows. This costs $O(n^2)$ rather than refactoring all the original rows.
+
+For an updated least-squares solve with full column rank, apply each rotation to the corresponding right-hand-side entries too: the entry for the pivot row and the added observation. Then solve the updated triangular system. The original residual block is unchanged.
 
 ## Numerical Stability
 
