@@ -460,9 +460,9 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-no-direct-solution">The Challenge: No Direct Solution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-to-polynomial-root-finding">Equivalence to Polynomial Root-Finding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterative-methods-are-a-necessity">Iterative Methods are a Necessity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-goals">Computational Goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-use-iteration">Why Use Iteration?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-the-power-method-to-qr-iteration">From the Power Method to QR Iteration</a></li>
 </ul>
             </nav>
         </div>
@@ -476,94 +476,90 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="eigenvalue-computation">
 <h1>Eigenvalue Computation<a class="headerlink" href="#eigenvalue-computation" title="Link to this heading">#</a></h1>
-<p>Eigenvalues and eigenvectors are fundamental concepts in linear algebra. They provide deep insight into the behavior of a matrix <span class="math notranslate nohighlight">\(A\)</span> by revealing the directions <span class="math notranslate nohighlight">\(v\)</span> in which the matrix acts as a simple scalar <span class="math notranslate nohighlight">\(\lambda\)</span>, such that <span class="math notranslate nohighlight">\(A v = \lambda v\)</span>.</p>
-<p>This single property unlocks a wide range of powerful applications:</p>
-<ul class="simple">
-<li><p><strong>Diagonalization:</strong> For a diagonalizable matrix, the eigendecomposition <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span> provides a “canonical” representation of the linear transformation, simplifying its structure.</p></li>
-<li><p><strong>Matrix Operations:</strong> This decomposition makes complex operations computationally trivial. It turns matrix powers into scalar powers (<span class="math notranslate nohighlight">\(A^k = X \Lambda^k X^{-1}\)</span>) and enables the general computation of matrix functions:</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[f(A) = X f(\Lambda) X^{-1}.\]</div>
-<ul class="simple">
-<li><p><strong>Dynamic Systems:</strong> Eigenvalues are essential for studying time-evolving systems. The solution to a system of linear differential equations, <span class="math notranslate nohighlight">\(\frac{dx}{dt} = M x\)</span>, is given by</p></li>
-</ul>
-<div class="math notranslate nohighlight">
-\[x(t) = \exp(Mt) x_0.\]</div>
-<p>The stability and long-term behavior of this solution are dictated entirely by the eigenvalues of <span class="math notranslate nohighlight">\(M\)</span>, as the solution depends on terms of the form <span class="math notranslate nohighlight">\(\exp(\lambda_i t)\)</span>.</p>
-<p>Given their critical importance in physics, engineering, data analysis, and countless other scientific disciplines, the ability to <em>compute</em> eigenvalues and eigenvectors is a core practical problem. The theoretical definitions, such as solving the characteristic polynomial <span class="math notranslate nohighlight">\(\det(A - \lambda I) = 0\)</span>, do not lead to stable or efficient algorithms for general matrices.</p>
-<p>In this section, we shift our focus from the <em>theory</em> of eigenvalues to the <em>practice</em> of their numerical computation. We will develop the robust and scalable algorithms that are used in modern software to solve eigenvalue problems efficiently and accurately.</p>
-<section id="the-challenge-no-direct-solution">
-<h2>The Challenge: No Direct Solution<a class="headerlink" href="#the-challenge-no-direct-solution" title="Link to this heading">#</a></h2>
-<p>Unlike other problems we have studied, such as solving <span class="math notranslate nohighlight">\(Ax = b\)</span> using <span class="math notranslate nohighlight">\(LU\)</span> factorization, there is no “direct” method or finite formula to compute the eigenvalues of a general <span class="math notranslate nohighlight">\(n \times n\)</span> matrix for <span class="math notranslate nohighlight">\(n \ge 5\)</span>.</p>
-<p>The root of this difficulty lies in a deep, fundamental connection between finding eigenvalues and finding the roots of a polynomial.</p>
-</section>
-<section id="equivalence-to-polynomial-root-finding">
-<h2>Equivalence to Polynomial Root-Finding<a class="headerlink" href="#equivalence-to-polynomial-root-finding" title="Link to this heading">#</a></h2>
-<p>We know that the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are the roots of the <strong>characteristic polynomial</strong>, <span class="math notranslate nohighlight">\(p(\lambda) = \det(A - \lambda I)\)</span>. This shows that finding eigenvalues is <em>at least as hard</em> as finding polynomial roots.</p>
-<p>It turns out these two problems are mathematically <strong>equivalent</strong>. We can also prove that finding the roots of <em>any</em> polynomial <span class="math notranslate nohighlight">\(p(x)\)</span> is equivalent to finding the eigenvalues of a specific matrix.</p>
-<p>Consider a general monic polynomial of degree <span class="math notranslate nohighlight">\(n\)</span>:</p>
+<p>Eigenvalues describe how a system evolves in time. In a discrete-time linear model,</p>
 <div class="math notranslate nohighlight">
 \[
-p(x) = x^n + a_{n-1} x^{n-1} + \cdots + a_1 x + a_0
+x_{k+1}=Ax_k,
 \]</div>
-<p>We can construct a special matrix <span class="math notranslate nohighlight">\(A\)</span>, known as the <strong>companion matrix</strong> of the polynomial <span class="math notranslate nohighlight">\(p(x)\)</span>:</p>
+<p>the state <span class="math notranslate nohighlight">\(x_k\)</span> might contain temperatures, displacements, or concentrations. If the initial state is an eigenvector <span class="math notranslate nohighlight">\(v\)</span>, with <span class="math notranslate nohighlight">\(Av=\lambda v\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[
+x_k=\lambda^k v.
+\]</div>
+<p>The eigenvector gives a pattern in the state, called a <strong>mode</strong>. The eigenvalue tells us how that mode changes at each step: it decays if <span class="math notranslate nohighlight">\(|\lambda|&lt;1\)</span> and grows if <span class="math notranslate nohighlight">\(|\lambda|&gt;1\)</span>. A negative or nonreal eigenvalue also introduces changes of sign or phase.</p>
+<p>For a continuous-time model <span class="math notranslate nohighlight">\(x'(t)=Ax(t)\)</span>, the same initial state gives</p>
+<div class="math notranslate nohighlight">
+\[
+x(t)=e^{\lambda t}v.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\operatorname{Re}\lambda\)</span> determines exponential growth or decay, while <span class="math notranslate nohighlight">\(\operatorname{Im}\lambda\)</span> determines the oscillation frequency. Linear models also approximate nonlinear systems near an equilibrium. Computing eigenvalues therefore helps us identify growing disturbances, slowly decaying modes, and oscillations in scientific and engineering models.</p>
+<p>We developed these interpretations in <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">eigendecomposition</span></a>. The task in this chapter is to compute the eigenvalues and the directions associated with them.</p>
+<section id="computational-goals">
+<h2>Computational Goals<a class="headerlink" href="#computational-goals" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(A\in\mathbb C^{n\times n}\)</span>, an <strong>eigenpair</strong> is a scalar <span class="math notranslate nohighlight">\(\lambda\)</span> and a nonzero vector <span class="math notranslate nohighlight">\(v\)</span> satisfying <span class="math notranslate nohighlight">\(Av=\lambda v\)</span>. Some applications require only a few eigenpairs, such as those governing the fastest growth or slowest decay. Others require the entire <strong>spectrum</strong>, meaning all the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>For the full spectrum, a useful computational target is the <strong>Schur decomposition</strong>,</p>
+<div class="math notranslate nohighlight">
+\[
+A=QTQ^H,
+\qquad Q^HQ=I,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. Its diagonal entries are the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. The columns of <span class="math notranslate nohighlight">\(Q\)</span> are Schur vectors and need not be eigenvectors. Unlike an eigendecomposition <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, Schur form exists even when <span class="math notranslate nohighlight">\(A\)</span> does not have a basis of eigenvectors. The orthonormal basis also avoids introducing an ill-conditioned change of coordinates.</p>
+<p>When working with a real matrix in real arithmetic, the target is real Schur form: an upper block triangular matrix with <span class="math notranslate nohighlight">\(1\times1\)</span> and <span class="math notranslate nohighlight">\(2\times2\)</span> diagonal blocks. The <span class="math notranslate nohighlight">\(2\times2\)</span> blocks represent nonreal conjugate pairs. Eigenvectors, when needed, can be recovered from Schur form. This is the approach used by dense nonsymmetric eigensolvers in <a class="reference external" href="https://www.netlib.org/lapack/lug/node50.html">LAPACK</a>.</p>
+</section>
+<section id="why-use-iteration">
+<h2>Why Use Iteration?<a class="headerlink" href="#why-use-iteration" title="Link to this heading">#</a></h2>
+<p>The definition of an eigenvalue suggests finding the roots of the characteristic polynomial,</p>
+<div class="math notranslate nohighlight">
+\[
+p_A(z)=\det(zI-A).
+\]</div>
+<p>This is useful for theory and small examples. For a general matrix, however, explicitly forming the polynomial and then finding its roots can lose accuracy through rounding its coefficients. Matrix algorithms work directly with <span class="math notranslate nohighlight">\(A\)</span> instead.</p>
+<p>There is also an algebraic obstacle to a general formula like the quadratic formula. Every polynomial root problem can be written as an eigenvalue problem. To see this, consider a monic polynomial of degree <span class="math notranslate nohighlight">\(n\ge2\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+p(z)=z^n+a_{n-1}z^{n-1}+\cdots+a_1z+a_0,
+\]</div>
+<p>and its <strong>companion matrix</strong></p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-A =
+C=
 \begin{pmatrix}
-    0 &amp; 1 &amp; &amp; &amp; \\
-    &amp; 0 &amp; 1 &amp; &amp; \\
-    &amp; &amp; \ddots &amp; \ddots &amp; \\
-    &amp; &amp; &amp; 0 &amp; 1 \\
-    -a_0 &amp; -a_1 &amp; \cdots &amp; -a_{n-2} &amp; -a_{n-1}
-\end{pmatrix}
+0&amp;1&amp;&amp;&amp;\\
+&amp;0&amp;1&amp;&amp;\\
+&amp;&amp;\ddots&amp;\ddots&amp;\\
+&amp;&amp;&amp;0&amp;1\\
+-a_0&amp;-a_1&amp;\cdots&amp;-a_{n-2}&amp;-a_{n-1}
+\end{pmatrix}.
 \end{split}\]</div>
 <div class="proof theorem admonition" id="thm:companion_matrix">
 <p class="admonition-title"><span class="caption-number">Theorem 22 </span> (Eigenvalues of the Companion Matrix)</p>
 <section class="theorem-content" id="proof-content">
-<p>The eigenvalues of this matrix <span class="math notranslate nohighlight">\(A\)</span> are <em>exactly</em> the roots of the polynomial <span class="math notranslate nohighlight">\(p(x)\)</span>.</p>
+<p>The eigenvalues of <span class="math notranslate nohighlight">\(C\)</span> are exactly the roots of <span class="math notranslate nohighlight">\(p\)</span>.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. Let <span class="math notranslate nohighlight">\(z \in \mathbb{C}\)</span> be an eigenvalue and <span class="math notranslate nohighlight">\(u = (u_1, \ldots, u_n)^T\)</span> be the corresponding eigenvector, so <span class="math notranslate nohighlight">\(A u = z u\)</span>. Let’s write out the first <span class="math notranslate nohighlight">\(n-1\)</span> equations from this system:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-u_2 &amp;= z u_1 \\
-u_3 &amp;= z u_2 = z^2 u_1 \\
-&amp;\vdots \\
-u_n &amp;= z u_{n-1} = z^{n-1} u_1
-\end{aligned}
-\end{split}\]</div>
-<p>This defines the structure of the eigenvector. If we set <span class="math notranslate nohighlight">\(u_1 = 1\)</span>, the eigenvector is <span class="math notranslate nohighlight">\(u = (1, z, z^2, \ldots, z^{n-1})^T\)</span>.</p>
-<p>Now, we look at the <span class="math notranslate nohighlight">\(n\)</span>-th and final equation from <span class="math notranslate nohighlight">\(A u = z u\)</span>, which corresponds to the last row of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<p>Proof. Suppose <span class="math notranslate nohighlight">\(Cu=zu\)</span>, with <span class="math notranslate nohighlight">\(u\ne0\)</span>. The first <span class="math notranslate nohighlight">\(n-1\)</span> rows give</p>
 <div class="math notranslate nohighlight">
 \[
--a_0 u_1 - a_1 u_2 - \cdots - a_{n-1} u_n = z u_n
+u_{j+1}=zu_j,
+\qquad j=1,\ldots,n-1.
 \]</div>
-<p>Substituting <span class="math notranslate nohighlight">\(u_k = z^{k-1}\)</span>:</p>
+<p>Thus <span class="math notranslate nohighlight">\(u_j=z^{j-1}u_1\)</span>. If <span class="math notranslate nohighlight">\(u_1=0\)</span>, all entries would vanish, so we can scale <span class="math notranslate nohighlight">\(u\)</span> to make <span class="math notranslate nohighlight">\(u_1=1\)</span>. The last row then gives</p>
 <div class="math notranslate nohighlight">
 \[
--a_0 - a_1 z - \cdots - a_{n-1} z^{n-1} = z (z^{n-1})
+-a_0-a_1z-\cdots-a_{n-1}z^{n-1}=z^n,
 \]</div>
-<p>Finally, moving all terms to one side, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0 = 0
-\]</div>
-<p>This is precisely <span class="math notranslate nohighlight">\(p(z) = 0\)</span>. Therefore, <span class="math notranslate nohighlight">\(z\)</span> is an eigenvalue of <span class="math notranslate nohighlight">\(A\)</span> if and only if <span class="math notranslate nohighlight">\(z\)</span> is a root of <span class="math notranslate nohighlight">\(p(x)\)</span>.</p>
+<p>which is <span class="math notranslate nohighlight">\(p(z)=0\)</span>.</p>
+<p>Conversely, if <span class="math notranslate nohighlight">\(p(z)=0\)</span>, the nonzero vector <span class="math notranslate nohighlight">\(u=(1,z,\ldots,z^{n-1})^T\)</span> satisfies every row of <span class="math notranslate nohighlight">\(Cu=zu\)</span>. Hence <span class="math notranslate nohighlight">\(z\)</span> is an eigenvalue of <span class="math notranslate nohighlight">\(C\)</span>.</p>
 </div>
+<p>The <strong>Abel–Ruffini theorem</strong> states that a general polynomial of degree five or higher has no formula using finitely many arithmetic operations and radicals. The companion matrix shows that the same restriction applies to general eigenvalue formulas. This rules out a general analogue of the quadratic formula; it does not rule out exact solutions for special matrices.</p>
+<p>Numerical eigensolvers instead generate successive approximations and stop when an accuracy criterion is met. An eigensolver therefore has two separate questions to answer: does the iteration converge, and how much work is needed to reach a useful approximation?</p>
+<p>Accuracy requires the same distinction between algorithm and problem that we used for linear systems. A backward stable eigensolver computes the exact spectrum of a nearby matrix, but sensitive eigenvalues may still have large errors. Iterative convergence and sensitivity both matter; neither fast convergence nor a small backward error alone guarantees accurate eigenvalues.</p>
 </section>
-<section id="iterative-methods-are-a-necessity">
-<h2>Iterative Methods are a Necessity<a class="headerlink" href="#iterative-methods-are-a-necessity" title="Link to this heading">#</a></h2>
-<p>This equivalence is profound. The <strong>Abel-Ruffini theorem</strong>, a landmark result from the 19th century, proves that there is <strong>no general formula in radicals</strong> (i.e., no equivalent of the quadratic formula) for the roots of polynomials of degree 5 or higher.</p>
-<p>Because of this:</p>
-<ol class="arabic simple">
-<li><p>If a direct, exact algorithm for eigenvalues existed, we could use it to find the roots of any polynomial exactly, via its companion matrix.</p></li>
-<li><p>The Abel-Ruffini theorem tells us such a root-finding algorithm is impossible.</p></li>
-<li><p>Therefore, <strong>no direct, exact algorithm for eigenvalues can exist</strong> for general <span class="math notranslate nohighlight">\(n \times n\)</span> matrices.</p></li>
-</ol>
-<p>This forces us to use a different approach. All general-purpose eigenvalue solvers are, by necessity, <strong>iterative</strong>. They do not compute the exact eigenvalues in a finite number of steps. Instead, they generate a sequence of approximate solutions that converge to the true eigenvalues.</p>
-<p>Fortunately, the algorithms we will study are so effective that this is not a practical limitation. They converge extremely fast (often quadratically or cubically) and are numerically stable, allowing us to compute eigenvalues to machine accuracy. For all practical purposes, the results are indistinguishable from an “exact” solution.</p>
+<section id="from-the-power-method-to-qr-iteration">
+<h2>From the Power Method to QR Iteration<a class="headerlink" href="#from-the-power-method-to-qr-iteration" title="Link to this heading">#</a></h2>
+<p>We begin with the <a class="reference internal" href="power_method.html"><span class="std std-doc">power method</span></a>. Repeated multiplication by <span class="math notranslate nohighlight">\(A\)</span> can amplify one eigenvector component relative to the others. Under suitable assumptions, normalizing after each multiplication produces an approximation to an eigenvector with a largest-magnitude eigenvalue. This connects the algorithm directly to the time-evolution picture above.</p>
+<p>To find more directions, <a class="reference internal" href="deflation.html"><span class="std std-doc">deflation</span></a> removes those already found. <a class="reference internal" href="orthogonal_iteration.html"><span class="std std-doc">Orthogonal iteration</span></a> combines these steps: multiply a set of vectors by <span class="math notranslate nohighlight">\(A\)</span>, then orthonormalize them using QR. Its convergence analysis explains how ratios of eigenvalue magnitudes control the rate at which the desired subspaces emerge.</p>
+<p>Expressing these updates as changes of coordinates leads to <a class="reference internal" href="qr_iteration.html"><span class="std std-doc">QR iteration</span></a>, which works toward Schur form. <a class="reference internal" href="upper_hessenberg.html"><span class="std std-doc">Hessenberg reduction</span></a> makes each iteration cheaper, and <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">shifts</span></a> accelerate convergence. We then compare the symmetric and nonsymmetric cases. The following chapter develops methods for computing a few eigenpairs of large, sparse matrices without forming the full Schur decomposition.</p>
 </section>
 <div class="toctree-wrapper compound">
 </div>
@@ -635,9 +631,9 @@ z^n + a_{n-1} z^{n-1} + \cdots + a_1 z + a_0 = 0
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-no-direct-solution">The Challenge: No Direct Solution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#equivalence-to-polynomial-root-finding">Equivalence to Polynomial Root-Finding</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#iterative-methods-are-a-necessity">Iterative Methods are a Necessity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-goals">Computational Goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-use-iteration">Why Use Iteration?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-the-power-method-to-qr-iteration">From the Power Method to QR Iteration</a></li>
 </ul>
   </nav></div>
 
