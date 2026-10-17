@@ -460,11 +460,13 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intuition-the-dominant-direction">Intuition: The Dominant Direction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation">Derivation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-power-iteration">The Algorithm: Power Iteration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-analysis">Convergence Analysis</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dominant-component">The Dominant Component</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normalize-after-each-multiplication">Normalize After Each Multiplication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-the-eigenvalue-ratio-controls-the-rate">Convergence: The Eigenvalue Ratio Controls the Rate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-hermitian-case-a-more-accurate-eigenvalue-estimate">The Hermitian Case: A More Accurate Eigenvalue Estimate</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations-and-the-next-step">Limitations and the Next Step</a></li>
 </ul>
             </nav>
         </div>
@@ -478,176 +480,158 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-power-method">
 <h1>The Power Method<a class="headerlink" href="#the-power-method" title="Link to this heading">#</a></h1>
-<p>Our first and most fundamental iterative algorithm is the <strong>power method</strong> (or <em>power iteration</em>). It is a simple but surprisingly effective method for finding the single, strictly dominant eigenvalue—the one with the largest magnitude—and its corresponding eigenvector.</p>
-<p>While we will eventually move to more sophisticated methods, the power method provides the core intuition for many advanced algorithms, including the celebrated <span class="math notranslate nohighlight">\(QR\)</span> iteration.</p>
-<section id="intuition-the-dominant-direction">
-<h2>Intuition: The Dominant Direction<a class="headerlink" href="#intuition-the-dominant-direction" title="Link to this heading">#</a></h2>
-<p>Imagine the matrix <span class="math notranslate nohighlight">\(A\)</span> as a linear transformation. When it acts on a vector, it stretches or shrinks it. The eigenvectors are the special directions that are <em>not</em> rotated, only scaled.</p>
-<p>Now, consider what happens when we apply this transformation repeatedly to an arbitrary starting vector <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span>. We can think of <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> as a mixture of all the eigenvector components.</p>
+<p>The <strong>power method</strong>, or <strong>power iteration</strong>, finds an eigenvector associated with the eigenvalue of largest magnitude, provided that eigenvalue is strictly dominant and the starting vector contains the required component. It uses only repeated matrix-vector multiplication and normalization. The same idea will lead to orthogonal iteration and QR iteration.</p>
+<section id="the-dominant-component">
+<h2>The Dominant Component<a class="headerlink" href="#the-dominant-component" title="Link to this heading">#</a></h2>
+<p>For the analysis, assume that <span class="math notranslate nohighlight">\(A\in\mathbb C^{n\times n}\)</span>, with <span class="math notranslate nohighlight">\(n\ge2\)</span>, is diagonalizable and its eigenvalues satisfy</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{q} = c_1 \boldsymbol{x}_1 + c_2 \boldsymbol{x}_2 + \cdots + c_n \boldsymbol{x}_n
+|\lambda_1|&gt;|\lambda_2|\ge\cdots\ge|\lambda_n|.
 \]</div>
-<p>Each time we apply <span class="math notranslate nohighlight">\(A\)</span>, each component <span class="math notranslate nohighlight">\(c_i \boldsymbol{x}_i\)</span> is scaled by its eigenvalue <span class="math notranslate nohighlight">\(\lambda_i\)</span>.</p>
+<p>Choose corresponding eigenvectors <span class="math notranslate nohighlight">\(\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n\)</span> with <span class="math notranslate nohighlight">\(\|\boldsymbol{x}_i\|_2=1\)</span>. Expand a unit starting vector in this eigenvector basis:</p>
 <div class="math notranslate nohighlight">
 \[
-A \boldsymbol{q} = c_1 \lambda_1 \boldsymbol{x}_1 + c_2 \lambda_2 \boldsymbol{x}_2 + \cdots + c_n \lambda_n \boldsymbol{x}_n
+\boldsymbol{q}_0=\sum_{i=1}^n c_i\boldsymbol{x}_i,
+\qquad c_1\ne0.
 \]</div>
-<p>If we apply <span class="math notranslate nohighlight">\(A\)</span> <span class="math notranslate nohighlight">\(k\)</span> times, we get:</p>
+<p>The condition <span class="math notranslate nohighlight">\(c_1\ne0\)</span> means that the dominant mode is present. For nonorthogonal eigenvectors, this coefficient is not generally <span class="math notranslate nohighlight">\(\boldsymbol{x}_1^H\boldsymbol{q}_0\)</span>. A starting vector drawn from a continuous distribution satisfies <span class="math notranslate nohighlight">\(c_1\ne0\)</span> with probability one in exact arithmetic.</p>
+<p>Repeated application of <span class="math notranslate nohighlight">\(A\)</span> scales each component by its eigenvalue:</p>
 <div class="math notranslate nohighlight">
 \[
-A^k \boldsymbol{q} = c_1 \lambda_1^k \boldsymbol{x}_1 + c_2 \lambda_2^k \boldsymbol{x}_2 + \cdots + c_n \lambda_n^k \boldsymbol{x}_n
+A^k\boldsymbol{q}_0=\sum_{i=1}^n c_i\lambda_i^k\boldsymbol{x}_i.
 \]</div>
-<p>If one eigenvalue, say <span class="math notranslate nohighlight">\(\lambda_1\)</span>, is larger in magnitude than all others (<span class="math notranslate nohighlight">\(|\lambda_1| &gt; |\lambda_2| \ge \dots\)</span>), its <span class="math notranslate nohighlight">\(k\)</span>-th power <span class="math notranslate nohighlight">\(\lambda_1^k\)</span> will grow much faster than all other terms. After many iterations, the first term will dominate the sum, and all other components will become negligible in comparison.</p>
-<div class="math notranslate nohighlight">
-\[
-A^k \boldsymbol{q} \approx c_1 \lambda_1^k \boldsymbol{x}_1
-\]</div>
-<p>This means the resulting vector <span class="math notranslate nohighlight">\(A^k \boldsymbol{q}\)</span> will be almost perfectly aligned with the dominant eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>.</p>
+<p>Relative to the first component, every other component is multiplied by <span class="math notranslate nohighlight">\((\lambda_i/\lambda_1)^k\)</span>. These ratios tend to zero. Thus the dominant component eventually determines the direction, even if all components are shrinking because <span class="math notranslate nohighlight">\(|\lambda_1|&lt;1\)</span>.</p>
 </section>
-<section id="derivation">
-<h2>Derivation<a class="headerlink" href="#derivation" title="Link to this heading">#</a></h2>
-<p>Let’s formalize this. We assume <span class="math notranslate nohighlight">\(A \in \mathbb{C}^{n \times n}\)</span> is diagonalizable and has a single, strictly dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>:</p>
+<section id="normalize-after-each-multiplication">
+<h2>Normalize After Each Multiplication<a class="headerlink" href="#normalize-after-each-multiplication" title="Link to this heading">#</a></h2>
+<p>The magnitude of <span class="math notranslate nohighlight">\(A^k\boldsymbol{q}_0\)</span> can become very large or very small. Since we want its direction, normalize after each multiplication:</p>
 <div class="math notranslate nohighlight">
 \[
-|\lambda_1| &gt; |\lambda_2| \ge |\lambda_3| \ge \cdots \ge |\lambda_n|
+\boldsymbol{z}_k=A\boldsymbol{q}_k,
+\qquad
+\boldsymbol{q}_{k+1}=\frac{\boldsymbol{z}_k}{\|\boldsymbol{z}_k\|_2},
+\qquad k=0,1,\ldots.
 \]</div>
-<p>Let <span class="math notranslate nohighlight">\(\boldsymbol{x}_1, \dots, \boldsymbol{x}_n\)</span> be the corresponding eigenvectors. We pick a starting vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_0\)</span> which we can express as a linear combination of these eigenvectors:</p>
+<p>In exact arithmetic, this gives <span class="math notranslate nohighlight">\(\boldsymbol{q}_k=A^k\boldsymbol{q}_0/\|A^k\boldsymbol{q}_0\|_2\)</span>. The normalization changes the length, not the direction, and avoids accumulating the overall growth or decay of the powers.</p>
+<figure class="align-default" id="fig-power-method-convergence">
+<a class="reference internal image-reference" href="../_images/power_method_convergence.svg"><img alt="Five copies of a two-dimensional unit-vector diagram show power iterates after zero, two, four, six, and ten steps. Each blue unit vector moves closer to the fixed horizontal teal eigenvector x1. The angle decreases from 70 degrees to about 4.4 degrees. Dashed quarter circles mark unit length." src="../_images/power_method_convergence.svg" style="width: 850px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">Normalized iterates align with the dominant direction. Here <span class="math notranslate nohighlight">\(A=\operatorname{diag}(1,0.7)\)</span>, <span class="math notranslate nohighlight">\(\boldsymbol{x}_1=(1,0)^T\)</span>, and <span class="math notranslate nohighlight">\(\boldsymbol{q}_0\)</span> makes an angle of <span class="math notranslate nohighlight">\(70^\circ\)</span> with <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>. Every arrow has length <span class="math notranslate nohighlight">\(1\)</span>; intermediate iterates are omitted. This symmetric example approaches the direction monotonically. General matrices need not do so.</span><a class="headerlink" href="#fig-power-method-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>At the current iterate, estimate the eigenvalue using the <strong>Rayleigh quotient</strong>:</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{q}_0 = \sum_{i=1}^n c_i \boldsymbol{x}_i
+\mu_k=\frac{\boldsymbol{q}_k^HA\boldsymbol{q}_k}
+{\boldsymbol{q}_k^H\boldsymbol{q}_k}
+=\boldsymbol{q}_k^H\boldsymbol{z}_k.
 \]</div>
-<p>We must assume that <span class="math notranslate nohighlight">\(c_1 \neq 0\)</span>. That is, our starting vector must have some component in the direction of the dominant eigenvector. In practice, a randomly chosen <span class="math notranslate nohighlight">\(\boldsymbol{q}_0\)</span> makes this overwhelmingly likely.</p>
-<p>Now, let’s examine the vector <span class="math notranslate nohighlight">\(\boldsymbol{z}_k = A^k \boldsymbol{q}_0\)</span>:</p>
+<p>We use <span class="math notranslate nohighlight">\(\mu_k\)</span> for an estimate and reserve <span class="math notranslate nohighlight">\(\lambda_i\)</span> for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. If <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> is an exact eigenvector, this quotient gives its eigenvalue, including its sign or complex phase.</p>
+<p>To decide when to stop, compute the <strong>residual</strong></p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{z}_k = A^k \left( \sum_{i=1}^n c_i \boldsymbol{x}_i \right) = \sum_{i=1}^n c_i A^k \boldsymbol{x}_i = \sum_{i=1}^n c_i \lambda_i^k \boldsymbol{x}_i
+\boldsymbol{r}_k=A\boldsymbol{q}_k-\mu_k\boldsymbol{q}_k
+=\boldsymbol{z}_k-\mu_k\boldsymbol{q}_k.
 \]</div>
-<p>We factor out the dominant term <span class="math notranslate nohighlight">\(\lambda_1^k\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-\boldsymbol{z}_k = \lambda_1^k \left( c_1 \boldsymbol{x}_1 + \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k \boldsymbol{x}_i \right)
-\]</div>
-<p>Because of our dominance assumption, <span class="math notranslate nohighlight">\(|\lambda_i / \lambda_1| &lt; 1\)</span> for all <span class="math notranslate nohighlight">\(i \ge 2\)</span>. Therefore, as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the summation term decays exponentially:</p>
-<div class="math notranslate nohighlight">
-\[
-\lim_{k \to \infty} \left[ \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k \boldsymbol{x}_i \right] = \boldsymbol{0}
-\]</div>
-<p>This leaves us with:</p>
-<div class="math notranslate nohighlight">
-\[
-\boldsymbol{z}_k = A^k \boldsymbol{q}_0 \approx c_1 \lambda_1^k \boldsymbol{x}_1
-\]</div>
-<p>This shows that the sequence of vectors <span class="math notranslate nohighlight">\(\boldsymbol{z}_k\)</span> converges to the subspace spanned by the dominant eigenvector, <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{x}_1\}\)</span>.</p>
+<p>The residual measures how closely the current pair satisfies the eigenvalue equation. For a chosen tolerance <span class="math notranslate nohighlight">\(\tau&gt;0\)</span>, a typical stopping test is <span class="math notranslate nohighlight">\(\|\boldsymbol{r}_k\|_2\le\tau\|A\|_2\)</span>. A norm estimate can supply the matrix scale in an implementation. Changes in <span class="math notranslate nohighlight">\(\mu_k\)</span> alone can be misleading because the estimate may change little while the vector is still inaccurate. Test before normalizing again, so the returned pair is <span class="math notranslate nohighlight">\((\mu_k,\boldsymbol{q}_k)\)</span>. A small residual verifies an approximate eigenpair; it does not by itself establish that the eigenvalue is dominant.</p>
+<p>Under our assumptions, <span class="math notranslate nohighlight">\(\boldsymbol{z}_k\)</span> is never zero. If <span class="math notranslate nohighlight">\(\boldsymbol{z}_k=0\)</span> outside these assumptions, the current <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> is an exact eigenvector for eigenvalue zero. Normalization is then impossible; restart if the dominant eigenpair is wanted. An implementation should also impose a maximum number of iterations.</p>
+<p>Each iteration needs one matrix-vector product and <span class="math notranslate nohighlight">\(O(n)\)</span> additional work. A dense product costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations; a sparse matrix or an operator that can be applied without forming <span class="math notranslate nohighlight">\(A\)</span> may be much cheaper.</p>
 </section>
-<section id="the-algorithm-power-iteration">
-<h2>The Algorithm: Power Iteration<a class="headerlink" href="#the-algorithm-power-iteration" title="Link to this heading">#</a></h2>
-<p>In practice, computing <span class="math notranslate nohighlight">\(A^k \boldsymbol{q}_0\)</span> directly is numerically unstable. If <span class="math notranslate nohighlight">\(|\lambda_1| &gt; 1\)</span>, the vector <span class="math notranslate nohighlight">\(\boldsymbol{z}_k\)</span> will overflow, and if <span class="math notranslate nohighlight">\(|\lambda_1| &lt; 1\)</span>, it will underflow to zero.</p>
-<p>The solution is to <strong>normalize</strong> the vector at every single iteration. This keeps the vector’s norm at <span class="math notranslate nohighlight">\(1\)</span> and preserves only the directional information, which is what we care about. This leads to the <strong>Power Iteration</strong> algorithm.</p>
-<p><strong>Algorithm: Power Iteration</strong></p>
-<ol class="arabic simple">
-<li><p>Start with a random unit vector <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> (i.e., <span class="math notranslate nohighlight">\(\|\boldsymbol{q}\|_2 = 1\)</span>).</p></li>
-<li><p>Loop until convergence (e.g., until <span class="math notranslate nohighlight">\(\lambda\)</span> stops changing):</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(\boldsymbol{z} = A \boldsymbol{q}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\lambda = \boldsymbol{q}^H \boldsymbol{z}\)</span> (Estimate eigenvalue using the <strong>Rayleigh quotient</strong>)</p></li>
-<li><p><span class="math notranslate nohighlight">\(\boldsymbol{q} = \boldsymbol{z} / \|\boldsymbol{z}\|_2\)</span> (Normalize for the next iteration)</p></li>
-</ol>
-</li>
-<li><p>Return <span class="math notranslate nohighlight">\(\lambda\)</span> (the dominant eigenvalue) and <span class="math notranslate nohighlight">\(\boldsymbol{q}\)</span> (the dominant eigenvector).</p></li>
-</ol>
+<section id="convergence-the-eigenvalue-ratio-controls-the-rate">
+<h2>Convergence: The Eigenvalue Ratio Controls the Rate<a class="headerlink" href="#convergence-the-eigenvalue-ratio-controls-the-rate" title="Link to this heading">#</a></h2>
+<p>The key quantity is</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\rho=\left|\frac{\lambda_2}{\lambda_1}\right|&lt;1.}
+\]</div>
+<div class="proof theorem admonition" id="thm-power-method-convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 23 </span> (Convergence of Power Iteration)</p>
+<section class="theorem-content" id="proof-content">
+<p>Under the assumptions above, the line spanned by <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> converges to the line spanned by <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>. More precisely, there are scalars <span class="math notranslate nohighlight">\(\phi_k\)</span> with <span class="math notranslate nohighlight">\(|\phi_k|=1\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[
+\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2=O(\rho^k),
+\qquad
+|\mu_k-\lambda_1|=O(\rho^k).
+\]</div>
 </section>
-<section id="convergence-analysis">
-<h2>Convergence Analysis<a class="headerlink" href="#convergence-analysis" title="Link to this heading">#</a></h2>
-<ul>
-<li><p><strong>Eigenvector:</strong> The convergence of the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> is slightly subtle. From our derivation, the normalized vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k = \boldsymbol{z}_k / \|\boldsymbol{z}_k\|\)</span> behaves like:</p>
-<div class="math notranslate nohighlight">
-\[
-    \boldsymbol{q}_k \approx \frac{c_1 \lambda_1^k \boldsymbol{x}_1}{\|c_1 \lambda_1^k \boldsymbol{x}_1\|} = \left( \frac{\lambda_1}{|\lambda_1|} \right)^k \left( \frac{c_1}{|c_1|} \right) \left( \frac{\boldsymbol{x}_1}{\|\boldsymbol{x}_1\|} \right)
-    \]</div>
-<p>If <span class="math notranslate nohighlight">\(\lambda_1\)</span> is real and positive, <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> converges to <span class="math notranslate nohighlight">\(\pm \boldsymbol{x}_1\)</span>. However, if <span class="math notranslate nohighlight">\(\lambda_1 = \rho e^{i\theta}\)</span> is complex, the phase factor <span class="math notranslate nohighlight">\((e^{i\theta})^k\)</span> remains, and the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> “spins” in the complex plane.</p>
-<ul class="simple">
-<li><p>In all cases, the <em>subspace</em> <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{q}_k\}\)</span> converges to <span class="math notranslate nohighlight">\(\text{span}\{\boldsymbol{x}_1\}\)</span>.</p></li>
-<li><p>The <em>rate of convergence</em> is linear and depends on the ratio <span class="math notranslate nohighlight">\(|\lambda_2 / \lambda_1|\)</span>. If this ratio is close to 1 (i.e., the dominant eigenvalue is not very dominant), convergence can be very slow.</p></li>
-</ul>
-</li>
-<li><p><strong>Eigenvalue:</strong> The sequence of estimates <span class="math notranslate nohighlight">\(\lambda_k = \boldsymbol{q}_{k}^H A \boldsymbol{q}_{k}\)</span> converges to the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>. We prove this result below.</p></li>
-</ul>
-<div class="proof admonition" id="proof">
-<p>Proof. We prove that the sequence of eigenvalue estimates <span class="math notranslate nohighlight">\(\lambda_k = \boldsymbol{q}_k^H A \boldsymbol{q}_k\)</span> (the Rayleigh quotient) converges to the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>.</p>
-<p><strong>Recall Eigenvector Convergence:</strong></p>
-<p>From the analysis of the eigenvector, we know that as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the vector <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> becomes almost perfectly aligned with the dominant eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>.</p>
-<p>Let’s assume <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> is normalized such that <span class="math notranslate nohighlight">\(\|\boldsymbol{x}_1\|_2 = 1\)</span>. As shown in the derivation, the sequence <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> can be written as:</p>
-<div class="math notranslate nohighlight">
-\[
-\boldsymbol{q}_k = \phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k
-\]</div>
-<p>where:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\phi_k = \left( \frac{\lambda_1}{|\lambda_1|} \right)^k \left( \frac{c_1}{|c_1|} \right)\)</span> is a complex phase factor. Note that <span class="math notranslate nohighlight">\(|\phi_k| = 1\)</span>, which means <span class="math notranslate nohighlight">\(\phi_k^H \phi_k = 1\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k\)</span> is the error vector, which contains all the non-dominant eigenvector components. From our derivation, we know that <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k \to \boldsymbol{0}\)</span> as <span class="math notranslate nohighlight">\(k \to \infty\)</span>.</p></li>
-</ul>
-<p><strong>Substitute into the Rayleigh Quotient:</strong></p>
-<p>Now, let’s examine the eigenvalue estimate <span class="math notranslate nohighlight">\(\lambda_k\)</span> using this expression for <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-\lambda_k = \boldsymbol{q}_k^H A \boldsymbol{q}_k = (\phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k)^H A (\phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k)
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(A(\phi_k \boldsymbol{x}_1) = \phi_k (A \boldsymbol{x}_1) = \phi_k \lambda_1 \boldsymbol{x}_1\)</span>, we can write:</p>
-<div class="math notranslate nohighlight">
-\[
-\lambda_k = (\phi_k^H \boldsymbol{x}_1^H + \boldsymbol{\epsilon}_k^H) (\phi_k \lambda_1 \boldsymbol{x}_1 + A \boldsymbol{\epsilon}_k)
-\]</div>
-<p><strong>Expand the Expression:</strong></p>
-<p>We multiply the terms:</p>
-<div class="math notranslate nohighlight">
-\[
-\lambda_k = \underbrace{(\phi_k^H \boldsymbol{x}_1^H)(\phi_k \lambda_1 \boldsymbol{x}_1)}_{\text{Term 1}} + \underbrace{(\phi_k^H \boldsymbol{x}_1^H)(A \boldsymbol{\epsilon}_k)}_{\text{Term 2}} + \underbrace{(\boldsymbol{\epsilon}_k^H)(\phi_k \lambda_1 \boldsymbol{x}_1)}_{\text{Term 3}} + \underbrace{(\boldsymbol{\epsilon}_k^H A \boldsymbol{\epsilon}_k)}_{\text{Term 4}}
-\]</div>
-<p><strong>Analyze Each Term as <span class="math notranslate nohighlight">\(k \to \infty\)</span>:</strong></p>
-<ul>
-<li><p><strong>Term 1:</strong> We can regroup the scalars:</p>
-<div class="math notranslate nohighlight">
-\[
-    (\phi_k^H \phi_k) \lambda_1 (\boldsymbol{x}_1^H \boldsymbol{x}_1)
-    \]</div>
-<p>Since <span class="math notranslate nohighlight">\(\phi_k^H \phi_k = 1\)</span> (as <span class="math notranslate nohighlight">\(|\phi_k|=1\)</span>) and <span class="math notranslate nohighlight">\(\boldsymbol{x}_1^H \boldsymbol{x}_1 = 1\)</span> (as <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> is normalized), this term simplifies to:</p>
-<div class="math notranslate nohighlight">
-\[
-    \text{Term 1} = (1) \cdot \lambda_1 \cdot (1) = \lambda_1
-    \]</div>
-</li>
-<li><p><strong>Term 2:</strong> As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, we know <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k \to \boldsymbol{0}\)</span>. The entire term, which is a scalar inner product, must therefore go to 0.</p></li>
-<li><p><strong>Term 3:</strong> Similarly, as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, this inner product also goes to 0.</p></li>
-<li><p><strong>Term 4:</strong> This is a quadratic form <span class="math notranslate nohighlight">\(\boldsymbol{\epsilon}_k^H A \boldsymbol{\epsilon}_k\)</span>. This term goes to 0 even faster.</p></li>
-</ul>
-<p>By taking the limit of the expanded expression, we get:</p>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Factor out the dominant component:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\lim_{k\to\infty}\lambda_k
-&amp;= \lim_{k\to\infty}\big(\text{Term 1} + \text{Term 2} + \text{Term 3} + \text{Term 4}\big) \\
-&amp;= \lambda_1 + 0 + 0 + 0 \\
-&amp;= \lambda_1
+A^k\boldsymbol{q}_0
+&amp;=c_1\lambda_1^k(\boldsymbol{x}_1+\boldsymbol{e}_k),\\
+\boldsymbol{e}_k
+&amp;=\sum_{i=2}^n\frac{c_i}{c_1}
+\left(\frac{\lambda_i}{\lambda_1}\right)^k\boldsymbol{x}_i,
+\qquad
+\|\boldsymbol{e}_k\|_2\le C\rho^k,
 \end{aligned}
 \end{split}\]</div>
-<p>Therefore,</p>
+<p>where <span class="math notranslate nohighlight">\(C=\sum_{i=2}^n|c_i/c_1|\)</span> is independent of <span class="math notranslate nohighlight">\(k\)</span>. Normalizing gives</p>
 <div class="math notranslate nohighlight">
 \[
-\lim_{k \to \infty} \lambda_k = \lambda_1
+\boldsymbol{q}_k
+=\phi_k\frac{\boldsymbol{x}_1+\boldsymbol{e}_k}
+{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2},
+\qquad
+\phi_k=\frac{c_1\lambda_1^k}{|c_1\lambda_1^k|}.
 \]</div>
-<p>This proves that the sequence of Rayleigh quotients converges to the dominant eigenvalue <span class="math notranslate nohighlight">\(\lambda_1\)</span>.</p>
+<p>The triangle inequality and its reverse form show that normalization preserves the rate:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2
+&amp;=\left\|\frac{\boldsymbol{x}_1+\boldsymbol{e}_k}
+{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}
+-\boldsymbol{x}_1\right\|_2\\
+&amp;=\left\|\left(\frac{1}{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}-1\right)
+(\boldsymbol{x}_1+\boldsymbol{e}_k)+\boldsymbol{e}_k\right\|_2\\
+&amp;\le\left|\frac{1}{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}-1\right|
+\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2+\|\boldsymbol{e}_k\|_2\\
+&amp;=\big|1-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2\big|
++\|\boldsymbol{e}_k\|_2\\
+&amp;=\big|\|\boldsymbol{x}_1\|_2-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2\big|
++\|\boldsymbol{e}_k\|_2\\
+&amp;\le2\|\boldsymbol{e}_k\|_2\le2C\rho^k.
+\end{aligned}
+\end{split}\]</div>
+<p>For the eigenvalue estimate, use <span class="math notranslate nohighlight">\((A-\lambda_1I)\boldsymbol{x}_1=0\)</span> and <span class="math notranslate nohighlight">\(\|\boldsymbol{q}_k\|_2=1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mu_k-\lambda_1
+&amp;=\boldsymbol{q}_k^H(A-\lambda_1I)
+(\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1),\\
+|\mu_k-\lambda_1|
+&amp;\le\|A-\lambda_1I\|_2
+\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2
+=O(\rho^k).
+\end{aligned}
+\end{split}\]</div>
 </div>
+<p>The factor <span class="math notranslate nohighlight">\(\phi_k\)</span> accounts for sign or phase changes. For real <span class="math notranslate nohighlight">\(A\)</span> and a real start, a positive <span class="math notranslate nohighlight">\(\lambda_1\)</span> gives convergence to either <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> or <span class="math notranslate nohighlight">\(-\boldsymbol{x}_1\)</span>. A negative <span class="math notranslate nohighlight">\(\lambda_1\)</span> makes the signs alternate. In complex arithmetic, the phase can keep rotating. The <strong>direction</strong>, interpreted as a one-dimensional subspace, converges in all these cases.</p>
+<p>The bound is geometric: a smaller <span class="math notranslate nohighlight">\(\rho\)</span> gives faster convergence, while <span class="math notranslate nohighlight">\(\rho\)</span> close to <span class="math notranslate nohighlight">\(1\)</span> gives slow convergence. The constant also matters. A very small <span class="math notranslate nohighlight">\(c_1\)</span> can delay the appearance of the dominant direction. The rate can be faster if the starting vector has no components associated with eigenvalues of magnitude <span class="math notranslate nohighlight">\(|\lambda_2|\)</span>.</p>
+<section id="the-hermitian-case-a-more-accurate-eigenvalue-estimate">
+<h3>The Hermitian Case: A More Accurate Eigenvalue Estimate<a class="headerlink" href="#the-hermitian-case-a-more-accurate-eigenvalue-estimate" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is Hermitian, including real symmetric matrices, the Rayleigh quotient has a stronger error bound. Write <span class="math notranslate nohighlight">\(\boldsymbol{q}_k=\alpha_k\boldsymbol{x}_1+\boldsymbol{w}_k\)</span> with <span class="math notranslate nohighlight">\(\boldsymbol{w}_k\perp\boldsymbol{x}_1\)</span>. The directional bound above gives <span class="math notranslate nohighlight">\(\|\boldsymbol{w}_k\|_2=O(\rho^k)\)</span>.</p>
+<p>Because <span class="math notranslate nohighlight">\(A\)</span> is Hermitian, both cross terms vanish when expanding the Rayleigh quotient. Also, <span class="math notranslate nohighlight">\(|\alpha_k|^2+\|\boldsymbol{w}_k\|_2^2=1\)</span>. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[
+\mu_k-\lambda_1
+=\boldsymbol{w}_k^H(A-\lambda_1I)\boldsymbol{w}_k
+=O(\rho^{2k}).
+\]</div>
+<p>Thus the eigenvalue estimate can converge faster than the eigenvector direction. This stronger bound does not hold for a general nonsymmetric matrix. For another presentation of power iteration and its convergence, see <a class="reference external" href="https://fncbook.com/python/power/">Driscoll and Braun, <em>Fundamentals of Numerical Computation</em></a>.</p>
 </section>
-<section id="limitations">
-<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">#</a></h2>
-<p>The power method is fundamental, but it has significant limitations:</p>
-<ol class="arabic simple">
-<li><p>It only finds the <strong>single largest eigenvalue</strong>.</p></li>
-<li><p>It fails if there is no <em>single</em> dominant eigenvalue (e.g., a complex conjugate pair <span class="math notranslate nohighlight">\(|\lambda_1| = |\lambda_2|\)</span> or real eigenvalues <span class="math notranslate nohighlight">\(\lambda_1 = -\lambda_2\)</span>).</p></li>
-<li><p>Convergence can be unacceptably slow if <span class="math notranslate nohighlight">\(|\lambda_1| \approx |\lambda_2|\)</span>.</p></li>
-</ol>
-<p>Despite these limitations, this core idea of “repeated application and normalization” is the engine inside the much more robust algorithms we will study next.</p>
+</section>
+<section id="limitations-and-the-next-step">
+<h2>Limitations and the Next Step<a class="headerlink" href="#limitations-and-the-next-step" title="Link to this heading">#</a></h2>
+<p>Power iteration finds one dominant direction. If <span class="math notranslate nohighlight">\(c_1=0\)</span>, that direction is absent from the exact iterates. If eigenvalues tie in magnitude, a single direction need not emerge; a conjugate pair or eigenvalues <span class="math notranslate nohighlight">\(\lambda\)</span> and <span class="math notranslate nohighlight">\(-\lambda\)</span> can produce persistent oscillations. A small gap in magnitudes can make convergence too slow to be useful.</p>
+<p>Diagonalizability is an assumption of the proof, not a requirement for running the algorithm. For matrices that are not diagonalizable, the convergence rate above need not apply.</p>
+<p>To find additional directions, we must remove the one already found. This leads to <a class="reference internal" href="deflation.html"><span class="std std-doc">deflation</span></a>.</p>
 </section>
 </section>
 
@@ -717,11 +701,13 @@ A^k \boldsymbol{q} \approx c_1 \lambda_1^k \boldsymbol{x}_1
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#intuition-the-dominant-direction">Intuition: The Dominant Direction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#derivation">Derivation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm-power-iteration">The Algorithm: Power Iteration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-analysis">Convergence Analysis</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations">Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dominant-component">The Dominant Component</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normalize-after-each-multiplication">Normalize After Each Multiplication</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-the-eigenvalue-ratio-controls-the-rate">Convergence: The Eigenvalue Ratio Controls the Rate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-hermitian-case-a-more-accurate-eigenvalue-estimate">The Hermitian Case: A More Accurate Eigenvalue Estimate</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations-and-the-next-step">Limitations and the Next Step</a></li>
 </ul>
   </nav></div>
 
