@@ -8,7 +8,7 @@ $$
 T_k = Q_k^H A Q_k
 $$
 
-where $Q_k$ is the sequence of orthogonal matrices produced by the method of **orthogonal iteration**.
+where $Q_k$ is the sequence of unitary matrices produced by **orthogonal iteration**.
 
 Let's consider the relationship between $T_k$ and the next matrix in the sequence, $T_{k+1}$:
 
@@ -38,7 +38,7 @@ $$
 U_{k+1} \overset{def}{=} Q_k^H Q_{k+1}
 $$
 
-As $k$ increases, $Q_k$ converges to the Schur orthogonal transformation. Therefore, $U_{k+1}$ can be interpreted as a small incremental rotation that updates $Q_k$ to $Q_{k+1}$.
+The relation $Q_{k+1}=Q_kU_{k+1}$ expresses the change of basis between consecutive iterations. It includes any sign or phase changes in the columns.
 
 Substituting this definition, we get:
 
@@ -104,11 +104,11 @@ The derivation shows that we can generate the sequence $T_{k+1}$ from $T_k$ usin
 
 We just switch the order of the terms! We can compute the entire sequence of $T_k$ matrices starting from $T_0 = A$ without ever needing to form the $Q_k$ matrices from the **orthogonal iteration**.
 
-This QR iteration produces the same sequence of $R_k$ matrices as the **orthogonal iteration**. 
+With positive diagonal entries in each QR factor $R_k$, this QR iteration produces the same sequence of $R_k$ matrices as orthogonal iteration.
 
-From $U_{k+1} = Q_k^H Q_{k+1}$, we can show by induction that the product of the unitary factors from the QR iteration, $U_1 \cdots U_k$, is equal to the $Q_k$ matrix from the **orthogonal iteration** (assuming $Q_0 = I$). This product therefore converges to the orthogonal matrix $Q$ from the **Schur decomposition**.
+From $U_{k+1}=Q_k^HQ_{k+1}$, the product $U_1\cdots U_k$ equals $Q_k$ from orthogonal iteration when $Q_0=I$. Under the strict-gap and starting-space conditions established there, its columns approach the ordered Schur directions. Signs or complex phases may continue to change.
 
-Recall from our [previous section](sec:oi-qr-ak) that
+Recall the [QR identity for orthogonal iteration](sec:oi-qr-ak):
 
 $$
 A^k = Q_k \, R_k R_{k-1}\cdots R_1.

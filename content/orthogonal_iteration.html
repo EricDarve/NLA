@@ -67,7 +67,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Power and Orthogonal Iteration Methods" href="orthogonal_and_power_iteration.html" />
+    <link rel="next" title="Orthogonal Iteration and Eigenvalues" href="orthogonal_iteration_and_eigenvalues.html" />
     <link rel="prev" title="The Method of Deflation" href="deflation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -263,7 +263,6 @@
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The Orthogonal Iteration Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
@@ -460,17 +459,20 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-the-target-separate-from-the-iterates">Keep the Target Separate from the Iterates</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">The Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-performs-the-deflation-steps">QR Performs the Deflation Steps</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-identity-qr-changes-the-basis-not-the-subspace">The Key Identity: QR Changes the Basis, Not the Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-exact-target-and-the-current-basis">The Exact Target and the Current Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiply-then-orthonormalize">Multiply, Then Orthonormalize</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-qr-performs-approximate-deflation">How QR Performs Approximate Deflation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-same-two-dimensional-example">The Same Two-Dimensional Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-connection-to-powers-of-a">The Connection to Powers of <span class="math notranslate nohighlight">\(A\)</span></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-a-leading-subspace">Convergence of a Leading Subspace</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-error">Measuring the Error</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-subspace-error">Measuring the Subspace Error</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-theorem">The Convergence Theorem</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-the-schur-vectors">From Subspaces to the Schur Vectors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-computed-subspace">Using the Computed Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-nested-subspaces-to-schur-directions">From Nested Subspaces to Schur Directions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-basic-implementation">A Basic Implementation</a></li>
 </ul>
             </nav>
         </div>
@@ -484,11 +486,11 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-orthogonal-iteration-algorithm">
 <h1>The Orthogonal Iteration Algorithm<a class="headerlink" href="#the-orthogonal-iteration-algorithm" title="Link to this heading">#</a></h1>
-<p><a class="reference internal" href="deflation.html"><span class="std std-doc">Deflation</span></a> finds successive Schur directions by projecting out those already known. <strong>Orthogonal iteration</strong> performs these power and projection steps together: multiply a set of vectors by <span class="math notranslate nohighlight">\(A\)</span>, then orthonormalize them. The first column follows the power method; each later column removes the directions represented by the preceding columns.</p>
-<p>We first explain this connection to deflation. Then we prove that the leading subspaces converge, with a rate controlled by the ratio of the first unwanted eigenvalue to the last wanted eigenvalue.</p>
-<section id="keep-the-target-separate-from-the-iterates">
-<h2>Keep the Target Separate from the Iterates<a class="headerlink" href="#keep-the-target-separate-from-the-iterates" title="Link to this heading">#</a></h2>
-<p>We use the notation introduced in the deflation section:</p>
+<p><a class="reference internal" href="deflation.html"><span class="std std-doc">Deflation</span></a> finds a new Schur direction by projecting out the directions already known. Its explanation assumed those directions were exact. In computation, we would have to wait for each power iteration to converge before starting the next one.</p>
+<p><strong>Orthogonal iteration</strong> updates all the directions together. At each step, it multiplies the current basis vectors by <span class="math notranslate nohighlight">\(A\)</span>, then uses QR to project out earlier directions and normalize. The projections use the current approximations rather than exact Schur vectors.</p>
+<section id="the-exact-target-and-the-current-basis">
+<h2>The Exact Target and the Current Basis<a class="headerlink" href="#the-exact-target-and-the-current-basis" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(A\in\mathbb C^{n\times n}\)</span>, write an ordered Schur decomposition as <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span>, with <span class="math notranslate nohighlight">\(|\lambda_1|\ge\cdots\ge|\lambda_n|\)</span>, as in deflation. Choose how many directions to follow: <span class="math notranslate nohighlight">\(1\le p\le n\)</span>.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Notation</p></th>
@@ -497,13 +499,13 @@
 </thead>
 <tbody>
 <tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_\star\)</span></p></td>
-<td class="text-left"><p>A fixed, exact Schur basis: <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span>.</p></td>
+<td class="text-left"><p>The fixed, exact <span class="math notranslate nohighlight">\(n\times n\)</span> Schur basis.</p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_k\)</span></p></td>
-<td class="text-left"><p>The computed <span class="math notranslate nohighlight">\(n\times p\)</span> orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p></td>
+<td class="text-left"><p>The <span class="math notranslate nohighlight">\(n\times p\)</span> orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p></td>
 </tr>
 <tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(\boldsymbol q_{\star,j}\)</span>, <span class="math notranslate nohighlight">\(\boldsymbol q_{k,j}\)</span></p></td>
-<td class="text-left"><p>Column <span class="math notranslate nohighlight">\(j\)</span> of the exact and computed bases.</p></td>
+<td class="text-left"><p>Column <span class="math notranslate nohighlight">\(j\)</span> of the exact and current bases.</p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_{\star,i}\)</span>, <span class="math notranslate nohighlight">\(Q_{k,i}\)</span></p></td>
 <td class="text-left"><p>The first <span class="math notranslate nohighlight">\(i\)</span> columns of those bases.</p></td>
@@ -511,53 +513,33 @@
 </tbody>
 </table>
 </div>
-<p>The iteration index is always <span class="math notranslate nohighlight">\(k\)</span>; <span class="math notranslate nohighlight">\(i\)</span> or <span class="math notranslate nohighlight">\(j\)</span> counts directions. We order the Schur form so that <span class="math notranslate nohighlight">\(|\lambda_1|\geq\cdots\geq|\lambda_n|\)</span>. The desired <span class="math notranslate nohighlight">\(p\)</span>-dimensional invariant subspace is</p>
+<p>Thus <span class="math notranslate nohighlight">\(k\)</span> counts iterations and <span class="math notranslate nohighlight">\(i\)</span> or <span class="math notranslate nohighlight">\(j\)</span> counts columns. The target <span class="math notranslate nohighlight">\(p\)</span>-dimensional invariant subspace is</p>
 <div class="math notranslate nohighlight">
 \[
 \mathcal S_\star=\operatorname{range}(Q_{\star,p}).
 \]</div>
-<p>The Schur basis is a target for the analysis, not an input to the algorithm.</p>
+<p>The exact basis describes what we want to find.</p>
 </section>
-<section id="the-algorithm">
-<h2>The Algorithm<a class="headerlink" href="#the-algorithm" title="Link to this heading">#</a></h2>
-<p>Choose <span class="math notranslate nohighlight">\(Q_0\in\mathbb C^{n\times p}\)</span> with orthonormal columns, where <span class="math notranslate nohighlight">\(1\leq p\leq n\)</span>. For <span class="math notranslate nohighlight">\(k=0,1,2,\ldots\)</span>, compute</p>
+<section id="multiply-then-orthonormalize">
+<h2>Multiply, Then Orthonormalize<a class="headerlink" href="#multiply-then-orthonormalize" title="Link to this heading">#</a></h2>
+<p>Start with <span class="math notranslate nohighlight">\(Q_0\in\mathbb C^{n\times p}\)</span> whose columns are orthonormal. For <span class="math notranslate nohighlight">\(k=0,1,\ldots\)</span>, compute</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{Z_{k+1}=AQ_k,\qquad Z_{k+1}=Q_{k+1}R_{k+1}.}
 \]</div>
-<p>The second step is an <strong>unpivoted thin QR factorization</strong>: <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> has <span class="math notranslate nohighlight">\(p\)</span> orthonormal columns and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span> upper triangular. Keeping the column order is important for the connection to successive deflation.</p>
-<p>For now, assume <span class="math notranslate nohighlight">\(AQ_k\)</span> has rank <span class="math notranslate nohighlight">\(p\)</span>, so <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is invertible. The convergence theorem below gives conditions that guarantee this. Full iteration (<span class="math notranslate nohighlight">\(p=n\)</span>) requires <span class="math notranslate nohighlight">\(A\)</span> to be nonsingular for this argument.</p>
-<p>A basic implementation is:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
-<span class="c1"># A is n x n; choose 1 &lt;= p &lt;= n and a number of steps.</span>
-<span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
-<span class="n">G</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
-<span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="n">G</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
-<span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"reduced"</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
-    <span class="n">Z</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span>
-    <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"reduced"</span><span class="p">)</span>
-
-<span class="n">T</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span>  <span class="c1"># A represented in the computed subspace</span>
-</pre></div>
-</div>
-<p>QR preserves the span of the columns while keeping them orthonormal. Normalizing each column separately would not remove the dominant directions from the later columns.</p>
+<p>The second step is an <strong>unpivoted thin QR factorization</strong>. The columns of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> are orthonormal, and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span> upper triangular. Column order matters: each new direction is made perpendicular to the directions before it. Normalizing the columns separately would allow all of them to approach the same dominant direction.</p>
+<p>For the analysis, assume that <span class="math notranslate nohighlight">\(AQ_k\)</span> has rank <span class="math notranslate nohighlight">\(p\)</span> at every step, so each <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is invertible. The convergence theorem below gives conditions that guarantee this.</p>
 </section>
-<section id="qr-performs-the-deflation-steps">
-<h2>QR Performs the Deflation Steps<a class="headerlink" href="#qr-performs-the-deflation-steps" title="Link to this heading">#</a></h2>
-<p>To see what QR does, write it column by column as Gram–Schmidt in exact arithmetic. Take the diagonal entries of <span class="math notranslate nohighlight">\(R_{k+1}\)</span> to be positive; other phase choices give the same subspaces.</p>
-<p>The first column satisfies</p>
+<section id="how-qr-performs-approximate-deflation">
+<h2>How QR Performs Approximate Deflation<a class="headerlink" href="#how-qr-performs-approximate-deflation" title="Link to this heading">#</a></h2>
+<p>Write the QR step as Gram–Schmidt in exact arithmetic, choosing positive diagonal entries in <span class="math notranslate nohighlight">\(R_{k+1}\)</span>. Other sign or phase choices give the same subspaces.</p>
+<p>The first column is simply power iteration:</p>
 <div class="math notranslate nohighlight">
 \[
 \boldsymbol q_{k+1,1}
 =\frac{A\boldsymbol q_{k,1}}{\|A\boldsymbol q_{k,1}\|_2}.
 \]</div>
-<p>This is the power method. Under its usual gap and starting-vector assumptions, its direction converges to <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,1}\)</span>.</p>
-<p>For column <span class="math notranslate nohighlight">\(i+1\)</span>, QR subtracts the components along the <strong>newly computed</strong> first <span class="math notranslate nohighlight">\(i\)</span> columns:</p>
+<p>For the second column, multiply <span class="math notranslate nohighlight">\(\boldsymbol q_{k,2}\)</span> by <span class="math notranslate nohighlight">\(A\)</span>, subtract its component along the <strong>new first column</strong> <span class="math notranslate nohighlight">\(\boldsymbol q_{k+1,1}\)</span>, and normalize. Continue in the same way. For column <span class="math notranslate nohighlight">\(i+1\)</span>, the update is</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -568,48 +550,126 @@
 &amp;=\frac{\boldsymbol w_{k+1,i+1}}{\|\boldsymbol w_{k+1,i+1}\|_2}.
 \end{aligned}
 \end{split}\]</div>
-<p>Suppose for a moment that these first <span class="math notranslate nohighlight">\(i\)</span> columns span the exact leading Schur subspace. Their complementary projector is then</p>
+<p>The projector uses the newly computed first <span class="math notranslate nohighlight">\(i\)</span> columns because QR processes the columns of <span class="math notranslate nohighlight">\(AQ_k\)</span> in order. If they spanned the exact leading Schur subspace, then</p>
 <div class="math notranslate nohighlight">
 \[
 I-Q_{k+1,i}Q_{k+1,i}^H
 =I-Q_{\star,i}Q_{\star,i}^H=P_i.
 \]</div>
-<p>The update for column <span class="math notranslate nohighlight">\(i+1\)</span> becomes power iteration on <span class="math notranslate nohighlight">\(P_iA\)</span>. From deflation,</p>
+<p>The update would then be the projected power step from deflation. Its target satisfies</p>
 <div class="math notranslate nohighlight">
 \[
 P_iA\boldsymbol q_{\star,i+1}
 =\lambda_{i+1}\boldsymbol q_{\star,i+1}.
 \]</div>
-<p>If <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span> is the unique dominant eigenvalue of <span class="math notranslate nohighlight">\(P_iA\)</span> and the starting direction contains the required eigenvector component, this power iteration finds the next Schur direction. This explains the inductive structure: the first column finds the first direction, the second projects it out to find the next, and so on.</p>
-<p>In the actual algorithm, the earlier columns are still changing. The argument above explains the mechanism; the proof below establishes convergence while accounting for all columns evolving together.</p>
+<p>In the actual iteration, the first <span class="math notranslate nohighlight">\(i\)</span> directions are still improving while we update direction <span class="math notranslate nohighlight">\(i+1\)</span>. This explains the mechanism, but it is not yet a convergence proof: the projector changes at every step. We will account for those changes by following the column spaces.</p>
+<section id="the-same-two-dimensional-example">
+<h3>The Same Two-Dimensional Example<a class="headerlink" href="#the-same-two-dimensional-example" title="Link to this heading">#</a></h3>
+<p>Return to the matrix from deflation and start with a rotated orthonormal basis:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}4&amp;1\\0&amp;2\end{pmatrix},
+\qquad
+Q_0=\frac{1}{\sqrt2}\begin{pmatrix}1&amp;-1\\1&amp;1\end{pmatrix}.
+\end{split}\]</div>
+<p>One multiplication and QR step give</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+AQ_0=\frac{1}{\sqrt2}\begin{pmatrix}5&amp;-3\\2&amp;2\end{pmatrix},
+\qquad
+Q_1=\frac{1}{\sqrt{29}}\begin{pmatrix}5&amp;-2\\2&amp;5\end{pmatrix}.
+\end{split}\]</div>
+<p>The first column moves closer to the horizontal dominant direction. The second stays perpendicular to the new first column, so it moves closer to the vertical second Schur direction. Neither direction has to converge before the other is updated.</p>
+<figure class="align-default" id="fig-orthogonal-iteration">
+<a class="reference internal image-reference" href="../_images/orthogonal_iteration.svg"><img alt="Four diagrams show both orthonormal columns after zero, one, three, and six orthogonal iterations for the matrix with rows (4,1) and (0,2). The blue first column approaches the horizontal axis. The purple second column approaches the vertical axis while remaining perpendicular to the first column at every step. Dashed arrows show the two exact Schur directions." src="../_images/orthogonal_iteration.svg" style="width: 850px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 16 </span><span class="caption-text">Both directions evolve together. The blue column follows power iteration; QR keeps the purple column perpendicular to it. The two columns span the whole plane from the start. What improves is the first column’s line and, consequently, the perpendicular second direction.</span><a class="headerlink" href="#fig-orthogonal-iteration" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
-<section id="the-key-identity-qr-changes-the-basis-not-the-subspace">
-<h2>The Key Identity: QR Changes the Basis, Not the Subspace<a class="headerlink" href="#the-key-identity-qr-changes-the-basis-not-the-subspace" title="Link to this heading">#</a></h2>
-<p>Repeatedly substituting <span class="math notranslate nohighlight">\(AQ_k=Q_{k+1}R_{k+1}\)</span> gives</p>
+</section>
+<section id="the-connection-to-powers-of-a">
+<span id="sec-oi-qr-ak"></span><h2>The Connection to Powers of <span class="math notranslate nohighlight">\(A\)</span><a class="headerlink" href="#the-connection-to-powers-of-a" title="Link to this heading">#</a></h2>
+<p>The changing projections make a column-by-column convergence proof awkward. A simpler observation removes them from the analysis: <strong>QR changes the basis, but preserves the column space</strong>.</p>
+<p>Define the accumulated triangular factor</p>
 <div class="math notranslate nohighlight">
 \[
-A^kQ_0=Q_k\bigl(R_kR_{k-1}\cdots R_1\bigr).
+\widehat R_0=I_p,
+\qquad
+\widehat R_k=R_kR_{k-1}\cdots R_1.
 \]</div>
-<p>The factor on the right is invertible, so</p>
+<div class="proof theorem admonition" id="thm:AkQR">
+<p class="admonition-title"><span class="caption-number">Theorem 25 </span> (QR of <span class="math notranslate nohighlight">\(A^kQ_0\)</span>)</p>
+<section class="theorem-content" id="proof-content">
+<p>For every <span class="math notranslate nohighlight">\(k\ge0\)</span>, orthogonal iteration satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+A^kQ_0=Q_k\widehat R_k.
+\]</div>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. For <span class="math notranslate nohighlight">\(k=0\)</span>, the identity is <span class="math notranslate nohighlight">\(Q_0=Q_0I_p\)</span>. If it holds at step <span class="math notranslate nohighlight">\(k\)</span>, then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+A^{k+1}Q_0
+&amp;=A(Q_k\widehat R_k)\\
+&amp;=(AQ_k)\widehat R_k\\
+&amp;=Q_{k+1}R_{k+1}\widehat R_k\\
+&amp;=Q_{k+1}\widehat R_{k+1}.
+\end{aligned}
+\end{split}\]</div>
+<p>This proves the identity by induction.</p>
+</div>
+<p>Because <span class="math notranslate nohighlight">\(\widehat R_k\)</span> is upper triangular and invertible, this is a thin QR factorization of <span class="math notranslate nohighlight">\(A^kQ_0\)</span>. With positive diagonal entries in each <span class="math notranslate nohighlight">\(R_j\)</span>, it is the unique thin QR factorization with positive diagonal.</p>
+<p>For <span class="math notranslate nohighlight">\(p=1\)</span>, <span class="math notranslate nohighlight">\(\widehat R_k\)</span> is the product of the normalization factors in the power method. For full iteration with <span class="math notranslate nohighlight">\(Q_0=I_n\)</span>, the identity becomes</p>
+<div class="math notranslate nohighlight">
+\[
+A^k=Q_k\widehat R_k.
+\]</div>
+<p>The algorithm obtains these factors without forming <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
+<p>More importantly, invertibility gives</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{\operatorname{range}(Q_k)
 =\operatorname{range}(A^kQ_0).}
 \]</div>
-<p>The product is also upper triangular. Therefore, for every <span class="math notranslate nohighlight">\(i\leq p\)</span>, its first <span class="math notranslate nohighlight">\(i\)</span> columns involve only the first <span class="math notranslate nohighlight">\(i\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span>, giving</p>
+<p>Upper triangularity gives the same result for every leading set of columns. Let <span class="math notranslate nohighlight">\(\widehat R_{k,i}\)</span> be the leading <span class="math notranslate nohighlight">\(i\times i\)</span> block of <span class="math notranslate nohighlight">\(\widehat R_k\)</span>. The first <span class="math notranslate nohighlight">\(i\)</span> columns of the factorization satisfy</p>
 <div class="math notranslate nohighlight">
 \[
+A^kQ_{0,i}=Q_{k,i}\widehat R_{k,i},
+\qquad
 \operatorname{range}(Q_{k,i})
 =\operatorname{range}(A^kQ_{0,i}).
 \]</div>
-<p>Each leading subspace undergoes its own power iteration. We can analyze these subspaces without tracking the individual projections inside QR. The <a class="reference internal" href="orthogonal_and_power_iteration.html"><span class="std std-doc">next section</span></a> develops this QR identity further.</p>
+<p>Thus each leading column space undergoes a power iteration of its own. QR keeps its basis orthonormal without changing that space.</p>
 </section>
 <section id="convergence-of-a-leading-subspace">
 <h2>Convergence of a Leading Subspace<a class="headerlink" href="#convergence-of-a-leading-subspace" title="Link to this heading">#</a></h2>
-<p>As in the power-method analysis, assume <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable. The theorem allows equal eigenvalue magnitudes within the wanted group or within the unwanted group; only the gap between the two groups must be strict.</p>
-<section id="measuring-the-error">
-<h3>Measuring the Error<a class="headerlink" href="#measuring-the-error" title="Link to this heading">#</a></h3>
-<p>Let <span class="math notranslate nohighlight">\(\Pi_\star=Q_{\star,p}Q_{\star,p}^H\)</span> be the orthogonal projection onto <span class="math notranslate nohighlight">\(\mathcal S_\star\)</span>. Define</p>
+<p>Orthogonal iteration aims to approximate the leading <span class="math notranslate nohighlight">\(p\)</span>-dimensional Schur subspace. The theorem below shows how quickly that approximation improves. This is the main convergence result for the method: it extends the power method’s convergence theory from one direction to a space of <span class="math notranslate nohighlight">\(p\)</span> directions.</p>
+<div class="important admonition">
+<p class="admonition-title">Key result: convergence of orthogonal iteration</p>
+<p>Under the assumptions below, the space spanned by the columns of <span class="math notranslate nohighlight">\(Q_k\)</span> approaches the space spanned by the first <span class="math notranslate nohighlight">\(p\)</span> exact Schur vectors. Its error is bounded by a constant times <span class="math notranslate nohighlight">\(\rho_p^k\)</span>, where</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\rho_p=\frac{|\lambda_{p+1}|}{|\lambda_p|}&lt;1,
+\qquad p&lt;n.}
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(p=1\)</span>, the target is the dominant eigenvector’s line and <span class="math notranslate nohighlight">\(\rho_1=|\lambda_2/\lambda_1|\)</span>: the familiar power-method convergence factor. For <span class="math notranslate nohighlight">\(p&gt;1\)</span>, the result controls the accuracy of an entire approximate Schur subspace.</p>
+</div>
+<p>To understand the ratio, recall that <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)=\operatorname{range}(A^kQ_0)\)</span>. Assuming <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, multiplication by <span class="math notranslate nohighlight">\(A^k\)</span> scales eigenvector component <span class="math notranslate nohighlight">\(i\)</span> by <span class="math notranslate nohighlight">\(\lambda_i^k\)</span>. We want to retain the first <span class="math notranslate nohighlight">\(p\)</span> eigenvector directions and suppress the rest. Their span is the same as that of the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors.</p>
+<p>Among the wanted components, <span class="math notranslate nohighlight">\(|\lambda_p|^k\)</span> is the smallest scaling factor. Among the unwanted components, <span class="math notranslate nohighlight">\(|\lambda_{p+1}|^k\)</span> is the largest. Comparing the largest unwanted scaling with the smallest wanted scaling gives</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{|\lambda_{p+1}|^k}{|\lambda_p|^k}=\rho_p^k.
+\]</div>
+<p>This is a relative comparison, so it applies whether the components grow or decay. A smaller <span class="math notranslate nohighlight">\(\rho_p\)</span> gives faster separation of the wanted space from the unwanted directions. Only the gap between these two groups must be strict; eigenvalue magnitudes within either group may be equal. The subspace can therefore converge even while its individual basis vectors continue to change within it.</p>
+<p>For example, suppose the three largest eigenvalue magnitudes are <span class="math notranslate nohighlight">\(10\)</span>, <span class="math notranslate nohighlight">\(9.9\)</span>, and <span class="math notranslate nohighlight">\(1\)</span>, and the starting-space conditions hold. For the first direction, the error bound decays like <span class="math notranslate nohighlight">\(0.99^k\)</span>. For the first two columns together, it decays like <span class="math notranslate nohighlight">\((1/9.9)^k\)</span>, with a convergence factor of about <span class="math notranslate nohighlight">\(0.10\)</span>. Thus a two-dimensional Schur subspace can become accurate much sooner than its individual Schur directions are resolved.</p>
+<p>There is also a starting-space requirement. The power method needs a nonzero coefficient in the wanted eigenvector direction. For <span class="math notranslate nohighlight">\(p\)</span> directions, the starting vectors must contain <span class="math notranslate nohighlight">\(p\)</span> independent combinations of the wanted eigenvector components. Otherwise, repeated multiplication cannot recover all of them. The theorem makes this requirement precise.</p>
+<section id="measuring-the-subspace-error">
+<h3>Measuring the Subspace Error<a class="headerlink" href="#measuring-the-subspace-error" title="Link to this heading">#</a></h3>
+<p>To measure the accuracy of the whole subspace, look at how far its unit vectors extend outside the target space. Changes of basis within the target should not count as error. Let <span class="math notranslate nohighlight">\(\Pi_\star=Q_{\star,p}Q_{\star,p}^H\)</span> project onto that target. Define</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -619,76 +679,71 @@ d_k&amp;=\|(I-\Pi_\star)Q_k\|_2\\
   \|(I-\Pi_\star)\boldsymbol z\|_2.
 \end{aligned}
 \end{split}\]</div>
-<p>Thus <span class="math notranslate nohighlight">\(d_k\)</span> is the largest component outside the target subspace among unit vectors in the current subspace. It is zero when the two subspaces coincide. Geometrically, it is the sine of their largest principal angle. This measures the subspaces themselves, independent of the orthonormal bases used to represent them.</p>
+<p>The second expression follows because the columns of <span class="math notranslate nohighlight">\(Q_k\)</span> are orthonormal. It measures the largest component outside the target among unit vectors in the current subspace. It is zero exactly when the two subspaces coincide and does not depend on which orthonormal bases represent them. For <span class="math notranslate nohighlight">\(p=1\)</span>, it measures the misalignment of the iterate with the dominant eigenvector’s line.</p>
 </section>
 <section id="the-convergence-theorem">
 <h3>The Convergence Theorem<a class="headerlink" href="#the-convergence-theorem" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="thm:orth-it-nh-rigorous">
-<p class="admonition-title"><span class="caption-number">Theorem 25 </span> (Convergence of a Dominant Subspace)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 26 </span> (Convergence of Orthogonal Iteration)</p>
 <section class="theorem-content" id="proof-content">
-<p>Suppose <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, and for some <span class="math notranslate nohighlight">\(1\leq p&lt;n\)</span>,</p>
+<p>Suppose <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, and for some <span class="math notranslate nohighlight">\(1\le p&lt;n\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
-|\lambda_1|\geq\cdots\geq|\lambda_p|
-&gt;|\lambda_{p+1}|\geq\cdots\geq|\lambda_n|.
+|\lambda_1|\ge\cdots\ge|\lambda_p|
+&gt;|\lambda_{p+1}|\ge\cdots\ge|\lambda_n|.
 \]</div>
-<p>Partition the eigenvector basis and the initial coordinates as</p>
+<p>Partition the eigenvector basis and the starting coordinates as</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 X=[X_1,X_2],
 \qquad
 X^{-1}Q_0=\begin{pmatrix}C_1\\C_2\end{pmatrix},
 \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(X_1\)</span> has <span class="math notranslate nohighlight">\(p\)</span> columns and <span class="math notranslate nohighlight">\(C_1\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span>. Assume <span class="math notranslate nohighlight">\(C_1\)</span> is invertible. Then orthogonal iteration is well-defined in exact arithmetic, and its subspace converges to</p>
+<p>where <span class="math notranslate nohighlight">\(X_1\)</span> has <span class="math notranslate nohighlight">\(p\)</span> columns and <span class="math notranslate nohighlight">\(C_1\)</span> is <span class="math notranslate nohighlight">\(p\times p\)</span>. If <span class="math notranslate nohighlight">\(C_1\)</span> is invertible, orthogonal iteration is well-defined in exact arithmetic and its column space converges to</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{range}(X_1)=\mathcal S_\star.
+\mathcal S_\star=\operatorname{range}(X_1)
+=\operatorname{range}(Q_{\star,p}).
 \]</div>
-<p>For <span class="math notranslate nohighlight">\(k\geq1\)</span>, its error satisfies</p>
+<p>For <span class="math notranslate nohighlight">\(k\ge1\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[
-d_k\leq K\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
-\]</div>
-<p>where one possible constant is</p>
-<div class="math notranslate nohighlight">
-\[
+d_k\le K\rho_p^k,
+\qquad
 K=\|X_2\|_2\,\|X^{-1}\|_2\,\|C_2C_1^{-1}\|_2.
 \]</div>
 </section>
-</div><p>The condition on <span class="math notranslate nohighlight">\(C_1\)</span> says that the starting vectors contain enough independent components to capture all <span class="math notranslate nohighlight">\(p\)</span> wanted eigenvector directions. For <span class="math notranslate nohighlight">\(p=1\)</span>, it is exactly the power method’s requirement <span class="math notranslate nohighlight">\(c_1\neq0\)</span>. A random orthonormal start satisfies it with probability one in exact arithmetic.</p>
-<p>For a normal matrix, we may take <span class="math notranslate nohighlight">\(X=Q_\star\)</span>, so the condition becomes invertibility of <span class="math notranslate nohighlight">\(Q_{\star,p}^HQ_0\)</span>. For a nonnormal matrix, the eigenvector coordinates <span class="math notranslate nohighlight">\(X^{-1}Q_0\)</span> matter; ordinary orthogonal overlap with the target is not the same condition.</p>
+</div><p>Invertibility of <span class="math notranslate nohighlight">\(C_1\)</span> means that the starting vectors contain enough independent components to recover all <span class="math notranslate nohighlight">\(p\)</span> wanted directions. For <span class="math notranslate nohighlight">\(p=1\)</span>, it reduces to <span class="math notranslate nohighlight">\(c_1\ne0\)</span> in the power method. A random orthonormal start satisfies it with probability one in exact arithmetic.</p>
+<p>These are coordinates in the eigenvector basis. For a normal matrix, we can take <span class="math notranslate nohighlight">\(X=Q_\star\)</span>, so <span class="math notranslate nohighlight">\(C_1=Q_{\star,p}^HQ_0\)</span>. For a nonnormal matrix, ordinary orthogonal overlap with the target does not replace the condition on <span class="math notranslate nohighlight">\(X^{-1}Q_0\)</span>.</p>
 <div class="proof admonition" id="proof">
 <p>Proof. The Eigenvalue-Ratio Bound.
-Partition <span class="math notranslate nohighlight">\(\Lambda=\operatorname{diag}(\Lambda_1,\Lambda_2)\)</span> consistently with <span class="math notranslate nohighlight">\(X\)</span>. The gap implies that every diagonal entry of <span class="math notranslate nohighlight">\(\Lambda_1\)</span> is nonzero. Then</p>
+Partition <span class="math notranslate nohighlight">\(\Lambda=\operatorname{diag}(\Lambda_1,\Lambda_2)\)</span> consistently with <span class="math notranslate nohighlight">\(X\)</span>. Repeated multiplication gives</p>
 <div class="math notranslate nohighlight">
 \[
 A^kQ_0=X_1\Lambda_1^kC_1+X_2\Lambda_2^kC_2.
 \]</div>
-<p>Its leading eigenvector-coordinate block, <span class="math notranslate nohighlight">\(\Lambda_1^kC_1\)</span>, is invertible. Thus <span class="math notranslate nohighlight">\(A^kQ_0\)</span> has rank <span class="math notranslate nohighlight">\(p\)</span> for every <span class="math notranslate nohighlight">\(k\)</span>, which ensures that all QR steps retain <span class="math notranslate nohighlight">\(p\)</span> independent columns.</p>
-<p><strong>Separate the desired directions from the error.</strong> Right multiplication by <span class="math notranslate nohighlight">\(C_1^{-1}\Lambda_1^{-k}\)</span> changes the basis but not the range. Using the QR identity,</p>
+<p>The gap implies that <span class="math notranslate nohighlight">\(\Lambda_1\)</span> is invertible. The first <span class="math notranslate nohighlight">\(p\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}A^kQ_0\)</span> form the invertible matrix <span class="math notranslate nohighlight">\(\Lambda_1^kC_1\)</span>. Hence <span class="math notranslate nohighlight">\(A^kQ_0\)</span> has rank <span class="math notranslate nohighlight">\(p\)</span> at every step. Inductively, <span class="math notranslate nohighlight">\(AQ_k\)</span> has the same rank as <span class="math notranslate nohighlight">\(A^{k+1}Q_0\)</span>, so every QR factor <span class="math notranslate nohighlight">\(R_k\)</span> is invertible.</p>
+<p><strong>Separate the wanted coordinates from the unwanted ones.</strong> Right multiplication by <span class="math notranslate nohighlight">\(C_1^{-1}\Lambda_1^{-k}\)</span> changes the basis but not the column space:</p>
 <div class="math notranslate nohighlight">
-\[
-\operatorname{range}(Q_k)
-=\operatorname{range}(X_1+X_2F_k),
-\]</div>
-<p>where</p>
-<div class="math notranslate nohighlight">
-\[
-F_k=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
-\]</div>
-<p>The matrix <span class="math notranslate nohighlight">\(F_k\)</span> gives the unwanted eigenvector coordinates when the wanted coordinates are set to the identity. Since <span class="math notranslate nohighlight">\(\Lambda_1\)</span> and <span class="math notranslate nohighlight">\(\Lambda_2\)</span> are diagonal,</p>
+\[\begin{split}
+\begin{aligned}
+A^kQ_0C_1^{-1}\Lambda_1^{-k}
+&amp;=X_1+X_2F_k,\\
+F_k&amp;=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)=\operatorname{range}(X_1+X_2F_k)\)</span>. The matrix <span class="math notranslate nohighlight">\(F_k\)</span> contains the unwanted coordinates after the wanted coordinates have been set to the identity. Since both eigenvalue blocks are diagonal,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 \|F_k\|_2
-&amp;\leq\|\Lambda_2^k\|_2\,
-       \|C_2C_1^{-1}\|_2\,
+&amp;\le\|\Lambda_2^k\|_2\,\|C_2C_1^{-1}\|_2\,
        \|\Lambda_1^{-k}\|_2\\
 &amp;=\|C_2C_1^{-1}\|_2
   \left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
 \end{aligned}
 \end{split}\]</div>
-<p><strong>Translate this into subspace error.</strong> Any unit vector in the computed subspace has the form</p>
+<p><strong>Translate this into geometric error.</strong> Any unit vector in the current subspace has the form</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \boldsymbol z=(X_1+X_2F_k)\boldsymbol c,
@@ -696,50 +751,57 @@ F_k=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
 X^{-1}\boldsymbol z
 =\begin{pmatrix}\boldsymbol c\\F_k\boldsymbol c\end{pmatrix}.
 \end{split}\]</div>
-<p>Hence <span class="math notranslate nohighlight">\(\|\boldsymbol c\|_2\leq\|X^{-1}\|_2\)</span>. Also, <span class="math notranslate nohighlight">\((I-\Pi_\star)X_1=0\)</span>, so</p>
+<p>Therefore,</p>
+<div class="math notranslate nohighlight">
+\[
+\|\boldsymbol c\|_2
+\le\|X^{-1}\boldsymbol z\|_2
+\le\|X^{-1}\|_2.
+\]</div>
+<p>Projection removes the wanted part because <span class="math notranslate nohighlight">\((I-\Pi_\star)X_1=0\)</span>. It follows that</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 \|(I-\Pi_\star)\boldsymbol z\|_2
 &amp;=\|(I-\Pi_\star)X_2F_k\boldsymbol c\|_2\\
-&amp;\leq\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
+&amp;\le\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
 \end{aligned}
 \end{split}\]</div>
-<p>Maximizing over unit vectors <span class="math notranslate nohighlight">\(\boldsymbol z\)</span> and applying the bound on <span class="math notranslate nohighlight">\(F_k\)</span> proves the result.</p>
+<p>Maximizing over unit vectors <span class="math notranslate nohighlight">\(\boldsymbol z\)</span> and substituting the bound on <span class="math notranslate nohighlight">\(F_k\)</span> gives <span class="math notranslate nohighlight">\(d_k\le K\rho_p^k\)</span>.</p>
 </div>
-<p>The ratio <span class="math notranslate nohighlight">\(|\lambda_{p+1}/\lambda_p|\)</span> compares the fastest-growing unwanted component with the slowest-growing wanted component. A ratio near one gives slow separation; a smaller ratio gives faster separation. The theorem is an upper bound, and particular starting spaces may converge faster. For nonnormal matrices, the constant <span class="math notranslate nohighlight">\(K\)</span> can be large.</p>
-<p>For example, suppose the three largest eigenvalue magnitudes are <span class="math notranslate nohighlight">\(10\)</span>, <span class="math notranslate nohighlight">\(9.9\)</span>, and <span class="math notranslate nohighlight">\(1\)</span>, and the starting-space conditions hold. The error bound for the first vector decays like <span class="math notranslate nohighlight">\(0.99^k\)</span>, but the bound for the first two columns together decays like <span class="math notranslate nohighlight">\((1/9.9)^k\)</span>. We can capture their two-dimensional invariant subspace long before the individual directions are resolved.</p>
-<p>This proof assumes diagonalizability. The algorithm also applies to matrices that are not diagonalizable, but their convergence analysis can include additional polynomial factors in <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<p>A ratio near one gives slow separation; a smaller ratio gives faster separation. The constant <span class="math notranslate nohighlight">\(K\)</span> depends on the initial space and the eigenvector basis and can be large for nonnormal matrices. The theorem gives an upper bound; particular starting spaces can converge faster.</p>
+<p>This proof assumes diagonalizability. Orthogonal iteration can also be applied to matrices that are not diagonalizable, but their convergence bounds may include polynomial factors in <span class="math notranslate nohighlight">\(k\)</span>. <a class="reference external" href="https://people.inf.ethz.ch/arbenz/ewp/Lnotes/chapter8.pdf">Arbenz’s notes on subspace iteration</a> give further analysis.</p>
 </section>
 </section>
-<section id="from-subspaces-to-the-schur-vectors">
-<h2>From Subspaces to the Schur Vectors<a class="headerlink" href="#from-subspaces-to-the-schur-vectors" title="Link to this heading">#</a></h2>
-<p>To recover all Schur directions, consider full iteration (<span class="math notranslate nohighlight">\(p=n\)</span>) and suppose now that</p>
+<section id="from-nested-subspaces-to-schur-directions">
+<h2>From Nested Subspaces to Schur Directions<a class="headerlink" href="#from-nested-subspaces-to-schur-directions" title="Link to this heading">#</a></h2>
+<p>For full iteration, <span class="math notranslate nohighlight">\(p=n\)</span>, the columns of <span class="math notranslate nohighlight">\(Q_k\)</span> always span <span class="math notranslate nohighlight">\(\mathbb C^n\)</span>. Convergence of that full space says nothing about the individual directions. The two-dimensional example illustrates what matters: the <strong>leading column spaces</strong> converge.</p>
+<p>Assume now that</p>
 <div class="math notranslate nohighlight">
 \[
 |\lambda_1|&gt;\cdots&gt;|\lambda_n|&gt;0,
 \]</div>
-<p>and that the starting-space condition holds for each leading set of columns being analyzed: the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_{0,i}\)</span> form an invertible <span class="math notranslate nohighlight">\(i\times i\)</span> matrix. Apply the theorem separately to each <span class="math notranslate nohighlight">\(i&lt;n\)</span>. It gives</p>
+<p>and that the starting-space condition holds for each leading set of columns: the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_{0,i}\)</span> form an invertible <span class="math notranslate nohighlight">\(i\times i\)</span> matrix. The nonzero eigenvalues ensure that full iteration has invertible QR factors. Applying the theorem separately for each <span class="math notranslate nohighlight">\(i&lt;n\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[
 \operatorname{range}(Q_{k,i})
 \longrightarrow\operatorname{range}(Q_{\star,i}),
 \]</div>
-<p>with an error bounded by a constant times <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|^k\)</span>.</p>
-<p>Why does this identify column <span class="math notranslate nohighlight">\(i\)</span>? It is the unit direction in the first <span class="math notranslate nohighlight">\(i\)</span> columns that is orthogonal to the first <span class="math notranslate nohighlight">\(i-1\)</span>. More explicitly, let</p>
+<p>with error bounded by a constant times <span class="math notranslate nohighlight">\(|\lambda_{i+1}/\lambda_i|^k\)</span>.</p>
+<p>Column <span class="math notranslate nohighlight">\(i\)</span> is the unit direction in the first <span class="math notranslate nohighlight">\(i\)</span> columns that is perpendicular to the first <span class="math notranslate nohighlight">\(i-1\)</span>. To express this precisely, let</p>
 <div class="math notranslate nohighlight">
 \[
 \Pi_{k,i}=Q_{k,i}Q_{k,i}^H,
 \qquad
 \Pi_{\star,i}=Q_{\star,i}Q_{\star,i}^H.
 \]</div>
-<p>For equal-dimensional subspaces, the error used above also equals the distance between their orthogonal projections:</p>
+<p>For equal-dimensional subspaces, their orthogonal projectors satisfy</p>
 <div class="math notranslate nohighlight">
 \[
 \|\Pi_{k,i}-\Pi_{\star,i}\|_2
 =\|(I-\Pi_{\star,i})Q_{k,i}\|_2.
 \]</div>
-<p>Thus these projections converge. Subtract the projections for two consecutive subspaces:</p>
+<p>Thus their projectors converge too. Subtracting two consecutive projectors isolates column <span class="math notranslate nohighlight">\(i\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -749,21 +811,45 @@ X^{-1}\boldsymbol z
 &amp;=\boldsymbol q_{\star,i}\boldsymbol q_{\star,i}^H.
 \end{aligned}
 \end{split}\]</div>
-<p>Here <span class="math notranslate nohighlight">\(\Pi_{k,0}=\Pi_{\star,0}=0\)</span>. For full iteration, <span class="math notranslate nohighlight">\(\Pi_{k,n}=\Pi_{\star,n}=I\)</span>, so the last column follows too. This proves convergence of all Schur directions. Signs or complex phases may continue to change, as in the power method; the lines converge.</p>
-<p>For <span class="math notranslate nohighlight">\(p=n\)</span>, the full column space is always <span class="math notranslate nohighlight">\(\mathbb C^n\)</span>. It is the convergence of these <strong>nested leading subspaces</strong>, not the full space, that produces Schur form. Under the assumptions above, the diagonal entries of <span class="math notranslate nohighlight">\(Q_k^HAQ_k\)</span> approach the ordered eigenvalues and the entries below the diagonal approach zero.</p>
-<p>For partial iteration (<span class="math notranslate nohighlight">\(p&lt;n\)</span>), if only <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span> holds, the <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace can converge without individual columns settling into Schur directions. This is useful when wanted eigenvalues have equal or nearly equal magnitudes. For real matrices, a nonreal conjugate pair has equal magnitudes and must be treated together when working in real arithmetic.</p>
+<p>Here <span class="math notranslate nohighlight">\(\Pi_{k,0}=\Pi_{\star,0}=0\)</span>, and <span class="math notranslate nohighlight">\(\Pi_{k,n}=\Pi_{\star,n}=I\)</span>. This proves convergence of every Schur direction, including the last one.</p>
+<p>As in the power method, signs or complex phases can keep changing. Nevertheless, the diagonal entries of</p>
+<div class="math notranslate nohighlight">
+\[
+T_k=Q_k^HAQ_k
+\]</div>
+<p>approach the ordered eigenvalues, and the entries below the diagonal approach zero. Entries above the diagonal can continue to change with those phases.</p>
+<p>For partial iteration, a boundary gap <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span> alone guarantees convergence of the <span class="math notranslate nohighlight">\(p\)</span>-dimensional space, not its individual basis directions. Additional internal gaps and starting-space conditions give convergence of the corresponding leading spaces. A nonreal conjugate pair must be treated together in real arithmetic because its two eigenvalues have equal magnitude.</p>
 </section>
-<section id="using-the-computed-subspace">
-<h2>Using the Computed Subspace<a class="headerlink" href="#using-the-computed-subspace" title="Link to this heading">#</a></h2>
-<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, form the projected matrix and its residual:</p>
+<section id="a-basic-implementation">
+<h2>A Basic Implementation<a class="headerlink" href="#a-basic-implementation" title="Link to this heading">#</a></h2>
+<p>The following code performs a fixed number of steps under the full-column-rank assumption above. NumPy may choose different QR signs or phases; these do not affect the computed subspaces.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">orthogonal_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">num_iterations</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">G</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"reduced"</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iterations</span><span class="p">):</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">Q</span>
+        <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"reduced"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Q</span>
+</pre></div>
+</div>
+<p>For dense <span class="math notranslate nohighlight">\(A\)</span>, each step costs <span class="math notranslate nohighlight">\(O(n^2p)\)</span> for multiplication and <span class="math notranslate nohighlight">\(O(np^2)\)</span> for QR. Using fewer columns is useful when only a few eigenvalues are wanted; sparse matrix products can also reduce the multiplication cost.</p>
+<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, form</p>
 <div class="math notranslate nohighlight">
 \[
 T_k=Q_k^HAQ_k,
 \qquad
 E_k=AQ_k-Q_kT_k.
 \]</div>
-<p>A small residual means that applying <span class="math notranslate nohighlight">\(A\)</span> nearly keeps vectors within the computed subspace. The eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span>, called <strong>Ritz values</strong>, then provide approximations to the wanted eigenvalues as the subspace converges. A residual alone does not identify which invariant subspace has been found.</p>
-<p>For full iteration, this residual is always zero because <span class="math notranslate nohighlight">\(Q_k\)</span> is square and unitary. Under the strict-gap assumptions, we instead monitor the entries below the diagonal of <span class="math notranslate nohighlight">\(T_k\)</span>. The following sections develop the connection to eigenvalue computation and the QR algorithm.</p>
+<p>A small <span class="math notranslate nohighlight">\(\|E_k\|_2\)</span> means that applying <span class="math notranslate nohighlight">\(A\)</span> nearly keeps vectors within the current subspace. It can be used as a stopping criterion relative to the scale of <span class="math notranslate nohighlight">\(A\)</span>. As the subspace converges, the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span>, called <strong>Ritz values</strong>, approach the wanted eigenvalues. A small residual alone does not identify which invariant subspace has been found.</p>
+<p>For full iteration, <span class="math notranslate nohighlight">\(E_k=0\)</span> at every step because <span class="math notranslate nohighlight">\(Q_k\)</span> is square and unitary. Under the strict-gap assumptions, the entries below the diagonal of <span class="math notranslate nohighlight">\(T_k\)</span> measure progress toward Schur form. The <a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html"><span class="std std-doc">next section</span></a> develops the eigenvalue interpretation and the role of shifts.</p>
 </section>
 </section>
 
@@ -807,11 +893,11 @@ E_k=AQ_k-Q_kT_k.
       </div>
     </a>
     <a class="right-next"
-       href="orthogonal_and_power_iteration.html"
+       href="orthogonal_iteration_and_eigenvalues.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Power and Orthogonal Iteration Methods</p>
+        <p class="prev-next-title">Orthogonal Iteration and Eigenvalues</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -833,17 +919,20 @@ E_k=AQ_k-Q_kT_k.
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-the-target-separate-from-the-iterates">Keep the Target Separate from the Iterates</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-algorithm">The Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-performs-the-deflation-steps">QR Performs the Deflation Steps</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-identity-qr-changes-the-basis-not-the-subspace">The Key Identity: QR Changes the Basis, Not the Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-exact-target-and-the-current-basis">The Exact Target and the Current Basis</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multiply-then-orthonormalize">Multiply, Then Orthonormalize</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-qr-performs-approximate-deflation">How QR Performs Approximate Deflation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-same-two-dimensional-example">The Same Two-Dimensional Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-connection-to-powers-of-a">The Connection to Powers of <span class="math notranslate nohighlight">\(A\)</span></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-a-leading-subspace">Convergence of a Leading Subspace</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-error">Measuring the Error</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-subspace-error">Measuring the Subspace Error</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-theorem">The Convergence Theorem</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-the-schur-vectors">From Subspaces to the Schur Vectors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-computed-subspace">Using the Computed Subspace</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-nested-subspaces-to-schur-directions">From Nested Subspaces to Schur Directions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-basic-implementation">A Basic Implementation</a></li>
 </ul>
   </nav></div>
 

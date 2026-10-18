@@ -105,7 +105,7 @@ P_iA(I-P_i)=0,
 P_iA=P_iAP_i.
 $$
 
-Thus the projected operator annihilates the known subspace and maps its perpendicular complement into itself.
+The first identity says that $P_iA$ sends every vector in the known subspace $\mathcal S_i$ to zero.
 
 ## Why the New Directions Are Schur Vectors
 

@@ -68,7 +68,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Computing Eigenvectors from the Schur Decomposition" href="computing_the_eigenvectors.html" />
-    <link rel="prev" title="Power and Orthogonal Iteration Methods" href="orthogonal_and_power_iteration.html" />
+    <link rel="prev" title="The Orthogonal Iteration Algorithm" href="orthogonal_iteration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -263,7 +263,6 @@
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
@@ -461,7 +460,7 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-eigenvalue-approximations">From Subspaces to Eigenvalue Approximations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-t-k-to-the-schur-form">Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subspace-convergence-and-schur-form">Subspace Convergence and Schur Form</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-with-slow-convergence">The Problem with Slow Convergence</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-shifted-iteration">The Shifted Iteration</a></li>
@@ -488,7 +487,7 @@
 \[
 T_k = Q_k^H A Q_k
 \]</div>
-<p>is the Rayleigh–Ritz compression of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span>. As this subspace converges to an invariant subspace of <span class="math notranslate nohighlight">\(A\)</span>, the matrix <span class="math notranslate nohighlight">\(T_k\)</span> converges to the (upper triangular) Schur form of <span class="math notranslate nohighlight">\(A\)</span> restricted to that subspace. Consequently, the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> (and ultimately its diagonal entries) become increasingly accurate approximations of the corresponding eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>is the Rayleigh–Ritz compression of <span class="math notranslate nohighlight">\(A\)</span> onto the subspace <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span>. As this subspace converges to the desired invariant subspace, the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> approach the wanted eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. To obtain Schur directions and read eigenvalues from the diagonal, we need convergence of the nested leading column spaces, as established in <a class="reference internal" href="orthogonal_iteration.html"><span class="std std-doc">orthogonal iteration</span></a>.</p>
 </div>
 <section id="from-subspaces-to-eigenvalue-approximations">
 <h2>From Subspaces to Eigenvalue Approximations<a class="headerlink" href="#from-subspaces-to-eigenvalue-approximations" title="Link to this heading">#</a></h2>
@@ -502,22 +501,24 @@ Z_{k+1} = A Q_k, \qquad Z_{k+1} = Q_{k+1} R_{k+1}.
 \[
 T_k = Q_k^H A Q_k \in \mathbb{C}^{p\times p}.
 \]</div>
-<p>By construction, <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> provides an orthonormal basis for a <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace, and <span class="math notranslate nohighlight">\(T_k\)</span> represents the matrix <span class="math notranslate nohighlight">\(A\)</span> projected onto that basis.</p>
+<p>The columns of <span class="math notranslate nohighlight">\(Q_k\)</span> form an orthonormal basis for a <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace, and <span class="math notranslate nohighlight">\(T_k\)</span> represents the action of <span class="math notranslate nohighlight">\(A\)</span> projected onto that subspace and expressed in this basis.</p>
 </section>
-<section id="convergence-of-t-k-to-the-schur-form">
-<h2>Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form<a class="headerlink" href="#convergence-of-t-k-to-the-schur-form" title="Link to this heading">#</a></h2>
-<p>Assume <span class="math notranslate nohighlight">\(A\)</span> has the Schur decomposition <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, where the eigenvalues on the diagonal of <span class="math notranslate nohighlight">\(T\)</span> are ordered by magnitude, <span class="math notranslate nohighlight">\(|\lambda_1| &gt; |\lambda_2| &gt; \dots &gt; |\lambda_n| &gt; 0\)</span>.</p>
-<p>If orthogonal iteration is initialized with a matrix <span class="math notranslate nohighlight">\(Q_0\)</span> whose columns are linearly independent and have a nonzero component in the desired invariant subspace, then <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> will converge. Under standard spectral separation conditions, it converges to the dominant <span class="math notranslate nohighlight">\(p\)</span>-dimensional <span class="math notranslate nohighlight">\(A\)</span>-invariant subspace, which is spanned by the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors.</p>
-<p>Let <span class="math notranslate nohighlight">\(Q_p = Q[:,1:p]\)</span> be the <span class="math notranslate nohighlight">\(n \times p\)</span> matrix of the first <span class="math notranslate nohighlight">\(p\)</span> Schur vectors, and let <span class="math notranslate nohighlight">\(T_p = T[1:p,1:p]\)</span> be the corresponding <span class="math notranslate nohighlight">\(p \times p\)</span> principal submatrix of <span class="math notranslate nohighlight">\(T\)</span>. As the subspaces converge, so do the projected matrices:</p>
+<section id="subspace-convergence-and-schur-form">
+<h2>Subspace Convergence and Schur Form<a class="headerlink" href="#subspace-convergence-and-schur-form" title="Link to this heading">#</a></h2>
+<p>The preceding section distinguishes two conclusions. Under its diagonalizability, boundary-gap, and invertible starting-coordinate assumptions, the <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace converges to <span class="math notranslate nohighlight">\(\operatorname{range}(Q_{\star,p})\)</span>. This is enough for the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> to approach <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_p\)</span>.</p>
+<p>The basis may still change within that subspace. Changing an orthonormal basis within a fixed invariant subspace changes its matrix representation by unitary similarity, which preserves eigenvalues. Thus convergence of the subspace does not require convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to a fixed triangular matrix.</p>
+<p>With strict ordering <span class="math notranslate nohighlight">\(|\lambda_1|&gt;\cdots&gt;|\lambda_n|&gt;0\)</span> and the starting-coordinate condition for each leading set of columns, the nested leading subspaces converge. The individual columns then approach Schur directions, up to signs or complex phases. Consequently,</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{range}(Q_k) \to \operatorname{range}(Q_p) \quad\Longrightarrow\quad T_k = Q_k^H A Q_k \to T_p
+(T_k)_{jj}\longrightarrow\lambda_j,
+\qquad
+(T_k)_{j\ell}\longrightarrow0\quad(j&gt;\ell).
 \]</div>
-<p>This means <span class="math notranslate nohighlight">\(T_k\)</span> asymptotically becomes upper triangular, and its eigenvalues (which are its diagonal entries) converge to the <span class="math notranslate nohighlight">\(p\)</span> dominant eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\{\lambda_1, \dots, \lambda_p\}\)</span>.</p>
+<p>Entries above the diagonal may continue to change with the phases of the basis vectors. For full iteration (<span class="math notranslate nohighlight">\(p=n\)</span>), <span class="math notranslate nohighlight">\(T_k\)</span> is unitarily similar to <span class="math notranslate nohighlight">\(A\)</span> at every step, so it already has exactly the same eigenvalues in exact arithmetic. The goal is to approach triangular form so those eigenvalues can be read from the diagonal.</p>
 </section>
 <section id="shifts-accelerating-eigenvalue-convergence">
 <h2>Shifts: Accelerating Eigenvalue Convergence<a class="headerlink" href="#shifts-accelerating-eigenvalue-convergence" title="Link to this heading">#</a></h2>
-<p>Shifting modifies the iteration to dramatically accelerate convergence by emphasizing specific eigenvalues.</p>
+<p>Shifting changes the eigenvalue ratios that control convergence. An effective choice can reduce the number of iterations.</p>
 <section id="the-problem-with-slow-convergence">
 <h3>The Problem with Slow Convergence<a class="headerlink" href="#the-problem-with-slow-convergence" title="Link to this heading">#</a></h3>
 <p>Without shifting, the convergence of <span class="math notranslate nohighlight">\(\mathrm{range}(Q_k)\)</span> to the dominant invariant subspace is governed by the eigenvalue separation. The convergence rate typically depends on the ratio of the largest “unwanted” eigenvalue (<span class="math notranslate nohighlight">\(\lambda_{p+1}\)</span>) to the smallest “wanted” one (<span class="math notranslate nohighlight">\(\lambda_p\)</span>):</p>
@@ -532,14 +533,15 @@ T_k = Q_k^H A Q_k \in \mathbb{C}^{p\times p}.
 <p>To accelerate this, we introduce a scalar <strong>shift</strong> <span class="math notranslate nohighlight">\(\mu\)</span> and apply the iteration to the matrix <span class="math notranslate nohighlight">\(A - \mu I\)</span> instead:</p>
 <div class="math notranslate nohighlight">
 \[
-Z_k = (A - \mu I) Q_k, \qquad Z_k = Q_{k+1} R_{k+1}.
+Z_{k+1} = (A - \mu I) Q_k,
+\qquad Z_{k+1} = Q_{k+1} R_{k+1}.
 \]</div>
-<p>This works because <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A - \mu I\)</span> share the same invariant subspaces (and Schur vectors), so <span class="math notranslate nohighlight">\(\mathrm{range}(Q_{k+1})\)</span> still converges to an invariant subspace. However, the convergence rate is now determined by the eigenvalues of the <em>shifted</em> matrix, which are <span class="math notranslate nohighlight">\(\lambda_i - \mu\)</span>.</p>
+<p>The matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(A-\mu I\)</span> have the same invariant subspaces, and an exact Schur basis for <span class="math notranslate nohighlight">\(A\)</span> is also a Schur basis for <span class="math notranslate nohighlight">\(A-\mu I\)</span>. The eigenvalues become <span class="math notranslate nohighlight">\(\lambda_i-\mu\)</span>. Their magnitudes can have a different ordering: power or partial subspace iteration now favors eigenvalues farthest from <span class="math notranslate nohighlight">\(\mu\)</span>. A shift therefore changes both the convergence ratios and potentially which subspace is selected.</p>
 </section>
 <section id="the-full-qr-algorithm-p-n">
 <h3>The Full QR Algorithm (<span class="math notranslate nohighlight">\(p=n\)</span>)<a class="headerlink" href="#the-full-qr-algorithm-p-n" title="Link to this heading">#</a></h3>
-<p>This strategy becomes exceptionally powerful when we set <span class="math notranslate nohighlight">\(p=n\)</span>, which transforms orthogonal iteration into the <strong>QR algorithm</strong>. In this special case, <span class="math notranslate nohighlight">\(Q_k\)</span> and <span class="math notranslate nohighlight">\(T_k\)</span> are square <span class="math notranslate nohighlight">\(n \times n\)</span> matrices.</p>
-<p>We can analyze the convergence by partitioning <span class="math notranslate nohighlight">\(T_k\)</span>:</p>
+<p>For <span class="math notranslate nohighlight">\(p=n\)</span>, we can express the basis updates directly as updates of <span class="math notranslate nohighlight">\(T_k\)</span>, giving the <strong>QR algorithm</strong>. The derivation is developed in <a class="reference internal" href="qr_iteration.html"><span class="std std-doc">QR iteration</span></a>. In this case, <span class="math notranslate nohighlight">\(Q_k\)</span> and <span class="math notranslate nohighlight">\(T_k\)</span> are square <span class="math notranslate nohighlight">\(n\times n\)</span> matrices.</p>
+<p>For <span class="math notranslate nohighlight">\(n\ge2\)</span>, partition after the first <span class="math notranslate nohighlight">\(n-1\)</span> rows and columns:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 T_k = \begin{bmatrix}
@@ -547,28 +549,30 @@ T_{k,11} &amp; T_{k,12} \\
 T_{k,21} &amp; T_{k,22}
 \end{bmatrix}
 \end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(T_{k,22}\)</span> is a scalar (the bottom-right entry) and <span class="math notranslate nohighlight">\(T_{k,21}\)</span> is a row vector. For the <span class="math notranslate nohighlight">\(p=n\)</span> case, the analysis shows that the sub-diagonal block <span class="math notranslate nohighlight">\(T_{k,21}\)</span> converges to zero at a rate governed by the ratio of the smallest-magnitude eigenvalues:</p>
+<p>Here <span class="math notranslate nohighlight">\(T_{k,22}\)</span> is the bottom-right scalar and <span class="math notranslate nohighlight">\(T_{k,21}\)</span> is a row vector. Under the strict ordering and starting-space conditions above, the unshifted iteration satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-|T_{k,21}| \to 0 \quad \text{with rate} \quad \frac{|\lambda_n|}{|\lambda_{n-1}|}
+\|T_{k,21}\|_2
+=O\!\left(\left|\frac{\lambda_n}{\lambda_{n-1}}\right|^k\right).
 \]</div>
 <p>As <span class="math notranslate nohighlight">\(T_{k,21} \to 0\)</span>, <span class="math notranslate nohighlight">\(T_k\)</span> becomes block upper triangular, and the scalar <span class="math notranslate nohighlight">\(T_{k,22}\)</span> converges to the eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p>
-<p>When we apply a shift <span class="math notranslate nohighlight">\(\mu\)</span>, the convergence rate of <span class="math notranslate nohighlight">\(T_{k,21}\)</span> to zero becomes:</p>
+<p>For a fixed shift <span class="math notranslate nohighlight">\(\mu\)</span> that is not an eigenvalue, suppose <span class="math notranslate nohighlight">\(\lambda_n\)</span> is the unique closest eigenvalue to <span class="math notranslate nohighlight">\(\mu\)</span> and the corresponding starting-space condition holds. The shifted boundary ratio is</p>
 <div class="math notranslate nohighlight">
 \[
-\frac{|\lambda_n - \mu|}{|\lambda_{n-1} - \mu|}
+\rho_\mu=
+\frac{|\lambda_n-\mu|}{\min_{j&lt;n}|\lambda_j-\mu|}&lt;1.
 \]</div>
 <div class="tip admonition">
 <p class="admonition-title">Key Idea</p>
-<p>This new ratio is the key to acceleration. To find the smallest eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span>, we can choose a shift <span class="math notranslate nohighlight">\(\mu\)</span> that is a good approximation of <span class="math notranslate nohighlight">\(\lambda_n\)</span>. This makes the numerator <span class="math notranslate nohighlight">\(|\lambda_n - \mu|\)</span> very small, forcing rapid (quadratic) convergence of <span class="math notranslate nohighlight">\(T_{k,21}\)</span> to 0.</p>
+<p>Choosing <span class="math notranslate nohighlight">\(\mu\)</span> close to an isolated eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span> makes <span class="math notranslate nohighlight">\(\rho_\mu\)</span> small. In full iteration, the other <span class="math notranslate nohighlight">\(n-1\)</span> directions separate from this last direction more quickly, so the bottom row approaches block upper triangular form faster. For a fixed shift the bound remains geometric. Updating the shift can give faster local convergence; the <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">section on shifts</span></a> develops those results.</p>
 </div>
-<p>The diagonal entries of <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span> provide our best available approximations to the eigenvalues. This enables a powerful feedback loop:</p>
+<p>Once <span class="math notranslate nohighlight">\(T_k\)</span> is close to Schur form, its diagonal entries provide eigenvalue approximations that can guide the next shift:</p>
 <ul class="simple">
 <li><p>Set <span class="math notranslate nohighlight">\(p=n\)</span>, so that <span class="math notranslate nohighlight">\(Q_k\)</span> is a full <span class="math notranslate nohighlight">\(n \times n\)</span> unitary matrix at each step</p></li>
 <li><p>At step <span class="math notranslate nohighlight">\(k\)</span>, compute the projected matrix <span class="math notranslate nohighlight">\(T_k = Q_k^H A Q_k\)</span>.</p></li>
-<li><p>Use the bottom-right entry of this matrix, <span class="math notranslate nohighlight">\(\mu_k = (T_k)_{nn}\)</span>, as the shift for the next iteration. This value, known as the Rayleigh quotient shift, is an excellent, adaptively improving approximation of <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p></li>
+<li><p>A common choice is the bottom-right entry, <span class="math notranslate nohighlight">\(\mu_k=(T_k)_{nn}\)</span>. This is the Rayleigh quotient of the last basis vector and is called the <strong>Rayleigh quotient shift</strong>.</p></li>
 </ul>
-<p>This strategy of adaptively choosing a shift based on the last entry of <span class="math notranslate nohighlight">\(T_k\)</span> is the core idea that transforms subspace iteration into the highly efficient QR iteration with shifts.</p>
+<p>Later sections explain how shift choices accelerate QR iteration and how to handle real matrices with complex conjugate eigenvalues.</p>
 </section>
 </section>
 </section>
@@ -604,12 +608,12 @@ T_{k,21} &amp; T_{k,22}
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="orthogonal_and_power_iteration.html"
+       href="orthogonal_iteration.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Power and Orthogonal Iteration Methods</p>
+        <p class="prev-next-title">The Orthogonal Iteration Algorithm</p>
       </div>
     </a>
     <a class="right-next"
@@ -640,7 +644,7 @@ T_{k,21} &amp; T_{k,22}
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspaces-to-eigenvalue-approximations">From Subspaces to Eigenvalue Approximations</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-t-k-to-the-schur-form">Convergence of <span class="math notranslate nohighlight">\(T_k\)</span> to the Schur Form</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subspace-convergence-and-schur-form">Subspace Convergence and Schur Form</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifts-accelerating-eigenvalue-convergence">Shifts: Accelerating Eigenvalue Convergence</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-with-slow-convergence">The Problem with Slow Convergence</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-shifted-iteration">The Shifted Iteration</a></li>

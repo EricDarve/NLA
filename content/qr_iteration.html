@@ -263,7 +263,6 @@
 <li class="toctree-l2"><a class="reference internal" href="power_method.html">The Power Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="deflation.html">The Method of Deflation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration.html">The Orthogonal Iteration Algorithm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="orthogonal_and_power_iteration.html">Power and Orthogonal Iteration Methods</a></li>
 <li class="toctree-l2"><a class="reference internal" href="orthogonal_iteration_and_eigenvalues.html">Orthogonal Iteration and Eigenvalues</a></li>
 <li class="toctree-l2"><a class="reference internal" href="computing_the_eigenvectors.html">Computing Eigenvectors from the Schur Decomposition</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">QR Iteration</a></li>
@@ -490,7 +489,7 @@
 \[
 T_k = Q_k^H A Q_k
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(Q_k\)</span> is the sequence of orthogonal matrices produced by the method of <strong>orthogonal iteration</strong>.</p>
+<p>where <span class="math notranslate nohighlight">\(Q_k\)</span> is the sequence of unitary matrices produced by <strong>orthogonal iteration</strong>.</p>
 <p>Let’s consider the relationship between <span class="math notranslate nohighlight">\(T_k\)</span> and the next matrix in the sequence, <span class="math notranslate nohighlight">\(T_{k+1}\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -513,7 +512,7 @@ T_k = Q_k^H (A Q_k) = Q_k^H (Q_{k+1} R_{k+1})
 \[
 U_{k+1} \overset{def}{=} Q_k^H Q_{k+1}
 \]</div>
-<p>As <span class="math notranslate nohighlight">\(k\)</span> increases, <span class="math notranslate nohighlight">\(Q_k\)</span> converges to the Schur orthogonal transformation. Therefore, <span class="math notranslate nohighlight">\(U_{k+1}\)</span> can be interpreted as a small incremental rotation that updates <span class="math notranslate nohighlight">\(Q_k\)</span> to <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>.</p>
+<p>The relation <span class="math notranslate nohighlight">\(Q_{k+1}=Q_kU_{k+1}\)</span> expresses the change of basis between consecutive iterations. It includes any sign or phase changes in the columns.</p>
 <p>Substituting this definition, we get:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -567,9 +566,9 @@ T_{k+1} = (U_{k+1}^H T_k) U_{k+1} = R_{k+1} U_{k+1}
 <span class="math notranslate nohighlight">\(T_{k+1} = R_{k+1} U_{k+1}\)</span></p></li>
 </ol>
 <p>We just switch the order of the terms! We can compute the entire sequence of <span class="math notranslate nohighlight">\(T_k\)</span> matrices starting from <span class="math notranslate nohighlight">\(T_0 = A\)</span> without ever needing to form the <span class="math notranslate nohighlight">\(Q_k\)</span> matrices from the <strong>orthogonal iteration</strong>.</p>
-<p>This QR iteration produces the same sequence of <span class="math notranslate nohighlight">\(R_k\)</span> matrices as the <strong>orthogonal iteration</strong>.</p>
-<p>From <span class="math notranslate nohighlight">\(U_{k+1} = Q_k^H Q_{k+1}\)</span>, we can show by induction that the product of the unitary factors from the QR iteration, <span class="math notranslate nohighlight">\(U_1 \cdots U_k\)</span>, is equal to the <span class="math notranslate nohighlight">\(Q_k\)</span> matrix from the <strong>orthogonal iteration</strong> (assuming <span class="math notranslate nohighlight">\(Q_0 = I\)</span>). This product therefore converges to the orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> from the <strong>Schur decomposition</strong>.</p>
-<p>Recall from our <a class="reference internal" href="orthogonal_and_power_iteration.html#sec-oi-qr-ak"><span class="std std-ref">previous section</span></a> that</p>
+<p>With positive diagonal entries in each QR factor <span class="math notranslate nohighlight">\(R_k\)</span>, this QR iteration produces the same sequence of <span class="math notranslate nohighlight">\(R_k\)</span> matrices as orthogonal iteration.</p>
+<p>From <span class="math notranslate nohighlight">\(U_{k+1}=Q_k^HQ_{k+1}\)</span>, the product <span class="math notranslate nohighlight">\(U_1\cdots U_k\)</span> equals <span class="math notranslate nohighlight">\(Q_k\)</span> from orthogonal iteration when <span class="math notranslate nohighlight">\(Q_0=I\)</span>. Under the strict-gap and starting-space conditions established there, its columns approach the ordered Schur directions. Signs or complex phases may continue to change.</p>
+<p>Recall the <a class="reference internal" href="orthogonal_iteration.html#sec-oi-qr-ak"><span class="std std-ref">QR identity for orthogonal iteration</span></a>:</p>
 <div class="math notranslate nohighlight">
 \[
 A^k = Q_k \, R_k R_{k-1}\cdots R_1.
