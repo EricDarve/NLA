@@ -215,6 +215,16 @@ $$
 
 The second expression follows because the columns of $Q_k$ are orthonormal. It measures the largest component outside the target among unit vectors in the current subspace. It is zero exactly when the two subspaces coincide and does not depend on which orthonormal bases represent them. For $p=1$, it measures the misalignment of the iterate with the dominant eigenvector's line.
 
+For $n=3$ and $p=2$, the subspaces are planes through the origin. The figure shows the approximate plane approaching the true Schur plane. The orange segment realizes the maximum in the definition of $d_k$: it joins a unit vector in the current plane to its orthogonal projection onto the target plane.
+
+:::{figure} ../_static/subspace_convergence.svg
+:alt: Four three-dimensional views show the blue approximate plane approaching a fixed horizontal teal Schur plane after zero, one, three, and seven orthogonal iterations. Both planes are drawn as unit-radius disks with identical viewpoints and scales. An orange perpendicular segment marks the largest distance of a unit vector in the current plane from the target plane. Its length decreases from 0.832 to 0.692, 0.366, and 0.067.
+:width: 820px
+:name: fig-subspace-convergence
+
+Plane convergence for $A=\operatorname{diag}(1.05,1,0.65)$, with $n=3$ and $p=2$. The true Schur subspace is the horizontal plane $\mathcal S_\star=\operatorname{span}\{e_1,e_2\}$; the starting plane is $z=0.9x+1.2y$. Each disk is a unit-radius patch of its subspace, and all views use the same camera and scale. The shrinking orange segment measures $d_k$. The convergence bound uses $\rho_2=|\lambda_3/\lambda_2|=0.65$.
+:::
+
 ### The Convergence Theorem
 
 :::{prf:theorem} Convergence of Orthogonal Iteration

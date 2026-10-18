@@ -680,6 +680,14 @@ d_k&amp;=\|(I-\Pi_\star)Q_k\|_2\\
 \end{aligned}
 \end{split}\]</div>
 <p>The second expression follows because the columns of <span class="math notranslate nohighlight">\(Q_k\)</span> are orthonormal. It measures the largest component outside the target among unit vectors in the current subspace. It is zero exactly when the two subspaces coincide and does not depend on which orthonormal bases represent them. For <span class="math notranslate nohighlight">\(p=1\)</span>, it measures the misalignment of the iterate with the dominant eigenvector’s line.</p>
+<p>For <span class="math notranslate nohighlight">\(n=3\)</span> and <span class="math notranslate nohighlight">\(p=2\)</span>, the subspaces are planes through the origin. The figure shows the approximate plane approaching the true Schur plane. The orange segment realizes the maximum in the definition of <span class="math notranslate nohighlight">\(d_k\)</span>: it joins a unit vector in the current plane to its orthogonal projection onto the target plane.</p>
+<figure class="align-default" id="fig-subspace-convergence">
+<a class="reference internal image-reference" href="../_images/subspace_convergence.svg"><img alt="Four three-dimensional views show the blue approximate plane approaching a fixed horizontal teal Schur plane after zero, one, three, and seven orthogonal iterations. Both planes are drawn as unit-radius disks with identical viewpoints and scales. An orange perpendicular segment marks the largest distance of a unit vector in the current plane from the target plane. Its length decreases from 0.832 to 0.692, 0.366, and 0.067." src="../_images/subspace_convergence.svg" style="width: 820px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">Plane convergence for <span class="math notranslate nohighlight">\(A=\operatorname{diag}(1.05,1,0.65)\)</span>, with <span class="math notranslate nohighlight">\(n=3\)</span> and <span class="math notranslate nohighlight">\(p=2\)</span>. The true Schur subspace is the horizontal plane <span class="math notranslate nohighlight">\(\mathcal S_\star=\operatorname{span}\{e_1,e_2\}\)</span>; the starting plane is <span class="math notranslate nohighlight">\(z=0.9x+1.2y\)</span>. Each disk is a unit-radius patch of its subspace, and all views use the same camera and scale. The shrinking orange segment measures <span class="math notranslate nohighlight">\(d_k\)</span>. The convergence bound uses <span class="math notranslate nohighlight">\(\rho_2=|\lambda_3/\lambda_2|=0.65\)</span>.</span><a class="headerlink" href="#fig-subspace-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
 <section id="the-convergence-theorem">
 <h3>The Convergence Theorem<a class="headerlink" href="#the-convergence-theorem" title="Link to this heading">#</a></h3>
