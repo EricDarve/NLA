@@ -460,8 +460,11 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-eigenvalues-from-a-subspace">Extracting Eigenvalues from a Subspace</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-subspace-convergence-guarantees">What Subspace Convergence Guarantees</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-eigenvalues-appear-on-the-diagonal">When Eigenvalues Appear on the Diagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspace-convergence-to-schur-form">From Subspace Convergence to Schur Form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-gap-convergence-of-the-subspace">One Gap: Convergence of the Subspace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#strict-ordering-convergence-of-schur-directions">Strict Ordering: Convergence of Schur Directions</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-orthogonal-iteration-to-qr-iteration">From Orthogonal Iteration to QR Iteration</a></li>
 </ul>
             </nav>
@@ -476,29 +479,24 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="orthogonal-iteration-and-eigenvalues">
 <h1>Orthogonal Iteration and Eigenvalues<a class="headerlink" href="#orthogonal-iteration-and-eigenvalues" title="Link to this heading">#</a></h1>
-<p>The <a class="reference internal" href="orthogonal_iteration.html"><span class="std std-doc">previous section</span></a> explains how orthogonal iteration finds invariant subspaces and Schur directions. To compute eigenvalues from these results, we study the matrix <span class="math notranslate nohighlight">\(T_k=Q_k^HAQ_k\)</span>. Following this matrix directly will lead to the QR iteration.</p>
-<p>We keep the same notation: <span class="math notranslate nohighlight">\(Q_\star\)</span> is an exact Schur basis in <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span>, with <span class="math notranslate nohighlight">\(|\lambda_1|\ge\cdots\ge|\lambda_n|\)</span>, and <span class="math notranslate nohighlight">\(Q_k\in\mathbb C^{n\times p}\)</span> is the orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>. The first <span class="math notranslate nohighlight">\(i\)</span> columns are denoted by <span class="math notranslate nohighlight">\(Q_{\star,i}\)</span> and <span class="math notranslate nohighlight">\(Q_{k,i}\)</span>.</p>
+<p>The <a class="reference internal" href="orthogonal_iteration.html"><span class="std std-doc">previous section</span></a> establishes how orthogonal iteration finds invariant subspaces and Schur directions. To use these results for eigenvalue computation, we represent the action of <span class="math notranslate nohighlight">\(A\)</span> in the current basis.</p>
+<p>We keep the same notation: <span class="math notranslate nohighlight">\(Q_\star\)</span> is an exact Schur basis in <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span>, with <span class="math notranslate nohighlight">\(|\lambda_1|\ge\cdots\ge|\lambda_n|\)</span>, and <span class="math notranslate nohighlight">\(Q_k\in\mathbb C^{n\times p}\)</span> is the orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
 <section id="extracting-eigenvalues-from-a-subspace">
 <h2>Extracting Eigenvalues from a Subspace<a class="headerlink" href="#extracting-eigenvalues-from-a-subspace" title="Link to this heading">#</a></h2>
-<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, orthogonal iteration gives a small subspace in which to look for eigenvectors. A vector in this subspace has the form <span class="math notranslate nohighlight">\(\boldsymbol u=Q_k\boldsymbol y\)</span>. Multiplication by <span class="math notranslate nohighlight">\(A\)</span> can take it outside the subspace. Projecting back gives</p>
+<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, a vector in the current subspace has the form <span class="math notranslate nohighlight">\(\boldsymbol u=Q_k\boldsymbol y\)</span>. Multiplication by <span class="math notranslate nohighlight">\(A\)</span> can take it outside the subspace. Projecting back gives</p>
 <div class="math notranslate nohighlight">
 \[
-Q_kQ_k^HA\boldsymbol u
-=Q_k\underbrace{(Q_k^HAQ_k)}_{T_k}\boldsymbol y.
+T_k=Q_k^HAQ_k,
+\qquad
+Q_kQ_k^HA\boldsymbol u=Q_kT_k\boldsymbol y.
 \]</div>
-<p>Thus the <span class="math notranslate nohighlight">\(p\times p\)</span> matrix</p>
-<div class="math notranslate nohighlight">
-\[
-\boxed{T_k=Q_k^HAQ_k}
-\]</div>
-<p>describes the projected action of <span class="math notranslate nohighlight">\(A\)</span> in the current basis. For <span class="math notranslate nohighlight">\(p=1\)</span>, this is the Rayleigh quotient used in the power method. For general <span class="math notranslate nohighlight">\(p\)</span>, its eigenvalues are called <strong>Ritz values</strong>. To see why they approximate eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, let</p>
+<p>The <span class="math notranslate nohighlight">\(p\times p\)</span> matrix <span class="math notranslate nohighlight">\(T_k\)</span> therefore describes the projected action of <span class="math notranslate nohighlight">\(A\)</span>. For <span class="math notranslate nohighlight">\(p=1\)</span>, it is the Rayleigh quotient used in the power method. For general <span class="math notranslate nohighlight">\(p\)</span>, its eigenvalues are called <strong>Ritz values</strong>. Take a unit eigenvector of <span class="math notranslate nohighlight">\(T_k\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
 T_k\boldsymbol y=\theta\boldsymbol y,
-\qquad \|\boldsymbol y\|_2=1,
-\qquad \boldsymbol u=Q_k\boldsymbol y.
+\qquad \|\boldsymbol y\|_2=1.
 \]</div>
-<p>Using the subspace residual <span class="math notranslate nohighlight">\(E_k=AQ_k-Q_kT_k\)</span> from the previous section,</p>
+<p>The corresponding <strong>Ritz vector</strong> <span class="math notranslate nohighlight">\(\boldsymbol u=Q_k\boldsymbol y\)</span> also has unit norm. Using the subspace residual <span class="math notranslate nohighlight">\(E_k=AQ_k-Q_kT_k\)</span> from the previous section,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -509,73 +507,66 @@ A\boldsymbol u-\theta\boldsymbol u
 &amp;\le\|E_k\|_2.
 \end{aligned}
 \end{split}\]</div>
-<p>The vector <span class="math notranslate nohighlight">\(\boldsymbol u\)</span> is called a <strong>Ritz vector</strong>. It has unit norm, and its eigenvalue residual is small whenever <span class="math notranslate nohighlight">\(E_k\)</span> is small. The residual is perpendicular to the current subspace, because</p>
-<div class="math notranslate nohighlight">
-\[
-Q_k^HE_k=Q_k^HAQ_k-T_k=0,
-\qquad
-Q_k^H(A\boldsymbol u-\theta\boldsymbol u)=0.
-\]</div>
-<p>Thus the Ritz pair satisfies the eigenvector equation after projection onto the subspace. If the subspace is exactly invariant, then <span class="math notranslate nohighlight">\(E_k=0\)</span> and <span class="math notranslate nohighlight">\((\theta,\boldsymbol u)\)</span> is an exact eigenpair of <span class="math notranslate nohighlight">\(A\)</span>. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.</p>
+<p>Because <span class="math notranslate nohighlight">\(Q_k^HE_k=Q_k^HAQ_k-T_k=0\)</span>, this residual is perpendicular to the current subspace. Thus the Ritz pair satisfies the eigenvector equation after projection. If the subspace is exactly invariant, <span class="math notranslate nohighlight">\(E_k=0\)</span> and <span class="math notranslate nohighlight">\((\theta,\boldsymbol u)\)</span> is an exact eigenpair of <span class="math notranslate nohighlight">\(A\)</span>. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.</p>
 </section>
-<section id="what-subspace-convergence-guarantees">
-<h2>What Subspace Convergence Guarantees<a class="headerlink" href="#what-subspace-convergence-guarantees" title="Link to this heading">#</a></h2>
-<p>Suppose the assumptions of the preceding convergence theorem hold: <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> is diagonalizable, <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span>, and the first <span class="math notranslate nohighlight">\(p\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_0\)</span> form an invertible matrix. The columns of <span class="math notranslate nohighlight">\(X\)</span> must follow the eigenvalue ordering above. Then</p>
+<section id="from-subspace-convergence-to-schur-form">
+<h2>From Subspace Convergence to Schur Form<a class="headerlink" href="#from-subspace-convergence-to-schur-form" title="Link to this heading">#</a></h2>
+<section id="one-gap-convergence-of-the-subspace">
+<h3>One Gap: Convergence of the Subspace<a class="headerlink" href="#one-gap-convergence-of-the-subspace" title="Link to this heading">#</a></h3>
+<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, suppose the preceding convergence theorem applies: <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> is diagonalizable, <span class="math notranslate nohighlight">\(|\lambda_p|&gt;|\lambda_{p+1}|\)</span>, and the first <span class="math notranslate nohighlight">\(p\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_0\)</span> form an invertible matrix. The columns of <span class="math notranslate nohighlight">\(X\)</span> follow the eigenvalue ordering above.</p>
+<p>This gap controls separation of the wanted subspace from the unwanted directions. No gaps within the wanted group are assumed. Thus <span class="math notranslate nohighlight">\(\operatorname{range}(Q_k)\)</span> approaches <span class="math notranslate nohighlight">\(\operatorname{range}(Q_{\star,p})\)</span>, but <strong>the basis matrix <span class="math notranslate nohighlight">\(Q_k\)</span> need not converge</strong>. Two orthonormal vectors can keep rotating within a plane even though the plane itself stays fixed.</p>
+<p>To compare the current basis with the exact one, we need a general unitary <span class="math notranslate nohighlight">\(p\times p\)</span> matrix <span class="math notranslate nohighlight">\(W_k\)</span> that can mix its columns. Subspace convergence guarantees that such matrices exist with</p>
 <div class="math notranslate nohighlight">
 \[
-\operatorname{range}(Q_k)
-\longrightarrow\operatorname{range}(Q_{\star,p}).
+\|Q_kW_k^H-Q_{\star,p}\|_2\longrightarrow0.
 \]</div>
-<p>On this exact invariant subspace, define</p>
+<p>The alignment depends on the unknown target basis <span class="math notranslate nohighlight">\(Q_{\star,p}\)</span>, so <span class="math notranslate nohighlight">\(W_k\)</span> is not available as a step of the algorithm. Its role here is theoretical: it lets us express what subspace convergence implies for <span class="math notranslate nohighlight">\(T_k\)</span>. Writing the leading <span class="math notranslate nohighlight">\(p\times p\)</span> Schur block as</p>
 <div class="math notranslate nohighlight">
 \[
-T_{\star,p}=Q_{\star,p}^HAQ_{\star,p}.
+T_{\star,p}=Q_{\star,p}^HAQ_{\star,p},
 \]</div>
-<p>This is the leading <span class="math notranslate nohighlight">\(p\times p\)</span> block of the exact Schur matrix <span class="math notranslate nohighlight">\(T\)</span>, with eigenvalues <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_p\)</span>. The current basis may keep changing within the converging subspace. We can account for these changes by choosing unitary <span class="math notranslate nohighlight">\(p\times p\)</span> matrices <span class="math notranslate nohighlight">\(W_k\)</span> that align the two bases:</p>
+<p>we obtain</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{aligned}
-\|Q_k-Q_{\star,p}W_k\|_2&amp;\longrightarrow0,\\
-\|W_kT_kW_k^H-T_{\star,p}\|_2&amp;\longrightarrow0.
-\end{aligned}
-\end{split}\]</div>
-<p>Unitary changes of basis preserve eigenvalues, and eigenvalues depend continuously on matrix entries. Therefore the Ritz values approach <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_p\)</span>, up to reordering and counting multiplicities, even if the basis keeps rotating. <strong>Convergence of the subspace is enough to recover its eigenvalues.</strong> It does not by itself make <span class="math notranslate nohighlight">\(T_k\)</span> triangular or make its diagonal entries eigenvalue approximations.</p>
+\[
+\|W_kT_kW_k^H-T_{\star,p}\|_2\longrightarrow0.
+\]</div>
+<p>Unitary changes of basis preserve eigenvalues, and eigenvalues depend continuously on matrix entries. Thus the Ritz values approach <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_p\)</span>, up to reordering and counting multiplicities. However, this argument does not give a computable rotation that makes <span class="math notranslate nohighlight">\(T_k\)</span> triangular, nor does it show that its diagonal entries approach the eigenvalues.</p>
 </section>
-<section id="when-eigenvalues-appear-on-the-diagonal">
-<h2>When Eigenvalues Appear on the Diagonal<a class="headerlink" href="#when-eigenvalues-appear-on-the-diagonal" title="Link to this heading">#</a></h2>
-<p>For full iteration, <span class="math notranslate nohighlight">\(p=n\)</span>, <span class="math notranslate nohighlight">\(Q_k\)</span> is square and unitary. Consequently, <span class="math notranslate nohighlight">\(T_k=Q_k^HAQ_k\)</span> already has exactly the same eigenvalues as <span class="math notranslate nohighlight">\(A\)</span> at every step in exact arithmetic. Also, <span class="math notranslate nohighlight">\(E_k=0\)</span> at every step, so the full-space residual cannot measure progress. The computational goal is to make <span class="math notranslate nohighlight">\(T_k\)</span> triangular so that those eigenvalues can be read from its diagonal.</p>
-<p>The previous section proves this under the stronger assumptions</p>
+<section id="strict-ordering-convergence-of-schur-directions">
+<h3>Strict Ordering: Convergence of Schur Directions<a class="headerlink" href="#strict-ordering-convergence-of-schur-directions" title="Link to this heading">#</a></h3>
+<p>For full iteration, <span class="math notranslate nohighlight">\(p=n\)</span>, <span class="math notranslate nohighlight">\(T_k\)</span> is unitarily similar to <span class="math notranslate nohighlight">\(A\)</span>. This guarantees that the two matrices have the same eigenvalues in exact arithmetic, but it does not compute their values. Finding the eigenvalues of a general <span class="math notranslate nohighlight">\(T_k\)</span> is still the original eigenvalue problem. Convergence of the individual Schur directions provides a way to read the eigenvalues from its diagonal.</p>
+<p>As proved on the previous page, this stronger conclusion holds when</p>
 <div class="math notranslate nohighlight">
 \[
 |\lambda_1|&gt;\cdots&gt;|\lambda_n|&gt;0,
 \]</div>
-<p>with the starting-coordinate condition for every leading set of columns: the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_{0,i}\)</span> form an invertible <span class="math notranslate nohighlight">\(i\times i\)</span> matrix. Each leading column space then converges, so each column approaches its Schur direction up to a sign or complex phase.</p>
-<p>Let <span class="math notranslate nohighlight">\(D_k\)</span> be a diagonal matrix of these unit-modulus phases. Equivalently,</p>
+<p>and the starting-space condition holds for every leading set of columns. Now every leading subspace converges, fixing each Schur direction. The only remaining freedom is a sign or unit complex phase for each column. We denote these by a <strong>diagonal</strong> unitary matrix</p>
+<div class="math notranslate nohighlight">
+\[
+D_k=\operatorname{diag}(d_{k,1},\ldots,d_{k,n}),
+\qquad |d_{k,j}|=1.
+\]</div>
+<p>Whereas <span class="math notranslate nohighlight">\(W_k\)</span> may mix columns, <span class="math notranslate nohighlight">\(D_k\)</span> only adjusts their phases, giving</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\|Q_k-Q_\star D_k\|_2&amp;\longrightarrow0,\\
-\|T_k-D_k^HTD_k\|_2&amp;\longrightarrow0.
+\|Q_kD_k^H-Q_\star\|_2&amp;\longrightarrow0,\\
+\|D_kT_kD_k^H-T\|_2&amp;\longrightarrow0.
 \end{aligned}
 \end{split}\]</div>
-<p>Because <span class="math notranslate nohighlight">\(T\)</span> is upper triangular, <span class="math notranslate nohighlight">\(D_k^HTD_k\)</span> is upper triangular with the same diagonal. Hence</p>
+<p>We do not need to compute <span class="math notranslate nohighlight">\(D_k\)</span>: these phase adjustments leave diagonal entries unchanged and preserve the magnitudes of all other entries. Since <span class="math notranslate nohighlight">\(T\)</span> is upper triangular, the unadjusted matrix <span class="math notranslate nohighlight">\(T_k\)</span> therefore satisfies</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{(T_k)_{jj}\longrightarrow\lambda_j,
 \qquad (T_k)_{j\ell}\longrightarrow0\quad(j&gt;\ell).}
 \]</div>
-<p>Entries above the diagonal may keep changing with the phases. These phase changes do not affect the limiting diagonal.</p>
-<div class="tip admonition">
-<p class="admonition-title">Key Result</p>
-<p>For partial iteration, convergence of the <span class="math notranslate nohighlight">\(p\)</span>-dimensional subspace makes the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> converge to the wanted eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>For full iteration, the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> are already exact. Convergence of the nested leading subspaces makes its entries below the diagonal tend to zero, exposing those eigenvalues on the diagonal.</p>
-</div>
+<p>This gives a way to compute the eigenvalues from the diagonal of <span class="math notranslate nohighlight">\(T_k\)</span> without knowing <span class="math notranslate nohighlight">\(Q_\star\)</span> or correcting the phases. Entries above the diagonal may keep changing with those phases.</p>
+</section>
 </section>
 <section id="from-orthogonal-iteration-to-qr-iteration">
 <h2>From Orthogonal Iteration to QR Iteration<a class="headerlink" href="#from-orthogonal-iteration-to-qr-iteration" title="Link to this heading">#</a></h2>
-<p>For computing all eigenvalues, the goal can be expressed entirely in terms of <span class="math notranslate nohighlight">\(T_k\)</span>: preserve the eigenvalues while driving the entries below the diagonal to zero. This suggests computing <span class="math notranslate nohighlight">\(T_{k+1}\)</span> directly from <span class="math notranslate nohighlight">\(T_k\)</span>, without explicitly updating the full basis <span class="math notranslate nohighlight">\(Q_k\)</span> and then forming <span class="math notranslate nohighlight">\(Q_k^HAQ_k\)</span> at every step.</p>
-<p>As <span class="math notranslate nohighlight">\(T_k\)</span> approaches triangular form, its diagonal entries provide eigenvalue approximations that can guide acceleration. A <strong>shift</strong> replaces <span class="math notranslate nohighlight">\(A\)</span> by <span class="math notranslate nohighlight">\(A-\mu I\)</span>, preserving its invariant subspaces while changing the eigenvalue ratios that control convergence. A suitable shift can speed up convergence. Shift selection and convergence are developed in the later section on <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">shifted QR iteration</span></a>.</p>
-<p>The immediate task is to derive the direct update of <span class="math notranslate nohighlight">\(T_k\)</span>. The <a class="reference internal" href="qr_iteration.html"><span class="std std-doc">next section</span></a> shows how a QR factorization of <span class="math notranslate nohighlight">\(T_k\)</span> gives <span class="math notranslate nohighlight">\(T_{k+1}\)</span>, producing the <strong>QR iteration</strong>.</p>
+<p>The diagonal approximations can also guide acceleration through <strong>shifts</strong>. Replacing <span class="math notranslate nohighlight">\(A\)</span> by <span class="math notranslate nohighlight">\(A-\mu I\)</span> preserves its invariant subspaces while changing the eigenvalue ratios that control convergence. Suitable choices can speed up convergence; their selection and analysis are developed in <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">shifted QR iteration</span></a>.</p>
+<p>To turn these results into a practical eigenvalue method, the <a class="reference internal" href="qr_iteration.html"><span class="std std-doc">next section</span></a> derives an update from <span class="math notranslate nohighlight">\(T_k\)</span> directly to <span class="math notranslate nohighlight">\(T_{k+1}\)</span> using a QR factorization. This <strong>QR iteration</strong> produces the same matrix sequence without explicitly updating the full basis <span class="math notranslate nohighlight">\(Q_k\)</span> and forming <span class="math notranslate nohighlight">\(Q_k^HAQ_k\)</span> at every step.</p>
 </section>
 </section>
 
@@ -646,8 +637,11 @@ T_{\star,p}=Q_{\star,p}^HAQ_{\star,p}.
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-eigenvalues-from-a-subspace">Extracting Eigenvalues from a Subspace</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-subspace-convergence-guarantees">What Subspace Convergence Guarantees</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-eigenvalues-appear-on-the-diagonal">When Eigenvalues Appear on the Diagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspace-convergence-to-schur-form">From Subspace Convergence to Schur Form</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-gap-convergence-of-the-subspace">One Gap: Convergence of the Subspace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#strict-ordering-convergence-of-schur-directions">Strict Ordering: Convergence of Schur Directions</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-orthogonal-iteration-to-qr-iteration">From Orthogonal Iteration to QR Iteration</a></li>
 </ul>
   </nav></div>
