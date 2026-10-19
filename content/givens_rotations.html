@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -557,7 +557,7 @@ c^2+s^2&amp;=\frac{a^2+b^2}{r^2}=1,\\
 ca+sb&amp;=\frac{a^2+b^2}{r}=r.
 \end{aligned}
 \end{split}\]</div>
-<p>If <span class="math notranslate nohighlight">\(a=b=0\)</span>, use <span class="math notranslate nohighlight">\(c=1\)</span>, <span class="math notranslate nohighlight">\(s=0\)</span>, and <span class="math notranslate nohighlight">\(r=0\)</span>, so <span class="math notranslate nohighlight">\(G=I\)</span>. If <span class="math notranslate nohighlight">\(b=0\)</span>, there is already no entry to eliminate, and the QR algorithm may skip the rotation. In that case the first entry remains <span class="math notranslate nohighlight">\(a\)</span>, which need not be positive. The signs of the diagonal entries of <span class="math notranslate nohighlight">\(R\)</span> do not affect the validity of QR.</p>
+<p>If <span class="math notranslate nohighlight">\(a=b=0\)</span>, use <span class="math notranslate nohighlight">\(c=1\)</span>, <span class="math notranslate nohighlight">\(s=0\)</span>, and <span class="math notranslate nohighlight">\(r=0\)</span>, so <span class="math notranslate nohighlight">\(G=I\)</span>. If <span class="math notranslate nohighlight">\(b=0\)</span>, there is already no entry to eliminate, and the QR factorization algorithm may skip the rotation. In that case the first entry remains <span class="math notranslate nohighlight">\(a\)</span>, which need not be positive. The signs of the diagonal entries of <span class="math notranslate nohighlight">\(R\)</span> do not affect the validity of QR.</p>
 </section>
 </section>
 <section id="two-coordinate-versus-global-transformations">
@@ -593,7 +593,7 @@ H=\begin{pmatrix}1&amp;0\\0&amp;-1\end{pmatrix}G.
 <p>For QR, the useful distinction is <strong>two-coordinate versus global transformations</strong>. A two-coordinate rotation or reflection eliminates one selected entry. A global Householder reflection acts on the whole active column segment and eliminates all entries below its first entry in one step.</p>
 <p>A Householder reflection can also act on just two coordinates. The computational difference comes from the number of coordinates involved in each step, rather than from choosing a rotation or a reflection. Rotations acting on more than two coordinates are also possible. Householder reflections are the standard global construction used here.</p>
 </div>
-<p>The QR algorithm below uses the rotation <span class="math notranslate nohighlight">\(G\)</span>. Replacing each rotation by the corresponding two-coordinate reflection gives another valid QR algorithm. The zero-preservation argument is unchanged, and each reflection is its own inverse.</p>
+<p>The QR factorization algorithm below uses the rotation <span class="math notranslate nohighlight">\(G\)</span>. Replacing each rotation by the corresponding two-coordinate reflection gives another valid QR factorization algorithm. The zero-preservation argument is unchanged, and each reflection is its own inverse.</p>
 </section>
 <section id="computing-the-rotation-without-overflow">
 <h2>Computing the Rotation Without Overflow<a class="headerlink" href="#computing-the-rotation-without-overflow" title="Link to this heading">#</a></h2>

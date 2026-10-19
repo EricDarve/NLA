@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -509,7 +509,7 @@ R_1x=Q_1^Tb
 <p>by back substitution. Householder QR stores <span class="math notranslate nohighlight">\(Q\)</span> implicitly as reflections, so the transformed right-hand side can be computed without forming an explicit orthogonal matrix.</p>
 <p>Householder QR gives small factorization and orthogonality errors under the arithmetic assumptions discussed earlier. It avoids forming <span class="math notranslate nohighlight">\(A^TA\)</span>, and its triangular factor satisfies <span class="math notranslate nohighlight">\(\kappa_2(R_1)=\kappa_2(A)\)</span>. This avoids squaring the condition number of the matrix used in the solve; it does not remove the sensitivity of the original least-squares problem.</p>
 <p>The leading dense factorization cost is <span class="math notranslate nohighlight">\(2mn^2-\frac23n^3\)</span> flops for <span class="math notranslate nohighlight">\(m\ge n\)</span>, plus <span class="math notranslate nohighlight">\(O(mn)\)</span> work to transform one right-hand side and <span class="math notranslate nohighlight">\(O(n^2)\)</span> for back substitution. The <a class="reference internal" href="qr_summary.html"><span class="std std-doc">QR summary</span></a> compares Householder, Givens, and Gram-Schmidt implementations and their different orthogonality guarantees.</p>
-<p>QR exists even when columns are dependent. What fails is the ordinary back-substitution solve with a singular <span class="math notranslate nohighlight">\(R_1\)</span>. Rank-aware QR extensions can also compute minimum-norm solutions; the full-column-rank algorithm presented here does not include those extensions.</p>
+<p>QR exists even when columns are dependent. What fails is the ordinary back-substitution solve with a singular <span class="math notranslate nohighlight">\(R_1\)</span>. QR-based minimum-norm solvers use an additional orthogonal factorization to obtain a basis for the row space; the full-column-rank algorithm presented here does not include this extra step.</p>
 </section>
 <section id="singular-value-decomposition">
 <h2>Singular Value Decomposition<a class="headerlink" href="#singular-value-decomposition" title="Link to this heading">#</a></h2>

@@ -1,4 +1,4 @@
-# The Shifted QR Iteration Algorithm
+# Shifted QR Iteration
 
 This approach combines the **shift** (to dramatically speed up convergence) with **deflation** (to reduce the problem size) to efficiently find all eigenvalues of a matrix.
 

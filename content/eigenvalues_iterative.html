@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -478,7 +478,7 @@
 <h1>Iterative Methods for Eigenvalue Computation<a class="headerlink" href="#iterative-methods-for-eigenvalue-computation" title="Link to this heading">#</a></h1>
 <section id="why-iterative-methods">
 <h2>Why Iterative Methods?<a class="headerlink" href="#why-iterative-methods" title="Link to this heading">#</a></h2>
-<p>Previously, we developed a robust and powerful framework for computing the eigenvalues of a matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times n}\)</span>. The cornerstone of this “direct” approach is the QR algorithm, which is based on similarity transformations (<span class="math notranslate nohighlight">\(A_k = Q_k R_k\)</span>, <span class="math notranslate nohighlight">\(A_{k+1} = R_k Q_k\)</span>) that preserve eigenvalues. These transformations are designed to drive the matrix to an upper-triangular or real-Schur form, from which the eigenvalues can be read.</p>
+<p>Previously, we developed a robust and powerful framework for computing the eigenvalues of a matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times n}\)</span>. The cornerstone of this “direct” approach is the QR iteration, which is based on similarity transformations (<span class="math notranslate nohighlight">\(A_k = Q_k R_k\)</span>, <span class="math notranslate nohighlight">\(A_{k+1} = R_k Q_k\)</span>) that preserve eigenvalues. These transformations are designed to drive the matrix to an upper-triangular or real-Schur form, from which the eigenvalues can be read.</p>
 <p>These methods are incredibly accurate, stable, and generally find the <em>entire</em> spectrum of the matrix. However, they are built on an implicit assumption: that we can afford to work with dense matrices.</p>
 </section>
 <section id="the-challenge-of-large-sparse-matrices">
@@ -488,11 +488,11 @@
 <li><p><strong>Definition:</strong> A matrix is considered sparse if the number of non-zero entries, denoted <span class="math notranslate nohighlight">\(nnz(A)\)</span>, is much smaller than the total number of entries, <span class="math notranslate nohighlight">\(n^2\)</span>.</p></li>
 <li><p><strong>A Common Case:</strong> In many applications (e.g., from discretizing a PDE), a matrix will have <span class="math notranslate nohighlight">\(O(n)\)</span> non-zero entries, meaning the number of non-zeros <em>per row</em> is bounded by a small constant, <span class="math notranslate nohighlight">\(O(1)\)</span>, even as <span class="math notranslate nohighlight">\(n \to \infty\)</span>.</p></li>
 </ul>
-<p>Why can’t we use our standard QR algorithm?</p>
+<p>Why can’t we use our standard QR iteration?</p>
 <ol class="arabic simple">
-<li><p><strong>Fill-In:</strong> The similarity transformations used in the QR algorithm (and its prerequisites, like reduction to Hessenberg form) almost universally destroy sparsity. Even if <span class="math notranslate nohighlight">\(A\)</span> is sparse, the intermediate matrices <span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(R\)</span>, and <span class="math notranslate nohighlight">\(A_k\)</span> will be dense. This is known as <strong>“fill-in.”</strong></p></li>
+<li><p><strong>Fill-In:</strong> The similarity transformations used in the QR iteration (and its prerequisites, like reduction to Hessenberg form) almost universally destroy sparsity. Even if <span class="math notranslate nohighlight">\(A\)</span> is sparse, the intermediate matrices <span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(R\)</span>, and <span class="math notranslate nohighlight">\(A_k\)</span> will be dense. This is known as <strong>“fill-in.”</strong></p></li>
 <li><p><strong>Memory Cost:</strong> For a “large” problem, <span class="math notranslate nohighlight">\(n\)</span> might be <span class="math notranslate nohighlight">\(10^6\)</span> or <span class="math notranslate nohighlight">\(10^9\)</span>. We can easily store the <span class="math notranslate nohighlight">\(O(n)\)</span> non-zero entries of <span class="math notranslate nohighlight">\(A\)</span>. We absolutely cannot store the <span class="math notranslate nohighlight">\(O(n^2)\)</span> entries of a dense <span class="math notranslate nohighlight">\(A_k\)</span>.</p></li>
-<li><p><strong>Computational Cost:</strong> The <span class="math notranslate nohighlight">\(O(n^3)\)</span> computational cost of the dense QR algorithm is completely infeasible for such dimensions.</p></li>
+<li><p><strong>Computational Cost:</strong> The <span class="math notranslate nohighlight">\(O(n^3)\)</span> computational cost of the dense QR iteration is completely infeasible for such dimensions.</p></li>
 </ol>
 <p>We are forced to conclude that any method that modifies the entries of <span class="math notranslate nohighlight">\(A\)</span> (like LU, QR, or Hessenberg reduction) is unsuitable for large, sparse problems.</p>
 </section>
@@ -517,7 +517,7 @@ y_i = \sum_{j=1}^n a_{ij} \, x_j
 <p>They build a sequence of vectors or subspaces that (ideally) converge to the desired eigenvectors.</p>
 <p>This new approach comes with a significant set of trade-offs:</p>
 <ul class="simple">
-<li><p><strong>Partial Spectrum:</strong> Unlike the QR algorithm, these methods typically do not find the <em>entire</em> spectrum. They are most effective at finding a few of the “extreme” eigenvalues (e.g., the largest or smallest in magnitude) and their corresponding eigenvectors. In practice, this is often all that is required by the application.</p></li>
+<li><p><strong>Partial Spectrum:</strong> Unlike the QR iteration, these methods typically do not find the <em>entire</em> spectrum. They are most effective at finding a few of the “extreme” eigenvalues (e.g., the largest or smallest in magnitude) and their corresponding eigenvectors. In practice, this is often all that is required by the application.</p></li>
 <li><p><strong>Convergence:</strong> Convergence is not guaranteed and can be slow, depending on the properties of the matrix (like the separation between eigenvalues).</p></li>
 <li><p><strong>Accuracy:</strong> We do not compute the eigenvalues to full machine precision. Instead, the iteration is stopped when the “residual” (a measure of error) falls below a user-defined tolerance.</p></li>
 </ul>

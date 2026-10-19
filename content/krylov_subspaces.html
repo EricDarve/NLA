@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -477,7 +477,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="projection-onto-krylov-subspaces">
 <h1>Projection onto Krylov Subspaces<a class="headerlink" href="#projection-onto-krylov-subspaces" title="Link to this heading">#</a></h1>
-<p>We established that for large, sparse matrices, our only computationally feasible tool is the sparse matrix-vector product, <span class="math notranslate nohighlight">\(v \mapsto Av\)</span>. Any method that modifies the matrix <span class="math notranslate nohighlight">\(A\)</span> itself, like the dense QR algorithm, is unusable due to “fill-in.”</p>
+<p>We established that for large, sparse matrices, our only computationally feasible tool is the sparse matrix-vector product, <span class="math notranslate nohighlight">\(v \mapsto Av\)</span>. Any method that modifies the matrix <span class="math notranslate nohighlight">\(A\)</span> itself, like the dense QR iteration, is unusable due to “fill-in.”</p>
 <p>This forces us to ask a new question: How can we find eigenvalues using <em>only</em> matrix-vector products?</p>
 <p>The answer lies in building a small, dense matrix <span class="math notranslate nohighlight">\(H_k\)</span> whose eigenvalues approximate the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. We do this by projecting <span class="math notranslate nohighlight">\(A\)</span> onto a carefully chosen low-dimensional subspace.</p>
 <section id="revisiting-the-hessenberg-reduction">
@@ -563,7 +563,7 @@ H_k = Q_k^T A Q_k
 <p>This defines the general strategy for all modern iterative eigensolvers:</p>
 <ol class="arabic simple">
 <li><p><strong>Build Subspace:</strong> Choose a starting vector <span class="math notranslate nohighlight">\(q_1\)</span> and run the Arnoldi iteration for <span class="math notranslate nohighlight">\(k\)</span> steps to build an orthonormal basis <span class="math notranslate nohighlight">\(Q_k\)</span> for the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> and the <span class="math notranslate nohighlight">\(k \times k\)</span> Hessenberg projection <span class="math notranslate nohighlight">\(H_k = Q_k^T A Q_k\)</span>.</p></li>
-<li><p><strong>Solve Small Problem:</strong> Compute the eigenvalues of the <em>small, dense</em> matrix <span class="math notranslate nohighlight">\(H_k\)</span> using a standard method (e.g., the QR iteration algorithm). Let these eigenvalues be <span class="math notranslate nohighlight">\(\theta_1, \dots, \theta_k\)</span>. These are called the <strong>Ritz values</strong>.</p></li>
+<li><p><strong>Solve Small Problem:</strong> Compute the eigenvalues of the <em>small, dense</em> matrix <span class="math notranslate nohighlight">\(H_k\)</span> using a standard method (e.g., QR iteration). Let these eigenvalues be <span class="math notranslate nohighlight">\(\theta_1, \dots, \theta_k\)</span>. These are called the <strong>Ritz values</strong>.</p></li>
 <li><p><strong>Check Convergence:</strong> These Ritz values are our approximations for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. We can check their associated residual error (which, as we will see, is related to the <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span> term) to see if they are “good enough.”</p></li>
 <li><p><strong>Iterate:</strong> If not converged, we can expand the subspace (increase <span class="math notranslate nohighlight">\(k\)</span>) and repeat.</p></li>
 </ol>

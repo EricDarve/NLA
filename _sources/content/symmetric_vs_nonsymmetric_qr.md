@@ -1,6 +1,6 @@
 # Symmetric vs Unsymmetric QR Iteration
 
-We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration algorithm with shifts for both cases.
+We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration with shifts for both cases.
 
 The standard, high-performance approach for finding all eigenvalues of a dense matrix is a **two-phase process**:
 
@@ -53,7 +53,7 @@ This is the iterative phase where we apply QR steps to the reduced matrix ($H$ o
 
 * **Eigenvalues:** The eigenvalues can be **real or complex conjugate pairs**.
 * **The Problem:** A simple shift like $\mu = H[n,n]$ will fail to converge if the eigenvalue it's "chasing" is part of a complex pair. The shift (which is real) will oscillate and never settle.
-* **The Algorithm (Francis QR Step):** The standard solution is the **double-shift QR algorithm**.
+* **The Algorithm (Francis QR Step):** The standard solution is the **double-shift QR iteration**.
     1.  It uses *two* shifts, $\mu_1$ and $\mu_2$, which are chosen as the eigenvalues of the bottom-right $2 \times 2$ submatrix of $H$.
     2.  If the eigenvalues are complex (e.g., $a \pm bi$), this choice perfectly captures them.
     3.  A "bulge chasing" technique performs this double-step implicitly, using only real arithmetic, which is very clever and stable.
@@ -73,7 +73,7 @@ This is the iterative phase where we apply QR steps to the reduced matrix ($H$ o
 * **The Algorithm (Wilkinson Shift):** Because the eigenvalues are real, we do not need a double-shift. We can use a single, real shift.
     1.  While the $\mu = T[n,n]$ shift works, a much more robust and faster-converging choice is the **Wilkinson shift**. It's the eigenvalue of the bottom $2 \times 2$ submatrix that is *closer* to $T[n,n]$.
     2.  This shift provides a safeguard against some pathological cases where the simple $T[n,n]$ shift might fail.
-* **Cost per Iteration:** Since the matrix is tridiagonal, applying one step of the QR algorithm (with "bulge chasing") is astonishingly cheap. It only costs **$O(n)$** operations.
+* **Cost per Iteration:** Since the matrix is tridiagonal, applying one step of the QR iteration (with "bulge chasing") is astonishingly cheap. It only costs **$O(n)$** operations.
 * **Convergence:** The convergence for the symmetric case with a Wilkinson shift is **globally and cubically convergent**. This is incredibly fast; it's one of the most powerful results in numerical linear algebra:
 
     $$

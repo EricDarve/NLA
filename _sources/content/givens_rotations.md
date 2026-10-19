@@ -77,7 +77,7 @@ ca+sb&=\frac{a^2+b^2}{r}=r.
 \end{aligned}
 $$
 
-If $a=b=0$, use $c=1$, $s=0$, and $r=0$, so $G=I$. If $b=0$, there is already no entry to eliminate, and the QR algorithm may skip the rotation. In that case the first entry remains $a$, which need not be positive. The signs of the diagonal entries of $R$ do not affect the validity of QR.
+If $a=b=0$, use $c=1$, $s=0$, and $r=0$, so $G=I$. If $b=0$, there is already no entry to eliminate, and the QR factorization algorithm may skip the rotation. In that case the first entry remains $a$, which need not be positive. The signs of the diagonal entries of $R$ do not affect the validity of QR.
 
 ## Two-Coordinate Versus Global Transformations
 
@@ -119,7 +119,7 @@ For QR, the useful distinction is **two-coordinate versus global transformations
 A Householder reflection can also act on just two coordinates. The computational difference comes from the number of coordinates involved in each step, rather than from choosing a rotation or a reflection. Rotations acting on more than two coordinates are also possible. Householder reflections are the standard global construction used here.
 :::
 
-The QR algorithm below uses the rotation $G$. Replacing each rotation by the corresponding two-coordinate reflection gives another valid QR algorithm. The zero-preservation argument is unchanged, and each reflection is its own inverse.
+The QR factorization algorithm below uses the rotation $G$. Replacing each rotation by the corresponding two-coordinate reflection gives another valid QR factorization algorithm. The zero-preservation argument is unchanged, and each reflection is its own inverse.
 
 ## Computing the Rotation Without Overflow
 

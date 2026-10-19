@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -461,6 +461,7 @@
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-for-the-eigenvector">Solving for the Eigenvector</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-and-cost">Solution and Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scope-and-numerical-considerations">Scope and Numerical Considerations</a></li>
 </ul>
             </nav>
         </div>
@@ -474,16 +475,22 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="computing-eigenvectors-from-the-schur-decomposition">
 <h1>Computing Eigenvectors from the Schur Decomposition<a class="headerlink" href="#computing-eigenvectors-from-the-schur-decomposition" title="Link to this heading">#</a></h1>
-<p>We will focus on coming sections on computing the eigenvalues and accelerating their convergence using shifts. However, once we have computed the Schur decomposition of <span class="math notranslate nohighlight">\(A = Q T Q^H\)</span>, we may also want to compute its eigenvectors. This can be achieved by first finding the eigenvectors of the upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span>. Let’s do that now.</p>
-<p>If <span class="math notranslate nohighlight">\(v\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(T\)</span> for an eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> (meaning <span class="math notranslate nohighlight">\(Tv = \lambda v\)</span>), then <span class="math notranslate nohighlight">\(x = Qv\)</span> is the corresponding eigenvector of <span class="math notranslate nohighlight">\(A\)</span>. This is because:</p>
+<p>Once QR iteration has produced a Schur decomposition <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span> for <span class="math notranslate nohighlight">\(A\in\mathbb C^{n\times n}\)</span>, we may also want its eigenvectors. The columns of <span class="math notranslate nohighlight">\(Q_\star\)</span> are Schur vectors and generally are not eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>. To obtain eigenvectors, we first find those of the upper triangular matrix <span class="math notranslate nohighlight">\(T\)</span>, then transform them using the unitary matrix <span class="math notranslate nohighlight">\(Q_\star\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(v\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(T\)</span> for an eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> (meaning <span class="math notranslate nohighlight">\(Tv = \lambda v\)</span>), then <span class="math notranslate nohighlight">\(x = Q_\star v\)</span> is the corresponding eigenvector of <span class="math notranslate nohighlight">\(A\)</span>. This is because:</p>
 <div class="math notranslate nohighlight">
-\[Ax = (QTQ^H)(Qv) = QTv = Q(\lambda v) = \lambda(Qv) = \lambda x\]</div>
+\[\begin{split}
+\begin{aligned}
+Ax&amp;=(Q_\star TQ_\star^H)(Q_\star v)\\
+&amp;=Q_\star Tv=Q_\star(\lambda v)
+=\lambda x.
+\end{aligned}
+\end{split}\]</div>
 <p>Our task, therefore, is to find a non-zero vector <span class="math notranslate nohighlight">\(v\)</span> for a given eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(T\)</span> such that <span class="math notranslate nohighlight">\(Tv = \lambda v\)</span>. This is equivalent to solving the homogeneous linear system:</p>
 <div class="math notranslate nohighlight">
 \[(T - \lambda I)v = 0\]</div>
 <section id="solving-for-the-eigenvector">
 <h2>Solving for the Eigenvector<a class="headerlink" href="#solving-for-the-eigenvector" title="Link to this heading">#</a></h2>
-<p>The eigenvalues <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(T\)</span> are its diagonal elements. Let’s find the eigenvector <span class="math notranslate nohighlight">\(v\)</span> corresponding to a specific eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span>. We can partition the matrix <span class="math notranslate nohighlight">\(T\)</span> and the vector <span class="math notranslate nohighlight">\(v\)</span> to isolate this <span class="math notranslate nohighlight">\(\lambda\)</span>:</p>
+<p>The eigenvalues of <span class="math notranslate nohighlight">\(T\)</span> are its diagonal entries. First assume that <span class="math notranslate nohighlight">\(\lambda=t_{jj}\)</span> is a <strong>simple eigenvalue</strong>, meaning that it occurs only once on the diagonal of <span class="math notranslate nohighlight">\(T\)</span>. This ensures that neither of the other diagonal blocks below has <span class="math notranslate nohighlight">\(\lambda\)</span> as an eigenvalue. Partition <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(v\)</span> around position <span class="math notranslate nohighlight">\(j\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 T = \begin{pmatrix} T_{11} &amp; T_{12} &amp; T_{13} \\
@@ -491,7 +498,7 @@ T = \begin{pmatrix} T_{11} &amp; T_{12} &amp; T_{13} \\
 0 &amp; 0 &amp; T_{33}
 \end{pmatrix}, \quad v = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix}
 \end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(T_{11}\)</span> and <span class="math notranslate nohighlight">\(T_{33}\)</span> are upper triangular matrices, and <span class="math notranslate nohighlight">\(v_2\)</span> is a scalar component corresponding to <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
+<p>Here, <span class="math notranslate nohighlight">\(T_{11}\)</span> is <span class="math notranslate nohighlight">\((j-1)\times(j-1)\)</span>, <span class="math notranslate nohighlight">\(T_{33}\)</span> is <span class="math notranslate nohighlight">\((n-j)\times(n-j)\)</span>, and <span class="math notranslate nohighlight">\(v_2\)</span> is a scalar. The diagonal blocks are upper triangular. For <span class="math notranslate nohighlight">\(j=1\)</span> or <span class="math notranslate nohighlight">\(j=n\)</span>, omit the corresponding empty blocks.</p>
 <p>The system <span class="math notranslate nohighlight">\((T - \lambda I)v = 0\)</span> can now be written in block form:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -506,17 +513,21 @@ T = \begin{pmatrix} T_{11} &amp; T_{12} &amp; T_{13} \\
 <p>We solve this system using block back-substitution, starting from the bottom row:</p>
 <ol class="arabic simple">
 <li><p><strong>Third Row:</strong> <span class="math notranslate nohighlight">\((T_{33} - \lambda I)v_3 = 0\)</span>.
-The eigenvalues of <span class="math notranslate nohighlight">\(T_{33}\)</span> are its diagonal elements. Assuming <span class="math notranslate nohighlight">\(\lambda\)</span> is distinct from the eigenvalues of <span class="math notranslate nohighlight">\(T_{33}\)</span>, the matrix <span class="math notranslate nohighlight">\((T_{33} - \lambda I)\)</span> is invertible. Therefore, the only solution is <span class="math notranslate nohighlight">\(v_3 = 0\)</span>.</p></li>
+Since <span class="math notranslate nohighlight">\(\lambda\)</span> is simple, it is not a diagonal entry of <span class="math notranslate nohighlight">\(T_{33}\)</span>. Thus <span class="math notranslate nohighlight">\(T_{33}-\lambda I\)</span> is invertible, and the only solution is <span class="math notranslate nohighlight">\(v_3=0\)</span>.</p></li>
 <li><p><strong>Second Row:</strong> <span class="math notranslate nohighlight">\(0 \cdot v_1 + 0 \cdot v_2 + T_{23} v_3 = 0\)</span>.
 Substituting <span class="math notranslate nohighlight">\(v_3 = 0\)</span>, this equation becomes <span class="math notranslate nohighlight">\(0 = 0\)</span>. This is always satisfied and provides no information for finding <span class="math notranslate nohighlight">\(v_1\)</span> or <span class="math notranslate nohighlight">\(v_2\)</span>.</p></li>
 <li><p><strong>First Row:</strong> <span class="math notranslate nohighlight">\((T_{11} - \lambda I)v_1 + T_{12}v_2 + T_{13}v_3 = 0\)</span>.
 With <span class="math notranslate nohighlight">\(v_3 = 0\)</span>, this simplifies to <span class="math notranslate nohighlight">\((T_{11} - \lambda I)v_1 + T_{12}v_2 = 0\)</span>.</p></li>
 </ol>
-<p>We are left with one equation: <span class="math notranslate nohighlight">\((T_{11} - \lambda I)v_1 + T_{12}v_2 = 0\)</span>. Since <span class="math notranslate nohighlight">\(\lambda\)</span> is an eigenvalue, the full system <span class="math notranslate nohighlight">\((T - \lambda I)v = 0\)</span> is singular and must have a non-trivial solution. The singularity (the <span class="math notranslate nohighlight">\(0\)</span> on the diagonal) corresponds to the <span class="math notranslate nohighlight">\(v_2\)</span> component, which acts as a free variable.</p>
-<p>Because eigenvectors are unique only up to a non-zero scalar multiple, we can set <span class="math notranslate nohighlight">\(v_2 = 1\)</span> to find one such eigenvector. The first-row equation becomes:</p>
+<p>The remaining equation is <span class="math notranslate nohighlight">\((T_{11}-\lambda I)v_1=-T_{12}v_2\)</span>. Since <span class="math notranslate nohighlight">\(\lambda\)</span> is simple, <span class="math notranslate nohighlight">\(T_{11}-\lambda I\)</span> is also invertible. Thus each choice of <span class="math notranslate nohighlight">\(v_2\)</span> determines exactly one <span class="math notranslate nohighlight">\(v_1\)</span>. Choosing <span class="math notranslate nohighlight">\(v_2=0\)</span> would give <span class="math notranslate nohighlight">\(v_1=v_3=0\)</span>, so every nonzero eigenvector has <span class="math notranslate nohighlight">\(v_2\ne0\)</span>. We can therefore scale it so that <span class="math notranslate nohighlight">\(v_2=1\)</span>. The first-row equation becomes:</p>
 <div class="math notranslate nohighlight">
-\[(T_{11} - \lambda I)v_1 + T_{12}(1) = 0 \implies (T_{11} - \lambda I)v_1 = -T_{12}\]</div>
-<p>Similar to the <span class="math notranslate nohighlight">\(T_{33}\)</span> case, <span class="math notranslate nohighlight">\((T_{11} - \lambda I)\)</span> is invertible because <span class="math notranslate nohighlight">\(\lambda\)</span> is not an eigenvalue of <span class="math notranslate nohighlight">\(T_{11}\)</span>. We can now solve for <span class="math notranslate nohighlight">\(v_1\)</span>:</p>
+\[\begin{split}
+\begin{aligned}
+(T_{11}-\lambda I)v_1+T_{12}&amp;=0,\\
+(T_{11}-\lambda I)v_1&amp;=-T_{12}.
+\end{aligned}
+\end{split}\]</div>
+<p>In mathematical notation, the solution is:</p>
 <div class="math notranslate nohighlight">
 \[v_1 = -(T_{11} - \lambda I)^{-1} T_{12}\]</div>
 </section>
@@ -529,8 +540,14 @@ v = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix} = \begin{pmatrix}
 - (T_{11}-\lambda I)^{-1} T_{12} \\ 1 \\ 0
 \end{pmatrix}
 \end{split}\]</div>
-<p>The corresponding eigenvector <span class="math notranslate nohighlight">\(x\)</span> of the original matrix <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(x = Qv\)</span>.</p>
-<p>Computationally, finding <span class="math notranslate nohighlight">\(v_1\)</span> involves solving a triangular linear system, which costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations. The final matrix-vector multiplication <span class="math notranslate nohighlight">\(x = Qv\)</span> also costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>. Thus, the computational cost to find each eigenvector from the Schur decomposition is <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p>
+<p>The corresponding eigenvector of <span class="math notranslate nohighlight">\(A\)</span> is <span class="math notranslate nohighlight">\(x=Q_\star v\)</span>. To obtain a unit eigenvector, use <span class="math notranslate nohighlight">\(x=Q_\star v/\|v\|_2\)</span>, since multiplication by <span class="math notranslate nohighlight">\(Q_\star\)</span> preserves the Euclidean norm.</p>
+<p>In computation, solve <span class="math notranslate nohighlight">\((T_{11}-\lambda I)v_1=-T_{12}\)</span> by back-substitution rather than forming an inverse. This costs <span class="math notranslate nohighlight">\(O(j^2)\)</span> operations, and the multiplication by <span class="math notranslate nohighlight">\(Q_\star\)</span> costs at most <span class="math notranslate nohighlight">\(O(n^2)\)</span>. Thus each eigenvector costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations after the Schur decomposition is available. If all eigenvalues are simple, computing all <span class="math notranslate nohighlight">\(n\)</span> eigenvectors costs <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p>
+</section>
+<section id="scope-and-numerical-considerations">
+<h2>Scope and Numerical Considerations<a class="headerlink" href="#scope-and-numerical-considerations" title="Link to this heading">#</a></h2>
+<p>For a repeated eigenvalue, the shifted diagonal blocks need not be invertible, so the inverse formula above is not generally valid. The corresponding eigenspace of <span class="math notranslate nohighlight">\(T\)</span> is the null space of <span class="math notranslate nohighlight">\(T-\lambda I\)</span>. The dimension of this eigenspace can be smaller than the eigenvalue’s algebraic multiplicity; in that case the matrix is defective. Thus we cannot expect one independent eigenvector for every occurrence on the diagonal.</p>
+<p>The derivation uses an upper triangular Schur form over <span class="math notranslate nohighlight">\(\mathbb C\)</span>. A real Schur form can contain <span class="math notranslate nohighlight">\(2\times2\)</span> diagonal blocks for complex conjugate eigenvalues; these require block back-substitution or conversion to complex Schur form.</p>
+<p>In floating-point arithmetic, small differences <span class="math notranslate nohighlight">\(t_{ii}-\lambda\)</span> can produce large intermediate components. Practical routines use scaled triangular solves to avoid overflow, as in <a class="reference external" href="https://www.netlib.org/lapack/complex16/ztrevc.f">LAPACK’s eigenvector routine</a>. Closely spaced eigenvalues can also make individual eigenvectors sensitive to perturbations, even when the Schur decomposition is computed accurately.</p>
 </section>
 </section>
 
@@ -602,6 +619,7 @@ v = \begin{pmatrix} v_1 \\ v_2 \\ v_3 \end{pmatrix} = \begin{pmatrix}
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-for-the-eigenvector">Solving for the Eigenvector</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solution-and-cost">Solution and Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#scope-and-numerical-considerations">Scope and Numerical Considerations</a></li>
 </ul>
   </nav></div>
 

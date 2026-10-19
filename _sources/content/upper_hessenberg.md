@@ -1,6 +1,6 @@
 # Reduction to Hessenberg Form
 
-The standard QR iteration algorithm, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense $n \times n$ matrix $A$ requires $O(n^3)$ floating-point operations (flops). If the iteration takes $k$ steps to converge, the total cost would be $O(k \cdot n^3)$, which is not competitive.
+The standard QR iteration, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense $n \times n$ matrix $A$ requires $O(n^3)$ floating-point operations (flops). If the iteration takes $k$ steps to converge, the total cost would be $O(k \cdot n^3)$, which is not competitive.
 
 The key to making the QR iteration practical is to first reduce the matrix $A$ to a form that is "cheaper" to iterate on, without changing its eigenvalues. This is a classic two-phase approach:
 

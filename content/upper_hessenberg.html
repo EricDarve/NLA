@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -475,7 +475,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="reduction-to-hessenberg-form">
 <h1>Reduction to Hessenberg Form<a class="headerlink" href="#reduction-to-hessenberg-form" title="Link to this heading">#</a></h1>
-<p>The standard QR iteration algorithm, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> requires <span class="math notranslate nohighlight">\(O(n^3)\)</span> floating-point operations (flops). If the iteration takes <span class="math notranslate nohighlight">\(k\)</span> steps to converge, the total cost would be <span class="math notranslate nohighlight">\(O(k \cdot n^3)\)</span>, which is not competitive.</p>
+<p>The standard QR iteration, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> requires <span class="math notranslate nohighlight">\(O(n^3)\)</span> floating-point operations (flops). If the iteration takes <span class="math notranslate nohighlight">\(k\)</span> steps to converge, the total cost would be <span class="math notranslate nohighlight">\(O(k \cdot n^3)\)</span>, which is not competitive.</p>
 <p>The key to making the QR iteration practical is to first reduce the matrix <span class="math notranslate nohighlight">\(A\)</span> to a form that is “cheaper” to iterate on, without changing its eigenvalues. This is a classic two-phase approach:</p>
 <ol class="arabic simple">
 <li><p><strong>Phase 1 (Reduction):</strong> Transform <span class="math notranslate nohighlight">\(A\)</span> into an <strong>upper Hessenberg matrix</strong> <span class="math notranslate nohighlight">\(H\)</span> via a similarity transformation. This is a one-time cost of <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>

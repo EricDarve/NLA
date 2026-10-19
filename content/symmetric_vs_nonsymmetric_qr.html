@@ -68,7 +68,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Iterative Methods for Eigenvalue Computation" href="eigenvalues_iterative.html" />
-    <link rel="prev" title="The Shifted QR Iteration Algorithm" href="qr_iteration_with_shifts.html" />
+    <link rel="prev" title="Shifted QR Iteration" href="qr_iteration_with_shifts.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -483,7 +483,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="symmetric-vs-unsymmetric-qr-iteration">
 <h1>Symmetric vs Unsymmetric QR Iteration<a class="headerlink" href="#symmetric-vs-unsymmetric-qr-iteration" title="Link to this heading">#</a></h1>
-<p>We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration algorithm with shifts for both cases.</p>
+<p>We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration with shifts for both cases.</p>
 <p>The standard, high-performance approach for finding all eigenvalues of a dense matrix is a <strong>two-phase process</strong>:</p>
 <ol class="arabic simple">
 <li><p><strong>Phase 1 (Direct):</strong> Use a <em>direct</em> (non-iterative) method to reduce the matrix to a simpler form that is unitarily similar. This step is <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>
@@ -537,7 +537,7 @@
 <ul>
 <li><p><strong>Eigenvalues:</strong> The eigenvalues can be <strong>real or complex conjugate pairs</strong>.</p></li>
 <li><p><strong>The Problem:</strong> A simple shift like <span class="math notranslate nohighlight">\(\mu = H[n,n]\)</span> will fail to converge if the eigenvalue it’s “chasing” is part of a complex pair. The shift (which is real) will oscillate and never settle.</p></li>
-<li><p><strong>The Algorithm (Francis QR Step):</strong> The standard solution is the <strong>double-shift QR algorithm</strong>.</p>
+<li><p><strong>The Algorithm (Francis QR Step):</strong> The standard solution is the <strong>double-shift QR iteration</strong>.</p>
 <ol class="arabic simple">
 <li><p>It uses <em>two</em> shifts, <span class="math notranslate nohighlight">\(\mu_1\)</span> and <span class="math notranslate nohighlight">\(\mu_2\)</span>, which are chosen as the eigenvalues of the bottom-right <span class="math notranslate nohighlight">\(2 \times 2\)</span> submatrix of <span class="math notranslate nohighlight">\(H\)</span>.</p></li>
 <li><p>If the eigenvalues are complex (e.g., <span class="math notranslate nohighlight">\(a \pm bi\)</span>), this choice perfectly captures them.</p></li>
@@ -565,7 +565,7 @@
 <li><p>This shift provides a safeguard against some pathological cases where the simple <span class="math notranslate nohighlight">\(T[n,n]\)</span> shift might fail.</p></li>
 </ol>
 </li>
-<li><p><strong>Cost per Iteration:</strong> Since the matrix is tridiagonal, applying one step of the QR algorithm (with “bulge chasing”) is astonishingly cheap. It only costs <strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong> operations.</p></li>
+<li><p><strong>Cost per Iteration:</strong> Since the matrix is tridiagonal, applying one step of the QR iteration (with “bulge chasing”) is astonishingly cheap. It only costs <strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong> operations.</p></li>
 <li><p><strong>Convergence:</strong> The convergence for the symmetric case with a Wilkinson shift is <strong>globally and cubically convergent</strong>. This is incredibly fast; it’s one of the most powerful results in numerical linear algebra:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -673,7 +673,7 @@
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">The Shifted QR Iteration Algorithm</p>
+        <p class="prev-next-title">Shifted QR Iteration</p>
       </div>
     </a>
     <a class="right-next"

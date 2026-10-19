@@ -140,4 +140,4 @@ $$
 R_1x=Q_1^Tb=b_1,
 $$
 
-which is the same system as {eq}`eq-qr-system`. This is an algebraic connection between the methods; the QR algorithm never needs to form $A^TA$.
+which is the same system as {eq}`eq-qr-system`. This is an algebraic connection between the methods; the QR least-squares method never needs to form $A^TA$.

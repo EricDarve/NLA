@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Reduction to Hessenberg Form</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_hessenberg.html">QR iteration for upper Hessenberg matrices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">The Shifted QR Iteration Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
@@ -488,7 +488,7 @@
   <section class="tex2jax_ignore mathjax_ignore" id="least-squares-and-minimum-norm-using-svd">
 <h1>Least Squares and Minimum Norm Using SVD<a class="headerlink" href="#least-squares-and-minimum-norm-using-svd" title="Link to this heading">#</a></h1>
 <p>The QR solve on the preceding page assumes that <span class="math notranslate nohighlight">\(A\)</span> has full column rank. If its columns are dependent, different coefficient vectors can produce the same fitted vector. Least squares still has a solution, but the coefficients are no longer unique.</p>
-<p>The normal-equations Cholesky solve and ordinary QR back substitution then need to be replaced by methods that account for this dependence. Rank-aware QR can also compute minimum-norm solutions; the <a class="reference external" href="https://www.netlib.org/lapack/lug/node27.html">LAPACK guide</a> describes both QR-based and SVD-based solvers. Here we use the SVD to separate the directions determined by <span class="math notranslate nohighlight">\(A\)</span> from those in its null space.</p>
+<p>The normal-equations Cholesky solve and ordinary QR back substitution then need to be replaced by methods that account for this dependence. We can also obtain minimum-norm solutions by performing a QR decomposition of <span class="math notranslate nohighlight">\(A\)</span> with column pivoting, followed by a second QR decomposition to obtain an orthonormal basis for the row space of <span class="math notranslate nohighlight">\(A\)</span>. The <a class="reference external" href="https://www.netlib.org/lapack/lug/node27.html">LAPACK guide</a> describes QR-based solvers with this additional orthogonal factorization, as well as SVD-based solvers. Here we use the SVD to separate the directions determined by <span class="math notranslate nohighlight">\(A\)</span> from those in its null space.</p>
 <p>Let <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> have rank <span class="math notranslate nohighlight">\(r\)</span>, and let <span class="math notranslate nohighlight">\(b\in\mathbb{R}^m\)</span>. The construction applies to any matrix shape or rank.</p>
 <section id="the-minimum-norm-solution">
 <h2>The Minimum Norm Solution<a class="headerlink" href="#the-minimum-norm-solution" title="Link to this heading">#</a></h2>
