@@ -636,7 +636,7 @@ A^k = \tilde{Q}_k \tilde{R}_k
 </div>
 <section id="first-few-iterations">
 <h3>First Few Iterations<a class="headerlink" href="#first-few-iterations" title="Link to this heading">#</a></h3>
-<p>The algorithm produces a sequence of matrices <span class="math notranslate nohighlight">\(T_0, T_1, T_2, \dots\)</span> where <span class="math notranslate nohighlight">\(T_k\)</span> converges to an upper-triangular (Schur) form.</p>
+<p>Under the convergence assumptions above, the entries below the diagonal of <span class="math notranslate nohighlight">\(T_k\)</span> approach zero and its diagonal entries approach the eigenvalues. The first steps are:</p>
 <ul class="simple">
 <li><p><strong>Start:</strong>
 <span class="math notranslate nohighlight">\(T_0 = A\)</span></p></li>
@@ -664,130 +664,42 @@ A^k = \tilde{Q}_k \tilde{R}_k
 </section>
 <section id="proof-of-decomposition-of-a-k">
 <h2>Proof of Decomposition of <span class="math notranslate nohighlight">\(A^k\)</span><a class="headerlink" href="#proof-of-decomposition-of-a-k" title="Link to this heading">#</a></h2>
-<p>We provide a direct proof of the following statement <span class="math notranslate nohighlight">\(P(k)\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-P(k): \quad A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)
-\]</div>
 <div class="proof admonition" id="proof">
-<p>Proof. We will use a proof by induction. To simplify notation, let’s define two product matrices:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\tilde{Q}_k = U_1 U_2 \cdots U_k\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\tilde{R}_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
-</ul>
-<p>Our goal is to prove <span class="math notranslate nohighlight">\(A^k = \tilde{Q}_k \tilde{R}_k\)</span> for all <span class="math notranslate nohighlight">\(k \ge 1\)</span>.</p>
-<p><strong>Lemma: <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span></strong></p>
-<p>Before the main proof, let’s first establish a key relationship between <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(T_k\)</span>. We will prove by induction that <span class="math notranslate nohighlight">\(T_k = \tilde{Q}_k^H A \tilde{Q}_k\)</span>. Note that this is not necessarily an obvious result since we start from the QR iteration, not the orthogonal iteration.</p>
-<ul class="simple">
-<li><p><strong>Base Case (k=1):</strong></p></li>
-</ul>
-<p>From the algorithm, <span class="math notranslate nohighlight">\(T_1 = R_1 U_1\)</span>.</p>
-<p>From the first step (<span class="math notranslate nohighlight">\(k=0\)</span>), we have <span class="math notranslate nohighlight">\(T_0 = U_1 R_1\)</span>. Since <span class="math notranslate nohighlight">\(T_0 = A\)</span>, this means <span class="math notranslate nohighlight">\(A = U_1 R_1\)</span>.</p>
-<p>Because <span class="math notranslate nohighlight">\(U_1\)</span> is unitary, <span class="math notranslate nohighlight">\(U_1^H = U_1^{-1}\)</span>, so we can write <span class="math notranslate nohighlight">\(R_1 = U_1^H A\)</span>.
-Substitute this into the equation for <span class="math notranslate nohighlight">\(T_1\)</span>:</p>
+<p>Proof. Use the product matrices <span class="math notranslate nohighlight">\(\tilde Q_k=U_1\cdots U_k\)</span> and <span class="math notranslate nohighlight">\(\tilde R_k=R_k\cdots R_1\)</span> defined in the theorem. We first relate <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(A\)</span>, then use that relation to prove the formula for <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
+<p>Each QR step gives the unitary similarity</p>
 <div class="math notranslate nohighlight">
 \[
-T_1 = (U_1^H A) U_1 = U_1^H A U_1
+T_{j+1}=R_{j+1}U_{j+1}
+=U_{j+1}^HT_jU_{j+1}.
 \]</div>
-<p>By definition, <span class="math notranslate nohighlight">\(\tilde{Q}_1 = U_1\)</span>, so <span class="math notranslate nohighlight">\(T_1 = \tilde{Q}_1^H A \tilde{Q}_1\)</span>. The base case holds.</p>
-<ul class="simple">
-<li><p><strong>Inductive Step:</strong></p></li>
-</ul>
-<p>Assume <span class="math notranslate nohighlight">\(T_n = \tilde{Q}_n^H A \tilde{Q}_n\)</span> for some <span class="math notranslate nohighlight">\(n \ge 1\)</span>. We want to show <span class="math notranslate nohighlight">\(T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}\)</span>.</p>
-<p>From the algorithm, <span class="math notranslate nohighlight">\(T_{n+1} = R_{n+1} U_{n+1}\)</span>.</p>
-<p>From the QR decomposition step, <span class="math notranslate nohighlight">\(T_n = U_{n+1} R_{n+1}\)</span>, which implies <span class="math notranslate nohighlight">\(R_{n+1} = U_{n+1}^H T_n\)</span>.</p>
-<p>Substitute this into the equation for <span class="math notranslate nohighlight">\(T_{n+1}\)</span>:</p>
+<p>Starting from <span class="math notranslate nohighlight">\(T_0=A\)</span> and substituting repeatedly,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+T_k
+&amp;=U_k^H\cdots U_1^H\,A\,U_1\cdots U_k\\
+&amp;=\tilde Q_k^HA\tilde Q_k.
+\end{aligned}
+\end{split}\]</div>
+<p>The second equality uses <span class="math notranslate nohighlight">\((U_1\cdots U_k)^H=U_k^H\cdots U_1^H\)</span>. Since <span class="math notranslate nohighlight">\(\tilde Q_k\)</span> is unitary, multiplying on the left by <span class="math notranslate nohighlight">\(\tilde Q_k\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[
-T_{n+1} = (U_{n+1}^H T_n) U_{n+1} = U_{n+1}^H T_n U_{n+1}
+A\tilde Q_k=\tilde Q_kT_k.
 \]</div>
-<p>Now, substitute the inductive hypothesis for <span class="math notranslate nohighlight">\(T_n\)</span>:</p>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, the first QR factorization gives <span class="math notranslate nohighlight">\(A=U_1R_1=\tilde Q_1\tilde R_1\)</span>. Assume now that <span class="math notranslate nohighlight">\(A^k=\tilde Q_k\tilde R_k\)</span>. Then</p>
 <div class="math notranslate nohighlight">
-\[
-T_{n+1} = U_{n+1}^H (\tilde{Q}_n^H A \tilde{Q}_n) U_{n+1}
-\]</div>
-<p>Grouping the terms:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{n+1} = (U_{n+1}^H \tilde{Q}_n^H) A (\tilde{Q}_n U_{n+1})
-\]</div>
-<p>Using the property <span class="math notranslate nohighlight">\((BC)^H = C^H B^H\)</span>, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{n+1} = (\tilde{Q}_n U_{n+1})^H A (\tilde{Q}_n U_{n+1})
-\]</div>
-<p>By definition, <span class="math notranslate nohighlight">\(\tilde{Q}_{n+1} = \tilde{Q}_n U_{n+1}\)</span>. Therefore:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{n+1} = \tilde{Q}_{n+1}^H A \tilde{Q}_{n+1}
-\]</div>
-<p>This proves the lemma. Since <span class="math notranslate nohighlight">\(\tilde{Q}_k\)</span> is unitary, we can rearrange this to <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span>.</p>
-<p><strong>Main Proof</strong></p>
-<p>Now we proceed with the main proof for <span class="math notranslate nohighlight">\(A^k = \tilde{Q}_k \tilde{R}_k\)</span>.</p>
-<p><strong>Base Case (k=1)</strong></p>
-<p>We need to show <span class="math notranslate nohighlight">\(A^1 = \tilde{Q}_1 \tilde{R}_1\)</span>.</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\tilde{Q}_1 = U_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\tilde{R}_1 = R_1\)</span></p></li>
-</ul>
-<p>So we must show <span class="math notranslate nohighlight">\(A = U_1 R_1\)</span>.
-From the first step of the QR iteration (<span class="math notranslate nohighlight">\(k=0\)</span>):</p>
-<div class="math notranslate nohighlight">
-\[
-T_0 = U_1 R_1
-\]</div>
-<p>By definition, <span class="math notranslate nohighlight">\(T_0 = A\)</span>. Therefore, <span class="math notranslate nohighlight">\(A = U_1 R_1\)</span>.
-The base case holds.</p>
-<p><strong>Inductive Hypothesis</strong></p>
-<p>Assume the statement <span class="math notranslate nohighlight">\(P(n)\)</span> is true for some integer <span class="math notranslate nohighlight">\(n \ge 1\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^n = \tilde{Q}_n \tilde{R}_n = (U_1 \cdots U_n) (R_n \cdots R_1)
-\]</div>
-<p><strong>Inductive Step</strong></p>
-<p>We must prove the statement <span class="math notranslate nohighlight">\(P(n+1)\)</span> is true. We want to show <span class="math notranslate nohighlight">\(A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}\)</span>.</p>
-<p>Let’s start with <span class="math notranslate nohighlight">\(A^{n+1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = A \cdot A^n
-\]</div>
-<p>Substitute the inductive hypothesis for <span class="math notranslate nohighlight">\(A^n\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = A \cdot (\tilde{Q}_n \tilde{R}_n)
-\]</div>
-<p>Now, use our lemma <span class="math notranslate nohighlight">\(A = \tilde{Q}_k T_k \tilde{Q}_k^H\)</span>. For <span class="math notranslate nohighlight">\(k=n\)</span>, we have <span class="math notranslate nohighlight">\(A = \tilde{Q}_n T_n \tilde{Q}_n^H\)</span>. Substitute this for <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = (\tilde{Q}_n T_n \tilde{Q}_n^H) \cdot (\tilde{Q}_n \tilde{R}_n)
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\tilde{Q}_n\)</span> is a product of unitary matrices, it is also unitary, which means <span class="math notranslate nohighlight">\(\tilde{Q}_n^H \tilde{Q}_n = I\)</span> (the identity matrix).</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = \tilde{Q}_n T_n (I) \tilde{R}_n = \tilde{Q}_n T_n \tilde{R}_n
-\]</div>
-<p>Now, use the QR iteration’s definition for <span class="math notranslate nohighlight">\(T_n\)</span>: <span class="math notranslate nohighlight">\(T_n = U_{n+1} R_{n+1}\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = \tilde{Q}_n (U_{n+1} R_{n+1}) \tilde{R}_n
-\]</div>
-<p>Regroup the terms using the associativity of matrix multiplication:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = (\tilde{Q}_n U_{n+1}) (R_{n+1} \tilde{R}_n)
-\]</div>
-<p>By our definitions:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\((\tilde{Q}_n U_{n+1}) = (U_1 \cdots U_n) U_{n+1} = \tilde{Q}_{n+1}\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\((R_{n+1} \tilde{R}_n) = R_{n+1} (R_n \cdots R_1) = \tilde{R}_{n+1}\)</span></p></li>
-</ul>
-<p>Substituting these back, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-A^{n+1} = \tilde{Q}_{n+1} \tilde{R}_{n+1}
-\]</div>
-<p>This is exactly the statement <span class="math notranslate nohighlight">\(P(n+1)\)</span>.</p>
-<p>We have shown that the statement is true for <span class="math notranslate nohighlight">\(k=1\)</span>, and that if it is true for <span class="math notranslate nohighlight">\(k=n\)</span>, it is also true for <span class="math notranslate nohighlight">\(k=n+1\)</span>. Therefore, by induction, the statement <span class="math notranslate nohighlight">\(A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1)\)</span> is true for all integers <span class="math notranslate nohighlight">\(k \ge 1\)</span>.</p>
+\[\begin{split}
+\begin{aligned}
+A^{k+1}
+&amp;=A(\tilde Q_k\tilde R_k)\\
+&amp;=(A\tilde Q_k)\tilde R_k\\
+&amp;=\tilde Q_kT_k\tilde R_k\\
+&amp;=\tilde Q_k(U_{k+1}R_{k+1})\tilde R_k\\
+&amp;=(\tilde Q_kU_{k+1})(R_{k+1}\tilde R_k)\\
+&amp;=\tilde Q_{k+1}\tilde R_{k+1}.
+\end{aligned}
+\end{split}\]</div>
+<p>This proves the result by induction. The new unitary factor is appended on the right of <span class="math notranslate nohighlight">\(\tilde Q_k\)</span>, while the new triangular factor is placed on the left of <span class="math notranslate nohighlight">\(\tilde R_k\)</span>. This explains the opposite orders of the two products.</p>
 </div>
 </section>
 </section>
