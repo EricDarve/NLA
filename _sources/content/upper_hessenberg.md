@@ -1,4 +1,4 @@
-# Reduction to Hessenberg Form
+# Hessenberg Reduction and QR Iteration
 
 The [QR iteration](qr_iteration.md) replaces a matrix by a unitarily similar one whose entries below the diagonal approach zero under suitable convergence assumptions. For a dense $n\times n$ matrix, each QR factorization and reverse multiplication costs $O(n^3)$ operations. Repeating these dense operations is expensive.
 
@@ -87,7 +87,7 @@ Since each reflection is symmetric, the product on the left is $Q_H^T$, giving t
 
 The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices $P_j$. The vectors can be stored in the eliminated part of $A$; $Q_H$ need not be formed when only eigenvalues are wanted. This is the representation used by [LAPACK's Hessenberg reduction](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html). If $Hv=\lambda v$, then $Q_Hv$ is an eigenvector of $A$, so the stored transformations also let us recover eigenvectors later.
 
-## Why QR Iteration Preserves Hessenberg Form
+## QR Iteration on the Hessenberg Matrix
 
 For an upper Hessenberg iterate $T_k$, the [Givens construction](givens_rotations.md) needs at most $n-1$ rotations. Rotation $G_j$ mixes rows $j,j+1$ to eliminate entry $(j+1,j)$, proceeding from top to bottom:
 
@@ -104,9 +104,14 @@ Each rotation updates only two rows, so forming $R_{k+1}$ and storing the rotati
 The reverse product is computed by applying those rotations from the right:
 
 $$
-T_{k+1}=R_{k+1}U_{k+1}
-=R_{k+1}G_1^T\cdots G_{n-1}^T.
+\begin{aligned}
+T_{k+1}&=R_{k+1}U_{k+1}
+=U_{k+1}^TT_kU_{k+1}\\
+&=R_{k+1}G_1^T\cdots G_{n-1}^T.
+\end{aligned}
 $$
+
+The similarity relation preserves the eigenvalues; the product of saved rotations makes the update inexpensive.
 
 Start with the upper triangular matrix $R_{k+1}$. The first right rotation mixes columns 1 and 2, possibly creating entry $(2,1)$. The second mixes columns 2 and 3, possibly creating entry $(3,2)$, while leaving column 1 unchanged. In general, when columns $j,j+1$ are mixed, both are zero below row $j+1$. Only a first-subdiagonal entry can be introduced into column $j$, and that column is not changed again. Hence $T_{k+1}$ is upper Hessenberg.
 
@@ -131,7 +136,7 @@ $$
 \boxed{O(n^3+kn^2),}
 $$
 
-compared with $O(kn^3)$ for dense QR iteration without reduction. This describes the cost for a given number of steps; Hessenberg reduction does not itself accelerate convergence.
+compared with $O(kn^3)$ for dense QR iteration without reduction. If $k=O(n)$, these estimates become $O(n^3)$ and $O(n^4)$, respectively. This is a cost comparison, not a convergence guarantee: unshifted QR iteration need not finish in $O(n)$ steps. Hessenberg reduction lowers the cost of each step without changing the eigenvalue ratios that control convergence.
 
 ## The Symmetric Case: Tridiagonal Form
 
