@@ -1,100 +1,148 @@
 # Reduction to Hessenberg Form
 
-The standard QR iteration, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense $n \times n$ matrix $A$ requires $O(n^3)$ floating-point operations (flops). If the iteration takes $k$ steps to converge, the total cost would be $O(k \cdot n^3)$, which is not competitive.
+The [QR iteration](qr_iteration.md) replaces a matrix by a unitarily similar one whose entries below the diagonal approach zero under suitable convergence assumptions. For a dense $n\times n$ matrix, each QR factorization and reverse multiplication costs $O(n^3)$ operations. Repeating these dense operations is expensive.
 
-The key to making the QR iteration practical is to first reduce the matrix $A$ to a form that is "cheaper" to iterate on, without changing its eigenvalues. This is a classic two-phase approach:
-
-1.  **Phase 1 (Reduction):** Transform $A$ into an **upper Hessenberg matrix** $H$ via a similarity transformation. This is a one-time cost of $O(n^3)$.
-2.  **Phase 2 (Iteration):** Apply the QR iteration directly to $H$. Since $H$ has a special structure, this phase is much faster, costing only $O(n^2)$ per iteration.
-
-The total cost becomes $O(n^3 + k \cdot n^2)$, a dramatic improvement over $O(k \cdot n^3)$.
-
-## Why Upper Hessenberg Form?
-
-An $n \times n$ matrix $H$ is **upper Hessenberg** if all its entries below the first subdiagonal are zero. That is, $h_{ij} = 0$ for all $i > j+1$.
+A one-time reduction to **upper Hessenberg form** makes each subsequent QR step cost only $O(n^2)$. We first construct
 
 $$
-H = \begin{pmatrix}
-h_{11} & h_{12} & h_{13} & \cdots & h_{1n} \\
-h_{21} & h_{22} & h_{23} & \cdots & h_{2n} \\
-0 & h_{32} & h_{33} & \cdots & h_{3n} \\
-\vdots & \ddots & \ddots & \ddots & \vdots \\
-0 & \cdots & 0 & h_{n,n-1} & h_{nn}
-\end{pmatrix}
+\boxed{H=Q_H^TAQ_H,\qquad A=Q_H\,H\,Q_H^T,}
 $$
 
-This form is the ideal compromise for the QR iteration for two critical reasons:
+where $Q_H$ is orthogonal and $H$ is upper Hessenberg. Thus $H$ has the same eigenvalues as $A$, and we can start QR iteration from $T_0=H$.
 
-1.  **It is computationally cheap to obtain.** As we will see, we can compute an orthogonal $Q$ such that $H = Q A Q^T$ in $O(n^3)$ flops. This is far cheaper than the iterative process required for a full **Schur decomposition** (which produces an upper triangular matrix).
-2.  **It is invariant under the QR iteration.** If $H_k$ is upper Hessenberg, we compute its QR factorization $H_k = Q_k R_k$. The subsequent "reverse multiplication" step, $H_{k+1} = R_k Q_k$, also produces an upper Hessenberg matrix. This "preservation of form" is essential.
-3.  **The QR factorization is fast.** Computing the QR factorization of an $n \times n$ upper Hessenberg matrix does not require $O(n^3)$ flops. It can be done in $O(n^2)$ time, for example, by using a sequence of $n-1$ **Givens rotations** to eliminate the subdiagonal elements.
+We describe the reduction using real symmetric reflections. For a complex matrix, the corresponding factorization is $H=Q_H^HAQ_H$ with $Q_H$ unitary.
 
-## How the Reduction Works
+## Why Leave One Subdiagonal?
 
-Our goal is to find an orthogonal matrix $Q$ such that $H = Q A Q^T$ is upper Hessenberg. This is a **unitary similarity transformation**, which is critical because it **preserves the eigenvalues** of $A$.
-
-We cannot introduce all the necessary zeros at once. Instead, we build $Q$ as a product of $n-2$ **Householder reflectors**, $Q = Q_{n-2} \cdots Q_2 Q_1$. The process works column by column.
-
-**Step 1: The First Column**
-
-We want to introduce zeros in the first column below the subdiagonal, i.e., in entries $(3, 1), (4, 1), \dots, (n, 1)$.
-
-Find a Householder reflector, $Q_1$, that operates on rows 2 through $n$. This $Q_1$ is constructed to zero out the desired elements in the first column, exactly as in a standard Householder QR factorization.
+An $n\times n$ matrix $H$ is upper Hessenberg if
 
 $$
-Q_1 A = \begin{pmatrix}
-a_{11}' & a_{12}' & \cdots & a_{1n}' \\
-a_{21}' & a_{22}' & \cdots & a_{2n}' \\
-0 & a_{32}' & \cdots & a_{3n}' \\
-\vdots & \vdots & \ddots & \vdots \\
-0 & a_{n2}' & \cdots & a_{nn}'
-\end{pmatrix}
+h_{ij}=0\qquad\text{whenever }i>j+1.
 $$
 
-1.  Now, to maintain a similarity transformation, we *must* apply the reflector from the right: $A' = (Q_1 A) Q_1^T$. (Note: Householder reflectors are symmetric, so $Q_1^T = Q_1$).
-2.  Because $Q_1$ only operates on rows/columns 2 through $n$, this right-multiplication $A' Q_1^T$ only mixes columns 2 through $n$. It **does not affect the first column**, so the zeros we just created are preserved.
-
-**Step 2: The Second Column**
-
-Our new matrix $A' = Q_1 A Q_1^T$ has the desired first column. We now move to the second column and aim to zero out entries $(4, 2), \dots, (n, 2)$.
-
-1.  We find a new Householder reflector, $Q_2$, that operates on rows 3 through $n$.
-2.  We apply it from the left and right: $A'' = Q_2 A' Q_2^T$.
-3.  The left-multiplication $Q_2 A'$ creates the zeros in the second column.
-4.  The right-multiplication $A'' Q_2^T$ only affects columns 3 through $n$. It does not destroy the zeros in the first column or the newly created zeros in the second column.
-
-**Continuing the Process**
-
-We repeat this process for a total of $n-2$ steps. At step $k$, we use a reflector $Q_k$ that operates on rows/columns $k+1$ through $n$ to introduce zeros in the $k$-th column.
-
-The final matrix is:
+Only the first subdiagonal may be nonzero below the diagonal:
 
 $$
-H = Q_{n-2} \cdots Q_2 Q_1 A Q_1^T Q_2^T \cdots Q_{n-2}^T
+H=\begin{pmatrix}
+h_{11}&h_{12}&h_{13}&\cdots&h_{1n}\\
+h_{21}&h_{22}&h_{23}&\cdots&h_{2n}\\
+0&h_{32}&h_{33}&\cdots&h_{3n}\\
+\vdots&\ddots&\ddots&\ddots&\vdots\\
+0&\cdots&0&h_{n,n-1}&h_{nn}
+\end{pmatrix}.
 $$
 
-If we define 
+In QR factorization, a Householder reflection acts from the left to eliminate entries in a column. For eigenvalue computation, we must also apply its transpose from the right to preserve similarity. If the first reflection mixes all coordinates to eliminate every entry below $a_{11}$, the right update generally mixes other columns into column 1 and destroys those zeros.
+
+Instead, leave the entry in position $(2,1)$ and use a reflection that fixes the first coordinate. It can eliminate entries $(3,1),\ldots,(n,1)$ while the right update leaves column 1 unchanged. Repeating this idea gives Hessenberg form in a fixed number of steps. The remaining subdiagonal is then handled by QR iteration.
+
+## Householder Reduction Column by Column
+
+```{figure} ../_static/householder_hessenberg.svg
+:alt: Three diagrams show a dense four-by-four matrix becoming upper Hessenberg. The first reflection mixes rows 2 through 4, clearing entries (3,1) and (4,1), and then mixes columns 2 through 4 without changing the new zeros. The second reflection mixes rows and columns 3 and 4, clearing entry (4,2). Blue cells show the entries updated from either side, orange circles mark elimination targets, and green zeros show completed eliminations. The first subdiagonal remains nonzero.
+:width: 780px
+:name: fig-householder-hessenberg
+
+Householder Hessenberg reduction. Each step reflects from the left to clear the circled entries, then from the right to preserve similarity. Blue cells show the combined update regions: the right reflection also changes entries above the active rows, but only in later columns. The green zeros remain unchanged. Unlike Householder QR, the first subdiagonal is retained. Dots denote entries that may be nonzero.
+```
+
+Set $A^{(0)}=A$. At step $j=1,\ldots,n-2$, extract the part of column $j$ below the diagonal:
 
 $$
-Q = Q_{n-2} \cdots Q_2 Q_1,
-$$ 
-
-then $H = Q A Q^T$, which is the upper Hessenberg matrix we seek.
-
-Note that the standard form is often written as
-
-$$
-H = Q^T A Q, \quad \text{or equivalently} \quad
-A = Q H Q^T,
+x=A^{(j-1)}_{j+1:n,\,j}.
 $$
 
-where $Q = Q_1^T Q_2 \cdots Q_{n-2}^T$. This is just a matter of convention.
+As in [Householder QR](householder_reflections.md), choose a reflection $\widehat P_j$ such that $\widehat P_jx=\sigma e_1$, where $|\sigma|=\|x\|_2$. Embed it in the full matrix:
+
+$$
+P_j=\begin{pmatrix}I_j&0\\0&\widehat P_j\end{pmatrix},
+\qquad P_j^T=P_j=P_j^{-1}.
+$$
+
+The transformation acts only on coordinates $j+1,\ldots,n$. Apply it from both sides:
+
+$$
+\boxed{A^{(j)}=P_j^TA^{(j-1)}P_j
+=P_jA^{(j-1)}P_j.}
+$$
+
+The left update creates zeros below position $(j+1,j)$ in column $j$. The right update preserves them because it mixes only columns $j+1,\ldots,n$.
+
+The earlier columns also retain their zeros. For each column $\ell<j$, all entries in rows $j+1,\ldots,n$ are already zero, so the left reflection acts on a zero vector there. The right update leaves columns $1,\ldots,j$ unchanged. Thus each step completes one more column without undoing previous eliminations.
+
+If the entries to eliminate are already zero, use the identity transformation. No division by a zero vector is needed. After $n-2$ steps, the result is upper Hessenberg; matrices of size $n\le2$ already have this form.
+
+### The Accumulated Transformation
+
+Expanding the successive updates gives
+
+$$
+\begin{aligned}
+H&=P_{n-2}\cdots P_1\,A\,P_1\cdots P_{n-2},\\
+Q_H&=P_1\cdots P_{n-2}.
+\end{aligned}
+$$
+
+Since each reflection is symmetric, the product on the left is $Q_H^T$, giving the convention $H=Q_H^TAQ_H$ used throughout this page.
+
+The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices $P_j$. The vectors can be stored in the eliminated part of $A$; $Q_H$ need not be formed when only eigenvalues are wanted. This is the representation used by [LAPACK's Hessenberg reduction](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html). If $Hv=\lambda v$, then $Q_Hv$ is an eigenvector of $A$, so the stored transformations also let us recover eigenvectors later.
+
+## Why QR Iteration Preserves Hessenberg Form
+
+For an upper Hessenberg iterate $T_k$, the [Givens construction](givens_rotations.md) needs at most $n-1$ rotations. Rotation $G_j$ mixes rows $j,j+1$ to eliminate entry $(j+1,j)$, proceeding from top to bottom:
+
+$$
+\begin{aligned}
+R_{k+1}&=G_{n-1}\cdots G_1T_k,\\
+U_{k+1}&=G_1^T\cdots G_{n-1}^T,\\
+T_k&=U_{k+1}R_{k+1}.
+\end{aligned}
+$$
+
+Each rotation updates only two rows, so forming $R_{k+1}$ and storing the rotations costs $O(n^2)$.
+
+The reverse product is computed by applying those rotations from the right:
+
+$$
+T_{k+1}=R_{k+1}U_{k+1}
+=R_{k+1}G_1^T\cdots G_{n-1}^T.
+$$
+
+Start with the upper triangular matrix $R_{k+1}$. The first right rotation mixes columns 1 and 2, possibly creating entry $(2,1)$. The second mixes columns 2 and 3, possibly creating entry $(3,2)$, while leaving column 1 unchanged. In general, when columns $j,j+1$ are mixed, both are zero below row $j+1$. Only a first-subdiagonal entry can be introduced into column $j$, and that column is not changed again. Hence $T_{k+1}$ is upper Hessenberg.
+
+Applying the rotations from the right also costs $O(n^2)$. **Both parts of the QR step must exploit the rotations.** Forming a dense $U_{k+1}$ and using a general dense multiplication for $R_{k+1}U_{k+1}$ would lose this saving.
+
+This argument uses the adjacent-row QR construction, so it remains valid when a subdiagonal entry is already zero or $T_k$ is singular: unnecessary rotations can be taken as the identity. It does not rely on a unique QR factorization. Subtracting a scalar shift changes only the diagonal, so the same structure and cost apply to a single shifted QR step.
 
 ## Computational Cost
 
-* There are $n-2$ main steps in this reduction.
-* At each step $k$, applying the Householder reflector $Q_k$ from the left and the right to the $n \times n$ matrix costs $O(n(n-k))$ flops. The dominant cost at each step is $O(n^2)$.
-* The total computational cost is the sum of these steps: $\sum_{k=1}^{n-2} O(n(n-k)) \approx O(n^3)$.
-(A more careful analysis shows the cost to be $\frac{10}{3}n^3$ flops if $Q$ is explicitly formed, or $\frac{4}{3}n^3$ flops if only $H$ is needed).
+For real arithmetic, write $q=n-j$ at reduction step $j$. Applying the left reflection to the trailing $q\times q$ block costs about $4q^2$ flops. Applying the right reflection to its $n\times q$ active block costs about $4nq$ flops. Constructing the reflection and setting the eliminated column contribute lower-order work. Summing gives
 
-This $O(n^3)$ cost is a one-time, upfront investment. Once we have $H$, each subsequent QR iteration (which consists of an $O(n^2)$ QR factorization and an $O(n^2)$ matrix multiplication) is "fast," allowing the overall algorithm to converge efficiently.
+$$
+\sum_{j=1}^{n-2}\bigl[4(n-j)^2+4n(n-j)\bigr]
+=\frac{10}{3}n^3+O(n^2).
+$$
+
+This cost produces $H$ and an implicit representation of $Q_H$. Forming $Q_H$ explicitly by backward accumulation of the stored reflections adds approximately $\frac43n^3$ flops, giving a total of $\frac{14}{3}n^3$ to obtain both matrices.
+
+If $k$ structured QR steps are performed after reduction, the total cost is
+
+$$
+\boxed{O(n^3+kn^2),}
+$$
+
+compared with $O(kn^3)$ for dense QR iteration without reduction. This describes the cost for a given number of steps; Hessenberg reduction does not itself accelerate convergence.
+
+## The Symmetric Case: Tridiagonal Form
+
+If $A=A^T$, orthogonal similarity preserves symmetry:
+
+$$
+H^T=(Q_H^TAQ_H)^T=Q_H^TAQ_H=H.
+$$
+
+A symmetric upper Hessenberg matrix is tridiagonal: every zero below the first subdiagonal has a matching zero above the first superdiagonal. Exploiting symmetry in the reduction lowers its leading cost to $\frac43n^3$ flops for the tridiagonal matrix and stored reflections.
+
+A QR step then preserves both symmetry and Hessenberg form, so the iterates remain tridiagonal. Exploiting this narrow band structure and storing the rotations implicitly makes each step cost $O(n)$ when only eigenvalues are wanted. Accumulating these rotations into a full eigenvector matrix instead costs $O(n^2)$ per step. The [comparison of symmetric and nonsymmetric QR iteration](symmetric_vs_nonsymmetric_qr.md) develops these cases further.
+
+With the cost of each step reduced, the [next section](qr_iteration_with_shifts.md) explains how shifts can reduce the number of steps needed for convergence.

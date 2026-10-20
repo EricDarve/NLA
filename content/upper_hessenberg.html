@@ -459,9 +459,14 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-upper-hessenberg-form">Why Upper Hessenberg Form?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-reduction-works">How the Reduction Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-leave-one-subdiagonal">Why Leave One Subdiagonal?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#householder-reduction-column-by-column">Householder Reduction Column by Column</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-accumulated-transformation">The Accumulated Transformation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-qr-iteration-preserves-hessenberg-form">Why QR Iteration Preserves Hessenberg Form</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-symmetric-case-tridiagonal-form">The Symmetric Case: Tridiagonal Form</a></li>
 </ul>
             </nav>
         </div>
@@ -475,92 +480,126 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="reduction-to-hessenberg-form">
 <h1>Reduction to Hessenberg Form<a class="headerlink" href="#reduction-to-hessenberg-form" title="Link to this heading">#</a></h1>
-<p>The standard QR iteration, as we have discussed, is a powerful theoretical tool. However, in its direct form, it is computationally prohibitive for large matrices. A naive QR factorization of a dense <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span> requires <span class="math notranslate nohighlight">\(O(n^3)\)</span> floating-point operations (flops). If the iteration takes <span class="math notranslate nohighlight">\(k\)</span> steps to converge, the total cost would be <span class="math notranslate nohighlight">\(O(k \cdot n^3)\)</span>, which is not competitive.</p>
-<p>The key to making the QR iteration practical is to first reduce the matrix <span class="math notranslate nohighlight">\(A\)</span> to a form that is “cheaper” to iterate on, without changing its eigenvalues. This is a classic two-phase approach:</p>
-<ol class="arabic simple">
-<li><p><strong>Phase 1 (Reduction):</strong> Transform <span class="math notranslate nohighlight">\(A\)</span> into an <strong>upper Hessenberg matrix</strong> <span class="math notranslate nohighlight">\(H\)</span> via a similarity transformation. This is a one-time cost of <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>
-<li><p><strong>Phase 2 (Iteration):</strong> Apply the QR iteration directly to <span class="math notranslate nohighlight">\(H\)</span>. Since <span class="math notranslate nohighlight">\(H\)</span> has a special structure, this phase is much faster, costing only <span class="math notranslate nohighlight">\(O(n^2)\)</span> per iteration.</p></li>
-</ol>
-<p>The total cost becomes <span class="math notranslate nohighlight">\(O(n^3 + k \cdot n^2)\)</span>, a dramatic improvement over <span class="math notranslate nohighlight">\(O(k \cdot n^3)\)</span>.</p>
-<section id="why-upper-hessenberg-form">
-<h2>Why Upper Hessenberg Form?<a class="headerlink" href="#why-upper-hessenberg-form" title="Link to this heading">#</a></h2>
-<p>An <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(H\)</span> is <strong>upper Hessenberg</strong> if all its entries below the first subdiagonal are zero. That is, <span class="math notranslate nohighlight">\(h_{ij} = 0\)</span> for all <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>.</p>
+<p>The <a class="reference internal" href="qr_iteration.html"><span class="std std-doc">QR iteration</span></a> replaces a matrix by a unitarily similar one whose entries below the diagonal approach zero under suitable convergence assumptions. For a dense <span class="math notranslate nohighlight">\(n\times n\)</span> matrix, each QR factorization and reverse multiplication costs <span class="math notranslate nohighlight">\(O(n^3)\)</span> operations. Repeating these dense operations is expensive.</p>
+<p>A one-time reduction to <strong>upper Hessenberg form</strong> makes each subsequent QR step cost only <span class="math notranslate nohighlight">\(O(n^2)\)</span>. We first construct</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{H=Q_H^TAQ_H,\qquad A=Q_H\,H\,Q_H^T,}
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q_H\)</span> is orthogonal and <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg. Thus <span class="math notranslate nohighlight">\(H\)</span> has the same eigenvalues as <span class="math notranslate nohighlight">\(A\)</span>, and we can start QR iteration from <span class="math notranslate nohighlight">\(T_0=H\)</span>.</p>
+<p>We describe the reduction using real symmetric reflections. For a complex matrix, the corresponding factorization is <span class="math notranslate nohighlight">\(H=Q_H^HAQ_H\)</span> with <span class="math notranslate nohighlight">\(Q_H\)</span> unitary.</p>
+<section id="why-leave-one-subdiagonal">
+<h2>Why Leave One Subdiagonal?<a class="headerlink" href="#why-leave-one-subdiagonal" title="Link to this heading">#</a></h2>
+<p>An <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg if</p>
+<div class="math notranslate nohighlight">
+\[
+h_{ij}=0\qquad\text{whenever }i&gt;j+1.
+\]</div>
+<p>Only the first subdiagonal may be nonzero below the diagonal:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-H = \begin{pmatrix}
-h_{11} &amp; h_{12} &amp; h_{13} &amp; \cdots &amp; h_{1n} \\
-h_{21} &amp; h_{22} &amp; h_{23} &amp; \cdots &amp; h_{2n} \\
-0 &amp; h_{32} &amp; h_{33} &amp; \cdots &amp; h_{3n} \\
-\vdots &amp; \ddots &amp; \ddots &amp; \ddots &amp; \vdots \\
-0 &amp; \cdots &amp; 0 &amp; h_{n,n-1} &amp; h_{nn}
-\end{pmatrix}
+H=\begin{pmatrix}
+h_{11}&amp;h_{12}&amp;h_{13}&amp;\cdots&amp;h_{1n}\\
+h_{21}&amp;h_{22}&amp;h_{23}&amp;\cdots&amp;h_{2n}\\
+0&amp;h_{32}&amp;h_{33}&amp;\cdots&amp;h_{3n}\\
+\vdots&amp;\ddots&amp;\ddots&amp;\ddots&amp;\vdots\\
+0&amp;\cdots&amp;0&amp;h_{n,n-1}&amp;h_{nn}
+\end{pmatrix}.
 \end{split}\]</div>
-<p>This form is the ideal compromise for the QR iteration for two critical reasons:</p>
-<ol class="arabic simple">
-<li><p><strong>It is computationally cheap to obtain.</strong> As we will see, we can compute an orthogonal <span class="math notranslate nohighlight">\(Q\)</span> such that <span class="math notranslate nohighlight">\(H = Q A Q^T\)</span> in <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops. This is far cheaper than the iterative process required for a full <strong>Schur decomposition</strong> (which produces an upper triangular matrix).</p></li>
-<li><p><strong>It is invariant under the QR iteration.</strong> If <span class="math notranslate nohighlight">\(H_k\)</span> is upper Hessenberg, we compute its QR factorization <span class="math notranslate nohighlight">\(H_k = Q_k R_k\)</span>. The subsequent “reverse multiplication” step, <span class="math notranslate nohighlight">\(H_{k+1} = R_k Q_k\)</span>, also produces an upper Hessenberg matrix. This “preservation of form” is essential.</p></li>
-<li><p><strong>The QR factorization is fast.</strong> Computing the QR factorization of an <span class="math notranslate nohighlight">\(n \times n\)</span> upper Hessenberg matrix does not require <span class="math notranslate nohighlight">\(O(n^3)\)</span> flops. It can be done in <span class="math notranslate nohighlight">\(O(n^2)\)</span> time, for example, by using a sequence of <span class="math notranslate nohighlight">\(n-1\)</span> <strong>Givens rotations</strong> to eliminate the subdiagonal elements.</p></li>
-</ol>
+<p>In QR factorization, a Householder reflection acts from the left to eliminate entries in a column. For eigenvalue computation, we must also apply its transpose from the right to preserve similarity. If the first reflection mixes all coordinates to eliminate every entry below <span class="math notranslate nohighlight">\(a_{11}\)</span>, the right update generally mixes other columns into column 1 and destroys those zeros.</p>
+<p>Instead, leave the entry in position <span class="math notranslate nohighlight">\((2,1)\)</span> and use a reflection that fixes the first coordinate. It can eliminate entries <span class="math notranslate nohighlight">\((3,1),\ldots,(n,1)\)</span> while the right update leaves column 1 unchanged. Repeating this idea gives Hessenberg form in a fixed number of steps. The remaining subdiagonal is then handled by QR iteration.</p>
 </section>
-<section id="how-the-reduction-works">
-<h2>How the Reduction Works<a class="headerlink" href="#how-the-reduction-works" title="Link to this heading">#</a></h2>
-<p>Our goal is to find an orthogonal matrix <span class="math notranslate nohighlight">\(Q\)</span> such that <span class="math notranslate nohighlight">\(H = Q A Q^T\)</span> is upper Hessenberg. This is a <strong>unitary similarity transformation</strong>, which is critical because it <strong>preserves the eigenvalues</strong> of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>We cannot introduce all the necessary zeros at once. Instead, we build <span class="math notranslate nohighlight">\(Q\)</span> as a product of <span class="math notranslate nohighlight">\(n-2\)</span> <strong>Householder reflectors</strong>, <span class="math notranslate nohighlight">\(Q = Q_{n-2} \cdots Q_2 Q_1\)</span>. The process works column by column.</p>
-<p><strong>Step 1: The First Column</strong></p>
-<p>We want to introduce zeros in the first column below the subdiagonal, i.e., in entries <span class="math notranslate nohighlight">\((3, 1), (4, 1), \dots, (n, 1)\)</span>.</p>
-<p>Find a Householder reflector, <span class="math notranslate nohighlight">\(Q_1\)</span>, that operates on rows 2 through <span class="math notranslate nohighlight">\(n\)</span>. This <span class="math notranslate nohighlight">\(Q_1\)</span> is constructed to zero out the desired elements in the first column, exactly as in a standard Householder QR factorization.</p>
+<section id="householder-reduction-column-by-column">
+<h2>Householder Reduction Column by Column<a class="headerlink" href="#householder-reduction-column-by-column" title="Link to this heading">#</a></h2>
+<figure class="align-default" id="fig-householder-hessenberg">
+<a class="reference internal image-reference" href="../_images/householder_hessenberg.svg"><img alt="Three diagrams show a dense four-by-four matrix becoming upper Hessenberg. The first reflection mixes rows 2 through 4, clearing entries (3,1) and (4,1), and then mixes columns 2 through 4 without changing the new zeros. The second reflection mixes rows and columns 3 and 4, clearing entry (4,2). Blue cells show the entries updated from either side, orange circles mark elimination targets, and green zeros show completed eliminations. The first subdiagonal remains nonzero." src="../_images/householder_hessenberg.svg" style="width: 780px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 18 </span><span class="caption-text">Householder Hessenberg reduction. Each step reflects from the left to clear the circled entries, then from the right to preserve similarity. Blue cells show the combined update regions: the right reflection also changes entries above the active rows, but only in later columns. The green zeros remain unchanged. Unlike Householder QR, the first subdiagonal is retained. Dots denote entries that may be nonzero.</span><a class="headerlink" href="#fig-householder-hessenberg" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Set <span class="math notranslate nohighlight">\(A^{(0)}=A\)</span>. At step <span class="math notranslate nohighlight">\(j=1,\ldots,n-2\)</span>, extract the part of column <span class="math notranslate nohighlight">\(j\)</span> below the diagonal:</p>
+<div class="math notranslate nohighlight">
+\[
+x=A^{(j-1)}_{j+1:n,\,j}.
+\]</div>
+<p>As in <a class="reference internal" href="householder_reflections.html"><span class="std std-doc">Householder QR</span></a>, choose a reflection <span class="math notranslate nohighlight">\(\widehat P_j\)</span> such that <span class="math notranslate nohighlight">\(\widehat P_jx=\sigma e_1\)</span>, where <span class="math notranslate nohighlight">\(|\sigma|=\|x\|_2\)</span>. Embed it in the full matrix:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-Q_1 A = \begin{pmatrix}
-a_{11}' &amp; a_{12}' &amp; \cdots &amp; a_{1n}' \\
-a_{21}' &amp; a_{22}' &amp; \cdots &amp; a_{2n}' \\
-0 &amp; a_{32}' &amp; \cdots &amp; a_{3n}' \\
-\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
-0 &amp; a_{n2}' &amp; \cdots &amp; a_{nn}'
-\end{pmatrix}
+P_j=\begin{pmatrix}I_j&amp;0\\0&amp;\widehat P_j\end{pmatrix},
+\qquad P_j^T=P_j=P_j^{-1}.
 \end{split}\]</div>
-<ol class="arabic simple">
-<li><p>Now, to maintain a similarity transformation, we <em>must</em> apply the reflector from the right: <span class="math notranslate nohighlight">\(A' = (Q_1 A) Q_1^T\)</span>. (Note: Householder reflectors are symmetric, so <span class="math notranslate nohighlight">\(Q_1^T = Q_1\)</span>).</p></li>
-<li><p>Because <span class="math notranslate nohighlight">\(Q_1\)</span> only operates on rows/columns 2 through <span class="math notranslate nohighlight">\(n\)</span>, this right-multiplication <span class="math notranslate nohighlight">\(A' Q_1^T\)</span> only mixes columns 2 through <span class="math notranslate nohighlight">\(n\)</span>. It <strong>does not affect the first column</strong>, so the zeros we just created are preserved.</p></li>
-</ol>
-<p><strong>Step 2: The Second Column</strong></p>
-<p>Our new matrix <span class="math notranslate nohighlight">\(A' = Q_1 A Q_1^T\)</span> has the desired first column. We now move to the second column and aim to zero out entries <span class="math notranslate nohighlight">\((4, 2), \dots, (n, 2)\)</span>.</p>
-<ol class="arabic simple">
-<li><p>We find a new Householder reflector, <span class="math notranslate nohighlight">\(Q_2\)</span>, that operates on rows 3 through <span class="math notranslate nohighlight">\(n\)</span>.</p></li>
-<li><p>We apply it from the left and right: <span class="math notranslate nohighlight">\(A'' = Q_2 A' Q_2^T\)</span>.</p></li>
-<li><p>The left-multiplication <span class="math notranslate nohighlight">\(Q_2 A'\)</span> creates the zeros in the second column.</p></li>
-<li><p>The right-multiplication <span class="math notranslate nohighlight">\(A'' Q_2^T\)</span> only affects columns 3 through <span class="math notranslate nohighlight">\(n\)</span>. It does not destroy the zeros in the first column or the newly created zeros in the second column.</p></li>
-</ol>
-<p><strong>Continuing the Process</strong></p>
-<p>We repeat this process for a total of <span class="math notranslate nohighlight">\(n-2\)</span> steps. At step <span class="math notranslate nohighlight">\(k\)</span>, we use a reflector <span class="math notranslate nohighlight">\(Q_k\)</span> that operates on rows/columns <span class="math notranslate nohighlight">\(k+1\)</span> through <span class="math notranslate nohighlight">\(n\)</span> to introduce zeros in the <span class="math notranslate nohighlight">\(k\)</span>-th column.</p>
-<p>The final matrix is:</p>
+<p>The transformation acts only on coordinates <span class="math notranslate nohighlight">\(j+1,\ldots,n\)</span>. Apply it from both sides:</p>
 <div class="math notranslate nohighlight">
 \[
-H = Q_{n-2} \cdots Q_2 Q_1 A Q_1^T Q_2^T \cdots Q_{n-2}^T
+\boxed{A^{(j)}=P_j^TA^{(j-1)}P_j
+=P_jA^{(j-1)}P_j.}
 \]</div>
-<p>If we define</p>
+<p>The left update creates zeros below position <span class="math notranslate nohighlight">\((j+1,j)\)</span> in column <span class="math notranslate nohighlight">\(j\)</span>. The right update preserves them because it mixes only columns <span class="math notranslate nohighlight">\(j+1,\ldots,n\)</span>.</p>
+<p>The earlier columns also retain their zeros. For each column <span class="math notranslate nohighlight">\(\ell&lt;j\)</span>, all entries in rows <span class="math notranslate nohighlight">\(j+1,\ldots,n\)</span> are already zero, so the left reflection acts on a zero vector there. The right update leaves columns <span class="math notranslate nohighlight">\(1,\ldots,j\)</span> unchanged. Thus each step completes one more column without undoing previous eliminations.</p>
+<p>If the entries to eliminate are already zero, use the identity transformation. No division by a zero vector is needed. After <span class="math notranslate nohighlight">\(n-2\)</span> steps, the result is upper Hessenberg; matrices of size <span class="math notranslate nohighlight">\(n\le2\)</span> already have this form.</p>
+<section id="the-accumulated-transformation">
+<h3>The Accumulated Transformation<a class="headerlink" href="#the-accumulated-transformation" title="Link to this heading">#</a></h3>
+<p>Expanding the successive updates gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+H&amp;=P_{n-2}\cdots P_1\,A\,P_1\cdots P_{n-2},\\
+Q_H&amp;=P_1\cdots P_{n-2}.
+\end{aligned}
+\end{split}\]</div>
+<p>Since each reflection is symmetric, the product on the left is <span class="math notranslate nohighlight">\(Q_H^T\)</span>, giving the convention <span class="math notranslate nohighlight">\(H=Q_H^TAQ_H\)</span> used throughout this page.</p>
+<p>The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices <span class="math notranslate nohighlight">\(P_j\)</span>. The vectors can be stored in the eliminated part of <span class="math notranslate nohighlight">\(A\)</span>; <span class="math notranslate nohighlight">\(Q_H\)</span> need not be formed when only eigenvalues are wanted. This is the representation used by <a class="reference external" href="https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html">LAPACK’s Hessenberg reduction</a>. If <span class="math notranslate nohighlight">\(Hv=\lambda v\)</span>, then <span class="math notranslate nohighlight">\(Q_Hv\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(A\)</span>, so the stored transformations also let us recover eigenvectors later.</p>
+</section>
+</section>
+<section id="why-qr-iteration-preserves-hessenberg-form">
+<h2>Why QR Iteration Preserves Hessenberg Form<a class="headerlink" href="#why-qr-iteration-preserves-hessenberg-form" title="Link to this heading">#</a></h2>
+<p>For an upper Hessenberg iterate <span class="math notranslate nohighlight">\(T_k\)</span>, the <a class="reference internal" href="givens_rotations.html"><span class="std std-doc">Givens construction</span></a> needs at most <span class="math notranslate nohighlight">\(n-1\)</span> rotations. Rotation <span class="math notranslate nohighlight">\(G_j\)</span> mixes rows <span class="math notranslate nohighlight">\(j,j+1\)</span> to eliminate entry <span class="math notranslate nohighlight">\((j+1,j)\)</span>, proceeding from top to bottom:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+R_{k+1}&amp;=G_{n-1}\cdots G_1T_k,\\
+U_{k+1}&amp;=G_1^T\cdots G_{n-1}^T,\\
+T_k&amp;=U_{k+1}R_{k+1}.
+\end{aligned}
+\end{split}\]</div>
+<p>Each rotation updates only two rows, so forming <span class="math notranslate nohighlight">\(R_{k+1}\)</span> and storing the rotations costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p>
+<p>The reverse product is computed by applying those rotations from the right:</p>
 <div class="math notranslate nohighlight">
 \[
-Q = Q_{n-2} \cdots Q_2 Q_1,
+T_{k+1}=R_{k+1}U_{k+1}
+=R_{k+1}G_1^T\cdots G_{n-1}^T.
 \]</div>
-<p>then <span class="math notranslate nohighlight">\(H = Q A Q^T\)</span>, which is the upper Hessenberg matrix we seek.</p>
-<p>Note that the standard form is often written as</p>
-<div class="math notranslate nohighlight">
-\[
-H = Q^T A Q, \quad \text{or equivalently} \quad
-A = Q H Q^T,
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(Q = Q_1^T Q_2 \cdots Q_{n-2}^T\)</span>. This is just a matter of convention.</p>
+<p>Start with the upper triangular matrix <span class="math notranslate nohighlight">\(R_{k+1}\)</span>. The first right rotation mixes columns 1 and 2, possibly creating entry <span class="math notranslate nohighlight">\((2,1)\)</span>. The second mixes columns 2 and 3, possibly creating entry <span class="math notranslate nohighlight">\((3,2)\)</span>, while leaving column 1 unchanged. In general, when columns <span class="math notranslate nohighlight">\(j,j+1\)</span> are mixed, both are zero below row <span class="math notranslate nohighlight">\(j+1\)</span>. Only a first-subdiagonal entry can be introduced into column <span class="math notranslate nohighlight">\(j\)</span>, and that column is not changed again. Hence <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is upper Hessenberg.</p>
+<p>Applying the rotations from the right also costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>. <strong>Both parts of the QR step must exploit the rotations.</strong> Forming a dense <span class="math notranslate nohighlight">\(U_{k+1}\)</span> and using a general dense multiplication for <span class="math notranslate nohighlight">\(R_{k+1}U_{k+1}\)</span> would lose this saving.</p>
+<p>This argument uses the adjacent-row QR construction, so it remains valid when a subdiagonal entry is already zero or <span class="math notranslate nohighlight">\(T_k\)</span> is singular: unnecessary rotations can be taken as the identity. It does not rely on a unique QR factorization. Subtracting a scalar shift changes only the diagonal, so the same structure and cost apply to a single shifted QR step.</p>
 </section>
 <section id="computational-cost">
 <h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>There are <span class="math notranslate nohighlight">\(n-2\)</span> main steps in this reduction.</p></li>
-<li><p>At each step <span class="math notranslate nohighlight">\(k\)</span>, applying the Householder reflector <span class="math notranslate nohighlight">\(Q_k\)</span> from the left and the right to the <span class="math notranslate nohighlight">\(n \times n\)</span> matrix costs <span class="math notranslate nohighlight">\(O(n(n-k))\)</span> flops. The dominant cost at each step is <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p></li>
-<li><p>The total computational cost is the sum of these steps: <span class="math notranslate nohighlight">\(\sum_{k=1}^{n-2} O(n(n-k)) \approx O(n^3)\)</span>.
-(A more careful analysis shows the cost to be <span class="math notranslate nohighlight">\(\frac{10}{3}n^3\)</span> flops if <span class="math notranslate nohighlight">\(Q\)</span> is explicitly formed, or <span class="math notranslate nohighlight">\(\frac{4}{3}n^3\)</span> flops if only <span class="math notranslate nohighlight">\(H\)</span> is needed).</p></li>
-</ul>
-<p>This <span class="math notranslate nohighlight">\(O(n^3)\)</span> cost is a one-time, upfront investment. Once we have <span class="math notranslate nohighlight">\(H\)</span>, each subsequent QR iteration (which consists of an <span class="math notranslate nohighlight">\(O(n^2)\)</span> QR factorization and an <span class="math notranslate nohighlight">\(O(n^2)\)</span> matrix multiplication) is “fast,” allowing the overall algorithm to converge efficiently.</p>
+<p>For real arithmetic, write <span class="math notranslate nohighlight">\(q=n-j\)</span> at reduction step <span class="math notranslate nohighlight">\(j\)</span>. Applying the left reflection to the trailing <span class="math notranslate nohighlight">\(q\times q\)</span> block costs about <span class="math notranslate nohighlight">\(4q^2\)</span> flops. Applying the right reflection to its <span class="math notranslate nohighlight">\(n\times q\)</span> active block costs about <span class="math notranslate nohighlight">\(4nq\)</span> flops. Constructing the reflection and setting the eliminated column contribute lower-order work. Summing gives</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{j=1}^{n-2}\bigl[4(n-j)^2+4n(n-j)\bigr]
+=\frac{10}{3}n^3+O(n^2).
+\]</div>
+<p>This cost produces <span class="math notranslate nohighlight">\(H\)</span> and an implicit representation of <span class="math notranslate nohighlight">\(Q_H\)</span>. Forming <span class="math notranslate nohighlight">\(Q_H\)</span> explicitly by backward accumulation of the stored reflections adds approximately <span class="math notranslate nohighlight">\(\frac43n^3\)</span> flops, giving a total of <span class="math notranslate nohighlight">\(\frac{14}{3}n^3\)</span> to obtain both matrices.</p>
+<p>If <span class="math notranslate nohighlight">\(k\)</span> structured QR steps are performed after reduction, the total cost is</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{O(n^3+kn^2),}
+\]</div>
+<p>compared with <span class="math notranslate nohighlight">\(O(kn^3)\)</span> for dense QR iteration without reduction. This describes the cost for a given number of steps; Hessenberg reduction does not itself accelerate convergence.</p>
+</section>
+<section id="the-symmetric-case-tridiagonal-form">
+<h2>The Symmetric Case: Tridiagonal Form<a class="headerlink" href="#the-symmetric-case-tridiagonal-form" title="Link to this heading">#</a></h2>
+<p>If <span class="math notranslate nohighlight">\(A=A^T\)</span>, orthogonal similarity preserves symmetry:</p>
+<div class="math notranslate nohighlight">
+\[
+H^T=(Q_H^TAQ_H)^T=Q_H^TAQ_H=H.
+\]</div>
+<p>A symmetric upper Hessenberg matrix is tridiagonal: every zero below the first subdiagonal has a matching zero above the first superdiagonal. Exploiting symmetry in the reduction lowers its leading cost to <span class="math notranslate nohighlight">\(\frac43n^3\)</span> flops for the tridiagonal matrix and stored reflections.</p>
+<p>A QR step then preserves both symmetry and Hessenberg form, so the iterates remain tridiagonal. Exploiting this narrow band structure and storing the rotations implicitly makes each step cost <span class="math notranslate nohighlight">\(O(n)\)</span> when only eigenvalues are wanted. Accumulating these rotations into a full eigenvector matrix instead costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> per step. The <a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html"><span class="std std-doc">comparison of symmetric and nonsymmetric QR iteration</span></a> develops these cases further.</p>
+<p>With the cost of each step reduced, the <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">next section</span></a> explains how shifts can reduce the number of steps needed for convergence.</p>
 </section>
 </section>
 
@@ -630,9 +669,14 @@ A = Q H Q^T,
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-upper-hessenberg-form">Why Upper Hessenberg Form?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-reduction-works">How the Reduction Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-leave-one-subdiagonal">Why Leave One Subdiagonal?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#householder-reduction-column-by-column">Householder Reduction Column by Column</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-accumulated-transformation">The Accumulated Transformation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-qr-iteration-preserves-hessenberg-form">Why QR Iteration Preserves Hessenberg Form</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost">Computational Cost</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-symmetric-case-tridiagonal-form">The Symmetric Case: Tridiagonal Form</a></li>
 </ul>
   </nav></div>
 
