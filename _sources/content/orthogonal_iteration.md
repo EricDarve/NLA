@@ -12,7 +12,7 @@ For $A\in\mathbb C^{n\times n}$, write an ordered Schur decomposition as $A=Q_\s
 | :--- | :--- |
 | $Q_\star$ | The fixed, exact $n\times n$ Schur basis. |
 | $Q_k$ | The $n\times p$ orthonormal basis at iteration $k$. |
-| $\boldsymbol q_{\star,j}$, $\boldsymbol q_{k,j}$ | Column $j$ of the exact and current bases. |
+| $q_{\star,j}$, $q_{k,j}$ | Column $j$ of the exact and current bases. |
 | $Q_{\star,i}$, $Q_{k,i}$ | The first $i$ columns of those bases. |
 
 Thus $k$ counts iterations and $i$ or $j$ counts columns. The target $p$-dimensional invariant subspace is
@@ -42,19 +42,19 @@ Write the QR step as Gram–Schmidt in exact arithmetic, choosing positive diago
 The first column is simply power iteration:
 
 $$
-\boldsymbol q_{k+1,1}
-=\frac{A\boldsymbol q_{k,1}}{\|A\boldsymbol q_{k,1}\|_2}.
+q_{k+1,1}
+=\frac{Aq_{k,1}}{\|Aq_{k,1}\|_2}.
 $$
 
-For the second column, multiply $\boldsymbol q_{k,2}$ by $A$, subtract its component along the **new first column** $\boldsymbol q_{k+1,1}$, and normalize. Continue in the same way. For column $i+1$, the update is
+For the second column, multiply $q_{k,2}$ by $A$, subtract its component along the **new first column** $q_{k+1,1}$, and normalize. Continue in the same way. For column $i+1$, the update is
 
 $$
 \begin{aligned}
-\boldsymbol w_{k+1,i+1}
+w_{k+1,i+1}
 &=\bigl(I-Q_{k+1,i}Q_{k+1,i}^H\bigr)
-  A\boldsymbol q_{k,i+1},\\
-\boldsymbol q_{k+1,i+1}
-&=\frac{\boldsymbol w_{k+1,i+1}}{\|\boldsymbol w_{k+1,i+1}\|_2}.
+  Aq_{k,i+1},\\
+q_{k+1,i+1}
+&=\frac{w_{k+1,i+1}}{\|w_{k+1,i+1}\|_2}.
 \end{aligned}
 $$
 
@@ -68,8 +68,8 @@ $$
 The update would then be the projected power step from deflation. Its target satisfies
 
 $$
-P_iA\boldsymbol q_{\star,i+1}
-=\lambda_{i+1}\boldsymbol q_{\star,i+1}.
+P_iAq_{\star,i+1}
+=\lambda_{i+1}q_{\star,i+1}.
 $$
 
 In the actual iteration, the first $i$ directions are still improving while we update direction $i+1$. This explains the mechanism, but it is not yet a convergence proof: the projector changes at every step. We will account for those changes by following the column spaces.
@@ -110,9 +110,9 @@ The changing projections make a column-by-column convergence proof awkward. A si
 Define the accumulated triangular factor
 
 $$
-\widehat R_0=I_p,
+\widetilde R_0=I_p,
 \qquad
-\widehat R_k=R_kR_{k-1}\cdots R_1.
+\widetilde R_k=R_kR_{k-1}\cdots R_1.
 $$
 
 :::{prf:theorem} QR of $A^kQ_0$
@@ -121,7 +121,7 @@ $$
 For every $k\ge0$, orthogonal iteration satisfies
 
 $$
-A^kQ_0=Q_k\widehat R_k.
+A^kQ_0=Q_k\widetilde R_k.
 $$
 :::
 
@@ -131,22 +131,22 @@ For $k=0$, the identity is $Q_0=Q_0I_p$. If it holds at step $k$, then
 $$
 \begin{aligned}
 A^{k+1}Q_0
-&=A(Q_k\widehat R_k)\\
-&=(AQ_k)\widehat R_k\\
-&=Q_{k+1}R_{k+1}\widehat R_k\\
-&=Q_{k+1}\widehat R_{k+1}.
+&=A(Q_k\widetilde R_k)\\
+&=(AQ_k)\widetilde R_k\\
+&=Q_{k+1}R_{k+1}\widetilde R_k\\
+&=Q_{k+1}\widetilde R_{k+1}.
 \end{aligned}
 $$
 
 This proves the identity by induction.
 :::
 
-Because $\widehat R_k$ is upper triangular and invertible, this is a thin QR factorization of $A^kQ_0$. With positive diagonal entries in each $R_j$, it is the unique thin QR factorization with positive diagonal.
+Because $\widetilde R_k$ is upper triangular and invertible, this is a thin QR factorization of $A^kQ_0$. With positive diagonal entries in each $R_j$, it is the unique thin QR factorization with positive diagonal.
 
-For $p=1$, $\widehat R_k$ is the product of the normalization factors in the power method. For full iteration with $Q_0=I_n$, the identity becomes
+For $p=1$, $\widetilde R_k$ is the product of the normalization factors in the power method. For full iteration with $Q_0=I_n$, the identity becomes
 
 $$
-A^k=Q_k\widehat R_k.
+A^k=Q_k\widetilde R_k.
 $$
 
 The algorithm obtains these factors without forming $A^k$.
@@ -158,10 +158,10 @@ $$
 =\operatorname{range}(A^kQ_0).}
 $$
 
-Upper triangularity gives the same result for every leading set of columns. Let $\widehat R_{k,i}$ be the leading $i\times i$ block of $\widehat R_k$. The first $i$ columns of the factorization satisfy
+Upper triangularity gives the same result for every leading set of columns. Let $\widetilde R_{k,i}$ be the leading $i\times i$ block of $\widetilde R_k$. The first $i$ columns of the factorization satisfy
 
 $$
-A^kQ_{0,i}=Q_{k,i}\widehat R_{k,i},
+A^kQ_{0,i}=Q_{k,i}\widetilde R_{k,i},
 \qquad
 \operatorname{range}(Q_{k,i})
 =\operatorname{range}(A^kQ_{0,i}).
@@ -207,9 +207,9 @@ To measure the accuracy of the whole subspace, look at how far its unit vectors 
 $$
 \begin{aligned}
 d_k&=\|(I-\Pi_\star)Q_k\|_2\\
-&=\max_{\substack{\boldsymbol z\in\operatorname{range}(Q_k)\\
-                  \|\boldsymbol z\|_2=1}}
-  \|(I-\Pi_\star)\boldsymbol z\|_2.
+&=\max_{\substack{z\in\operatorname{range}(Q_k)\\
+                  \|z\|_2=1}}
+  \|(I-\Pi_\star)z\|_2.
 \end{aligned}
 $$
 
@@ -299,17 +299,17 @@ $$
 **Translate this into geometric error.** Any unit vector in the current subspace has the form
 
 $$
-\boldsymbol z=(X_1+X_2F_k)\boldsymbol c,
+z=(X_1+X_2F_k)c,
 \qquad
-X^{-1}\boldsymbol z
-=\begin{pmatrix}\boldsymbol c\\F_k\boldsymbol c\end{pmatrix}.
+X^{-1}z
+=\begin{pmatrix}c\\F_kc\end{pmatrix}.
 $$
 
 Therefore,
 
 $$
-\|\boldsymbol c\|_2
-\le\|X^{-1}\boldsymbol z\|_2
+\|c\|_2
+\le\|X^{-1}z\|_2
 \le\|X^{-1}\|_2.
 $$
 
@@ -317,13 +317,13 @@ Projection removes the wanted part because $(I-\Pi_\star)X_1=0$. It follows that
 
 $$
 \begin{aligned}
-\|(I-\Pi_\star)\boldsymbol z\|_2
-&=\|(I-\Pi_\star)X_2F_k\boldsymbol c\|_2\\
+\|(I-\Pi_\star)z\|_2
+&=\|(I-\Pi_\star)X_2F_kc\|_2\\
 &\le\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
 \end{aligned}
 $$
 
-Maximizing over unit vectors $\boldsymbol z$ and substituting the bound on $F_k$ gives $d_k\le K\rho_p^k$.
+Maximizing over unit vectors $z$ and substituting the bound on $F_k$ gives $d_k\le K\rho_p^k$.
 :::
 
 A ratio near one gives slow separation; a smaller ratio gives faster separation. The constant $K$ depends on the initial space and the eigenvector basis and can be large for nonnormal matrices. The theorem gives an upper bound; particular starting spaces can converge faster.
@@ -368,10 +368,10 @@ Thus their projectors converge too. Subtracting two consecutive projectors isola
 
 $$
 \begin{aligned}
-\boldsymbol q_{k,i}\boldsymbol q_{k,i}^H
+q_{k,i}q_{k,i}^H
 &=\Pi_{k,i}-\Pi_{k,i-1}\\
 &\longrightarrow\Pi_{\star,i}-\Pi_{\star,i-1}\\
-&=\boldsymbol q_{\star,i}\boldsymbol q_{\star,i}^H.
+&=q_{\star,i}q_{\star,i}^H.
 \end{aligned}
 $$
 

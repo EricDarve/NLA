@@ -6,34 +6,34 @@ We keep the same notation: $Q_\star$ is an exact Schur basis in $A=Q_\star TQ_\s
 
 ## Extracting Eigenvalues from a Subspace
 
-For $p<n$, a vector in the current subspace has the form $\boldsymbol u=Q_k\boldsymbol y$. Multiplication by $A$ can take it outside the subspace. Projecting back gives
+For $p<n$, a vector in the current subspace has the form $u=Q_ky$. Multiplication by $A$ can take it outside the subspace. Projecting back gives
 
 $$
 T_k=Q_k^HAQ_k,
 \qquad
-Q_kQ_k^HA\boldsymbol u=Q_kT_k\boldsymbol y.
+Q_kQ_k^HAu=Q_kT_ky.
 $$
 
 The $p\times p$ matrix $T_k$ therefore describes the projected action of $A$. For $p=1$, it is the Rayleigh quotient used in the power method. For general $p$, its eigenvalues are called **Ritz values**. Take a unit eigenvector of $T_k$:
 
 $$
-T_k\boldsymbol y=\theta\boldsymbol y,
-\qquad \|\boldsymbol y\|_2=1.
+T_ky=\theta y,
+\qquad \|y\|_2=1.
 $$
 
-The corresponding **Ritz vector** $\boldsymbol u=Q_k\boldsymbol y$ also has unit norm. Using the subspace residual $E_k=AQ_k-Q_kT_k$ from the previous section,
+The corresponding **Ritz vector** $u=Q_ky$ also has unit norm. Using the subspace residual $E_k=AQ_k-Q_kT_k$ from the previous section,
 
 $$
 \begin{aligned}
-A\boldsymbol u-\theta\boldsymbol u
-&=AQ_k\boldsymbol y-Q_kT_k\boldsymbol y\\
-&=E_k\boldsymbol y,\\
-\|A\boldsymbol u-\theta\boldsymbol u\|_2
+Au-\theta u
+&=AQ_ky-Q_kT_ky\\
+&=E_ky,\\
+\|Au-\theta u\|_2
 &\le\|E_k\|_2.
 \end{aligned}
 $$
 
-Because $Q_k^HE_k=Q_k^HAQ_k-T_k=0$, this residual is perpendicular to the current subspace. Thus the Ritz pair satisfies the eigenvector equation after projection. If the subspace is exactly invariant, $E_k=0$ and $(\theta,\boldsymbol u)$ is an exact eigenpair of $A$. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.
+Because $Q_k^HE_k=Q_k^HAQ_k-T_k=0$, this residual is perpendicular to the current subspace. Thus the Ritz pair satisfies the eigenvector equation after projection. If the subspace is exactly invariant, $E_k=0$ and $(\theta,u)$ is an exact eigenpair of $A$. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.
 
 ## From Subspace Convergence to Schur Form
 
@@ -73,23 +73,23 @@ $$
 |\lambda_1|>\cdots>|\lambda_n|>0,
 $$
 
-and the starting-space condition holds for every leading set of columns. Now every leading subspace converges, fixing each Schur direction. The only remaining freedom is a sign or unit complex phase for each column. We denote these by a **diagonal** unitary matrix
+and the starting-space condition holds for every leading set of columns. Now every leading subspace converges, fixing each Schur direction. The only remaining freedom is a sign or unit complex phase for each column. Following the power method's notation $\phi_k$ for a single phase, write these phases as $\phi_{k,j}$ and collect them in a **diagonal** unitary matrix
 
 $$
-D_k=\operatorname{diag}(d_{k,1},\ldots,d_{k,n}),
-\qquad |d_{k,j}|=1.
+\Phi_k=\operatorname{diag}(\phi_{k,1},\ldots,\phi_{k,n}),
+\qquad |\phi_{k,j}|=1.
 $$
 
-Whereas $W_k$ may mix columns, $D_k$ only adjusts their phases, giving
+Whereas $W_k$ may mix columns, $\Phi_k$ only adjusts their phases, giving
 
 $$
 \begin{aligned}
-\|Q_kD_k^H-Q_\star\|_2&\longrightarrow0,\\
-\|D_kT_kD_k^H-T\|_2&\longrightarrow0.
+\|Q_k\Phi_k^H-Q_\star\|_2&\longrightarrow0,\\
+\|\Phi_kT_k\Phi_k^H-T\|_2&\longrightarrow0.
 \end{aligned}
 $$
 
-We do not need to compute $D_k$: these phase adjustments leave diagonal entries unchanged and preserve the magnitudes of all other entries. Since $T$ is upper triangular, the unadjusted matrix $T_k$ therefore satisfies
+We do not need to compute $\Phi_k$: these phase adjustments leave diagonal entries unchanged and preserve the magnitudes of all other entries. Since $T$ is upper triangular, the unadjusted matrix $T_k$ therefore satisfies
 
 $$
 \boxed{(T_k)_{jj}\longrightarrow\lambda_j,

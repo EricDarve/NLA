@@ -67,7 +67,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Symmetric vs Unsymmetric QR Iteration" href="symmetric_vs_nonsymmetric_qr.html" />
+    <link rel="next" title="Symmetric and Nonsymmetric QR Iteration" href="symmetric_vs_nonsymmetric_qr.html" />
     <link rel="prev" title="Hessenberg Reduction and QR Iteration" href="upper_hessenberg.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -495,9 +495,9 @@
 <p>For <span class="math notranslate nohighlight">\(A\in\mathbb R^{n\times n}\)</span>, start from the Hessenberg reduction</p>
 <div class="math notranslate nohighlight">
 \[
-H=Q_H^TAQ_H,
+H=Q_{\mathrm{red}}^TAQ_{\mathrm{red}},
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(Q_H\)</span> is the orthogonal matrix from the previous section. Throughout this page, <span class="math notranslate nohighlight">\(H\)</span> denotes the current Hessenberg matrix. Its size is <span class="math notranslate nohighlight">\(m\times m\)</span>, initially with <span class="math notranslate nohighlight">\(m=n\)</span>, and its entries are <span class="math notranslate nohighlight">\(h_{ij}\)</span>.</p>
+<p>Here <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span> is the orthogonal reduction factor from the previous section. We now write <span class="math notranslate nohighlight">\(H\)</span> for the current QR iterate, called <span class="math notranslate nohighlight">\(T_k\)</span> on the preceding pages, and <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span> for the next iterate. Its entries are <span class="math notranslate nohighlight">\(h_{ij}\)</span>. We keep <span class="math notranslate nohighlight">\(H\)</span> and <span class="math notranslate nohighlight">\(n\)</span> for the matrix and its size as deflation reduces the problem.</p>
 <p>For one step, choose a real shift <span class="math notranslate nohighlight">\(\mu\)</span> and factor <span class="math notranslate nohighlight">\(H-\mu I=UR\)</span>, where <span class="math notranslate nohighlight">\(U\)</span> is orthogonal and <span class="math notranslate nohighlight">\(R\)</span> is upper triangular. The updated matrix, denoted by <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span>, is obtained by reversing the factors and adding the shift back:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -517,13 +517,13 @@ H_{\mathrm{new}}
 &amp;=U^THU.
 \end{aligned}
 \end{split}\]</div>
-<p>The Hessenberg structure is preserved by the adjacent-rotation implementation from the previous section, so a step costs <span class="math notranslate nohighlight">\(O(m^2)\)</span> operations. A complex shift generally introduces complex arithmetic; below we explain how to handle conjugate shifts together while keeping the computation real.</p>
+<p>The Hessenberg structure is preserved by the adjacent-rotation implementation from the previous section, so a step costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations. A complex shift generally introduces complex arithmetic; below we explain how to handle conjugate shifts together while keeping the computation real.</p>
 </section>
 <section id="why-a-good-shift-helps">
 <h2>Why a Good Shift Helps<a class="headerlink" href="#why-a-good-shift-helps" title="Link to this heading">#</a></h2>
 <p>For intuition, first hold <span class="math notranslate nohighlight">\(\mu\)</span> fixed. Shifted QR iteration on <span class="math notranslate nohighlight">\(H\)</span> is then ordinary QR iteration on <span class="math notranslate nohighlight">\(H-\mu I\)</span>, followed by adding <span class="math notranslate nohighlight">\(\mu I\)</span> back. If the eigenvalues of <span class="math notranslate nohighlight">\(H\)</span> are <span class="math notranslate nohighlight">\(\lambda_j\)</span>, those of <span class="math notranslate nohighlight">\(H-\mu I\)</span> are <span class="math notranslate nohighlight">\(\lambda_j-\mu\)</span>.</p>
 <p>Recall that orthogonal iteration captures the directions associated with larger eigenvalue magnitudes first. If <span class="math notranslate nohighlight">\(\mu\)</span> is close to one eigenvalue <span class="math notranslate nohighlight">\(\lambda_\star\)</span>, then <span class="math notranslate nohighlight">\(|\lambda_\star-\mu|\)</span> is small. The other directions occupy the leading columns, leaving this eigenvalue at the bottom.</p>
-<p>More precisely, suppose <span class="math notranslate nohighlight">\(H\)</span> is diagonalizable, <span class="math notranslate nohighlight">\(\mu\)</span> is not an eigenvalue, and a simple eigenvalue <span class="math notranslate nohighlight">\(\lambda_\star\)</span> is uniquely closest to <span class="math notranslate nohighlight">\(\mu\)</span>. Under the starting-space assumption of <a class="reference internal" href="orthogonal_iteration.html#thm:orth-it-nh-rigorous">Theorem 26</a>, the leading <span class="math notranslate nohighlight">\((m-1)\)</span>-dimensional subspace converges with the asymptotic factor</p>
+<p>More precisely, suppose <span class="math notranslate nohighlight">\(H\)</span> is diagonalizable, <span class="math notranslate nohighlight">\(\mu\)</span> is not an eigenvalue, and a simple eigenvalue <span class="math notranslate nohighlight">\(\lambda_\star\)</span> is uniquely closest to <span class="math notranslate nohighlight">\(\mu\)</span>. Under the starting-space assumption of <a class="reference internal" href="orthogonal_iteration.html#thm:orth-it-nh-rigorous">Theorem 26</a>, the leading <span class="math notranslate nohighlight">\((n-1)\)</span>-dimensional subspace converges with the asymptotic factor</p>
 <div class="math notranslate nohighlight">
 \[
 \rho_\mu=
@@ -579,17 +579,17 @@ H_{\mathrm{new}}=RU+\sqrt2 I
 <section id="deflation-recognizing-that-an-eigenvalue-has-separated">
 <h2>Deflation: Recognizing That an Eigenvalue Has Separated<a class="headerlink" href="#deflation-recognizing-that-an-eigenvalue-has-separated" title="Link to this heading">#</a></h2>
 <p>A successful shift makes a subdiagonal entry small enough to replace by zero. Because <span class="math notranslate nohighlight">\(H\)</span> is Hessenberg, this separates it into an upper block triangular matrix. Its eigenvalues are the eigenvalues of its diagonal blocks, so the smaller problems can be solved separately. This reduction is called <strong>deflation</strong>.</p>
-<p>For a single real eigenvalue, the separating entry is <span class="math notranslate nohighlight">\(h_{m,m-1}\)</span>. Setting it to zero gives</p>
+<p>For a single real eigenvalue, the separating entry is <span class="math notranslate nohighlight">\(h_{n,n-1}\)</span>. Setting it to zero gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 H\approx
 \begin{pmatrix}
 H_{11}&amp;*\\
-0&amp;h_{mm}
+0&amp;h_{nn}
 \end{pmatrix}.
 \end{split}\]</div>
-<p>Here <span class="math notranslate nohighlight">\(H_{11}\)</span> consists of the first <span class="math notranslate nohighlight">\(m-1\)</span> rows and columns. The asterisk denotes the remaining entries above <span class="math notranslate nohighlight">\(h_{mm}\)</span>, which do not affect the eigenvalues of this block triangular matrix. The scalar <span class="math notranslate nohighlight">\(h_{mm}\)</span> is an eigenvalue of the matrix after this small perturbation. We record it and continue QR iteration on <span class="math notranslate nohighlight">\(H_{11}\)</span>. This remaining matrix is called the <strong>active block</strong>: it contains the eigenvalues still to be computed. We keep the notation <span class="math notranslate nohighlight">\(H\)</span> for it and decrease <span class="math notranslate nohighlight">\(m\)</span> by one.</p>
-<p>For a trailing conjugate pair, the separating entry is instead <span class="math notranslate nohighlight">\(h_{m-1,m-2}\)</span>, when <span class="math notranslate nohighlight">\(m\ge3\)</span>. Setting it to zero isolates the trailing <span class="math notranslate nohighlight">\(2\times2\)</span> block <span class="math notranslate nohighlight">\(B\)</span>:</p>
+<p>Here <span class="math notranslate nohighlight">\(H_{11}\)</span> consists of the first <span class="math notranslate nohighlight">\(n-1\)</span> rows and columns. The asterisk denotes the remaining entries above <span class="math notranslate nohighlight">\(h_{nn}\)</span>, which do not affect the eigenvalues of this block triangular matrix. The scalar <span class="math notranslate nohighlight">\(h_{nn}\)</span> is an eigenvalue of the matrix after this small perturbation. We record it and continue QR iteration on <span class="math notranslate nohighlight">\(H_{11}\)</span>. This remaining matrix is called the <strong>active block</strong>: it contains the eigenvalues still to be computed. We keep the notation <span class="math notranslate nohighlight">\(H\)</span> for it and decrease <span class="math notranslate nohighlight">\(n\)</span> by one.</p>
+<p>For a trailing conjugate pair, the separating entry is instead <span class="math notranslate nohighlight">\(h_{n-1,n-2}\)</span>, when <span class="math notranslate nohighlight">\(n\ge3\)</span>. Setting it to zero isolates the trailing <span class="math notranslate nohighlight">\(2\times2\)</span> block <span class="math notranslate nohighlight">\(B\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 H\approx
@@ -598,7 +598,7 @@ H_{11}&amp;*\\
 0&amp;B
 \end{pmatrix}.
 \end{split}\]</div>
-<p>Now <span class="math notranslate nohighlight">\(H_{11}\)</span> consists of the first <span class="math notranslate nohighlight">\(m-2\)</span> rows and columns. The internal entry <span class="math notranslate nohighlight">\(h_{m,m-1}\)</span> of <span class="math notranslate nohighlight">\(B\)</span> need not become small. Once <span class="math notranslate nohighlight">\(B\)</span> is isolated, an orthogonal <span class="math notranslate nohighlight">\(2\times2\)</span> similarity puts it in real Schur form: triangular for real roots, or a <span class="math notranslate nohighlight">\(2\times2\)</span> block for a nonreal pair. We compute its two eigenvalues directly and continue on <span class="math notranslate nohighlight">\(H_{11}\)</span>, again denoting this smaller matrix by <span class="math notranslate nohighlight">\(H\)</span>, with <span class="math notranslate nohighlight">\(m\)</span> decreased by two. An isolated nonreal block is a completed part of the calculation, not a convergence failure. The same splitting principle applies to small subdiagonal entries anywhere inside the active block.</p>
+<p>Now <span class="math notranslate nohighlight">\(H_{11}\)</span> consists of the first <span class="math notranslate nohighlight">\(n-2\)</span> rows and columns. The internal entry <span class="math notranslate nohighlight">\(h_{n,n-1}\)</span> of <span class="math notranslate nohighlight">\(B\)</span> need not become small. Once <span class="math notranslate nohighlight">\(B\)</span> is isolated, an orthogonal <span class="math notranslate nohighlight">\(2\times2\)</span> similarity puts it in real Schur form: triangular for real roots, or a <span class="math notranslate nohighlight">\(2\times2\)</span> block for a nonreal pair. We compute its two eigenvalues directly and continue on <span class="math notranslate nohighlight">\(H_{11}\)</span>, again denoting this smaller matrix by <span class="math notranslate nohighlight">\(H\)</span>, with <span class="math notranslate nohighlight">\(n\)</span> decreased by two. An isolated nonreal block is a completed part of the calculation, not a convergence failure. The same splitting principle applies to small subdiagonal entries anywhere inside the active block.</p>
 <p>How small is small enough? Setting <span class="math notranslate nohighlight">\(h_{j+1,j}\)</span> to zero changes <span class="math notranslate nohighlight">\(H\)</span> by a matrix with 2-norm <span class="math notranslate nohighlight">\(|h_{j+1,j}|\)</span>. This gives a backward-error interpretation of the deflation test. A common initial check compares it with nearby diagonal entries:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -616,9 +616,9 @@ H_{11}&amp;*\\
 <p>The choice</p>
 <div class="math notranslate nohighlight">
 \[
-\mu=h_{mm}
+\mu=h_{nn}
 \]</div>
-<p>is often called the <strong>Rayleigh quotient shift</strong>, since <span class="math notranslate nohighlight">\(h_{mm}=\boldsymbol e_m^TH\boldsymbol e_m\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol e_m\)</span> is the last coordinate vector. When the last row is nearly separated, this entry approximates a real eigenvalue. It costs nothing to compute, but the cycling example shows why it cannot be the only shift rule.</p>
+<p>is often called the <strong>Rayleigh quotient shift</strong>, since <span class="math notranslate nohighlight">\(h_{nn}=e_n^THe_n\)</span>, where <span class="math notranslate nohighlight">\(e_n\)</span> is the last coordinate vector. When the last row is nearly separated, this entry approximates a real eigenvalue. It costs nothing to compute, but the cycling example shows why it cannot be the only shift rule.</p>
 <p>The rapid local convergence can be seen in a <span class="math notranslate nohighlight">\(2\times2\)</span> calculation. Write the entry below the diagonal as <span class="math notranslate nohighlight">\(\varepsilon\)</span> and choose the bottom-right entry as the shift:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
@@ -661,8 +661,8 @@ r&amp;b(a-d)/r\\
 \[\begin{split}
 B=\begin{pmatrix}a&amp;b\\c&amp;d\end{pmatrix}
 =\begin{pmatrix}
-h_{m-1,m-1}&amp;h_{m-1,m}\\
-h_{m,m-1}&amp;h_{mm}
+h_{n-1,n-1}&amp;h_{n-1,n}\\
+h_{n,n-1}&amp;h_{nn}
 \end{pmatrix}.
 \end{split}\]</div>
 <p>Its two eigenvalues solve</p>
@@ -687,7 +687,7 @@ z^2-sz+t=0,
 \alpha\pm i\sqrt{-\Delta},&amp;\Delta&lt;0.
 \end{cases}
 \end{split}\]</div>
-<p>When the roots are real, one possible single shift is the root closest to <span class="math notranslate nohighlight">\(d=h_{mm}\)</span>, with a fixed rule to break ties. This uses information that the bottom-right entry alone misses. In the cycling example, it selects one of <span class="math notranslate nohighlight">\(\pm\sqrt2\)</span> and ends the cycle immediately.</p>
+<p>When the roots are real, one possible single shift is the root closest to <span class="math notranslate nohighlight">\(d=h_{nn}\)</span>, with a fixed rule to break ties. This uses information that the bottom-right entry alone misses. In the cycling example, it selects one of <span class="math notranslate nohighlight">\(\pm\sqrt2\)</span> and ends the cycle immediately.</p>
 <p>When the roots are nonreal, they estimate a conjugate pair. A real matrix cannot become upper triangular over the reals while retaining nonreal eigenvalues. We must separate a two-dimensional block instead of trying to force its two eigenvalues onto real diagonal entries.</p>
 <p>The roots of <span class="math notranslate nohighlight">\(B\)</span> are estimates of eigenvalues of <span class="math notranslate nohighlight">\(H\)</span>; they need not be accurate until the trailing block is nearly separated. The displayed formulas explain the choices, but a numerical implementation should use scaled formulas that avoid overflow and cancellation. LAPACK’s <a class="reference external" href="https://github.com/Reference-LAPACK/lapack/blob/master/SRC/dlanv2.f">DLANV2 routine</a> computes a real <span class="math notranslate nohighlight">\(2\times2\)</span> Schur decomposition and its eigenvalues with such safeguards.</p>
 </section>
@@ -719,20 +719,20 @@ p(H)=UR,\qquad H_{\mathrm{new}}=U^THU.
 <div class="math notranslate nohighlight">
 \[
 H-\mu_1I=U_1R_1,\qquad
-H_1=R_1U_1+\mu_1I=U_1^H H U_1.
+H_1=R_1U_1+\mu_1I.
 \]</div>
-<p>These factors may be complex, so the superscript <span class="math notranslate nohighlight">\(H\)</span> denotes the conjugate transpose. Apply the second shift <span class="math notranslate nohighlight">\(\mu_2\)</span> to <span class="math notranslate nohighlight">\(H_1\)</span>, obtaining <span class="math notranslate nohighlight">\(H_2\)</span>:</p>
+<p>These factors may be complex, and <span class="math notranslate nohighlight">\(U_1\)</span> is unitary. Apply the second shift <span class="math notranslate nohighlight">\(\mu_2\)</span> to <span class="math notranslate nohighlight">\(H_1\)</span>, obtaining <span class="math notranslate nohighlight">\(H_2\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
 H_1-\mu_2I=U_2R_2,\qquad
-H_2=R_2U_2+\mu_2I=U_2^H H_1U_2.
+H_2=R_2U_2+\mu_2I.
 \]</div>
-<p>The combined change of basis is <span class="math notranslate nohighlight">\(U_1U_2\)</span>, since</p>
+<p>The shifted QR identities give <span class="math notranslate nohighlight">\(HU_1=U_1H_1\)</span> and <span class="math notranslate nohighlight">\(H_1U_2=U_2H_2\)</span>. Therefore</p>
 <div class="math notranslate nohighlight">
 \[
-H_2=(U_1U_2)^H H(U_1U_2).
+H(U_1U_2)=U_1H_1U_2=(U_1U_2)H_2.
 \]</div>
-<p>This same product appears in a QR factorization of <span class="math notranslate nohighlight">\(p(H)\)</span>:</p>
+<p>Thus the unitary product <span class="math notranslate nohighlight">\(U_1U_2\)</span> is the combined change of basis. This same product appears in a QR factorization of <span class="math notranslate nohighlight">\(p(H)\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -808,7 +808,7 @@ p(H)
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Symmetric vs Unsymmetric QR Iteration</p>
+        <p class="prev-next-title">Symmetric and Nonsymmetric QR Iteration</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

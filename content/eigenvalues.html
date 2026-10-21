@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -495,6 +495,7 @@ x(t)=e^{\lambda t}v.
 <section id="computational-goals">
 <h2>Computational Goals<a class="headerlink" href="#computational-goals" title="Link to this heading">#</a></h2>
 <p>For <span class="math notranslate nohighlight">\(A\in\mathbb C^{n\times n}\)</span>, an <strong>eigenpair</strong> is a scalar <span class="math notranslate nohighlight">\(\lambda\)</span> and a nonzero vector <span class="math notranslate nohighlight">\(v\)</span> satisfying <span class="math notranslate nohighlight">\(Av=\lambda v\)</span>. Some applications require only a few eigenpairs, such as those governing the fastest growth or slowest decay. Others require the entire <strong>spectrum</strong>, meaning all the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>We use <span class="math notranslate nohighlight">\(^{H}\)</span> for the conjugate transpose. For real matrices, it is the ordinary transpose <span class="math notranslate nohighlight">\(^{T}\)</span>. Vector symbols are plain lowercase letters, as in the preceding chapters.</p>
 <p>For the full spectrum, a useful computational target is the <strong>Schur decomposition</strong>,</p>
 <div class="math notranslate nohighlight">
 \[

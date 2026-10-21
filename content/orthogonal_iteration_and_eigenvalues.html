@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -482,31 +482,31 @@
 <p>We keep the same notation: <span class="math notranslate nohighlight">\(Q_\star\)</span> is an exact Schur basis in <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span>, with <span class="math notranslate nohighlight">\(|\lambda_1|\ge\cdots\ge|\lambda_n|\)</span>, and <span class="math notranslate nohighlight">\(Q_k\in\mathbb C^{n\times p}\)</span> is the orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
 <section id="extracting-eigenvalues-from-a-subspace">
 <h2>Extracting Eigenvalues from a Subspace<a class="headerlink" href="#extracting-eigenvalues-from-a-subspace" title="Link to this heading">#</a></h2>
-<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, a vector in the current subspace has the form <span class="math notranslate nohighlight">\(\boldsymbol u=Q_k\boldsymbol y\)</span>. Multiplication by <span class="math notranslate nohighlight">\(A\)</span> can take it outside the subspace. Projecting back gives</p>
+<p>For <span class="math notranslate nohighlight">\(p&lt;n\)</span>, a vector in the current subspace has the form <span class="math notranslate nohighlight">\(u=Q_ky\)</span>. Multiplication by <span class="math notranslate nohighlight">\(A\)</span> can take it outside the subspace. Projecting back gives</p>
 <div class="math notranslate nohighlight">
 \[
 T_k=Q_k^HAQ_k,
 \qquad
-Q_kQ_k^HA\boldsymbol u=Q_kT_k\boldsymbol y.
+Q_kQ_k^HAu=Q_kT_ky.
 \]</div>
 <p>The <span class="math notranslate nohighlight">\(p\times p\)</span> matrix <span class="math notranslate nohighlight">\(T_k\)</span> therefore describes the projected action of <span class="math notranslate nohighlight">\(A\)</span>. For <span class="math notranslate nohighlight">\(p=1\)</span>, it is the Rayleigh quotient used in the power method. For general <span class="math notranslate nohighlight">\(p\)</span>, its eigenvalues are called <strong>Ritz values</strong>. Take a unit eigenvector of <span class="math notranslate nohighlight">\(T_k\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-T_k\boldsymbol y=\theta\boldsymbol y,
-\qquad \|\boldsymbol y\|_2=1.
+T_ky=\theta y,
+\qquad \|y\|_2=1.
 \]</div>
-<p>The corresponding <strong>Ritz vector</strong> <span class="math notranslate nohighlight">\(\boldsymbol u=Q_k\boldsymbol y\)</span> also has unit norm. Using the subspace residual <span class="math notranslate nohighlight">\(E_k=AQ_k-Q_kT_k\)</span> from the previous section,</p>
+<p>The corresponding <strong>Ritz vector</strong> <span class="math notranslate nohighlight">\(u=Q_ky\)</span> also has unit norm. Using the subspace residual <span class="math notranslate nohighlight">\(E_k=AQ_k-Q_kT_k\)</span> from the previous section,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-A\boldsymbol u-\theta\boldsymbol u
-&amp;=AQ_k\boldsymbol y-Q_kT_k\boldsymbol y\\
-&amp;=E_k\boldsymbol y,\\
-\|A\boldsymbol u-\theta\boldsymbol u\|_2
+Au-\theta u
+&amp;=AQ_ky-Q_kT_ky\\
+&amp;=E_ky,\\
+\|Au-\theta u\|_2
 &amp;\le\|E_k\|_2.
 \end{aligned}
 \end{split}\]</div>
-<p>Because <span class="math notranslate nohighlight">\(Q_k^HE_k=Q_k^HAQ_k-T_k=0\)</span>, this residual is perpendicular to the current subspace. Thus the Ritz pair satisfies the eigenvector equation after projection. If the subspace is exactly invariant, <span class="math notranslate nohighlight">\(E_k=0\)</span> and <span class="math notranslate nohighlight">\((\theta,\boldsymbol u)\)</span> is an exact eigenpair of <span class="math notranslate nohighlight">\(A\)</span>. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.</p>
+<p>Because <span class="math notranslate nohighlight">\(Q_k^HE_k=Q_k^HAQ_k-T_k=0\)</span>, this residual is perpendicular to the current subspace. Thus the Ritz pair satisfies the eigenvector equation after projection. If the subspace is exactly invariant, <span class="math notranslate nohighlight">\(E_k=0\)</span> and <span class="math notranslate nohighlight">\((\theta,u)\)</span> is an exact eigenpair of <span class="math notranslate nohighlight">\(A\)</span>. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.</p>
 </section>
 <section id="from-subspace-convergence-to-schur-form">
 <h2>From Subspace Convergence to Schur Form<a class="headerlink" href="#from-subspace-convergence-to-schur-form" title="Link to this heading">#</a></h2>
@@ -539,21 +539,21 @@ T_{\star,p}=Q_{\star,p}^HAQ_{\star,p},
 \[
 |\lambda_1|&gt;\cdots&gt;|\lambda_n|&gt;0,
 \]</div>
-<p>and the starting-space condition holds for every leading set of columns. Now every leading subspace converges, fixing each Schur direction. The only remaining freedom is a sign or unit complex phase for each column. We denote these by a <strong>diagonal</strong> unitary matrix</p>
+<p>and the starting-space condition holds for every leading set of columns. Now every leading subspace converges, fixing each Schur direction. The only remaining freedom is a sign or unit complex phase for each column. Following the power method’s notation <span class="math notranslate nohighlight">\(\phi_k\)</span> for a single phase, write these phases as <span class="math notranslate nohighlight">\(\phi_{k,j}\)</span> and collect them in a <strong>diagonal</strong> unitary matrix</p>
 <div class="math notranslate nohighlight">
 \[
-D_k=\operatorname{diag}(d_{k,1},\ldots,d_{k,n}),
-\qquad |d_{k,j}|=1.
+\Phi_k=\operatorname{diag}(\phi_{k,1},\ldots,\phi_{k,n}),
+\qquad |\phi_{k,j}|=1.
 \]</div>
-<p>Whereas <span class="math notranslate nohighlight">\(W_k\)</span> may mix columns, <span class="math notranslate nohighlight">\(D_k\)</span> only adjusts their phases, giving</p>
+<p>Whereas <span class="math notranslate nohighlight">\(W_k\)</span> may mix columns, <span class="math notranslate nohighlight">\(\Phi_k\)</span> only adjusts their phases, giving</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\|Q_kD_k^H-Q_\star\|_2&amp;\longrightarrow0,\\
-\|D_kT_kD_k^H-T\|_2&amp;\longrightarrow0.
+\|Q_k\Phi_k^H-Q_\star\|_2&amp;\longrightarrow0,\\
+\|\Phi_kT_k\Phi_k^H-T\|_2&amp;\longrightarrow0.
 \end{aligned}
 \end{split}\]</div>
-<p>We do not need to compute <span class="math notranslate nohighlight">\(D_k\)</span>: these phase adjustments leave diagonal entries unchanged and preserve the magnitudes of all other entries. Since <span class="math notranslate nohighlight">\(T\)</span> is upper triangular, the unadjusted matrix <span class="math notranslate nohighlight">\(T_k\)</span> therefore satisfies</p>
+<p>We do not need to compute <span class="math notranslate nohighlight">\(\Phi_k\)</span>: these phase adjustments leave diagonal entries unchanged and preserve the magnitudes of all other entries. Since <span class="math notranslate nohighlight">\(T\)</span> is upper triangular, the unadjusted matrix <span class="math notranslate nohighlight">\(T_k\)</span> therefore satisfies</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{(T_k)_{jj}\longrightarrow\lambda_j,

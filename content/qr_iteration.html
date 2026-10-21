@@ -268,7 +268,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -592,18 +592,19 @@ A^k = (U_1 U_2 \cdots U_k) (R_k R_{k-1}\cdots R_1).
 </li>
 </ol>
 <p>where <span class="math notranslate nohighlight">\(U_{k+1}\)</span> is a unitary matrix and <span class="math notranslate nohighlight">\(R_{k+1}\)</span> is an upper triangular matrix.</p>
-<p>If we define the product matrices <span class="math notranslate nohighlight">\(\tilde{Q}_k\)</span> and <span class="math notranslate nohighlight">\(\tilde{R}_k\)</span> as:</p>
+<p>Use the same accumulated triangular factor <span class="math notranslate nohighlight">\(\widetilde R_k=R_k\cdots R_1\)</span> as in orthogonal iteration. Define the product matrices:</p>
 <ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\tilde{Q}_k = U_1 U_2 \cdots U_k\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\tilde{R}_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\widetilde Q_k = U_1 U_2 \cdots U_k\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\widetilde R_k = R_k R_{k-1} \cdots R_1\)</span></p></li>
 </ul>
 <p>Then for any integer <span class="math notranslate nohighlight">\(k \ge 1\)</span>, the <span class="math notranslate nohighlight">\(k\)</span>-th power of the matrix <span class="math notranslate nohighlight">\(A\)</span> is given by:</p>
 <div class="math notranslate nohighlight">
 \[
-A^k = \tilde{Q}_k \tilde{R}_k
+A^k = \widetilde Q_k \widetilde R_k
 \]</div>
 </section>
 </div><p>The proof is provided at the end of this section.</p>
+<p>Thus <span class="math notranslate nohighlight">\(\widetilde Q_k=Q_k\)</span> when orthogonal iteration starts from <span class="math notranslate nohighlight">\(Q_0=I\)</span>.</p>
 </section>
 </section>
 <section id="qr-iteration-steps">
@@ -664,7 +665,7 @@ A^k = \tilde{Q}_k \tilde{R}_k
 <section id="proof-of-decomposition-of-a-k">
 <h2>Proof of Decomposition of <span class="math notranslate nohighlight">\(A^k\)</span><a class="headerlink" href="#proof-of-decomposition-of-a-k" title="Link to this heading">#</a></h2>
 <div class="proof admonition" id="proof">
-<p>Proof. Use the product matrices <span class="math notranslate nohighlight">\(\tilde Q_k=U_1\cdots U_k\)</span> and <span class="math notranslate nohighlight">\(\tilde R_k=R_k\cdots R_1\)</span> defined in the theorem. We first relate <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(A\)</span>, then use that relation to prove the formula for <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
+<p>Proof. Use the product matrices <span class="math notranslate nohighlight">\(\widetilde Q_k=U_1\cdots U_k\)</span> and <span class="math notranslate nohighlight">\(\widetilde R_k=R_k\cdots R_1\)</span> defined in the theorem. We first relate <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(A\)</span>, then use that relation to prove the formula for <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
 <p>Each QR step gives the unitary similarity</p>
 <div class="math notranslate nohighlight">
 \[
@@ -677,28 +678,28 @@ T_{j+1}=R_{j+1}U_{j+1}
 \begin{aligned}
 T_k
 &amp;=U_k^H\cdots U_1^H\,A\,U_1\cdots U_k\\
-&amp;=\tilde Q_k^HA\tilde Q_k.
+&amp;=\widetilde Q_k^HA\widetilde Q_k.
 \end{aligned}
 \end{split}\]</div>
-<p>The second equality uses <span class="math notranslate nohighlight">\((U_1\cdots U_k)^H=U_k^H\cdots U_1^H\)</span>. Since <span class="math notranslate nohighlight">\(\tilde Q_k\)</span> is unitary, multiplying on the left by <span class="math notranslate nohighlight">\(\tilde Q_k\)</span> gives</p>
+<p>The second equality uses <span class="math notranslate nohighlight">\((U_1\cdots U_k)^H=U_k^H\cdots U_1^H\)</span>. Since <span class="math notranslate nohighlight">\(\widetilde Q_k\)</span> is unitary, multiplying on the left by <span class="math notranslate nohighlight">\(\widetilde Q_k\)</span> gives</p>
 <div class="math notranslate nohighlight">
 \[
-A\tilde Q_k=\tilde Q_kT_k.
+A\widetilde Q_k=\widetilde Q_kT_k.
 \]</div>
-<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, the first QR factorization gives <span class="math notranslate nohighlight">\(A=U_1R_1=\tilde Q_1\tilde R_1\)</span>. Assume now that <span class="math notranslate nohighlight">\(A^k=\tilde Q_k\tilde R_k\)</span>. Then</p>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, the first QR factorization gives <span class="math notranslate nohighlight">\(A=U_1R_1=\widetilde Q_1\widetilde R_1\)</span>. Assume now that <span class="math notranslate nohighlight">\(A^k=\widetilde Q_k\widetilde R_k\)</span>. Then</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 A^{k+1}
-&amp;=A(\tilde Q_k\tilde R_k)\\
-&amp;=(A\tilde Q_k)\tilde R_k\\
-&amp;=\tilde Q_kT_k\tilde R_k\\
-&amp;=\tilde Q_k(U_{k+1}R_{k+1})\tilde R_k\\
-&amp;=(\tilde Q_kU_{k+1})(R_{k+1}\tilde R_k)\\
-&amp;=\tilde Q_{k+1}\tilde R_{k+1}.
+&amp;=A(\widetilde Q_k\widetilde R_k)\\
+&amp;=(A\widetilde Q_k)\widetilde R_k\\
+&amp;=\widetilde Q_kT_k\widetilde R_k\\
+&amp;=\widetilde Q_k(U_{k+1}R_{k+1})\widetilde R_k\\
+&amp;=(\widetilde Q_kU_{k+1})(R_{k+1}\widetilde R_k)\\
+&amp;=\widetilde Q_{k+1}\widetilde R_{k+1}.
 \end{aligned}
 \end{split}\]</div>
-<p>This proves the result by induction. The new unitary factor is appended on the right of <span class="math notranslate nohighlight">\(\tilde Q_k\)</span>, while the new triangular factor is placed on the left of <span class="math notranslate nohighlight">\(\tilde R_k\)</span>. This explains the opposite orders of the two products.</p>
+<p>This proves the result by induction. The new unitary factor is appended on the right of <span class="math notranslate nohighlight">\(\widetilde Q_k\)</span>, while the new triangular factor is placed on the left of <span class="math notranslate nohighlight">\(\widetilde R_k\)</span>. This explains the opposite orders of the two products.</p>
 </div>
 </section>
 </section>

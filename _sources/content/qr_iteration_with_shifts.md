@@ -9,10 +9,10 @@ We focus on a real, generally nonsymmetric matrix. Its eigenvalues may be real o
 For $A\in\mathbb R^{n\times n}$, start from the Hessenberg reduction
 
 $$
-H=Q_H^TAQ_H,
+H=Q_{\mathrm{red}}^TAQ_{\mathrm{red}},
 $$
 
-where $Q_H$ is the orthogonal matrix from the previous section. Throughout this page, $H$ denotes the current Hessenberg matrix. Its size is $m\times m$, initially with $m=n$, and its entries are $h_{ij}$.
+Here $Q_{\mathrm{red}}$ is the orthogonal reduction factor from the previous section. We now write $H$ for the current QR iterate, called $T_k$ on the preceding pages, and $H_{\mathrm{new}}$ for the next iterate. Its entries are $h_{ij}$. We keep $H$ and $n$ for the matrix and its size as deflation reduces the problem.
 
 For one step, choose a real shift $\mu$ and factor $H-\mu I=UR$, where $U$ is orthogonal and $R$ is upper triangular. The updated matrix, denoted by $H_{\mathrm{new}}$, is obtained by reversing the factors and adding the shift back:
 
@@ -35,7 +35,7 @@ H_{\mathrm{new}}
 \end{aligned}
 $$
 
-The Hessenberg structure is preserved by the adjacent-rotation implementation from the previous section, so a step costs $O(m^2)$ operations. A complex shift generally introduces complex arithmetic; below we explain how to handle conjugate shifts together while keeping the computation real.
+The Hessenberg structure is preserved by the adjacent-rotation implementation from the previous section, so a step costs $O(n^2)$ operations. A complex shift generally introduces complex arithmetic; below we explain how to handle conjugate shifts together while keeping the computation real.
 
 ## Why a Good Shift Helps
 
@@ -43,7 +43,7 @@ For intuition, first hold $\mu$ fixed. Shifted QR iteration on $H$ is then ordin
 
 Recall that orthogonal iteration captures the directions associated with larger eigenvalue magnitudes first. If $\mu$ is close to one eigenvalue $\lambda_\star$, then $|\lambda_\star-\mu|$ is small. The other directions occupy the leading columns, leaving this eigenvalue at the bottom.
 
-More precisely, suppose $H$ is diagonalizable, $\mu$ is not an eigenvalue, and a simple eigenvalue $\lambda_\star$ is uniquely closest to $\mu$. Under the starting-space assumption of {prf:ref}`thm:orth-it-nh-rigorous`, the leading $(m-1)$-dimensional subspace converges with the asymptotic factor
+More precisely, suppose $H$ is diagonalizable, $\mu$ is not an eigenvalue, and a simple eigenvalue $\lambda_\star$ is uniquely closest to $\mu$. Under the starting-space assumption of {prf:ref}`thm:orth-it-nh-rigorous`, the leading $(n-1)$-dimensional subspace converges with the asymptotic factor
 
 $$
 \rho_\mu=
@@ -108,19 +108,19 @@ One step makes the matrix triangular. An approximate shift also helps: with $\mu
 
 A successful shift makes a subdiagonal entry small enough to replace by zero. Because $H$ is Hessenberg, this separates it into an upper block triangular matrix. Its eigenvalues are the eigenvalues of its diagonal blocks, so the smaller problems can be solved separately. This reduction is called **deflation**.
 
-For a single real eigenvalue, the separating entry is $h_{m,m-1}$. Setting it to zero gives
+For a single real eigenvalue, the separating entry is $h_{n,n-1}$. Setting it to zero gives
 
 $$
 H\approx
 \begin{pmatrix}
 H_{11}&*\\
-0&h_{mm}
+0&h_{nn}
 \end{pmatrix}.
 $$
 
-Here $H_{11}$ consists of the first $m-1$ rows and columns. The asterisk denotes the remaining entries above $h_{mm}$, which do not affect the eigenvalues of this block triangular matrix. The scalar $h_{mm}$ is an eigenvalue of the matrix after this small perturbation. We record it and continue QR iteration on $H_{11}$. This remaining matrix is called the **active block**: it contains the eigenvalues still to be computed. We keep the notation $H$ for it and decrease $m$ by one.
+Here $H_{11}$ consists of the first $n-1$ rows and columns. The asterisk denotes the remaining entries above $h_{nn}$, which do not affect the eigenvalues of this block triangular matrix. The scalar $h_{nn}$ is an eigenvalue of the matrix after this small perturbation. We record it and continue QR iteration on $H_{11}$. This remaining matrix is called the **active block**: it contains the eigenvalues still to be computed. We keep the notation $H$ for it and decrease $n$ by one.
 
-For a trailing conjugate pair, the separating entry is instead $h_{m-1,m-2}$, when $m\ge3$. Setting it to zero isolates the trailing $2\times2$ block $B$:
+For a trailing conjugate pair, the separating entry is instead $h_{n-1,n-2}$, when $n\ge3$. Setting it to zero isolates the trailing $2\times2$ block $B$:
 
 $$
 H\approx
@@ -130,7 +130,7 @@ H_{11}&*\\
 \end{pmatrix}.
 $$
 
-Now $H_{11}$ consists of the first $m-2$ rows and columns. The internal entry $h_{m,m-1}$ of $B$ need not become small. Once $B$ is isolated, an orthogonal $2\times2$ similarity puts it in real Schur form: triangular for real roots, or a $2\times2$ block for a nonreal pair. We compute its two eigenvalues directly and continue on $H_{11}$, again denoting this smaller matrix by $H$, with $m$ decreased by two. An isolated nonreal block is a completed part of the calculation, not a convergence failure. The same splitting principle applies to small subdiagonal entries anywhere inside the active block.
+Now $H_{11}$ consists of the first $n-2$ rows and columns. The internal entry $h_{n,n-1}$ of $B$ need not become small. Once $B$ is isolated, an orthogonal $2\times2$ similarity puts it in real Schur form: triangular for real roots, or a $2\times2$ block for a nonreal pair. We compute its two eigenvalues directly and continue on $H_{11}$, again denoting this smaller matrix by $H$, with $n$ decreased by two. An isolated nonreal block is a completed part of the calculation, not a convergence failure. The same splitting principle applies to small subdiagonal entries anywhere inside the active block.
 
 How small is small enough? Setting $h_{j+1,j}$ to zero changes $H$ by a matrix with 2-norm $|h_{j+1,j}|$. This gives a backward-error interpretation of the deflation test. A common initial check compares it with nearby diagonal entries:
 
@@ -152,10 +152,10 @@ All shift choices below use the current matrix $H$, whose size decreases as eige
 The choice
 
 $$
-\mu=h_{mm}
+\mu=h_{nn}
 $$
 
-is often called the **Rayleigh quotient shift**, since $h_{mm}=\boldsymbol e_m^TH\boldsymbol e_m$, where $\boldsymbol e_m$ is the last coordinate vector. When the last row is nearly separated, this entry approximates a real eigenvalue. It costs nothing to compute, but the cycling example shows why it cannot be the only shift rule.
+is often called the **Rayleigh quotient shift**, since $h_{nn}=e_n^THe_n$, where $e_n$ is the last coordinate vector. When the last row is nearly separated, this entry approximates a real eigenvalue. It costs nothing to compute, but the cycling example shows why it cannot be the only shift rule.
 
 The rapid local convergence can be seen in a $2\times2$ calculation. Write the entry below the diagonal as $\varepsilon$ and choose the bottom-right entry as the shift:
 
@@ -203,8 +203,8 @@ A better estimate uses the last two coordinates together:
 $$
 B=\begin{pmatrix}a&b\\c&d\end{pmatrix}
 =\begin{pmatrix}
-h_{m-1,m-1}&h_{m-1,m}\\
-h_{m,m-1}&h_{mm}
+h_{n-1,n-1}&h_{n-1,n}\\
+h_{n,n-1}&h_{nn}
 \end{pmatrix}.
 $$
 
@@ -233,7 +233,7 @@ $$
 \end{cases}
 $$
 
-When the roots are real, one possible single shift is the root closest to $d=h_{mm}$, with a fixed rule to break ties. This uses information that the bottom-right entry alone misses. In the cycling example, it selects one of $\pm\sqrt2$ and ends the cycle immediately.
+When the roots are real, one possible single shift is the root closest to $d=h_{nn}$, with a fixed rule to break ties. This uses information that the bottom-right entry alone misses. In the cycling example, it selects one of $\pm\sqrt2$ and ends the cycle immediately.
 
 When the roots are nonreal, they estimate a conjugate pair. A real matrix cannot become upper triangular over the reals while retaining nonreal eigenvalues. We must separate a two-dimensional block instead of trying to force its two eigenvalues onto real diagonal entries.
 
@@ -271,23 +271,23 @@ To see why, first apply the shift $\mu_1$. Denote the intermediate matrix by $H_
 
 $$
 H-\mu_1I=U_1R_1,\qquad
-H_1=R_1U_1+\mu_1I=U_1^H H U_1.
+H_1=R_1U_1+\mu_1I.
 $$
 
-These factors may be complex, so the superscript $H$ denotes the conjugate transpose. Apply the second shift $\mu_2$ to $H_1$, obtaining $H_2$:
+These factors may be complex, and $U_1$ is unitary. Apply the second shift $\mu_2$ to $H_1$, obtaining $H_2$:
 
 $$
 H_1-\mu_2I=U_2R_2,\qquad
-H_2=R_2U_2+\mu_2I=U_2^H H_1U_2.
+H_2=R_2U_2+\mu_2I.
 $$
 
-The combined change of basis is $U_1U_2$, since
+The shifted QR identities give $HU_1=U_1H_1$ and $H_1U_2=U_2H_2$. Therefore
 
 $$
-H_2=(U_1U_2)^H H(U_1U_2).
+H(U_1U_2)=U_1H_1U_2=(U_1U_2)H_2.
 $$
 
-This same product appears in a QR factorization of $p(H)$:
+Thus the unitary product $U_1U_2$ is the combined change of basis. This same product appears in a QR factorization of $p(H)$:
 
 $$
 \begin{aligned}

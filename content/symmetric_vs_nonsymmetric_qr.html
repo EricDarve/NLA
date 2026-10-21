@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Symmetric vs Unsymmetric QR Iteration &#8212; Numerical Linear Algebra</title>
+    <title>Symmetric and Nonsymmetric QR Iteration &#8212; Numerical Linear Algebra</title>
   
   
   
@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -448,7 +448,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Symmetric vs Unsymmetric QR Iteration</h1>
+    <h1>Symmetric and Nonsymmetric QR Iteration</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -458,17 +458,15 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-1-reduction-to-upper-hessenberg-form">Phase 1: Reduction to Upper Hessenberg Form</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unsymmetric-real-matrices">Unsymmetric Real Matrices</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-real-matrices">Symmetric Real Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reduction-hessenberg-or-tridiagonal">Reduction: Hessenberg or Tridiagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-nonsymmetric-case">The Nonsymmetric Case</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-symmetric-case">The Symmetric Case</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-qr-step-costs-only-o-n">Why a QR Step Costs Only <span class="math notranslate nohighlight">\(O(n)\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-wilkinson-shift">Choosing the Wilkinson Shift</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-convergence-is-often-cubic">Why Convergence Is Often Cubic</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-2-the-shifted-qr-iteration">Phase 2: The Shifted QR Iteration</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Unsymmetric Real Matrices</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Symmetric Real Matrices</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-cost-and-convergence">3. Summary: Cost and Convergence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-comparison">Cost Comparison</a></li>
 </ul>
             </nav>
         </div>
@@ -480,159 +478,128 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="symmetric-vs-unsymmetric-qr-iteration">
-<h1>Symmetric vs Unsymmetric QR Iteration<a class="headerlink" href="#symmetric-vs-unsymmetric-qr-iteration" title="Link to this heading">#</a></h1>
-<p>We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration with shifts for both cases.</p>
-<p>The standard, high-performance approach for finding all eigenvalues of a dense matrix is a <strong>two-phase process</strong>:</p>
-<ol class="arabic simple">
-<li><p><strong>Phase 1 (Direct):</strong> Use a <em>direct</em> (non-iterative) method to reduce the matrix to a simpler form that is unitarily similar. This step is <span class="math notranslate nohighlight">\(O(n^3)\)</span>.</p></li>
-<li><p><strong>Phase 2 (Iterative):</strong> Use an <em>iterative</em> method (the shifted QR iteration) on this simpler form to find the eigenvalues.</p></li>
-</ol>
-<p>The differences between the symmetric and unsymmetric cases affect every part of this process.</p>
-<section id="phase-1-reduction-to-upper-hessenberg-form">
-<h2>Phase 1: Reduction to Upper Hessenberg Form<a class="headerlink" href="#phase-1-reduction-to-upper-hessenberg-form" title="Link to this heading">#</a></h2>
-<p>The goal of this phase is to introduce as many zeros as possible using a <em>finite</em> number of similarity transformations (e.g., Householder reflections) to make the subsequent iterative phase cheaper.</p>
-<section id="unsymmetric-real-matrices">
-<h3>Unsymmetric Real Matrices<a class="headerlink" href="#unsymmetric-real-matrices" title="Link to this heading">#</a></h3>
-<ul>
-<li><p><strong>Target Form:</strong> <strong>Upper Hessenberg form</strong>.</p></li>
-<li><p><strong>Structure:</strong> A matrix <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg if all entries below the first sub-diagonal are zero (<span class="math notranslate nohighlight">\(H_{ij} = 0\)</span> for <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>). It’s the “closest” you can get to upper triangular in a finite number of steps.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split} H = \begin{pmatrix}
-    \times &amp; \times &amp; \times &amp; \times \\
-    \times &amp; \times &amp; \times &amp; \times \\
-    0 &amp; \times &amp; \times &amp; \times \\
-    0 &amp; 0 &amp; \times &amp; \times
-    \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Computational Cost:</strong> This reduction requires <span class="math notranslate nohighlight">\(\approx \frac{10}{3}n^3\)</span> floating-point operations (flops).</p></li>
-</ul>
-</section>
-<section id="symmetric-real-matrices">
-<h3>Symmetric Real Matrices<a class="headerlink" href="#symmetric-real-matrices" title="Link to this heading">#</a></h3>
-<ul>
-<li><p><strong>Target Form:</strong> <strong>Tridiagonal form</strong>.</p></li>
-<li><p><strong>Structure:</strong> If the original matrix <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A = A^T\)</span>), any similarity transformation <span class="math notranslate nohighlight">\(H = Q^T A Q\)</span> will also be symmetric. A <strong>symmetric upper Hessenberg matrix is, by definition, tridiagonal</strong>.</p>
-<div class="math notranslate nohighlight">
-\[\begin{split} T = \begin{pmatrix}
-    \times &amp; \times &amp; 0 &amp; 0 \\
-    \times &amp; \times &amp; \times &amp; 0 \\
-    0 &amp; \times &amp; \times &amp; \times \\
-    0 &amp; 0 &amp; \times &amp; \times
-    \end{pmatrix}
-    \end{split}\]</div>
-</li>
-<li><p><strong>Computational Cost:</strong> This reduction is significantly cheaper, requiring <span class="math notranslate nohighlight">\(\approx \frac{4}{3}n^3\)</span> flops.</p></li>
-</ul>
-<p>This initial reduction is a <em>huge</em> win for the symmetric case. The target matrix <span class="math notranslate nohighlight">\(T\)</span> has only <span class="math notranslate nohighlight">\(O(n)\)</span> non-zero elements, compared to the <span class="math notranslate nohighlight">\(O(n^2)\)</span> elements in the unsymmetric Hessenberg matrix <span class="math notranslate nohighlight">\(H\)</span>.</p>
-</section>
-</section>
-<section id="phase-2-the-shifted-qr-iteration">
-<h2>Phase 2: The Shifted QR Iteration<a class="headerlink" href="#phase-2-the-shifted-qr-iteration" title="Link to this heading">#</a></h2>
-<p>This is the iterative phase where we apply QR steps to the reduced matrix (<span class="math notranslate nohighlight">\(H\)</span> or <span class="math notranslate nohighlight">\(T\)</span>) to find the eigenvalues.</p>
-<section id="id1">
-<h3>Unsymmetric Real Matrices<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<ul>
-<li><p><strong>Eigenvalues:</strong> The eigenvalues can be <strong>real or complex conjugate pairs</strong>.</p></li>
-<li><p><strong>The Problem:</strong> A simple shift like <span class="math notranslate nohighlight">\(\mu = H[n,n]\)</span> will fail to converge if the eigenvalue it’s “chasing” is part of a complex pair. The shift (which is real) will oscillate and never settle.</p></li>
-<li><p><strong>The Algorithm (Francis QR Step):</strong> The standard solution is the <strong>double-shift QR iteration</strong>.</p>
-<ol class="arabic simple">
-<li><p>It uses <em>two</em> shifts, <span class="math notranslate nohighlight">\(\mu_1\)</span> and <span class="math notranslate nohighlight">\(\mu_2\)</span>, which are chosen as the eigenvalues of the bottom-right <span class="math notranslate nohighlight">\(2 \times 2\)</span> submatrix of <span class="math notranslate nohighlight">\(H\)</span>.</p></li>
-<li><p>If the eigenvalues are complex (e.g., <span class="math notranslate nohighlight">\(a \pm bi\)</span>), this choice perfectly captures them.</p></li>
-<li><p>A “bulge chasing” technique performs this double-step implicitly, using only real arithmetic, which is very clever and stable.</p></li>
-</ol>
-</li>
-<li><p><strong>Cost per Iteration:</strong> This “bulge chase” on a Hessenberg matrix costs <strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong> operations.</p></li>
-<li><p><strong>Convergence:</strong> The convergence is generally quadratic with the Francis double-shift:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="symmetric-and-nonsymmetric-qr-iteration">
+<h1>Symmetric and Nonsymmetric QR Iteration<a class="headerlink" href="#symmetric-and-nonsymmetric-qr-iteration" title="Link to this heading">#</a></h1>
+<p>For a real <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(A\)</span>, eigenvalue computation has two stages: reduce the matrix by orthogonal similarity, then apply shifted QR iteration. Symmetry makes both stages cheaper and ensures that all eigenvalues are real.</p>
+<section id="reduction-hessenberg-or-tridiagonal">
+<h2>Reduction: Hessenberg or Tridiagonal<a class="headerlink" href="#reduction-hessenberg-or-tridiagonal" title="Link to this heading">#</a></h2>
+<p>As in <a class="reference internal" href="upper_hessenberg.html"><span class="std std-doc">Hessenberg reduction</span></a>, first compute</p>
 <div class="math notranslate nohighlight">
 \[
-    \epsilon_{k+1} \approx c \, \epsilon_k^2
-    \]</div>
-<p>for some constant <span class="math notranslate nohighlight">\(c &lt; 1\)</span>, where <span class="math notranslate nohighlight">\(\epsilon_k\)</span> is the error at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
-</li>
-<li><p><strong>Final Form:</strong> The iteration converges to the <strong>Schur form</strong>—an upper triangular (or block-upper-triangular) matrix <span class="math notranslate nohighlight">\(S\)</span>. The eigenvalues are on the diagonal (or in <span class="math notranslate nohighlight">\(2 \times 2\)</span> blocks for complex pairs).</p></li>
-</ul>
-</section>
-<section id="id2">
-<h3>Symmetric Real Matrices<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
-<ul>
-<li><p><strong>Eigenvalues:</strong> The eigenvalues are <strong>always real</strong>.</p></li>
-<li><p><strong>The Algorithm (Wilkinson Shift):</strong> Because the eigenvalues are real, we do not need a double-shift. We can use a single, real shift.</p>
-<ol class="arabic simple">
-<li><p>While the <span class="math notranslate nohighlight">\(\mu = T[n,n]\)</span> shift works, a much more robust and faster-converging choice is the <strong>Wilkinson shift</strong>. It’s the eigenvalue of the bottom <span class="math notranslate nohighlight">\(2 \times 2\)</span> submatrix that is <em>closer</em> to <span class="math notranslate nohighlight">\(T[n,n]\)</span>.</p></li>
-<li><p>This shift provides a safeguard against some pathological cases where the simple <span class="math notranslate nohighlight">\(T[n,n]\)</span> shift might fail.</p></li>
-</ol>
-</li>
-<li><p><strong>Cost per Iteration:</strong> Since the matrix is tridiagonal, applying one step of the QR iteration (with “bulge chasing”) is astonishingly cheap. It only costs <strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong> operations.</p></li>
-<li><p><strong>Convergence:</strong> The convergence for the symmetric case with a Wilkinson shift is <strong>globally and cubically convergent</strong>. This is incredibly fast; it’s one of the most powerful results in numerical linear algebra:</p>
+H=Q_{\mathrm{red}}^TAQ_{\mathrm{red}},
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span> is orthogonal. For a general real matrix, <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg and may have <span class="math notranslate nohighlight">\(O(n^2)\)</span> nonzero entries.</p>
+<p>If <span class="math notranslate nohighlight">\(A=A^T\)</span>, then</p>
 <div class="math notranslate nohighlight">
 \[
-    \epsilon_{k+1} \approx c \, \epsilon_k^3
-    \]</div>
-<p>for some constant <span class="math notranslate nohighlight">\(c &lt; 1\)</span>.</p>
-</li>
-<li><p><strong>Final Form:</strong> The iteration converges to a <strong>diagonal matrix</strong> <span class="math notranslate nohighlight">\(D\)</span>. (A symmetric upper triangular matrix is, by definition, diagonal). The eigenvalues are the diagonal entries.</p></li>
-</ul>
+H^T=(Q_{\mathrm{red}}^TAQ_{\mathrm{red}})^T=Q_{\mathrm{red}}^TAQ_{\mathrm{red}}=H.
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(H\)</span> is both symmetric and upper Hessenberg, so it is <strong>tridiagonal</strong>. It has only a diagonal and matching first subdiagonal and superdiagonal, requiring <span class="math notranslate nohighlight">\(O(n)\)</span> storage. Exploiting symmetry also reduces the work of the initial Householder reduction.</p>
+<p>We keep the notation <span class="math notranslate nohighlight">\(H\)</span> for the current matrix, which becomes smaller as eigenvalues are deflated.</p>
+</section>
+<section id="the-nonsymmetric-case">
+<h2>The Nonsymmetric Case<a class="headerlink" href="#the-nonsymmetric-case" title="Link to this heading">#</a></h2>
+<p>The <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">previous section</span></a> describes shift selection and deflation for this case. The eigenvalues of the trailing <span class="math notranslate nohighlight">\(2\times2\)</span> block supply shift estimates. Nonreal shifts are used in conjugate pairs, and the Francis double-shift step allows real arithmetic throughout. Its efficient implementation costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> per step; the implementation details are beyond this summary.</p>
+<p>The target is <strong>real Schur form</strong>: an upper block triangular matrix with <span class="math notranslate nohighlight">\(1\times1\)</span> diagonal blocks for real eigenvalues and <span class="math notranslate nohighlight">\(2\times2\)</span> blocks for nonreal conjugate pairs. Once a <span class="math notranslate nohighlight">\(2\times2\)</span> block separates from the rest of the matrix, its two eigenvalues can be computed directly. Its internal subdiagonal entry need not vanish.</p>
+<p>Trailing-block shifts can stagnate, so practical methods also use exceptional shifts and other safeguards. Rapid local convergence does not guarantee convergence from every starting matrix.</p>
+</section>
+<section id="the-symmetric-case">
+<h2>The Symmetric Case<a class="headerlink" href="#the-symmetric-case" title="Link to this heading">#</a></h2>
+<p>Because every eigenvalue is real, a single real shift is sufficient. Choose a shift <span class="math notranslate nohighlight">\(\mu\)</span> and take the same step as before:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+H-\mu I&amp;=UR,\\
+H_{\mathrm{new}}&amp;=RU+\mu I=U^THU.
+\end{aligned}}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(U\)</span> is orthogonal, <span class="math notranslate nohighlight">\(R\)</span> is upper triangular, and <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span> is the updated matrix. Orthogonal similarity preserves symmetry, and the adjacent-rotation construction preserves Hessenberg form. Consequently, <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span> is again symmetric tridiagonal.</p>
+<section id="why-a-qr-step-costs-only-o-n">
+<h3>Why a QR Step Costs Only <span class="math notranslate nohighlight">\(O(n)\)</span><a class="headerlink" href="#why-a-qr-step-costs-only-o-n" title="Link to this heading">#</a></h3>
+<p>The narrow band makes both the factorization and the reverse product inexpensive. To factor <span class="math notranslate nohighlight">\(H-\mu I\)</span>, use at most <span class="math notranslate nohighlight">\(n-1\)</span> Givens rotations, eliminating the subdiagonal from top to bottom. Each rotation updates only a fixed number of potentially nonzero entries. The resulting <span class="math notranslate nohighlight">\(R\)</span> has at most two superdiagonals.</p>
+<p>Store these rotations and apply them from the right to compute <span class="math notranslate nohighlight">\(RU\)</span>. The intermediate matrices also have a band of fixed width, so each right rotation again requires only a fixed amount of work. Both parts of the step therefore cost <span class="math notranslate nohighlight">\(O(n)\)</span>. This cost assumes that <span class="math notranslate nohighlight">\(U\)</span> is stored as rotations and that the reverse product is computed by applying them, rather than by dense matrix multiplication.</p>
+</section>
+<section id="choosing-the-wilkinson-shift">
+<h3>Choosing the Wilkinson Shift<a class="headerlink" href="#choosing-the-wilkinson-shift" title="Link to this heading">#</a></h3>
+<p>The bottom-right entry <span class="math notranslate nohighlight">\(h_{nn}\)</span> is an inexpensive shift, but it can cycle even for a symmetric matrix. For example, <span class="math notranslate nohighlight">\(H=\begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}\)</span> has bottom-right entry zero. With this shift, the magnitude of its subdiagonal entry remains 1.</p>
+<p>The <strong>Wilkinson shift</strong> uses the trailing symmetric block</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+B=\begin{pmatrix}a&amp;\varepsilon\\\varepsilon&amp;d\end{pmatrix},
+\qquad d=h_{nn}.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\varepsilon\)</span> is the off-diagonal entry. Compute the two eigenvalues of <span class="math notranslate nohighlight">\(B\)</span> and choose the one closer to <span class="math notranslate nohighlight">\(d\)</span>, using a fixed rule to break ties. Explicitly, the candidates are</p>
+<div class="math notranslate nohighlight">
+\[
+\mu_\pm=\frac{a+d}{2}
+\pm\sqrt{\left(\frac{a-d}{2}\right)^2+\varepsilon^2}.
+\]</div>
+<p>They are always real. In the example above they are <span class="math notranslate nohighlight">\(\pm1\)</span>; either choice gives deflation in one step. If <span class="math notranslate nohighlight">\(\varepsilon=0\)</span>, the last eigenvalue is already separated and no QR step is needed. Numerical implementations use scaled formulas to avoid overflow and unnecessary cancellation.</p>
+<p><strong>For real symmetric tridiagonal matrices, Wilkinson-shift QR converges to deflation from every starting matrix in exact arithmetic.</strong> The bottom subdiagonal tends to zero, so it eventually meets any positive deflation tolerance. Repeating the procedure on the remaining blocks computes all the eigenvalues. This global convergence guarantee is a main difference from the usual nonsymmetric trailing-block shift rules; see <a class="reference external" href="https://arxiv.org/abs/0912.3376">Leite, Saldanha, and Tomei</a>.</p>
+</section>
+<section id="why-convergence-is-often-cubic">
+<h3>Why Convergence Is Often Cubic<a class="headerlink" href="#why-convergence-is-often-cubic" title="Link to this heading">#</a></h3>
+<p>To see the effect of symmetry, use the simpler bottom-right shift <span class="math notranslate nohighlight">\(\mu=d\)</span> on the <span class="math notranslate nohighlight">\(2\times2\)</span> matrix <span class="math notranslate nohighlight">\(H=B\)</span> above. Assume <span class="math notranslate nohighlight">\(\varepsilon\ne0\)</span>, and let <span class="math notranslate nohighlight">\(\varepsilon_{\mathrm{new}}\)</span> denote its subdiagonal entry after the step. Since both off-diagonal entries equal <span class="math notranslate nohighlight">\(\varepsilon\)</span>, the previous section’s <span class="math notranslate nohighlight">\(2\times2\)</span> calculation gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+|\varepsilon_{\mathrm{new}}|
+&amp;=\frac{|\varepsilon|^3}{(a-d)^2+\varepsilon^2}\\
+&amp;\approx\frac{|\varepsilon|^3}{(a-d)^2}
+\qquad\text{when }|\varepsilon|\ll|a-d|.
+\end{aligned}
+\end{split}\]</div>
+<p>In this regime, the new off-diagonal entry is approximately proportional to the cube of the old one. This is <strong>cubic local convergence</strong>: once the off-diagonal entry is small and the diagonal entries are separated, it can decrease very rapidly.</p>
+<p>The Wilkinson shift also usually gives cubic local convergence, but some exceptional cases converge only quadratically. The cubic rate is therefore not a universal guarantee; see <a class="reference external" href="https://arxiv.org/abs/0912.3376">Leite, Saldanha, and Tomei’s analysis of shift strategies</a>.</p>
+<p>When a subdiagonal entry is set to zero, symmetry makes the matching superdiagonal entry zero as well. The matrix splits into independent diagonal blocks. Repeated scalar deflation leads to a diagonal matrix <span class="math notranslate nohighlight">\(D\)</span>, so the final factorization is the eigendecomposition</p>
+<div class="math notranslate nohighlight">
+\[
+A=QDQ^T,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(Q\)</span> is the accumulated orthogonal transformation. Its columns are eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 </section>
 </section>
-<section id="summary-cost-and-convergence">
-<h2>3. Summary: Cost and Convergence<a class="headerlink" href="#summary-cost-and-convergence" title="Link to this heading">#</a></h2>
-<p>Here is a side-by-side comparison of finding all eigenvalues.</p>
+<section id="cost-comparison">
+<h2>Cost Comparison<a class="headerlink" href="#cost-comparison" title="Link to this heading">#</a></h2>
+<p>The following costs are for real arithmetic and <strong>eigenvalues only</strong>. Reduction costs cover <span class="math notranslate nohighlight">\(H\)</span> and the stored Householder reflections. The total QR costs assume that only a few steps are needed per eigenvalue on average; more iterations increase these costs.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
-<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
-<th class="head text-left"><p>Symmetric Case (e.g., <code class="docutils literal notranslate"><span class="pre">np.linalg.eigh</span></code>)</p></th>
-<th class="head text-left"><p>Unsymmetric Case (e.g., <code class="docutils literal notranslate"><span class="pre">np.linalg.eig</span></code>)</p></th>
+<tr class="row-odd"><th class="head text-left"><p>Quantity</p></th>
+<th class="head text-left"><p>Symmetric</p></th>
+<th class="head text-left"><p>Nonsymmetric</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Eigenvalues</strong></p></td>
-<td class="text-left"><p>Always <strong>real</strong></p></td>
-<td class="text-left"><p>Can be <strong>real or complex conjugate pairs</strong></p></td>
+<tr class="row-even"><td class="text-left"><p>Reduced form</p></td>
+<td class="text-left"><p>Tridiagonal</p></td>
+<td class="text-left"><p>Upper Hessenberg</p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Phase 1: Form</strong></p></td>
-<td class="text-left"><p><strong>Tridiagonal</strong> (<span class="math notranslate nohighlight">\(O(n)\)</span> non-zeros)</p></td>
-<td class="text-left"><p><strong>Upper Hessenberg</strong> (<span class="math notranslate nohighlight">\(O(n^2)\)</span> non-zeros)</p></td>
+<tr class="row-odd"><td class="text-left"><p>Reduction cost</p></td>
+<td class="text-left"><p>About <span class="math notranslate nohighlight">\(\frac43n^3\)</span> flops</p></td>
+<td class="text-left"><p>About <span class="math notranslate nohighlight">\(\frac{10}{3}n^3\)</span> flops</p></td>
 </tr>
-<tr class="row-even"><td class="text-left"><p><strong>Phase 1: Cost</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(\approx \frac{4}{3}n^3\)</span> flops</p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(\approx \frac{10}{3}n^3\)</span> flops</p></td>
+<tr class="row-even"><td class="text-left"><p>QR step on a block of size <span class="math notranslate nohighlight">\(n\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n)\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^2)\)</span></p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Phase 2: Shift</strong></p></td>
-<td class="text-left"><p>Single real shift (e.g., Wilkinson)</p></td>
-<td class="text-left"><p>Double shift (Francis QR step)</p></td>
+<tr class="row-odd"><td class="text-left"><p>Typical total QR-phase cost</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^2)\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3)\)</span></p></td>
 </tr>
-<tr class="row-even"><td class="text-left"><p><strong>Phase 2: Cost / Iteration</strong></p></td>
-<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n)\)</span></strong></p></td>
-<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong></p></td>
+<tr class="row-even"><td class="text-left"><p>Total cost including reduction</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3)\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3)\)</span></p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Phase 2: Convergence</strong></p></td>
-<td class="text-left"><p><strong>Cubic</strong> (extremely fast)</p></td>
-<td class="text-left"><p><strong>Quadratic</strong></p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Phase 2: Total Cost</strong></p></td>
-<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n^2)\)</span></strong></p></td>
-<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(n^3)\)</span></strong></p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Overall Total Cost</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3) + O(n^2) = \mathbf{O(n^3)}\)</span></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n^3) + O(n^3) = \mathbf{O(n^3)}\)</span></p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Final Form</strong></p></td>
-<td class="text-left"><p><strong>Diagonal</strong> (Schur form is diagonal)</p></td>
-<td class="text-left"><p><strong>Upper Triangular</strong> (Schur form)</p></td>
+<tr class="row-odd"><td class="text-left"><p>Final real Schur form</p></td>
+<td class="text-left"><p>Diagonal</p></td>
+<td class="text-left"><p>Upper block triangular</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>Key Takeaway on Cost:</strong></p>
-<p>While both algorithms have the same asymptotic complexity of <span class="math notranslate nohighlight">\(O(n^3)\)</span>, the <strong>symmetric case is significantly faster</strong>.</p>
-<ul class="simple">
-<li><p>The <span class="math notranslate nohighlight">\(O(n^3)\)</span> reduction step has a smaller constant (<span class="math notranslate nohighlight">\(\frac{4}{3}\)</span> vs. <span class="math notranslate nohighlight">\(\frac{10}{3}\)</span>).</p></li>
-<li><p>The <span class="math notranslate nohighlight">\(O(n^3)\)</span> iterative phase for the unsymmetric case is completely <em>avoided</em> in the symmetric case, which has an almost-negligible <span class="math notranslate nohighlight">\(O(n^2)\)</span> iterative cost.</p></li>
-<li><p>Therefore, the total cost for the symmetric problem is dominated <em>only</em> by the initial reduction, whereas both phases contribute significantly to the cost of the unsymmetric problem.</p></li>
-</ul>
+<p>For a dense symmetric matrix, the initial reduction usually dominates the eigenvalue-only cost. In the nonsymmetric case, both reduction and QR iteration contribute at order <span class="math notranslate nohighlight">\(n^3\)</span>.</p>
+<p>If eigenvectors are also required, the symmetric QR phase becomes more expensive. Each Givens rotation must update two full columns of the accumulated matrix <span class="math notranslate nohighlight">\(Q\)</span>, costing <span class="math notranslate nohighlight">\(O(n)\)</span> per rotation. A full-size step then costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>, and the usual total cost of accumulating all eigenvectors is <span class="math notranslate nohighlight">\(O(n^3)\)</span>. The <span class="math notranslate nohighlight">\(O(n)\)</span> step cost applies to eigenvalues alone. <a class="reference external" href="https://www.netlib.org/lapack/lug/node48.html">LAPACK’s symmetric eigenproblem guide</a> distinguishes these outputs and also describes alternatives to QR iteration.</p>
 </section>
 </section>
 
@@ -702,17 +669,15 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-1-reduction-to-upper-hessenberg-form">Phase 1: Reduction to Upper Hessenberg Form</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unsymmetric-real-matrices">Unsymmetric Real Matrices</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-real-matrices">Symmetric Real Matrices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reduction-hessenberg-or-tridiagonal">Reduction: Hessenberg or Tridiagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-nonsymmetric-case">The Nonsymmetric Case</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-symmetric-case">The Symmetric Case</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-qr-step-costs-only-o-n">Why a QR Step Costs Only <span class="math notranslate nohighlight">\(O(n)\)</span></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-wilkinson-shift">Choosing the Wilkinson Shift</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-convergence-is-often-cubic">Why Convergence Is Often Cubic</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-2-the-shifted-qr-iteration">Phase 2: The Shifted QR Iteration</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Unsymmetric Real Matrices</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Symmetric Real Matrices</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-cost-and-convergence">3. Summary: Cost and Convergence</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-comparison">Cost Comparison</a></li>
 </ul>
   </nav></div>
 

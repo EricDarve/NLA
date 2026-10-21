@@ -2,15 +2,21 @@
 
 The [QR iteration](qr_iteration.md) replaces a matrix by a unitarily similar one whose entries below the diagonal approach zero under suitable convergence assumptions. For a dense $n\times n$ matrix, each QR factorization and reverse multiplication costs $O(n^3)$ operations. Repeating these dense operations is expensive.
 
-A one-time reduction to **upper Hessenberg form** makes each subsequent QR step cost only $O(n^2)$. We first construct
+A one-time reduction to **upper Hessenberg form** makes each subsequent QR step cost only $O(n^2)$.
+
+The preceding analysis allowed complex matrices. Here we describe the reduction for a real matrix $A$, so the transformations are orthogonal and $^{H}$ becomes the ordinary transpose $^{T}$. Write the reduction as
 
 $$
-\boxed{H=Q_H^TAQ_H,\qquad A=Q_H\,H\,Q_H^T,}
+\boxed{
+\begin{aligned}
+H&=Q_{\mathrm{red}}^TAQ_{\mathrm{red}},\\
+A&=Q_{\mathrm{red}}\,H\,Q_{\mathrm{red}}^T.
+\end{aligned}}
 $$
 
-where $Q_H$ is orthogonal and $H$ is upper Hessenberg. Thus $H$ has the same eigenvalues as $A$, and we can start QR iteration from $T_0=H$.
+Here $Q_{\mathrm{red}}$ is the orthogonal reduction factor and $H$ is upper Hessenberg. Thus $H$ has the same eigenvalues as $A$, and we can start QR iteration from $T_0=H$.
 
-We describe the reduction using real symmetric reflections. For a complex matrix, the corresponding factorization is $H=Q_H^HAQ_H$ with $Q_H$ unitary.
+We describe the reduction using real symmetric reflections. For a complex matrix, the corresponding factorization is $H=Q_{\mathrm{red}}^HAQ_{\mathrm{red}}$ with $Q_{\mathrm{red}}$ unitary.
 
 ## Why Leave One Subdiagonal?
 
@@ -79,13 +85,13 @@ Expanding the successive updates gives
 $$
 \begin{aligned}
 H&=P_{n-2}\cdots P_1\,A\,P_1\cdots P_{n-2},\\
-Q_H&=P_1\cdots P_{n-2}.
+Q_{\mathrm{red}}&=P_1\cdots P_{n-2}.
 \end{aligned}
 $$
 
-Since each reflection is symmetric, the product on the left is $Q_H^T$, giving the convention $H=Q_H^TAQ_H$ used throughout this page.
+Since each reflection is symmetric, the product on the left is $Q_{\mathrm{red}}^T$, giving the convention $H=Q_{\mathrm{red}}^TAQ_{\mathrm{red}}$ used throughout this page.
 
-The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices $P_j$. The vectors can be stored in the eliminated part of $A$; $Q_H$ need not be formed when only eigenvalues are wanted. This is the representation used by [LAPACK's Hessenberg reduction](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html). If $Hv=\lambda v$, then $Q_Hv$ is an eigenvector of $A$, so the stored transformations also let us recover eigenvectors later.
+The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices $P_j$. The vectors can be stored in the eliminated part of $A$; $Q_{\mathrm{red}}$ need not be formed when only eigenvalues are wanted. This is the representation used by [LAPACK's Hessenberg reduction](https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html). If $Hv=\lambda v$, then $Q_{\mathrm{red}}v$ is an eigenvector of $A$, so the stored transformations also let us recover eigenvectors later.
 
 ## QR Iteration on the Hessenberg Matrix
 
@@ -117,7 +123,7 @@ Start with the upper triangular matrix $R_{k+1}$. The first right rotation mixes
 
 Applying the rotations from the right also costs $O(n^2)$. **Both parts of the QR step must exploit the rotations.** Forming a dense $U_{k+1}$ and using a general dense multiplication for $R_{k+1}U_{k+1}$ would lose this saving.
 
-This argument uses the adjacent-row QR construction, so it remains valid when a subdiagonal entry is already zero or $T_k$ is singular: unnecessary rotations can be taken as the identity. It does not rely on a unique QR factorization. Subtracting a scalar shift changes only the diagonal, so the same structure and cost apply to a single shifted QR step.
+This argument uses the adjacent-row QR construction, so it remains valid when a subdiagonal entry is already zero or $T_k$ is singular: unnecessary rotations can be taken as the identity. It does not rely on a unique QR factorization.
 
 ## Computational Cost
 
@@ -128,7 +134,7 @@ $$
 =\frac{10}{3}n^3+O(n^2).
 $$
 
-This cost produces $H$ and an implicit representation of $Q_H$. Forming $Q_H$ explicitly by backward accumulation of the stored reflections adds approximately $\frac43n^3$ flops, giving a total of $\frac{14}{3}n^3$ to obtain both matrices.
+This cost produces $H$ and an implicit representation of $Q_{\mathrm{red}}$. Forming $Q_{\mathrm{red}}$ explicitly by backward accumulation of the stored reflections adds approximately $\frac43n^3$ flops, giving a total of $\frac{14}{3}n^3$ to obtain both matrices.
 
 If $k$ structured QR steps are performed after reduction, the total cost is
 
@@ -136,18 +142,18 @@ $$
 \boxed{O(n^3+kn^2),}
 $$
 
-compared with $O(kn^3)$ for dense QR iteration without reduction. If $k=O(n)$, these estimates become $O(n^3)$ and $O(n^4)$, respectively. This is a cost comparison, not a convergence guarantee: unshifted QR iteration need not finish in $O(n)$ steps. Hessenberg reduction lowers the cost of each step without changing the eigenvalue ratios that control convergence.
+compared with $O(kn^3)$ for dense QR iteration without reduction. If $k=O(n)$, these estimates become $O(n^3)$ and $O(n^4)$, respectively. This is a cost comparison, not a convergence guarantee: basic QR iteration need not finish in $O(n)$ steps. Hessenberg reduction lowers the cost of each step without changing the eigenvalue ratios that control convergence.
 
 ## The Symmetric Case: Tridiagonal Form
 
 If $A=A^T$, orthogonal similarity preserves symmetry:
 
 $$
-H^T=(Q_H^TAQ_H)^T=Q_H^TAQ_H=H.
+H^T=(Q_{\mathrm{red}}^TAQ_{\mathrm{red}})^T=Q_{\mathrm{red}}^TAQ_{\mathrm{red}}=H.
 $$
 
 A symmetric upper Hessenberg matrix is tridiagonal: every zero below the first subdiagonal has a matching zero above the first superdiagonal. Exploiting symmetry in the reduction lowers its leading cost to $\frac43n^3$ flops for the tridiagonal matrix and stored reflections.
 
 A QR step then preserves both symmetry and Hessenberg form, so the iterates remain tridiagonal. Exploiting this narrow band structure and storing the rotations implicitly makes each step cost $O(n)$ when only eigenvalues are wanted. Accumulating these rotations into a full eigenvector matrix instead costs $O(n^2)$ per step. The [comparison of symmetric and nonsymmetric QR iteration](symmetric_vs_nonsymmetric_qr.md) develops these cases further.
 
-With the cost of each step reduced, the [next section](qr_iteration_with_shifts.md) explains how shifts can reduce the number of steps needed for convergence.
+The [next section](qr_iteration_with_shifts.md) develops a modification of QR iteration that can reduce the number of steps needed for convergence.

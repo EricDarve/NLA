@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -480,13 +480,18 @@
   <section class="tex2jax_ignore mathjax_ignore" id="hessenberg-reduction-and-qr-iteration">
 <h1>Hessenberg Reduction and QR Iteration<a class="headerlink" href="#hessenberg-reduction-and-qr-iteration" title="Link to this heading">#</a></h1>
 <p>The <a class="reference internal" href="qr_iteration.html"><span class="std std-doc">QR iteration</span></a> replaces a matrix by a unitarily similar one whose entries below the diagonal approach zero under suitable convergence assumptions. For a dense <span class="math notranslate nohighlight">\(n\times n\)</span> matrix, each QR factorization and reverse multiplication costs <span class="math notranslate nohighlight">\(O(n^3)\)</span> operations. Repeating these dense operations is expensive.</p>
-<p>A one-time reduction to <strong>upper Hessenberg form</strong> makes each subsequent QR step cost only <span class="math notranslate nohighlight">\(O(n^2)\)</span>. We first construct</p>
+<p>A one-time reduction to <strong>upper Hessenberg form</strong> makes each subsequent QR step cost only <span class="math notranslate nohighlight">\(O(n^2)\)</span>.</p>
+<p>The preceding analysis allowed complex matrices. Here we describe the reduction for a real matrix <span class="math notranslate nohighlight">\(A\)</span>, so the transformations are orthogonal and <span class="math notranslate nohighlight">\(^{H}\)</span> becomes the ordinary transpose <span class="math notranslate nohighlight">\(^{T}\)</span>. Write the reduction as</p>
 <div class="math notranslate nohighlight">
-\[
-\boxed{H=Q_H^TAQ_H,\qquad A=Q_H\,H\,Q_H^T,}
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(Q_H\)</span> is orthogonal and <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg. Thus <span class="math notranslate nohighlight">\(H\)</span> has the same eigenvalues as <span class="math notranslate nohighlight">\(A\)</span>, and we can start QR iteration from <span class="math notranslate nohighlight">\(T_0=H\)</span>.</p>
-<p>We describe the reduction using real symmetric reflections. For a complex matrix, the corresponding factorization is <span class="math notranslate nohighlight">\(H=Q_H^HAQ_H\)</span> with <span class="math notranslate nohighlight">\(Q_H\)</span> unitary.</p>
+\[\begin{split}
+\boxed{
+\begin{aligned}
+H&amp;=Q_{\mathrm{red}}^TAQ_{\mathrm{red}},\\
+A&amp;=Q_{\mathrm{red}}\,H\,Q_{\mathrm{red}}^T.
+\end{aligned}}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span> is the orthogonal reduction factor and <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg. Thus <span class="math notranslate nohighlight">\(H\)</span> has the same eigenvalues as <span class="math notranslate nohighlight">\(A\)</span>, and we can start QR iteration from <span class="math notranslate nohighlight">\(T_0=H\)</span>.</p>
+<p>We describe the reduction using real symmetric reflections. For a complex matrix, the corresponding factorization is <span class="math notranslate nohighlight">\(H=Q_{\mathrm{red}}^HAQ_{\mathrm{red}}\)</span> with <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span> unitary.</p>
 <section id="why-leave-one-subdiagonal">
 <h2>Why Leave One Subdiagonal?<a class="headerlink" href="#why-leave-one-subdiagonal" title="Link to this heading">#</a></h2>
 <p>An <span class="math notranslate nohighlight">\(n\times n\)</span> matrix <span class="math notranslate nohighlight">\(H\)</span> is upper Hessenberg if</p>
@@ -544,11 +549,11 @@ P_j=\begin{pmatrix}I_j&amp;0\\0&amp;\widehat P_j\end{pmatrix},
 \[\begin{split}
 \begin{aligned}
 H&amp;=P_{n-2}\cdots P_1\,A\,P_1\cdots P_{n-2},\\
-Q_H&amp;=P_1\cdots P_{n-2}.
+Q_{\mathrm{red}}&amp;=P_1\cdots P_{n-2}.
 \end{aligned}
 \end{split}\]</div>
-<p>Since each reflection is symmetric, the product on the left is <span class="math notranslate nohighlight">\(Q_H^T\)</span>, giving the convention <span class="math notranslate nohighlight">\(H=Q_H^TAQ_H\)</span> used throughout this page.</p>
-<p>The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices <span class="math notranslate nohighlight">\(P_j\)</span>. The vectors can be stored in the eliminated part of <span class="math notranslate nohighlight">\(A\)</span>; <span class="math notranslate nohighlight">\(Q_H\)</span> need not be formed when only eigenvalues are wanted. This is the representation used by <a class="reference external" href="https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html">LAPACK’s Hessenberg reduction</a>. If <span class="math notranslate nohighlight">\(Hv=\lambda v\)</span>, then <span class="math notranslate nohighlight">\(Q_Hv\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(A\)</span>, so the stored transformations also let us recover eigenvectors later.</p>
+<p>Since each reflection is symmetric, the product on the left is <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}^T\)</span>, giving the convention <span class="math notranslate nohighlight">\(H=Q_{\mathrm{red}}^TAQ_{\mathrm{red}}\)</span> used throughout this page.</p>
+<p>The reflections are applied using their vectors and rank-one updates, rather than by forming dense matrices <span class="math notranslate nohighlight">\(P_j\)</span>. The vectors can be stored in the eliminated part of <span class="math notranslate nohighlight">\(A\)</span>; <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span> need not be formed when only eigenvalues are wanted. This is the representation used by <a class="reference external" href="https://www.netlib.org/lapack/explore-html/d2/d28/group__gehrd_ga74cea8f05a014cca243674999f71c238.html">LAPACK’s Hessenberg reduction</a>. If <span class="math notranslate nohighlight">\(Hv=\lambda v\)</span>, then <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}v\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(A\)</span>, so the stored transformations also let us recover eigenvectors later.</p>
 </section>
 </section>
 <section id="qr-iteration-on-the-hessenberg-matrix">
@@ -575,7 +580,7 @@ T_{k+1}&amp;=R_{k+1}U_{k+1}
 <p>The similarity relation preserves the eigenvalues; the product of saved rotations makes the update inexpensive.</p>
 <p>Start with the upper triangular matrix <span class="math notranslate nohighlight">\(R_{k+1}\)</span>. The first right rotation mixes columns 1 and 2, possibly creating entry <span class="math notranslate nohighlight">\((2,1)\)</span>. The second mixes columns 2 and 3, possibly creating entry <span class="math notranslate nohighlight">\((3,2)\)</span>, while leaving column 1 unchanged. In general, when columns <span class="math notranslate nohighlight">\(j,j+1\)</span> are mixed, both are zero below row <span class="math notranslate nohighlight">\(j+1\)</span>. Only a first-subdiagonal entry can be introduced into column <span class="math notranslate nohighlight">\(j\)</span>, and that column is not changed again. Hence <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is upper Hessenberg.</p>
 <p>Applying the rotations from the right also costs <span class="math notranslate nohighlight">\(O(n^2)\)</span>. <strong>Both parts of the QR step must exploit the rotations.</strong> Forming a dense <span class="math notranslate nohighlight">\(U_{k+1}\)</span> and using a general dense multiplication for <span class="math notranslate nohighlight">\(R_{k+1}U_{k+1}\)</span> would lose this saving.</p>
-<p>This argument uses the adjacent-row QR construction, so it remains valid when a subdiagonal entry is already zero or <span class="math notranslate nohighlight">\(T_k\)</span> is singular: unnecessary rotations can be taken as the identity. It does not rely on a unique QR factorization. Subtracting a scalar shift changes only the diagonal, so the same structure and cost apply to a single shifted QR step.</p>
+<p>This argument uses the adjacent-row QR construction, so it remains valid when a subdiagonal entry is already zero or <span class="math notranslate nohighlight">\(T_k\)</span> is singular: unnecessary rotations can be taken as the identity. It does not rely on a unique QR factorization.</p>
 </section>
 <section id="computational-cost">
 <h2>Computational Cost<a class="headerlink" href="#computational-cost" title="Link to this heading">#</a></h2>
@@ -585,24 +590,24 @@ T_{k+1}&amp;=R_{k+1}U_{k+1}
 \sum_{j=1}^{n-2}\bigl[4(n-j)^2+4n(n-j)\bigr]
 =\frac{10}{3}n^3+O(n^2).
 \]</div>
-<p>This cost produces <span class="math notranslate nohighlight">\(H\)</span> and an implicit representation of <span class="math notranslate nohighlight">\(Q_H\)</span>. Forming <span class="math notranslate nohighlight">\(Q_H\)</span> explicitly by backward accumulation of the stored reflections adds approximately <span class="math notranslate nohighlight">\(\frac43n^3\)</span> flops, giving a total of <span class="math notranslate nohighlight">\(\frac{14}{3}n^3\)</span> to obtain both matrices.</p>
+<p>This cost produces <span class="math notranslate nohighlight">\(H\)</span> and an implicit representation of <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span>. Forming <span class="math notranslate nohighlight">\(Q_{\mathrm{red}}\)</span> explicitly by backward accumulation of the stored reflections adds approximately <span class="math notranslate nohighlight">\(\frac43n^3\)</span> flops, giving a total of <span class="math notranslate nohighlight">\(\frac{14}{3}n^3\)</span> to obtain both matrices.</p>
 <p>If <span class="math notranslate nohighlight">\(k\)</span> structured QR steps are performed after reduction, the total cost is</p>
 <div class="math notranslate nohighlight">
 \[
 \boxed{O(n^3+kn^2),}
 \]</div>
-<p>compared with <span class="math notranslate nohighlight">\(O(kn^3)\)</span> for dense QR iteration without reduction. If <span class="math notranslate nohighlight">\(k=O(n)\)</span>, these estimates become <span class="math notranslate nohighlight">\(O(n^3)\)</span> and <span class="math notranslate nohighlight">\(O(n^4)\)</span>, respectively. This is a cost comparison, not a convergence guarantee: unshifted QR iteration need not finish in <span class="math notranslate nohighlight">\(O(n)\)</span> steps. Hessenberg reduction lowers the cost of each step without changing the eigenvalue ratios that control convergence.</p>
+<p>compared with <span class="math notranslate nohighlight">\(O(kn^3)\)</span> for dense QR iteration without reduction. If <span class="math notranslate nohighlight">\(k=O(n)\)</span>, these estimates become <span class="math notranslate nohighlight">\(O(n^3)\)</span> and <span class="math notranslate nohighlight">\(O(n^4)\)</span>, respectively. This is a cost comparison, not a convergence guarantee: basic QR iteration need not finish in <span class="math notranslate nohighlight">\(O(n)\)</span> steps. Hessenberg reduction lowers the cost of each step without changing the eigenvalue ratios that control convergence.</p>
 </section>
 <section id="the-symmetric-case-tridiagonal-form">
 <h2>The Symmetric Case: Tridiagonal Form<a class="headerlink" href="#the-symmetric-case-tridiagonal-form" title="Link to this heading">#</a></h2>
 <p>If <span class="math notranslate nohighlight">\(A=A^T\)</span>, orthogonal similarity preserves symmetry:</p>
 <div class="math notranslate nohighlight">
 \[
-H^T=(Q_H^TAQ_H)^T=Q_H^TAQ_H=H.
+H^T=(Q_{\mathrm{red}}^TAQ_{\mathrm{red}})^T=Q_{\mathrm{red}}^TAQ_{\mathrm{red}}=H.
 \]</div>
 <p>A symmetric upper Hessenberg matrix is tridiagonal: every zero below the first subdiagonal has a matching zero above the first superdiagonal. Exploiting symmetry in the reduction lowers its leading cost to <span class="math notranslate nohighlight">\(\frac43n^3\)</span> flops for the tridiagonal matrix and stored reflections.</p>
 <p>A QR step then preserves both symmetry and Hessenberg form, so the iterates remain tridiagonal. Exploiting this narrow band structure and storing the rotations implicitly makes each step cost <span class="math notranslate nohighlight">\(O(n)\)</span> when only eigenvalues are wanted. Accumulating these rotations into a full eigenvector matrix instead costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> per step. The <a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html"><span class="std std-doc">comparison of symmetric and nonsymmetric QR iteration</span></a> develops these cases further.</p>
-<p>With the cost of each step reduced, the <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">next section</span></a> explains how shifts can reduce the number of steps needed for convergence.</p>
+<p>The <a class="reference internal" href="qr_iteration_with_shifts.html"><span class="std std-doc">next section</span></a> develops a modification of QR iteration that can reduce the number of steps needed for convergence.</p>
 </section>
 </section>
 

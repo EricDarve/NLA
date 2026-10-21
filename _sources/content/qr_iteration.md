@@ -134,18 +134,20 @@ Let $A$ be a square matrix. Let the sequences of matrices $\{T_k\}$, $\{U_k\}$, 
 
 where $U_{k+1}$ is a unitary matrix and $R_{k+1}$ is an upper triangular matrix.
 
-If we define the product matrices $\tilde{Q}_k$ and $\tilde{R}_k$ as:
-* $\tilde{Q}_k = U_1 U_2 \cdots U_k$
-* $\tilde{R}_k = R_k R_{k-1} \cdots R_1$
+Use the same accumulated triangular factor $\widetilde R_k=R_k\cdots R_1$ as in orthogonal iteration. Define the product matrices:
+* $\widetilde Q_k = U_1 U_2 \cdots U_k$
+* $\widetilde R_k = R_k R_{k-1} \cdots R_1$
 
 Then for any integer $k \ge 1$, the $k$-th power of the matrix $A$ is given by:
 
 $$
-A^k = \tilde{Q}_k \tilde{R}_k
+A^k = \widetilde Q_k \widetilde R_k
 $$
 ```
 
 The proof is provided at the end of this section.
+
+Thus $\widetilde Q_k=Q_k$ when orthogonal iteration starts from $Q_0=I$.
 
 ## QR Iteration Steps
 
@@ -199,7 +201,7 @@ Under the convergence assumptions above, the entries below the diagonal of $T_k$
 ## Proof of Decomposition of $A^k$
 
 ```{prf:proof}
-Use the product matrices $\tilde Q_k=U_1\cdots U_k$ and $\tilde R_k=R_k\cdots R_1$ defined in the theorem. We first relate $T_k$ to $A$, then use that relation to prove the formula for $A^k$.
+Use the product matrices $\widetilde Q_k=U_1\cdots U_k$ and $\widetilde R_k=R_k\cdots R_1$ defined in the theorem. We first relate $T_k$ to $A$, then use that relation to prove the formula for $A^k$.
 
 Each QR step gives the unitary similarity
 
@@ -214,29 +216,29 @@ $$
 \begin{aligned}
 T_k
 &=U_k^H\cdots U_1^H\,A\,U_1\cdots U_k\\
-&=\tilde Q_k^HA\tilde Q_k.
+&=\widetilde Q_k^HA\widetilde Q_k.
 \end{aligned}
 $$
 
-The second equality uses $(U_1\cdots U_k)^H=U_k^H\cdots U_1^H$. Since $\tilde Q_k$ is unitary, multiplying on the left by $\tilde Q_k$ gives
+The second equality uses $(U_1\cdots U_k)^H=U_k^H\cdots U_1^H$. Since $\widetilde Q_k$ is unitary, multiplying on the left by $\widetilde Q_k$ gives
 
 $$
-A\tilde Q_k=\tilde Q_kT_k.
+A\widetilde Q_k=\widetilde Q_kT_k.
 $$
 
-For $k=1$, the first QR factorization gives $A=U_1R_1=\tilde Q_1\tilde R_1$. Assume now that $A^k=\tilde Q_k\tilde R_k$. Then
+For $k=1$, the first QR factorization gives $A=U_1R_1=\widetilde Q_1\widetilde R_1$. Assume now that $A^k=\widetilde Q_k\widetilde R_k$. Then
 
 $$
 \begin{aligned}
 A^{k+1}
-&=A(\tilde Q_k\tilde R_k)\\
-&=(A\tilde Q_k)\tilde R_k\\
-&=\tilde Q_kT_k\tilde R_k\\
-&=\tilde Q_k(U_{k+1}R_{k+1})\tilde R_k\\
-&=(\tilde Q_kU_{k+1})(R_{k+1}\tilde R_k)\\
-&=\tilde Q_{k+1}\tilde R_{k+1}.
+&=A(\widetilde Q_k\widetilde R_k)\\
+&=(A\widetilde Q_k)\widetilde R_k\\
+&=\widetilde Q_kT_k\widetilde R_k\\
+&=\widetilde Q_k(U_{k+1}R_{k+1})\widetilde R_k\\
+&=(\widetilde Q_kU_{k+1})(R_{k+1}\widetilde R_k)\\
+&=\widetilde Q_{k+1}\widetilde R_{k+1}.
 \end{aligned}
 $$
 
-This proves the result by induction. The new unitary factor is appended on the right of $\tilde Q_k$, while the new triangular factor is placed on the left of $\tilde R_k$. This explains the opposite orders of the two products.
+This proves the result by induction. The new unitary factor is appended on the right of $\widetilde Q_k$, while the new triangular factor is placed on the left of $\widetilde R_k$. This explains the opposite orders of the two products.
 ```

@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -485,45 +485,45 @@
 \[\begin{split}
 A=\begin{pmatrix}4&amp;1\\0&amp;2\end{pmatrix}.
 \end{split}\]</div>
-<p>Its eigenvalues are <span class="math notranslate nohighlight">\(\lambda_1=4\)</span> and <span class="math notranslate nohighlight">\(\lambda_2=2\)</span>. Corresponding eigenvectors are <span class="math notranslate nohighlight">\((1,0)^T\)</span> and <span class="math notranslate nohighlight">\(\boldsymbol{x}_2=(-1,2)^T\)</span>.</p>
+<p>Its eigenvalues are <span class="math notranslate nohighlight">\(\lambda_1=4\)</span> and <span class="math notranslate nohighlight">\(\lambda_2=2\)</span>. Corresponding eigenvectors are <span class="math notranslate nohighlight">\((1,0)^T\)</span> and <span class="math notranslate nohighlight">\(x_2=(-1,2)^T\)</span>.</p>
 <p>Suppose the power method has found the first unit direction exactly:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\boldsymbol q_{\star,1}=\begin{pmatrix}1\\0\end{pmatrix}.
+q_{\star,1}=\begin{pmatrix}1\\0\end{pmatrix}.
 \end{split}\]</div>
 <p>The star marks an exact basis direction, to distinguish it from numerical iterates. The orthogonal projection onto the perpendicular direction is</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-P_1=I-\boldsymbol q_{\star,1}\boldsymbol q_{\star,1}^H
+P_1=I-q_{\star,1}q_{\star,1}^H
 =\begin{pmatrix}0&amp;0\\0&amp;1\end{pmatrix}.
 \end{split}\]</div>
-<p>Projecting <span class="math notranslate nohighlight">\(\boldsymbol{x}_2\)</span> and normalizing gives a perpendicular unit vector:</p>
+<p>Projecting <span class="math notranslate nohighlight">\(x_2\)</span> and normalizing gives a perpendicular unit vector:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-P_1\boldsymbol{x}_2=\begin{pmatrix}0\\2\end{pmatrix},
+P_1x_2=\begin{pmatrix}0\\2\end{pmatrix},
 \qquad
-\boldsymbol q_{\star,2}
-=\frac{P_1\boldsymbol{x}_2}{\|P_1\boldsymbol{x}_2\|_2}
+q_{\star,2}
+=\frac{P_1x_2}{\|P_1x_2\|_2}
 =\begin{pmatrix}0\\1\end{pmatrix}.
 \end{split}\]</div>
-<p>This changes the direction: <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,2}\)</span> is not an eigenvector of <span class="math notranslate nohighlight">\(A\)</span>. Multiplication by <span class="math notranslate nohighlight">\(A\)</span> brings back a component along the first direction:</p>
+<p>This changes the direction: <span class="math notranslate nohighlight">\(q_{\star,2}\)</span> is not an eigenvector of <span class="math notranslate nohighlight">\(A\)</span>. Multiplication by <span class="math notranslate nohighlight">\(A\)</span> brings back a component along the first direction:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-A\boldsymbol q_{\star,2}
+Aq_{\star,2}
 =\begin{pmatrix}1\\2\end{pmatrix}
-=\boldsymbol q_{\star,1}+2\boldsymbol q_{\star,2}.
+=q_{\star,1}+2q_{\star,2}.
 \end{split}\]</div>
 <p>Projection removes that component:</p>
 <div class="math notranslate nohighlight">
 \[
-P_1A\boldsymbol q_{\star,2}=2\boldsymbol q_{\star,2}.
+P_1Aq_{\star,2}=2q_{\star,2}.
 \]</div>
-<p>Thus <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,2}\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(P_1A\)</span> with eigenvalue <span class="math notranslate nohighlight">\(2\)</span>, the second eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>. Starting perpendicular to the first direction was not enough: we had to project again after multiplication.</p>
+<p>Thus <span class="math notranslate nohighlight">\(q_{\star,2}\)</span> is an eigenvector of <span class="math notranslate nohighlight">\(P_1A\)</span> with eigenvalue <span class="math notranslate nohighlight">\(2\)</span>, the second eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>. Starting perpendicular to the first direction was not enough: we had to project again after multiplication.</p>
 <figure class="align-default" id="fig-deflation-geometry">
 <a class="reference internal image-reference" href="../_images/deflation_geometry.svg"><img alt="Two diagrams illustrate deflation for the matrix with rows (4,1) and (0,2). On the left, the blue eigenvector x2=(-1,2) is projected horizontally onto the vertical complement of the known direction q-star-1. Its purple projection (0,2) is normalized to q-star-2=(0,1). On the right, A sends q-star-2 to the blue vector (1,2). An orange horizontal projection removes the known component and leaves the purple vector 2 q-star-2=(0,2)." src="../_images/deflation_geometry.svg" style="width: 820px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 15 </span><span class="caption-text">Left: projection changes the eigenvector’s direction; normalization gives <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,2}\)</span>. Right: applying <span class="math notranslate nohighlight">\(A\)</span> to this new direction creates a component along the known horizontal direction. Removing it leaves <span class="math notranslate nohighlight">\(2\boldsymbol q_{\star,2}\)</span>. The eigenvalue <span class="math notranslate nohighlight">\(2\)</span> is preserved even though the eigenvector has changed.</span><a class="headerlink" href="#fig-deflation-geometry" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 15 </span><span class="caption-text">Left: projection changes the eigenvector’s direction; normalization gives <span class="math notranslate nohighlight">\(q_{\star,2}\)</span>. Right: applying <span class="math notranslate nohighlight">\(A\)</span> to this new direction creates a component along the known horizontal direction. Removing it leaves <span class="math notranslate nohighlight">\(2q_{\star,2}\)</span>. The eigenvalue <span class="math notranslate nohighlight">\(2\)</span> is preserved even though the eigenvector has changed.</span><a class="headerlink" href="#fig-deflation-geometry" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 </section>
@@ -532,32 +532,32 @@ P_1A\boldsymbol q_{\star,2}=2\boldsymbol q_{\star,2}.
 <p>Suppose we have found <span class="math notranslate nohighlight">\(i\)</span> orthonormal directions. Collect them in</p>
 <div class="math notranslate nohighlight">
 \[
-Q_{\star,i}=[\boldsymbol q_{\star,1},\ldots,\boldsymbol q_{\star,i}],
+Q_{\star,i}=[q_{\star,1},\ldots,q_{\star,i}],
 \qquad
 \mathcal S_i=\operatorname{range}(Q_{\star,i}).
 \]</div>
 <p>Assume that <span class="math notranslate nohighlight">\(\mathcal S_i\)</span> is <strong>invariant under <span class="math notranslate nohighlight">\(A\)</span></strong>: applying <span class="math notranslate nohighlight">\(A\)</span> to any vector in <span class="math notranslate nohighlight">\(\mathcal S_i\)</span> keeps it in <span class="math notranslate nohighlight">\(\mathcal S_i\)</span>. This holds for the first direction because it is an eigenvector. The construction below will preserve this property as we add directions.</p>
-<p>Let <span class="math notranslate nohighlight">\(P_i=I-Q_{\star,i}Q_{\star,i}^H\)</span> be the orthogonal projection onto <span class="math notranslate nohighlight">\(\mathcal S_i^\perp\)</span>. Take an eigenvector <span class="math notranslate nohighlight">\(\boldsymbol{x}\)</span> with eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> that is not in <span class="math notranslate nohighlight">\(\mathcal S_i\)</span>. Split it into its known component and its perpendicular remainder:</p>
+<p>Let <span class="math notranslate nohighlight">\(P_i=I-Q_{\star,i}Q_{\star,i}^H\)</span> be the orthogonal projection onto <span class="math notranslate nohighlight">\(\mathcal S_i^\perp\)</span>. Take an eigenvector <span class="math notranslate nohighlight">\(x\)</span> with eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> that is not in <span class="math notranslate nohighlight">\(\mathcal S_i\)</span>. Split it into its known component and its perpendicular remainder:</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{x}=\boldsymbol{s}+\boldsymbol{v},
+x=s+v,
 \qquad
-\boldsymbol{s}=(I-P_i)\boldsymbol{x}\in\mathcal S_i,
+s=(I-P_i)x\in\mathcal S_i,
 \qquad
-\boldsymbol{v}=P_i\boldsymbol{x}\ne0.
+v=P_ix\ne0.
 \]</div>
-<p>Because the known subspace is invariant, <span class="math notranslate nohighlight">\(A\boldsymbol{s}\in\mathcal S_i\)</span>, so <span class="math notranslate nohighlight">\(P_iA\boldsymbol{s}=0\)</span>. Consequently,</p>
+<p>Because the known subspace is invariant, <span class="math notranslate nohighlight">\(As\in\mathcal S_i\)</span>, so <span class="math notranslate nohighlight">\(P_iAs=0\)</span>. Consequently,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-P_iA\boldsymbol{v}
-&amp;=P_iA(\boldsymbol{x}-\boldsymbol{s})\\
-&amp;=P_iA\boldsymbol{x}-P_iA\boldsymbol{s}\\
-&amp;=\lambda P_i\boldsymbol{x}-0\\
-&amp;=\lambda\boldsymbol{v}.
+P_iAv
+&amp;=P_iA(x-s)\\
+&amp;=P_iAx-P_iAs\\
+&amp;=\lambda P_ix-0\\
+&amp;=\lambda v.
 \end{aligned}
 \end{split}\]</div>
-<p>The perpendicular remainder is therefore an eigenvector of <span class="math notranslate nohighlight">\(P_iA\)</span> with the <strong>same eigenvalue</strong>. Although <span class="math notranslate nohighlight">\(A\boldsymbol{v}\)</span> can have a component in the known subspace, its component perpendicular to that subspace is exactly <span class="math notranslate nohighlight">\(\lambda\boldsymbol{v}\)</span>.</p>
+<p>The perpendicular remainder is therefore an eigenvector of <span class="math notranslate nohighlight">\(P_iA\)</span> with the <strong>same eigenvalue</strong>. Although <span class="math notranslate nohighlight">\(Av\)</span> can have a component in the known subspace, its component perpendicular to that subspace is exactly <span class="math notranslate nohighlight">\(\lambda v\)</span>.</p>
 <p>Invariance also gives</p>
 <div class="math notranslate nohighlight">
 \[
@@ -574,32 +574,32 @@ P_iA=P_iAP_i.
 \[
 |\lambda_1|&gt;|\lambda_2|&gt;\cdots&gt;|\lambda_n|&gt;0.
 \]</div>
-<p>They are distinct, so their eigenvectors <span class="math notranslate nohighlight">\(\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n\)</span> are independent. Suppose that <span class="math notranslate nohighlight">\(\mathcal S_i\)</span> spans the first <span class="math notranslate nohighlight">\(i\)</span> eigenvectors. Projecting the next one gives</p>
+<p>They are distinct, so their eigenvectors <span class="math notranslate nohighlight">\(x_1,\ldots,x_n\)</span> are independent. Suppose that <span class="math notranslate nohighlight">\(\mathcal S_i\)</span> spans the first <span class="math notranslate nohighlight">\(i\)</span> eigenvectors. Projecting the next one gives</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol q_{\star,i+1}
-=\frac{P_i\boldsymbol{x}_{i+1}}{\|P_i\boldsymbol{x}_{i+1}\|_2},
+q_{\star,i+1}
+=\frac{P_ix_{i+1}}{\|P_ix_{i+1}\|_2},
 \qquad
-P_iA\boldsymbol q_{\star,i+1}
-=\lambda_{i+1}\boldsymbol q_{\star,i+1}.
+P_iAq_{\star,i+1}
+=\lambda_{i+1}q_{\star,i+1}.
 \]</div>
-<p>The denominator is nonzero because <span class="math notranslate nohighlight">\(\boldsymbol{x}_{i+1}\notin\mathcal S_i\)</span>. This describes the direction we want; the algorithm below finds it without knowing <span class="math notranslate nohighlight">\(\boldsymbol{x}_{i+1}\)</span>.</p>
+<p>The denominator is nonzero because <span class="math notranslate nohighlight">\(x_{i+1}\notin\mathcal S_i\)</span>. This describes the direction we want; the algorithm below finds it without knowing <span class="math notranslate nohighlight">\(x_{i+1}\)</span>.</p>
 <p>Since <span class="math notranslate nohighlight">\(P_i\)</span> retains the perpendicular component, the last identity means</p>
 <div class="math notranslate nohighlight">
 \[
-A\boldsymbol q_{\star,i+1}
-=\lambda_{i+1}\boldsymbol q_{\star,i+1}
-+\boldsymbol{s}_{i+1},
+Aq_{\star,i+1}
+=\lambda_{i+1}q_{\star,i+1}
++s_{i+1},
 \qquad
-\boldsymbol{s}_{i+1}\in\mathcal S_i.
+s_{i+1}\in\mathcal S_i.
 \]</div>
-<p>Therefore, adding this direction gives a larger invariant subspace. It is also the span of <span class="math notranslate nohighlight">\(\boldsymbol{x}_1,\ldots,\boldsymbol{x}_{i+1}\)</span>, because we have only subtracted a vector in <span class="math notranslate nohighlight">\(\mathcal S_i\)</span> from <span class="math notranslate nohighlight">\(\boldsymbol{x}_{i+1}\)</span> and normalized.</p>
+<p>Therefore, adding this direction gives a larger invariant subspace. It is also the span of <span class="math notranslate nohighlight">\(x_1,\ldots,x_{i+1}\)</span>, because we have only subtracted a vector in <span class="math notranslate nohighlight">\(\mathcal S_i\)</span> from <span class="math notranslate nohighlight">\(x_{i+1}\)</span> and normalized.</p>
 <p>Starting with the first eigenvector and repeating this construction produces an orthonormal basis. In that basis, each column satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-A\boldsymbol q_{\star,j}
-=\sum_{\ell=1}^{j-1}t_{\ell j}\boldsymbol q_{\star,\ell}
-+\lambda_j\boldsymbol q_{\star,j}.
+Aq_{\star,j}
+=\sum_{\ell=1}^{j-1}t_{\ell j}q_{\star,\ell}
++\lambda_jq_{\star,j}.
 \]</div>
 <p>Only earlier directions and the current direction occur. Collecting the columns gives</p>
 <div class="math notranslate nohighlight">
@@ -608,11 +608,11 @@ AQ_\star=Q_\star T,
 \qquad
 A=Q_\star TQ_\star^H,
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(Q_\star=[\boldsymbol q_{\star,1},\ldots,\boldsymbol q_{\star,n}]\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. This is the <strong>Schur decomposition</strong>.</p>
+<p>where <span class="math notranslate nohighlight">\(Q_\star=[q_{\star,1},\ldots,q_{\star,n}]\)</span> is unitary and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. This is the <strong>Schur decomposition</strong>.</p>
 <p>The off-diagonal entries of <span class="math notranslate nohighlight">\(T\)</span> record the components along earlier directions. They explain why a Schur vector need not be an eigenvector of <span class="math notranslate nohighlight">\(A\)</span>. The diagonal entries still give the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, and orthogonality gives</p>
 <div class="math notranslate nohighlight">
 \[
-\lambda_j=\boldsymbol q_{\star,j}^HA\boldsymbol q_{\star,j}.
+\lambda_j=q_{\star,j}^HAq_{\star,j}.
 \]</div>
 <p>For Hermitian matrices, the eigenvectors can be chosen orthonormal, and these Schur directions are eigenvectors of <span class="math notranslate nohighlight">\(A\)</span> itself.</p>
 </section>
@@ -625,8 +625,8 @@ A=Q_\star TQ_\star^H,
 <p>For <span class="math notranslate nohighlight">\(1\le i&lt;n\)</span>, let <span class="math notranslate nohighlight">\(P_i=I-Q_{\star,i}Q_{\star,i}^H\)</span> and <span class="math notranslate nohighlight">\(M_i=P_iA\)</span>. The eigenvalues of <span class="math notranslate nohighlight">\(M_i\)</span> are <span class="math notranslate nohighlight">\(i\)</span> zeros followed by <span class="math notranslate nohighlight">\(\lambda_{i+1},\ldots,\lambda_n\)</span>, counted with multiplicity. Moreover,</p>
 <div class="math notranslate nohighlight">
 \[
-M_i\boldsymbol q_{\star,i+1}
-=\lambda_{i+1}\boldsymbol q_{\star,i+1}.
+M_iq_{\star,i+1}
+=\lambda_{i+1}q_{\star,i+1}.
 \]</div>
 </section>
 </div><div class="proof admonition" id="proof">
@@ -648,30 +648,30 @@ Q_\star^HM_iQ_\star
 &amp;=\begin{pmatrix}0&amp;0\\0&amp;T_{22}\end{pmatrix}.
 \end{aligned}
 \end{split}\]</div>
-<p>This upper triangular matrix has the claimed diagonal entries. The first column of <span class="math notranslate nohighlight">\(T_{22}\)</span> has <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span> at the top and zeros below. Thus its first coordinate direction is an eigenvector; transforming back to the original coordinates gives <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,i+1}\)</span>.</p>
+<p>This upper triangular matrix has the claimed diagonal entries. The first column of <span class="math notranslate nohighlight">\(T_{22}\)</span> has <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span> at the top and zeros below. Thus its first coordinate direction is an eigenvector; transforming back to the original coordinates gives <span class="math notranslate nohighlight">\(q_{\star,i+1}\)</span>.</p>
 </div>
 </section>
 <section id="power-iteration-on-the-remaining-subspace">
 <h2>Power Iteration on the Remaining Subspace<a class="headerlink" href="#power-iteration-on-the-remaining-subspace" title="Link to this heading">#</a></h2>
-<p>Under the strict magnitude ordering above, <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span> is the unique dominant eigenvalue of <span class="math notranslate nohighlight">\(M_i\)</span>. Choose a random vector <span class="math notranslate nohighlight">\(\boldsymbol{g}\)</span> and initialize</p>
+<p>Under the strict magnitude ordering above, <span class="math notranslate nohighlight">\(\lambda_{i+1}\)</span> is the unique dominant eigenvalue of <span class="math notranslate nohighlight">\(M_i\)</span>. Choose a random vector <span class="math notranslate nohighlight">\(g\)</span> and initialize</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol v_0=\frac{P_i\boldsymbol{g}}{\|P_i\boldsymbol{g}\|_2}.
+v_0=\frac{P_ig}{\|P_ig\|_2}.
 \]</div>
 <p>Redraw if the projection is zero. For fixed <span class="math notranslate nohighlight">\(i\)</span>, repeat</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\boldsymbol w_{\ell+1}
-&amp;=A\boldsymbol v_\ell
--Q_{\star,i}\bigl(Q_{\star,i}^HA\boldsymbol v_\ell\bigr),\\
-\boldsymbol v_{\ell+1}
-&amp;=\frac{\boldsymbol w_{\ell+1}}{\|\boldsymbol w_{\ell+1}\|_2}.
+w_{\ell+1}
+&amp;=Av_\ell
+-Q_{\star,i}\bigl(Q_{\star,i}^HAv_\ell\bigr),\\
+v_{\ell+1}
+&amp;=\frac{w_{\ell+1}}{\|w_{\ell+1}\|_2}.
 \end{aligned}
 \end{split}\]</div>
 <p>Each step multiplies by <span class="math notranslate nohighlight">\(A\)</span>, subtracts the component in the known subspace, and normalizes. There is no need to form either <span class="math notranslate nohighlight">\(P_i\)</span> or <span class="math notranslate nohighlight">\(M_i\)</span>. Here <span class="math notranslate nohighlight">\(i\)</span> counts known directions and <span class="math notranslate nohighlight">\(\ell\)</span> counts power iterations for the next direction.</p>
-<p>As in the power method, <span class="math notranslate nohighlight">\(\boldsymbol v_0\)</span> must have a nonzero coefficient in the dominant direction when expanded in an eigenvector basis of <span class="math notranslate nohighlight">\(M_i\)</span>. Projecting a random vector drawn from a continuous distribution satisfies this condition, and gives a nonzero initial projection, with probability one in exact arithmetic.</p>
-<p>Then the line spanned by <span class="math notranslate nohighlight">\(\boldsymbol v_\ell\)</span> converges to the line spanned by <span class="math notranslate nohighlight">\(\boldsymbol q_{\star,i+1}\)</span>. For <span class="math notranslate nohighlight">\(i\le n-2\)</span>, the geometric convergence factor is governed by <span class="math notranslate nohighlight">\(|\lambda_{i+2}/\lambda_{i+1}|\)</span>. After <span class="math notranslate nohighlight">\(n-1\)</span> directions have been found, their one-dimensional orthogonal complement supplies the last direction without further power iteration. Signs or complex phases do not affect these subspaces.</p>
+<p>As in the power method, <span class="math notranslate nohighlight">\(v_0\)</span> must have a nonzero coefficient in the dominant direction when expanded in an eigenvector basis of <span class="math notranslate nohighlight">\(M_i\)</span>. Projecting a random vector drawn from a continuous distribution satisfies this condition, and gives a nonzero initial projection, with probability one in exact arithmetic.</p>
+<p>Then the line spanned by <span class="math notranslate nohighlight">\(v_\ell\)</span> converges to the line spanned by <span class="math notranslate nohighlight">\(q_{\star,i+1}\)</span>. For <span class="math notranslate nohighlight">\(i\le n-2\)</span>, the geometric convergence factor is governed by <span class="math notranslate nohighlight">\(|\lambda_{i+2}/\lambda_{i+1}|\)</span>. After <span class="math notranslate nohighlight">\(n-1\)</span> directions have been found, their one-dimensional orthogonal complement supplies the last direction without further power iteration. Signs or complex phases do not affect these subspaces.</p>
 <p>This construction assumes the preceding directions are exact. In computation, they are still approximate. <a class="reference internal" href="orthogonal_iteration.html"><span class="std std-doc">Orthogonal iteration</span></a> updates all directions together, using QR to perform the successive projections. There, <span class="math notranslate nohighlight">\(Q_k\)</span> denotes the basis at iteration <span class="math notranslate nohighlight">\(k\)</span>, while <span class="math notranslate nohighlight">\(Q_\star\)</span> remains the exact Schur target. Equal eigenvalue magnitudes may require following several directions as a subspace rather than one direction at a time.</p>
 </section>
 </section>

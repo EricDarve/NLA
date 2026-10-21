@@ -28,6 +28,8 @@ We developed these interpretations in [eigendecomposition](eigendecomposition.md
 
 For $A\in\mathbb C^{n\times n}$, an **eigenpair** is a scalar $\lambda$ and a nonzero vector $v$ satisfying $Av=\lambda v$. Some applications require only a few eigenpairs, such as those governing the fastest growth or slowest decay. Others require the entire **spectrum**, meaning all the eigenvalues of $A$.
 
+We use $^{H}$ for the conjugate transpose. For real matrices, it is the ordinary transpose $^{T}$. Vector symbols are plain lowercase letters, as in the preceding chapters.
+
 For the full spectrum, a useful computational target is the **Schur decomposition**,
 
 $$

@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -486,54 +486,54 @@
 \[
 |\lambda_1|&gt;|\lambda_2|\ge\cdots\ge|\lambda_n|.
 \]</div>
-<p>Choose corresponding eigenvectors <span class="math notranslate nohighlight">\(\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n\)</span> with <span class="math notranslate nohighlight">\(\|\boldsymbol{x}_i\|_2=1\)</span>. Expand a unit starting vector in this eigenvector basis:</p>
+<p>Choose corresponding eigenvectors <span class="math notranslate nohighlight">\(x_1,\ldots,x_n\)</span> with <span class="math notranslate nohighlight">\(\|x_i\|_2=1\)</span>. Expand a unit starting vector in this eigenvector basis:</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{q}_0=\sum_{i=1}^n c_i\boldsymbol{x}_i,
+q_0=\sum_{i=1}^n c_ix_i,
 \qquad c_1\ne0.
 \]</div>
-<p>The condition <span class="math notranslate nohighlight">\(c_1\ne0\)</span> means that the dominant mode is present. For nonorthogonal eigenvectors, this coefficient is not generally <span class="math notranslate nohighlight">\(\boldsymbol{x}_1^H\boldsymbol{q}_0\)</span>. A starting vector drawn from a continuous distribution satisfies <span class="math notranslate nohighlight">\(c_1\ne0\)</span> with probability one in exact arithmetic.</p>
+<p>The condition <span class="math notranslate nohighlight">\(c_1\ne0\)</span> means that the dominant mode is present. For nonorthogonal eigenvectors, this coefficient is not generally <span class="math notranslate nohighlight">\(x_1^Hq_0\)</span>. A starting vector drawn from a continuous distribution satisfies <span class="math notranslate nohighlight">\(c_1\ne0\)</span> with probability one in exact arithmetic.</p>
 <p>Repeated application of <span class="math notranslate nohighlight">\(A\)</span> scales each component by its eigenvalue:</p>
 <div class="math notranslate nohighlight">
 \[
-A^k\boldsymbol{q}_0=\sum_{i=1}^n c_i\lambda_i^k\boldsymbol{x}_i.
+A^kq_0=\sum_{i=1}^n c_i\lambda_i^kx_i.
 \]</div>
 <p>Relative to the first component, every other component is multiplied by <span class="math notranslate nohighlight">\((\lambda_i/\lambda_1)^k\)</span>. These ratios tend to zero. Thus the dominant component eventually determines the direction, even if all components are shrinking because <span class="math notranslate nohighlight">\(|\lambda_1|&lt;1\)</span>.</p>
 </section>
 <section id="normalize-after-each-multiplication">
 <h2>Normalize After Each Multiplication<a class="headerlink" href="#normalize-after-each-multiplication" title="Link to this heading">#</a></h2>
-<p>The magnitude of <span class="math notranslate nohighlight">\(A^k\boldsymbol{q}_0\)</span> can become very large or very small. Since we want its direction, normalize after each multiplication:</p>
+<p>The magnitude of <span class="math notranslate nohighlight">\(A^kq_0\)</span> can become very large or very small. Since we want its direction, normalize after each multiplication:</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{z}_k=A\boldsymbol{q}_k,
+z_k=Aq_k,
 \qquad
-\boldsymbol{q}_{k+1}=\frac{\boldsymbol{z}_k}{\|\boldsymbol{z}_k\|_2},
+q_{k+1}=\frac{z_k}{\|z_k\|_2},
 \qquad k=0,1,\ldots.
 \]</div>
-<p>In exact arithmetic, this gives <span class="math notranslate nohighlight">\(\boldsymbol{q}_k=A^k\boldsymbol{q}_0/\|A^k\boldsymbol{q}_0\|_2\)</span>. The normalization changes the length, not the direction, and avoids accumulating the overall growth or decay of the powers.</p>
+<p>In exact arithmetic, this gives <span class="math notranslate nohighlight">\(q_k=A^kq_0/\|A^kq_0\|_2\)</span>. The normalization changes the length, not the direction, and avoids accumulating the overall growth or decay of the powers.</p>
 <figure class="align-default" id="fig-power-method-convergence">
 <a class="reference internal image-reference" href="../_images/power_method_convergence.svg"><img alt="Five copies of a two-dimensional unit-vector diagram show power iterates after zero, two, four, six, and ten steps. Each blue unit vector moves closer to the fixed horizontal teal eigenvector x1. The angle decreases from 70 degrees to about 4.4 degrees. Dashed quarter circles mark unit length." src="../_images/power_method_convergence.svg" style="width: 850px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 14 </span><span class="caption-text">Normalized iterates align with the dominant direction. Here <span class="math notranslate nohighlight">\(A=\operatorname{diag}(1,0.7)\)</span>, <span class="math notranslate nohighlight">\(\boldsymbol{x}_1=(1,0)^T\)</span>, and <span class="math notranslate nohighlight">\(\boldsymbol{q}_0\)</span> makes an angle of <span class="math notranslate nohighlight">\(70^\circ\)</span> with <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>. Every arrow has length <span class="math notranslate nohighlight">\(1\)</span>; intermediate iterates are omitted. This symmetric example approaches the direction monotonically. General matrices need not do so.</span><a class="headerlink" href="#fig-power-method-convergence" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 14 </span><span class="caption-text">Normalized iterates align with the dominant direction. Here <span class="math notranslate nohighlight">\(A=\operatorname{diag}(1,0.7)\)</span>, <span class="math notranslate nohighlight">\(x_1=(1,0)^T\)</span>, and <span class="math notranslate nohighlight">\(q_0\)</span> makes an angle of <span class="math notranslate nohighlight">\(70^\circ\)</span> with <span class="math notranslate nohighlight">\(x_1\)</span>. Every arrow has length <span class="math notranslate nohighlight">\(1\)</span>; intermediate iterates are omitted. This symmetric example approaches the direction monotonically. General matrices need not do so.</span><a class="headerlink" href="#fig-power-method-convergence" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>At the current iterate, estimate the eigenvalue using the <strong>Rayleigh quotient</strong>:</p>
 <div class="math notranslate nohighlight">
 \[
-\mu_k=\frac{\boldsymbol{q}_k^HA\boldsymbol{q}_k}
-{\boldsymbol{q}_k^H\boldsymbol{q}_k}
-=\boldsymbol{q}_k^H\boldsymbol{z}_k.
+\mu_k=\frac{q_k^HAq_k}
+{q_k^Hq_k}
+=q_k^Hz_k.
 \]</div>
-<p>We use <span class="math notranslate nohighlight">\(\mu_k\)</span> for an estimate and reserve <span class="math notranslate nohighlight">\(\lambda_i\)</span> for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. If <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> is an exact eigenvector, this quotient gives its eigenvalue, including its sign or complex phase.</p>
+<p>We use <span class="math notranslate nohighlight">\(\mu_k\)</span> for an estimate and reserve <span class="math notranslate nohighlight">\(\lambda_i\)</span> for the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. If <span class="math notranslate nohighlight">\(q_k\)</span> is an exact eigenvector, this quotient gives its eigenvalue, including its sign or complex phase.</p>
 <p>To decide when to stop, compute the <strong>residual</strong></p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{r}_k=A\boldsymbol{q}_k-\mu_k\boldsymbol{q}_k
-=\boldsymbol{z}_k-\mu_k\boldsymbol{q}_k.
+r_k=Aq_k-\mu_kq_k
+=z_k-\mu_kq_k.
 \]</div>
-<p>The residual measures how closely the current pair satisfies the eigenvalue equation. For a chosen tolerance <span class="math notranslate nohighlight">\(\tau&gt;0\)</span>, a typical stopping test is <span class="math notranslate nohighlight">\(\|\boldsymbol{r}_k\|_2\le\tau\|A\|_2\)</span>. A norm estimate can supply the matrix scale in an implementation. Changes in <span class="math notranslate nohighlight">\(\mu_k\)</span> alone can be misleading because the estimate may change little while the vector is still inaccurate. Test before normalizing again, so the returned pair is <span class="math notranslate nohighlight">\((\mu_k,\boldsymbol{q}_k)\)</span>. A small residual verifies an approximate eigenpair; it does not by itself establish that the eigenvalue is dominant.</p>
-<p>Under our assumptions, <span class="math notranslate nohighlight">\(\boldsymbol{z}_k\)</span> is never zero. If <span class="math notranslate nohighlight">\(\boldsymbol{z}_k=0\)</span> outside these assumptions, the current <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> is an exact eigenvector for eigenvalue zero. Normalization is then impossible; restart if the dominant eigenpair is wanted. An implementation should also impose a maximum number of iterations.</p>
+<p>The residual measures how closely the current pair satisfies the eigenvalue equation. For a chosen tolerance <span class="math notranslate nohighlight">\(\tau&gt;0\)</span>, a typical stopping test is <span class="math notranslate nohighlight">\(\|r_k\|_2\le\tau\|A\|_2\)</span>. A norm estimate can supply the matrix scale in an implementation. Changes in <span class="math notranslate nohighlight">\(\mu_k\)</span> alone can be misleading because the estimate may change little while the vector is still inaccurate. Test before normalizing again, so the returned pair is <span class="math notranslate nohighlight">\((\mu_k,q_k)\)</span>. A small residual verifies an approximate eigenpair; it does not by itself establish that the eigenvalue is dominant.</p>
+<p>Under our assumptions, <span class="math notranslate nohighlight">\(z_k\)</span> is never zero. If <span class="math notranslate nohighlight">\(z_k=0\)</span> outside these assumptions, the current <span class="math notranslate nohighlight">\(q_k\)</span> is an exact eigenvector for eigenvalue zero. Normalization is then impossible; restart if the dominant eigenpair is wanted. An implementation should also impose a maximum number of iterations.</p>
 <p>Each iteration needs one matrix-vector product and <span class="math notranslate nohighlight">\(O(n)\)</span> additional work. A dense product costs <span class="math notranslate nohighlight">\(O(n^2)\)</span> operations; a sparse matrix or an operator that can be applied without forming <span class="math notranslate nohighlight">\(A\)</span> may be much cheaper.</p>
 </section>
 <section id="convergence-the-eigenvalue-ratio-controls-the-rate">
@@ -546,10 +546,10 @@ A^k\boldsymbol{q}_0=\sum_{i=1}^n c_i\lambda_i^k\boldsymbol{x}_i.
 <div class="proof theorem admonition" id="thm-power-method-convergence">
 <p class="admonition-title"><span class="caption-number">Theorem 23 </span> (Convergence of Power Iteration)</p>
 <section class="theorem-content" id="proof-content">
-<p>Under the assumptions above, the line spanned by <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> converges to the line spanned by <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span>. More precisely, there are scalars <span class="math notranslate nohighlight">\(\phi_k\)</span> with <span class="math notranslate nohighlight">\(|\phi_k|=1\)</span> such that</p>
+<p>Under the assumptions above, the line spanned by <span class="math notranslate nohighlight">\(q_k\)</span> converges to the line spanned by <span class="math notranslate nohighlight">\(x_1\)</span>. More precisely, there are scalars <span class="math notranslate nohighlight">\(\phi_k\)</span> with <span class="math notranslate nohighlight">\(|\phi_k|=1\)</span> such that</p>
 <div class="math notranslate nohighlight">
 \[
-\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2=O(\rho^k),
+\|q_k-\phi_kx_1\|_2=O(\rho^k),
 \qquad
 |\mu_k-\lambda_1|=O(\rho^k).
 \]</div>
@@ -559,21 +559,21 @@ A^k\boldsymbol{q}_0=\sum_{i=1}^n c_i\lambda_i^k\boldsymbol{x}_i.
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-A^k\boldsymbol{q}_0
-&amp;=c_1\lambda_1^k(\boldsymbol{x}_1+\boldsymbol{e}_k),\\
-\boldsymbol{e}_k
+A^kq_0
+&amp;=c_1\lambda_1^k(x_1+e_k),\\
+e_k
 &amp;=\sum_{i=2}^n\frac{c_i}{c_1}
-\left(\frac{\lambda_i}{\lambda_1}\right)^k\boldsymbol{x}_i,
+\left(\frac{\lambda_i}{\lambda_1}\right)^kx_i,
 \qquad
-\|\boldsymbol{e}_k\|_2\le C\rho^k,
+\|e_k\|_2\le C\rho^k,
 \end{aligned}
 \end{split}\]</div>
 <p>where <span class="math notranslate nohighlight">\(C=\sum_{i=2}^n|c_i/c_1|\)</span> is independent of <span class="math notranslate nohighlight">\(k\)</span>. Normalizing gives</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol{q}_k
-=\phi_k\frac{\boldsymbol{x}_1+\boldsymbol{e}_k}
-{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2},
+q_k
+=\phi_k\frac{x_1+e_k}
+{\|x_1+e_k\|_2},
 \qquad
 \phi_k=\frac{c_1\lambda_1^k}{|c_1\lambda_1^k|}.
 \]</div>
@@ -581,45 +581,45 @@ A^k\boldsymbol{q}_0
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2
-&amp;=\left\|\frac{\boldsymbol{x}_1+\boldsymbol{e}_k}
-{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}
--\boldsymbol{x}_1\right\|_2\\
-&amp;=\left\|\left(\frac{1}{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}-1\right)
-(\boldsymbol{x}_1+\boldsymbol{e}_k)+\boldsymbol{e}_k\right\|_2\\
-&amp;\le\left|\frac{1}{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}-1\right|
-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2+\|\boldsymbol{e}_k\|_2\\
-&amp;=\big|1-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2\big|
-+\|\boldsymbol{e}_k\|_2\\
-&amp;=\big|\|\boldsymbol{x}_1\|_2-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2\big|
-+\|\boldsymbol{e}_k\|_2\\
-&amp;\le2\|\boldsymbol{e}_k\|_2\le2C\rho^k.
+\|q_k-\phi_kx_1\|_2
+&amp;=\left\|\frac{x_1+e_k}
+{\|x_1+e_k\|_2}
+-x_1\right\|_2\\
+&amp;=\left\|\left(\frac{1}{\|x_1+e_k\|_2}-1\right)
+(x_1+e_k)+e_k\right\|_2\\
+&amp;\le\left|\frac{1}{\|x_1+e_k\|_2}-1\right|
+\|x_1+e_k\|_2+\|e_k\|_2\\
+&amp;=\big|1-\|x_1+e_k\|_2\big|
++\|e_k\|_2\\
+&amp;=\big|\|x_1\|_2-\|x_1+e_k\|_2\big|
++\|e_k\|_2\\
+&amp;\le2\|e_k\|_2\le2C\rho^k.
 \end{aligned}
 \end{split}\]</div>
-<p>For the eigenvalue estimate, use <span class="math notranslate nohighlight">\((A-\lambda_1I)\boldsymbol{x}_1=0\)</span> and <span class="math notranslate nohighlight">\(\|\boldsymbol{q}_k\|_2=1\)</span>:</p>
+<p>For the eigenvalue estimate, use <span class="math notranslate nohighlight">\((A-\lambda_1I)x_1=0\)</span> and <span class="math notranslate nohighlight">\(\|q_k\|_2=1\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
 \mu_k-\lambda_1
-&amp;=\boldsymbol{q}_k^H(A-\lambda_1I)
-(\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1),\\
+&amp;=q_k^H(A-\lambda_1I)
+(q_k-\phi_kx_1),\\
 |\mu_k-\lambda_1|
 &amp;\le\|A-\lambda_1I\|_2
-\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2
+\|q_k-\phi_kx_1\|_2
 =O(\rho^k).
 \end{aligned}
 \end{split}\]</div>
 </div>
-<p>The factor <span class="math notranslate nohighlight">\(\phi_k\)</span> accounts for sign or phase changes. For real <span class="math notranslate nohighlight">\(A\)</span> and a real start, a positive <span class="math notranslate nohighlight">\(\lambda_1\)</span> gives convergence to either <span class="math notranslate nohighlight">\(\boldsymbol{x}_1\)</span> or <span class="math notranslate nohighlight">\(-\boldsymbol{x}_1\)</span>. A negative <span class="math notranslate nohighlight">\(\lambda_1\)</span> makes the signs alternate. In complex arithmetic, the phase can keep rotating. The <strong>direction</strong>, interpreted as a one-dimensional subspace, converges in all these cases.</p>
+<p>The factor <span class="math notranslate nohighlight">\(\phi_k\)</span> accounts for sign or phase changes. For real <span class="math notranslate nohighlight">\(A\)</span> and a real start, a positive <span class="math notranslate nohighlight">\(\lambda_1\)</span> gives convergence to either <span class="math notranslate nohighlight">\(x_1\)</span> or <span class="math notranslate nohighlight">\(-x_1\)</span>. A negative <span class="math notranslate nohighlight">\(\lambda_1\)</span> makes the signs alternate. In complex arithmetic, the phase can keep rotating. The <strong>direction</strong>, interpreted as a one-dimensional subspace, converges in all these cases.</p>
 <p>The bound is geometric: a smaller <span class="math notranslate nohighlight">\(\rho\)</span> gives faster convergence, while <span class="math notranslate nohighlight">\(\rho\)</span> close to <span class="math notranslate nohighlight">\(1\)</span> gives slow convergence. The constant also matters. A very small <span class="math notranslate nohighlight">\(c_1\)</span> can delay the appearance of the dominant direction. The rate can be faster if the starting vector has no components associated with eigenvalues of magnitude <span class="math notranslate nohighlight">\(|\lambda_2|\)</span>.</p>
 <section id="the-hermitian-case-a-more-accurate-eigenvalue-estimate">
 <h3>The Hermitian Case: A More Accurate Eigenvalue Estimate<a class="headerlink" href="#the-hermitian-case-a-more-accurate-eigenvalue-estimate" title="Link to this heading">#</a></h3>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is Hermitian, including real symmetric matrices, the Rayleigh quotient has a stronger error bound. Write <span class="math notranslate nohighlight">\(\boldsymbol{q}_k=\alpha_k\boldsymbol{x}_1+\boldsymbol{w}_k\)</span> with <span class="math notranslate nohighlight">\(\boldsymbol{w}_k\perp\boldsymbol{x}_1\)</span>. The directional bound above gives <span class="math notranslate nohighlight">\(\|\boldsymbol{w}_k\|_2=O(\rho^k)\)</span>.</p>
-<p>Because <span class="math notranslate nohighlight">\(A\)</span> is Hermitian, both cross terms vanish when expanding the Rayleigh quotient. Also, <span class="math notranslate nohighlight">\(|\alpha_k|^2+\|\boldsymbol{w}_k\|_2^2=1\)</span>. Therefore,</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is Hermitian, including real symmetric matrices, the Rayleigh quotient has a stronger error bound. Write <span class="math notranslate nohighlight">\(q_k=\alpha_kx_1+w_k\)</span> with <span class="math notranslate nohighlight">\(w_k\perp x_1\)</span>. The directional bound above gives <span class="math notranslate nohighlight">\(\|w_k\|_2=O(\rho^k)\)</span>.</p>
+<p>Because <span class="math notranslate nohighlight">\(A\)</span> is Hermitian, both cross terms vanish when expanding the Rayleigh quotient. Also, <span class="math notranslate nohighlight">\(|\alpha_k|^2+\|w_k\|_2^2=1\)</span>. Therefore,</p>
 <div class="math notranslate nohighlight">
 \[
 \mu_k-\lambda_1
-=\boldsymbol{w}_k^H(A-\lambda_1I)\boldsymbol{w}_k
+=w_k^H(A-\lambda_1I)w_k
 =O(\rho^{2k}).
 \]</div>
 <p>Thus the eigenvalue estimate can converge faster than the eigenvector direction. This stronger bound does not hold for a general nonsymmetric matrix. For another presentation of power iteration and its convergence, see <a class="reference external" href="https://fncbook.com/python/power/">Driscoll and Braun, <em>Fundamentals of Numerical Computation</em></a>.</p>

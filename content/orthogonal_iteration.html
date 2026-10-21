@@ -268,7 +268,7 @@
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration.html">QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="upper_hessenberg.html">Hessenberg Reduction and QR Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="qr_iteration_with_shifts.html">Shifted QR Iteration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric vs Unsymmetric QR Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="symmetric_vs_nonsymmetric_qr.html">Symmetric and Nonsymmetric QR Iteration</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="eigenvalues_iterative.html">Iterative Methods for Eigenvalue Computation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,7 +503,7 @@
 <tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_k\)</span></p></td>
 <td class="text-left"><p>The <span class="math notranslate nohighlight">\(n\times p\)</span> orthonormal basis at iteration <span class="math notranslate nohighlight">\(k\)</span>.</p></td>
 </tr>
-<tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(\boldsymbol q_{\star,j}\)</span>, <span class="math notranslate nohighlight">\(\boldsymbol q_{k,j}\)</span></p></td>
+<tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(q_{\star,j}\)</span>, <span class="math notranslate nohighlight">\(q_{k,j}\)</span></p></td>
 <td class="text-left"><p>Column <span class="math notranslate nohighlight">\(j\)</span> of the exact and current bases.</p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(Q_{\star,i}\)</span>, <span class="math notranslate nohighlight">\(Q_{k,i}\)</span></p></td>
@@ -535,18 +535,18 @@
 <p>The first column is simply power iteration:</p>
 <div class="math notranslate nohighlight">
 \[
-\boldsymbol q_{k+1,1}
-=\frac{A\boldsymbol q_{k,1}}{\|A\boldsymbol q_{k,1}\|_2}.
+q_{k+1,1}
+=\frac{Aq_{k,1}}{\|Aq_{k,1}\|_2}.
 \]</div>
-<p>For the second column, multiply <span class="math notranslate nohighlight">\(\boldsymbol q_{k,2}\)</span> by <span class="math notranslate nohighlight">\(A\)</span>, subtract its component along the <strong>new first column</strong> <span class="math notranslate nohighlight">\(\boldsymbol q_{k+1,1}\)</span>, and normalize. Continue in the same way. For column <span class="math notranslate nohighlight">\(i+1\)</span>, the update is</p>
+<p>For the second column, multiply <span class="math notranslate nohighlight">\(q_{k,2}\)</span> by <span class="math notranslate nohighlight">\(A\)</span>, subtract its component along the <strong>new first column</strong> <span class="math notranslate nohighlight">\(q_{k+1,1}\)</span>, and normalize. Continue in the same way. For column <span class="math notranslate nohighlight">\(i+1\)</span>, the update is</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\boldsymbol w_{k+1,i+1}
+w_{k+1,i+1}
 &amp;=\bigl(I-Q_{k+1,i}Q_{k+1,i}^H\bigr)
-  A\boldsymbol q_{k,i+1},\\
-\boldsymbol q_{k+1,i+1}
-&amp;=\frac{\boldsymbol w_{k+1,i+1}}{\|\boldsymbol w_{k+1,i+1}\|_2}.
+  Aq_{k,i+1},\\
+q_{k+1,i+1}
+&amp;=\frac{w_{k+1,i+1}}{\|w_{k+1,i+1}\|_2}.
 \end{aligned}
 \end{split}\]</div>
 <p>The projector uses the newly computed first <span class="math notranslate nohighlight">\(i\)</span> columns because QR processes the columns of <span class="math notranslate nohighlight">\(AQ_k\)</span> in order. If they spanned the exact leading Schur subspace, then</p>
@@ -558,8 +558,8 @@ I-Q_{k+1,i}Q_{k+1,i}^H
 <p>The update would then be the projected power step from deflation. Its target satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-P_iA\boldsymbol q_{\star,i+1}
-=\lambda_{i+1}\boldsymbol q_{\star,i+1}.
+P_iAq_{\star,i+1}
+=\lambda_{i+1}q_{\star,i+1}.
 \]</div>
 <p>In the actual iteration, the first <span class="math notranslate nohighlight">\(i\)</span> directions are still improving while we update direction <span class="math notranslate nohighlight">\(i+1\)</span>. This explains the mechanism, but it is not yet a convergence proof: the projector changes at every step. We will account for those changes by following the column spaces.</p>
 <section id="the-same-two-dimensional-example">
@@ -594,9 +594,9 @@ Q_1=\frac{1}{\sqrt{29}}\begin{pmatrix}5&amp;-2\\2&amp;5\end{pmatrix}.
 <p>Define the accumulated triangular factor</p>
 <div class="math notranslate nohighlight">
 \[
-\widehat R_0=I_p,
+\widetilde R_0=I_p,
 \qquad
-\widehat R_k=R_kR_{k-1}\cdots R_1.
+\widetilde R_k=R_kR_{k-1}\cdots R_1.
 \]</div>
 <div class="proof theorem admonition" id="thm:AkQR">
 <p class="admonition-title"><span class="caption-number">Theorem 25 </span> (QR of <span class="math notranslate nohighlight">\(A^kQ_0\)</span>)</p>
@@ -604,7 +604,7 @@ Q_1=\frac{1}{\sqrt{29}}\begin{pmatrix}5&amp;-2\\2&amp;5\end{pmatrix}.
 <p>For every <span class="math notranslate nohighlight">\(k\ge0\)</span>, orthogonal iteration satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-A^kQ_0=Q_k\widehat R_k.
+A^kQ_0=Q_k\widetilde R_k.
 \]</div>
 </section>
 </div><div class="proof admonition" id="proof">
@@ -613,19 +613,19 @@ A^kQ_0=Q_k\widehat R_k.
 \[\begin{split}
 \begin{aligned}
 A^{k+1}Q_0
-&amp;=A(Q_k\widehat R_k)\\
-&amp;=(AQ_k)\widehat R_k\\
-&amp;=Q_{k+1}R_{k+1}\widehat R_k\\
-&amp;=Q_{k+1}\widehat R_{k+1}.
+&amp;=A(Q_k\widetilde R_k)\\
+&amp;=(AQ_k)\widetilde R_k\\
+&amp;=Q_{k+1}R_{k+1}\widetilde R_k\\
+&amp;=Q_{k+1}\widetilde R_{k+1}.
 \end{aligned}
 \end{split}\]</div>
 <p>This proves the identity by induction.</p>
 </div>
-<p>Because <span class="math notranslate nohighlight">\(\widehat R_k\)</span> is upper triangular and invertible, this is a thin QR factorization of <span class="math notranslate nohighlight">\(A^kQ_0\)</span>. With positive diagonal entries in each <span class="math notranslate nohighlight">\(R_j\)</span>, it is the unique thin QR factorization with positive diagonal.</p>
-<p>For <span class="math notranslate nohighlight">\(p=1\)</span>, <span class="math notranslate nohighlight">\(\widehat R_k\)</span> is the product of the normalization factors in the power method. For full iteration with <span class="math notranslate nohighlight">\(Q_0=I_n\)</span>, the identity becomes</p>
+<p>Because <span class="math notranslate nohighlight">\(\widetilde R_k\)</span> is upper triangular and invertible, this is a thin QR factorization of <span class="math notranslate nohighlight">\(A^kQ_0\)</span>. With positive diagonal entries in each <span class="math notranslate nohighlight">\(R_j\)</span>, it is the unique thin QR factorization with positive diagonal.</p>
+<p>For <span class="math notranslate nohighlight">\(p=1\)</span>, <span class="math notranslate nohighlight">\(\widetilde R_k\)</span> is the product of the normalization factors in the power method. For full iteration with <span class="math notranslate nohighlight">\(Q_0=I_n\)</span>, the identity becomes</p>
 <div class="math notranslate nohighlight">
 \[
-A^k=Q_k\widehat R_k.
+A^k=Q_k\widetilde R_k.
 \]</div>
 <p>The algorithm obtains these factors without forming <span class="math notranslate nohighlight">\(A^k\)</span>.</p>
 <p>More importantly, invertibility gives</p>
@@ -634,10 +634,10 @@ A^k=Q_k\widehat R_k.
 \boxed{\operatorname{range}(Q_k)
 =\operatorname{range}(A^kQ_0).}
 \]</div>
-<p>Upper triangularity gives the same result for every leading set of columns. Let <span class="math notranslate nohighlight">\(\widehat R_{k,i}\)</span> be the leading <span class="math notranslate nohighlight">\(i\times i\)</span> block of <span class="math notranslate nohighlight">\(\widehat R_k\)</span>. The first <span class="math notranslate nohighlight">\(i\)</span> columns of the factorization satisfy</p>
+<p>Upper triangularity gives the same result for every leading set of columns. Let <span class="math notranslate nohighlight">\(\widetilde R_{k,i}\)</span> be the leading <span class="math notranslate nohighlight">\(i\times i\)</span> block of <span class="math notranslate nohighlight">\(\widetilde R_k\)</span>. The first <span class="math notranslate nohighlight">\(i\)</span> columns of the factorization satisfy</p>
 <div class="math notranslate nohighlight">
 \[
-A^kQ_{0,i}=Q_{k,i}\widehat R_{k,i},
+A^kQ_{0,i}=Q_{k,i}\widetilde R_{k,i},
 \qquad
 \operatorname{range}(Q_{k,i})
 =\operatorname{range}(A^kQ_{0,i}).
@@ -673,9 +673,9 @@ A^kQ_{0,i}=Q_{k,i}\widehat R_{k,i},
 \[\begin{split}
 \begin{aligned}
 d_k&amp;=\|(I-\Pi_\star)Q_k\|_2\\
-&amp;=\max_{\substack{\boldsymbol z\in\operatorname{range}(Q_k)\\
-                  \|\boldsymbol z\|_2=1}}
-  \|(I-\Pi_\star)\boldsymbol z\|_2.
+&amp;=\max_{\substack{z\in\operatorname{range}(Q_k)\\
+                  \|z\|_2=1}}
+  \|(I-\Pi_\star)z\|_2.
 \end{aligned}
 \end{split}\]</div>
 <p>The second expression follows because the columns of <span class="math notranslate nohighlight">\(Q_k\)</span> are orthonormal. It measures the largest component outside the target among unit vectors in the current subspace. It is zero exactly when the two subspaces coincide and does not depend on which orthonormal bases represent them. For <span class="math notranslate nohighlight">\(p=1\)</span>, it measures the misalignment of the iterate with the dominant eigenvector’s line.</p>
@@ -753,28 +753,28 @@ F_k&amp;=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
 <p><strong>Translate this into geometric error.</strong> Any unit vector in the current subspace has the form</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\boldsymbol z=(X_1+X_2F_k)\boldsymbol c,
+z=(X_1+X_2F_k)c,
 \qquad
-X^{-1}\boldsymbol z
-=\begin{pmatrix}\boldsymbol c\\F_k\boldsymbol c\end{pmatrix}.
+X^{-1}z
+=\begin{pmatrix}c\\F_kc\end{pmatrix}.
 \end{split}\]</div>
 <p>Therefore,</p>
 <div class="math notranslate nohighlight">
 \[
-\|\boldsymbol c\|_2
-\le\|X^{-1}\boldsymbol z\|_2
+\|c\|_2
+\le\|X^{-1}z\|_2
 \le\|X^{-1}\|_2.
 \]</div>
 <p>Projection removes the wanted part because <span class="math notranslate nohighlight">\((I-\Pi_\star)X_1=0\)</span>. It follows that</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\|(I-\Pi_\star)\boldsymbol z\|_2
-&amp;=\|(I-\Pi_\star)X_2F_k\boldsymbol c\|_2\\
+\|(I-\Pi_\star)z\|_2
+&amp;=\|(I-\Pi_\star)X_2F_kc\|_2\\
 &amp;\le\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
 \end{aligned}
 \end{split}\]</div>
-<p>Maximizing over unit vectors <span class="math notranslate nohighlight">\(\boldsymbol z\)</span> and substituting the bound on <span class="math notranslate nohighlight">\(F_k\)</span> gives <span class="math notranslate nohighlight">\(d_k\le K\rho_p^k\)</span>.</p>
+<p>Maximizing over unit vectors <span class="math notranslate nohighlight">\(z\)</span> and substituting the bound on <span class="math notranslate nohighlight">\(F_k\)</span> gives <span class="math notranslate nohighlight">\(d_k\le K\rho_p^k\)</span>.</p>
 </div>
 <p>A ratio near one gives slow separation; a smaller ratio gives faster separation. The constant <span class="math notranslate nohighlight">\(K\)</span> depends on the initial space and the eigenvector basis and can be large for nonnormal matrices. The theorem gives an upper bound; particular starting spaces can converge faster.</p>
 <p>This proof assumes diagonalizability. Orthogonal iteration can also be applied to matrices that are not diagonalizable, but their convergence bounds may include polynomial factors in <span class="math notranslate nohighlight">\(k\)</span>. <a class="reference external" href="https://people.inf.ethz.ch/arbenz/ewp/Lnotes/chapter8.pdf">Arbenz’s notes on subspace iteration</a> give further analysis.</p>
@@ -812,10 +812,10 @@ X^{-1}\boldsymbol z
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\boldsymbol q_{k,i}\boldsymbol q_{k,i}^H
+q_{k,i}q_{k,i}^H
 &amp;=\Pi_{k,i}-\Pi_{k,i-1}\\
 &amp;\longrightarrow\Pi_{\star,i}-\Pi_{\star,i-1}\\
-&amp;=\boldsymbol q_{\star,i}\boldsymbol q_{\star,i}^H.
+&amp;=q_{\star,i}q_{\star,i}^H.
 \end{aligned}
 \end{split}\]</div>
 <p>Here <span class="math notranslate nohighlight">\(\Pi_{k,0}=\Pi_{\star,0}=0\)</span>, and <span class="math notranslate nohighlight">\(\Pi_{k,n}=\Pi_{\star,n}=I\)</span>. This proves convergence of every Schur direction, including the last one.</p>
