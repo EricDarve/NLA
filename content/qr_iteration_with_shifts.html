@@ -458,11 +458,21 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifted-qr-iteration-step-by-step">Shifted QR Iteration Step-by-Step</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#similarity-transformation-verification">Similarity Transformation Verification</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-deflation">Convergence and Deflation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-shift-accelerates-convergence">How the Shift Accelerates Convergence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-deflation-is-used">How Deflation is Used</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-shifted-qr-step">The Shifted QR Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-good-shift-helps">Why a Good Shift Helps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-shift-that-cycles-and-one-that-deflates">A Shift That Cycles, and One That Deflates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deflation-recognizing-that-an-eigenvalue-has-separated">Deflation: Recognizing That an Eigenvalue Has Separated</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-shifts-from-the-trailing-block">Computing Shifts from the Trailing Block</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-bottom-right-entry">The Bottom-Right Entry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-trailing-2-times2-block">The Trailing <span class="math notranslate nohighlight">\(2\times2\)</span> Block</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-shifts-in-real-arithmetic-the-francis-step">Two Shifts in Real Arithmetic: The Francis Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stagnation-and-practical-remedies">Stagnation and Practical Remedies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exceptional-shifts">Exceptional Shifts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#larger-trailing-windows">Larger Trailing Windows</a></li>
 </ul>
 </li>
 </ul>
@@ -478,130 +488,278 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="shifted-qr-iteration">
 <h1>Shifted QR Iteration<a class="headerlink" href="#shifted-qr-iteration" title="Link to this heading">#</a></h1>
-<p>This approach combines the <strong>shift</strong> (to dramatically speed up convergence) with <strong>deflation</strong> (to reduce the problem size) to efficiently find all eigenvalues of a matrix.</p>
-<p>The core of the process is an iterative loop. Instead of decomposing the matrix <span class="math notranslate nohighlight">\(A\)</span> (or <span class="math notranslate nohighlight">\(T_k\)</span>) directly, we “shift” it by an approximate eigenvalue <span class="math notranslate nohighlight">\(\mu\)</span> <em>before</em> the QR factorization.</p>
-<p>Each step <span class="math notranslate nohighlight">\(k\)</span> of the iteration works as follows:</p>
-<ol class="arabic">
-<li><p><strong>Start with your matrix:</strong> Let <span class="math notranslate nohighlight">\(T_k\)</span> be the matrix at the current step (initially <span class="math notranslate nohighlight">\(T_0 = A\)</span>, which is assumed to be in <strong>upper Hessenberg</strong> form).</p></li>
-<li><p><strong>Choose a Shift:</strong> Select a shift <span class="math notranslate nohighlight">\(\mu\)</span>. A very effective choice is the bottom-right element of the current matrix: <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span>.</p></li>
-<li><p><strong>Factor the Shifted Matrix:</strong> Compute the QR factorization of the <em>shifted</em> matrix:</p>
-<div class="math notranslate nohighlight">
-\[T_k - \mu I = U_k R_k\]</div>
-</li>
-<li><p><strong>Recombine and “Unshift”:</strong> Create the next matrix, <span class="math notranslate nohighlight">\(T_{k+1}\)</span>, by multiplying <span class="math notranslate nohighlight">\(R_k\)</span> and <span class="math notranslate nohighlight">\(U_k\)</span> in the reverse order and then adding the shift <span class="math notranslate nohighlight">\(\mu\)</span> back:</p>
-<div class="math notranslate nohighlight">
-\[T_{k+1} = R_k U_k + \mu I\]</div>
-</li>
-</ol>
-<p>The process is a <strong>similarity transformation</strong> (<span class="math notranslate nohighlight">\(T_{k+1} = U_k^H T_k U_k\)</span>), which means all eigenvalues are preserved at every step. The algorithm is simply converging to the <strong>Schur form</strong>, an upper triangular matrix with the eigenvalues on the diagonal.</p>
-<section id="shifted-qr-iteration-step-by-step">
-<h2>Shifted QR Iteration Step-by-Step<a class="headerlink" href="#shifted-qr-iteration-step-by-step" title="Link to this heading">#</a></h2>
-<p>This iteration is implemented in the following Python code:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
-<span class="c1"># Assume A is the initial upper Hessenberg matrix</span>
-<span class="n">Tk</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="c1"># This loop would contain logic to check for convergence and perform deflation</span>
-<span class="k">while</span> <span class="n">not_converged</span><span class="p">:</span>
-    <span class="c1"># Choose the shift (e.g., the bottom-right element)</span>
-    <span class="n">mu</span> <span class="o">=</span> <span class="n">Tk</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    
-    <span class="c1"># Create an identity matrix of the same size</span>
-    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    
-    <span class="c1"># Perform QR factorization on the shifted matrix</span>
-    <span class="n">Qk</span><span class="p">,</span> <span class="n">Rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">Tk</span> <span class="o">-</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">I</span><span class="p">)</span>
-    
-    <span class="c1"># Recombine and add the shift back to get the next iterate</span>
-    <span class="n">Tk</span> <span class="o">=</span> <span class="n">Rk</span> <span class="o">@</span> <span class="n">Qk</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">I</span>
-</pre></div>
-</div>
-</section>
-<section id="similarity-transformation-verification">
-<h2>Similarity Transformation Verification<a class="headerlink" href="#similarity-transformation-verification" title="Link to this heading">#</a></h2>
-<p>We can verify that this algorithm preserves eigenvalues because the transformation from <span class="math notranslate nohighlight">\(T_k\)</span> to <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is a <strong>unitary similarity transformation</strong>. Let’s walk through the derivation in detail.</p>
-<p>Our starting point is the two core equations of a single iteration:</p>
-<ol class="arabic">
-<li><p><strong>The QR factorization of the shifted matrix:</strong></p>
-<div class="math notranslate nohighlight">
-\[T_k - \mu I = U_{k} R_{k}\]</div>
-</li>
-<li><p><strong>The update step to find the next matrix in the sequence:</strong></p>
-<div class="math notranslate nohighlight">
-\[T_{k+1} = R_{k} U_{k} + \mu I\]</div>
-</li>
-</ol>
-<p>Our goal is to show that these two steps are equivalent to the similarity transformation <span class="math notranslate nohighlight">\(T_{k+1} = U_{k}^H T_k U_{k}\)</span>.</p>
-<p><strong>Step 1: Isolate <span class="math notranslate nohighlight">\(R_{k}\)</span></strong></p>
-<p>We begin with the first equation. Since <span class="math notranslate nohighlight">\(U_{k}\)</span> is a unitary matrix from the QR decomposition, its inverse is its conjugate transpose, <span class="math notranslate nohighlight">\(U_{k}^H\)</span>. We can left-multiply both sides by <span class="math notranslate nohighlight">\(U_{k}^H\)</span> to isolate <span class="math notranslate nohighlight">\(R_{k}\)</span>:</p>
+<p>The <a class="reference internal" href="upper_hessenberg.html"><span class="std std-doc">previous section</span></a> makes each QR step inexpensive by reducing <span class="math notranslate nohighlight">\(A\)</span> to upper Hessenberg form. A <strong>shift</strong> addresses a different problem: how many steps are needed before an eigenvalue, or a pair of eigenvalues, can be separated from the rest of the matrix. A poor shift can leave the iteration cycling. A good shift can make the separating subdiagonal entry nearly zero in a single step.</p>
+<p>We focus on a real, generally nonsymmetric matrix. Its eigenvalues may be real or occur in complex conjugate pairs. The target is therefore <strong>real Schur form</strong>: an upper block triangular matrix with <span class="math notranslate nohighlight">\(1\times1\)</span> blocks for real eigenvalues and <span class="math notranslate nohighlight">\(2\times2\)</span> blocks for nonreal conjugate pairs.</p>
+<section id="the-shifted-qr-step">
+<h2>The Shifted QR Step<a class="headerlink" href="#the-shifted-qr-step" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(A\in\mathbb R^{n\times n}\)</span>, start from the Hessenberg reduction</p>
 <div class="math notranslate nohighlight">
 \[
-U_{k}^H (T_k - \mu I) = U_{k}^H (U_{k} R_{k})
+H=Q_H^TAQ_H,
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(U_{k}^H U_{k} = I\)</span>, the equation simplifies to:</p>
-<div class="math notranslate nohighlight">
-\[
-R_{k} = U_{k}^H (T_{k} - \mu I)
-\]</div>
-<p><strong>Step 2: Substitute <span class="math notranslate nohighlight">\(R_{k}\)</span> into the Update Equation</strong></p>
-<p>Now, we take this expression for <span class="math notranslate nohighlight">\(R_{k}\)</span> and substitute it into the second equation, <span class="math notranslate nohighlight">\(T_{k+1} = R_{k} U_{k} + \mu I\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{k+1} = \left[ U_{k}^H (T_k - \mu I) \right] U_{k} + \mu I
-\]</div>
-<p><strong>Step 3: Expand and Simplify</strong></p>
-<p>Let’s distribute the terms inside the parentheses. The term <span class="math notranslate nohighlight">\(U_{k}\)</span> on the right multiplies both <span class="math notranslate nohighlight">\(T_k\)</span> and <span class="math notranslate nohighlight">\(\mu I\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{k+1} = (U_{k}^H T_k U_{k}) - (U_{k}^H (\mu I) U_{k}) + \mu I
-\]</div>
-<p>Because <span class="math notranslate nohighlight">\(\mu\)</span> is a scalar, it can be moved outside the matrix multiplication:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{k+1} = U_{k}^H T_k U_{k} - \mu (U_{k}^H I U_{k}) + \mu I
-\]</div>
-<p>Again, since <span class="math notranslate nohighlight">\(U_{k}^H U_{k} = I\)</span>, the equation becomes:</p>
-<div class="math notranslate nohighlight">
-\[
-T_{k+1} = U_{k}^H T_k U_{k} - \mu I + \mu I = U_{k}^H T_k U_{k}
-\]</div>
-<p>This proves that <span class="math notranslate nohighlight">\(T_{k+1}\)</span> is unitarily similar to <span class="math notranslate nohighlight">\(T_k\)</span>. Since this relationship holds for every step of the iteration, the final converged matrix <span class="math notranslate nohighlight">\(T\)</span> is unitarily similar to the original matrix <span class="math notranslate nohighlight">\(A\)</span>. Similarity transformations <strong>preserve eigenvalues</strong>, which is why this algorithm correctly computes the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> while converging to the upper-triangular Schur form.</p>
-</section>
-<section id="convergence-and-deflation">
-<h2>Convergence and Deflation<a class="headerlink" href="#convergence-and-deflation" title="Link to this heading">#</a></h2>
-<p>This is where the shift and deflation work together. The shift is designed to dramatically speed up convergence, which in turn allows us to deflate the matrix and reduce the problem size.</p>
-<section id="how-the-shift-accelerates-convergence">
-<h3>How the Shift Accelerates Convergence<a class="headerlink" href="#how-the-shift-accelerates-convergence" title="Link to this heading">#</a></h3>
-<p>The convergence of the <em>basic</em> (un-shifted) QR iteration is governed by the ratios of the eigenvalues (e.g., <span class="math notranslate nohighlight">\(|\lambda_{i+1} / \lambda_i|^k\)</span>). The shifted QR iteration is mathematically equivalent to applying the basic QR iteration to the matrix <span class="math notranslate nohighlight">\(T_k - \mu I\)</span>. Therefore, its convergence rate is governed by the ratios of the <em>shifted</em> eigenvalues.</p>
-<p>The effectiveness of the algorithm is in <em>how</em> the shift <span class="math notranslate nohighlight">\(\mu\)</span> is chosen. We select <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span>, which, as the iteration progresses, becomes an increasingly accurate approximation of an eigenvalue, <span class="math notranslate nohighlight">\(\lambda_n\)</span>.</p>
-<p>This choice has a powerful effect on the convergence rate. The rate at which the sub-diagonal element <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span> goes to zero is determined by the ratio:</p>
-<div class="math notranslate nohighlight">
-\[
-\left| \frac{\lambda_{n} - \mu}{\lambda_{n-1} - \mu} \right|
-\]</div>
-<p>Because our shift <span class="math notranslate nohighlight">\(\mu = T_k[n,n]\)</span> is chosen to be very close to <span class="math notranslate nohighlight">\(\lambda_n\)</span>, the numerator <span class="math notranslate nohighlight">\(|\lambda_n - \mu|\)</span> becomes extremely small. This makes the entire ratio very close to zero, leading to exceptionally fast convergence. In practice, this convergence is often <strong>quadratic</strong> (and <strong>cubic</strong> for symmetric matrices), meaning only one or two iterations are needed per eigenvalue.</p>
-<p>This abstract convergence has a direct, observable effect on the matrix <span class="math notranslate nohighlight">\(T_k\)</span>: the sub-diagonal element <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span> is rapidly driven to zero.</p>
-</section>
-<section id="how-deflation-is-used">
-<h3>How Deflation is Used<a class="headerlink" href="#how-deflation-is-used" title="Link to this heading">#</a></h3>
-<p>This convergence is the signal to “deflate.”</p>
-<ol class="arabic simple">
-<li><p><strong>Identify Convergence:</strong> We check the sub-diagonal element in the last row, <span class="math notranslate nohighlight">\(T_k[n, n-1]\)</span>. When this value is small enough (e.g., below a machine-precision threshold), we declare that the <span class="math notranslate nohighlight">\(n\)</span>-th eigenvalue has converged.</p></li>
-<li><p><strong>Record the Eigenvalue:</strong> The converged value <span class="math notranslate nohighlight">\(T_k[n,n]\)</span> is now one of the eigenvalues of the original matrix <span class="math notranslate nohighlight">\(A\)</span>. We record it.</p></li>
-<li><p><strong>Deflate the Matrix:</strong> When <span class="math notranslate nohighlight">\(T_k[n,n-1] \approx 0\)</span>, the matrix has the approximate form:</p></li>
-</ol>
+<p>where <span class="math notranslate nohighlight">\(Q_H\)</span> is the orthogonal matrix from the previous section. Throughout this page, <span class="math notranslate nohighlight">\(H\)</span> denotes the current Hessenberg matrix. Its size is <span class="math notranslate nohighlight">\(m\times m\)</span>, initially with <span class="math notranslate nohighlight">\(m=n\)</span>, and its entries are <span class="math notranslate nohighlight">\(h_{ij}\)</span>.</p>
+<p>For one step, choose a real shift <span class="math notranslate nohighlight">\(\mu\)</span> and factor <span class="math notranslate nohighlight">\(H-\mu I=UR\)</span>, where <span class="math notranslate nohighlight">\(U\)</span> is orthogonal and <span class="math notranslate nohighlight">\(R\)</span> is upper triangular. The updated matrix, denoted by <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span>, is obtained by reversing the factors and adding the shift back:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-T_k \approx \begin{pmatrix}
-A_{11} &amp; A_{12} \\
-0 &amp; \lambda_n
-\end{pmatrix}
+\boxed{
+\begin{aligned}
+H-\mu I&amp;=UR,\\
+H_{\mathrm{new}}&amp;=RU+\mu I.
+\end{aligned}}
 \end{split}\]</div>
-<p>The eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span> are the eigenvalues of the <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> block <span class="math notranslate nohighlight">\(A_{11}\)</span> combined with the eigenvalue <span class="math notranslate nohighlight">\(\lambda_n\)</span> we just found.</p>
-<p><strong>Repeat the Process:</strong> We can now “deflate” the problem by discarding the last row and column. The <em>entire</em> shifted QR iteration process (choose shift, factor, recombine) is repeated, but only on the <strong>smaller <span class="math notranslate nohighlight">\((n-1) \times (n-1)\)</span> matrix <span class="math notranslate nohighlight">\(A_{11}\)</span></strong>.</p>
-<p>This cycle repeats: the algorithm runs the shifted QR iteration on the smaller matrix until <em>its</em> last row converges, it records another eigenvalue, and it deflates again. This continues until the matrix is reduced to a <span class="math notranslate nohighlight">\(1 \times 1\)</span> matrix, and all eigenvalues have been found.</p>
+<p>We replace <span class="math notranslate nohighlight">\(H\)</span> by <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span> before taking the next step. The shift changes the QR factors, but the update still preserves the eigenvalues. Since <span class="math notranslate nohighlight">\(R=U^T(H-\mu I)\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+H_{\mathrm{new}}
+&amp;=U^T(H-\mu I)U+\mu I\\
+&amp;=U^THU-\mu I+\mu I\\
+&amp;=U^THU.
+\end{aligned}
+\end{split}\]</div>
+<p>The Hessenberg structure is preserved by the adjacent-rotation implementation from the previous section, so a step costs <span class="math notranslate nohighlight">\(O(m^2)\)</span> operations. A complex shift generally introduces complex arithmetic; below we explain how to handle conjugate shifts together while keeping the computation real.</p>
+</section>
+<section id="why-a-good-shift-helps">
+<h2>Why a Good Shift Helps<a class="headerlink" href="#why-a-good-shift-helps" title="Link to this heading">#</a></h2>
+<p>For intuition, first hold <span class="math notranslate nohighlight">\(\mu\)</span> fixed. Shifted QR iteration on <span class="math notranslate nohighlight">\(H\)</span> is then ordinary QR iteration on <span class="math notranslate nohighlight">\(H-\mu I\)</span>, followed by adding <span class="math notranslate nohighlight">\(\mu I\)</span> back. If the eigenvalues of <span class="math notranslate nohighlight">\(H\)</span> are <span class="math notranslate nohighlight">\(\lambda_j\)</span>, those of <span class="math notranslate nohighlight">\(H-\mu I\)</span> are <span class="math notranslate nohighlight">\(\lambda_j-\mu\)</span>.</p>
+<p>Recall that orthogonal iteration captures the directions associated with larger eigenvalue magnitudes first. If <span class="math notranslate nohighlight">\(\mu\)</span> is close to one eigenvalue <span class="math notranslate nohighlight">\(\lambda_\star\)</span>, then <span class="math notranslate nohighlight">\(|\lambda_\star-\mu|\)</span> is small. The other directions occupy the leading columns, leaving this eigenvalue at the bottom.</p>
+<p>More precisely, suppose <span class="math notranslate nohighlight">\(H\)</span> is diagonalizable, <span class="math notranslate nohighlight">\(\mu\)</span> is not an eigenvalue, and a simple eigenvalue <span class="math notranslate nohighlight">\(\lambda_\star\)</span> is uniquely closest to <span class="math notranslate nohighlight">\(\mu\)</span>. Under the starting-space assumption of <a class="reference internal" href="orthogonal_iteration.html#thm:orth-it-nh-rigorous">Theorem 26</a>, the leading <span class="math notranslate nohighlight">\((m-1)\)</span>-dimensional subspace converges with the asymptotic factor</p>
+<div class="math notranslate nohighlight">
+\[
+\rho_\mu=
+\frac{|\lambda_\star-\mu|}
+{\min_{\lambda_j\ne\lambda_\star}|\lambda_j-\mu|}
+&lt;1.
+\]</div>
+<p>The smaller this ratio, the faster the last eigenvalue separates. Closeness to the target must be judged relative to its distance from the other eigenvalues.</p>
+<p>In practice, the shift is recomputed after each step. As the trailing part of the matrix separates, it can give a better eigenvalue estimate, which makes the next shift more effective. This feedback explains the rapid local convergence often observed, but does not guarantee convergence from every starting matrix.</p>
+<section id="a-shift-that-cycles-and-one-that-deflates">
+<h3>A Shift That Cycles, and One That Deflates<a class="headerlink" href="#a-shift-that-cycles-and-one-that-deflates" title="Link to this heading">#</a></h3>
+<p>Consider the nonsymmetric matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H=\begin{pmatrix}0&amp;2\\1&amp;0\end{pmatrix},
+\qquad \lambda=\pm\sqrt2.
+\end{split}\]</div>
+<p>The simplest shift is the bottom-right entry, so <span class="math notranslate nohighlight">\(\mu=0\)</span>. A QR factorization with positive diagonal entries in <span class="math notranslate nohighlight">\(R\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H=
+\underbrace{\begin{pmatrix}0&amp;1\\1&amp;0\end{pmatrix}}_U
+\underbrace{\begin{pmatrix}1&amp;0\\0&amp;2\end{pmatrix}}_R.
+\end{split}\]</div>
+<p>Reversing the factors gives <span class="math notranslate nohighlight">\(\begin{pmatrix}0&amp;1\\2&amp;0\end{pmatrix}\)</span>. Its bottom-right entry is again zero, and the next step returns to <span class="math notranslate nohighlight">\(H\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{pmatrix}0&amp;2\\1&amp;0\end{pmatrix}
+\ \longrightarrow\
+\begin{pmatrix}0&amp;1\\2&amp;0\end{pmatrix}
+\ \longrightarrow\
+\begin{pmatrix}0&amp;2\\1&amp;0\end{pmatrix}.
+\end{split}\]</div>
+<p>Neither eigenvalue separates. Both are equally far from the shift.</p>
+<p>With the exact shift <span class="math notranslate nohighlight">\(\mu=\sqrt2\)</span>, a QR factorization instead gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H-\sqrt2 I
+=
+\underbrace{\frac1{\sqrt3}
+\begin{pmatrix}-\sqrt2&amp;1\\1&amp;\sqrt2\end{pmatrix}}_U
+\underbrace{\begin{pmatrix}\sqrt3&amp;-\sqrt6\\0&amp;0\end{pmatrix}}_R.
+\end{split}\]</div>
+<p>Consequently,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H_{\mathrm{new}}=RU+\sqrt2 I
+=\begin{pmatrix}-\sqrt2&amp;-1\\0&amp;\sqrt2\end{pmatrix}.
+\end{split}\]</div>
+<p>One step makes the matrix triangular. An approximate shift also helps: with <span class="math notranslate nohighlight">\(\mu=1.414\)</span>, the new subdiagonal entry is approximately <span class="math notranslate nohighlight">\(2.01\times10^{-4}\)</span>, compared with its original value <span class="math notranslate nohighlight">\(1\)</span>. The example shows both stagnation and rapid progress. For a larger matrix, we need an inexpensive way to obtain such shift estimates without already knowing its eigenvalues.</p>
+</section>
+</section>
+<section id="deflation-recognizing-that-an-eigenvalue-has-separated">
+<h2>Deflation: Recognizing That an Eigenvalue Has Separated<a class="headerlink" href="#deflation-recognizing-that-an-eigenvalue-has-separated" title="Link to this heading">#</a></h2>
+<p>A successful shift makes a subdiagonal entry small enough to replace by zero. Because <span class="math notranslate nohighlight">\(H\)</span> is Hessenberg, this separates it into an upper block triangular matrix. Its eigenvalues are the eigenvalues of its diagonal blocks, so the smaller problems can be solved separately. This reduction is called <strong>deflation</strong>.</p>
+<p>For a single real eigenvalue, the separating entry is <span class="math notranslate nohighlight">\(h_{m,m-1}\)</span>. Setting it to zero gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H\approx
+\begin{pmatrix}
+H_{11}&amp;*\\
+0&amp;h_{mm}
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(H_{11}\)</span> consists of the first <span class="math notranslate nohighlight">\(m-1\)</span> rows and columns. The asterisk denotes the remaining entries above <span class="math notranslate nohighlight">\(h_{mm}\)</span>, which do not affect the eigenvalues of this block triangular matrix. The scalar <span class="math notranslate nohighlight">\(h_{mm}\)</span> is an eigenvalue of the matrix after this small perturbation. We record it and continue QR iteration on <span class="math notranslate nohighlight">\(H_{11}\)</span>. This remaining matrix is called the <strong>active block</strong>: it contains the eigenvalues still to be computed. We keep the notation <span class="math notranslate nohighlight">\(H\)</span> for it and decrease <span class="math notranslate nohighlight">\(m\)</span> by one.</p>
+<p>For a trailing conjugate pair, the separating entry is instead <span class="math notranslate nohighlight">\(h_{m-1,m-2}\)</span>, when <span class="math notranslate nohighlight">\(m\ge3\)</span>. Setting it to zero isolates the trailing <span class="math notranslate nohighlight">\(2\times2\)</span> block <span class="math notranslate nohighlight">\(B\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H\approx
+\begin{pmatrix}
+H_{11}&amp;*\\
+0&amp;B
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Now <span class="math notranslate nohighlight">\(H_{11}\)</span> consists of the first <span class="math notranslate nohighlight">\(m-2\)</span> rows and columns. The internal entry <span class="math notranslate nohighlight">\(h_{m,m-1}\)</span> of <span class="math notranslate nohighlight">\(B\)</span> need not become small. Once <span class="math notranslate nohighlight">\(B\)</span> is isolated, an orthogonal <span class="math notranslate nohighlight">\(2\times2\)</span> similarity puts it in real Schur form: triangular for real roots, or a <span class="math notranslate nohighlight">\(2\times2\)</span> block for a nonreal pair. We compute its two eigenvalues directly and continue on <span class="math notranslate nohighlight">\(H_{11}\)</span>, again denoting this smaller matrix by <span class="math notranslate nohighlight">\(H\)</span>, with <span class="math notranslate nohighlight">\(m\)</span> decreased by two. An isolated nonreal block is a completed part of the calculation, not a convergence failure. The same splitting principle applies to small subdiagonal entries anywhere inside the active block.</p>
+<p>How small is small enough? Setting <span class="math notranslate nohighlight">\(h_{j+1,j}\)</span> to zero changes <span class="math notranslate nohighlight">\(H\)</span> by a matrix with 2-norm <span class="math notranslate nohighlight">\(|h_{j+1,j}|\)</span>. This gives a backward-error interpretation of the deflation test. A common initial check compares it with nearby diagonal entries:</p>
+<div class="math notranslate nohighlight">
+\[
+|h_{j+1,j}|\le
+\tau\bigl(|h_{jj}|+|h_{j+1,j+1}|\bigr),
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\tau\)</span> is of the order of machine precision. This is only an initial check. Robust nonsymmetric implementations use additional tests involving the off-diagonal entries, together with underflow safeguards. A small discarded entry gives a small matrix perturbation; for a sensitive eigenvalue problem, it need not give an equally small relative eigenvalue error.</p>
+<p>If Schur vectors or the full Schur form are required, the active-block transformations must also update the rest of the matrix and the accumulated orthogonal factor. Deflation reduces the part still needing iteration; it does not mean discarding information needed for those outputs.</p>
+</section>
+<section id="computing-shifts-from-the-trailing-block">
+<h2>Computing Shifts from the Trailing Block<a class="headerlink" href="#computing-shifts-from-the-trailing-block" title="Link to this heading">#</a></h2>
+<p>All shift choices below use the current matrix <span class="math notranslate nohighlight">\(H\)</span>, whose size decreases as eigenvalues are deflated.</p>
+<section id="the-bottom-right-entry">
+<h3>The Bottom-Right Entry<a class="headerlink" href="#the-bottom-right-entry" title="Link to this heading">#</a></h3>
+<p>The choice</p>
+<div class="math notranslate nohighlight">
+\[
+\mu=h_{mm}
+\]</div>
+<p>is often called the <strong>Rayleigh quotient shift</strong>, since <span class="math notranslate nohighlight">\(h_{mm}=\boldsymbol e_m^TH\boldsymbol e_m\)</span>, where <span class="math notranslate nohighlight">\(\boldsymbol e_m\)</span> is the last coordinate vector. When the last row is nearly separated, this entry approximates a real eigenvalue. It costs nothing to compute, but the cycling example shows why it cannot be the only shift rule.</p>
+<p>The rapid local convergence can be seen in a <span class="math notranslate nohighlight">\(2\times2\)</span> calculation. Write the entry below the diagonal as <span class="math notranslate nohighlight">\(\varepsilon\)</span> and choose the bottom-right entry as the shift:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H=\begin{pmatrix}a&amp;b\\\varepsilon&amp;d\end{pmatrix},
+\qquad \mu=d.
+\end{split}\]</div>
+<p>Let <span class="math notranslate nohighlight">\(r=\sqrt{(a-d)^2+\varepsilon^2}\)</span> be the length of the first column of <span class="math notranslate nohighlight">\(H-dI\)</span>, and assume <span class="math notranslate nohighlight">\(r&gt;0\)</span>. A rotation-based QR factorization is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+H-dI=
+\underbrace{\frac1r
+\begin{pmatrix}a-d&amp;-\varepsilon\\\varepsilon&amp;a-d\end{pmatrix}}_U
+\underbrace{\begin{pmatrix}
+r&amp;b(a-d)/r\\
+0&amp;-b\varepsilon/r
+\end{pmatrix}}_R.
+\end{split}\]</div>
+<p>The updated matrix is <span class="math notranslate nohighlight">\(H_{\mathrm{new}}=RU+dI\)</span>. Denote its entry below the diagonal by <span class="math notranslate nohighlight">\(\varepsilon_{\mathrm{new}}\)</span>. Multiplying the last row of <span class="math notranslate nohighlight">\(R\)</span> by the first column of <span class="math notranslate nohighlight">\(U\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\varepsilon_{\mathrm{new}}
+&amp;=\left(-\frac{b\varepsilon}{r}\right)
+  \frac{\varepsilon}{r}\\
+&amp;=-\frac{b\varepsilon^2}{(a-d)^2+\varepsilon^2}.
+\end{aligned}
+\end{split}\]</div>
+<p>When <span class="math notranslate nohighlight">\(|\varepsilon|\ll|a-d|\)</span>, the denominator is approximately <span class="math notranslate nohighlight">\((a-d)^2\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[
+|\varepsilon_{\mathrm{new}}|
+\approx\frac{|b|}{(a-d)^2}|\varepsilon|^2.
+\]</div>
+<p>This is <strong>quadratic local convergence</strong>: the new coupling is proportional to the square of the old one. With <span class="math notranslate nohighlight">\(a,b,d\)</span> fixed and <span class="math notranslate nohighlight">\(a\ne d\)</span>, a sufficiently small coupling becomes much smaller after one step. This calculation does not explain how to escape the cycle above, where <span class="math notranslate nohighlight">\(a=d=0\)</span>.</p>
+</section>
+<section id="the-trailing-2-times2-block">
+<h3>The Trailing <span class="math notranslate nohighlight">\(2\times2\)</span> Block<a class="headerlink" href="#the-trailing-2-times2-block" title="Link to this heading">#</a></h3>
+<p>A better estimate uses the last two coordinates together:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+B=\begin{pmatrix}a&amp;b\\c&amp;d\end{pmatrix}
+=\begin{pmatrix}
+h_{m-1,m-1}&amp;h_{m-1,m}\\
+h_{m,m-1}&amp;h_{mm}
+\end{pmatrix}.
+\end{split}\]</div>
+<p>Its two eigenvalues solve</p>
+<div class="math notranslate nohighlight">
+\[
+z^2-sz+t=0,
+\qquad s=a+d,\qquad t=ad-bc.
+\]</div>
+<p>Equivalently, with</p>
+<div class="math notranslate nohighlight">
+\[
+\alpha=\frac{a+d}{2},
+\qquad
+\Delta=\left(\frac{a-d}{2}\right)^2+bc,
+\]</div>
+<p>the roots are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mu_1,\mu_2=
+\begin{cases}
+\alpha\pm\sqrt\Delta,&amp;\Delta\ge0,\\
+\alpha\pm i\sqrt{-\Delta},&amp;\Delta&lt;0.
+\end{cases}
+\end{split}\]</div>
+<p>When the roots are real, one possible single shift is the root closest to <span class="math notranslate nohighlight">\(d=h_{mm}\)</span>, with a fixed rule to break ties. This uses information that the bottom-right entry alone misses. In the cycling example, it selects one of <span class="math notranslate nohighlight">\(\pm\sqrt2\)</span> and ends the cycle immediately.</p>
+<p>When the roots are nonreal, they estimate a conjugate pair. A real matrix cannot become upper triangular over the reals while retaining nonreal eigenvalues. We must separate a two-dimensional block instead of trying to force its two eigenvalues onto real diagonal entries.</p>
+<p>The roots of <span class="math notranslate nohighlight">\(B\)</span> are estimates of eigenvalues of <span class="math notranslate nohighlight">\(H\)</span>; they need not be accurate until the trailing block is nearly separated. The displayed formulas explain the choices, but a numerical implementation should use scaled formulas that avoid overflow and cancellation. LAPACK’s <a class="reference external" href="https://github.com/Reference-LAPACK/lapack/blob/master/SRC/dlanv2.f">DLANV2 routine</a> computes a real <span class="math notranslate nohighlight">\(2\times2\)</span> Schur decomposition and its eigenvalues with such safeguards.</p>
+</section>
+</section>
+<section id="two-shifts-in-real-arithmetic-the-francis-step">
+<h2>Two Shifts in Real Arithmetic: The Francis Step<a class="headerlink" href="#two-shifts-in-real-arithmetic-the-francis-step" title="Link to this heading">#</a></h2>
+<p>Applying a complex shift and then its conjugate would return, up to QR phase conventions, to a real problem. The <strong>Francis double-shift step</strong> combines the pair without carrying out the intervening complex computation.</p>
+<p>For shifts <span class="math notranslate nohighlight">\(\mu_1\)</span> and <span class="math notranslate nohighlight">\(\mu_2\)</span> that are real or complex conjugates, form the polynomial</p>
+<div class="math notranslate nohighlight">
+\[
+p(z)=(z-\mu_1)(z-\mu_2)=z^2-sz+t,
+\qquad
+s=\mu_1+\mu_2,\quad t=\mu_1\mu_2.
+\]</div>
+<p>Both <span class="math notranslate nohighlight">\(s\)</span> and <span class="math notranslate nohighlight">\(t\)</span> are real. For the eigenvalues of <span class="math notranslate nohighlight">\(B\)</span>, these coefficients are simply <span class="math notranslate nohighlight">\(s=\operatorname{tr}(B)\)</span> and <span class="math notranslate nohighlight">\(t=\det(B)\)</span>. Thus</p>
+<div class="math notranslate nohighlight">
+\[
+p(H)=H^2-sH+tI
+\]</div>
+<p>is real even when neither shift is real. A conceptual double-shift step takes the QR factorization of <span class="math notranslate nohighlight">\(p(H)\)</span>. Using <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(R\)</span> for these factors, the update is</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+p(H)=UR,\qquad H_{\mathrm{new}}=U^THU.
+}
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(U\)</span> is orthogonal, <span class="math notranslate nohighlight">\(R\)</span> is upper triangular, and <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span> is the matrix after the double-shift step. When <span class="math notranslate nohighlight">\(p(H)\)</span> is nonsingular, this combines two successive shifted QR steps, up to the signs or phases allowed in their QR factors.</p>
+<p>To see why, first apply the shift <span class="math notranslate nohighlight">\(\mu_1\)</span>. Denote the intermediate matrix by <span class="math notranslate nohighlight">\(H_1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+H-\mu_1I=U_1R_1,\qquad
+H_1=R_1U_1+\mu_1I=U_1^H H U_1.
+\]</div>
+<p>These factors may be complex, so the superscript <span class="math notranslate nohighlight">\(H\)</span> denotes the conjugate transpose. Apply the second shift <span class="math notranslate nohighlight">\(\mu_2\)</span> to <span class="math notranslate nohighlight">\(H_1\)</span>, obtaining <span class="math notranslate nohighlight">\(H_2\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+H_1-\mu_2I=U_2R_2,\qquad
+H_2=R_2U_2+\mu_2I=U_2^H H_1U_2.
+\]</div>
+<p>The combined change of basis is <span class="math notranslate nohighlight">\(U_1U_2\)</span>, since</p>
+<div class="math notranslate nohighlight">
+\[
+H_2=(U_1U_2)^H H(U_1U_2).
+\]</div>
+<p>This same product appears in a QR factorization of <span class="math notranslate nohighlight">\(p(H)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+p(H)
+&amp;=(H-\mu_2I)(H-\mu_1I)\\
+&amp;=(H-\mu_2I)U_1R_1\\
+&amp;=U_1(H_1-\mu_2I)R_1\\
+&amp;=(U_1U_2)(R_2R_1).
+\end{aligned}
+\end{split}\]</div>
+<p>The product <span class="math notranslate nohighlight">\(R_2R_1\)</span> is upper triangular, so <span class="math notranslate nohighlight">\(U_1U_2\)</span> is a unitary QR factor of the real matrix <span class="math notranslate nohighlight">\(p(H)\)</span>. The real factor <span class="math notranslate nohighlight">\(U\)</span> in <span class="math notranslate nohighlight">\(p(H)=UR\)</span> differs from <span class="math notranslate nohighlight">\(U_1U_2\)</span> only by column signs or unit complex factors. Thus <span class="math notranslate nohighlight">\(H_{\mathrm{new}}\)</span> carries out the same two-shift transformation, up to those harmless choices of basis.</p>
+<p>The efficient implementation of this step requires the implicit QR property, which is beyond the scope of this section.</p>
+<p>The trailing-block pair is a standard choice, but implementations can modify it. For example, when the two roots are real, LAPACK’s <a class="reference external" href="https://github.com/Reference-LAPACK/lapack/blob/master/SRC/dlahqr.f">DLAHQR routine</a> uses the root closer to <span class="math notranslate nohighlight">\(d\)</span> twice. Conjugate roots are kept together. Double shifting handles complex pairs in real arithmetic; it does not by itself rule out stagnation.</p>
+</section>
+<section id="stagnation-and-practical-remedies">
+<h2>Stagnation and Practical Remedies<a class="headerlink" href="#stagnation-and-practical-remedies" title="Link to this heading">#</a></h2>
+<p>The trailing block is useful because it is small and becomes informative near convergence. Far from convergence, it may keep producing ineffective shifts. A robust implementation therefore monitors progress and changes strategy when needed.</p>
+<section id="exceptional-shifts">
+<h3>Exceptional Shifts<a class="headerlink" href="#exceptional-shifts" title="Link to this heading">#</a></h3>
+<p>If many sweeps pass without deflation, repeating the same trailing-block rule can sustain a cycle or a nearly stationary pattern. Here a <strong>sweep</strong> means one pass of the QR transformations through the active block. <strong>Exceptional shifts</strong> deliberately depart from the usual shift rule to break the pattern. They are usually constructed from local matrix entries and subdiagonal magnitudes, so they adapt to the matrix’s scale. They need not be better eigenvalue estimates; their purpose is to move the iteration away from stagnation.</p>
+<p>For example, LAPACK’s DLAHQR counts iterations since the last deflation and periodically substitutes exceptional shifts. It also uses conservative deflation tests and an iteration limit. These safeguards are part of the method, rather than an assumption that every trailing-block shift will work.</p>
+</section>
+<section id="larger-trailing-windows">
+<h3>Larger Trailing Windows<a class="headerlink" href="#larger-trailing-windows" title="Link to this heading">#</a></h3>
+<p>Closely spaced eigenvalues may be difficult to separate, and for a strongly nonnormal matrix the trailing <span class="math notranslate nohighlight">\(2\times2\)</span> eigenvalues can be poor estimates of the full spectrum. A <strong>trailing window</strong> is a block formed from the last several rows and columns of <span class="math notranslate nohighlight">\(H\)</span>. Using a larger window can supply several shift estimates. <strong>Multishift QR iteration</strong> applies these shifts in a structured sweep.</p>
+<p>Modern implementations also use <strong>aggressive early deflation</strong>: compute a small Schur decomposition of a trailing window and test whether some of its Schur blocks have negligible coupling to the rest of the matrix. This can recognize converged eigenvalues before the ordinary subdiagonal tests do. LAPACK’s <a class="reference external" href="https://www.netlib.org/lapack/lawnspdf/lawn187.pdf">implementation notes for xHSEQR</a> describe how larger windows, multiple shifts, and early deflation are combined, including a fallback when double-shift iteration fails to converge.</p>
+<p>These strategies improve reliability, but the usual trailing-block shift rules do not provide an unconditional convergence guarantee for every nonsymmetric matrix. A solver must impose an iteration limit and report any unresolved block. LAPACK’s <a class="reference external" href="https://www.netlib.org/lapack/double/dhseqr.f">DHSEQR documentation</a> specifies both successful real Schur output and partial results on nonconvergence.</p>
 </section>
 </section>
 </section>
@@ -672,11 +830,21 @@ A_{11} &amp; A_{12} \\
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shifted-qr-iteration-step-by-step">Shifted QR Iteration Step-by-Step</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#similarity-transformation-verification">Similarity Transformation Verification</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-deflation">Convergence and Deflation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-shift-accelerates-convergence">How the Shift Accelerates Convergence</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-deflation-is-used">How Deflation is Used</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-shifted-qr-step">The Shifted QR Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-good-shift-helps">Why a Good Shift Helps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-shift-that-cycles-and-one-that-deflates">A Shift That Cycles, and One That Deflates</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deflation-recognizing-that-an-eigenvalue-has-separated">Deflation: Recognizing That an Eigenvalue Has Separated</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-shifts-from-the-trailing-block">Computing Shifts from the Trailing Block</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-bottom-right-entry">The Bottom-Right Entry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-trailing-2-times2-block">The Trailing <span class="math notranslate nohighlight">\(2\times2\)</span> Block</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-shifts-in-real-arithmetic-the-francis-step">Two Shifts in Real Arithmetic: The Francis Step</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#stagnation-and-practical-remedies">Stagnation and Practical Remedies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exceptional-shifts">Exceptional Shifts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#larger-trailing-windows">Larger Trailing Windows</a></li>
 </ul>
 </li>
 </ul>
