@@ -2,7 +2,7 @@
 
 The QR solve on the preceding page assumes that $A$ has full column rank. If its columns are dependent, different coefficient vectors can produce the same fitted vector. Least squares still has a solution, but the coefficients are no longer unique.
 
-The normal-equations Cholesky solve and ordinary QR back substitution then need to be replaced by methods that account for this dependence. Rank-aware QR can also compute minimum-norm solutions; the [LAPACK guide](https://www.netlib.org/lapack/lug/node27.html) describes both QR-based and SVD-based solvers. Here we use the SVD to separate the directions determined by $A$ from those in its null space.
+The normal-equations Cholesky solve and ordinary QR back substitution then need to be replaced by methods that account for this dependence. We can also obtain minimum-norm solutions by performing a QR decomposition of $A$ with column pivoting, followed by a second QR decomposition to obtain an orthonormal basis for the row space of $A$. The [LAPACK guide](https://www.netlib.org/lapack/lug/node27.html) describes QR-based solvers with this additional orthogonal factorization, as well as SVD-based solvers. Here we use the SVD to separate the directions determined by $A$ from those in its null space.
 
 Let $A\in\mathbb{R}^{m\times n}$ have rank $r$, and let $b\in\mathbb{R}^m$. The construction applies to any matrix shape or rank.
 

@@ -1,197 +1,178 @@
 # The Power Method
 
-Our first and most fundamental iterative algorithm is the **power method** (or *power iteration*). It is a simple but surprisingly effective method for finding the single, strictly dominant eigenvalue—the one with the largest magnitude—and its corresponding eigenvector.
+The **power method**, or **power iteration**, finds an eigenvector associated with the eigenvalue of largest magnitude, provided that eigenvalue is strictly dominant and the starting vector contains the required component. It uses only repeated matrix-vector multiplication and normalization. The same idea will lead to orthogonal iteration and QR iteration.
 
-While we will eventually move to more sophisticated methods, the power method provides the core intuition for many advanced algorithms, including the celebrated $QR$ iteration.
+## The Dominant Component
 
-## Intuition: The Dominant Direction
-
-Imagine the matrix $A$ as a linear transformation. When it acts on a vector, it stretches or shrinks it. The eigenvectors are the special directions that are *not* rotated, only scaled.
-
-Now, consider what happens when we apply this transformation repeatedly to an arbitrary starting vector $\boldsymbol{q}$. We can think of $\boldsymbol{q}$ as a mixture of all the eigenvector components.
+For the analysis, assume that $A\in\mathbb C^{n\times n}$, with $n\ge2$, is diagonalizable and its eigenvalues satisfy
 
 $$
-\boldsymbol{q} = c_1 \boldsymbol{x}_1 + c_2 \boldsymbol{x}_2 + \cdots + c_n \boldsymbol{x}_n
+|\lambda_1|>|\lambda_2|\ge\cdots\ge|\lambda_n|.
 $$
 
-Each time we apply $A$, each component $c_i \boldsymbol{x}_i$ is scaled by its eigenvalue $\lambda_i$.
+Choose corresponding eigenvectors $\boldsymbol{x}_1,\ldots,\boldsymbol{x}_n$ with $\|\boldsymbol{x}_i\|_2=1$. Expand a unit starting vector in this eigenvector basis:
 
 $$
-A \boldsymbol{q} = c_1 \lambda_1 \boldsymbol{x}_1 + c_2 \lambda_2 \boldsymbol{x}_2 + \cdots + c_n \lambda_n \boldsymbol{x}_n
+\boldsymbol{q}_0=\sum_{i=1}^n c_i\boldsymbol{x}_i,
+\qquad c_1\ne0.
 $$
 
-If we apply $A$ $k$ times, we get:
+The condition $c_1\ne0$ means that the dominant mode is present. For nonorthogonal eigenvectors, this coefficient is not generally $\boldsymbol{x}_1^H\boldsymbol{q}_0$. A starting vector drawn from a continuous distribution satisfies $c_1\ne0$ with probability one in exact arithmetic.
+
+Repeated application of $A$ scales each component by its eigenvalue:
 
 $$
-A^k \boldsymbol{q} = c_1 \lambda_1^k \boldsymbol{x}_1 + c_2 \lambda_2^k \boldsymbol{x}_2 + \cdots + c_n \lambda_n^k \boldsymbol{x}_n
+A^k\boldsymbol{q}_0=\sum_{i=1}^n c_i\lambda_i^k\boldsymbol{x}_i.
 $$
 
-If one eigenvalue, say $\lambda_1$, is larger in magnitude than all others ($|\lambda_1| > |\lambda_2| \ge \dots$), its $k$-th power $\lambda_1^k$ will grow much faster than all other terms. After many iterations, the first term will dominate the sum, and all other components will become negligible in comparison.
+Relative to the first component, every other component is multiplied by $(\lambda_i/\lambda_1)^k$. These ratios tend to zero. Thus the dominant component eventually determines the direction, even if all components are shrinking because $|\lambda_1|<1$.
+
+## Normalize After Each Multiplication
+
+The magnitude of $A^k\boldsymbol{q}_0$ can become very large or very small. Since we want its direction, normalize after each multiplication:
 
 $$
-A^k \boldsymbol{q} \approx c_1 \lambda_1^k \boldsymbol{x}_1
+\boldsymbol{z}_k=A\boldsymbol{q}_k,
+\qquad
+\boldsymbol{q}_{k+1}=\frac{\boldsymbol{z}_k}{\|\boldsymbol{z}_k\|_2},
+\qquad k=0,1,\ldots.
 $$
 
-This means the resulting vector $A^k \boldsymbol{q}$ will be almost perfectly aligned with the dominant eigenvector $\boldsymbol{x}_1$.
+In exact arithmetic, this gives $\boldsymbol{q}_k=A^k\boldsymbol{q}_0/\|A^k\boldsymbol{q}_0\|_2$. The normalization changes the length, not the direction, and avoids accumulating the overall growth or decay of the powers.
 
-## Derivation
+:::{figure} ../_static/power_method_convergence.svg
+:alt: Five copies of a two-dimensional unit-vector diagram show power iterates after zero, two, four, six, and ten steps. Each blue unit vector moves closer to the fixed horizontal teal eigenvector x1. The angle decreases from 70 degrees to about 4.4 degrees. Dashed quarter circles mark unit length.
+:width: 850px
+:name: fig-power-method-convergence
 
-Let's formalize this. We assume $A \in \mathbb{C}^{n \times n}$ is diagonalizable and has a single, strictly dominant eigenvalue $\lambda_1$:
+Normalized iterates align with the dominant direction. Here $A=\operatorname{diag}(1,0.7)$, $\boldsymbol{x}_1=(1,0)^T$, and $\boldsymbol{q}_0$ makes an angle of $70^\circ$ with $\boldsymbol{x}_1$. Every arrow has length $1$; intermediate iterates are omitted. This symmetric example approaches the direction monotonically. General matrices need not do so.
+:::
 
-$$
-|\lambda_1| > |\lambda_2| \ge |\lambda_3| \ge \cdots \ge |\lambda_n|
-$$
-
-Let $\boldsymbol{x}_1, \dots, \boldsymbol{x}_n$ be the corresponding eigenvectors. We pick a starting vector $\boldsymbol{q}_0$ which we can express as a linear combination of these eigenvectors:
-
-$$
-\boldsymbol{q}_0 = \sum_{i=1}^n c_i \boldsymbol{x}_i
-$$
-
-We must assume that $c_1 \neq 0$. That is, our starting vector must have some component in the direction of the dominant eigenvector. In practice, a randomly chosen $\boldsymbol{q}_0$ makes this overwhelmingly likely.
-
-Now, let's examine the vector $\boldsymbol{z}_k = A^k \boldsymbol{q}_0$:
+At the current iterate, estimate the eigenvalue using the **Rayleigh quotient**:
 
 $$
-\boldsymbol{z}_k = A^k \left( \sum_{i=1}^n c_i \boldsymbol{x}_i \right) = \sum_{i=1}^n c_i A^k \boldsymbol{x}_i = \sum_{i=1}^n c_i \lambda_i^k \boldsymbol{x}_i
+\mu_k=\frac{\boldsymbol{q}_k^HA\boldsymbol{q}_k}
+{\boldsymbol{q}_k^H\boldsymbol{q}_k}
+=\boldsymbol{q}_k^H\boldsymbol{z}_k.
 $$
 
-We factor out the dominant term $\lambda_1^k$:
+We use $\mu_k$ for an estimate and reserve $\lambda_i$ for the eigenvalues of $A$. If $\boldsymbol{q}_k$ is an exact eigenvector, this quotient gives its eigenvalue, including its sign or complex phase.
+
+To decide when to stop, compute the **residual**
 
 $$
-\boldsymbol{z}_k = \lambda_1^k \left( c_1 \boldsymbol{x}_1 + \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k \boldsymbol{x}_i \right)
+\boldsymbol{r}_k=A\boldsymbol{q}_k-\mu_k\boldsymbol{q}_k
+=\boldsymbol{z}_k-\mu_k\boldsymbol{q}_k.
 $$
 
-Because of our dominance assumption, $|\lambda_i / \lambda_1| < 1$ for all $i \ge 2$. Therefore, as $k \to \infty$, the summation term decays exponentially:
+The residual measures how closely the current pair satisfies the eigenvalue equation. For a chosen tolerance $\tau>0$, a typical stopping test is $\|\boldsymbol{r}_k\|_2\le\tau\|A\|_2$. A norm estimate can supply the matrix scale in an implementation. Changes in $\mu_k$ alone can be misleading because the estimate may change little while the vector is still inaccurate. Test before normalizing again, so the returned pair is $(\mu_k,\boldsymbol{q}_k)$. A small residual verifies an approximate eigenpair; it does not by itself establish that the eigenvalue is dominant.
+
+Under our assumptions, $\boldsymbol{z}_k$ is never zero. If $\boldsymbol{z}_k=0$ outside these assumptions, the current $\boldsymbol{q}_k$ is an exact eigenvector for eigenvalue zero. Normalization is then impossible; restart if the dominant eigenpair is wanted. An implementation should also impose a maximum number of iterations.
+
+Each iteration needs one matrix-vector product and $O(n)$ additional work. A dense product costs $O(n^2)$ operations; a sparse matrix or an operator that can be applied without forming $A$ may be much cheaper.
+
+## Convergence: The Eigenvalue Ratio Controls the Rate
+
+The key quantity is
 
 $$
-\lim_{k \to \infty} \left[ \sum_{i=2}^n c_i \left(\frac{\lambda_i}{\lambda_1}\right)^k \boldsymbol{x}_i \right] = \boldsymbol{0}
+\boxed{\rho=\left|\frac{\lambda_2}{\lambda_1}\right|<1.}
 $$
 
-This leaves us with:
+:::{prf:theorem} Convergence of Power Iteration
+:label: thm-power-method-convergence
+
+Under the assumptions above, the line spanned by $\boldsymbol{q}_k$ converges to the line spanned by $\boldsymbol{x}_1$. More precisely, there are scalars $\phi_k$ with $|\phi_k|=1$ such that
 
 $$
-\boldsymbol{z}_k = A^k \boldsymbol{q}_0 \approx c_1 \lambda_1^k \boldsymbol{x}_1
+\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2=O(\rho^k),
+\qquad
+|\mu_k-\lambda_1|=O(\rho^k).
 $$
+:::
 
-This shows that the sequence of vectors $\boldsymbol{z}_k$ converges to the subspace spanned by the dominant eigenvector, $\text{span}\{\boldsymbol{x}_1\}$.
-
-## The Algorithm: Power Iteration
-
-In practice, computing $A^k \boldsymbol{q}_0$ directly is numerically unstable. If $|\lambda_1| > 1$, the vector $\boldsymbol{z}_k$ will overflow, and if $|\lambda_1| < 1$, it will underflow to zero.
-
-The solution is to **normalize** the vector at every single iteration. This keeps the vector's norm at $1$ and preserves only the directional information, which is what we care about. This leads to the **Power Iteration** algorithm.
-
-**Algorithm: Power Iteration**
-
-1.  Start with a random unit vector $\boldsymbol{q}$ (i.e., $\|\boldsymbol{q}\|_2 = 1$).
-2.  Loop until convergence (e.g., until $\lambda$ stops changing):
-      1. $\boldsymbol{z} = A \boldsymbol{q}$
-      2. $\lambda = \boldsymbol{q}^H \boldsymbol{z}$ (Estimate eigenvalue using the **Rayleigh quotient**)
-      3. $\boldsymbol{q} = \boldsymbol{z} / \|\boldsymbol{z}\|_2$ (Normalize for the next iteration)
-3.  Return $\lambda$ (the dominant eigenvalue) and $\boldsymbol{q}$ (the dominant eigenvector).
-
-## Convergence Analysis
-
-* **Eigenvector:** The convergence of the vector $\boldsymbol{q}_k$ is slightly subtle. From our derivation, the normalized vector $\boldsymbol{q}_k = \boldsymbol{z}_k / \|\boldsymbol{z}_k\|$ behaves like:
-
-    $$
-    \boldsymbol{q}_k \approx \frac{c_1 \lambda_1^k \boldsymbol{x}_1}{\|c_1 \lambda_1^k \boldsymbol{x}_1\|} = \left( \frac{\lambda_1}{|\lambda_1|} \right)^k \left( \frac{c_1}{|c_1|} \right) \left( \frac{\boldsymbol{x}_1}{\|\boldsymbol{x}_1\|} \right)
-    $$
-
-    If $\lambda_1$ is real and positive, $\boldsymbol{q}_k$ converges to $\pm \boldsymbol{x}_1$. However, if $\lambda_1 = \rho e^{i\theta}$ is complex, the phase factor $(e^{i\theta})^k$ remains, and the vector $\boldsymbol{q}_k$ "spins" in the complex plane.
-
-   * In all cases, the *subspace* $\text{span}\{\boldsymbol{q}_k\}$ converges to $\text{span}\{\boldsymbol{x}_1\}$.
-   * The *rate of convergence* is linear and depends on the ratio $|\lambda_2 / \lambda_1|$. If this ratio is close to 1 (i.e., the dominant eigenvalue is not very dominant), convergence can be very slow.
-
-* **Eigenvalue:** The sequence of estimates $\lambda_k = \boldsymbol{q}_{k}^H A \boldsymbol{q}_{k}$ converges to the dominant eigenvalue $\lambda_1$. We prove this result below.
-
-````{prf:proof}
-We prove that the sequence of eigenvalue estimates $\lambda_k = \boldsymbol{q}_k^H A \boldsymbol{q}_k$ (the Rayleigh quotient) converges to the dominant eigenvalue $\lambda_1$.
-
-**Recall Eigenvector Convergence:**
-
-From the analysis of the eigenvector, we know that as $k \to \infty$, the vector $\boldsymbol{q}_k$ becomes almost perfectly aligned with the dominant eigenvector $\boldsymbol{x}_1$.
-
-Let's assume $\boldsymbol{x}_1$ is normalized such that $\|\boldsymbol{x}_1\|_2 = 1$. As shown in the derivation, the sequence $\boldsymbol{q}_k$ can be written as:
-
-$$
-\boldsymbol{q}_k = \phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k
-$$
-
-where:
-
-* $\phi_k = \left( \frac{\lambda_1}{|\lambda_1|} \right)^k \left( \frac{c_1}{|c_1|} \right)$ is a complex phase factor. Note that $|\phi_k| = 1$, which means $\phi_k^H \phi_k = 1$.
-* $\boldsymbol{\epsilon}_k$ is the error vector, which contains all the non-dominant eigenvector components. From our derivation, we know that $\boldsymbol{\epsilon}_k \to \boldsymbol{0}$ as $k \to \infty$.
-
-**Substitute into the Rayleigh Quotient:**
-
-Now, let's examine the eigenvalue estimate $\lambda_k$ using this expression for $\boldsymbol{q}_k$:
-
-$$
-\lambda_k = \boldsymbol{q}_k^H A \boldsymbol{q}_k = (\phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k)^H A (\phi_k \boldsymbol{x}_1 + \boldsymbol{\epsilon}_k)
-$$
-
-Since $A(\phi_k \boldsymbol{x}_1) = \phi_k (A \boldsymbol{x}_1) = \phi_k \lambda_1 \boldsymbol{x}_1$, we can write:
-
-$$
-\lambda_k = (\phi_k^H \boldsymbol{x}_1^H + \boldsymbol{\epsilon}_k^H) (\phi_k \lambda_1 \boldsymbol{x}_1 + A \boldsymbol{\epsilon}_k)
-$$
-
-**Expand the Expression:**
-
-We multiply the terms:
-
-$$
-\lambda_k = \underbrace{(\phi_k^H \boldsymbol{x}_1^H)(\phi_k \lambda_1 \boldsymbol{x}_1)}_{\text{Term 1}} + \underbrace{(\phi_k^H \boldsymbol{x}_1^H)(A \boldsymbol{\epsilon}_k)}_{\text{Term 2}} + \underbrace{(\boldsymbol{\epsilon}_k^H)(\phi_k \lambda_1 \boldsymbol{x}_1)}_{\text{Term 3}} + \underbrace{(\boldsymbol{\epsilon}_k^H A \boldsymbol{\epsilon}_k)}_{\text{Term 4}}
-$$
-
-**Analyze Each Term as $k \to \infty$:**
-
-* **Term 1:** We can regroup the scalars:
-
-    $$
-    (\phi_k^H \phi_k) \lambda_1 (\boldsymbol{x}_1^H \boldsymbol{x}_1)
-    $$
-
-    Since $\phi_k^H \phi_k = 1$ (as $|\phi_k|=1$) and $\boldsymbol{x}_1^H \boldsymbol{x}_1 = 1$ (as $\boldsymbol{x}_1$ is normalized), this term simplifies to:
-
-    $$
-    \text{Term 1} = (1) \cdot \lambda_1 \cdot (1) = \lambda_1
-    $$
-
-* **Term 2:** As $k \to \infty$, we know $\boldsymbol{\epsilon}_k \to \boldsymbol{0}$. The entire term, which is a scalar inner product, must therefore go to 0.
-
-* **Term 3:** Similarly, as $k \to \infty$, this inner product also goes to 0.
-
-* **Term 4:** This is a quadratic form $\boldsymbol{\epsilon}_k^H A \boldsymbol{\epsilon}_k$. This term goes to 0 even faster.
-
-By taking the limit of the expanded expression, we get:
+:::{prf:proof}
+Factor out the dominant component:
 
 $$
 \begin{aligned}
-\lim_{k\to\infty}\lambda_k
-&= \lim_{k\to\infty}\big(\text{Term 1} + \text{Term 2} + \text{Term 3} + \text{Term 4}\big) \\
-&= \lambda_1 + 0 + 0 + 0 \\
-&= \lambda_1
+A^k\boldsymbol{q}_0
+&=c_1\lambda_1^k(\boldsymbol{x}_1+\boldsymbol{e}_k),\\
+\boldsymbol{e}_k
+&=\sum_{i=2}^n\frac{c_i}{c_1}
+\left(\frac{\lambda_i}{\lambda_1}\right)^k\boldsymbol{x}_i,
+\qquad
+\|\boldsymbol{e}_k\|_2\le C\rho^k,
 \end{aligned}
 $$
 
-Therefore,
+where $C=\sum_{i=2}^n|c_i/c_1|$ is independent of $k$. Normalizing gives
 
 $$
-\lim_{k \to \infty} \lambda_k = \lambda_1
+\boldsymbol{q}_k
+=\phi_k\frac{\boldsymbol{x}_1+\boldsymbol{e}_k}
+{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2},
+\qquad
+\phi_k=\frac{c_1\lambda_1^k}{|c_1\lambda_1^k|}.
 $$
 
-This proves that the sequence of Rayleigh quotients converges to the dominant eigenvalue $\lambda_1$.
-````
+The triangle inequality and its reverse form show that normalization preserves the rate:
 
-## Limitations
+$$
+\begin{aligned}
+\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2
+&=\left\|\frac{\boldsymbol{x}_1+\boldsymbol{e}_k}
+{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}
+-\boldsymbol{x}_1\right\|_2\\
+&=\left\|\left(\frac{1}{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}-1\right)
+(\boldsymbol{x}_1+\boldsymbol{e}_k)+\boldsymbol{e}_k\right\|_2\\
+&\le\left|\frac{1}{\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2}-1\right|
+\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2+\|\boldsymbol{e}_k\|_2\\
+&=\big|1-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2\big|
++\|\boldsymbol{e}_k\|_2\\
+&=\big|\|\boldsymbol{x}_1\|_2-\|\boldsymbol{x}_1+\boldsymbol{e}_k\|_2\big|
++\|\boldsymbol{e}_k\|_2\\
+&\le2\|\boldsymbol{e}_k\|_2\le2C\rho^k.
+\end{aligned}
+$$
 
-The power method is fundamental, but it has significant limitations:
+For the eigenvalue estimate, use $(A-\lambda_1I)\boldsymbol{x}_1=0$ and $\|\boldsymbol{q}_k\|_2=1$:
 
-1.  It only finds the **single largest eigenvalue**.
-2.  It fails if there is no *single* dominant eigenvalue (e.g., a complex conjugate pair $|\lambda_1| = |\lambda_2|$ or real eigenvalues $\lambda_1 = -\lambda_2$).
-3.  Convergence can be unacceptably slow if $|\lambda_1| \approx |\lambda_2|$.
+$$
+\begin{aligned}
+\mu_k-\lambda_1
+&=\boldsymbol{q}_k^H(A-\lambda_1I)
+(\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1),\\
+|\mu_k-\lambda_1|
+&\le\|A-\lambda_1I\|_2
+\|\boldsymbol{q}_k-\phi_k\boldsymbol{x}_1\|_2
+=O(\rho^k).
+\end{aligned}
+$$
+:::
 
-Despite these limitations, this core idea of "repeated application and normalization" is the engine inside the much more robust algorithms we will study next.
+The factor $\phi_k$ accounts for sign or phase changes. For real $A$ and a real start, a positive $\lambda_1$ gives convergence to either $\boldsymbol{x}_1$ or $-\boldsymbol{x}_1$. A negative $\lambda_1$ makes the signs alternate. In complex arithmetic, the phase can keep rotating. The **direction**, interpreted as a one-dimensional subspace, converges in all these cases.
+
+The bound is geometric: a smaller $\rho$ gives faster convergence, while $\rho$ close to $1$ gives slow convergence. The constant also matters. A very small $c_1$ can delay the appearance of the dominant direction. The rate can be faster if the starting vector has no components associated with eigenvalues of magnitude $|\lambda_2|$.
+
+### The Hermitian Case: A More Accurate Eigenvalue Estimate
+
+If $A$ is Hermitian, including real symmetric matrices, the Rayleigh quotient has a stronger error bound. Write $\boldsymbol{q}_k=\alpha_k\boldsymbol{x}_1+\boldsymbol{w}_k$ with $\boldsymbol{w}_k\perp\boldsymbol{x}_1$. The directional bound above gives $\|\boldsymbol{w}_k\|_2=O(\rho^k)$.
+
+Because $A$ is Hermitian, both cross terms vanish when expanding the Rayleigh quotient. Also, $|\alpha_k|^2+\|\boldsymbol{w}_k\|_2^2=1$. Therefore,
+
+$$
+\mu_k-\lambda_1
+=\boldsymbol{w}_k^H(A-\lambda_1I)\boldsymbol{w}_k
+=O(\rho^{2k}).
+$$
+
+Thus the eigenvalue estimate can converge faster than the eigenvector direction. This stronger bound does not hold for a general nonsymmetric matrix. For another presentation of power iteration and its convergence, see [Driscoll and Braun, *Fundamentals of Numerical Computation*](https://fncbook.com/python/power/).
+
+## Limitations and the Next Step
+
+Power iteration finds one dominant direction. If $c_1=0$, that direction is absent from the exact iterates. If eigenvalues tie in magnitude, a single direction need not emerge; a conjugate pair or eigenvalues $\lambda$ and $-\lambda$ can produce persistent oscillations. A small gap in magnitudes can make convergence too slow to be useful.
+
+Diagonalizability is an assumption of the proof, not a requirement for running the algorithm. For matrices that are not diagonalizable, the convergence rate above need not apply.
+
+To find additional directions, we must remove the one already found. This leads to [deflation](deflation.md).

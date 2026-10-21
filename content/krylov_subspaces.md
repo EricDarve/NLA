@@ -1,6 +1,6 @@
 # Projection onto Krylov Subspaces
 
-We established that for large, sparse matrices, our only computationally feasible tool is the sparse matrix-vector product, $v \mapsto Av$. Any method that modifies the matrix $A$ itself, like the dense QR algorithm, is unusable due to "fill-in."
+We established that for large, sparse matrices, our only computationally feasible tool is the sparse matrix-vector product, $v \mapsto Av$. Any method that modifies the matrix $A$ itself, like the dense QR iteration, is unusable due to "fill-in."
 
 This forces us to ask a new question: How can we find eigenvalues using *only* matrix-vector products?
 
@@ -104,7 +104,7 @@ The Arnoldi iteration is a numerically stable way (essentially a modified Gram-S
 This defines the general strategy for all modern iterative eigensolvers:
 
 1.  **Build Subspace:** Choose a starting vector $q_1$ and run the Arnoldi iteration for $k$ steps to build an orthonormal basis $Q_k$ for the Krylov subspace $\mathcal{K}_k$ and the $k \times k$ Hessenberg projection $H_k = Q_k^T A Q_k$.
-2.  **Solve Small Problem:** Compute the eigenvalues of the *small, dense* matrix $H_k$ using a standard method (e.g., the QR iteration algorithm). Let these eigenvalues be $\theta_1, \dots, \theta_k$. These are called the **Ritz values**.
+2.  **Solve Small Problem:** Compute the eigenvalues of the *small, dense* matrix $H_k$ using a standard method (e.g., QR iteration). Let these eigenvalues be $\theta_1, \dots, \theta_k$. These are called the **Ritz values**.
 3.  **Check Convergence:** These Ritz values are our approximations for the eigenvalues of $A$. We can check their associated residual error (which, as we will see, is related to the $h_{k+1,k}$ term) to see if they are "good enough."
 4.  **Iterate:** If not converged, we can expand the subspace (increase $k$) and repeat.
 

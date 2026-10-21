@@ -11,8 +11,8 @@ import numpy as np
 
 
 def plot_sequence(states, active_rows, active_columns, eliminated_groups,
-                  titles, actions, row_labels, footer, stem):
-    """Show matrix states and highlight the next transformation's entries."""
+                  titles, actions, row_labels, footer, stem, active_masks=None):
+    """Highlight the next update, optionally using masks for two-sided actions."""
     plt.rcParams.update({"font.size": 13, "svg.fonttype": "path"})
     nrows, ncols = states[0].shape
     cell = 0.55
@@ -38,8 +38,11 @@ def plot_sequence(states, active_rows, active_columns, eliminated_groups,
         for row in range(nrows):
             for col in range(ncols):
                 x, y = left + col * cell, -row * cell
-                active = (stage < len(active_rows) and row in active_rows[stage]
-                          and col in active_columns[stage])
+                if active_masks is not None and stage < len(active_masks):
+                    active = active_masks[stage][row, col]
+                else:
+                    active = (stage < len(active_rows) and row in active_rows[stage]
+                              and col in active_columns[stage])
                 if active:
                     ax.add_patch(Rectangle(
                         (x - 0.25, y - 0.24), 0.5, 0.48,

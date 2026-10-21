@@ -2,7 +2,7 @@
 
 ## Why Iterative Methods?
 
-Previously, we developed a robust and powerful framework for computing the eigenvalues of a matrix $A \in \mathbb{R}^{n \times n}$. The cornerstone of this "direct" approach is the QR algorithm, which is based on similarity transformations ($A_k = Q_k R_k$, $A_{k+1} = R_k Q_k$) that preserve eigenvalues. These transformations are designed to drive the matrix to an upper-triangular or real-Schur form, from which the eigenvalues can be read.
+Previously, we developed a robust and powerful framework for computing the eigenvalues of a matrix $A \in \mathbb{R}^{n \times n}$. The cornerstone of this "direct" approach is the QR iteration, which is based on similarity transformations ($A_k = Q_k R_k$, $A_{k+1} = R_k Q_k$) that preserve eigenvalues. These transformations are designed to drive the matrix to an upper-triangular or real-Schur form, from which the eigenvalues can be read.
 
 These methods are incredibly accurate, stable, and generally find the *entire* spectrum of the matrix. However, they are built on an implicit assumption: that we can afford to work with dense matrices.
 
@@ -13,11 +13,11 @@ In virtually all large-scale applications in science, engineering, data science,
 * **Definition:** A matrix is considered sparse if the number of non-zero entries, denoted $nnz(A)$, is much smaller than the total number of entries, $n^2$.
 * **A Common Case:** In many applications (e.g., from discretizing a PDE), a matrix will have $O(n)$ non-zero entries, meaning the number of non-zeros *per row* is bounded by a small constant, $O(1)$, even as $n \to \infty$.
 
-Why can't we use our standard QR algorithm?
+Why can't we use our standard QR iteration?
 
-1.  **Fill-In:** The similarity transformations used in the QR algorithm (and its prerequisites, like reduction to Hessenberg form) almost universally destroy sparsity. Even if $A$ is sparse, the intermediate matrices $Q$, $R$, and $A_k$ will be dense. This is known as **"fill-in."**
+1.  **Fill-In:** The similarity transformations used in the QR iteration (and its prerequisites, like reduction to Hessenberg form) almost universally destroy sparsity. Even if $A$ is sparse, the intermediate matrices $Q$, $R$, and $A_k$ will be dense. This is known as **"fill-in."**
 2.  **Memory Cost:** For a "large" problem, $n$ might be $10^6$ or $10^9$. We can easily store the $O(n)$ non-zero entries of $A$. We absolutely cannot store the $O(n^2)$ entries of a dense $A_k$.
-3.  **Computational Cost:** The $O(n^3)$ computational cost of the dense QR algorithm is completely infeasible for such dimensions.
+3.  **Computational Cost:** The $O(n^3)$ computational cost of the dense QR iteration is completely infeasible for such dimensions.
 
 We are forced to conclude that any method that modifies the entries of $A$ (like LU, QR, or Hessenberg reduction) is unsuitable for large, sparse problems.
 
@@ -46,7 +46,7 @@ They build a sequence of vectors or subspaces that (ideally) converge to the des
 
 This new approach comes with a significant set of trade-offs:
 
-* **Partial Spectrum:** Unlike the QR algorithm, these methods typically do not find the *entire* spectrum. They are most effective at finding a few of the "extreme" eigenvalues (e.g., the largest or smallest in magnitude) and their corresponding eigenvectors. In practice, this is often all that is required by the application.
+* **Partial Spectrum:** Unlike the QR iteration, these methods typically do not find the *entire* spectrum. They are most effective at finding a few of the "extreme" eigenvalues (e.g., the largest or smallest in magnitude) and their corresponding eigenvectors. In practice, this is often all that is required by the application.
 * **Convergence:** Convergence is not guaranteed and can be slow, depending on the properties of the matrix (like the separation between eigenvalues).
 * **Accuracy:** We do not compute the eigenvalues to full machine precision. Instead, the iteration is stopped when the "residual" (a measure of error) falls below a user-defined tolerance.
 

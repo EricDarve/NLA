@@ -1,108 +1,105 @@
 # Orthogonal Iteration and Eigenvalues
 
-:::{admonition} Key Idea
-:class: tip
+The [previous section](orthogonal_iteration.md) establishes how orthogonal iteration finds invariant subspaces and Schur directions. To use these results for eigenvalue computation, we represent the action of $A$ in the current basis.
 
-Orthogonal (subspace) iteration produces a sequence of orthonormal bases $Q_k$. The projected matrix,
+We keep the same notation: $Q_\star$ is an exact Schur basis in $A=Q_\star TQ_\star^H$, with $|\lambda_1|\ge\cdots\ge|\lambda_n|$, and $Q_k\in\mathbb C^{n\times p}$ is the orthonormal basis at iteration $k$.
 
-$$
-T_k = Q_k^H A Q_k
-$$
+## Extracting Eigenvalues from a Subspace
 
-is the Rayleigh–Ritz compression of $A$ onto the subspace $\operatorname{range}(Q_k)$. As this subspace converges to an invariant subspace of $A$, the matrix $T_k$ converges to the (upper triangular) Schur form of $A$ restricted to that subspace. Consequently, the eigenvalues of $T_k$ (and ultimately its diagonal entries) become increasingly accurate approximations of the corresponding eigenvalues of $A$.
-:::
-
-## From Subspaces to Eigenvalue Approximations
-
-Recall that one step of orthogonal iteration (using the thin QR factorization) is:
+For $p<n$, a vector in the current subspace has the form $\boldsymbol u=Q_k\boldsymbol y$. Multiplication by $A$ can take it outside the subspace. Projecting back gives
 
 $$
-Z_{k+1} = A Q_k, \qquad Z_{k+1} = Q_{k+1} R_{k+1}.
+T_k=Q_k^HAQ_k,
+\qquad
+Q_kQ_k^HA\boldsymbol u=Q_kT_k\boldsymbol y.
 $$
 
-We define the Rayleigh–Ritz matrix as:
+The $p\times p$ matrix $T_k$ therefore describes the projected action of $A$. For $p=1$, it is the Rayleigh quotient used in the power method. For general $p$, its eigenvalues are called **Ritz values**. Take a unit eigenvector of $T_k$:
 
 $$
-T_k = Q_k^H A Q_k \in \mathbb{C}^{p\times p}.
+T_k\boldsymbol y=\theta\boldsymbol y,
+\qquad \|\boldsymbol y\|_2=1.
 $$
 
-By construction, $\operatorname{range}(Q_k)$ provides an orthonormal basis for a $p$-dimensional subspace, and $T_k$ represents the matrix $A$ projected onto that basis.
-
-## Convergence of $T_k$ to the Schur Form
-
-Assume $A$ has the Schur decomposition $A = Q T Q^H$, where the eigenvalues on the diagonal of $T$ are ordered by magnitude, $|\lambda_1| > |\lambda_2| > \dots > |\lambda_n| > 0$.
-
-If orthogonal iteration is initialized with a matrix $Q_0$ whose columns are linearly independent and have a nonzero component in the desired invariant subspace, then $\operatorname{range}(Q_k)$ will converge. Under standard spectral separation conditions, it converges to the dominant $p$-dimensional $A$-invariant subspace, which is spanned by the first $p$ Schur vectors.
-
-Let $Q_p = Q[:,1:p]$ be the $n \times p$ matrix of the first $p$ Schur vectors, and let $T_p = T[1:p,1:p]$ be the corresponding $p \times p$ principal submatrix of $T$. As the subspaces converge, so do the projected matrices:
+The corresponding **Ritz vector** $\boldsymbol u=Q_k\boldsymbol y$ also has unit norm. Using the subspace residual $E_k=AQ_k-Q_kT_k$ from the previous section,
 
 $$
-\operatorname{range}(Q_k) \to \operatorname{range}(Q_p) \quad\Longrightarrow\quad T_k = Q_k^H A Q_k \to T_p
+\begin{aligned}
+A\boldsymbol u-\theta\boldsymbol u
+&=AQ_k\boldsymbol y-Q_kT_k\boldsymbol y\\
+&=E_k\boldsymbol y,\\
+\|A\boldsymbol u-\theta\boldsymbol u\|_2
+&\le\|E_k\|_2.
+\end{aligned}
 $$
 
-This means $T_k$ asymptotically becomes upper triangular, and its eigenvalues (which are its diagonal entries) converge to the $p$ dominant eigenvalues of $A$, $\{\lambda_1, \dots, \lambda_p\}$.
+Because $Q_k^HE_k=Q_k^HAQ_k-T_k=0$, this residual is perpendicular to the current subspace. Thus the Ritz pair satisfies the eigenvector equation after projection. If the subspace is exactly invariant, $E_k=0$ and $(\theta,\boldsymbol u)$ is an exact eigenpair of $A$. For a nonnormal matrix, the eigenvalue error can be much larger than the residual.
 
-## Shifts: Accelerating Eigenvalue Convergence
+## From Subspace Convergence to Schur Form
 
-Shifting modifies the iteration to dramatically accelerate convergence by emphasizing specific eigenvalues.
+### One Gap: Convergence of the Subspace
 
-### The Problem with Slow Convergence
+For $p<n$, suppose the preceding convergence theorem applies: $A=X\Lambda X^{-1}$ is diagonalizable, $|\lambda_p|>|\lambda_{p+1}|$, and the first $p$ rows of $X^{-1}Q_0$ form an invertible matrix. The columns of $X$ follow the eigenvalue ordering above.
 
-Without shifting, the convergence of $\mathrm{range}(Q_k)$ to the dominant invariant subspace is governed by the eigenvalue separation. The convergence rate typically depends on the ratio of the largest "unwanted" eigenvalue ($\lambda_{p+1}$) to the smallest "wanted" one ($\lambda_p$):
+This gap controls separation of the wanted subspace from the unwanted directions. No gaps within the wanted group are assumed. Thus $\operatorname{range}(Q_k)$ approaches $\operatorname{range}(Q_{\star,p})$, but **the basis matrix $Q_k$ need not converge**. Two orthonormal vectors can keep rotating within a plane even though the plane itself stays fixed.
 
-$$
-\frac{|\lambda_{p+1}|}{|\lambda_p|}
-$$
-
-If this ratio is close to 1 (i.e., the spectral gap is small), convergence can be impractically slow.
-
-### The Shifted Iteration
-
-To accelerate this, we introduce a scalar **shift** $\mu$ and apply the iteration to the matrix $A - \mu I$ instead:
+To compare the current basis with the exact one, we need a general unitary $p\times p$ matrix $W_k$ that can mix its columns. Subspace convergence guarantees that such matrices exist with
 
 $$
-Z_k = (A - \mu I) Q_k, \qquad Z_k = Q_{k+1} R_{k+1}.
+\|Q_kW_k^H-Q_{\star,p}\|_2\longrightarrow0.
 $$
 
-This works because $A$ and $A - \mu I$ share the same invariant subspaces (and Schur vectors), so $\mathrm{range}(Q_{k+1})$ still converges to an invariant subspace. However, the convergence rate is now determined by the eigenvalues of the *shifted* matrix, which are $\lambda_i - \mu$.
-
-### The Full QR Algorithm ($p=n$)
-
-This strategy becomes exceptionally powerful when we set $p=n$, which transforms orthogonal iteration into the **QR algorithm**. In this special case, $Q_k$ and $T_k$ are square $n \times n$ matrices.
-
-We can analyze the convergence by partitioning $T_k$:
+The alignment depends on the unknown target basis $Q_{\star,p}$, so $W_k$ is not available as a step of the algorithm. Its role here is theoretical: it lets us express what subspace convergence implies for $T_k$. Writing the leading $p\times p$ Schur block as
 
 $$
-T_k = \begin{bmatrix}
-T_{k,11} & T_{k,12} \\
-T_{k,21} & T_{k,22}
-\end{bmatrix}
+T_{\star,p}=Q_{\star,p}^HAQ_{\star,p},
 $$
 
-Here, $T_{k,22}$ is a scalar (the bottom-right entry) and $T_{k,21}$ is a row vector. For the $p=n$ case, the analysis shows that the sub-diagonal block $T_{k,21}$ converges to zero at a rate governed by the ratio of the smallest-magnitude eigenvalues:
+we obtain
 
 $$
-|T_{k,21}| \to 0 \quad \text{with rate} \quad \frac{|\lambda_n|}{|\lambda_{n-1}|}
+\|W_kT_kW_k^H-T_{\star,p}\|_2\longrightarrow0.
 $$
 
-As $T_{k,21} \to 0$, $T_k$ becomes block upper triangular, and the scalar $T_{k,22}$ converges to the eigenvalue $\lambda_n$.
+Unitary changes of basis preserve eigenvalues, and eigenvalues depend continuously on matrix entries. Thus the Ritz values approach $\lambda_1,\ldots,\lambda_p$, up to reordering and counting multiplicities. However, this argument does not give a computable rotation that makes $T_k$ triangular, nor does it show that its diagonal entries approach the eigenvalues.
 
-When we apply a shift $\mu$, the convergence rate of $T_{k,21}$ to zero becomes:
+### Strict Ordering: Convergence of Schur Directions
+
+For full iteration, $p=n$, $T_k$ is unitarily similar to $A$. This guarantees that the two matrices have the same eigenvalues in exact arithmetic, but it does not compute their values. Finding the eigenvalues of a general $T_k$ is still the original eigenvalue problem. Convergence of the individual Schur directions provides a way to read the eigenvalues from its diagonal.
+
+As proved on the previous page, this stronger conclusion holds when
 
 $$
-\frac{|\lambda_n - \mu|}{|\lambda_{n-1} - \mu|}
+|\lambda_1|>\cdots>|\lambda_n|>0,
 $$
 
-:::{admonition} Key Idea
-:class: tip
+and the starting-space condition holds for every leading set of columns. Now every leading subspace converges, fixing each Schur direction. The only remaining freedom is a sign or unit complex phase for each column. We denote these by a **diagonal** unitary matrix
 
-This new ratio is the key to acceleration. To find the smallest eigenvalue $\lambda_n$, we can choose a shift $\mu$ that is a good approximation of $\lambda_n$. This makes the numerator $|\lambda_n - \mu|$ very small, forcing rapid (quadratic) convergence of $T_{k,21}$ to 0.
-:::
+$$
+D_k=\operatorname{diag}(d_{k,1},\ldots,d_{k,n}),
+\qquad |d_{k,j}|=1.
+$$
 
-The diagonal entries of $T_k = Q_k^H A Q_k$ provide our best available approximations to the eigenvalues. This enables a powerful feedback loop:
+Whereas $W_k$ may mix columns, $D_k$ only adjusts their phases, giving
 
-* Set $p=n$, so that $Q_k$ is a full $n \times n$ unitary matrix at each step
-* At step $k$, compute the projected matrix $T_k = Q_k^H A Q_k$.
-* Use the bottom-right entry of this matrix, $\mu_k = (T_k)_{nn}$, as the shift for the next iteration. This value, known as the Rayleigh quotient shift, is an excellent, adaptively improving approximation of $\lambda_n$.
+$$
+\begin{aligned}
+\|Q_kD_k^H-Q_\star\|_2&\longrightarrow0,\\
+\|D_kT_kD_k^H-T\|_2&\longrightarrow0.
+\end{aligned}
+$$
 
-This strategy of adaptively choosing a shift based on the last entry of $T_k$ is the core idea that transforms subspace iteration into the highly efficient QR iteration with shifts.
+We do not need to compute $D_k$: these phase adjustments leave diagonal entries unchanged and preserve the magnitudes of all other entries. Since $T$ is upper triangular, the unadjusted matrix $T_k$ therefore satisfies
+
+$$
+\boxed{(T_k)_{jj}\longrightarrow\lambda_j,
+\qquad (T_k)_{j\ell}\longrightarrow0\quad(j>\ell).}
+$$
+
+This gives a way to compute the eigenvalues from the diagonal of $T_k$ without knowing $Q_\star$ or correcting the phases. Entries above the diagonal may keep changing with those phases.
+
+## From Orthogonal Iteration to QR Iteration
+
+The diagonal approximations can also guide acceleration through **shifts**. Replacing $A$ by $A-\mu I$ preserves its invariant subspaces while changing the eigenvalue ratios that control convergence. Suitable choices can speed up convergence; their selection and analysis are developed in [shifted QR iteration](qr_iteration_with_shifts.md).
+
+To turn these results into a practical eigenvalue method, the [next section](qr_iteration.md) derives an update from $T_k$ directly to $T_{k+1}$ using a QR factorization. This **QR iteration** produces the same matrix sequence without explicitly updating the full basis $Q_k$ and forming $Q_k^HAQ_k$ at every step.

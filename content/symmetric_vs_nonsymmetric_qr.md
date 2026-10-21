@@ -1,107 +1,113 @@
-# Symmetric vs Unsymmetric QR Iteration
+# Symmetric and Nonsymmetric QR Iteration
 
-We discuss the differences between the reduction to Hessenberg form, the shifted QR iteration, and their behavior for symmetric versus unsymmetric real matrices. We also provide additional details on the QR iteration algorithm with shifts for both cases.
+For a real $n\times n$ matrix $A$, eigenvalue computation has two stages: reduce the matrix by orthogonal similarity, then apply shifted QR iteration. Symmetry makes both stages cheaper and ensures that all eigenvalues are real.
 
-The standard, high-performance approach for finding all eigenvalues of a dense matrix is a **two-phase process**:
+## Reduction: Hessenberg or Tridiagonal
 
-1.  **Phase 1 (Direct):** Use a *direct* (non-iterative) method to reduce the matrix to a simpler form that is unitarily similar. This step is $O(n^3)$.
-2.  **Phase 2 (Iterative):** Use an *iterative* method (the shifted QR iteration) on this simpler form to find the eigenvalues.
+As in [Hessenberg reduction](upper_hessenberg.md), first compute
 
-The differences between the symmetric and unsymmetric cases affect every part of this process.
+$$
+H=Q_H^TAQ_H,
+$$
 
-## Phase 1: Reduction to Upper Hessenberg Form
+where $Q_H$ is orthogonal. For a general real matrix, $H$ is upper Hessenberg and may have $O(n^2)$ nonzero entries.
 
-The goal of this phase is to introduce as many zeros as possible using a *finite* number of similarity transformations (e.g., Householder reflections) to make the subsequent iterative phase cheaper.
+If $A=A^T$, then
 
-### Unsymmetric Real Matrices
+$$
+H^T=(Q_H^TAQ_H)^T=Q_H^TAQ_H=H.
+$$
 
-* **Target Form:** **Upper Hessenberg form**.
-* **Structure:** A matrix $H$ is upper Hessenberg if all entries below the first sub-diagonal are zero ($H_{ij} = 0$ for $i > j+1$). It's the "closest" you can get to upper triangular in a finite number of steps.
+Thus $H$ is both symmetric and upper Hessenberg, so it is **tridiagonal**. It has only a diagonal and matching first subdiagonal and superdiagonal, requiring $O(n)$ storage. Exploiting symmetry also reduces the work of the initial Householder reduction.
 
-    $$ H = \begin{pmatrix}
-    \times & \times & \times & \times \\
-    \times & \times & \times & \times \\
-    0 & \times & \times & \times \\
-    0 & 0 & \times & \times
-    \end{pmatrix}
-    $$
+We keep the notation $H$ for the current matrix, which becomes smaller as eigenvalues are deflated.
 
-* **Computational Cost:** This reduction requires $\approx \frac{10}{3}n^3$ floating-point operations (flops).
+## The Nonsymmetric Case
 
-### Symmetric Real Matrices
+The [previous section](qr_iteration_with_shifts.md) describes shift selection and deflation for this case. The eigenvalues of the trailing $2\times2$ block supply shift estimates. Nonreal shifts are used in conjugate pairs, and the Francis double-shift step allows real arithmetic throughout. Its efficient implementation costs $O(n^2)$ per step; the implementation details are beyond this summary.
 
-* **Target Form:** **Tridiagonal form**.
-* **Structure:** If the original matrix $A$ is symmetric ($A = A^T$), any similarity transformation $H = Q^T A Q$ will also be symmetric. A **symmetric upper Hessenberg matrix is, by definition, tridiagonal**.
+The target is **real Schur form**: an upper block triangular matrix with $1\times1$ diagonal blocks for real eigenvalues and $2\times2$ blocks for nonreal conjugate pairs. Once a $2\times2$ block separates from the rest of the matrix, its two eigenvalues can be computed directly. Its internal subdiagonal entry need not vanish.
 
-    $$ T = \begin{pmatrix}
-    \times & \times & 0 & 0 \\
-    \times & \times & \times & 0 \\
-    0 & \times & \times & \times \\
-    0 & 0 & \times & \times
-    \end{pmatrix}
-    $$
+Trailing-block shifts can stagnate, so practical methods also use exceptional shifts and other safeguards. Rapid local convergence does not guarantee convergence from every starting matrix.
 
-* **Computational Cost:** This reduction is significantly cheaper, requiring $\approx \frac{4}{3}n^3$ flops.
+## The Symmetric Case
 
-This initial reduction is a *huge* win for the symmetric case. The target matrix $T$ has only $O(n)$ non-zero elements, compared to the $O(n^2)$ elements in the unsymmetric Hessenberg matrix $H$.
+Because every eigenvalue is real, a single real shift is sufficient. Choose a shift $\mu$ and take the same step as before:
 
-## Phase 2: The Shifted QR Iteration
+$$
+\boxed{
+\begin{aligned}
+H-\mu I&=UR,\\
+H_{\mathrm{new}}&=RU+\mu I=U^THU.
+\end{aligned}}
+$$
 
-This is the iterative phase where we apply QR steps to the reduced matrix ($H$ or $T$) to find the eigenvalues.
+Here $U$ is orthogonal, $R$ is upper triangular, and $H_{\mathrm{new}}$ is the updated matrix. Orthogonal similarity preserves symmetry, and the adjacent-rotation construction preserves Hessenberg form. Consequently, $H_{\mathrm{new}}$ is again symmetric tridiagonal.
 
-### Unsymmetric Real Matrices
+### Why a QR Step Costs Only $O(n)$
 
-* **Eigenvalues:** The eigenvalues can be **real or complex conjugate pairs**.
-* **The Problem:** A simple shift like $\mu = H[n,n]$ will fail to converge if the eigenvalue it's "chasing" is part of a complex pair. The shift (which is real) will oscillate and never settle.
-* **The Algorithm (Francis QR Step):** The standard solution is the **double-shift QR algorithm**.
-    1.  It uses *two* shifts, $\mu_1$ and $\mu_2$, which are chosen as the eigenvalues of the bottom-right $2 \times 2$ submatrix of $H$.
-    2.  If the eigenvalues are complex (e.g., $a \pm bi$), this choice perfectly captures them.
-    3.  A "bulge chasing" technique performs this double-step implicitly, using only real arithmetic, which is very clever and stable.
-* **Cost per Iteration:** This "bulge chase" on a Hessenberg matrix costs **$O(n^2)$** operations.
-* **Convergence:** The convergence is generally quadratic with the Francis double-shift: 
+The narrow band makes both the factorization and the reverse product inexpensive. To factor $H-\mu I$, use at most $n-1$ Givens rotations, eliminating the subdiagonal from top to bottom. Each rotation updates only a fixed number of potentially nonzero entries. The resulting $R$ has at most two superdiagonals.
 
-    $$
-    \epsilon_{k+1} \approx c \, \epsilon_k^2
-    $$ 
+Store these rotations and apply them from the right to compute $RU$. The intermediate matrices also have a band of fixed width, so each right rotation again requires only a fixed amount of work. Both parts of the step therefore cost $O(n)$. This cost assumes that $U$ is stored as rotations and that the reverse product is computed by applying them, rather than by dense matrix multiplication.
 
-    for some constant $c < 1$, where $\epsilon_k$ is the error at iteration $k$.
-* **Final Form:** The iteration converges to the **Schur form**—an upper triangular (or block-upper-triangular) matrix $S$. The eigenvalues are on the diagonal (or in $2 \times 2$ blocks for complex pairs).
+### Choosing the Wilkinson Shift
 
-### Symmetric Real Matrices
+The bottom-right entry $h_{nn}$ is an inexpensive shift, but it can cycle even for a symmetric matrix. For example, $H=\begin{pmatrix}0&1\\1&0\end{pmatrix}$ has bottom-right entry zero. With this shift, the magnitude of its subdiagonal entry remains 1.
 
-* **Eigenvalues:** The eigenvalues are **always real**.
-* **The Algorithm (Wilkinson Shift):** Because the eigenvalues are real, we do not need a double-shift. We can use a single, real shift.
-    1.  While the $\mu = T[n,n]$ shift works, a much more robust and faster-converging choice is the **Wilkinson shift**. It's the eigenvalue of the bottom $2 \times 2$ submatrix that is *closer* to $T[n,n]$.
-    2.  This shift provides a safeguard against some pathological cases where the simple $T[n,n]$ shift might fail.
-* **Cost per Iteration:** Since the matrix is tridiagonal, applying one step of the QR algorithm (with "bulge chasing") is astonishingly cheap. It only costs **$O(n)$** operations.
-* **Convergence:** The convergence for the symmetric case with a Wilkinson shift is **globally and cubically convergent**. This is incredibly fast; it's one of the most powerful results in numerical linear algebra:
+The **Wilkinson shift** uses the trailing symmetric block
 
-    $$
-    \epsilon_{k+1} \approx c \, \epsilon_k^3
-    $$
+$$
+B=\begin{pmatrix}a&\varepsilon\\\varepsilon&d\end{pmatrix},
+\qquad d=h_{nn}.
+$$
 
-    for some constant $c < 1$.
-* **Final Form:** The iteration converges to a **diagonal matrix** $D$. (A symmetric upper triangular matrix is, by definition, diagonal). The eigenvalues are the diagonal entries.
+Here $\varepsilon$ is the off-diagonal entry. Compute the two eigenvalues of $B$ and choose the one closer to $d$, using a fixed rule to break ties. Explicitly, the candidates are
 
-## 3. Summary: Cost and Convergence
+$$
+\mu_\pm=\frac{a+d}{2}
+\pm\sqrt{\left(\frac{a-d}{2}\right)^2+\varepsilon^2}.
+$$
 
-Here is a side-by-side comparison of finding all eigenvalues.
+They are always real. In the example above they are $\pm1$; either choice gives deflation in one step. If $\varepsilon=0$, the last eigenvalue is already separated and no QR step is needed. Numerical implementations use scaled formulas to avoid overflow and unnecessary cancellation.
 
-| Feature | Symmetric Case (e.g., `np.linalg.eigh`) | Unsymmetric Case (e.g., `np.linalg.eig`) |
+### Why Convergence Is Often Cubic
+
+To see the effect of symmetry, use the simpler bottom-right shift $\mu=d$ on the $2\times2$ matrix $H=B$ above. Assume $\varepsilon\ne0$, and let $\varepsilon_{\mathrm{new}}$ denote its subdiagonal entry after the step. Since both off-diagonal entries equal $\varepsilon$, the previous section's $2\times2$ calculation gives
+
+$$
+\begin{aligned}
+|\varepsilon_{\mathrm{new}}|
+&=\frac{|\varepsilon|^3}{(a-d)^2+\varepsilon^2}\\
+&\approx\frac{|\varepsilon|^3}{(a-d)^2}
+\qquad\text{when }|\varepsilon|\ll|a-d|.
+\end{aligned}
+$$
+
+In this regime, the new off-diagonal entry is approximately proportional to the cube of the old one. This is **cubic local convergence**: once the off-diagonal entry is small and the diagonal entries are separated, it can decrease very rapidly.
+
+The Wilkinson shift also usually gives cubic local convergence, but some exceptional cases converge only quadratically. The cubic rate is therefore not a universal guarantee; see [Leite, Saldanha, and Tomei's analysis of shift strategies](https://arxiv.org/abs/0912.3376).
+
+When a subdiagonal entry is set to zero, symmetry makes the matching superdiagonal entry zero as well. The matrix splits into independent diagonal blocks. Repeated scalar deflation leads to a diagonal matrix $D$, so the final factorization is the eigendecomposition
+
+$$
+A=QDQ^T,
+$$
+
+where $Q$ is the accumulated orthogonal transformation. Its columns are eigenvectors of $A$.
+
+## Cost Comparison
+
+The following costs are for real arithmetic and **eigenvalues only**. Reduction costs cover $H$ and the stored Householder reflections. The total QR costs assume that only a few steps are needed per eigenvalue on average; more iterations increase these costs.
+
+| Quantity | Symmetric | Nonsymmetric |
 | :--- | :--- | :--- |
-| **Eigenvalues** | Always **real** | Can be **real or complex conjugate pairs** |
-| **Phase 1: Form** | **Tridiagonal** ($O(n)$ non-zeros) | **Upper Hessenberg** ($O(n^2)$ non-zeros) |
-| **Phase 1: Cost** | $\approx \frac{4}{3}n^3$ flops | $\approx \frac{10}{3}n^3$ flops |
-| **Phase 2: Shift** | Single real shift (e.g., Wilkinson) | Double shift (Francis QR step) |
-| **Phase 2: Cost / Iteration**| **$O(n)$** | **$O(n^2)$** |
-| **Phase 2: Convergence**| **Cubic** (extremely fast) | **Quadratic** |
-| **Phase 2: Total Cost** | **$O(n^2)$** | **$O(n^3)$** |
-| **Overall Total Cost** | $O(n^3) + O(n^2) = \mathbf{O(n^3)}$ | $O(n^3) + O(n^3) = \mathbf{O(n^3)}$ |
-| **Final Form** | **Diagonal** (Schur form is diagonal) | **Upper Triangular** (Schur form) |
+| Reduced form | Tridiagonal | Upper Hessenberg |
+| Reduction cost | About $\frac43n^3$ flops | About $\frac{10}{3}n^3$ flops |
+| QR step on a block of size $n$ | $O(n)$ | $O(n^2)$ |
+| Typical total QR-phase cost | $O(n^2)$ | $O(n^3)$ |
+| Total cost including reduction | $O(n^3)$ | $O(n^3)$ |
+| Final real Schur form | Diagonal | Upper block triangular |
 
-**Key Takeaway on Cost:**
+For a dense symmetric matrix, the initial reduction usually dominates the eigenvalue-only cost. In the nonsymmetric case, both reduction and QR iteration contribute at order $n^3$.
 
-While both algorithms have the same asymptotic complexity of $O(n^3)$, the **symmetric case is significantly faster**.
-* The $O(n^3)$ reduction step has a smaller constant ($\frac{4}{3}$ vs. $\frac{10}{3}$).
-* The $O(n^3)$ iterative phase for the unsymmetric case is completely *avoided* in the symmetric case, which has an almost-negligible $O(n^2)$ iterative cost.
-* Therefore, the total cost for the symmetric problem is dominated *only* by the initial reduction, whereas both phases contribute significantly to the cost of the unsymmetric problem.
+If eigenvectors are also required, the symmetric QR phase becomes more expensive. Each Givens rotation must update two full columns of the accumulated matrix $Q$, costing $O(n)$ per rotation. A full-size step then costs $O(n^2)$, and the usual total cost of accumulating all eigenvectors is $O(n^3)$. The $O(n)$ step cost applies to eigenvalues alone. [LAPACK's symmetric eigenproblem guide](https://www.netlib.org/lapack/lug/node48.html) distinguishes these outputs and also describes alternatives to QR iteration.

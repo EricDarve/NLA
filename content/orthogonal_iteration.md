@@ -1,76 +1,52 @@
 # The Orthogonal Iteration Algorithm
 
-[Deflation](deflation.md) finds successive Schur directions by projecting out those already known. **Orthogonal iteration** performs these power and projection steps together: multiply a set of vectors by $A$, then orthonormalize them. The first column follows the power method; each later column removes the directions represented by the preceding columns.
+[Deflation](deflation.md) finds a new Schur direction by projecting out the directions already known. Its explanation assumed those directions were exact. In computation, we would have to wait for each power iteration to converge before starting the next one.
 
-We first explain this connection to deflation. Then we prove that the leading subspaces converge, with a rate controlled by the ratio of the first unwanted eigenvalue to the last wanted eigenvalue.
+**Orthogonal iteration** updates all the directions together. At each step, it multiplies the current basis vectors by $A$, then uses QR to project out earlier directions and normalize. The projections use the current approximations rather than exact Schur vectors.
 
-## Keep the Target Separate from the Iterates
+## The Exact Target and the Current Basis
 
-We use the notation introduced in the deflation section:
+For $A\in\mathbb C^{n\times n}$, write an ordered Schur decomposition as $A=Q_\star TQ_\star^H$, with $|\lambda_1|\ge\cdots\ge|\lambda_n|$, as in deflation. Choose how many directions to follow: $1\le p\le n$.
 
 | Notation | Meaning |
 | :--- | :--- |
-| $Q_\star$ | A fixed, exact Schur basis: $A=Q_\star TQ_\star^H$. |
-| $Q_k$ | The computed $n\times p$ orthonormal basis at iteration $k$. |
-| $\boldsymbol q_{\star,j}$, $\boldsymbol q_{k,j}$ | Column $j$ of the exact and computed bases. |
+| $Q_\star$ | The fixed, exact $n\times n$ Schur basis. |
+| $Q_k$ | The $n\times p$ orthonormal basis at iteration $k$. |
+| $\boldsymbol q_{\star,j}$, $\boldsymbol q_{k,j}$ | Column $j$ of the exact and current bases. |
 | $Q_{\star,i}$, $Q_{k,i}$ | The first $i$ columns of those bases. |
 
-The iteration index is always $k$; $i$ or $j$ counts directions. We order the Schur form so that $|\lambda_1|\geq\cdots\geq|\lambda_n|$. The desired $p$-dimensional invariant subspace is
+Thus $k$ counts iterations and $i$ or $j$ counts columns. The target $p$-dimensional invariant subspace is
 
 $$
 \mathcal S_\star=\operatorname{range}(Q_{\star,p}).
 $$
 
-The Schur basis is a target for the analysis, not an input to the algorithm.
+The exact basis describes what we want to find.
 
-## The Algorithm
+## Multiply, Then Orthonormalize
 
-Choose $Q_0\in\mathbb C^{n\times p}$ with orthonormal columns, where $1\leq p\leq n$. For $k=0,1,2,\ldots$, compute
+Start with $Q_0\in\mathbb C^{n\times p}$ whose columns are orthonormal. For $k=0,1,\ldots$, compute
 
 $$
 \boxed{Z_{k+1}=AQ_k,\qquad Z_{k+1}=Q_{k+1}R_{k+1}.}
 $$
 
-The second step is an **unpivoted thin QR factorization**: $Q_{k+1}$ has $p$ orthonormal columns and $R_{k+1}$ is $p\times p$ upper triangular. Keeping the column order is important for the connection to successive deflation.
+The second step is an **unpivoted thin QR factorization**. The columns of $Q_{k+1}$ are orthonormal, and $R_{k+1}$ is $p\times p$ upper triangular. Column order matters: each new direction is made perpendicular to the directions before it. Normalizing the columns separately would allow all of them to approach the same dominant direction.
 
-For now, assume $AQ_k$ has rank $p$, so $R_{k+1}$ is invertible. The convergence theorem below gives conditions that guarantee this. Full iteration ($p=n$) requires $A$ to be nonsingular for this argument.
+For the analysis, assume that $AQ_k$ has rank $p$ at every step, so each $R_{k+1}$ is invertible. The convergence theorem below gives conditions that guarantee this.
 
-A basic implementation is:
+## How QR Performs Approximate Deflation
 
-```python
-import numpy as np
+Write the QR step as Gram–Schmidt in exact arithmetic, choosing positive diagonal entries in $R_{k+1}$. Other sign or phase choices give the same subspaces.
 
-# A is n x n; choose 1 <= p <= n and a number of steps.
-n = A.shape[0]
-rng = np.random.default_rng()
-G = rng.standard_normal((n, p))
-if np.iscomplexobj(A):
-    G = G + 1j * rng.standard_normal((n, p))
-Q, _ = np.linalg.qr(G, mode="reduced")
-
-for _ in range(num_iterations):
-    Z = A @ Q
-    Q, R = np.linalg.qr(Z, mode="reduced")
-
-T = Q.conj().T @ A @ Q  # A represented in the computed subspace
-```
-
-QR preserves the span of the columns while keeping them orthonormal. Normalizing each column separately would not remove the dominant directions from the later columns.
-
-## QR Performs the Deflation Steps
-
-To see what QR does, write it column by column as Gram–Schmidt in exact arithmetic. Take the diagonal entries of $R_{k+1}$ to be positive; other phase choices give the same subspaces.
-
-The first column satisfies
+The first column is simply power iteration:
 
 $$
 \boldsymbol q_{k+1,1}
 =\frac{A\boldsymbol q_{k,1}}{\|A\boldsymbol q_{k,1}\|_2}.
 $$
 
-This is the power method. Under its usual gap and starting-vector assumptions, its direction converges to $\boldsymbol q_{\star,1}$.
-
-For column $i+1$, QR subtracts the components along the **newly computed** first $i$ columns:
+For the second column, multiply $\boldsymbol q_{k,2}$ by $A$, subtract its component along the **new first column** $\boldsymbol q_{k+1,1}$, and normalize. Continue in the same way. For column $i+1$, the update is
 
 $$
 \begin{aligned}
@@ -82,55 +58,151 @@ $$
 \end{aligned}
 $$
 
-Suppose for a moment that these first $i$ columns span the exact leading Schur subspace. Their complementary projector is then
+The projector uses the newly computed first $i$ columns because QR processes the columns of $AQ_k$ in order. If they spanned the exact leading Schur subspace, then
 
 $$
 I-Q_{k+1,i}Q_{k+1,i}^H
 =I-Q_{\star,i}Q_{\star,i}^H=P_i.
 $$
 
-The update for column $i+1$ becomes power iteration on $P_iA$. From deflation,
+The update would then be the projected power step from deflation. Its target satisfies
 
 $$
 P_iA\boldsymbol q_{\star,i+1}
 =\lambda_{i+1}\boldsymbol q_{\star,i+1}.
 $$
 
-If $\lambda_{i+1}$ is the unique dominant eigenvalue of $P_iA$ and the starting direction contains the required eigenvector component, this power iteration finds the next Schur direction. This explains the inductive structure: the first column finds the first direction, the second projects it out to find the next, and so on.
+In the actual iteration, the first $i$ directions are still improving while we update direction $i+1$. This explains the mechanism, but it is not yet a convergence proof: the projector changes at every step. We will account for those changes by following the column spaces.
 
-In the actual algorithm, the earlier columns are still changing. The argument above explains the mechanism; the proof below establishes convergence while accounting for all columns evolving together.
+### The Same Two-Dimensional Example
 
-## The Key Identity: QR Changes the Basis, Not the Subspace
-
-Repeatedly substituting $AQ_k=Q_{k+1}R_{k+1}$ gives
+Return to the matrix from deflation and start with a rotated orthonormal basis:
 
 $$
-A^kQ_0=Q_k\bigl(R_kR_{k-1}\cdots R_1\bigr).
+A=\begin{pmatrix}4&1\\0&2\end{pmatrix},
+\qquad
+Q_0=\frac{1}{\sqrt2}\begin{pmatrix}1&-1\\1&1\end{pmatrix}.
 $$
 
-The factor on the right is invertible, so
+One multiplication and QR step give
+
+$$
+AQ_0=\frac{1}{\sqrt2}\begin{pmatrix}5&-3\\2&2\end{pmatrix},
+\qquad
+Q_1=\frac{1}{\sqrt{29}}\begin{pmatrix}5&-2\\2&5\end{pmatrix}.
+$$
+
+The first column moves closer to the horizontal dominant direction. The second stays perpendicular to the new first column, so it moves closer to the vertical second Schur direction. Neither direction has to converge before the other is updated.
+
+:::{figure} ../_static/orthogonal_iteration.svg
+:alt: Four diagrams show both orthonormal columns after zero, one, three, and six orthogonal iterations for the matrix with rows (4,1) and (0,2). The blue first column approaches the horizontal axis. The purple second column approaches the vertical axis while remaining perpendicular to the first column at every step. Dashed arrows show the two exact Schur directions.
+:width: 850px
+:name: fig-orthogonal-iteration
+
+Both directions evolve together. The blue column follows power iteration; QR keeps the purple column perpendicular to it. The two columns span the whole plane from the start. What improves is the first column's line and, consequently, the perpendicular second direction.
+:::
+
+(sec:oi-qr-ak)=
+## The Connection to Powers of $A$
+
+The changing projections make a column-by-column convergence proof awkward. A simpler observation removes them from the analysis: **QR changes the basis, but preserves the column space**.
+
+Define the accumulated triangular factor
+
+$$
+\widehat R_0=I_p,
+\qquad
+\widehat R_k=R_kR_{k-1}\cdots R_1.
+$$
+
+:::{prf:theorem} QR of $A^kQ_0$
+:label: thm:AkQR
+
+For every $k\ge0$, orthogonal iteration satisfies
+
+$$
+A^kQ_0=Q_k\widehat R_k.
+$$
+:::
+
+:::{prf:proof}
+For $k=0$, the identity is $Q_0=Q_0I_p$. If it holds at step $k$, then
+
+$$
+\begin{aligned}
+A^{k+1}Q_0
+&=A(Q_k\widehat R_k)\\
+&=(AQ_k)\widehat R_k\\
+&=Q_{k+1}R_{k+1}\widehat R_k\\
+&=Q_{k+1}\widehat R_{k+1}.
+\end{aligned}
+$$
+
+This proves the identity by induction.
+:::
+
+Because $\widehat R_k$ is upper triangular and invertible, this is a thin QR factorization of $A^kQ_0$. With positive diagonal entries in each $R_j$, it is the unique thin QR factorization with positive diagonal.
+
+For $p=1$, $\widehat R_k$ is the product of the normalization factors in the power method. For full iteration with $Q_0=I_n$, the identity becomes
+
+$$
+A^k=Q_k\widehat R_k.
+$$
+
+The algorithm obtains these factors without forming $A^k$.
+
+More importantly, invertibility gives
 
 $$
 \boxed{\operatorname{range}(Q_k)
 =\operatorname{range}(A^kQ_0).}
 $$
 
-The product is also upper triangular. Therefore, for every $i\leq p$, its first $i$ columns involve only the first $i$ columns of $Q_k$, giving
+Upper triangularity gives the same result for every leading set of columns. Let $\widehat R_{k,i}$ be the leading $i\times i$ block of $\widehat R_k$. The first $i$ columns of the factorization satisfy
 
 $$
+A^kQ_{0,i}=Q_{k,i}\widehat R_{k,i},
+\qquad
 \operatorname{range}(Q_{k,i})
 =\operatorname{range}(A^kQ_{0,i}).
 $$
 
-Each leading subspace undergoes its own power iteration. We can analyze these subspaces without tracking the individual projections inside QR. The [next section](orthogonal_and_power_iteration.md) develops this QR identity further.
+Thus each leading column space undergoes a power iteration of its own. QR keeps its basis orthonormal without changing that space.
 
 ## Convergence of a Leading Subspace
 
-As in the power-method analysis, assume $A$ is diagonalizable. The theorem allows equal eigenvalue magnitudes within the wanted group or within the unwanted group; only the gap between the two groups must be strict.
+Orthogonal iteration aims to approximate the leading $p$-dimensional Schur subspace. The theorem below shows how quickly that approximation improves. This is the main convergence result for the method: it extends the power method's convergence theory from one direction to a space of $p$ directions.
 
-### Measuring the Error
+:::{admonition} Key result: convergence of orthogonal iteration
+:class: important
 
-Let $\Pi_\star=Q_{\star,p}Q_{\star,p}^H$ be the orthogonal projection onto $\mathcal S_\star$. Define
+Under the assumptions below, the space spanned by the columns of $Q_k$ approaches the space spanned by the first $p$ exact Schur vectors. Its error is bounded by a constant times $\rho_p^k$, where
+
+$$
+\boxed{\rho_p=\frac{|\lambda_{p+1}|}{|\lambda_p|}<1,
+\qquad p<n.}
+$$
+
+For $p=1$, the target is the dominant eigenvector's line and $\rho_1=|\lambda_2/\lambda_1|$: the familiar power-method convergence factor. For $p>1$, the result controls the accuracy of an entire approximate Schur subspace.
+:::
+
+To understand the ratio, recall that $\operatorname{range}(Q_k)=\operatorname{range}(A^kQ_0)$. Assuming $A$ is diagonalizable, multiplication by $A^k$ scales eigenvector component $i$ by $\lambda_i^k$. We want to retain the first $p$ eigenvector directions and suppress the rest. Their span is the same as that of the first $p$ Schur vectors.
+
+Among the wanted components, $|\lambda_p|^k$ is the smallest scaling factor. Among the unwanted components, $|\lambda_{p+1}|^k$ is the largest. Comparing the largest unwanted scaling with the smallest wanted scaling gives
+
+$$
+\frac{|\lambda_{p+1}|^k}{|\lambda_p|^k}=\rho_p^k.
+$$
+
+This is a relative comparison, so it applies whether the components grow or decay. A smaller $\rho_p$ gives faster separation of the wanted space from the unwanted directions. Only the gap between these two groups must be strict; eigenvalue magnitudes within either group may be equal. The subspace can therefore converge even while its individual basis vectors continue to change within it.
+
+For example, suppose the three largest eigenvalue magnitudes are $10$, $9.9$, and $1$, and the starting-space conditions hold. For the first direction, the error bound decays like $0.99^k$. For the first two columns together, it decays like $(1/9.9)^k$, with a convergence factor of about $0.10$. Thus a two-dimensional Schur subspace can become accurate much sooner than its individual Schur directions are resolved.
+
+There is also a starting-space requirement. The power method needs a nonzero coefficient in the wanted eigenvector direction. For $p$ directions, the starting vectors must contain $p$ independent combinations of the wanted eigenvector components. Otherwise, repeated multiplication cannot recover all of them. The theorem makes this requirement precise.
+
+### Measuring the Subspace Error
+
+To measure the accuracy of the whole subspace, look at how far its unit vectors extend outside the target space. Changes of basis within the target should not count as error. Let $\Pi_\star=Q_{\star,p}Q_{\star,p}^H$ project onto that target. Define
 
 $$
 \begin{aligned}
@@ -141,20 +213,31 @@ d_k&=\|(I-\Pi_\star)Q_k\|_2\\
 \end{aligned}
 $$
 
-Thus $d_k$ is the largest component outside the target subspace among unit vectors in the current subspace. It is zero when the two subspaces coincide. Geometrically, it is the sine of their largest principal angle. This measures the subspaces themselves, independent of the orthonormal bases used to represent them.
+The second expression follows because the columns of $Q_k$ are orthonormal. It measures the largest component outside the target among unit vectors in the current subspace. It is zero exactly when the two subspaces coincide and does not depend on which orthonormal bases represent them. For $p=1$, it measures the misalignment of the iterate with the dominant eigenvector's line.
+
+For $n=3$ and $p=2$, the subspaces are planes through the origin. The figure shows the approximate plane approaching the true Schur plane. The orange segment realizes the maximum in the definition of $d_k$: it joins a unit vector in the current plane to its orthogonal projection onto the target plane.
+
+:::{figure} ../_static/subspace_convergence.svg
+:alt: Four three-dimensional views show the blue approximate plane approaching a fixed horizontal teal Schur plane after zero, one, three, and seven orthogonal iterations. Both planes are drawn as unit-radius disks with identical viewpoints and scales. An orange perpendicular segment marks the largest distance of a unit vector in the current plane from the target plane. Its length decreases from 0.832 to 0.692, 0.366, and 0.067.
+:width: 820px
+:name: fig-subspace-convergence
+
+Plane convergence for $A=\operatorname{diag}(1.05,1,0.65)$, with $n=3$ and $p=2$. The true Schur subspace is the horizontal plane $\mathcal S_\star=\operatorname{span}\{e_1,e_2\}$; the starting plane is $z=0.9x+1.2y$. Each disk is a unit-radius patch of its subspace, and all views use the same camera and scale. The shrinking orange segment measures $d_k$. The convergence bound uses $\rho_2=|\lambda_3/\lambda_2|=0.65$.
+:::
 
 ### The Convergence Theorem
 
-````{prf:theorem} Convergence of a Dominant Subspace
+:::{prf:theorem} Convergence of Orthogonal Iteration
 :label: thm:orth-it-nh-rigorous
-Suppose $A=X\Lambda X^{-1}$, and for some $1\leq p<n$,
+
+Suppose $A=X\Lambda X^{-1}$, and for some $1\le p<n$,
 
 $$
-|\lambda_1|\geq\cdots\geq|\lambda_p|
->|\lambda_{p+1}|\geq\cdots\geq|\lambda_n|.
+|\lambda_1|\ge\cdots\ge|\lambda_p|
+>|\lambda_{p+1}|\ge\cdots\ge|\lambda_n|.
 $$
 
-Partition the eigenvector basis and the initial coordinates as
+Partition the eigenvector basis and the starting coordinates as
 
 $$
 X=[X_1,X_2],
@@ -162,65 +245,58 @@ X=[X_1,X_2],
 X^{-1}Q_0=\begin{pmatrix}C_1\\C_2\end{pmatrix},
 $$
 
-where $X_1$ has $p$ columns and $C_1$ is $p\times p$. Assume $C_1$ is invertible. Then orthogonal iteration is well-defined in exact arithmetic, and its subspace converges to
+where $X_1$ has $p$ columns and $C_1$ is $p\times p$. If $C_1$ is invertible, orthogonal iteration is well-defined in exact arithmetic and its column space converges to
 
 $$
-\operatorname{range}(X_1)=\mathcal S_\star.
+\mathcal S_\star=\operatorname{range}(X_1)
+=\operatorname{range}(Q_{\star,p}).
 $$
 
-For $k\geq1$, its error satisfies
+For $k\ge1$,
 
 $$
-d_k\leq K\left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k,
-$$
-
-where one possible constant is
-
-$$
+d_k\le K\rho_p^k,
+\qquad
 K=\|X_2\|_2\,\|X^{-1}\|_2\,\|C_2C_1^{-1}\|_2.
 $$
-````
+:::
 
-The condition on $C_1$ says that the starting vectors contain enough independent components to capture all $p$ wanted eigenvector directions. For $p=1$, it is exactly the power method's requirement $c_1\neq0$. A random orthonormal start satisfies it with probability one in exact arithmetic.
+Invertibility of $C_1$ means that the starting vectors contain enough independent components to recover all $p$ wanted directions. For $p=1$, it reduces to $c_1\ne0$ in the power method. A random orthonormal start satisfies it with probability one in exact arithmetic.
 
-For a normal matrix, we may take $X=Q_\star$, so the condition becomes invertibility of $Q_{\star,p}^HQ_0$. For a nonnormal matrix, the eigenvector coordinates $X^{-1}Q_0$ matter; ordinary orthogonal overlap with the target is not the same condition.
+These are coordinates in the eigenvector basis. For a normal matrix, we can take $X=Q_\star$, so $C_1=Q_{\star,p}^HQ_0$. For a nonnormal matrix, ordinary orthogonal overlap with the target does not replace the condition on $X^{-1}Q_0$.
 
-````{prf:proof} The Eigenvalue-Ratio Bound.
-Partition $\Lambda=\operatorname{diag}(\Lambda_1,\Lambda_2)$ consistently with $X$. The gap implies that every diagonal entry of $\Lambda_1$ is nonzero. Then
+:::{prf:proof} The Eigenvalue-Ratio Bound.
+Partition $\Lambda=\operatorname{diag}(\Lambda_1,\Lambda_2)$ consistently with $X$. Repeated multiplication gives
 
 $$
 A^kQ_0=X_1\Lambda_1^kC_1+X_2\Lambda_2^kC_2.
 $$
 
-Its leading eigenvector-coordinate block, $\Lambda_1^kC_1$, is invertible. Thus $A^kQ_0$ has rank $p$ for every $k$, which ensures that all QR steps retain $p$ independent columns.
+The gap implies that $\Lambda_1$ is invertible. The first $p$ rows of $X^{-1}A^kQ_0$ form the invertible matrix $\Lambda_1^kC_1$. Hence $A^kQ_0$ has rank $p$ at every step. Inductively, $AQ_k$ has the same rank as $A^{k+1}Q_0$, so every QR factor $R_k$ is invertible.
 
-**Separate the desired directions from the error.** Right multiplication by $C_1^{-1}\Lambda_1^{-k}$ changes the basis but not the range. Using the QR identity,
-
-$$
-\operatorname{range}(Q_k)
-=\operatorname{range}(X_1+X_2F_k),
-$$
-
-where
+**Separate the wanted coordinates from the unwanted ones.** Right multiplication by $C_1^{-1}\Lambda_1^{-k}$ changes the basis but not the column space:
 
 $$
-F_k=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
+\begin{aligned}
+A^kQ_0C_1^{-1}\Lambda_1^{-k}
+&=X_1+X_2F_k,\\
+F_k&=\Lambda_2^kC_2C_1^{-1}\Lambda_1^{-k}.
+\end{aligned}
 $$
 
-The matrix $F_k$ gives the unwanted eigenvector coordinates when the wanted coordinates are set to the identity. Since $\Lambda_1$ and $\Lambda_2$ are diagonal,
+Thus $\operatorname{range}(Q_k)=\operatorname{range}(X_1+X_2F_k)$. The matrix $F_k$ contains the unwanted coordinates after the wanted coordinates have been set to the identity. Since both eigenvalue blocks are diagonal,
 
 $$
 \begin{aligned}
 \|F_k\|_2
-&\leq\|\Lambda_2^k\|_2\,
-       \|C_2C_1^{-1}\|_2\,
+&\le\|\Lambda_2^k\|_2\,\|C_2C_1^{-1}\|_2\,
        \|\Lambda_1^{-k}\|_2\\
 &=\|C_2C_1^{-1}\|_2
   \left(\frac{|\lambda_{p+1}|}{|\lambda_p|}\right)^k.
 \end{aligned}
 $$
 
-**Translate this into subspace error.** Any unit vector in the computed subspace has the form
+**Translate this into geometric error.** Any unit vector in the current subspace has the form
 
 $$
 \boldsymbol z=(X_1+X_2F_k)\boldsymbol c,
@@ -229,43 +305,51 @@ X^{-1}\boldsymbol z
 =\begin{pmatrix}\boldsymbol c\\F_k\boldsymbol c\end{pmatrix}.
 $$
 
-Hence $\|\boldsymbol c\|_2\leq\|X^{-1}\|_2$. Also, $(I-\Pi_\star)X_1=0$, so
+Therefore,
+
+$$
+\|\boldsymbol c\|_2
+\le\|X^{-1}\boldsymbol z\|_2
+\le\|X^{-1}\|_2.
+$$
+
+Projection removes the wanted part because $(I-\Pi_\star)X_1=0$. It follows that
 
 $$
 \begin{aligned}
 \|(I-\Pi_\star)\boldsymbol z\|_2
 &=\|(I-\Pi_\star)X_2F_k\boldsymbol c\|_2\\
-&\leq\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
+&\le\|X_2\|_2\,\|F_k\|_2\,\|X^{-1}\|_2.
 \end{aligned}
 $$
 
-Maximizing over unit vectors $\boldsymbol z$ and applying the bound on $F_k$ proves the result.
-````
+Maximizing over unit vectors $\boldsymbol z$ and substituting the bound on $F_k$ gives $d_k\le K\rho_p^k$.
+:::
 
-The ratio $|\lambda_{p+1}/\lambda_p|$ compares the fastest-growing unwanted component with the slowest-growing wanted component. A ratio near one gives slow separation; a smaller ratio gives faster separation. The theorem is an upper bound, and particular starting spaces may converge faster. For nonnormal matrices, the constant $K$ can be large.
+A ratio near one gives slow separation; a smaller ratio gives faster separation. The constant $K$ depends on the initial space and the eigenvector basis and can be large for nonnormal matrices. The theorem gives an upper bound; particular starting spaces can converge faster.
 
-For example, suppose the three largest eigenvalue magnitudes are $10$, $9.9$, and $1$, and the starting-space conditions hold. The error bound for the first vector decays like $0.99^k$, but the bound for the first two columns together decays like $(1/9.9)^k$. We can capture their two-dimensional invariant subspace long before the individual directions are resolved.
+This proof assumes diagonalizability. Orthogonal iteration can also be applied to matrices that are not diagonalizable, but their convergence bounds may include polynomial factors in $k$. [Arbenz's notes on subspace iteration](https://people.inf.ethz.ch/arbenz/ewp/Lnotes/chapter8.pdf) give further analysis.
 
-This proof assumes diagonalizability. The algorithm also applies to matrices that are not diagonalizable, but their convergence analysis can include additional polynomial factors in $k$.
+## From Nested Subspaces to Schur Directions
 
-## From Subspaces to the Schur Vectors
+For full iteration, $p=n$, the columns of $Q_k$ always span $\mathbb C^n$. Convergence of that full space says nothing about the individual directions. The two-dimensional example illustrates what matters: the **leading column spaces** converge.
 
-To recover all Schur directions, consider full iteration ($p=n$) and suppose now that
+Assume now that
 
 $$
 |\lambda_1|>\cdots>|\lambda_n|>0,
 $$
 
-and that the starting-space condition holds for each leading set of columns being analyzed: the first $i$ rows of $X^{-1}Q_{0,i}$ form an invertible $i\times i$ matrix. Apply the theorem separately to each $i<n$. It gives
+and that the starting-space condition holds for each leading set of columns: the first $i$ rows of $X^{-1}Q_{0,i}$ form an invertible $i\times i$ matrix. The nonzero eigenvalues ensure that full iteration has invertible QR factors. Applying the theorem separately for each $i<n$ gives
 
 $$
 \operatorname{range}(Q_{k,i})
 \longrightarrow\operatorname{range}(Q_{\star,i}),
 $$
 
-with an error bounded by a constant times $|\lambda_{i+1}/\lambda_i|^k$.
+with error bounded by a constant times $|\lambda_{i+1}/\lambda_i|^k$.
 
-Why does this identify column $i$? It is the unit direction in the first $i$ columns that is orthogonal to the first $i-1$. More explicitly, let
+Column $i$ is the unit direction in the first $i$ columns that is perpendicular to the first $i-1$. To express this precisely, let
 
 $$
 \Pi_{k,i}=Q_{k,i}Q_{k,i}^H,
@@ -273,14 +357,14 @@ $$
 \Pi_{\star,i}=Q_{\star,i}Q_{\star,i}^H.
 $$
 
-For equal-dimensional subspaces, the error used above also equals the distance between their orthogonal projections:
+For equal-dimensional subspaces, their orthogonal projectors satisfy
 
 $$
 \|\Pi_{k,i}-\Pi_{\star,i}\|_2
 =\|(I-\Pi_{\star,i})Q_{k,i}\|_2.
 $$
 
-Thus these projections converge. Subtract the projections for two consecutive subspaces:
+Thus their projectors converge too. Subtracting two consecutive projectors isolates column $i$:
 
 $$
 \begin{aligned}
@@ -291,15 +375,43 @@ $$
 \end{aligned}
 $$
 
-Here $\Pi_{k,0}=\Pi_{\star,0}=0$. For full iteration, $\Pi_{k,n}=\Pi_{\star,n}=I$, so the last column follows too. This proves convergence of all Schur directions. Signs or complex phases may continue to change, as in the power method; the lines converge.
+Here $\Pi_{k,0}=\Pi_{\star,0}=0$, and $\Pi_{k,n}=\Pi_{\star,n}=I$. This proves convergence of every Schur direction, including the last one.
 
-For $p=n$, the full column space is always $\mathbb C^n$. It is the convergence of these **nested leading subspaces**, not the full space, that produces Schur form. Under the assumptions above, the diagonal entries of $Q_k^HAQ_k$ approach the ordered eigenvalues and the entries below the diagonal approach zero.
+As in the power method, signs or complex phases can keep changing. Nevertheless, the diagonal entries of
 
-For partial iteration ($p<n$), if only $|\lambda_p|>|\lambda_{p+1}|$ holds, the $p$-dimensional subspace can converge without individual columns settling into Schur directions. This is useful when wanted eigenvalues have equal or nearly equal magnitudes. For real matrices, a nonreal conjugate pair has equal magnitudes and must be treated together when working in real arithmetic.
+$$
+T_k=Q_k^HAQ_k
+$$
 
-## Using the Computed Subspace
+approach the ordered eigenvalues, and the entries below the diagonal approach zero. Entries above the diagonal can continue to change with those phases.
 
-For $p<n$, form the projected matrix and its residual:
+For partial iteration, a boundary gap $|\lambda_p|>|\lambda_{p+1}|$ alone guarantees convergence of the $p$-dimensional space, not its individual basis directions. Additional internal gaps and starting-space conditions give convergence of the corresponding leading spaces. A nonreal conjugate pair must be treated together in real arithmetic because its two eigenvalues have equal magnitude.
+
+## A Basic Implementation
+
+The following code performs a fixed number of steps under the full-column-rank assumption above. NumPy may choose different QR signs or phases; these do not affect the computed subspaces.
+
+~~~python
+import numpy as np
+
+def orthogonal_iteration(A, p, num_iterations):
+    n = A.shape[0]
+    rng = np.random.default_rng()
+    G = rng.standard_normal((n, p))
+    if np.iscomplexobj(A):
+        G = G + 1j * rng.standard_normal((n, p))
+    Q, _ = np.linalg.qr(G, mode="reduced")
+
+    for _ in range(num_iterations):
+        Z = A @ Q
+        Q, R = np.linalg.qr(Z, mode="reduced")
+
+    return Q
+~~~
+
+For dense $A$, each step costs $O(n^2p)$ for multiplication and $O(np^2)$ for QR. Using fewer columns is useful when only a few eigenvalues are wanted; sparse matrix products can also reduce the multiplication cost.
+
+For $p<n$, form
 
 $$
 T_k=Q_k^HAQ_k,
@@ -307,6 +419,6 @@ T_k=Q_k^HAQ_k,
 E_k=AQ_k-Q_kT_k.
 $$
 
-A small residual means that applying $A$ nearly keeps vectors within the computed subspace. The eigenvalues of $T_k$, called **Ritz values**, then provide approximations to the wanted eigenvalues as the subspace converges. A residual alone does not identify which invariant subspace has been found.
+A small $\|E_k\|_2$ means that applying $A$ nearly keeps vectors within the current subspace. It can be used as a stopping criterion relative to the scale of $A$. As the subspace converges, the eigenvalues of $T_k$, called **Ritz values**, approach the wanted eigenvalues. A small residual alone does not identify which invariant subspace has been found.
 
-For full iteration, this residual is always zero because $Q_k$ is square and unitary. Under the strict-gap assumptions, we instead monitor the entries below the diagonal of $T_k$. The following sections develop the connection to eigenvalue computation and the QR algorithm.
+For full iteration, $E_k=0$ at every step because $Q_k$ is square and unitary. Under the strict-gap assumptions, the entries below the diagonal of $T_k$ measure progress toward Schur form. The [next section](orthogonal_iteration_and_eigenvalues.md) develops the eigenvalue interpretation and the role of shifts.

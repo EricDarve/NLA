@@ -45,7 +45,7 @@ Householder QR gives small factorization and orthogonality errors under the arit
 
 The leading dense factorization cost is $2mn^2-\frac23n^3$ flops for $m\ge n$, plus $O(mn)$ work to transform one right-hand side and $O(n^2)$ for back substitution. The [QR summary](qr_summary.md) compares Householder, Givens, and Gram-Schmidt implementations and their different orthogonality guarantees.
 
-QR exists even when columns are dependent. What fails is the ordinary back-substitution solve with a singular $R_1$. Rank-aware QR extensions can also compute minimum-norm solutions; the full-column-rank algorithm presented here does not include those extensions.
+QR exists even when columns are dependent. What fails is the ordinary back-substitution solve with a singular $R_1$. QR-based minimum-norm solvers use an additional orthogonal factorization to obtain a basis for the row space; the full-column-rank algorithm presented here does not include this extra step.
 
 ## Singular Value Decomposition
 
