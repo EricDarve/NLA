@@ -58,9 +58,9 @@ for ax, k in zip(axes, steps):
     ax.scatter([0], [0], s=15, color=ink, zorder=4)
 
     ax.text(*(1.13 * q + np.array([0.0, 0.03])),
-            rf"$\mathbf{{q}}_{{{k}}}$", color=blue, fontsize=19,
+            rf"$q_{{{k}}}$", color=blue, fontsize=19,
             ha="center", va="bottom")
-    ax.text(1.03, -0.12, r"$\mathbf{x}_1$", color=teal,
+    ax.text(1.03, -0.12, r"$x_1$", color=teal,
             fontsize=18, ha="center", va="top")
     ax.text(-0.07, -0.1, "0", color=ink, fontsize=12, ha="right")
     ax.set_title("Start" if k == 0 else f"{k} steps",

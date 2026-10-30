@@ -51,7 +51,7 @@ for ax, k in zip(axes, steps):
     for j, color in enumerate((blue, purple)):
         arrow(ax, Q[:, j], color)
         label = 1.17 * Q[:, j] + np.array([0, 0.04])
-        ax.text(*label, rf"$\mathbf{{q}}_{{{k},{j+1}}}$", color=color,
+        ax.text(*label, rf"$q_{{{k},{j+1}}}$", color=color,
                 fontsize=18, ha="center", va="bottom")
     corner = np.array([0.14*Q[:, 0], 0.14*(Q[:, 0]+Q[:, 1]), 0.14*Q[:, 1]])
     ax.plot(corner[:, 0], corner[:, 1], color=ink, linewidth=1.1)

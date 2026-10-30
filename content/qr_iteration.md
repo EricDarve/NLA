@@ -134,18 +134,270 @@ Let $A$ be a square matrix. Let the sequences of matrices $\{T_k\}$, $\{U_k\}$, 
 
 where $U_{k+1}$ is a unitary matrix and $R_{k+1}$ is an upper triangular matrix.
 
-If we define the product matrices $\tilde{Q}_k$ and $\tilde{R}_k$ as:
-* $\tilde{Q}_k = U_1 U_2 \cdots U_k$
-* $\tilde{R}_k = R_k R_{k-1} \cdots R_1$
+Use the same accumulated triangular factor $\widetilde R_k=R_k\cdots R_1$ as in orthogonal iteration. Define the product matrices:
+* $\widetilde Q_k = U_1 U_2 \cdots U_k$
+* $\widetilde R_k = R_k R_{k-1} \cdots R_1$
 
 Then for any integer $k \ge 1$, the $k$-th power of the matrix $A$ is given by:
 
 $$
-A^k = \tilde{Q}_k \tilde{R}_k
+A^k = \widetilde Q_k \widetilde R_k
 $$
 ```
 
 The proof is provided at the end of this section.
+
+Thus $\widetilde Q_k=Q_k$ when orthogonal iteration starts from $Q_0=I$.
+
+## Convergence Rate
+
+The subspace convergence result, {prf:ref}`thm:orth-it-nh-rigorous`, explains how quickly the leading column spaces of $Q_k$ approach invariant subspaces. For QR iteration, we need to translate this geometric error into an error in $T_k=Q_k^HAQ_k$. The connection is the block below the diagonal: as a leading column space becomes invariant, this block approaches zero.
+
+### From Subspace Error to Entries Below the Diagonal
+
+Fix $1\le i<n$. Let $Q_{k,i}$ contain the first $i$ columns of $Q_k$, and let $Q_{k,\perp}$ contain its remaining columns. Then
+
+$$
+T_k=
+\begin{pmatrix}
+Q_{k,i}^HAQ_{k,i} & Q_{k,i}^HAQ_{k,\perp}\\
+\underbrace{Q_{k,\perp}^HAQ_{k,i}}_{B_{k,i}} &
+Q_{k,\perp}^HAQ_{k,\perp}
+\end{pmatrix}.
+$$
+
+The lower-left block $B_{k,i}=(T_k)_{i+1:n,\,1:i}$ measures the component of $AQ_{k,i}$ outside the first $i$ columns. It is zero exactly when their span is invariant. Thus convergence of this subspace should make this entire block small, even if the columns still rotate within the subspace.
+
+Write the orthogonal projectors onto the current and exact leading spaces as
+
+$$
+\Pi_{k,i}=Q_{k,i}Q_{k,i}^H,
+\qquad
+\Pi_{\star,i}=Q_{\star,i}Q_{\star,i}^H.
+$$
+
+As established for orthogonal iteration, the subspace error can be written as
+
+$$
+d_{k,i}=\|\Pi_{k,i}-\Pi_{\star,i}\|_2
+=\|(I-\Pi_{\star,i})Q_{k,i}\|_2.
+$$
+
+The extra index $i$ records which leading subspace is being measured. Since $Q_k$ is unitary,
+
+$$
+\|B_{k,i}\|_2
+=\|(I-\Pi_{k,i})A\Pi_{k,i}\|_2.
+$$
+
+The exact Schur space is invariant, so $(I-\Pi_{\star,i})A\Pi_{\star,i}=0$. Subtract this zero term and regroup:
+
+$$
+\begin{aligned}
+(I-\Pi_{k,i})A\Pi_{k,i}
+&=(I-\Pi_{k,i})A(\Pi_{k,i}-\Pi_{\star,i})\\
+&\quad +(\Pi_{\star,i}-\Pi_{k,i})A\Pi_{\star,i}.
+\end{aligned}
+$$
+
+Taking norms gives the desired connection:
+
+$$
+\boxed{\|B_{k,i}\|_2\le 2\|A\|_2\,d_{k,i}.}
+$$
+
+:::{prf:theorem} Convergence of a Lower-Left Block in QR Iteration
+:label: thm:qr-block-convergence
+
+Suppose $A=X\Lambda X^{-1}$ is nonsingular, with eigenvalues ordered by decreasing magnitude. Fix $1\le i<n$ and assume
+
+$$
+|\lambda_i|>|\lambda_{i+1}|.
+$$
+
+Assume also that the leading $i\times i$ submatrix of $X^{-1}$ is invertible. This is the starting-space condition for the first $i$ columns of $Q_0=I$.
+
+Then unshifted QR iteration starting from $T_0=A$ satisfies, in exact arithmetic and for $k\ge1$,
+
+$$
+\boxed{
+\begin{aligned}
+\|(T_k)_{i+1:n,\,1:i}\|_2
+&\le 2\|A\|_2K_i\rho_i^k,\\
+\rho_i&=\left|\frac{\lambda_{i+1}}{\lambda_i}\right|<1.
+\end{aligned}
+}
+$$
+
+Here $K_i$ is the constant in {prf:ref}`thm:orth-it-nh-rigorous` applied to the first $i$ starting columns.
+:::
+
+:::{prf:proof}
+The subspace theorem gives $d_{k,i}\le K_i\rho_i^k$. Substituting this into the preceding estimate $\|B_{k,i}\|_2\le2\|A\|_2d_{k,i}$ proves the result.
+:::
+
+This bound needs only the gap at position $i$ and the corresponding starting-space condition. For example, with $i=n-1$, it bounds all entries to the left of the bottom-right diagonal entry. A small ratio $|\lambda_n/\lambda_{n-1}|$ makes the last eigenvalue separate quickly.
+
+### Error Bound for the Schur Approximation
+
+To make every block below the diagonal converge, apply the preceding argument to every leading subspace.
+
+:::{prf:theorem} Convergence Rate of Unshifted QR Iteration
+:label: thm:qr-iteration-convergence
+
+Suppose $n\ge2$, $A=X\Lambda X^{-1}$, and
+
+$$
+|\lambda_1|>\cdots>|\lambda_n|>0.
+$$
+
+For each $1\le i<n$, assume the first $i$ rows of $X^{-1}Q_{0,i}$ form an invertible $i\times i$ matrix, where $Q_{0,i}$ contains the first $i$ columns of $I$. Let $A=Q_\star TQ_\star^H$ be the Schur decomposition in this eigenvalue order, and define
+
+$$
+\rho=\max_{1\le i<n}
+\left|\frac{\lambda_{i+1}}{\lambda_i}\right|<1.
+$$
+
+In exact arithmetic, there are diagonal unitary phase matrices $\Phi_k$ and a constant $C$, independent of $k$, such that, for $k\ge1$,
+
+$$
+\boxed{\|\Phi_kT_k\Phi_k^H-T\|_2\le C\rho^k.}
+$$
+
+In particular, without any phase adjustment,
+
+$$
+\begin{aligned}
+|(T_k)_{jj}-\lambda_j|&\le C\rho^k,\\
+|(T_k)_{j\ell}|&\le C\rho^k\qquad(j>\ell).
+\end{aligned}
+$$
+:::
+
+The starting-space condition is the same one used for orthogonal iteration, specialized to $Q_0=I$. The constant depends on the eigenvector basis and the starting coordinates and can be large for a nonnormal matrix.
+
+:::{prf:proof}
+The subspace theorem gives $d_{k,i}\le K_i\rho_i^k\le K_i\rho^k$. As on the orthogonal-iteration page, subtracting consecutive projectors isolates column $i$:
+
+$$
+q_{k,i}q_{k,i}^H=\Pi_{k,i}-\Pi_{k,i-1}.
+$$
+
+Set $d_{k,0}=d_{k,n}=0$, since the zero space and the full space are already exact. The triangle inequality gives
+
+$$
+\|q_{k,i}q_{k,i}^H-q_{\star,i}q_{\star,i}^H\|_2
+\le d_{k,i}+d_{k,i-1}.
+$$
+
+Choose $\phi_{k,i}$ with $|\phi_{k,i}|=1$ to align $q_{k,i}$ with $q_{\star,i}$. For two unit vectors, this phase choice gives
+
+$$
+\begin{aligned}
+\|q_{k,i}\overline{\phi_{k,i}}-q_{\star,i}\|_2^2
+&=2(1-|q_{\star,i}^Hq_{k,i}|)\\
+&\le 2(1-|q_{\star,i}^Hq_{k,i}|^2)\\
+&=2\|q_{k,i}q_{k,i}^H-q_{\star,i}q_{\star,i}^H\|_2^2.
+\end{aligned}
+$$
+
+Thus every aligned column has error bounded by a constant times $\rho^k$. Collecting the phases in $\Phi_k=\operatorname{diag}(\phi_{k,1},\ldots,\phi_{k,n})$ and bounding the matrix norm by the Frobenius norm gives
+
+$$
+\|Q_k\Phi_k^H-Q_\star\|_2\le C_Q\rho^k
+$$
+
+for a constant $C_Q$ independent of $k$. Put $V_k=Q_k\Phi_k^H$. Both $V_k$ and $Q_\star$ are unitary, so
+
+$$
+\begin{aligned}
+\Phi_kT_k\Phi_k^H-T
+&=V_k^HAV_k-Q_\star^HAQ_\star\\
+&=(V_k-Q_\star)^HAV_k
+  +Q_\star^HA(V_k-Q_\star),\\
+\|\Phi_kT_k\Phi_k^H-T\|_2
+&\le 2\|A\|_2\,\|V_k-Q_\star\|_2\\
+&\le 2\|A\|_2C_Q\rho^k.
+\end{aligned}
+$$
+
+Take $C=2\|A\|_2C_Q$. Diagonal phase changes leave diagonal entries unchanged and preserve the magnitudes of other entries. Since $T$ is upper triangular, the entrywise bounds follow.
+:::
+
+The slowest adjacent eigenvalue ratio controls this overall bound. The block bounds above can give faster rates for particular parts of $T_k$. We do not need to compute $\Phi_k$ to read the diagonal approximations or monitor the entries below the diagonal; its role is to account for signs or phases when comparing the whole matrix with a fixed Schur factor. Entries above the diagonal may continue to change with those phases.
+
+### Convergence Rate of an Individual Eigenvalue
+
+A particular diagonal entry can converge faster than the whole matrix. The direction $q_{k,j}$ is determined by the first $j$ columns and their first $j-1$ columns: it lies in the former space and is perpendicular to the latter. Its accuracy therefore depends on these two subspaces, whose rates are $\rho_j$ and $\rho_{j-1}$.
+
+:::{prf:corollary} Individual Eigenvalue Error
+:label: cor:qr-individual-eigenvalue-rate
+
+Under the assumptions of {prf:ref}`thm:qr-iteration-convergence`, for $1<j<n$ there is a constant $C_j$, independent of $k$, such that
+
+$$
+\boxed{
+\begin{aligned}
+|(T_k)_{jj}-\lambda_j|&\le C_j\theta_j^k,\\
+\theta_j&=\max\left\{
+\left|\frac{\lambda_{j+1}}{\lambda_j}\right|,
+\left|\frac{\lambda_j}{\lambda_{j-1}}\right|
+\right\}.
+\end{aligned}
+}
+$$
+
+At the two ends, only one neighboring subspace contributes:
+
+$$
+\begin{aligned}
+|(T_k)_{11}-\lambda_1|
+&\le C_1\left|\frac{\lambda_2}{\lambda_1}\right|^k,\\
+|(T_k)_{nn}-\lambda_n|
+&\le C_n\left|\frac{\lambda_n}{\lambda_{n-1}}\right|^k.
+\end{aligned}
+$$
+:::
+
+:::{prf:proof}
+Use the phase-aligned unit vector $v_{k,j}=q_{k,j}\overline{\phi_{k,j}}$ from the preceding proof. Its Rayleigh quotient is unchanged by this phase, so
+
+$$
+(T_k)_{jj}=v_{k,j}^HAv_{k,j},
+\qquad
+\lambda_j=q_{\star,j}^HAq_{\star,j}.
+$$
+
+Subtracting these expressions gives
+
+$$
+\begin{aligned}
+(T_k)_{jj}-\lambda_j
+&=(v_{k,j}-q_{\star,j})^HAv_{k,j}\\
+&\quad+q_{\star,j}^HA(v_{k,j}-q_{\star,j}),\\
+|(T_k)_{jj}-\lambda_j|
+&\le 2\|A\|_2\,\|v_{k,j}-q_{\star,j}\|_2\\
+&\le 2\sqrt{2}\|A\|_2(d_{k,j}+d_{k,j-1}).
+\end{aligned}
+$$
+
+For $1<j<n$, substituting the two subspace bounds yields
+
+$$
+\begin{aligned}
+|(T_k)_{jj}-\lambda_j|
+&\le 2\sqrt{2}\|A\|_2
+   (K_j\rho_j^k+K_{j-1}\rho_{j-1}^k)\\
+&\le 2\sqrt{2}\|A\|_2(K_j+K_{j-1})\theta_j^k.
+\end{aligned}
+$$
+
+At $j=1$ or $j=n$, use $d_{k,0}=d_{k,n}=0$ to obtain the endpoint bounds.
+:::
+
+Thus a ratio near one elsewhere in the spectrum need not slow the approximation to $\lambda_j$. Its bound is controlled by the two adjacent ratios. These are upper bounds; particular matrices or starting spaces can give faster convergence.
+
+These are bounds for unshifted QR iteration under the stated assumptions. Equal eigenvalue magnitudes are outside this theorem; in real arithmetic, a nonreal conjugate pair must be treated together as a $2\times2$ Schur block.
 
 ## QR Iteration Steps
 
@@ -199,7 +451,7 @@ Under the convergence assumptions above, the entries below the diagonal of $T_k$
 ## Proof of Decomposition of $A^k$
 
 ```{prf:proof}
-Use the product matrices $\tilde Q_k=U_1\cdots U_k$ and $\tilde R_k=R_k\cdots R_1$ defined in the theorem. We first relate $T_k$ to $A$, then use that relation to prove the formula for $A^k$.
+Use the product matrices $\widetilde Q_k=U_1\cdots U_k$ and $\widetilde R_k=R_k\cdots R_1$ defined in the theorem. We first relate $T_k$ to $A$, then use that relation to prove the formula for $A^k$.
 
 Each QR step gives the unitary similarity
 
@@ -214,29 +466,29 @@ $$
 \begin{aligned}
 T_k
 &=U_k^H\cdots U_1^H\,A\,U_1\cdots U_k\\
-&=\tilde Q_k^HA\tilde Q_k.
+&=\widetilde Q_k^HA\widetilde Q_k.
 \end{aligned}
 $$
 
-The second equality uses $(U_1\cdots U_k)^H=U_k^H\cdots U_1^H$. Since $\tilde Q_k$ is unitary, multiplying on the left by $\tilde Q_k$ gives
+The second equality uses $(U_1\cdots U_k)^H=U_k^H\cdots U_1^H$. Since $\widetilde Q_k$ is unitary, multiplying on the left by $\widetilde Q_k$ gives
 
 $$
-A\tilde Q_k=\tilde Q_kT_k.
+A\widetilde Q_k=\widetilde Q_kT_k.
 $$
 
-For $k=1$, the first QR factorization gives $A=U_1R_1=\tilde Q_1\tilde R_1$. Assume now that $A^k=\tilde Q_k\tilde R_k$. Then
+For $k=1$, the first QR factorization gives $A=U_1R_1=\widetilde Q_1\widetilde R_1$. Assume now that $A^k=\widetilde Q_k\widetilde R_k$. Then
 
 $$
 \begin{aligned}
 A^{k+1}
-&=A(\tilde Q_k\tilde R_k)\\
-&=(A\tilde Q_k)\tilde R_k\\
-&=\tilde Q_kT_k\tilde R_k\\
-&=\tilde Q_k(U_{k+1}R_{k+1})\tilde R_k\\
-&=(\tilde Q_kU_{k+1})(R_{k+1}\tilde R_k)\\
-&=\tilde Q_{k+1}\tilde R_{k+1}.
+&=A(\widetilde Q_k\widetilde R_k)\\
+&=(A\widetilde Q_k)\widetilde R_k\\
+&=\widetilde Q_kT_k\widetilde R_k\\
+&=\widetilde Q_k(U_{k+1}R_{k+1})\widetilde R_k\\
+&=(\widetilde Q_kU_{k+1})(R_{k+1}\widetilde R_k)\\
+&=\widetilde Q_{k+1}\widetilde R_{k+1}.
 \end{aligned}
 $$
 
-This proves the result by induction. The new unitary factor is appended on the right of $\tilde Q_k$, while the new triangular factor is placed on the left of $\tilde R_k$. This explains the opposite orders of the two products.
+This proves the result by induction. The new unitary factor is appended on the right of $\widetilde Q_k$, while the new triangular factor is placed on the left of $\widetilde R_k$. This explains the opposite orders of the two products.
 ```

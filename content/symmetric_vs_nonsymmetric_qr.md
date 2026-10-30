@@ -7,15 +7,15 @@ For a real $n\times n$ matrix $A$, eigenvalue computation has two stages: reduce
 As in [Hessenberg reduction](upper_hessenberg.md), first compute
 
 $$
-H=Q_H^TAQ_H,
+H=Q_{\mathrm{red}}^TAQ_{\mathrm{red}},
 $$
 
-where $Q_H$ is orthogonal. For a general real matrix, $H$ is upper Hessenberg and may have $O(n^2)$ nonzero entries.
+where $Q_{\mathrm{red}}$ is orthogonal. For a general real matrix, $H$ is upper Hessenberg and may have $O(n^2)$ nonzero entries.
 
 If $A=A^T$, then
 
 $$
-H^T=(Q_H^TAQ_H)^T=Q_H^TAQ_H=H.
+H^T=(Q_{\mathrm{red}}^TAQ_{\mathrm{red}})^T=Q_{\mathrm{red}}^TAQ_{\mathrm{red}}=H.
 $$
 
 Thus $H$ is both symmetric and upper Hessenberg, so it is **tridiagonal**. It has only a diagonal and matching first subdiagonal and superdiagonal, requiring $O(n)$ storage. Exploiting symmetry also reduces the work of the initial Householder reduction.
@@ -69,6 +69,8 @@ $$
 $$
 
 They are always real. In the example above they are $\pm1$; either choice gives deflation in one step. If $\varepsilon=0$, the last eigenvalue is already separated and no QR step is needed. Numerical implementations use scaled formulas to avoid overflow and unnecessary cancellation.
+
+**For real symmetric tridiagonal matrices, Wilkinson-shift QR converges to deflation from every starting matrix in exact arithmetic.** The bottom subdiagonal tends to zero, so it eventually meets any positive deflation tolerance. Repeating the procedure on the remaining blocks computes all the eigenvalues. This global convergence guarantee is a main difference from the usual nonsymmetric trailing-block shift rules; see [Leite, Saldanha, and Tomei](https://arxiv.org/abs/0912.3376).
 
 ### Why Convergence Is Often Cubic
 
