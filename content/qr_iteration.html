@@ -464,6 +464,12 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-the-key-steps">Summary of the Key Steps</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate">Convergence Rate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspace-error-to-entries-below-the-diagonal">From Subspace Error to Entries Below the Diagonal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-bound-for-the-schur-approximation">Error Bound for the Schur Approximation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-an-individual-eigenvalue">Convergence Rate of an Individual Eigenvalue</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-iteration-steps">QR Iteration Steps</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-few-iterations">First Few Iterations</a></li>
 </ul>
@@ -605,6 +611,224 @@ A^k = \widetilde Q_k \widetilde R_k
 </section>
 </div><p>The proof is provided at the end of this section.</p>
 <p>Thus <span class="math notranslate nohighlight">\(\widetilde Q_k=Q_k\)</span> when orthogonal iteration starts from <span class="math notranslate nohighlight">\(Q_0=I\)</span>.</p>
+</section>
+</section>
+<section id="convergence-rate">
+<h2>Convergence Rate<a class="headerlink" href="#convergence-rate" title="Link to this heading">#</a></h2>
+<p>The subspace convergence result, <a class="reference internal" href="orthogonal_iteration.html#thm:orth-it-nh-rigorous">Theorem 26</a>, explains how quickly the leading column spaces of <span class="math notranslate nohighlight">\(Q_k\)</span> approach invariant subspaces. For QR iteration, we need to translate this geometric error into an error in <span class="math notranslate nohighlight">\(T_k=Q_k^HAQ_k\)</span>. The connection is the block below the diagonal: as a leading column space becomes invariant, this block approaches zero.</p>
+<section id="from-subspace-error-to-entries-below-the-diagonal">
+<h3>From Subspace Error to Entries Below the Diagonal<a class="headerlink" href="#from-subspace-error-to-entries-below-the-diagonal" title="Link to this heading">#</a></h3>
+<p>Fix <span class="math notranslate nohighlight">\(1\le i&lt;n\)</span>. Let <span class="math notranslate nohighlight">\(Q_{k,i}\)</span> contain the first <span class="math notranslate nohighlight">\(i\)</span> columns of <span class="math notranslate nohighlight">\(Q_k\)</span>, and let <span class="math notranslate nohighlight">\(Q_{k,\perp}\)</span> contain its remaining columns. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+T_k=
+\begin{pmatrix}
+Q_{k,i}^HAQ_{k,i} &amp; Q_{k,i}^HAQ_{k,\perp}\\
+\underbrace{Q_{k,\perp}^HAQ_{k,i}}_{B_{k,i}} &amp;
+Q_{k,\perp}^HAQ_{k,\perp}
+\end{pmatrix}.
+\end{split}\]</div>
+<p>The lower-left block <span class="math notranslate nohighlight">\(B_{k,i}=(T_k)_{i+1:n,\,1:i}\)</span> measures the component of <span class="math notranslate nohighlight">\(AQ_{k,i}\)</span> outside the first <span class="math notranslate nohighlight">\(i\)</span> columns. It is zero exactly when their span is invariant. Thus convergence of this subspace should make this entire block small, even if the columns still rotate within the subspace.</p>
+<p>Write the orthogonal projectors onto the current and exact leading spaces as</p>
+<div class="math notranslate nohighlight">
+\[
+\Pi_{k,i}=Q_{k,i}Q_{k,i}^H,
+\qquad
+\Pi_{\star,i}=Q_{\star,i}Q_{\star,i}^H.
+\]</div>
+<p>As established for orthogonal iteration, the subspace error can be written as</p>
+<div class="math notranslate nohighlight">
+\[
+d_{k,i}=\|\Pi_{k,i}-\Pi_{\star,i}\|_2
+=\|(I-\Pi_{\star,i})Q_{k,i}\|_2.
+\]</div>
+<p>The extra index <span class="math notranslate nohighlight">\(i\)</span> records which leading subspace is being measured. Since <span class="math notranslate nohighlight">\(Q_k\)</span> is unitary,</p>
+<div class="math notranslate nohighlight">
+\[
+\|B_{k,i}\|_2
+=\|(I-\Pi_{k,i})A\Pi_{k,i}\|_2.
+\]</div>
+<p>The exact Schur space is invariant, so <span class="math notranslate nohighlight">\((I-\Pi_{\star,i})A\Pi_{\star,i}=0\)</span>. Subtract this zero term and regroup:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+(I-\Pi_{k,i})A\Pi_{k,i}
+&amp;=(I-\Pi_{k,i})A(\Pi_{k,i}-\Pi_{\star,i})\\
+&amp;\quad +(\Pi_{\star,i}-\Pi_{k,i})A\Pi_{\star,i}.
+\end{aligned}
+\end{split}\]</div>
+<p>Taking norms gives the desired connection:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\|B_{k,i}\|_2\le 2\|A\|_2\,d_{k,i}.}
+\]</div>
+<div class="proof theorem admonition" id="thm:qr-block-convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 28 </span> (Convergence of a Lower-Left Block in QR Iteration)</p>
+<section class="theorem-content" id="proof-content">
+<p>Suppose <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> is nonsingular, with eigenvalues ordered by decreasing magnitude. Fix <span class="math notranslate nohighlight">\(1\le i&lt;n\)</span> and assume</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_i|&gt;|\lambda_{i+1}|.
+\]</div>
+<p>Assume also that the leading <span class="math notranslate nohighlight">\(i\times i\)</span> submatrix of <span class="math notranslate nohighlight">\(X^{-1}\)</span> is invertible. This is the starting-space condition for the first <span class="math notranslate nohighlight">\(i\)</span> columns of <span class="math notranslate nohighlight">\(Q_0=I\)</span>.</p>
+<p>Then unshifted QR iteration starting from <span class="math notranslate nohighlight">\(T_0=A\)</span> satisfies, in exact arithmetic and for <span class="math notranslate nohighlight">\(k\ge1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+\|(T_k)_{i+1:n,\,1:i}\|_2
+&amp;\le 2\|A\|_2K_i\rho_i^k,\\
+\rho_i&amp;=\left|\frac{\lambda_{i+1}}{\lambda_i}\right|&lt;1.
+\end{aligned}
+}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(K_i\)</span> is the constant in <a class="reference internal" href="orthogonal_iteration.html#thm:orth-it-nh-rigorous">Theorem 26</a> applied to the first <span class="math notranslate nohighlight">\(i\)</span> starting columns.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. The subspace theorem gives <span class="math notranslate nohighlight">\(d_{k,i}\le K_i\rho_i^k\)</span>. Substituting this into the preceding estimate <span class="math notranslate nohighlight">\(\|B_{k,i}\|_2\le2\|A\|_2d_{k,i}\)</span> proves the result.</p>
+</div>
+<p>This bound needs only the gap at position <span class="math notranslate nohighlight">\(i\)</span> and the corresponding starting-space condition. For example, with <span class="math notranslate nohighlight">\(i=n-1\)</span>, it bounds all entries to the left of the bottom-right diagonal entry. A small ratio <span class="math notranslate nohighlight">\(|\lambda_n/\lambda_{n-1}|\)</span> makes the last eigenvalue separate quickly.</p>
+</section>
+<section id="error-bound-for-the-schur-approximation">
+<h3>Error Bound for the Schur Approximation<a class="headerlink" href="#error-bound-for-the-schur-approximation" title="Link to this heading">#</a></h3>
+<p>To make every block below the diagonal converge, apply the preceding argument to every leading subspace.</p>
+<div class="proof theorem admonition" id="thm:qr-iteration-convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 29 </span> (Convergence Rate of Unshifted QR Iteration)</p>
+<section class="theorem-content" id="proof-content">
+<p>Suppose <span class="math notranslate nohighlight">\(n\ge2\)</span>, <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span>, and</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_1|&gt;\cdots&gt;|\lambda_n|&gt;0.
+\]</div>
+<p>For each <span class="math notranslate nohighlight">\(1\le i&lt;n\)</span>, assume the first <span class="math notranslate nohighlight">\(i\)</span> rows of <span class="math notranslate nohighlight">\(X^{-1}Q_{0,i}\)</span> form an invertible <span class="math notranslate nohighlight">\(i\times i\)</span> matrix, where <span class="math notranslate nohighlight">\(Q_{0,i}\)</span> contains the first <span class="math notranslate nohighlight">\(i\)</span> columns of <span class="math notranslate nohighlight">\(I\)</span>. Let <span class="math notranslate nohighlight">\(A=Q_\star TQ_\star^H\)</span> be the Schur decomposition in this eigenvalue order, and define</p>
+<div class="math notranslate nohighlight">
+\[
+\rho=\max_{1\le i&lt;n}
+\left|\frac{\lambda_{i+1}}{\lambda_i}\right|&lt;1.
+\]</div>
+<p>In exact arithmetic, there are diagonal unitary phase matrices <span class="math notranslate nohighlight">\(\Phi_k\)</span> and a constant <span class="math notranslate nohighlight">\(C\)</span>, independent of <span class="math notranslate nohighlight">\(k\)</span>, such that, for <span class="math notranslate nohighlight">\(k\ge1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\|\Phi_kT_k\Phi_k^H-T\|_2\le C\rho^k.}
+\]</div>
+<p>In particular, without any phase adjustment,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+|(T_k)_{jj}-\lambda_j|&amp;\le C\rho^k,\\
+|(T_k)_{j\ell}|&amp;\le C\rho^k\qquad(j&gt;\ell).
+\end{aligned}
+\end{split}\]</div>
+</section>
+</div><p>The starting-space condition is the same one used for orthogonal iteration, specialized to <span class="math notranslate nohighlight">\(Q_0=I\)</span>. The constant depends on the eigenvector basis and the starting coordinates and can be large for a nonnormal matrix.</p>
+<div class="proof admonition" id="proof">
+<p>Proof. The subspace theorem gives <span class="math notranslate nohighlight">\(d_{k,i}\le K_i\rho_i^k\le K_i\rho^k\)</span>. As on the orthogonal-iteration page, subtracting consecutive projectors isolates column <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+q_{k,i}q_{k,i}^H=\Pi_{k,i}-\Pi_{k,i-1}.
+\]</div>
+<p>Set <span class="math notranslate nohighlight">\(d_{k,0}=d_{k,n}=0\)</span>, since the zero space and the full space are already exact. The triangle inequality gives</p>
+<div class="math notranslate nohighlight">
+\[
+\|q_{k,i}q_{k,i}^H-q_{\star,i}q_{\star,i}^H\|_2
+\le d_{k,i}+d_{k,i-1}.
+\]</div>
+<p>Choose <span class="math notranslate nohighlight">\(\phi_{k,i}\)</span> with <span class="math notranslate nohighlight">\(|\phi_{k,i}|=1\)</span> to align <span class="math notranslate nohighlight">\(q_{k,i}\)</span> with <span class="math notranslate nohighlight">\(q_{\star,i}\)</span>. For two unit vectors, this phase choice gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|q_{k,i}\overline{\phi_{k,i}}-q_{\star,i}\|_2^2
+&amp;=2(1-|q_{\star,i}^Hq_{k,i}|)\\
+&amp;\le 2(1-|q_{\star,i}^Hq_{k,i}|^2)\\
+&amp;=2\|q_{k,i}q_{k,i}^H-q_{\star,i}q_{\star,i}^H\|_2^2.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus every aligned column has error bounded by a constant times <span class="math notranslate nohighlight">\(\rho^k\)</span>. Collecting the phases in <span class="math notranslate nohighlight">\(\Phi_k=\operatorname{diag}(\phi_{k,1},\ldots,\phi_{k,n})\)</span> and bounding the matrix norm by the Frobenius norm gives</p>
+<div class="math notranslate nohighlight">
+\[
+\|Q_k\Phi_k^H-Q_\star\|_2\le C_Q\rho^k
+\]</div>
+<p>for a constant <span class="math notranslate nohighlight">\(C_Q\)</span> independent of <span class="math notranslate nohighlight">\(k\)</span>. Put <span class="math notranslate nohighlight">\(V_k=Q_k\Phi_k^H\)</span>. Both <span class="math notranslate nohighlight">\(V_k\)</span> and <span class="math notranslate nohighlight">\(Q_\star\)</span> are unitary, so</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\Phi_kT_k\Phi_k^H-T
+&amp;=V_k^HAV_k-Q_\star^HAQ_\star\\
+&amp;=(V_k-Q_\star)^HAV_k
+  +Q_\star^HA(V_k-Q_\star),\\
+\|\Phi_kT_k\Phi_k^H-T\|_2
+&amp;\le 2\|A\|_2\,\|V_k-Q_\star\|_2\\
+&amp;\le 2\|A\|_2C_Q\rho^k.
+\end{aligned}
+\end{split}\]</div>
+<p>Take <span class="math notranslate nohighlight">\(C=2\|A\|_2C_Q\)</span>. Diagonal phase changes leave diagonal entries unchanged and preserve the magnitudes of other entries. Since <span class="math notranslate nohighlight">\(T\)</span> is upper triangular, the entrywise bounds follow.</p>
+</div>
+<p>The slowest adjacent eigenvalue ratio controls this overall bound. The block bounds above can give faster rates for particular parts of <span class="math notranslate nohighlight">\(T_k\)</span>. We do not need to compute <span class="math notranslate nohighlight">\(\Phi_k\)</span> to read the diagonal approximations or monitor the entries below the diagonal; its role is to account for signs or phases when comparing the whole matrix with a fixed Schur factor. Entries above the diagonal may continue to change with those phases.</p>
+</section>
+<section id="convergence-rate-of-an-individual-eigenvalue">
+<h3>Convergence Rate of an Individual Eigenvalue<a class="headerlink" href="#convergence-rate-of-an-individual-eigenvalue" title="Link to this heading">#</a></h3>
+<p>A particular diagonal entry can converge faster than the whole matrix. The direction <span class="math notranslate nohighlight">\(q_{k,j}\)</span> is determined by the first <span class="math notranslate nohighlight">\(j\)</span> columns and their first <span class="math notranslate nohighlight">\(j-1\)</span> columns: it lies in the former space and is perpendicular to the latter. Its accuracy therefore depends on these two subspaces, whose rates are <span class="math notranslate nohighlight">\(\rho_j\)</span> and <span class="math notranslate nohighlight">\(\rho_{j-1}\)</span>.</p>
+<div class="proof corollary admonition" id="cor:qr-individual-eigenvalue-rate">
+<p class="admonition-title"><span class="caption-number">Corollary 1 </span> (Individual Eigenvalue Error)</p>
+<section class="corollary-content" id="proof-content">
+<p>Under the assumptions of <a class="reference internal" href="#thm:qr-iteration-convergence">Theorem 29</a>, for <span class="math notranslate nohighlight">\(1&lt;j&lt;n\)</span> there is a constant <span class="math notranslate nohighlight">\(C_j\)</span>, independent of <span class="math notranslate nohighlight">\(k\)</span>, such that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+|(T_k)_{jj}-\lambda_j|&amp;\le C_j\theta_j^k,\\
+\theta_j&amp;=\max\left\{
+\left|\frac{\lambda_{j+1}}{\lambda_j}\right|,
+\left|\frac{\lambda_j}{\lambda_{j-1}}\right|
+\right\}.
+\end{aligned}
+}
+\end{split}\]</div>
+<p>At the two ends, only one neighboring subspace contributes:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+|(T_k)_{11}-\lambda_1|
+&amp;\le C_1\left|\frac{\lambda_2}{\lambda_1}\right|^k,\\
+|(T_k)_{nn}-\lambda_n|
+&amp;\le C_n\left|\frac{\lambda_n}{\lambda_{n-1}}\right|^k.
+\end{aligned}
+\end{split}\]</div>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Use the phase-aligned unit vector <span class="math notranslate nohighlight">\(v_{k,j}=q_{k,j}\overline{\phi_{k,j}}\)</span> from the preceding proof. Its Rayleigh quotient is unchanged by this phase, so</p>
+<div class="math notranslate nohighlight">
+\[
+(T_k)_{jj}=v_{k,j}^HAv_{k,j},
+\qquad
+\lambda_j=q_{\star,j}^HAq_{\star,j}.
+\]</div>
+<p>Subtracting these expressions gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+(T_k)_{jj}-\lambda_j
+&amp;=(v_{k,j}-q_{\star,j})^HAv_{k,j}\\
+&amp;\quad+q_{\star,j}^HA(v_{k,j}-q_{\star,j}),\\
+|(T_k)_{jj}-\lambda_j|
+&amp;\le 2\|A\|_2\,\|v_{k,j}-q_{\star,j}\|_2\\
+&amp;\le 2\sqrt{2}\|A\|_2(d_{k,j}+d_{k,j-1}).
+\end{aligned}
+\end{split}\]</div>
+<p>For <span class="math notranslate nohighlight">\(1&lt;j&lt;n\)</span>, substituting the two subspace bounds yields</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+|(T_k)_{jj}-\lambda_j|
+&amp;\le 2\sqrt{2}\|A\|_2
+   (K_j\rho_j^k+K_{j-1}\rho_{j-1}^k)\\
+&amp;\le 2\sqrt{2}\|A\|_2(K_j+K_{j-1})\theta_j^k.
+\end{aligned}
+\end{split}\]</div>
+<p>At <span class="math notranslate nohighlight">\(j=1\)</span> or <span class="math notranslate nohighlight">\(j=n\)</span>, use <span class="math notranslate nohighlight">\(d_{k,0}=d_{k,n}=0\)</span> to obtain the endpoint bounds.</p>
+</div>
+<p>Thus a ratio near one elsewhere in the spectrum need not slow the approximation to <span class="math notranslate nohighlight">\(\lambda_j\)</span>. Its bound is controlled by the two adjacent ratios. These are upper bounds; particular matrices or starting spaces can give faster convergence.</p>
+<p>These are bounds for unshifted QR iteration under the stated assumptions. Equal eigenvalue magnitudes are outside this theorem; in real arithmetic, a nonreal conjugate pair must be treated together as a <span class="math notranslate nohighlight">\(2\times2\)</span> Schur block.</p>
 </section>
 </section>
 <section id="qr-iteration-steps">
@@ -774,6 +998,12 @@ A^{k+1}
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-relate-t-k-to-a-qr-decomposition">Step 1: Relate <span class="math notranslate nohighlight">\(T_k\)</span> to a QR Decomposition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-relate-t-k-1-to-t-k">Step 2: Relate <span class="math notranslate nohighlight">\(T_{k+1}\)</span> to <span class="math notranslate nohighlight">\(T_k\)</span></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-of-the-key-steps">Summary of the Key Steps</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate">Convergence Rate</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-subspace-error-to-entries-below-the-diagonal">From Subspace Error to Entries Below the Diagonal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-bound-for-the-schur-approximation">Error Bound for the Schur Approximation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-rate-of-an-individual-eigenvalue">Convergence Rate of an Individual Eigenvalue</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#qr-iteration-steps">QR Iteration Steps</a><ul class="nav section-nav flex-column">
