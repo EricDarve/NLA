@@ -1,170 +1,157 @@
-# The Lanczos Algorithm: Arnoldi for Symmetric Matrices
+# The Lanczos Process
 
-We now turn our attention to the important special case where the matrix $A \in \mathbb{R}^{n \times n}$ is symmetric. The Arnoldi iteration, while general, does not exploit this structure. When symmetry is present, the algorithm simplifies dramatically, leading to profound computational savings. This specialized algorithm is the **Lanczos algorithm**, one of the most influential algorithms in numerical linear algebra.
+For a symmetric matrix, Arnoldi's projection has additional structure: the Hessenberg matrix is also symmetric, so it is tridiagonal. This reduces the orthogonalization to a **three-term recurrence**. Each new direction depends only on the current basis vector and its predecessor.
 
-## From Hessenberg to Tridiagonal
+We derive this simplification for $A=A^T\in\mathbb R^{n\times n}$ in exact arithmetic. For complex Hermitian matrices, replace transpose by conjugate transpose. The implementation below supports both cases.
 
-Recall the fundamental relation from the Arnoldi iteration after $k$ steps:
+## Symmetry Makes the Projection Tridiagonal
 
-$$
-A Q_k = Q_k H_k + h_{k+1,k} \boldsymbol{q}_{k+1} \boldsymbol{e}_k^T
-$$
-
-where $Q_k = [\boldsymbol{q}_1 | \cdots | \boldsymbol{q}_k]$ has orthonormal columns, and $H_k$ is a $k \times k$ upper Hessenberg matrix. By pre-multiplying by $Q_k^T$ and using the orthogonality of the columns of $Q_{k+1}$, we arrived at the projection:
+The Arnoldi basis satisfies $Q_k^TQ_k=I_k$, and its projected matrix is $H_k=Q_k^TAQ_k$. Symmetry gives
 
 $$
-H_k = Q_k^T A Q_k
+H_k^T=Q_k^TA^TQ_k=Q_k^TAQ_k=H_k.
 $$
 
-Now, let us impose the condition that $A$ is symmetric ($A = A^T$). The projected matrix $H_k$ must inherit this symmetry:
+The Hessenberg structure places zeros below the first subdiagonal. Symmetry reflects those zeros above the first superdiagonal. We therefore write $T_k=H_k$ and obtain
 
 $$
-H_k^T = (Q_k^T A Q_k)^T = Q_k^T A^T (Q_k^T)^T = Q_k^T A Q_k = H_k
-$$
-
-So, $H_k$ must be a symmetric matrix.
-
-It is a remarkable fact that a matrix cannot be both upper Hessenberg and symmetric without having a very specific structure: it must be **tridiagonal**.
-
-An upper Hessenberg matrix has zeros below its first subdiagonal ($h_{i,j} = 0$ for $i > j+1$). A symmetric matrix requires that $h_{i,j} = h_{j,i}$ for all $i,j$. If we combine these properties, any non-zero entry in the upper triangle, say $h_{j, i}$ with $i > j+1$, would imply a corresponding non-zero entry $h_{i,j}$ in the lower triangle, which would violate the Hessenberg structure. Thus, the only non-zero entries can be on the main diagonal, the first superdiagonal, and the first subdiagonal.
-
-We therefore rename the matrix $T_k = H_k$ to emphasize its tridiagonal nature. It is standard to denote the diagonal entries by $\alpha_j$ and the off-diagonal entries by $\beta_j$. Since $T_k$ is symmetric, we have $T_{j, j-1} = T_{j-1, j}$.
-
-In the Lanczos recurrence, we will set the diagonal entries $\alpha_k = h_{k,k}$ and the new subdiagonal entry $\beta_k = h_{k+1,k}$. The matrix $T_k$ is then:
-
-$$
-T_k = Q_k^T A Q_k =
+T_k=
 \begin{pmatrix}
-\alpha_1 & \beta_1 & & & \\
-\beta_1 & \alpha_2 & \beta_2 & & \\
-& \beta_2 & \ddots & \ddots & \\
-& & \ddots & \alpha_{k-1} & \beta_{k-1} \\
-& & & \beta_{k-1} & \alpha_k
-\end{pmatrix}
+\alpha_1&\beta_1&&\\
+\beta_1&\alpha_2&\ddots&\\
+&\ddots&\ddots&\beta_{k-1}\\
+&&\beta_{k-1}&\alpha_k
+\end{pmatrix}.
 $$
 
-## The Three-Term Recurrence
+Here $\alpha_j=h_{jj}$ and $\beta_j=h_{j+1,j}$ are the Arnoldi coefficients. The change from $H_k$ to $T_k$ emphasizes that the small projected matrix is tridiagonal.
 
-This tridiagonal structure leads to a dramatic simplification of the Arnoldi recurrence. The core step in Arnoldi is the modified Gram-Schmidt process used to compute $\boldsymbol{q}_{k+1}$:
+## Why Only Two Components Must Be Removed
 
-$$
-h_{k+1, k} \boldsymbol{q}_{k+1} = A \boldsymbol{q}_k - \sum_{j=1}^{k} h_{j,k} \boldsymbol{q}_j
-$$
-
-Since $H_k$ (now $T_k$) is tridiagonal, for a given column $k$, the only non-zero entries $h_{j,k}$ are $h_{k-1, k}$ and $h_{k,k}$. Using our new notation, these are $\beta_{k-1}$ and $\alpha_k$, respectively. All other $h_{j,k}$ for $j < k-1$ are zero.
-
-The summation therefore collapses from $k$ terms to just two, yielding the famous **Lanczos three-term recurrence**:
+Start with a unit vector $q_1$ and set $q_0=0$, $\beta_0=0$. The Arnoldi column relation now has just three terms:
 
 $$
-\beta_k \boldsymbol{q}_{k+1} = A \boldsymbol{q}_k - \alpha_k \boldsymbol{q}_k - \beta_{k-1} \boldsymbol{q}_{k-1}
+\boxed{
+Aq_j=\beta_{j-1}q_{j-1}
++\alpha_jq_j+\beta_jq_{j+1}.
+}
 $$
 
-### Another Derivation of the Three-Term Recurrence
+Only the components along $q_{j-1}$ and $q_j$ need to be removed before normalizing the new vector. The components along older basis vectors are already zero.
 
-Another way to derive the three-term recurrence is to start from the Arnoldi relation and use symmetry directly. We start with:
-
-$$
-A q_k = \sum_{j=1}^{k+1} h_{j,k} q_j
-$$
-
-Take a dot product with $q_i$ for $i < k-1$:
+To see why, take $i\le j-2$. Symmetry allows us to move $A$ to the other side of the inner product:
 
 $$
-q_i^T A q_k = \sum_{j=1}^{k+1} h_{j,k} q_i^T q_j = h_{i,k}
+q_i^TAq_j=(Aq_i)^Tq_j=0.
 $$
 
-Using symmetry of $A$:
+The last equality holds because $Aq_i$ lies in the span of $q_1,\ldots,q_{i+1}$, all perpendicular to $q_j$. This is what makes the short recurrence possible: orthogonality to the older directions follows from symmetry.
+
+At step $j$, compute
 
 $$
-q_i^T A q_k = (A q_i)^T q_k
+\begin{aligned}
+w&=Aq_j-\beta_{j-1}q_{j-1},\\
+\alpha_j&=q_j^Tw,\\
+w&\leftarrow w-\alpha_jq_j,\\
+\beta_j&=\|w\|_2,\qquad
+q_{j+1}=\frac{w}{\beta_j}\quad(\beta_j>0).
+\end{aligned}
 $$
 
-However $A q_i \in \text{span}\{q_1, \dots, q_{i+1}\}$, so $q_k$ is orthogonal to $A q_i$ for $i < k-1$. Thus $q_i^T A q_k = 0$ for $i < k-1$, which implies $h_{i,k} = 0$ for $i < k-1$. This leads us again to the three-term recurrence.
+The first subtraction removes the known component along the preceding direction. The second removes the component along the current direction. What remains gives the next basis vector. If $\beta_j=0$, the space is invariant and the process stops, just as in Arnoldi.
 
-## Lanczos Algorithm
+## The Lanczos Relation
 
-Let's assemble this into the algorithm. The Python implementation of the Lanczos iteration is as follows:
+Collecting the first $k$ column equations gives
+
+$$
+\boxed{
+AQ_k=Q_kT_k+f_ke_k^T,
+\qquad Q_k^Tf_k=0.
+}
+$$
+
+This is the Arnoldi relation specialized to the symmetric case. When $\beta_k>0$,
+
+$$
+f_k=\beta_kq_{k+1},\qquad \|f_k\|_2=\beta_k.
+$$
+
+The coefficient $\beta_k$ is **not an entry of $T_k$**. It couples the current space to the next direction; $T_k$ contains only $\beta_1,\ldots,\beta_{k-1}$. We retain $f_k$ to check the Ritz residuals, as explained in [Residuals and Eigenvector Accuracy](sec:lanczos-residuals). At exact breakdown, $f_k=0$ and no $q_{k+1}$ is needed.
+
+## Basic Implementation
+
+The following code implements the three-term recurrence without reorthogonalization. It returns $Q_k$, $T_k$, and the final remainder $f_k$, matching the output convention of the Arnoldi implementation. The maximum number of steps is $k$; early termination returns smaller matrices.
 
 ```python
 import numpy as np
 
-def lanczos(A, b, m):
+def lanczos_iteration(A, q1, k, breakdown_tol=None):
+    """Basic Lanczos recurrence for symmetric or Hermitian A.
+
+    Return Q, T, f with A @ Q approximately Q @ T + outer(f, e_last).
+    This implementation stores Q and does not reorthogonalize.
     """
-    Lanczos iteration for symmetric matrix A.
-    
-    Parameters:
-    A: n x n symmetric matrix
-    b: starting vector (will be normalized)
-    m: number of iterations
-    
-    Returns:
-    T: m x m tridiagonal matrix
-    Q: n x m matrix with orthonormal columns (optional, for Ritz vectors)
-    """
-    n = A.shape[0]
-    
-    # Initialize
-    q = b / np.linalg.norm(b)
-    q_prev = np.zeros(n)
+    q = np.asarray(q1)
+    if q.ndim != 1 or A.shape != (q.size, q.size):
+        raise ValueError("A must be square and q1 a matching vector.")
+    if not isinstance(k, (int, np.integer)) or not 1 <= k <= q.size:
+        raise ValueError("k must be an integer between 1 and n.")
+
+    dtype = np.result_type(A.dtype, q.dtype, np.float64)
+    q = q.astype(dtype, copy=True)
+    qnorm = np.linalg.norm(q)
+    if qnorm == 0:
+        raise ValueError("The starting vector must be nonzero.")
+    q /= qnorm
+
+    if breakdown_tol is None:
+        breakdown_tol = 10 * np.finfo(q.real.dtype).eps
+    if breakdown_tol < 0:
+        raise ValueError("breakdown_tol must be nonnegative.")
+
+    q_prev = np.zeros_like(q)
     beta_prev = 0.0
-    
-    alpha = np.zeros(m)
-    beta = np.zeros(m)
-    Q = np.zeros((n, m))
-    
-    for k in range(m):
-        Q[:, k] = q
-        
-        # Matrix-vector product
-        v = A @ q
-        
-        # Compute diagonal entry
-        alpha[k] = q.T @ v
-        
-        # Three-term recurrence
-        r = v - alpha[k] * q - beta_prev * q_prev
-        
-        # Compute off-diagonal entry
-        beta_k = np.linalg.norm(r)
-        
-        # Check for invariant subspace
-        if beta_k < 1e-12:
-            alpha = alpha[:k+1]
-            beta = beta[:k]
-            Q = Q[:, :k+1]
-            break
-        
-        # Update for next iteration
-        q_prev = q
-        q = r / beta_k
-        beta_prev = beta_k
-        if k < m - 1:
-            beta[k] = beta_k
-    
-    # Construct tridiagonal matrix T
-    T = np.diag(alpha) + np.diag(beta[:-1] if len(beta) > 1 else [], 1) + \
-        np.diag(beta[:-1] if len(beta) > 1 else [], -1)
-    
-    return T, Q
+    Q, alpha, beta = [], [], []
+
+    for j in range(k):
+        Q.append(q)
+        Aq = A @ q
+        w = Aq - beta_prev * q_prev
+        a = float(np.vdot(q, w).real)
+        w = w - a * q
+        alpha.append(a)
+        b = np.linalg.norm(w)
+
+        # b is the final coupling, outside T, if we stop here.
+        if b <= breakdown_tol * np.linalg.norm(Aq) or j + 1 == k:
+            T = np.diag(alpha)
+            if beta:
+                T += np.diag(beta, 1) + np.diag(beta, -1)
+            return np.column_stack(Q), T, w
+
+        beta.append(b)
+        q_prev, q = q, w / b
+        beta_prev = b
 ```
 
-The eigenvalues of the tridiagonal matrix $T_m$ are the **Ritz values**, which approximate the eigenvalues of $A$. The corresponding eigenvectors of $T_m$ can be used to compute the associated **Ritz vectors**, which approximate the eigenvectors of $A$.
+The final step computes the remainder even when no further basis vector is requested. The threshold is a relative test for a small new direction, not a tolerance on eigenvalue error.
 
-## Lanczos vs. Arnoldi: A Comparison
+## What the Short Recurrence Saves
 
-The transition from Arnoldi to Lanczos is not merely an aesthetic simplification; it represents one of the most significant performance gains in numerical methods. The cost of running for $k$ iterations is dominated by two components: matrix-vector products and the vector orthogonalization steps. For a sparse matrix $A$ where the number of non-zero entries, $\text{nnz}(A)$, is on the order of $n$, the costs are summarized below.
+Without reorthogonalization, each step requires one matrix-vector product and $O(n)$ additional vector work. Building $T_k$ therefore takes $k$ products and $O(nk)$ additional work, compared with Arnoldi's $O(nk^2)$ orthogonalization work.
 
-| Cost Component | Arnoldi Iteration (General $A$) | Lanczos Iteration (Symmetric $A$) |
-| :--- | :--- | :--- |
-| **Matrix-Vector Products** <br/> (Total for $k$ iterations) | $O(k \cdot \text{nnz}(A))$ | $O(k \cdot \text{nnz}(A))$ |
-| **Vector Operations** <br/> (Total for $k$ iterations) | $O(k^2 n)$ <br/> *Orthogonalization against all $j-1$ previous vectors at iteration $j$* | $O(kn)$ <br/> *Operations involve only the 2 previous vectors at each iteration* |
-| **Storage Requirement** | $O(kn)$ <br/> *Must store the entire basis $Q_k$* | $O(n)$ <br/> *Only needs to store the two most recent vectors* |
-| **Total Asymptotic Cost** <br/> (for sparse $A$) | **$O(k^2 n)$** | **$O(kn)$** |
+The recurrence itself needs only a few length-$n$ working vectors and the tridiagonal coefficients. However, **storing the basis $Q_k$ costs $O(nk)$ memory**. The implementation above does store it, so it can form Ritz vectors. The smaller $O(n)$ working-memory requirement applies when the basis is not retained. These costs concern the construction; solving the small eigenvalue problem adds further work.
 
-As the table shows, the cost of Lanczos scales linearly with the number of iterations, whereas Arnoldi scales quadratically. This makes the **Lanczos algorithm dramatically more efficient**, allowing for many more iterations to be run to achieve convergence, which is essential when dealing with the massive matrices found in modern scientific computing.
+## Orthogonality in Floating-Point Arithmetic
 
-## A Practical Caveat: Loss of Orthogonality
+The orthogonality argument used symmetry and exact arithmetic. Rounding errors can introduce components along older directions, and the short recurrence does not explicitly remove them. The computed basis can therefore lose orthogonality.
 
-In theory, the Lanczos vectors $\boldsymbol{q}_j$ are perfectly orthogonal. However, in finite-precision arithmetic, rounding errors accumulate, and the orthogonality among the vectors degrades over time. Specifically, $\boldsymbol{q}_k$ tends to lose orthogonality with the first few vectors $\boldsymbol{q}_j$ whose corresponding Ritz vector components are converging.
+A common consequence is the appearance of extra copies of already-converged eigenvalues among the eigenvalues of $T_k$. These are often called *ghost Ritz values*. They do not reliably indicate a true eigenvalue multiplicity.
 
-This loss of orthogonality is a famous and subtle feature of the algorithm. It manifests as the appearance of multiple copies ("ghosts") of already-converged eigenvalues in the spectrum of $T_m$. While this can be problematic, it can also be managed. Techniques like *full reorthogonalization* (which makes the algorithm as expensive as Arnoldi) or more practical *selective reorthogonalization* can be employed to maintain orthogonality where it matters most. For many applications, particularly finding the largest or smallest eigenvalues, the unmodified Lanczos algorithm is remarkably effective despite this issue.
+Full reorthogonalization removes components along every stored basis vector, restoring an orthogonalization cost of $O(nk^2)$. Selective reorthogonalization instead focuses on converged Ritz directions. This controls the tendency to rediscover eigenvectors already found; [the Netlib discussion of reorthogonalization](https://netlib.org/utk/people/JackDongarra/etemplates/node108.html) explains the mechanism.
+
+The basic implementation above illustrates the short recurrence, but long floating-point runs may require these additional orthogonalization steps. When assessing an eigenpair, an explicitly computed residual provides a useful check.
+
+The [next section](lanczos_convergence.md) explains the second benefit of symmetry: the largest and smallest Ritz values have variational characterizations that turn accurate directions in the Krylov space into eigenvalue error bounds.

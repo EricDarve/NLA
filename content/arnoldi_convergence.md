@@ -428,7 +428,19 @@ $$
 
 Thus the filtered vector is a scalar multiple of the Ritz vector. If the other Ritz roots make $s_\ell$ small at unwanted eigenvalues relative to its value at $\lambda_1$, the bound is small. Normalizing then gives an accurate Ritz direction, up to a sign or phase, by the same normalization argument used for the power method.
 
-A simpler trial polynomial can help compare the approximation available in a Krylov space with the power method. For example, suppose $\lambda_1=10$ and all unwanted eigenvalues lie in $[1,2]$. The polynomial
+The figure connects this filtering effect to the accuracy of the computed Ritz pair. The example has one eigenvalue at $10$, separated from all the others in $[1,2]$.
+
+:::{figure} ../_static/arnoldi_convergence.svg
+:alt: At Krylov sizes 2, 4, and 6, normalized filter values at unwanted eigenvalues become progressively smaller while the wanted value stays at one. The Ritz residual initially increases, then decreases rapidly as the subspace grows.
+:width: 100%
+:name: fig-arnoldi-convergence
+
+Polynomial filtering and Ritz-pair convergence for a $40\times40$ nonsymmetric matrix, with equal starting coefficients in its eigenvector basis. Left: the normalized Ritz-root filters preserve the component at $\lambda_1=10$ and suppress components at the other $39$ eigenvalues, evenly spaced in $[1,2]$. Right: the relative residual of the unit Ritz vector whose Ritz value is nearest $10$; matching colors mark the same subspace sizes. Both vertical axes are logarithmic. The initial increase illustrates that Ritz residuals need not decrease monotonically.
+:::
+
+The known eigenvalue $10$ is used to normalize the filters for the illustration. Arnoldi computes the Ritz pairs from $H_k$.
+
+For the same spectral configuration, a simpler trial polynomial helps compare the accuracy available in the Krylov space with the power method:
 
 $$
 p(z)=\left(\frac{z-1.5}{8.5}\right)^{k-1}
@@ -436,7 +448,7 @@ $$
 
 satisfies $p(10)=1$ and $|p(\lambda_i)|\le(1/17)^{k-1}$ for $i>1$. This gives a faster-decaying subspace error bound than the power-method choice $(z/10)^{k-1}$, whose corresponding bound is $(1/5)^{k-1}$. Arnoldi makes these polynomial combinations available without explicitly choosing this polynomial.
 
-This example bounds the accuracy available in the space; the Ritz-root filter identifies a particular computed direction. To certify an actual eigenvalue approximation, we return to the residual obtained directly from Arnoldi.
+This trial-polynomial comparison bounds the accuracy available in the space; the Ritz-root filter identifies a particular computed direction. To certify an actual eigenvalue approximation, we return to the residual obtained directly from Arnoldi.
 
 ### What a Small Residual Guarantees
 
