@@ -1,4 +1,7 @@
-"""Illustrate Arnoldi convergence with computed Ritz-root filters and residuals."""
+"""Illustrate Arnoldi convergence with computed Ritz-root filters and residuals.
+
+Run from any directory with Python, NumPy, and Matplotlib installed.
+"""
 
 from pathlib import Path
 

@@ -446,7 +446,7 @@ $$
 p(z)=\left(\frac{z-1.5}{8.5}\right)^{k-1}
 $$
 
-satisfies $p(10)=1$ and $|p(\lambda_i)|\le(1/17)^{k-1}$ for $i>1$. This gives a faster-decaying subspace error bound than the power-method choice $(z/10)^{k-1}$, whose corresponding bound is $(1/5)^{k-1}$. Arnoldi makes these polynomial combinations available without explicitly choosing this polynomial.
+It satisfies $p(10)=1$ and $|p(\lambda_i)|\le(1/17)^{k-1}$ for $i>1$. This gives a faster-decaying subspace error bound than the power-method choice $(z/10)^{k-1}$, whose corresponding bound is $(1/5)^{k-1}$. Arnoldi makes these polynomial combinations available without explicitly choosing this polynomial.
 
 This trial-polynomial comparison bounds the accuracy available in the space; the Ritz-root filter identifies a particular computed direction. To certify an actual eigenvalue approximation, we return to the residual obtained directly from Arnoldi.
 

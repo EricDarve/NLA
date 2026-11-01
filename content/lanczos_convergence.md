@@ -203,6 +203,16 @@ $$
 
 shows that the denominator grows geometrically. A larger relative gap $\rho$ gives a larger $\tau$ and a faster-decaying bound. Small gaps or a poor starting direction can require more iterations. This is the largest-eigenvalue case of the classical Kaniel–Paige–Saad bounds; see [Saad, Section 6.6](https://www-users.cse.umn.edu/~saad/eig_book_2ndEd.pdf#page=157).
 
+The figure compares this bound with the actual error of the largest Ritz value. The Chebyshev polynomials provide trial filters for the analysis; Lanczos computes its Ritz values from $T_k$.
+
+:::{figure} ../_static/lanczos_convergence.svg
+:alt: Chebyshev filter magnitudes at unwanted eigenvalues shrink as the Krylov size increases from 3 to 7 to 11, while the wanted component stays at one. The largest Ritz-value error decreases and remains below the Chebyshev upper bound.
+:width: 100%
+:name: fig-lanczos-convergence
+
+Lanczos convergence for a $40\times40$ diagonal matrix with $\lambda_1=2.5$ and the other $39$ eigenvalues evenly spaced in $[1,2]$, so $\rho=0.5$. The unit starting vector has equal eigenvector coefficients. Left: the normalized Chebyshev filters suppress unwanted components while preserving $p(2.5)=1$. Right: the computed error $\lambda_1-\theta_1^{(k)}$ (solid) and its Chebyshev bound (dashed). Matching colors mark the same subspace sizes. Both vertical axes are logarithmic. The calculation uses reorthogonalization to preserve the basis orthogonality.
+:::
+
 If $\lambda_1>\lambda_2=\lambda_n$, the unwanted eigenvalues all coincide. The degree-one polynomial $p(z)=(z-\lambda_n)/(\lambda_1-\lambda_n)$ removes them exactly, so the largest eigenvalue is obtained in at most two steps, assuming $c_1\ne0$. If all eigenvalues coincide, every nonzero vector is already an eigenvector and one step suffices.
 
 The smallest eigenvalue is treated in exactly the same way by applying the argument to $-A$. Its convergence depends on the gap at the bottom of the spectrum and the starting component in that eigendirection.
