@@ -275,8 +275,7 @@
 <li class="toctree-l2"><a class="reference internal" href="content/krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/arnoldi_iteration.html">The Arnoldi Process</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
-
-<li class="toctree-l2"><a class="reference internal" href="content/lanczos_iteration.html">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content/lanczos_iteration.html">The Lanczos Process</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content/lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
@@ -424,8 +423,6 @@
    <a href="#cap-cor:qr-individual-eigenvalue-rate"><strong>cor:qr-individual-eigenvalue-rate</strong></a> | 
    <a href="#cap-def:characteristic_polynomial"><strong>def:characteristic_polynomial</strong></a> | 
    <a href="#cap-def:minimal_polynomial"><strong>def:minimal_polynomial</strong></a> | 
-   <a href="#cap-def:pseudospectrum1"><strong>def:pseudospectrum1</strong></a> | 
-   <a href="#cap-def:pseudospectrum2"><strong>def:pseudospectrum2</strong></a> | 
    <a href="#cap-definition-0"><strong>definition-0</strong></a> | 
    <a href="#cap-gmres_residual_bound"><strong>gmres_residual_bound</strong></a> | 
    <a href="#cap-lem:banach"><strong>lem:banach</strong></a> | 
@@ -436,6 +433,8 @@
    <a href="#cap-theorem-0"><strong>theorem-0</strong></a> | 
    <a href="#cap-thm-power-method-convergence"><strong>thm-power-method-convergence</strong></a> | 
    <a href="#cap-thm:AkQR"><strong>thm:AkQR</strong></a> | 
+   <a href="#cap-thm:arnoldi-polynomial-approximation"><strong>thm:arnoldi-polynomial-approximation</strong></a> | 
+   <a href="#cap-thm:arnoldi-polynomial-ritz-residual"><strong>thm:arnoldi-polynomial-ritz-residual</strong></a> | 
    <a href="#cap-thm:arnoldi_krylov_basis"><strong>thm:arnoldi_krylov_basis</strong></a> | 
    <a href="#cap-thm:arnoldi_optimality"><strong>thm:arnoldi_optimality</strong></a> | 
    <a href="#cap-thm:backward_error_cholesky"><strong>thm:backward_error_cholesky</strong></a> | 
@@ -456,6 +455,10 @@
    <a href="#cap-thm:existence_qr"><strong>thm:existence_qr</strong></a> | 
    <a href="#cap-thm:gauss_seidel_convergence"><strong>thm:gauss_seidel_convergence</strong></a> | 
    <a href="#cap-thm:jacobi_convergence"><strong>thm:jacobi_convergence</strong></a> | 
+   <a href="#cap-thm:lanczos-chebyshev-bound"><strong>thm:lanczos-chebyshev-bound</strong></a> | 
+   <a href="#cap-thm:lanczos-interior-convergence"><strong>thm:lanczos-interior-convergence</strong></a> | 
+   <a href="#cap-thm:lanczos-monotone-ritz"><strong>thm:lanczos-monotone-ritz</strong></a> | 
+   <a href="#cap-thm:lanczos-polynomial-bound"><strong>thm:lanczos-polynomial-bound</strong></a> | 
    <a href="#cap-thm:non_hermitian_convergence"><strong>thm:non_hermitian_convergence</strong></a> | 
    <a href="#cap-thm:orth-it-nh-rigorous"><strong>thm:orth-it-nh-rigorous</strong></a> | 
    <a href="#cap-thm:perturbation_bound"><strong>thm:perturbation_bound</strong></a> | 
@@ -535,22 +538,6 @@
        <td></td>
        <td>
        <a href="content/arnoldi_convergence.html#def:minimal_polynomial"><code class="xref">def:minimal_polynomial</code></a> <em>(content/arnoldi_convergence)</em></td><td>
-       <em>definition</em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-def:pseudospectrum1"><td></td><td>
-       <strong>def:pseudospectrum1</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="content/arnoldi_convergence.html#def:pseudospectrum1"><code class="xref">def:pseudospectrum1</code></a> <em>(content/arnoldi_convergence)</em></td><td>
-       <em>definition</em></td></tr>
-     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
-     <tr class="cap" id="cap-def:pseudospectrum2"><td></td><td>
-       <strong>def:pseudospectrum2</strong></td><td></td></tr>
-     <tr>
-       <td></td>
-       <td>
-       <a href="content/arnoldi_convergence.html#def:pseudospectrum2"><code class="xref">def:pseudospectrum2</code></a> <em>(content/arnoldi_convergence)</em></td><td>
        <em>definition</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-definition-0"><td></td><td>
@@ -633,12 +620,28 @@
        <a href="content/orthogonal_iteration.html#thm:AkQR"><code class="xref">thm:AkQR</code></a> <em>(content/orthogonal_iteration)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:arnoldi-polynomial-approximation"><td></td><td>
+       <strong>thm:arnoldi-polynomial-approximation</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#thm:arnoldi-polynomial-approximation"><code class="xref">thm:arnoldi-polynomial-approximation</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:arnoldi-polynomial-ritz-residual"><td></td><td>
+       <strong>thm:arnoldi-polynomial-ritz-residual</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/arnoldi_convergence.html#thm:arnoldi-polynomial-ritz-residual"><code class="xref">thm:arnoldi-polynomial-ritz-residual</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:arnoldi_krylov_basis"><td></td><td>
        <strong>thm:arnoldi_krylov_basis</strong></td><td></td></tr>
      <tr>
        <td></td>
        <td>
-       <a href="content/arnoldi_convergence.html#thm:arnoldi_krylov_basis"><code class="xref">thm:arnoldi_krylov_basis</code></a> <em>(content/arnoldi_convergence)</em></td><td>
+       <a href="content/arnoldi_iteration.html#thm:arnoldi_krylov_basis"><code class="xref">thm:arnoldi_krylov_basis</code></a> <em>(content/arnoldi_iteration)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:arnoldi_optimality"><td></td><td>
@@ -791,6 +794,38 @@
        <td></td>
        <td>
        <a href="content/jacobi_method.html#thm:jacobi_convergence"><code class="xref">thm:jacobi_convergence</code></a> <em>(content/jacobi_method)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:lanczos-chebyshev-bound"><td></td><td>
+       <strong>thm:lanczos-chebyshev-bound</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/lanczos_convergence.html#thm:lanczos-chebyshev-bound"><code class="xref">thm:lanczos-chebyshev-bound</code></a> <em>(content/lanczos_convergence)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:lanczos-interior-convergence"><td></td><td>
+       <strong>thm:lanczos-interior-convergence</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/lanczos_convergence.html#thm:lanczos-interior-convergence"><code class="xref">thm:lanczos-interior-convergence</code></a> <em>(content/lanczos_convergence)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:lanczos-monotone-ritz"><td></td><td>
+       <strong>thm:lanczos-monotone-ritz</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/lanczos_convergence.html#thm:lanczos-monotone-ritz"><code class="xref">thm:lanczos-monotone-ritz</code></a> <em>(content/lanczos_convergence)</em></td><td>
+       <em>theorem</em></td></tr>
+     <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
+     <tr class="cap" id="cap-thm:lanczos-polynomial-bound"><td></td><td>
+       <strong>thm:lanczos-polynomial-bound</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="content/lanczos_convergence.html#thm:lanczos-polynomial-bound"><code class="xref">thm:lanczos-polynomial-bound</code></a> <em>(content/lanczos_convergence)</em></td><td>
        <em>theorem</em></td></tr>
      <tr class="pcap"><td></td><td>&#160;</td><td></td></tr>
      <tr class="cap" id="cap-thm:non_hermitian_convergence"><td></td><td>

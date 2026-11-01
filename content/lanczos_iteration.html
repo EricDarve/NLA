@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Lanczos Algorithm: Arnoldi for Symmetric Matrices &#8212; Numerical Linear Algebra</title>
+    <title>The Lanczos Process &#8212; Numerical Linear Algebra</title>
   
   
   
@@ -275,8 +275,7 @@
 <li class="toctree-l2"><a class="reference internal" href="krylov_subspaces.html">Projection onto Krylov Subspaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arnoldi_iteration.html">The Arnoldi Process</a></li>
 <li class="toctree-l2"><a class="reference internal" href="arnoldi_convergence.html">Convergence of the Arnoldi Process</a></li>
-
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Lanczos Algorithm: Arnoldi for Symmetric Matrices</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">The Lanczos Process</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lanczos_convergence.html">Convergence of the Lanczos Process</a></li>
 </ul>
 </details></li>
@@ -448,7 +447,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>The Lanczos Algorithm: Arnoldi for Symmetric Matrices</h1>
+    <h1>The Lanczos Process</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -458,14 +457,12 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-hessenberg-to-tridiagonal">From Hessenberg to Tridiagonal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-term-recurrence">The Three-Term Recurrence</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#another-derivation-of-the-three-term-recurrence">Another Derivation of the Three-Term Recurrence</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-algorithm">Lanczos Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-vs-arnoldi-a-comparison">Lanczos vs. Arnoldi: A Comparison</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-practical-caveat-loss-of-orthogonality">A Practical Caveat: Loss of Orthogonality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetry-makes-the-projection-tridiagonal">Symmetry Makes the Projection Tridiagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-only-two-components-must-be-removed">Why Only Two Components Must Be Removed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lanczos-relation">The Lanczos Relation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-implementation">Basic Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-short-recurrence-saves">What the Short Recurrence Saves</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-in-floating-point-arithmetic">Orthogonality in Floating-Point Arithmetic</a></li>
 </ul>
             </nav>
         </div>
@@ -477,179 +474,145 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="the-lanczos-algorithm-arnoldi-for-symmetric-matrices">
-<h1>The Lanczos Algorithm: Arnoldi for Symmetric Matrices<a class="headerlink" href="#the-lanczos-algorithm-arnoldi-for-symmetric-matrices" title="Link to this heading">#</a></h1>
-<p>We now turn our attention to the important special case where the matrix <span class="math notranslate nohighlight">\(A \in \mathbb{R}^{n \times n}\)</span> is symmetric. The Arnoldi iteration, while general, does not exploit this structure. When symmetry is present, the algorithm simplifies dramatically, leading to profound computational savings. This specialized algorithm is the <strong>Lanczos algorithm</strong>, one of the most influential algorithms in numerical linear algebra.</p>
-<section id="from-hessenberg-to-tridiagonal">
-<h2>From Hessenberg to Tridiagonal<a class="headerlink" href="#from-hessenberg-to-tridiagonal" title="Link to this heading">#</a></h2>
-<p>Recall the fundamental relation from the Arnoldi iteration after <span class="math notranslate nohighlight">\(k\)</span> steps:</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="the-lanczos-process">
+<h1>The Lanczos Process<a class="headerlink" href="#the-lanczos-process" title="Link to this heading">#</a></h1>
+<p>For a symmetric matrix, Arnoldi’s projection has additional structure: the Hessenberg matrix is also symmetric, so it is tridiagonal. This reduces the orthogonalization to a <strong>three-term recurrence</strong>. Each new direction depends only on the current basis vector and its predecessor.</p>
+<p>We derive this simplification for <span class="math notranslate nohighlight">\(A=A^T\in\mathbb R^{n\times n}\)</span> in exact arithmetic. For complex Hermitian matrices, replace transpose by conjugate transpose. The implementation below supports both cases.</p>
+<section id="symmetry-makes-the-projection-tridiagonal">
+<h2>Symmetry Makes the Projection Tridiagonal<a class="headerlink" href="#symmetry-makes-the-projection-tridiagonal" title="Link to this heading">#</a></h2>
+<p>The Arnoldi basis satisfies <span class="math notranslate nohighlight">\(Q_k^TQ_k=I_k\)</span>, and its projected matrix is <span class="math notranslate nohighlight">\(H_k=Q_k^TAQ_k\)</span>. Symmetry gives</p>
 <div class="math notranslate nohighlight">
 \[
-A Q_k = Q_k H_k + h_{k+1,k} \boldsymbol{q}_{k+1} \boldsymbol{e}_k^T
+H_k^T=Q_k^TA^TQ_k=Q_k^TAQ_k=H_k.
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(Q_k = [\boldsymbol{q}_1 | \cdots | \boldsymbol{q}_k]\)</span> has orthonormal columns, and <span class="math notranslate nohighlight">\(H_k\)</span> is a <span class="math notranslate nohighlight">\(k \times k\)</span> upper Hessenberg matrix. By pre-multiplying by <span class="math notranslate nohighlight">\(Q_k^T\)</span> and using the orthogonality of the columns of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>, we arrived at the projection:</p>
-<div class="math notranslate nohighlight">
-\[
-H_k = Q_k^T A Q_k
-\]</div>
-<p>Now, let us impose the condition that <span class="math notranslate nohighlight">\(A\)</span> is symmetric (<span class="math notranslate nohighlight">\(A = A^T\)</span>). The projected matrix <span class="math notranslate nohighlight">\(H_k\)</span> must inherit this symmetry:</p>
-<div class="math notranslate nohighlight">
-\[
-H_k^T = (Q_k^T A Q_k)^T = Q_k^T A^T (Q_k^T)^T = Q_k^T A Q_k = H_k
-\]</div>
-<p>So, <span class="math notranslate nohighlight">\(H_k\)</span> must be a symmetric matrix.</p>
-<p>It is a remarkable fact that a matrix cannot be both upper Hessenberg and symmetric without having a very specific structure: it must be <strong>tridiagonal</strong>.</p>
-<p>An upper Hessenberg matrix has zeros below its first subdiagonal (<span class="math notranslate nohighlight">\(h_{i,j} = 0\)</span> for <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>). A symmetric matrix requires that <span class="math notranslate nohighlight">\(h_{i,j} = h_{j,i}\)</span> for all <span class="math notranslate nohighlight">\(i,j\)</span>. If we combine these properties, any non-zero entry in the upper triangle, say <span class="math notranslate nohighlight">\(h_{j, i}\)</span> with <span class="math notranslate nohighlight">\(i &gt; j+1\)</span>, would imply a corresponding non-zero entry <span class="math notranslate nohighlight">\(h_{i,j}\)</span> in the lower triangle, which would violate the Hessenberg structure. Thus, the only non-zero entries can be on the main diagonal, the first superdiagonal, and the first subdiagonal.</p>
-<p>We therefore rename the matrix <span class="math notranslate nohighlight">\(T_k = H_k\)</span> to emphasize its tridiagonal nature. It is standard to denote the diagonal entries by <span class="math notranslate nohighlight">\(\alpha_j\)</span> and the off-diagonal entries by <span class="math notranslate nohighlight">\(\beta_j\)</span>. Since <span class="math notranslate nohighlight">\(T_k\)</span> is symmetric, we have <span class="math notranslate nohighlight">\(T_{j, j-1} = T_{j-1, j}\)</span>.</p>
-<p>In the Lanczos recurrence, we will set the diagonal entries <span class="math notranslate nohighlight">\(\alpha_k = h_{k,k}\)</span> and the new subdiagonal entry <span class="math notranslate nohighlight">\(\beta_k = h_{k+1,k}\)</span>. The matrix <span class="math notranslate nohighlight">\(T_k\)</span> is then:</p>
+<p>The Hessenberg structure places zeros below the first subdiagonal. Symmetry reflects those zeros above the first superdiagonal. We therefore write <span class="math notranslate nohighlight">\(T_k=H_k\)</span> and obtain</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-T_k = Q_k^T A Q_k =
+T_k=
 \begin{pmatrix}
-\alpha_1 &amp; \beta_1 &amp; &amp; &amp; \\
-\beta_1 &amp; \alpha_2 &amp; \beta_2 &amp; &amp; \\
-&amp; \beta_2 &amp; \ddots &amp; \ddots &amp; \\
-&amp; &amp; \ddots &amp; \alpha_{k-1} &amp; \beta_{k-1} \\
-&amp; &amp; &amp; \beta_{k-1} &amp; \alpha_k
-\end{pmatrix}
+\alpha_1&amp;\beta_1&amp;&amp;\\
+\beta_1&amp;\alpha_2&amp;\ddots&amp;\\
+&amp;\ddots&amp;\ddots&amp;\beta_{k-1}\\
+&amp;&amp;\beta_{k-1}&amp;\alpha_k
+\end{pmatrix}.
 \end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\alpha_j=h_{jj}\)</span> and <span class="math notranslate nohighlight">\(\beta_j=h_{j+1,j}\)</span> are the Arnoldi coefficients. The change from <span class="math notranslate nohighlight">\(H_k\)</span> to <span class="math notranslate nohighlight">\(T_k\)</span> emphasizes that the small projected matrix is tridiagonal.</p>
 </section>
-<section id="the-three-term-recurrence">
-<h2>The Three-Term Recurrence<a class="headerlink" href="#the-three-term-recurrence" title="Link to this heading">#</a></h2>
-<p>This tridiagonal structure leads to a dramatic simplification of the Arnoldi recurrence. The core step in Arnoldi is the modified Gram-Schmidt process used to compute <span class="math notranslate nohighlight">\(\boldsymbol{q}_{k+1}\)</span>:</p>
+<section id="why-only-two-components-must-be-removed">
+<h2>Why Only Two Components Must Be Removed<a class="headerlink" href="#why-only-two-components-must-be-removed" title="Link to this heading">#</a></h2>
+<p>Start with a unit vector <span class="math notranslate nohighlight">\(q_1\)</span> and set <span class="math notranslate nohighlight">\(q_0=0\)</span>, <span class="math notranslate nohighlight">\(\beta_0=0\)</span>. The Arnoldi column relation now has just three terms:</p>
 <div class="math notranslate nohighlight">
 \[
-h_{k+1, k} \boldsymbol{q}_{k+1} = A \boldsymbol{q}_k - \sum_{j=1}^{k} h_{j,k} \boldsymbol{q}_j
+\boxed{
+Aq_j=\beta_{j-1}q_{j-1}
++\alpha_jq_j+\beta_jq_{j+1}.
+}
 \]</div>
-<p>Since <span class="math notranslate nohighlight">\(H_k\)</span> (now <span class="math notranslate nohighlight">\(T_k\)</span>) is tridiagonal, for a given column <span class="math notranslate nohighlight">\(k\)</span>, the only non-zero entries <span class="math notranslate nohighlight">\(h_{j,k}\)</span> are <span class="math notranslate nohighlight">\(h_{k-1, k}\)</span> and <span class="math notranslate nohighlight">\(h_{k,k}\)</span>. Using our new notation, these are <span class="math notranslate nohighlight">\(\beta_{k-1}\)</span> and <span class="math notranslate nohighlight">\(\alpha_k\)</span>, respectively. All other <span class="math notranslate nohighlight">\(h_{j,k}\)</span> for <span class="math notranslate nohighlight">\(j &lt; k-1\)</span> are zero.</p>
-<p>The summation therefore collapses from <span class="math notranslate nohighlight">\(k\)</span> terms to just two, yielding the famous <strong>Lanczos three-term recurrence</strong>:</p>
+<p>Only the components along <span class="math notranslate nohighlight">\(q_{j-1}\)</span> and <span class="math notranslate nohighlight">\(q_j\)</span> need to be removed before normalizing the new vector. The components along older basis vectors are already zero.</p>
+<p>To see why, take <span class="math notranslate nohighlight">\(i\le j-2\)</span>. Symmetry allows us to move <span class="math notranslate nohighlight">\(A\)</span> to the other side of the inner product:</p>
 <div class="math notranslate nohighlight">
 \[
-\beta_k \boldsymbol{q}_{k+1} = A \boldsymbol{q}_k - \alpha_k \boldsymbol{q}_k - \beta_{k-1} \boldsymbol{q}_{k-1}
+q_i^TAq_j=(Aq_i)^Tq_j=0.
 \]</div>
-<section id="another-derivation-of-the-three-term-recurrence">
-<h3>Another Derivation of the Three-Term Recurrence<a class="headerlink" href="#another-derivation-of-the-three-term-recurrence" title="Link to this heading">#</a></h3>
-<p>Another way to derive the three-term recurrence is to start from the Arnoldi relation and use symmetry directly. We start with:</p>
+<p>The last equality holds because <span class="math notranslate nohighlight">\(Aq_i\)</span> lies in the span of <span class="math notranslate nohighlight">\(q_1,\ldots,q_{i+1}\)</span>, all perpendicular to <span class="math notranslate nohighlight">\(q_j\)</span>. This is what makes the short recurrence possible: orthogonality to the older directions follows from symmetry.</p>
+<p>At step <span class="math notranslate nohighlight">\(j\)</span>, compute</p>
 <div class="math notranslate nohighlight">
-\[
-A q_k = \sum_{j=1}^{k+1} h_{j,k} q_j
-\]</div>
-<p>Take a dot product with <span class="math notranslate nohighlight">\(q_i\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-q_i^T A q_k = \sum_{j=1}^{k+1} h_{j,k} q_i^T q_j = h_{i,k}
-\]</div>
-<p>Using symmetry of <span class="math notranslate nohighlight">\(A\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-q_i^T A q_k = (A q_i)^T q_k
-\]</div>
-<p>However <span class="math notranslate nohighlight">\(A q_i \in \text{span}\{q_1, \dots, q_{i+1}\}\)</span>, so <span class="math notranslate nohighlight">\(q_k\)</span> is orthogonal to <span class="math notranslate nohighlight">\(A q_i\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>. Thus <span class="math notranslate nohighlight">\(q_i^T A q_k = 0\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>, which implies <span class="math notranslate nohighlight">\(h_{i,k} = 0\)</span> for <span class="math notranslate nohighlight">\(i &lt; k-1\)</span>. This leads us again to the three-term recurrence.</p>
+\[\begin{split}
+\begin{aligned}
+w&amp;=Aq_j-\beta_{j-1}q_{j-1},\\
+\alpha_j&amp;=q_j^Tw,\\
+w&amp;\leftarrow w-\alpha_jq_j,\\
+\beta_j&amp;=\|w\|_2,\qquad
+q_{j+1}=\frac{w}{\beta_j}\quad(\beta_j&gt;0).
+\end{aligned}
+\end{split}\]</div>
+<p>The first subtraction removes the known component along the preceding direction. The second removes the component along the current direction. What remains gives the next basis vector. If <span class="math notranslate nohighlight">\(\beta_j=0\)</span>, the space is invariant and the process stops, just as in Arnoldi.</p>
 </section>
+<section id="the-lanczos-relation">
+<h2>The Lanczos Relation<a class="headerlink" href="#the-lanczos-relation" title="Link to this heading">#</a></h2>
+<p>Collecting the first <span class="math notranslate nohighlight">\(k\)</span> column equations gives</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+AQ_k=Q_kT_k+f_ke_k^T,
+\qquad Q_k^Tf_k=0.
+}
+\]</div>
+<p>This is the Arnoldi relation specialized to the symmetric case. When <span class="math notranslate nohighlight">\(\beta_k&gt;0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+f_k=\beta_kq_{k+1},\qquad \|f_k\|_2=\beta_k.
+\]</div>
+<p>The coefficient <span class="math notranslate nohighlight">\(\beta_k\)</span> is <strong>not an entry of <span class="math notranslate nohighlight">\(T_k\)</span></strong>. It couples the current space to the next direction; <span class="math notranslate nohighlight">\(T_k\)</span> contains only <span class="math notranslate nohighlight">\(\beta_1,\ldots,\beta_{k-1}\)</span>. We retain <span class="math notranslate nohighlight">\(f_k\)</span> to check the Ritz residuals, as explained in <a class="reference internal" href="lanczos_convergence.html#sec-lanczos-residuals"><span class="std std-ref">Residuals and Eigenvector Accuracy</span></a>. At exact breakdown, <span class="math notranslate nohighlight">\(f_k=0\)</span> and no <span class="math notranslate nohighlight">\(q_{k+1}\)</span> is needed.</p>
 </section>
-<section id="lanczos-algorithm">
-<h2>Lanczos Algorithm<a class="headerlink" href="#lanczos-algorithm" title="Link to this heading">#</a></h2>
-<p>Let’s assemble this into the algorithm. The Python implementation of the Lanczos iteration is as follows:</p>
+<section id="basic-implementation">
+<h2>Basic Implementation<a class="headerlink" href="#basic-implementation" title="Link to this heading">#</a></h2>
+<p>The following code implements the three-term recurrence without reorthogonalization. It returns <span class="math notranslate nohighlight">\(Q_k\)</span>, <span class="math notranslate nohighlight">\(T_k\)</span>, and the final remainder <span class="math notranslate nohighlight">\(f_k\)</span>, matching the output convention of the Arnoldi implementation. The maximum number of steps is <span class="math notranslate nohighlight">\(k\)</span>; early termination returns smaller matrices.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">lanczos</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Lanczos iteration for symmetric matrix A.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    A: n x n symmetric matrix</span>
-<span class="sd">    b: starting vector (will be normalized)</span>
-<span class="sd">    m: number of iterations</span>
-<span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    T: m x m tridiagonal matrix</span>
-<span class="sd">    Q: n x m matrix with orthonormal columns (optional, for Ritz vectors)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lanczos_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">breakdown_tol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Basic Lanczos recurrence for symmetric or Hermitian A.</span>
+
+<span class="sd">    Return Q, T, f with A @ Q approximately Q @ T + outer(f, e_last).</span>
+<span class="sd">    This implementation stores Q and does not reorthogonalize.</span>
 <span class="sd">    """</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    
-    <span class="c1"># Initialize</span>
-    <span class="n">q</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="n">q_prev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"A must be square and q1 a matching vector."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="n">q</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"k must be an integer between 1 and n."</span><span class="p">)</span>
+
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">qnorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">qnorm</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The starting vector must be nonzero."</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">/=</span> <span class="n">qnorm</span>
+
+    <span class="k">if</span> <span class="n">breakdown_tol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">breakdown_tol</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+    <span class="k">if</span> <span class="n">breakdown_tol</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"breakdown_tol must be nonnegative."</span><span class="p">)</span>
+
+    <span class="n">q_prev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
     <span class="n">beta_prev</span> <span class="o">=</span> <span class="mf">0.0</span>
-    
-    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
-    <span class="n">Q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">))</span>
-    
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
-        <span class="n">Q</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
-        
-        <span class="c1"># Matrix-vector product</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">q</span>
-        
-        <span class="c1"># Compute diagonal entry</span>
-        <span class="n">alpha</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">v</span>
-        
-        <span class="c1"># Three-term recurrence</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">q</span> <span class="o">-</span> <span class="n">beta_prev</span> <span class="o">*</span> <span class="n">q_prev</span>
-        
-        <span class="c1"># Compute off-diagonal entry</span>
-        <span class="n">beta_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-        
-        <span class="c1"># Check for invariant subspace</span>
-        <span class="k">if</span> <span class="n">beta_k</span> <span class="o">&lt;</span> <span class="mf">1e-12</span><span class="p">:</span>
-            <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">[:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[:</span><span class="n">k</span><span class="p">]</span>
-            <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">break</span>
-        
-        <span class="c1"># Update for next iteration</span>
-        <span class="n">q_prev</span> <span class="o">=</span> <span class="n">q</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="n">r</span> <span class="o">/</span> <span class="n">beta_k</span>
-        <span class="n">beta_prev</span> <span class="o">=</span> <span class="n">beta_k</span>
-        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">beta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta_k</span>
-    
-    <span class="c1"># Construct tridiagonal matrix T</span>
-    <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">beta</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> \
-        <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">beta</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">T</span><span class="p">,</span> <span class="n">Q</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="n">Q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">Aq</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">q</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">Aq</span> <span class="o">-</span> <span class="n">beta_prev</span> <span class="o">*</span> <span class="n">q_prev</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="n">a</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="n">alpha</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="c1"># b is the final coupling, outside T, if we stop here.</span>
+        <span class="k">if</span> <span class="n">b</span> <span class="o">&lt;=</span> <span class="n">breakdown_tol</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Aq</span><span class="p">)</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">k</span><span class="p">:</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">beta</span><span class="p">:</span>
+                <span class="n">T</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span><span class="n">Q</span><span class="p">),</span> <span class="n">T</span><span class="p">,</span> <span class="n">w</span>
+
+        <span class="n">beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">q_prev</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="p">,</span> <span class="n">w</span> <span class="o">/</span> <span class="n">b</span>
+        <span class="n">beta_prev</span> <span class="o">=</span> <span class="n">b</span>
 </pre></div>
 </div>
-<p>The eigenvalues of the tridiagonal matrix <span class="math notranslate nohighlight">\(T_m\)</span> are the <strong>Ritz values</strong>, which approximate the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>. The corresponding eigenvectors of <span class="math notranslate nohighlight">\(T_m\)</span> can be used to compute the associated <strong>Ritz vectors</strong>, which approximate the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>The final step computes the remainder even when no further basis vector is requested. The threshold is a relative test for a small new direction, not a tolerance on eigenvalue error.</p>
 </section>
-<section id="lanczos-vs-arnoldi-a-comparison">
-<h2>Lanczos vs. Arnoldi: A Comparison<a class="headerlink" href="#lanczos-vs-arnoldi-a-comparison" title="Link to this heading">#</a></h2>
-<p>The transition from Arnoldi to Lanczos is not merely an aesthetic simplification; it represents one of the most significant performance gains in numerical methods. The cost of running for <span class="math notranslate nohighlight">\(k\)</span> iterations is dominated by two components: matrix-vector products and the vector orthogonalization steps. For a sparse matrix <span class="math notranslate nohighlight">\(A\)</span> where the number of non-zero entries, <span class="math notranslate nohighlight">\(\text{nnz}(A)\)</span>, is on the order of <span class="math notranslate nohighlight">\(n\)</span>, the costs are summarized below.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Cost Component</p></th>
-<th class="head text-left"><p>Arnoldi Iteration (General <span class="math notranslate nohighlight">\(A\)</span>)</p></th>
-<th class="head text-left"><p>Lanczos Iteration (Symmetric <span class="math notranslate nohighlight">\(A\)</span>)</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Matrix-Vector Products</strong> <br/> (Total for <span class="math notranslate nohighlight">\(k\)</span> iterations)</p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(k \cdot \text{nnz}(A))\)</span></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(k \cdot \text{nnz}(A))\)</span></p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Vector Operations</strong> <br/> (Total for <span class="math notranslate nohighlight">\(k\)</span> iterations)</p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(k^2 n)\)</span> <br/> <em>Orthogonalization against all <span class="math notranslate nohighlight">\(j-1\)</span> previous vectors at iteration <span class="math notranslate nohighlight">\(j\)</span></em></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(kn)\)</span> <br/> <em>Operations involve only the 2 previous vectors at each iteration</em></p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Storage Requirement</strong></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(kn)\)</span> <br/> <em>Must store the entire basis <span class="math notranslate nohighlight">\(Q_k\)</span></em></p></td>
-<td class="text-left"><p><span class="math notranslate nohighlight">\(O(n)\)</span> <br/> <em>Only needs to store the two most recent vectors</em></p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Total Asymptotic Cost</strong> <br/> (for sparse <span class="math notranslate nohighlight">\(A\)</span>)</p></td>
-<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(k^2 n)\)</span></strong></p></td>
-<td class="text-left"><p><strong><span class="math notranslate nohighlight">\(O(kn)\)</span></strong></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>As the table shows, the cost of Lanczos scales linearly with the number of iterations, whereas Arnoldi scales quadratically. This makes the <strong>Lanczos algorithm dramatically more efficient</strong>, allowing for many more iterations to be run to achieve convergence, which is essential when dealing with the massive matrices found in modern scientific computing.</p>
+<section id="what-the-short-recurrence-saves">
+<h2>What the Short Recurrence Saves<a class="headerlink" href="#what-the-short-recurrence-saves" title="Link to this heading">#</a></h2>
+<p>Without reorthogonalization, each step requires one matrix-vector product and <span class="math notranslate nohighlight">\(O(n)\)</span> additional vector work. Building <span class="math notranslate nohighlight">\(T_k\)</span> therefore takes <span class="math notranslate nohighlight">\(k\)</span> products and <span class="math notranslate nohighlight">\(O(nk)\)</span> additional work, compared with Arnoldi’s <span class="math notranslate nohighlight">\(O(nk^2)\)</span> orthogonalization work.</p>
+<p>The recurrence itself needs only a few length-<span class="math notranslate nohighlight">\(n\)</span> working vectors and the tridiagonal coefficients. However, <strong>storing the basis <span class="math notranslate nohighlight">\(Q_k\)</span> costs <span class="math notranslate nohighlight">\(O(nk)\)</span> memory</strong>. The implementation above does store it, so it can form Ritz vectors. The smaller <span class="math notranslate nohighlight">\(O(n)\)</span> working-memory requirement applies when the basis is not retained. These costs concern the construction; solving the small eigenvalue problem adds further work.</p>
 </section>
-<section id="a-practical-caveat-loss-of-orthogonality">
-<h2>A Practical Caveat: Loss of Orthogonality<a class="headerlink" href="#a-practical-caveat-loss-of-orthogonality" title="Link to this heading">#</a></h2>
-<p>In theory, the Lanczos vectors <span class="math notranslate nohighlight">\(\boldsymbol{q}_j\)</span> are perfectly orthogonal. However, in finite-precision arithmetic, rounding errors accumulate, and the orthogonality among the vectors degrades over time. Specifically, <span class="math notranslate nohighlight">\(\boldsymbol{q}_k\)</span> tends to lose orthogonality with the first few vectors <span class="math notranslate nohighlight">\(\boldsymbol{q}_j\)</span> whose corresponding Ritz vector components are converging.</p>
-<p>This loss of orthogonality is a famous and subtle feature of the algorithm. It manifests as the appearance of multiple copies (“ghosts”) of already-converged eigenvalues in the spectrum of <span class="math notranslate nohighlight">\(T_m\)</span>. While this can be problematic, it can also be managed. Techniques like <em>full reorthogonalization</em> (which makes the algorithm as expensive as Arnoldi) or more practical <em>selective reorthogonalization</em> can be employed to maintain orthogonality where it matters most. For many applications, particularly finding the largest or smallest eigenvalues, the unmodified Lanczos algorithm is remarkably effective despite this issue.</p>
+<section id="orthogonality-in-floating-point-arithmetic">
+<h2>Orthogonality in Floating-Point Arithmetic<a class="headerlink" href="#orthogonality-in-floating-point-arithmetic" title="Link to this heading">#</a></h2>
+<p>The orthogonality argument used symmetry and exact arithmetic. Rounding errors can introduce components along older directions, and the short recurrence does not explicitly remove them. The computed basis can therefore lose orthogonality.</p>
+<p>A common consequence is the appearance of extra copies of already-converged eigenvalues among the eigenvalues of <span class="math notranslate nohighlight">\(T_k\)</span>. These are often called <em>ghost Ritz values</em>. They do not reliably indicate a true eigenvalue multiplicity.</p>
+<p>Full reorthogonalization removes components along every stored basis vector, restoring an orthogonalization cost of <span class="math notranslate nohighlight">\(O(nk^2)\)</span>. Selective reorthogonalization instead focuses on converged Ritz directions. This controls the tendency to rediscover eigenvectors already found; <a class="reference external" href="https://netlib.org/utk/people/JackDongarra/etemplates/node108.html">the Netlib discussion of reorthogonalization</a> explains the mechanism.</p>
+<p>The basic implementation above illustrates the short recurrence, but long floating-point runs may require these additional orthogonalization steps. When assessing an eigenpair, an explicitly computed residual provides a useful check.</p>
+<p>The <a class="reference internal" href="lanczos_convergence.html"><span class="std std-doc">next section</span></a> explains the second benefit of symmetry: the largest and smallest Ritz values have variational characterizations that turn accurate directions in the Krylov space into eigenvalue error bounds.</p>
 </section>
 </section>
 
@@ -719,14 +682,12 @@ q_i^T A q_k = (A q_i)^T q_k
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-hessenberg-to-tridiagonal">From Hessenberg to Tridiagonal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-term-recurrence">The Three-Term Recurrence</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#another-derivation-of-the-three-term-recurrence">Another Derivation of the Three-Term Recurrence</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-algorithm">Lanczos Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lanczos-vs-arnoldi-a-comparison">Lanczos vs. Arnoldi: A Comparison</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-practical-caveat-loss-of-orthogonality">A Practical Caveat: Loss of Orthogonality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetry-makes-the-projection-tridiagonal">Symmetry Makes the Projection Tridiagonal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-only-two-components-must-be-removed">Why Only Two Components Must Be Removed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lanczos-relation">The Lanczos Relation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-implementation">Basic Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-short-recurrence-saves">What the Short Recurrence Saves</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-in-floating-point-arithmetic">Orthogonality in Floating-Point Arithmetic</a></li>
 </ul>
   </nav></div>
 
