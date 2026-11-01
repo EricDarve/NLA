@@ -1,137 +1,209 @@
 # The Arnoldi Process
 
-Previously, we introduced the core idea of the Arnoldi iteration: a numerically stable process to build an orthonormal basis $Q_k = [q_1, \dots, q_k]$ for the Krylov subspace $\mathcal{K}_k(A, q_1)$. This process simultaneously generates a $k \times k$ upper Hessenberg matrix $H_k = Q_k^T A Q_k$.
+The [previous section](krylov_subspaces.md) introduced the projected eigenvalue problem on a Krylov subspace. Arnoldi constructs its orthonormal basis and the small Hessenberg matrix together. Each step uses one matrix-vector product and removes the components along the directions already found.
 
-Now, we will formalize this algorithm and show precisely why the eigenvalues of $H_k$ are good approximations for the eigenvalues of $A$.
+We first derive this construction in exact arithmetic for $A\in\mathbb R^{n\times n}$. For complex matrices, use conjugate transposes and complex inner products. The implementation below supports both cases.
 
-## The Arnoldi Algorithm
+## Building One New Direction
 
-The algorithm is an iterative application of the Modified Gram-Schmidt process. Starting with a chosen unit vector $q_1$, we generate $q_2, q_3, \dots, q_k$ one by one.
-
-**Algorithm: The Arnoldi Iteration**
-
-* **Input:** A matrix $A$, a number of steps $k$, and a starting vector $q_1$ with $\|q_1\|_2 = 1$.
-* **Output:** $Q_k = [q_1, \dots, q_k]$ with orthonormal columns and a $k \times k$ upper Hessenberg matrix $H_k$ with entries $h_{ij}$.
-
-```python
-def arnoldi_iteration(A, q1, k):
-    """
-    The Arnoldi Iteration
-    
-    Parameters:
-    -----------
-    A : matrix or linear operator
-        The matrix to approximate eigenvalues of
-    q1 : array
-        Starting vector with ||q1||_2 = 1
-    k : int
-        Number of iterations
-    
-    Returns:
-    --------
-    Q_k : matrix
-        Orthonormal basis vectors [q_1, ..., q_k]
-    H_k : matrix
-        k x k upper Hessenberg matrix
-    """
-    n = len(q1)
-    Q = [q1]  # List to store q_j vectors
-    H = np.zeros((k, k))  # Upper Hessenberg matrix
-    
-    for j in range(k):
-        # Compute matrix-vector product
-        v = A @ Q[j]
-        
-        # Modified Gram-Schmidt orthogonalization
-        for i in range(j + 1):
-            H[i, j] = Q[i].T @ v  # Compute projection coefficient
-            v = v - H[i, j] * Q[i]  # Subtract projection
-        
-        # Compute next basis vector
-        if j < k - 1:
-            h_next = np.linalg.norm(v)
-            
-            if h_next == 0:
-                # Lucky breakdown: invariant subspace found
-                print("Lucky breakdown at iteration", j + 1)
-                return np.column_stack(Q), H[:j+1, :j+1]
-            
-            H[j + 1, j] = h_next
-            Q.append(v / h_next)
-    
-    return np.column_stack(Q), H
-```
-
-This algorithm produces the $k \times k$ matrix $H_k$ and the basis $Q_k$ that satisfy the **Arnoldi relation** we saw previously:
+Start with a unit vector $q_1$. Suppose we have constructed orthonormal vectors $q_1,\ldots,q_j$, and write $Q_j=[q_1,\ldots,q_j]$. To extend the basis, multiply the newest vector by $A$:
 
 $$
-A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T
+v=Aq_j.
 $$
 
-The computational cost is dominated by the $k$ sparse matrix-vector products and the $O(k^2 n)$ work of the inner loop. As long as $k \ll n$, this is far more efficient than any $O(n^3)$ direct method.
-
-## Ritz Values and Ritz Vectors
-
-Our strategy is to use the eigenvalues of the small, dense matrix $H_k$ to approximate the eigenvalues of $A$. Let's formalize this.
-
-Let $H_k$ have an eigendecomposition $H_k = Y_k \Lambda_k Y_k^{-1}$, where $\Lambda_k = \text{diag}(\theta_1, \dots, \theta_k)$ is the diagonal matrix of eigenvalues and $Y_k = [y_1, \dots, y_k]$ contains the corresponding eigenvectors.
-
-* **Ritz Values:** The eigenvalues $\theta_j$ of $H_k$ are called the **Ritz values**. They serve as our approximations to the eigenvalues of $A$.
-* **Ritz Vectors:** The eigenvectors $y_j$ of $H_k$ are $k$-dimensional. We can "lift" them back into the $n$-dimensional space to get our approximate eigenvectors of $A$, which are called the **Ritz vectors**:
+Part of $v$ may already lie in the current subspace. Its coordinates along the existing basis vectors are
 
 $$
-u_j = Q_k y_j
+h_{ij}=q_i^Tv,\qquad i=1,\ldots,j.
 $$
 
-Note that $u_j$ is a linear combination of our basis vectors $q_1, \dots, q_k$, so $u_j \in \mathcal{K}_k$.
-
-## Why is this a good approximation?
-
-Let's see just how "approximate" these eigenpairs are. We can derive an exact expression for the residual $A u_j - \theta_j u_j$.
-
-We start with the Arnoldi relation:
+Remove these components:
 
 $$
-A Q_k = Q_k H_k + h_{k+1,k} q_{k+1} e_k^T
+w=v-\sum_{i=1}^j h_{ij}q_i.
 $$
 
-Now, multiply from the right by a single eigenvector $y_j$ of $H_k$:
-
-$$
-A Q_k y_j = Q_k H_k y_j + h_{k+1,k} q_{k+1} (e_k^T y_j)
-$$
-
-Substitute our definitions. On the left, $Q_k y_j = u_j$. On the right, $H_k y_j = \theta_j y_j$.
+The remainder is perpendicular to every existing basis vector. For $\ell=1,\ldots,j$,
 
 $$
 \begin{aligned}
-A u_j &= Q_k (\theta_j y_j) + h_{k+1,k} q_{k+1} (e_k^T y_j) \\
-&= \theta_j (Q_k y_j) + h_{k+1,k} q_{k+1} (e_k^T y_j) \\
-&= \theta_j u_j + h_{k+1,k} q_{k+1} (y_j)_k
+q_\ell^Tw
+&=q_\ell^Tv-\sum_{i=1}^j h_{ij}q_\ell^Tq_i\\
+&=q_\ell^Tv-h_{\ell j}=0.
 \end{aligned}
 $$
 
-where $(y_j)_k = e_k^T y_j$ is simply the $k$-th (i.e., last) component of the small eigenvector $y_j$.
-
-Rearranging this gives us the **residual vector**:
+If $w\ne0$, normalize it to obtain the next direction:
 
 $$
-A u_j - \theta_j u_j = h_{k+1,k} (y_j)_k q_{k+1}
+h_{j+1,j}=\|w\|_2,\qquad
+q_{j+1}=\frac{w}{h_{j+1,j}}.
 $$
 
-This is a remarkable and powerful result. It gives us a cheap and easy way to check the quality of our approximation. By taking the 2-norm (and since $\|q_{k+1}\|_2 = 1$):
+Rearranging the construction gives
 
 $$
-\| A u_j - \theta_j u_j \|_2 = |h_{k+1,k}| \cdot |(y_j)_k|
+\boxed{
+Aq_j=\sum_{i=1}^j h_{ij}q_i
+     +h_{j+1,j}q_{j+1}.
+}
 $$
 
-This tells us that the Ritz pair $(\theta_j, u_j)$ is a good approximation for an eigenpair of $A$ if:
+If $w=0$ instead, no new direction can be added and the process stops. This is called **breakdown**; its meaning for the eigenvalue problem is explained below.
 
-1.  The quantity $h_{k+1,k}$ (the "breakdown" term) is small, OR
-2.  The last component $(y_j)_k$ of the small eigenvector $y_j$ is small.
+This is Gram-Schmidt applied to the newly generated vector $Aq_j$. Unlike orthogonal iteration, which updates a whole basis at each step, Arnoldi keeps the existing vectors and adds one new direction.
 
-In practice, the Arnoldi iteration is run, and the eigenvalues of $H_k$ are computed. We then compute the residual norm for each Ritz pair using this formula. If the residual is below a desired tolerance, we declare that Ritz pair "converged."
+## The Subspace Generated by Arnoldi
 
-```{note}
-**Lucky breakdown:** If at some step $j$, we find $h_{j+1, j} = 0$, what does this mean? The Arnoldi relation becomes $A Q_j = Q_j H_j$. This implies that the subspace $\mathcal{K}_j = \text{span}(q_1, \dots, q_j)$ is an **invariant subspace** of $A$. In this case, the $j$ Ritz values (the eigenvalues of $H_j$) are *exactly* eigenvalues of $A$. This is rare in practice but is a welcome event when it occurs.
+The construction keeps the basis orthonormal. We also need to verify that it spans the Krylov subspace chosen on the previous page.
+
+:::{prf:theorem} Arnoldi Produces a Krylov Basis
+:label: thm:arnoldi_krylov_basis
+
+If Arnoldi constructs $q_1,\ldots,q_k$ without earlier breakdown, then these vectors form an orthonormal basis of $\mathcal K_k(A,q_1)$.
+:::
+
+:::{prf:proof}
+The claim is immediate for $k=1$. Suppose it holds for the first $j$ vectors. The Arnoldi construction gives
+
+$$
+q_{j+1}
+=\frac{Aq_j-\sum_{i=1}^j h_{ij}q_i}{h_{j+1,j}}
+\in\mathcal K_{j+1}(A,q_1).
+$$
+
+The inclusion holds because multiplication by $A$ raises the largest power by at most one. When $h_{j+1,j}\ne0$, this is a new unit vector perpendicular to the first $j$. Thus we have $j+1$ orthonormal vectors in a space generated by $j+1$ vectors. They must span that space, completing the induction.
+:::
+
+There is also a QR interpretation. The **Krylov matrix**
+
+$$
+K_k=[q_1,Aq_1,\ldots,A^{k-1}q_1]
+$$
+
+has a factorization $K_k=Q_kR_k$. The matrix $R_k$ is upper triangular because column $j$ of $K_k$ lies in the span of the first $j$ columns of $Q_k$.
+
+Arnoldi obtains this basis without forming $K_k$ explicitly. Successive powers can become nearly parallel, making the raw Krylov matrix poorly conditioned. Generating each new direction from the existing orthonormal basis avoids explicitly storing and factoring these nearly parallel columns.
+
+## The Arnoldi Relation
+
+After $k$ steps, collect the first $k$ basis vectors in $Q_k$ and the coefficients in a $k\times k$ matrix $H_k$. Column $j$ has no entries below row $j+1$, so $H_k$ is upper Hessenberg.
+
+For $j<k$, the new direction $q_{j+1}$ is already a column of $Q_k$. Only the last product, $Aq_k$, can have a component outside this basis. Let $f_k$ be the remainder from this final step:
+
+$$
+f_k=Aq_k-\sum_{i=1}^k h_{ik}q_i.
+$$
+
+When $f_k\ne0$, normalization gives $f_k=h_{k+1,k}q_{k+1}$. If it is zero, there is no new direction to add.
+
+Stacking the column equations gives the **Arnoldi relation**:
+
+$$
+\boxed{
+AQ_k=Q_kH_k+f_ke_k^T,
+}
+$$
+
+where $e_k$ is the last coordinate vector in $\mathbb R^k$. The matrix $f_ke_k^T$ has zeros in its first $k-1$ columns and $f_k$ in its last column.
+
+Since $Q_k^TQ_k=I_k$ and $Q_k^Tf_k=0$, multiplication on the left by $Q_k^T$ gives
+
+$$
+Q_k^TAQ_k
+=H_k+(Q_k^Tf_k)e_k^T
+=H_k.
+$$
+
+Thus the coefficients collected during orthogonalization are exactly the projected matrix from the previous section. We do not need to form $AQ_k$ again to compute it.
+
+## When the Subspace Stops Growing
+
+At breakdown in step $j$, the remainder is zero and $h_{j+1,j}=0$. The Arnoldi relation becomes
+
+$$
+AQ_j=Q_jH_j.
+$$
+
+The current space is invariant under $A$. For any eigenpair $H_jy=\theta y$,
+
+$$
+A(Q_jy)=Q_jH_jy=\theta(Q_jy).
+$$
+
+Every Ritz pair from this space is therefore an exact eigenpair of $A$. This is often called *happy* or *lucky breakdown*. It does not mean that we have found every eigenvalue of $A$: the starting vector may generate only a proper invariant subspace.
+
+In floating-point arithmetic, the remainder may be very small without being exactly zero. Dividing by its norm can magnify rounding errors, so implementations use a small threshold to decide when to stop expanding. Such a decision indicates approximate invariance; it does not make the computed Ritz pairs exact.
+
+## Implementation
+
+The implementation uses modified Gram-Schmidt: each component is subtracted immediately, and the next inner product uses the current remainder. In exact arithmetic, this gives the coefficients and remainder derived above.
+
+It normalizes the starting vector and performs a second orthogonalization pass by default to help preserve orthogonality despite rounding. It returns the basis, the projected matrix, and the final remainder $f_k$. The [next section](sec:arnoldi-ritz-residuals) uses this remainder to check Ritz residuals.
+
+Here $k$ is the maximum number of Arnoldi steps. If the process stops earlier, the returned matrices have the smaller dimensions.
+
+```python
+import numpy as np
+
+def arnoldi_iteration(A, q1, k, reorthogonalize=True,
+                      breakdown_tol=None):
+    """Return Q, H, f with A @ Q approximately Q @ H + outer(f, e_last).
+
+    A is a square matrix or linear operator supporting A @ v.
+    Q has at most k orthonormal columns, and H is square Hessenberg.
+    f is a vector: the remainder from the last completed step.
+    breakdown_tol is relative to the norm of A @ q_j.
+    """
+    q = np.asarray(q1)
+    if q.ndim != 1 or A.shape != (q.size, q.size):
+        raise ValueError("A must be square and q1 a matching vector.")
+    if not isinstance(k, (int, np.integer)) or not 1 <= k <= q.size:
+        raise ValueError("k must be an integer between 1 and n.")
+
+    dtype = np.result_type(A.dtype, q.dtype, np.float64)
+    q = q.astype(dtype, copy=True)
+    qnorm = np.linalg.norm(q)
+    if qnorm == 0:
+        raise ValueError("The starting vector must be nonzero.")
+    q /= qnorm
+
+    if breakdown_tol is None:
+        breakdown_tol = 10 * np.finfo(q.real.dtype).eps
+    if breakdown_tol < 0:
+        raise ValueError("breakdown_tol must be nonnegative.")
+
+    Q = [q]
+    H = np.zeros((k, k), dtype=dtype)
+    passes = 2 if reorthogonalize else 1
+
+    for j in range(k):
+        v = A @ Q[j]
+        scale = np.linalg.norm(v)
+
+        # Accumulate coefficients from all orthogonalization passes.
+        for _ in range(passes):
+            for i in range(j + 1):
+                h = np.vdot(Q[i], v)
+                H[i, j] += h
+                v = v - h * Q[i]
+
+        beta = np.linalg.norm(v)
+        if beta <= breakdown_tol * scale or j + 1 == k:
+            m = j + 1
+            return np.column_stack(Q), H[:m, :m].copy(), v
+
+        H[j + 1, j] = beta
+        Q.append(v / beta)
 ```
+
+The last step still computes its remainder, even though no further basis vector is needed. If the requested number of steps is reached, $f_k$ need not be small: stopping after $k$ steps does not by itself imply an accurate eigenpair.
+
+The threshold in this example is a simple relative test, not an eigenvalue accuracy tolerance. In finite precision, the basis is only approximately orthonormal and the Arnoldi relation holds up to rounding errors. Reorthogonalization helps preserve the orthogonality on which the projection relies.
+
+## Computational Cost and the Next Step
+
+For $k$ steps without early termination, Arnoldi uses $k$ matrix-vector products, $O(nk^2)$ work for orthogonalization, and $O(nk)$ storage for the basis. A second orthogonalization pass changes the constant, not these orders. Computing the eigenvalues of the small dense $H_k$ adds work of order $O(k^3)$.
+
+Keeping $k$ small makes the method useful for large matrices. The [next section](arnoldi_convergence.md) explains how to extract Ritz pairs, check their residuals, and understand their accuracy through polynomials of $A$.
