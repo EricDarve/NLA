@@ -325,6 +325,57 @@ For the fastest asymptotic convergence, we seek a parameter that minimizes $\rho
 
 Useful parameter formulas exist for particular structured problems. For general systems, parameter selection often relies on estimates or numerical trials.
 
+## Comparing the Paths in Two Dimensions
+
+Use the same SPD example as in the [Gauss-Seidel section](gauss_seidel_method.md):
+
+$$
+A=\begin{pmatrix}1&-0.8\\-0.8&1\end{pmatrix},
+\qquad b=0,
+\qquad x^{(0)}=\begin{pmatrix}2.4\\1.8\end{pmatrix}.
+$$
+
+The eigenvalues of $A$ are $0.2$ and $1.8$, so its energy contours are ellipses centered at the solution $x=0$. All three methods start at the same point and use this same energy,
+
+$$
+\Phi(z)=\frac12 z^TAz
+=\frac12\bigl(z_1^2-1.6z_1z_2+z_2^2\bigr).
+$$
+
+For this $2\times2$ matrix, $\rho(R_J)=0.8$, and the parameter that minimizes the SOR spectral radius is
+
+$$
+\boxed{
+\omega_{\mathrm{opt}}
+=\frac{2}{1+\sqrt{1-\rho(R_J)^2}}
+=\frac{2}{1+\sqrt{1-0.8^2}}
+=1.25.
+}
+$$
+
+The resulting spectral radii are $0.8$ for Jacobi, $0.64$ for Gauss-Seidel, and $0.25$ for SOR. Here optimal means fastest asymptotic convergence, not necessarily the smallest error after every individual sweep.
+
+The figure shows actual updates for three complete sweeps. Jacobi computes both new coordinates from the old vector. Gauss-Seidel first minimizes along the horizontal coordinate, then along the vertical coordinate using the new horizontal value. SOR follows the same coordinate order but takes $1.25$ times each suggested correction, moving beyond the coordinate minimum.
+
+For example, the first SOR sweep gives
+
+$$
+\begin{aligned}
+x_1^{(1)}&=2.4+1.25\bigl(0.8(1.8)-2.4\bigr)=1.2,\\
+x_2^{(1)}&=1.8+1.25\bigl(0.8(1.2)-1.8\bigr)=0.75.
+\end{aligned}
+$$
+
+Compare this with $(1.44,1.92)^T$ for Jacobi and $(1.44,1.152)^T$ for Gauss-Seidel after one sweep.
+
+:::{figure} ../_static/sor_geometry.svg
+:alt: Actual two-dimensional paths for Jacobi, Gauss-Seidel, and SOR with omega 1.25 from the same starting point. After three sweeps, SOR is closest to the origin. All panels use the same elliptical energy contours and axes.
+:width: 100%
+:name: fig-sor-geometry
+
+Filled points numbered $0$ through $3$ mark completed sweeps. Jacobi arrows connect successive vector iterates. For Gauss-Seidel and SOR, blue and orange arrows show the first and second coordinate updates; open circles mark intermediate points. Gauss-Seidel stops at each coordinate minimum. SOR goes beyond it, so its endpoints need not be tangent to the contours. In this example each SOR coordinate update still decreases the energy, and the iterates approach the solution faster.
+:::
+
 ## Comparing Convergence on a Poisson Grid
 
 A regular-grid Poisson problem gives a concrete comparison of Jacobi, Gauss-Seidel, and SOR. Consider

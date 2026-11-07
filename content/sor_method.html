@@ -474,6 +474,7 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-parameter">Choosing the Parameter</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-the-paths-in-two-dimensions">Comparing the Paths in Two Dimensions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-convergence-on-a-poisson-grid">Comparing Convergence on a Poisson Grid</a></li>
 </ul>
             </nav>
@@ -778,6 +779,50 @@ M+M^T-A=(2/\omega-1)D.
 <p>For the fastest asymptotic convergence, we seek a parameter that minimizes <span class="math notranslate nohighlight">\(\rho(G_\omega)\)</span>. For SPD matrices, every choice in <span class="math notranslate nohighlight">\((0,2)\)</span> converges, but some choices can require many more sweeps than others. A value that helps one matrix or ordering need not help another.</p>
 <p>Useful parameter formulas exist for particular structured problems. For general systems, parameter selection often relies on estimates or numerical trials.</p>
 </section>
+<section id="comparing-the-paths-in-two-dimensions">
+<h2>Comparing the Paths in Two Dimensions<a class="headerlink" href="#comparing-the-paths-in-two-dimensions" title="Link to this heading">#</a></h2>
+<p>Use the same SPD example as in the <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">Gauss-Seidel section</span></a>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}1&amp;-0.8\\-0.8&amp;1\end{pmatrix},
+\qquad b=0,
+\qquad x^{(0)}=\begin{pmatrix}2.4\\1.8\end{pmatrix}.
+\end{split}\]</div>
+<p>The eigenvalues of <span class="math notranslate nohighlight">\(A\)</span> are <span class="math notranslate nohighlight">\(0.2\)</span> and <span class="math notranslate nohighlight">\(1.8\)</span>, so its energy contours are ellipses centered at the solution <span class="math notranslate nohighlight">\(x=0\)</span>. All three methods start at the same point and use this same energy,</p>
+<div class="math notranslate nohighlight">
+\[
+\Phi(z)=\frac12 z^TAz
+=\frac12\bigl(z_1^2-1.6z_1z_2+z_2^2\bigr).
+\]</div>
+<p>For this <span class="math notranslate nohighlight">\(2\times2\)</span> matrix, <span class="math notranslate nohighlight">\(\rho(R_J)=0.8\)</span>, and the parameter that minimizes the SOR spectral radius is</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\omega_{\mathrm{opt}}
+=\frac{2}{1+\sqrt{1-\rho(R_J)^2}}
+=\frac{2}{1+\sqrt{1-0.8^2}}
+=1.25.
+}
+\]</div>
+<p>The resulting spectral radii are <span class="math notranslate nohighlight">\(0.8\)</span> for Jacobi, <span class="math notranslate nohighlight">\(0.64\)</span> for Gauss-Seidel, and <span class="math notranslate nohighlight">\(0.25\)</span> for SOR. Here optimal means fastest asymptotic convergence, not necessarily the smallest error after every individual sweep.</p>
+<p>The figure shows actual updates for three complete sweeps. Jacobi computes both new coordinates from the old vector. Gauss-Seidel first minimizes along the horizontal coordinate, then along the vertical coordinate using the new horizontal value. SOR follows the same coordinate order but takes <span class="math notranslate nohighlight">\(1.25\)</span> times each suggested correction, moving beyond the coordinate minimum.</p>
+<p>For example, the first SOR sweep gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+x_1^{(1)}&amp;=2.4+1.25\bigl(0.8(1.8)-2.4\bigr)=1.2,\\
+x_2^{(1)}&amp;=1.8+1.25\bigl(0.8(1.2)-1.8\bigr)=0.75.
+\end{aligned}
+\end{split}\]</div>
+<p>Compare this with <span class="math notranslate nohighlight">\((1.44,1.92)^T\)</span> for Jacobi and <span class="math notranslate nohighlight">\((1.44,1.152)^T\)</span> for Gauss-Seidel after one sweep.</p>
+<figure class="align-default" id="fig-sor-geometry">
+<a class="reference internal image-reference" href="../_images/sor_geometry.svg"><img alt="Actual two-dimensional paths for Jacobi, Gauss-Seidel, and SOR with omega 1.25 from the same starting point. After three sweeps, SOR is closest to the origin. All panels use the same elliptical energy contours and axes." src="../_images/sor_geometry.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 23 </span><span class="caption-text">Filled points numbered <span class="math notranslate nohighlight">\(0\)</span> through <span class="math notranslate nohighlight">\(3\)</span> mark completed sweeps. Jacobi arrows connect successive vector iterates. For Gauss-Seidel and SOR, blue and orange arrows show the first and second coordinate updates; open circles mark intermediate points. Gauss-Seidel stops at each coordinate minimum. SOR goes beyond it, so its endpoints need not be tangent to the contours. In this example each SOR coordinate update still decreases the energy, and the iterates approach the solution faster.</span><a class="headerlink" href="#fig-sor-geometry" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
 <section id="comparing-convergence-on-a-poisson-grid">
 <h2>Comparing Convergence on a Poisson Grid<a class="headerlink" href="#comparing-convergence-on-a-poisson-grid" title="Link to this heading">#</a></h2>
 <p>A regular-grid Poisson problem gives a concrete comparison of Jacobi, Gauss-Seidel, and SOR. Consider</p>
@@ -830,7 +875,7 @@ k\approx\frac{\log(1/\epsilon)}{-\log\rho}
 <a class="reference internal image-reference" href="../_images/poisson_convergence.svg"><img alt="Left, spectral-radius decay factors on a 63 by 63 Poisson grid reach one millionth after 11463 Jacobi sweeps, 5732 Gauss-Seidel sweeps, and 141 optimal SOR sweeps. Right, predicted counts grow much faster for Jacobi and Gauss-Seidel as the grid is refined." src="../_images/poisson_convergence.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 23 </span><span class="caption-text">Left: the asymptotic model <span class="math notranslate nohighlight">\(\rho^k\)</span> for the three methods; dots mark the first integer sweep count below <span class="math notranslate nohighlight">\(10^{-6}\)</span>. Right: the corresponding counts on progressively finer grids. Each successive grid halves <span class="math notranslate nohighlight">\(h\)</span>, roughly quadrupling the Jacobi and Gauss-Seidel counts but doubling the optimal SOR count. SOR uses the optimal parameter for each grid. These curves are predictions from the spectral radii, not measured errors or finite-step error bounds.</span><a class="headerlink" href="#fig-poisson-convergence" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 24 </span><span class="caption-text">Left: the asymptotic model <span class="math notranslate nohighlight">\(\rho^k\)</span> for the three methods; dots mark the first integer sweep count below <span class="math notranslate nohighlight">\(10^{-6}\)</span>. Right: the corresponding counts on progressively finer grids. Each successive grid halves <span class="math notranslate nohighlight">\(h\)</span>, roughly quadrupling the Jacobi and Gauss-Seidel counts but doubling the optimal SOR count. SOR uses the optimal parameter for each grid. These curves are predictions from the spectral radii, not measured errors or finite-step error bounds.</span><a class="headerlink" href="#fig-poisson-convergence" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>Each sparse sweep costs <span class="math notranslate nohighlight">\(O(N^2)\)</span> operations because every grid point has at most four neighbors. Thus reducing the number of sweeps can save substantial work, although Jacobi offers more parallelism. The advantage here also relies on choosing <span class="math notranslate nohighlight">\(\omega\)</span> well: setting <span class="math notranslate nohighlight">\(\omega=1\)</span> gives exactly the Gauss-Seidel rate. The optimal formula above is specific to this grid problem and ordering, not a rule for arbitrary SPD matrices.</p>
@@ -921,6 +966,7 @@ k\approx\frac{\log(1/\epsilon)}{-\log\rho}
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-parameter">Choosing the Parameter</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-the-paths-in-two-dimensions">Comparing the Paths in Two Dimensions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-convergence-on-a-poisson-grid">Comparing Convergence on a Poisson Grid</a></li>
 </ul>
   </nav></div>
