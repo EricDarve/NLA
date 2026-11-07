@@ -457,22 +457,24 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-stationary-to-nonstationary-iteration">From Stationary to Nonstationary Iteration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#error-propagation-and-matrix-polynomials">Error Propagation and Matrix Polynomials</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-polynomial-optimization-problem">The Polynomial Optimization Problem</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#error-representation-and-the-minimax-problem">Error Representation and the Minimax Problem</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-optimal-polynomial-p-k-lambda">Deriving the Optimal Polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-the-exact-bound">Calculating the Exact Bound</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#asymptotic-rate">Asymptotic Rate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-splitting-methods-to-richardson-iteration">From Splitting Methods to Richardson Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-residual-corrections-to-polynomials">From Residual Corrections to Polynomials</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-an-error-polynomial">Choosing an Error Polynomial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-chebyshev-minimax-polynomial">The Chebyshev Minimax Polynomial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-bound">The Convergence Bound</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-the-polynomial-to-an-iteration">From the Polynomial to an Iteration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-order-chebyshev-iteration-factoring-a-polynomial">First-Order Chebyshev Iteration: Factoring a Polynomial</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations-of-the-1st-order-chebyshev-iterative-method">Limitations of the 1st Order Chebyshev Iterative Method</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-build-the-2nd-order-chebyshev-iterative-method">How to Build the 2nd Order Chebyshev Iterative Method</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-the-2nd-order-chebyshev-iterative-method">Advantages of the 2nd Order Chebyshev Iterative Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-eigenvalue-bounds">Choosing Eigenvalue Bounds</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preconditioning-and-scope-of-the-theory">Preconditioning and Scope of the Theory</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-preconditioned-bound-holds-optional">Why the Preconditioned Bound Holds (Optional)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scope-of-the-spd-theory">Scope of the SPD Theory</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements-and-sensitivity-to-eigenvalue-bounds">Requirements and Sensitivity to Eigenvalue Bounds</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pros-cons-and-applications">Pros, Cons, and Applications</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-role-and-connection-to-cg">Practical Role and Connection to CG</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-implementation">Python Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#second-order-chebyshev-iteration-optional">Second-Order Chebyshev Iteration (Optional)</a></li>
 </ul>
             </nav>
         </div>
@@ -486,231 +488,467 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-chebyshev-iteration-method">
 <h1>The Chebyshev Iteration Method<a class="headerlink" href="#the-chebyshev-iteration-method" title="Link to this heading">#</a></h1>
-<p>The Chebyshev iteration method, also known as a Chebyshev semi-iterative method, is a powerful technique for accelerating the convergence of iterative solvers for the linear system <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. It is a <strong>nonstationary iterative method</strong>, meaning it improves upon basic stationary schemes (like the Richardson iteration) by using acceleration parameters <span class="math notranslate nohighlight">\(\tau_k\)</span> that change at each step <span class="math notranslate nohighlight">\(k\)</span>. This strategy, which leverages the properties of Chebyshev polynomials, can result in significantly faster convergence.</p>
-<section id="from-stationary-to-nonstationary-iteration">
-<h2>From Stationary to Nonstationary Iteration<a class="headerlink" href="#from-stationary-to-nonstationary-iteration" title="Link to this heading">#</a></h2>
-<p>Classical iterative methods can be expressed using the preconditioned “residual update” form. Let’s start with the familiar splitting-style approach:</p>
+<p>A stationary iteration applies the same correction rule repeatedly. Chebyshev iteration chooses changing coefficients so that different error components are reduced together. Its coefficients depend on bounds for the eigenvalues, rather than on inner products computed during the iteration.</p>
+<p>The main idea is to view the error after several steps as a polynomial of the matrix applied to the initial error. Choosing that polynomial well can be much more effective than repeating one fixed step.</p>
+<section id="from-splitting-methods-to-richardson-iteration">
+<h2>From Splitting Methods to Richardson Iteration<a class="headerlink" href="#from-splitting-methods-to-richardson-iteration" title="Link to this heading">#</a></h2>
+<p>For <span class="math notranslate nohighlight">\(Ax=b\)</span>, let <span class="math notranslate nohighlight">\(x\)</span> denote the exact solution and <span class="math notranslate nohighlight">\(x^{(k)}\)</span> the current approximation. The <a class="reference internal" href="splitting_methods_definition.html"><span class="std std-doc">splitting methods</span></a> choose a nonsingular matrix <span class="math notranslate nohighlight">\(M\)</span> whose systems are inexpensive to solve. They use a decomposition <span class="math notranslate nohighlight">\(A=M-N\)</span> and the update <span class="math notranslate nohighlight">\(Mx^{(k+1)}=Nx^{(k)}+b\)</span>. Writing <span class="math notranslate nohighlight">\(N=M-A\)</span> gives the residual correction form:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-A &amp;= M - N \\
-\mathbf{x}^{(k+1)} &amp;= M^{-1} (\mathbf{b} + N \mathbf{x}^{(k)}) \\
-\mathbf{x}^{(k+1)} &amp;= M^{-1} (\mathbf{b} + (M - A) \mathbf{x}^{(k)})
+Mx^{(k+1)}&amp;=(M-A)x^{(k)}+b,\\
+M\bigl(x^{(k+1)}-x^{(k)}\bigr)&amp;=b-Ax^{(k)}=r^{(k)}.
 \end{aligned}
 \end{split}\]</div>
-<p>This implies that</p>
+<p>Here <span class="math notranslate nohighlight">\(r^{(k)}=b-Ax^{(k)}\)</span> is the residual. Each step solves with <span class="math notranslate nohighlight">\(M\)</span> to turn this residual into a correction. Jacobi uses <span class="math notranslate nohighlight">\(M=D\)</span>, while Gauss-Seidel uses <span class="math notranslate nohighlight">\(M=D-L\)</span>, with the convention <span class="math notranslate nohighlight">\(A=D-L-U\)</span> from the preceding sections.</p>
+<p>Call the correction <span class="math notranslate nohighlight">\(z^{(k)}\)</span>. We can adjust how much of it we take:</p>
 <div class="math notranslate nohighlight">
 \[
-\mathbf{x}^{(k+1)} = \mathbf{x}^{(k)} + M^{-1} (\mathbf{b} - A \mathbf{x}^{(k)})
+Mz^{(k)}=r^{(k)},
+\qquad
+x^{(k+1)}=x^{(k)}+\tau_k z^{(k)}.
 \]</div>
-<p>This is the residual iteration form. If we define <span class="math notranslate nohighlight">\(\tilde{A} = M^{-1}A\)</span> and <span class="math notranslate nohighlight">\(\tilde{\mathbf{b}} = M^{-1}\mathbf{b}\)</span>, the iteration becomes:</p>
-<div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)} = \mathbf{x}^{(k)} + (\tilde{\mathbf{b}} - \tilde{A}\mathbf{x}^{(k)})\]</div>
-<p>This is the basic <strong>Richardson iteration</strong>. A stationary method would apply a single, fixed acceleration parameter <span class="math notranslate nohighlight">\(\tau\)</span>. The key idea of a nonstationary method is to allow this parameter to vary at each step.</p>
-<p>For the remainder of this analysis, we will assume such preconditioning <span class="math notranslate nohighlight">\(M^{-1}A\)</span> has already been applied and (for notational simplicity) analyze the iteration for the system <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. The general nonstationary form is:</p>
-<div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)} = \mathbf{x}^{(k)} + \tau_k (\mathbf{b} - A\mathbf{x}^{(k)}), \quad k=0, 1, \dots\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(\{\tau_k\}\)</span> is the sequence of step-varying parameters.</p>
+<p>Setting <span class="math notranslate nohighlight">\(\tau_k=1\)</span> recovers the original splitting method. This scaled correction is called <strong>preconditioned Richardson iteration</strong>: solving with <span class="math notranslate nohighlight">\(M\)</span> is the preconditioning step. Choosing <span class="math notranslate nohighlight">\(M=I\)</span> gives <strong>Richardson iteration</strong>, where the correction is the residual itself. The step length <span class="math notranslate nohighlight">\(\tau_k\)</span> controls how much of the correction we add.</p>
+<p>Here the scaling applies to the correction of the whole vector. Even with <span class="math notranslate nohighlight">\(M=D-L\)</span>, it is generally different from SOR, which relaxes each component before computing the next one.</p>
+<p>Chebyshev acceleration chooses changing coefficients using spectral bounds to reduce the error more effectively. To explain the polynomial construction first, we take <span class="math notranslate nohighlight">\(M=I\)</span>. We return to preconditioning after deriving the method and its convergence bound.</p>
 </section>
-<section id="error-propagation-and-matrix-polynomials">
-<h2>Error Propagation and Matrix Polynomials<a class="headerlink" href="#error-propagation-and-matrix-polynomials" title="Link to this heading">#</a></h2>
-<p>We can analyze the method’s convergence by tracking the error <span class="math notranslate nohighlight">\(\mathbf{e}^{(k)} = \mathbf{x} - \mathbf{x}^{(k)}\)</span>. We can derive the recurrence for the error as follows:</p>
+<section id="from-residual-corrections-to-polynomials">
+<h2>From Residual Corrections to Polynomials<a class="headerlink" href="#from-residual-corrections-to-polynomials" title="Link to this heading">#</a></h2>
+<p>For the analysis, assume <span class="math notranslate nohighlight">\(A\)</span> is real <strong>symmetric positive definite (SPD)</strong>. Its eigenvalues are therefore real and positive. Suppose we know bounds</p>
+<div class="math notranslate nohighlight">
+\[
+0&lt;\alpha&lt;\beta,
+\qquad
+\alpha\le\lambda_j(A)\le\beta
+\quad\text{for every }j.
+\]</div>
+<p>These are enclosing bounds; they need not be the exact extreme eigenvalues.</p>
+<p>Starting from <span class="math notranslate nohighlight">\(x^{(0)}\)</span>, we correct the current approximation by adding a multiple of its residual:</p>
+<div class="math notranslate nohighlight">
+\[
+r^{(k)}=b-Ax^{(k)},
+\qquad
+x^{(k+1)}=x^{(k)}+\tau_k r^{(k)}.
+\]</div>
+<p>With a fixed step length, this iteration is stationary. Allowing <span class="math notranslate nohighlight">\(\tau_k\)</span> to vary gives a <strong>nonstationary</strong> iteration.</p>
+<p>Use the error convention <span class="math notranslate nohighlight">\(e^{(k)}=x^{(k)}-x\)</span> from the preceding sections. Since <span class="math notranslate nohighlight">\(b=Ax\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+e^{(k+1)}=(I-\tau_k A)e^{(k)}.
+\]</div>
+<p>After <span class="math notranslate nohighlight">\(k\)</span> steps,</p>
+<div class="math notranslate nohighlight">
+\[
+e^{(k)}=p(A)e^{(0)},
+\qquad
+p(\lambda)=\prod_{j=0}^{k-1}(1-\tau_j\lambda).
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(p\)</span> has degree at most <span class="math notranslate nohighlight">\(k\)</span> and satisfies <span class="math notranslate nohighlight">\(p(0)=1\)</span>. We call it the <strong>error polynomial</strong>, since it describes how the iteration changes the initial error. A root of <span class="math notranslate nohighlight">\(p\)</span> at <span class="math notranslate nohighlight">\(\theta\)</span> corresponds to a step length <span class="math notranslate nohighlight">\(1/\theta\)</span>.</p>
+<p>In the eigenvalue chapter, a polynomial filter preserved a wanted eigenvector component. Here we want <strong>every eigenvector component of the error to shrink</strong>. The normalization at zero comes from the correction formula, and zero lies outside the positive eigenvalue interval.</p>
+</section>
+<section id="choosing-an-error-polynomial">
+<h2>Choosing an Error Polynomial<a class="headerlink" href="#choosing-an-error-polynomial" title="Link to this heading">#</a></h2>
+<p>Because <span class="math notranslate nohighlight">\(A\)</span> is symmetric, its eigenvectors form an orthonormal basis. In this basis, <span class="math notranslate nohighlight">\(p(A)\)</span> multiplies error component <span class="math notranslate nohighlight">\(j\)</span> by <span class="math notranslate nohighlight">\(p(\lambda_j)\)</span>. Consequently,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-\mathbf{e}^{(k+1)} &amp;= \mathbf{x} - \mathbf{x}^{(k+1)} \\
-&amp;= \mathbf{x} - \left[ \mathbf{x}^{(k)} + \tau_k (\mathbf{b} - A\mathbf{x}^{(k)}) \right] \\
-&amp;= (\mathbf{x} - \mathbf{x}^{(k)}) - \tau_k (A\mathbf{x} - A\mathbf{x}^{(k)}) \quad (\text{since } \mathbf{b} = A\mathbf{x}) \\
-&amp;= \mathbf{e}^{(k)} - \tau_k A \mathbf{e}^{(k)} \\
-\mathbf{e}^{(k+1)} &amp;= (I - \tau_k A) \mathbf{e}^{(k)}
+\|p(A)\|_2
+&amp;=\max_j|p(\lambda_j)|\\
+&amp;\le\max_{\alpha\le\lambda\le\beta}|p(\lambda)|,\\
+\|e^{(k)}\|_2
+&amp;\le\max_{\alpha\le\lambda\le\beta}|p(\lambda)|\,\|e^{(0)}\|_2.
 \end{aligned}
 \end{split}\]</div>
-<p>By unrolling this recurrence, we can express the error after <span class="math notranslate nohighlight">\(k\)</span> steps as the result of a matrix polynomial applied to the initial error <span class="math notranslate nohighlight">\(\mathbf{e}^{(0)}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\mathbf{e}^{(k)} = (I - \tau_{k-1} A) \cdots (I - \tau_1 A) (I - \tau_0 A) \mathbf{e}^{(0)}\]</div>
-<p>We define this product as the <strong>matrix polynomial</strong> <span class="math notranslate nohighlight">\(P_k(A)\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\mathbf{e}^{(k)} = P_k(A) \mathbf{e}^{(0)} \quad \text{where} \quad P_k(A) = \prod_{l=0}^{k-1} (I - \tau_l A)\]</div>
+<p>We therefore seek a polynomial of degree at most <span class="math notranslate nohighlight">\(k\)</span>, normalized by <span class="math notranslate nohighlight">\(p(0)=1\)</span>, that makes the last maximum as small as possible.</p>
+<p>This is a <strong>minimax problem</strong>: minimize the largest magnitude over the interval. It gives a worst-case guarantee using only the spectral bounds. A polynomial tailored to the particular eigenvalues or initial error can do better for that particular problem. We write <span class="math notranslate nohighlight">\(p\)</span> for a general admissible polynomial and <span class="math notranslate nohighlight">\(p_k\)</span> for the optimal polynomial of degree <span class="math notranslate nohighlight">\(k\)</span> constructed below.</p>
 </section>
-<section id="the-polynomial-optimization-problem">
-<h2>The Polynomial Optimization Problem<a class="headerlink" href="#the-polynomial-optimization-problem" title="Link to this heading">#</a></h2>
-<p>The effectiveness of the iteration after <span class="math notranslate nohighlight">\(k\)</span> steps is determined entirely by the properties of this <span class="math notranslate nohighlight">\(k\)</span>-th degree polynomial. This construction imposes two fundamental constraints on the corresponding scalar polynomial <span class="math notranslate nohighlight">\(P_k(\lambda) = \prod_{l=0}^{k-1} (1 - \tau_l \lambda)\)</span>:</p>
-<ol class="arabic simple">
-<li><p><strong>Degree:</strong> <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span> is a polynomial of degree <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
-<li><p><strong>Normalization:</strong> The polynomial must satisfy <span class="math notranslate nohighlight">\(P_k(0) = 1\)</span>. This is self-evident from the product form (setting <span class="math notranslate nohighlight">\(\lambda=0\)</span>) and is a necessary constraint for any method derived from this iterative form.</p></li>
-</ol>
-<p>From this factorization, we also gain a key insight: the iteration parameters <span class="math notranslate nohighlight">\(\{\tau_l\}\)</span> are the <strong>inverses of the roots</strong> of the scalar polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span>, since <span class="math notranslate nohighlight">\(P_k(1/\tau_l) = 0\)</span>.</p>
-<p>The central goal of the Chebyshev method is to choose the sequence of parameters <span class="math notranslate nohighlight">\(\{\tau_l\}\)</span> to minimize the norm of the error <span class="math notranslate nohighlight">\(\mathbf{e}^{(k)}\)</span> in the fastest possible way. Since <span class="math notranslate nohighlight">\(\mathbf{e}^{(k)} = P_k(A) \mathbf{e}^{(0)}\)</span>, this is equivalent to finding the polynomial <span class="math notranslate nohighlight">\(P_k(A)\)</span> that is “as small as possible” in some sense.</p>
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable, its eigenvectors <span class="math notranslate nohighlight">\(\mathbf{v}_i\)</span> corresponding to eigenvalues <span class="math notranslate nohighlight">\(\lambda_i\)</span> are mapped as:</p>
+<section id="the-chebyshev-minimax-polynomial">
+<h2>The Chebyshev Minimax Polynomial<a class="headerlink" href="#the-chebyshev-minimax-polynomial" title="Link to this heading">#</a></h2>
+<p>Write <span class="math notranslate nohighlight">\(C_k\)</span> for the Chebyshev polynomial of the first kind, using the same notation as in the Lanczos analysis. Recall that</p>
 <div class="math notranslate nohighlight">
-\[P_k(A)\mathbf{v}_i = P_k(\lambda_i)\mathbf{v}_i\]</div>
-<p>This shows that the error components in the direction of <span class="math notranslate nohighlight">\(\mathbf{v}_i\)</span> are damped by a factor of <span class="math notranslate nohighlight">\(P_k(\lambda_i)\)</span>. The optimization problem is thus reduced to finding a polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span> of degree <span class="math notranslate nohighlight">\(k\)</span> that satisfies:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(P_k(0) = 1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(P_k(\lambda)\)</span> is as small as possible across the spectrum of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(\sigma(A)\)</span>.</p></li>
-</ol>
-<p>This strategy—finding the optimal polynomial that is small on the spectrum while constrained to be 1 at the origin—is the foundation of the Chebyshev iteration method.</p>
-<p>The convergence analysis of the Chebyshev iteration method is rooted in optimization theory, specifically solving a <strong>minimax polynomial approximation problem</strong>. The goal is to construct a polynomial that is maximally suppressed over the range of eigenvalues while satisfying a critical normalization condition.</p>
-</section>
-<section id="error-representation-and-the-minimax-problem">
-<h2>Error Representation and the Minimax Problem<a class="headerlink" href="#error-representation-and-the-minimax-problem" title="Link to this heading">#</a></h2>
-<p>Since the eigenvalues of <span class="math notranslate nohighlight">\(P_k(A)\)</span> are <span class="math notranslate nohighlight">\(P_k(\lambda_i)\)</span> for eigenvalues <span class="math notranslate nohighlight">\(\lambda_i\)</span> of <span class="math notranslate nohighlight">\(A\)</span>, the convergence rate (determined by the spectral radius <span class="math notranslate nohighlight">\(\rho(P_k(A))\)</span>) is minimized by solving the following <strong>minimax problem</strong>:</p>
+\[
+C_k(\cos t)=\cos(kt),
+\qquad
+|C_k(z)|\le1\quad(-1\le z\le1).
+\]</div>
+<p>In particular, <span class="math notranslate nohighlight">\(C_0(z)=1\)</span> and <span class="math notranslate nohighlight">\(C_1(z)=z\)</span>.</p>
+<p>Although defined using cosine, <span class="math notranslate nohighlight">\(C_k\)</span> is a polynomial in <span class="math notranslate nohighlight">\(z\)</span>. The identity <span class="math notranslate nohighlight">\(\cos((k+1)t)=2\cos t\cos(kt)-\cos((k-1)t)\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[\min_{P_k \in \Pi_k, P_k(0)=1} \max_{\lambda \in [a, b]} |P_k(\lambda)|\]</div>
-<p>where <span class="math notranslate nohighlight">\(\Pi_k\)</span> is the set of polynomials of degree at most <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\([a, b]\)</span> is the interval containing the eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, with <span class="math notranslate nohighlight">\(0 &lt; a \le b\)</span>.</p>
-<section id="deriving-the-optimal-polynomial-p-k-lambda">
-<h3>Deriving the Optimal Polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span><a class="headerlink" href="#deriving-the-optimal-polynomial-p-k-lambda" title="Link to this heading">#</a></h3>
-<p>The function that solves this specific minimax problem is a suitably scaled and shifted Chebyshev polynomial of the first kind, <span class="math notranslate nohighlight">\(T_k(z)\)</span>.</p>
-<p><strong>Transformation to the Standard Interval</strong></p>
-<p>The standard Chebyshev polynomial <span class="math notranslate nohighlight">\(T_k(z)\)</span> minimizes its maximum magnitude over the interval <span class="math notranslate nohighlight">\(z \in [-1, 1]\)</span>. To map the eigenvalue interval <span class="math notranslate nohighlight">\(\lambda \in [a, b]\)</span> to this standard interval, a linear transformation is required:</p>
+\[
+C_{k+1}(z)=2zC_k(z)-C_{k-1}(z),
+\qquad k\ge1.
+\]</div>
+<p>Starting from <span class="math notranslate nohighlight">\(C_0=1\)</span> and <span class="math notranslate nohighlight">\(C_1=z\)</span>, this recurrence constructs a polynomial of degree <span class="math notranslate nohighlight">\(k\)</span> at each step. For example, <span class="math notranslate nohighlight">\(C_2(z)=2z^2-1\)</span> and <span class="math notranslate nohighlight">\(C_3(z)=4z^3-3z\)</span>. These polynomials are defined for all real <span class="math notranslate nohighlight">\(z\)</span>, including values outside <span class="math notranslate nohighlight">\([-1,1]\)</span>.</p>
+<p>Define the center and half-width of the spectral interval:</p>
 <div class="math notranslate nohighlight">
-\[z(\lambda) = \frac{a + b - 2\lambda}{b - a}\]</div>
-<p>This linear transformation maps <span class="math notranslate nohighlight">\(\lambda \in [a, b]\)</span> to <span class="math notranslate nohighlight">\(z \in [-1, 1]\)</span>, reversing the order of the interval.</p>
-<p>This transformation ensures that:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\lambda = a \implies z = 1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(\lambda = b \implies z = -1\)</span></p></li>
-</ul>
-<p><strong>Normalization</strong></p>
-<p>The optimal polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span> is then constructed using <span class="math notranslate nohighlight">\(T_k(z(\lambda))\)</span> but requires normalization to enforce the constraint <span class="math notranslate nohighlight">\(P_k(0)=1\)</span>. This is achieved by dividing by the polynomial’s value at the origin:</p>
+\[
+c=\frac{\alpha+\beta}{2},
+\qquad
+d=\frac{\beta-\alpha}{2}.
+\]</div>
+<p>The map <span class="math notranslate nohighlight">\(z=(c-\lambda)/d\)</span> sends <span class="math notranslate nohighlight">\([\alpha,\beta]\)</span> to <span class="math notranslate nohighlight">\([-1,1]\)</span>, while <span class="math notranslate nohighlight">\(\lambda=0\)</span> maps to <span class="math notranslate nohighlight">\(c/d&gt;1\)</span>. This suggests using <span class="math notranslate nohighlight">\(C_k\)</span> on the mapped interval and dividing by its value at zero.</p>
+<p>For <span class="math notranslate nohighlight">\(z&gt;1\)</span>, the starting values <span class="math notranslate nohighlight">\(C_0=1\)</span> and <span class="math notranslate nohighlight">\(C_1=z\)</span> satisfy <span class="math notranslate nohighlight">\(C_1&gt;C_0&gt;0\)</span>. The recurrence then gives <span class="math notranslate nohighlight">\(C_{k+1}&gt;C_k&gt;0\)</span> by induction. In particular, the denominator <span class="math notranslate nohighlight">\(C_k(c/d)\)</span> is positive.</p>
+<div class="proof theorem admonition" id="thm:chebyshev-interval-minimax">
+<p class="admonition-title"><span class="caption-number">Theorem 46 </span> (Chebyshev Interval Minimax Property)</p>
+<section class="theorem-content" id="proof-content">
+<p>For <span class="math notranslate nohighlight">\(0&lt;\alpha&lt;\beta\)</span> and <span class="math notranslate nohighlight">\(k\ge0\)</span>, the polynomial</p>
 <div class="math notranslate nohighlight">
-\[P_k(\lambda) = \frac{T_k(z(\lambda))}{T_k(z(0))}\]</div>
-</section>
-<section id="calculating-the-exact-bound">
-<h3>Calculating the Exact Bound<a class="headerlink" href="#calculating-the-exact-bound" title="Link to this heading">#</a></h3>
-<p>The convergence bound arises from evaluating the magnitude of the optimal polynomial at its maximal points over the eigenvalue interval <span class="math notranslate nohighlight">\([a, b]\)</span>.</p>
-<p><strong>Evaluating the Maximum Modulus of the Numerator</strong></p>
-<p>For <span class="math notranslate nohighlight">\(\lambda \in [a, b]\)</span>, the transformed variable <span class="math notranslate nohighlight">\(z(\lambda)\)</span> lies in <span class="math notranslate nohighlight">\([-1, 1]\)</span>. In this range, the Chebyshev polynomial’s defining property ensures that its maximum modulus is unity:</p>
-<div class="math notranslate nohighlight">
-\[\max_{\lambda \in [a, b]} |T_k(z(\lambda))| = \max_{z \in [-1, 1]} |T_k(z)| = 1\]</div>
-<p><strong>Evaluating the Normalization Constant</strong></p>
-<div class="math notranslate nohighlight">
-\[z(0) = \frac{b+a - 2(0)}{b-a} = \frac{b+a}{b-a}\,.\]</div>
-<p>Since <span class="math notranslate nohighlight">\(a&gt;0\)</span>, <span class="math notranslate nohighlight">\(b&gt;a\)</span>, the argument <span class="math notranslate nohighlight">\(z(0) = \frac{b+a}{b-a}\)</span> is greater than <span class="math notranslate nohighlight">\(1\)</span>. Substituting these results into the definition of the optimal polynomial gives the final exact bound for the maximum error reduction:</p>
-<div class="math notranslate nohighlight">
-\[\min_{P_k \in \Pi_k, P_k(0)=1} \max_{a \le \lambda \le b} |P_k(\lambda)| = \frac{\max_{\lambda \in [a, b]} |T_k(z(\lambda))|}{|T_k(z(0))|} = \frac{1}{\Big|T_k(\frac{b+a}{b-a})\Big|}\]</div>
-</section>
-<section id="asymptotic-rate">
-<h3>Asymptotic Rate<a class="headerlink" href="#asymptotic-rate" title="Link to this heading">#</a></h3>
-<p><strong>Error Norm Application</strong></p>
-<p>Recall that:</p>
-<div class="math notranslate nohighlight">
-\[\mathbf{e}^{(k)} = P_k(A) \mathbf{e}^{(0)} = X P_k(\Lambda) X^{-1} \mathbf{e}^{(0)}\]</div>
-<p>Assume that <span class="math notranslate nohighlight">\(A\)</span> is symmetric positive definite (SPD), so it has an orthonormal eigenvector basis. Then:</p>
-<div class="math notranslate nohighlight">
-\[\|\mathbf{e}^{(k)}\|_2 \le \|P_k(A)\|_2 \|\mathbf{e}^{(0)}\|_2 = \max_{a \le \lambda \le b} |P_k(\lambda)| \; \|\mathbf{e}^{(0)}\|_2\]</div>
-<p><strong>Asymptotic Approximation and <span class="math notranslate nohighlight">\(\sigma\)</span></strong></p>
-<p>For large <span class="math notranslate nohighlight">\(k\)</span>, the Chebyshev polynomial <span class="math notranslate nohighlight">\(T_k(z)\)</span> for <span class="math notranslate nohighlight">\(z &gt; 1\)</span> is approximated by its exponential form (hyperbolic cosine):</p>
-<div class="math notranslate nohighlight">
-\[T_k(z) \approx \frac{1}{2} (z + \sqrt{z^2 - 1})^k\]</div>
-<p>When <span class="math notranslate nohighlight">\(z_0 = \frac{b+a}{b-a}\)</span>, the term <span class="math notranslate nohighlight">\(z_0 + \sqrt{z_0^2 - 1}\)</span> simplifies, defining the asymptotic reduction rate <span class="math notranslate nohighlight">\(\sigma\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\|\mathbf{e}^{(k)}\|_2 \lessapprox 2 \cdot \left(\frac{1 - \sqrt{\frac{a}{b}}}{1 + \sqrt{\frac{a}{b}}}\right)^k \|\mathbf{e}^{(0)}\|_2 = 2 \sigma^k \|\mathbf{e}^{(0)}\|_2\]</div>
-<p>where the reduction rate is defined as:</p>
-<div class="math notranslate nohighlight">
-\[\sigma = \frac{1 - \sqrt{a/b}}{1 + \sqrt{a/b}}\]</div>
-<p>This reduction rate <span class="math notranslate nohighlight">\(\sigma\)</span> shows that the number of iterations required is proportional to <span class="math notranslate nohighlight">\(\ln(2/\epsilon) / \ln(1/\sigma)\)</span>, where <span class="math notranslate nohighlight">\(\epsilon\)</span> is the desired error tolerance. Since <span class="math notranslate nohighlight">\(\sigma\)</span> is approximately <span class="math notranslate nohighlight">\(1 - 2/\sqrt{\kappa}\)</span> when the condition number <span class="math notranslate nohighlight">\(\kappa = b/a\)</span> is large, the convergence rate is proportional to <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span>, which explains the superior efficiency of Chebyshev iteration compared to linear convergence methods proportional to <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
-<p>The convergence analysis hinges on finding the polynomial roots (the iteration parameters <span class="math notranslate nohighlight">\(\tau_l\)</span>) that distribute the suppression across the eigenvalue interval optimally, minimizing the largest residual component left after <span class="math notranslate nohighlight">\(k\)</span> steps. The Chebyshev iteration achieves this by having the roots of <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span> correspond to the specific <strong>zeros of <span class="math notranslate nohighlight">\(T_k(z)\)</span></strong> transformed back to the <span class="math notranslate nohighlight">\(\lambda\)</span> axis.</p>
-</section>
-</section>
-<section id="limitations-of-the-1st-order-chebyshev-iterative-method">
-<h2>Limitations of the 1st Order Chebyshev Iterative Method<a class="headerlink" href="#limitations-of-the-1st-order-chebyshev-iterative-method" title="Link to this heading">#</a></h2>
-<p>The first-order Chebyshev iterative method is defined by the one-step recurrence relation:</p>
-<div class="math notranslate nohighlight">
-\[x^{(k+1)} = x^{(k)} - \tau_k(Ax^{(k)} - b).\]</div>
-<p>The limitations associated with this method are:</p>
-<ul class="simple">
-<li><p><strong>A Priori Selection of Steps:</strong> The method requires the user to choose the total number of iteration steps <span class="math notranslate nohighlight">\(k\)</span> beforehand. This must be done using estimation formulas based on the desired accuracy and the eigenvalue bounds.</p></li>
-<li><p><strong>Numerical Instability:</strong> The major disadvantage is that the method can be <strong>numerically unstable</strong>. This instability arises because for certain indices <span class="math notranslate nohighlight">\(k\)</span>, the iteration matrices <span class="math notranslate nohighlight">\(I - \tau_k A\)</span> can have a spectral radius much larger than <span class="math notranslate nohighlight">\(1\)</span>.</p></li>
-<li><p><strong>Parameter Ordering Requirement:</strong> To mitigate the instability, the iteration parameters <span class="math notranslate nohighlight">\(\tau_k\)</span> must be selected and used in a specific order (so that large values of <span class="math notranslate nohighlight">\(\tau_k\)</span> are balanced by small values).</p></li>
-</ul>
-<section id="how-to-build-the-2nd-order-chebyshev-iterative-method">
-<h3>How to Build the 2nd Order Chebyshev Iterative Method<a class="headerlink" href="#how-to-build-the-2nd-order-chebyshev-iterative-method" title="Link to this heading">#</a></h3>
-<p>The 2nd order Chebyshev iterative method is developed to eliminate the disadvantages of the 1st order method—namely, the requirement to choose the total number of iteration steps <span class="math notranslate nohighlight">\(k\)</span> beforehand and the potential numerical instability. The two-step version is stable across iterations when the eigenvalue bounds <span class="math notranslate nohighlight">\([a,b]\)</span> are valid.</p>
-<p>This method utilizes a two-step recurrence relation:</p>
-<div class="math notranslate nohighlight">
-\[x^{(k+1)} = \alpha_k x^{(k)} + (1 - \alpha_k) x^{(k-1)} - \beta_k r^{(k)}, \quad k= 1, 2, \dots\]</div>
-<p>where the iteration step starts with a special first step:</p>
-<div class="math notranslate nohighlight">
-\[x^{(1)} = x^{(0)} - \frac{1}{2} \beta_0 r^{(0)}.\]</div>
-<p><span class="math notranslate nohighlight">\(r^{(k)}\)</span> is the residual:</p>
-<div class="math notranslate nohighlight">
-\[r^{(k)} = Ax^{(k)} - b\]</div>
-<p>The construction relates the error polynomials <span class="math notranslate nohighlight">\(P_k(A)\)</span> generated by this recurrence to the standard three-term recurrence relation of the Chebyshev polynomials of the first kind:</p>
-<div class="math notranslate nohighlight">
-\[T_{k+1}(z) = 2zT_k(z) - T_{k-1}(z), \quad k = 1, 2, \dots\]</div>
-<p>To ensure the recursion for the error vector <span class="math notranslate nohighlight">\(e^{(k)}\)</span> follows the structure derived from the normalized Chebyshev polynomial recurrence, the parameters <span class="math notranslate nohighlight">\(\alpha_k\)</span> and <span class="math notranslate nohighlight">\(\beta_k\)</span> must be chosen such that the error polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span> matches <span class="math notranslate nohighlight">\(T_k(z(\lambda))/T_k(z(0))\)</span>.</p>
-<p>Let <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> be the lower and upper bounds, respectively, of the eigenvalues <span class="math notranslate nohighlight">\(\lambda_j\)</span> of <span class="math notranslate nohighlight">\(A\)</span>, such that <span class="math notranslate nohighlight">\(0 &lt; a &lt; \lambda_j &lt; b\)</span>. The optimal parameters are defined as, <span class="math notranslate nohighlight">\(k \ge 1\)</span>:</p>
+\[
+\boxed{
+p_k(\lambda)=
+\frac{C_k((c-\lambda)/d)}{C_k(c/d)}
+}
+\]</div>
+<p>minimizes the maximum magnitude on <span class="math notranslate nohighlight">\([\alpha,\beta]\)</span> among real polynomials of degree at most <span class="math notranslate nohighlight">\(k\)</span> satisfying <span class="math notranslate nohighlight">\(p(0)=1\)</span>. The minimum value is</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\alpha_k = \frac{a+b}{2} \beta_k, \\[1em]
-\beta_k^{-1} = \frac{a+b}{2} - \left(\frac{b-a}{4}\right)^2 \beta_{k-1},
+\boxed{
+\min_{\substack{\deg p\le k\\p(0)=1}}
+\max_{\lambda\in[\alpha,\beta]}|p(\lambda)|
+=\frac{1}{C_k(c/d)}.
+}
 \end{split}\]</div>
-<p>with starting parameter</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. The proof uses a simple fact: a nonzero polynomial of degree at most <span class="math notranslate nohighlight">\(k\)</span> cannot have more than <span class="math notranslate nohighlight">\(k\)</span> distinct roots. A better polynomial would force too many crossings of the Chebyshev polynomial.</p>
+<p>For <span class="math notranslate nohighlight">\(k\ge1\)</span>, consider the <span class="math notranslate nohighlight">\(k+1\)</span> points</p>
 <div class="math notranslate nohighlight">
-\[\beta_0 = \frac{4}{a+b}\]</div>
-<p>The primary advantage of this second-order method is that <strong>it gives the optimal result for every step <span class="math notranslate nohighlight">\(k\)</span></strong> (apart from rounding errors), eliminating the need to choose the total number of iterations <span class="math notranslate nohighlight">\(k\)</span> a priori.</p>
-</section>
-<section id="advantages-of-the-2nd-order-chebyshev-iterative-method">
-<h3>Advantages of the 2nd Order Chebyshev Iterative Method<a class="headerlink" href="#advantages-of-the-2nd-order-chebyshev-iterative-method" title="Link to this heading">#</a></h3>
-<p>The second-order method offers distinct advantages over its first-order counterpart:</p>
-<ul class="simple">
-<li><p><strong>Numerical Stability:</strong> The two-step version of the Chebyshev iterative method is <strong>numerically stable</strong>.</p></li>
-<li><p><strong>Optimal Performance at Every Step:</strong> Unlike the one-step method which optimizes the result only for a predetermined step <span class="math notranslate nohighlight">\(k\)</span>, the two-step method is designed so that, apart from rounding errors, it gives the <strong>optimal result for every step <span class="math notranslate nohighlight">\(k\)</span></strong>.</p></li>
-<li><p><strong>Elimination of A Priori Step Count:</strong> The method eliminates the requirement to choose the number of iteration steps <span class="math notranslate nohighlight">\(k\)</span> <em>a priori</em>.</p></li>
-</ul>
-<p>Both the first-order (when stable) and the second-order methods share the optimal asymptotic rate of convergence, which increases only as the square root of the condition number of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-</section>
-</section>
-<section id="requirements-and-sensitivity-to-eigenvalue-bounds">
-<h2>Requirements and Sensitivity to Eigenvalue Bounds<a class="headerlink" href="#requirements-and-sensitivity-to-eigenvalue-bounds" title="Link to this heading">#</a></h2>
-<p>The Chebyshev iteration method has <strong>excellent convergence properties</strong> because the number of iterations required for a constant error reduction is proportional to <span class="math notranslate nohighlight">\(\sqrt{\kappa}\)</span>, which is a vast improvement over basic stationary methods (like Jacobi or Gauss-Seidel) where the number of iterations is typically proportional to <span class="math notranslate nohighlight">\(\kappa\)</span>.</p>
-<p>However, this method <strong>requires precise knowledge of the interval that contains the eigenvalues</strong> of the iteration matrix.</p>
-<ol class="arabic simple">
-<li><p><strong>Real and Positive/Negative Eigenvalues:</strong> The basic method is derived assuming the eigenvalues are real and positive (or all negative, allowing for a transformation). If the eigenvalues are complex, the method is still applicable, provided they are contained within an ellipse in the right or left half of the complex plane, symmetric with respect to the real axis.</p></li>
-<li><p><strong>Sensitivity to the Lower Bound:</strong> For the optimal convergence rate derived above, the method critically depends on the ratio <span class="math notranslate nohighlight">\(b/a\)</span>, where <span class="math notranslate nohighlight">\(a\)</span> is the smallest positive eigenvalue.</p>
-<ul class="simple">
-<li><p>In many problems, particularly those arising from discretized PDEs, the <strong>smallest eigenvalues (<span class="math notranslate nohighlight">\(a\)</span>) can be very close to 0</strong> (e.g., <span class="math notranslate nohighlight">\(O(h^2)\)</span> in many finite difference schemes).</p></li>
-<li><p>Determining this lower bound <span class="math notranslate nohighlight">\(a\)</span> accurately can be <strong>difficult and computationally expensive</strong>.</p></li>
-<li><p>If the estimate for the lower bound <span class="math notranslate nohighlight">\(a\)</span> is slightly too small, the estimated condition number <span class="math notranslate nohighlight">\(\kappa = b/a\)</span> becomes inflated, leading to a much slower predicted rate of convergence. If the estimate for <span class="math notranslate nohighlight">\(a\)</span> is too large (i.e., outside the true interval), the method may diverge.</p></li>
-<li><p>The convergence rate curve can be <strong>extremely sensitive near the optimal value</strong> of the parameters, highlighting the danger of slightly inaccurate eigenvalue estimates.</p></li>
-</ul>
-</li>
-</ol>
-</section>
-<section id="pros-cons-and-applications">
-<h2>Pros, Cons, and Applications<a class="headerlink" href="#pros-cons-and-applications" title="Link to this heading">#</a></h2>
-<p>The method’s reliance on precise spectral bounds means that despite its theoretical efficiency, it is often avoided in favor of <strong>parameter-free methods</strong> like the Conjugate Gradient (CG) method, which typically converges even faster in a certain norm without requiring eigenvalue estimates.</p>
-<p>The following table summarizes the key properties, advantages (pros), and disadvantages (cons) of the 1st order (one-step) and 2nd order (two-step) Chebyshev iterative methods:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
-<th class="head text-left"><p>1st Order Chebyshev Iterative Method (One-Step)</p></th>
-<th class="head text-left"><p>2nd Order Chebyshev Iterative Method (Two-Step)</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p><strong>Recurrence Relation</strong></p></td>
-<td class="text-left"><p>Uses a one-step recurrence relation: <span class="math notranslate nohighlight">\(x^{k+1} = x^k - \tau_k(Ax^k - b)\)</span>.</p></td>
-<td class="text-left"><p>Uses a two-step recurrence relation: <span class="math notranslate nohighlight">\(x^{k+1} = \alpha_k x^k + (1 - \alpha_k) x^{k-1} - \beta_k r^k\)</span>.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>Primary Pros</strong></p></td>
-<td class="text-left"><p>Parameters are computed from a <strong>closed expression</strong>—that is, the one-step method’s parameters are explicit functions of <span class="math notranslate nohighlight">\(a\)</span>, <span class="math notranslate nohighlight">\(b\)</span>, and <span class="math notranslate nohighlight">\(k\)</span>. Shares the <strong>optimal asymptotic rate of convergence</strong> (proportional to the square root of the condition number <span class="math notranslate nohighlight">\(O(\sqrt{\kappa})\)</span>).</p></td>
-<td class="text-left"><p><strong>Numerically stable</strong>. Gives the <strong>optimal result for every step <span class="math notranslate nohighlight">\(k\)</span></strong>, apart from rounding errors, unlike the one-step method which is only optimized for a pre-chosen final step <span class="math notranslate nohighlight">\(k\)</span>. Eliminates the requirement to choose the number of iteration steps <span class="math notranslate nohighlight">\(k\)</span> <em>a priori</em>.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>Primary Cons</strong></p></td>
-<td class="text-left"><p>Major disadvantage is potential <strong>numerical instability</strong>. Instability occurs because, for certain iteration indices <span class="math notranslate nohighlight">\(k\)</span>, the iteration matrices can have a spectral radius much larger than 1. Requires the user to choose the total number of iteration steps <span class="math notranslate nohighlight">\(k\)</span> <strong>a priori</strong>. The iteration parameters <span class="math notranslate nohighlight">\(\tau_k\)</span> must be selected and used in a specific order (large values balanced by small values) to mitigate instability.</p></td>
-<td class="text-left"><p>Parameters are derived from <strong>recursions</strong>. Requires more memory and complexity due to the two-step dependence.</p></td>
-</tr>
-</tbody>
-</table>
+\[
+t_j=c-d\cos(j\pi/k),
+\qquad j=0,\ldots,k.
+\]</div>
+<p>They run in increasing order from <span class="math notranslate nohighlight">\(t_0=\alpha\)</span> to <span class="math notranslate nohighlight">\(t_k=\beta\)</span>. At these points,</p>
+<div class="math notranslate nohighlight">
+\[
+p_k(t_j)=\frac{\cos(j\pi)}{C_k(c/d)}
+=\frac{(-1)^j}{C_k(c/d)}.
+\]</div>
+<p>Suppose another polynomial <span class="math notranslate nohighlight">\(p\)</span>, of degree at most <span class="math notranslate nohighlight">\(k\)</span> with <span class="math notranslate nohighlight">\(p(0)=1\)</span>, had strictly smaller maximum magnitude. Then</p>
+<div class="math notranslate nohighlight">
+\[
+-\frac{1}{C_k(c/d)}&lt;p(t_j)&lt;\frac{1}{C_k(c/d)}
+\qquad\text{for every }j.
+\]</div>
+<p>At an even index, <span class="math notranslate nohighlight">\(p_k(t_j)\)</span> equals the upper bound, so <span class="math notranslate nohighlight">\(p(t_j)-p_k(t_j)&lt;0\)</span>. At an odd index, <span class="math notranslate nohighlight">\(p_k(t_j)\)</span> equals the lower bound, so <span class="math notranslate nohighlight">\(p(t_j)-p_k(t_j)&gt;0\)</span>. Thus the difference <span class="math notranslate nohighlight">\(p-p_k\)</span> changes sign between every consecutive pair of points.</p>
+<p>Since polynomials are continuous, the intermediate value theorem gives at least one zero of <span class="math notranslate nohighlight">\(p-p_k\)</span> in each of the <span class="math notranslate nohighlight">\(k\)</span> disjoint intervals <span class="math notranslate nohighlight">\((t_j,t_{j+1})\)</span>. There is also a zero at the origin because <span class="math notranslate nohighlight">\(p(0)-p_k(0)=1-1=0\)</span>. This additional zero lies outside <span class="math notranslate nohighlight">\([\alpha,\beta]\)</span>, since <span class="math notranslate nohighlight">\(\alpha&gt;0\)</span>.</p>
+<p>We have therefore found at least <span class="math notranslate nohighlight">\(k+1\)</span> distinct zeros of <span class="math notranslate nohighlight">\(p-p_k\)</span>. But this difference is a polynomial of degree at most <span class="math notranslate nohighlight">\(k\)</span> and is nonzero, as its strict signs at the <span class="math notranslate nohighlight">\(t_j\)</span> show. This is impossible. Hence no admissible polynomial has a smaller maximum magnitude. The case <span class="math notranslate nohighlight">\(k=0\)</span> is immediate.</p>
 </div>
-<p><strong>Shared Requirements</strong>: Requires estimates of extreme eigenvalues for optimal performance. Convergence rate curve can be <strong>extremely sensitive near the optimal value</strong> of the parameters if eigenvalue estimates are inaccurate.</p>
-<p><strong>Applications and Use Cases:</strong></p>
-<ol class="arabic simple">
-<li><p><strong>Preconditioning:</strong> The method is applicable when combined with a preconditioning matrix <span class="math notranslate nohighlight">\(M\)</span> (such as SSOR) to solve the system <span class="math notranslate nohighlight">\(M^{-1}A\mathbf{x} = M^{-1}\mathbf{b}\)</span>, provided <span class="math notranslate nohighlight">\(M^{-1}A\)</span> has positive eigenvalues. This combination (SSOR with Chebyshev acceleration) can substantially reduce the iteration count.</p></li>
-<li><p><strong>Other Specific Matrix Classes:</strong> Chebyshev methods can be extended to systems where the eigenvalues lie in two disjoint intervals or ellipses (such as indefinite symmetric matrices after transformation).</p></li>
-</ol>
+<p>The alternating extrema explain the result: the polynomial balances its largest amplification across the interval. The normalization is essential; without a constraint, the zero polynomial would trivially minimize the maximum. A general interval version is given in <a class="reference external" href="https://www-users.cse.umn.edu/~saad/eig_book_2ndEd.pdf#page=119">Saad, Theorem 4.8</a>.</p>
+</section>
+<section id="the-convergence-bound">
+<h2>The Convergence Bound<a class="headerlink" href="#the-convergence-bound" title="Link to this heading">#</a></h2>
+<p>The minimax property gives a uniform error bound. It does not assert equality with the actual error, which depends on the starting vector and the eigenvalues present.</p>
+<div class="proof theorem admonition" id="thm:chebyshev-convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 47 </span> (Chebyshev Convergence Bound)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be SPD with spectrum in <span class="math notranslate nohighlight">\([\alpha,\beta]\)</span>, where <span class="math notranslate nohighlight">\(0&lt;\alpha&lt;\beta\)</span>. Suppose the iterates satisfy <span class="math notranslate nohighlight">\(e^{(k)}=p_k(A)e^{(0)}\)</span> for the normalized Chebyshev polynomials above. Put</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa=\frac{\beta}{\alpha},
+\qquad
+q=\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}.
+\]</div>
+<p>Then, in exact arithmetic,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\|e^{(k)}\|_2
+\le
+\frac{2q^k}{1+q^{2k}}\|e^{(0)}\|_2
+\le2q^k\|e^{(0)}\|_2.
+}
+\]</div>
+<p>The same inequalities hold in the energy norm <span class="math notranslate nohighlight">\(\|e\|_A=\sqrt{e^TAe}\)</span>.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. In the orthonormal eigenvector basis, each error coefficient is multiplied by <span class="math notranslate nohighlight">\(p_k(\lambda_j)\)</span>. This gives the factor <span class="math notranslate nohighlight">\(1/C_k(c/d)\)</span> in either norm; the energy norm simply weights the squared coefficients by the positive eigenvalues.</p>
+<p>To evaluate this factor, we use the following standard formula for Chebyshev polynomials, stated without proof: for <span class="math notranslate nohighlight">\(z&gt;1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+C_k(z)=\frac{1}{2}\left[
+\left(z+\sqrt{z^2-1}\right)^k
++\left(z-\sqrt{z^2-1}\right)^k
+\right].
+\]</div>
+<p>In our case, <span class="math notranslate nohighlight">\(z=c/d=(\kappa+1)/(\kappa-1)\)</span>. Substitution gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{c}{d}-\sqrt{\left(\frac{c}{d}\right)^2-1}
+&amp;=\frac{\kappa+1-2\sqrt{\kappa}}{\kappa-1}=q,\\
+\frac{c}{d}+\sqrt{\left(\frac{c}{d}\right)^2-1}
+&amp;=q^{-1}.
+\end{aligned}
+\end{split}\]</div>
+<p>The formula therefore yields</p>
+<div class="math notranslate nohighlight">
+\[
+C_k(c/d)=\frac{q^{-k}+q^k}{2}.
+\]</div>
+<p>Taking the reciprocal gives the required error factor:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{1}{C_k(c/d)}
+=\frac{2}{q^{-k}+q^k}
+=\frac{2q^k}{1+q^{2k}}
+\le2q^k.
+\]</div>
+</div>
+<p>Here <span class="math notranslate nohighlight">\(\kappa\)</span> is the ratio of the chosen bounds. It equals the 2-norm condition number <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span> when the bounds are the exact extreme eigenvalues. The scalar <span class="math notranslate nohighlight">\(q\)</span>, which lies between zero and one, is the geometric convergence factor; a smaller <span class="math notranslate nohighlight">\(q\)</span> gives a faster error reduction.</p>
+<p>For comparison, a constant Richardson step gives the error polynomial <span class="math notranslate nohighlight">\((1-\tau\lambda)^k\)</span>. The largest value of <span class="math notranslate nohighlight">\(|1-\tau\lambda|\)</span> on the interval occurs at an endpoint. The best step balances the two endpoint values with opposite signs:</p>
+<div class="math notranslate nohighlight">
+\[
+1-\tau\alpha=-(1-\tau\beta),
+\qquad
+\tau=\frac{2}{\alpha+\beta}=\frac{1}{c}.
+\]</div>
+<p>Its interval error bound therefore has factor</p>
+<div class="math notranslate nohighlight">
+\[
+\left(\frac{\kappa-1}{\kappa+1}\right)^k.
+\]</div>
+<p>For the interval <span class="math notranslate nohighlight">\([1,9]\)</span>, this factor is <span class="math notranslate nohighlight">\((4/5)^k\)</span>, whereas the Chebyshev bound is at most <span class="math notranslate nohighlight">\(2(1/2)^k\)</span>.</p>
+<p>To reduce the error to <span class="math notranslate nohighlight">\(\|e^{(k)}\|_2\le\epsilon\|e^{(0)}\|_2\)</span>, where <span class="math notranslate nohighlight">\(0&lt;\epsilon&lt;1\)</span>, it suffices to take</p>
+<div class="math notranslate nohighlight">
+\[
+k\ge
+\left\lceil
+\frac{\log(2/\epsilon)}{\log(1/q)}
+\right\rceil.
+\]</div>
+<p>For large <span class="math notranslate nohighlight">\(\kappa\)</span>, this estimate grows like <span class="math notranslate nohighlight">\(\sqrt{\kappa}\log(1/\epsilon)\)</span>, compared with <span class="math notranslate nohighlight">\(\kappa\log(1/\epsilon)\)</span> for Richardson iteration with its best constant step length.</p>
+<p>The practical difference is how much harder the iteration becomes as <span class="math notranslate nohighlight">\(\kappa\)</span> grows. For a fixed accuracy, increasing a large <span class="math notranslate nohighlight">\(\kappa\)</span> by a factor of <span class="math notranslate nohighlight">\(100\)</span> multiplies the predicted Chebyshev iteration count by about <span class="math notranslate nohighlight">\(10\)</span>, but the Richardson count by about <span class="math notranslate nohighlight">\(100\)</span>. Chebyshev therefore becomes increasingly attractive as the eigenvalue interval becomes more spread out. Each method uses one matrix-vector product per step, so fewer steps can mean substantially less work. These are worst-case predictions from the interval bounds; actual iteration counts can be smaller.</p>
+<p>The plot compares the exact interval bounds for both methods. The vertical axis is logarithmic: a decrease from <span class="math notranslate nohighlight">\(10^{-2}\)</span> to <span class="math notranslate nohighlight">\(10^{-3}\)</span>, for example, means a tenfold reduction in the error bound.</p>
+<figure class="align-default" id="fig-chebyshev-convergence">
+<a class="reference internal image-reference" href="../_images/chebyshev_convergence.svg"><img alt="Relative error bounds versus iteration count for Chebyshev and optimally damped Richardson iteration. For kappa 10, the bounds reach ten to the minus six after 23 and 69 steps, respectively; for kappa 100, after 73 and 691 steps." src="../_images/chebyshev_convergence.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 22 </span><span class="caption-text">Predicted convergence for spectral ratios <span class="math notranslate nohighlight">\(\kappa=10\)</span> (left) and <span class="math notranslate nohighlight">\(\kappa=100\)</span> (right). The curves bound <span class="math notranslate nohighlight">\(\|e^{(k)}\|_2/\|e^{(0)}\|_2\)</span> using the same eigenvalue interval for both methods. Markers show the first step at which each bound reaches the target <span class="math notranslate nohighlight">\(10^{-6}\)</span>. Chebyshev reaches the target much sooner, and the advantage grows with <span class="math notranslate nohighlight">\(\kappa\)</span>. These are theoretical bounds, not measured errors for a particular system. Note the different horizontal scales.</span><a class="headerlink" href="#fig-chebyshev-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="from-the-polynomial-to-an-iteration">
+<h2>From the Polynomial to an Iteration<a class="headerlink" href="#from-the-polynomial-to-an-iteration" title="Link to this heading">#</a></h2>
+<p>The preceding theorem tells us which error polynomial to use. We still need an update for <span class="math notranslate nohighlight">\(x^{(k)}\)</span> that produces it. There are two ways to do this. The first-order method uses only the current iterate and factors a polynomial of a chosen degree. The second-order method, developed in the optional section at the end of this page, uses the two most recent iterates to produce the optimal polynomial at every step without fixing the final degree in advance.</p>
+<section id="first-order-chebyshev-iteration-factoring-a-polynomial">
+<h3>First-Order Chebyshev Iteration: Factoring a Polynomial<a class="headerlink" href="#first-order-chebyshev-iteration-factoring-a-polynomial" title="Link to this heading">#</a></h3>
+<p>Fix a final degree <span class="math notranslate nohighlight">\(m\ge1\)</span>. The roots of <span class="math notranslate nohighlight">\(p_m\)</span> and the corresponding step lengths are</p>
+<div class="math notranslate nohighlight">
+\[
+\theta_j=c-d\cos\left(\frac{(2j-1)\pi}{2m}\right),
+\qquad
+\tau_{j-1}^{(m)}=\frac{1}{\theta_j},
+\quad j=1,\ldots,m.
+\]</div>
+<p>The superscript records the chosen final degree: changing <span class="math notranslate nohighlight">\(m\)</span> changes the whole sequence of step lengths. To see why these steps produce the desired polynomial, write</p>
+<div class="math notranslate nohighlight">
+\[
+p_m(\lambda)=\prod_{j=1}^{m}\left(1-\frac{\lambda}{\theta_j}\right).
+\]</div>
+<p>Both sides have the same <span class="math notranslate nohighlight">\(m\)</span> roots and equal <span class="math notranslate nohighlight">\(1\)</span> at zero, so they are the same polynomial. Each Richardson step supplies one factor. After all <span class="math notranslate nohighlight">\(m\)</span> steps, we therefore have <span class="math notranslate nohighlight">\(e^{(m)}=p_m(A)e^{(0)}\)</span> in exact arithmetic. The intermediate products generally differ from the optimal polynomials of their respective degrees.</p>
+<p>Factor ordering therefore matters in floating-point arithmetic. Although the final product is independent of the ordering in exact arithmetic, unfavorable orderings can produce large intermediate vectors and amplify rounding errors. <a class="reference external" href="https://www.stat.uchicago.edu/~lekheng/courses/302/notes17.pdf">Golub’s lecture notes</a> discuss this issue.</p>
+</section>
+</section>
+<section id="choosing-eigenvalue-bounds">
+<h2>Choosing Eigenvalue Bounds<a class="headerlink" href="#choosing-eigenvalue-bounds" title="Link to this heading">#</a></h2>
+<p>Safe enclosing bounds give the stated guarantee. Taking a smaller positive lower bound or a larger upper bound is safe, but increases the interval ratio and weakens the convergence estimate. Exact extreme eigenvalues are not required.</p>
+<p>If the interval misses an eigenvalue, the stated error bound no longer applies. In particular, underestimating the upper bound can cause divergence.</p>
+<p>Gershgorin estimates can provide an upper bound; a useful positive lower bound may be harder to obtain. A few Lanczos steps can suggest estimates, but the <a class="reference internal" href="lanczos_convergence.html"><span class="std std-doc">extreme Ritz values</span></a> lie inside the extreme eigenvalues: the smallest Ritz value is an upper bound for the smallest eigenvalue, and the largest is a lower bound for the largest eigenvalue. They are not, by themselves, certified enclosing bounds.</p>
+</section>
+<section id="preconditioning-and-scope-of-the-theory">
+<h2>Preconditioning and Scope of the Theory<a class="headerlink" href="#preconditioning-and-scope-of-the-theory" title="Link to this heading">#</a></h2>
+<p>We now return to the correction <span class="math notranslate nohighlight">\(z^{(k)}\)</span> introduced with the splitting methods. Assume that both <span class="math notranslate nohighlight">\(A\)</span> and the preconditioner <span class="math notranslate nohighlight">\(M\)</span> are SPD, and solve</p>
+<div class="math notranslate nohighlight">
+\[
+Mz^{(k)}=r^{(k)}.
+\]</div>
+<p>Use <span class="math notranslate nohighlight">\(z^{(k)}\)</span> in place of <span class="math notranslate nohighlight">\(r^{(k)}\)</span> when forming solution corrections. Choosing <span class="math notranslate nohighlight">\(M=D\)</span> gives the diagonally preconditioned version associated with Jacobi.</p>
+<p>The coefficients must now use bounds <span class="math notranslate nohighlight">\([\alpha,\beta]\)</span> for the eigenvalues of <span class="math notranslate nohighlight">\(M^{-1}A\)</span>, rather than those of <span class="math notranslate nohighlight">\(A\)</span>. The aim is to make this interval narrower relative to its lower endpoint, giving a smaller ratio <span class="math notranslate nohighlight">\(\beta/\alpha\)</span> and faster convergence. For SPD <span class="math notranslate nohighlight">\(M\)</span>, the same convergence factor holds in the energy norm <span class="math notranslate nohighlight">\(\|e\|_A\)</span>.</p>
+<p>The SPD assumption on <span class="math notranslate nohighlight">\(M\)</span> matters. Diagonal preconditioning and the SSOR preconditioner described earlier fit this theory. The Gauss-Seidel splitting matrix <span class="math notranslate nohighlight">\(D-L\)</span> is generally nonsymmetric, so this guarantee does not automatically apply to that choice.</p>
+<section id="why-the-preconditioned-bound-holds-optional">
+<h3>Why the Preconditioned Bound Holds (Optional)<a class="headerlink" href="#why-the-preconditioned-bound-holds-optional" title="Link to this heading">#</a></h3>
+<p>This change-of-variables argument justifies the preceding claim. It can be skipped on a first reading.</p>
+<p>Although <span class="math notranslate nohighlight">\(M^{-1}A\)</span> is generally nonsymmetric, it is similar to the SPD matrix</p>
+<div class="math notranslate nohighlight">
+\[
+B=M^{-1/2}AM^{-1/2}
+=M^{1/2}(M^{-1}A)M^{-1/2}.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(M^{1/2}\)</span> is the symmetric positive definite square root of <span class="math notranslate nohighlight">\(M\)</span>, and <span class="math notranslate nohighlight">\(M^{-1/2}\)</span> is its inverse. Define the transformed error by <span class="math notranslate nohighlight">\(\widetilde e=M^{1/2}e\)</span>. The polynomial error relation becomes</p>
+<div class="math notranslate nohighlight">
+\[
+\widetilde e^{(k)}
+=M^{1/2}p_k(M^{-1}A)e^{(0)}
+=p_k(B)\widetilde e^{(0)}.
+\]</div>
+<p>The SPD convergence theorem applies to <span class="math notranslate nohighlight">\(B\)</span>. To translate its bounds back, observe that</p>
+<div class="math notranslate nohighlight">
+\[
+\|\widetilde e\|_2^2=e^TMe,
+\qquad
+\|\widetilde e\|_B^2=e^TAe.
+\]</div>
+<p>Thus the bounds hold in both <span class="math notranslate nohighlight">\(\|e\|_M=\sqrt{e^TMe}\)</span> and <span class="math notranslate nohighlight">\(\|e\|_A\)</span>.</p>
+</section>
+<section id="scope-of-the-spd-theory">
+<h3>Scope of the SPD Theory<a class="headerlink" href="#scope-of-the-spd-theory" title="Link to this heading">#</a></h3>
+<p>For symmetric negative definite <span class="math notranslate nohighlight">\(A\)</span>, multiplying <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\(-1\)</span> reduces the problem to the SPD case. For a general nonsymmetric matrix, eigenvalue locations alone do not give the same 2-norm guarantee; eigenvector conditioning can enter, as in the Arnoldi analysis. Extensions to complex spectral regions or separated real intervals require additional polynomial approximation theory. The SPD interval analysis above does not establish their convergence rates.</p>
+</section>
+</section>
+<section id="practical-role-and-connection-to-cg">
+<h2>Practical Role and Connection to CG<a class="headerlink" href="#practical-role-and-connection-to-cg" title="Link to this heading">#</a></h2>
+<p>Each unpreconditioned step needs one matrix-vector product and a few vector updates. Preconditioning adds a solve with <span class="math notranslate nohighlight">\(M\)</span>. Only a fixed number of vectors is stored.</p>
+<p>The forthcoming <a class="reference internal" href="conjugate_gradient.html"><span class="std std-doc">conjugate gradient (CG) method</span></a> chooses its polynomial using information from the current iterates. As we will show in the next chapter, for SPD systems in exact arithmetic, CG has no larger energy-norm error than Chebyshev after the same number of steps, using the same initial guess and preconditioner. It also avoids requiring external spectral bounds. Chebyshev remains useful when bounds are available and predictable work or reduced synchronization is valuable, including as a preconditioner or a multigrid smoother. The implementation below shows why it needs no inner products to compute its updates.</p>
+</section>
+<section id="python-implementation">
+<h2>Python Implementation<a class="headerlink" href="#python-implementation" title="Link to this heading">#</a></h2>
+<p>The code implements the second-order Chebyshev recurrence for a real SPD matrix with eigenvalues in <span class="math notranslate nohighlight">\([\alpha,\beta]\)</span>. Its derivation is given in the optional section below; the implementation and example can be used without following that derivation.</p>
+<p>As above, <code class="docutils literal notranslate"><span class="pre">c</span></code> and <code class="docutils literal notranslate"><span class="pre">d</span></code> are the center and half-width of the interval. The scalar <code class="docutils literal notranslate"><span class="pre">tau</span></code> weights the residual, while <code class="docutils literal notranslate"><span class="pre">mu</span></code> weights the previous correction. The code stores that correction instead of the previous solution vector: after <span class="math notranslate nohighlight">\(k\ge1\)</span> updates, <code class="docutils literal notranslate"><span class="pre">correction</span></code> is <span class="math notranslate nohighlight">\(x^{(k)}-x^{(k-1)}\)</span>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>The iteration uses no inner products.</strong> Each update needs one matrix-vector product, scalar coefficient calculations, and vector additions and scalings. The coefficients depend only on the eigenvalue bounds.</p>
+<p>In contrast, CG uses inner products of its current vectors to choose its coefficients. On a parallel machine, these inner products require combining contributions from different processors, an operation called a <strong>reduction</strong>. Chebyshev avoids those reductions, although its matrix-vector products can still require communication. <a class="reference external" href="https://netlib.org/linalg/html_templates/node45.html">Netlib’s comparison</a> discusses this advantage.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">chebyshev</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Take `steps` second-order Chebyshev updates, without inner products.</span>
+
+<span class="sd">    A is real SPD; 0 &lt; alpha &lt; beta enclose its eigenvalues.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">alpha</span> <span class="o">&lt;</span> <span class="n">beta</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Require 0 &lt; alpha &lt; beta."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">steps</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"steps must be a nonnegative integer."</span><span class="p">)</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">correction</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">c</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">correction</span>                         <span class="c1"># First update</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">tau</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="n">d</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">c</span><span class="p">))</span>      <span class="c1"># Special initialization</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tau</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="p">(</span><span class="n">d</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">tau</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="n">tau</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span>                           <span class="c1"># Matrix-vector product</span>
+        <span class="n">correction</span> <span class="o">=</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">correction</span>  <span class="c1"># No dot products</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">correction</span>
+
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">steps</span></code> determines when this demonstration stops; it does not enter the coefficient formulas. Choosing a larger value leaves the earlier iterates unchanged, unlike changing the final degree in the factored method.</p>
+<p>For example, take a tridiagonal matrix with diagonal entries <span class="math notranslate nohighlight">\(4\)</span> and neighboring entries <span class="math notranslate nohighlight">\(-1\)</span>. Each Gershgorin disc has center <span class="math notranslate nohighlight">\(4\)</span> and radius at most <span class="math notranslate nohighlight">\(2\)</span>, so its real eigenvalues lie in <span class="math notranslate nohighlight">\([2,6]\)</span>. We choose the right-hand side so that the exact solution is the vector of ones.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">A</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+     <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+     <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">steps</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">chebyshev</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+    <span class="n">relative_residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"steps = </span><span class="si">{</span><span class="n">steps</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">, relative residual = </span><span class="si">{</span><span class="n">relative_residual</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>steps =  0, relative residual = 1.0e+00
+steps =  5, relative residual = 2.5e-03
+steps = 10, relative residual = 3.0e-06
+steps = 15, relative residual = 3.4e-09
+steps = 20, relative residual = 3.4e-12
+</pre></div>
+</div>
+</div>
+</div>
+<p>The output reports the relative residual, which measures how well the equations are satisfied, rather than the error in the solution. These norm calculations are outside the iteration function. Computing a residual norm for stopping or monitoring requires a reduction over vector entries; the absence of inner products concerns the Chebyshev updates themselves. In practice, these checks can be made periodically rather than at every step.</p>
+</section>
+<section id="second-order-chebyshev-iteration-optional">
+<h2>Second-Order Chebyshev Iteration (Optional)<a class="headerlink" href="#second-order-chebyshev-iteration-optional" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This derivation is optional. It explains the coefficients used in the implementation above. You can use that implementation and its convergence bound without following the algebra here.</p>
+</div>
+<p>The factored method targets one chosen final degree. To obtain the optimal polynomial at every degree instead, the <strong>second-order Chebyshev method</strong> uses both <span class="math notranslate nohighlight">\(x^{(k)}\)</span> and <span class="math notranslate nohighlight">\(x^{(k-1)}\)</span>. Here “second-order” describes this dependence; it does not mean quadratic convergence.</p>
+<p>For this derivation, take <span class="math notranslate nohighlight">\(M=I\)</span> and use the bounds for <span class="math notranslate nohighlight">\(A\)</span>. The Chebyshev polynomials satisfy the recurrence</p>
+<div class="math notranslate nohighlight">
+\[
+C_{k+1}(z)=2zC_k(z)-C_{k-1}(z).
+\]</div>
+<p>We use this recurrence to construct each normalized error polynomial from the previous two. Since <span class="math notranslate nohighlight">\(p_1(\lambda)=1-\lambda/c\)</span>, the first solution update is</p>
+<div class="math notranslate nohighlight">
+\[
+x^{(1)}=x^{(0)}+\frac{1}{c}r^{(0)}.
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(k\ge1\)</span>, compute the residual <span class="math notranslate nohighlight">\(r^{(k)}=b-Ax^{(k)}\)</span> and use</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+x^{(k+1)}
+=x^{(k)}+\tau_k r^{(k)}
++\mu_k\bigl(x^{(k)}-x^{(k-1)}\bigr),
+}
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\tau_k\)</span> weights the residual correction, and <span class="math notranslate nohighlight">\(\mu_k\)</span> weights the preceding change in the approximation. These are coefficients of the two-step recurrence; <span class="math notranslate nohighlight">\(\tau_k\)</span> is not the root-based step length <span class="math notranslate nohighlight">\(\tau_k^{(m)}\)</span> of the factored method. Compute them from</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\tau_1&amp;=\frac{1}{c-d^2/(2c)},\\
+\tau_k&amp;=\frac{1}{c-(d^2/4)\tau_{k-1}}
+\qquad(k\ge2),\\
+\mu_k&amp;=c\tau_k-1.
+\end{aligned}
+\end{split}\]</div>
+<p>The first update uses only <span class="math notranslate nohighlight">\(x^{(0)}\)</span>. Then compute <span class="math notranslate nohighlight">\(\tau_1\)</span> and <span class="math notranslate nohighlight">\(\mu_1\)</span> to obtain <span class="math notranslate nohighlight">\(x^{(2)}\)</span>; thereafter use the recurrence for <span class="math notranslate nohighlight">\(\tau_k\)</span>. This initialization reflects the starting polynomials <span class="math notranslate nohighlight">\(C_0=1\)</span> and <span class="math notranslate nohighlight">\(C_1=z\)</span>.</p>
+<p>To see why the update produces the desired polynomials, substitute the formula for <span class="math notranslate nohighlight">\(p_k\)</span> into the Chebyshev recurrence. This gives</p>
+<div class="math notranslate nohighlight">
+\[
+p_{k+1}(\lambda)
+=(c-\lambda)\tau_k p_k(\lambda)
+-\mu_k p_{k-1}(\lambda),
+\]</div>
+<p>with</p>
+<div class="math notranslate nohighlight">
+\[
+\tau_k=\frac{2C_k(c/d)}{dC_{k+1}(c/d)},
+\qquad
+\mu_k=\frac{C_{k-1}(c/d)}{C_{k+1}(c/d)}.
+\]</div>
+<p>At <span class="math notranslate nohighlight">\(\lambda=0\)</span>, the normalization <span class="math notranslate nohighlight">\(p_j(0)=1\)</span> gives <span class="math notranslate nohighlight">\(c\tau_k-\mu_k=1\)</span>. Applying the polynomial recurrence to the initial error therefore gives</p>
+<div class="math notranslate nohighlight">
+\[
+e^{(k+1)}
+=\bigl((1+\mu_k)I-\tau_k A\bigr)e^{(k)}
+-\mu_k e^{(k-1)}.
+\]</div>
+<p>Using <span class="math notranslate nohighlight">\(e^{(k)}=x^{(k)}-x\)</span> and <span class="math notranslate nohighlight">\(r^{(k)}=-Ae^{(k)}\)</span> recovers the stated solution update.</p>
+<p>Finally, the scalar recurrence avoids evaluating large Chebyshev values. For <span class="math notranslate nohighlight">\(k\ge2\)</span>, the recurrence for <span class="math notranslate nohighlight">\(C_k\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{1}{\tau_k}
+&amp;=\frac{dC_{k+1}(c/d)}{2C_k(c/d)}\\
+&amp;=c-\frac{d}{2}\frac{C_{k-1}(c/d)}{C_k(c/d)}\\
+&amp;=c-\frac{d^2}{4}\tau_{k-1}.
+\end{aligned}
+\end{split}\]</div>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, substituting <span class="math notranslate nohighlight">\(C_1(z)=z\)</span> and <span class="math notranslate nohighlight">\(C_2(z)=2z^2-1\)</span> gives <span class="math notranslate nohighlight">\(\tau_1=1/(c-d^2/(2c))\)</span>. This explains the separate initialization in the code.</p>
+<p>Consequently, the convergence theorem applies at every step of this method. For the factored method, it applies at the chosen final step. In both cases, optimality concerns the interval bound, rather than the actual error for each system.</p>
+<p>The short recurrence avoids choosing a root ordering, but finite-precision accuracy still depends on its implementation. For stopping, check an explicitly computed residual using the <a class="reference internal" href="jacobi_method.html"><span class="std std-doc">scaled residual criterion</span></a> from Jacobi and Gauss-Seidel; the exact error is unknown. A detailed comparison of formulations and roundoff effects is given by <a class="reference external" href="https://www.sam.math.ethz.ch/~mhg/pub/Cheby-02ParComp.pdf">Gutknecht and Röllin</a>.</p>
 </section>
 </section>
 
@@ -780,22 +1018,24 @@ A &amp;= M - N \\
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-stationary-to-nonstationary-iteration">From Stationary to Nonstationary Iteration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#error-propagation-and-matrix-polynomials">Error Propagation and Matrix Polynomials</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-polynomial-optimization-problem">The Polynomial Optimization Problem</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#error-representation-and-the-minimax-problem">Error Representation and the Minimax Problem</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-optimal-polynomial-p-k-lambda">Deriving the Optimal Polynomial <span class="math notranslate nohighlight">\(P_k(\lambda)\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculating-the-exact-bound">Calculating the Exact Bound</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#asymptotic-rate">Asymptotic Rate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-splitting-methods-to-richardson-iteration">From Splitting Methods to Richardson Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-residual-corrections-to-polynomials">From Residual Corrections to Polynomials</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-an-error-polynomial">Choosing an Error Polynomial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-chebyshev-minimax-polynomial">The Chebyshev Minimax Polynomial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-bound">The Convergence Bound</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-the-polynomial-to-an-iteration">From the Polynomial to an Iteration</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#first-order-chebyshev-iteration-factoring-a-polynomial">First-Order Chebyshev Iteration: Factoring a Polynomial</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#limitations-of-the-1st-order-chebyshev-iterative-method">Limitations of the 1st Order Chebyshev Iterative Method</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-build-the-2nd-order-chebyshev-iterative-method">How to Build the 2nd Order Chebyshev Iterative Method</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-the-2nd-order-chebyshev-iterative-method">Advantages of the 2nd Order Chebyshev Iterative Method</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-eigenvalue-bounds">Choosing Eigenvalue Bounds</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preconditioning-and-scope-of-the-theory">Preconditioning and Scope of the Theory</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-preconditioned-bound-holds-optional">Why the Preconditioned Bound Holds (Optional)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scope-of-the-spd-theory">Scope of the SPD Theory</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements-and-sensitivity-to-eigenvalue-bounds">Requirements and Sensitivity to Eigenvalue Bounds</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pros-cons-and-applications">Pros, Cons, and Applications</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-role-and-connection-to-cg">Practical Role and Connection to CG</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-implementation">Python Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#second-order-chebyshev-iteration-optional">Second-Order Chebyshev Iteration (Optional)</a></li>
 </ul>
   </nav></div>
 

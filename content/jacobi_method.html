@@ -462,6 +462,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-parallelism">Implementation and Parallelism</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-criteria">Convergence Criteria</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonal-dominance-condition">Diagonal Dominance Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-alternative-proof-using-gershgorin-discs">An Alternative Proof Using Gershgorin Discs</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-considerations">Practical Considerations</a></li>
@@ -478,91 +479,106 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-jacobi-iteration-method">
 <h1>The Jacobi Iteration Method<a class="headerlink" href="#the-jacobi-iteration-method" title="Link to this heading">#</a></h1>
-<p>The Jacobi iteration, proposed by Carl Gustav Jacob Jacobi in 1845, is the <strong>simplest</strong> of the stationary iterative methods for solving large sparse linear systems <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. It serves as an excellent foundational example of a splitting method.</p>
+<p>Jacobi iteration updates each component of an approximate solution using the previous values of all the other components. This makes it a simple example of a stationary splitting method for solving <span class="math notranslate nohighlight">\(Ax=b\)</span>.</p>
+<p>One update of the full vector is called an <strong>iteration</strong> or a <strong>sweep</strong>. As before, <span class="math notranslate nohighlight">\(x^{(k)}\)</span> denotes the approximation after <span class="math notranslate nohighlight">\(k\)</span> such updates. We assume <span class="math notranslate nohighlight">\(A\)</span> is real and nonsingular, with nonzero diagonal entries.</p>
 <section id="defining-the-splitting-and-iteration">
 <h2>Defining the Splitting and Iteration<a class="headerlink" href="#defining-the-splitting-and-iteration" title="Link to this heading">#</a></h2>
-<p>Recall that in a splitting method, we decompose the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A = M - N\)</span>, where <span class="math notranslate nohighlight">\(M\)</span> is easily invertible. The iterative step is defined by <span class="math notranslate nohighlight">\(M \mathbf{x}^{(k+1)} = \mathbf{b} + N \mathbf{x}^{(k)}\)</span>.</p>
+<p>Recall that in a splitting method, we decompose the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> into <span class="math notranslate nohighlight">\(A = M - N\)</span>, where linear systems with <span class="math notranslate nohighlight">\(M\)</span> are inexpensive to solve. The iterative step is defined by <span class="math notranslate nohighlight">\(M x^{(k+1)} = b + N x^{(k)}\)</span>.</p>
 <p>For the Jacobi method, we define the splitting based on the diagonal, strictly lower triangular, and strictly upper triangular parts of <span class="math notranslate nohighlight">\(A\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[A = D - L - U\]</div>
 <p>where <span class="math notranslate nohighlight">\(D = \text{diag}(A)\)</span> is the diagonal matrix of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(-L\)</span> is the strictly lower triangular part, and <span class="math notranslate nohighlight">\(-U\)</span> is the strictly upper triangular part.</p>
 <p>The Jacobi method uses <span class="math notranslate nohighlight">\(M = D\)</span> and <span class="math notranslate nohighlight">\(N = L + U\)</span>. Substituting these into the general splitting framework yields the Jacobi iteration:</p>
 <div class="math notranslate nohighlight">
-\[D \mathbf{x}^{(k+1)} = \mathbf{b} + (L+U) \mathbf{x}^{(k)} \quad \text{}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(D\)</span> is a diagonal matrix, <span class="math notranslate nohighlight">\(D^{-1}\)</span> is trivial to compute, and the iteration can be explicitly written as a fixed-point iteration:</p>
+\[D x^{(k+1)} = b + (L+U) x^{(k)} \]</div>
+<p>Since <span class="math notranslate nohighlight">\(D\)</span> is diagonal, solving with <span class="math notranslate nohighlight">\(D\)</span> requires only componentwise division. The iteration can be written as</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)} = D^{-1} (L+U) \mathbf{x}^{(k)} + D^{-1} \mathbf{b} \quad \text{}\]</div>
-<p>We define the Jacobi iteration matrix (or tensor) as <span class="math notranslate nohighlight">\(G = R_J = D^{-1}(L+U)\)</span> and the constant vector <span class="math notranslate nohighlight">\(\mathbf{c}_J = D^{-1}\mathbf{b}\)</span>. The iterative scheme then takes the standard stationary form:</p>
+\[x^{(k+1)} = D^{-1} (L+U) x^{(k)} + D^{-1} b \]</div>
+<p>Define the Jacobi iteration matrix <span class="math notranslate nohighlight">\(R_J=D^{-1}(L+U)\)</span> and the constant vector <span class="math notranslate nohighlight">\(c_J=D^{-1}b\)</span>. The stationary form is</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)} = G \mathbf{x}^{(k)} + \mathbf{c}_J \quad \text{}\]</div>
-<p>In component form, this updates each entry <span class="math notranslate nohighlight">\(x_i\)</span> using the previous iteration’s values for all other components:</p>
+\[x^{(k+1)} = R_J x^{(k)} + c_J \]</div>
+<p>Expanding row <span class="math notranslate nohighlight">\(i\)</span> and dividing by <span class="math notranslate nohighlight">\(a_{ii}\)</span> gives the component update. Every term on the right uses the previous approximation:</p>
 <div class="math notranslate nohighlight">
-\[x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij} x_j^{(k)} \right) \quad \text{}\]</div>
-<p>Note that this method requires the diagonal entries <span class="math notranslate nohighlight">\(a_{ii}\)</span> to be nonzero.</p>
+\[x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j \neq i} a_{ij} x_j^{(k)} \right) \]</div>
 </section>
 <section id="python-code-example">
 <h2>Python Code Example<a class="headerlink" href="#python-code-example" title="Link to this heading">#</a></h2>
-<p>Here is a simple implementation of the Jacobi method in Python:</p>
+<p>The code uses the residual correction form of the splitting iteration. With <span class="math notranslate nohighlight">\(M=D\)</span>, each component update is</p>
+<div class="math notranslate nohighlight">
+\[
+x_i^{(k+1)}=x_i^{(k)}+\frac{r_i^{(k)}}{a_{ii}},
+\qquad r^{(k)}=b-Ax^{(k)}.
+\]</div>
+<p>Dividing the residual componentwise by the diagonal gives the same Jacobi update without forming <span class="math notranslate nohighlight">\(D\)</span> or <span class="math notranslate nohighlight">\(D^{-1}\)</span>. The implementation uses real NumPy arrays.</p>
+<p>We cannot check the error <span class="math notranslate nohighlight">\(x^{(k)}-x\)</span> directly because the exact solution is unknown. Instead, we check the residual relative to the scale of the system, using the <a class="reference internal" href="lu_pivoting.html"><span class="std std-doc">backward-error measure</span></a> introduced for linear solves:</p>
+<div class="math notranslate nohighlight">
+\[
+\eta(x^{(k)})=
+\frac{\|b-Ax^{(k)}\|_\infty}
+{\|A\|_\infty\|x^{(k)}\|_\infty+\|b\|_\infty}.
+\]</div>
+<p>A small change between iterates alone does not guarantee a small residual. A small <span class="math notranslate nohighlight">\(\eta\)</span> measures how accurately the equations are satisfied; the solution error also depends on the conditioning of <span class="math notranslate nohighlight">\(A\)</span>. In the code, <code class="docutils literal notranslate"><span class="pre">x</span></code> is the current approximation and <code class="docutils literal notranslate"><span class="pre">tol</span></code> is the requested upper bound on <span class="math notranslate nohighlight">\(\eta\)</span>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">jacobi</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Solve the linear system Ax = b using the Jacobi iteration method.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    -----------</span>
-<span class="sd">    A : ndarray</span>
-<span class="sd">        Coefficient matrix (n x n)</span>
-<span class="sd">    b : ndarray</span>
-<span class="sd">        Right-hand side vector (n,)</span>
-<span class="sd">    x0 : ndarray, optional</span>
-<span class="sd">        Initial guess (n,). If None, uses zero vector.</span>
-<span class="sd">    tol : float, optional</span>
-<span class="sd">        Tolerance for convergence (default: 1e-10)</span>
-<span class="sd">    max_iter : int, optional</span>
-<span class="sd">        Maximum number of iterations (default: 1000)</span>
-<span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    x : ndarray</span>
-<span class="sd">        Approximate solution vector</span>
-<span class="sd">    iterations : int</span>
-<span class="sd">        Number of iterations performed</span>
+<span class="w">    </span><span class="sd">"""Return (x, updates), stopping when the scaled residual is &lt;= tol.</span>
+
+<span class="sd">    A and b are real arrays. Raise RuntimeError if the iteration limit</span>
+<span class="sd">    is reached without satisfying the stopping criterion.</span>
 <span class="sd">    """</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">x_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    
-    <span class="c1"># Extract diagonal D and off-diagonal (L + U)</span>
-    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
-    <span class="n">LU</span> <span class="o">=</span> <span class="n">A</span> <span class="o">-</span> <span class="n">D</span>
-    <span class="n">D_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
-    
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
-        <span class="c1"># x^(k+1) = D^(-1) * (b + (L+U) * x^(k))</span>
-        <span class="n">x_new</span> <span class="o">=</span> <span class="n">D_inv</span> <span class="o">@</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">LU</span> <span class="o">@</span> <span class="n">x</span><span class="p">)</span>
-        
-        <span class="c1"># Check convergence</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_new</span> <span class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">x_new</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
-        
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x_new</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: Maximum iterations (</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">) reached without convergence"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_iter</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"A must be square and b a matching vector."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tol</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"tol must be positive and finite."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_iter</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">max_iter</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"max_iter must be a nonnegative integer."</span><span class="p">)</span>
+
+    <span class="n">diagonal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">diagonal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Jacobi requires nonzero diagonal entries."</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x0 must have the same shape as b."</span><span class="p">)</span>
+
+    <span class="n">norm_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="n">norm_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">norm_A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">+</span> <span class="n">norm_b</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tol</span> <span class="o">*</span> <span class="n">scale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="c1"># Every correction uses the same old vector x.</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">r</span> <span class="o">/</span> <span class="n">diagonal</span>
+
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Jacobi did not converge within max_iter updates."</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The returned count is the number of updates performed; it is zero if the initial guess already satisfies the tolerance. If <span class="math notranslate nohighlight">\(b=0\)</span> and <span class="math notranslate nohighlight">\(x=0\)</span>, the residual is exactly zero and the code accepts it without dividing by a zero scale.</p>
+<p>A sparse implementation can use the same correction formula with a sparse matrix-vector product. The example above uses dense arrays for simplicity.</p>
 </section>
 <section id="implementation-and-parallelism">
 <h2>Implementation and Parallelism<a class="headerlink" href="#implementation-and-parallelism" title="Link to this heading">#</a></h2>
-<p>A key attraction of the Jacobi method is its <strong>ease of implementation and high parallelism</strong>.</p>
-<p>Because the matrix <span class="math notranslate nohighlight">\(D\)</span> is diagonal (or block diagonal), the computation of all components of <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> can be performed <strong>independently and concurrently</strong>. This characteristic has led to the Jacobi method also being referred to as <strong>simultaneous iteration</strong>.</p>
-<p>For massively parallel machines, the Jacobi method is appealing because the operation <span class="math notranslate nohighlight">\(D \mathbf{x}^{(k+1)} = \mathbf{b} + (L+U) \mathbf{x}^{(k)}\)</span> is highly parallelized. This contrasts with methods like Gauss-Seidel, where component updates are sequential due to the dependency on newly computed values within the current iteration.</p>
+<p>All entries of <span class="math notranslate nohighlight">\(x^{(k+1)}\)</span> depend only on <span class="math notranslate nohighlight">\(x^{(k)}\)</span>. They can therefore be computed independently once the old vector is available. Keep the old values until every new component has been computed; using a newly updated component would change the method.</p>
+<p>This is why Jacobi is also called <strong>simultaneous iteration</strong>. It is well suited to parallel computation. Gauss-Seidel, developed next, uses new values immediately and introduces dependencies between component updates.</p>
 </section>
 <section id="convergence-criteria">
 <h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Link to this heading">#</a></h2>
-<p>As with any splitting method, the Jacobi iteration converges for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span> if and only if the <strong>spectral radius</strong> of the iteration matrix <span class="math notranslate nohighlight">\(\rho(G)\)</span> is less than one.</p>
-<p>We rely on the matrix properties to guarantee this condition:</p>
+<p>As with any splitting method, the Jacobi iteration converges for every initial guess if and only if <span class="math notranslate nohighlight">\(\rho(R_J)&lt;1\)</span>.</p>
+<p>We can often check this condition without computing the eigenvalues. The key bound is <span class="math notranslate nohighlight">\(\rho(R_J)\le\|R_J\|_\infty\)</span>, where the infinity norm is the largest absolute row sum.</p>
+<p>To see why, recall the <a class="reference internal" href="operator_norms.html"><span class="std std-doc">operator norm inequality</span></a>: the operator norm bounds how much the matrix can stretch any vector. Apply it to an eigenvector <span class="math notranslate nohighlight">\(v\ne0\)</span> with <span class="math notranslate nohighlight">\(R_Jv=\lambda v\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda|\,\|v\|_\infty
+=\|\lambda v\|_\infty
+=\|R_Jv\|_\infty
+\le\|R_J\|_\infty\,\|v\|_\infty.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(\|v\|_\infty&gt;0\)</span>, division gives <span class="math notranslate nohighlight">\(|\lambda|\le\|R_J\|_\infty\)</span>. This holds for every eigenvalue, so their largest magnitude, <span class="math notranslate nohighlight">\(\rho(R_J)\)</span>, satisfies the same bound. Thus, if every absolute row sum is less than one, all eigenvalues lie inside the unit circle and Jacobi converges.</p>
+<p>The same argument works for any induced norm, including the 1-norm used below, which is the largest absolute column sum.</p>
 <section id="diagonal-dominance-condition">
 <h3>Diagonal Dominance Condition<a class="headerlink" href="#diagonal-dominance-condition" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="thm:jacobi_convergence">
@@ -570,34 +586,54 @@
 <section class="theorem-content" id="proof-content">
 <p>The Jacobi iteration is guaranteed to converge if the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>strictly row diagonally dominant</strong>:</p>
 <div class="math notranslate nohighlight">
-\[|a_{ii}| &gt; \sum_{j \neq i} |a_{ij}| \text{ for all } i \quad \text{}\]</div>
-<p>A similar result holds if <span class="math notranslate nohighlight">\(A\)</span> is <strong>strictly column diagonally dominant</strong>.</p>
+\[|a_{ii}| &gt; \sum_{j \neq i} |a_{ij}| \text{ for all } i \]</div>
+<p>The same conclusion holds if <span class="math notranslate nohighlight">\(A\)</span> is <strong>strictly column diagonally dominant</strong>, meaning <span class="math notranslate nohighlight">\(|a_{jj}|&gt;\sum_{i\ne j}|a_{ij}|\)</span> for every column <span class="math notranslate nohighlight">\(j\)</span>.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. If <span class="math notranslate nohighlight">\(A\)</span> is strictly row diagonally dominant, we can prove convergence using the operator <span class="math notranslate nohighlight">\(\infty\)</span>-norm:</p>
-<ol class="arabic simple">
-<li><p>The iteration matrix is <span class="math notranslate nohighlight">\(G = D^{-1}(L+U)\)</span>.</p></li>
-<li><p>The <span class="math notranslate nohighlight">\(\infty\)</span>-norm of <span class="math notranslate nohighlight">\(G\)</span> is given by <span class="math notranslate nohighlight">\(\|G\|_{\infty} = \max_i \sum_{j \neq i} |a_{ij}| / |a_{ii}|\)</span>.</p></li>
-<li><p>Strict row diagonal dominance implies <span class="math notranslate nohighlight">\(\|G\|_{\infty} &lt; 1\)</span>.</p></li>
-<li><p>Since the spectral radius <span class="math notranslate nohighlight">\(\rho(G)\)</span> is bounded by any matrix norm, <span class="math notranslate nohighlight">\(\rho(G) \le \|G\|_{\infty}\)</span>, convergence is assured because <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>.</p></li>
-</ol>
-<p>For column diagonally dominant matrices, convergence can be shown similarly using the matrix 1-norm, which confirms that <span class="math notranslate nohighlight">\(\|G^k\|_1 \to 0\)</span>.</p>
-<p><strong>Convergence Proof using the Gershgorin Circle Theorem</strong></p>
-<p>The Gershgorin Circle Theorem provides an alternative way to establish convergence under diagonal dominance:</p>
-<ol class="arabic simple">
-<li><p>Any eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> of an <span class="math notranslate nohighlight">\(n \times n\)</span> matrix <span class="math notranslate nohighlight">\(G\)</span> lies within at least one of the Gershgorin discs. The <span class="math notranslate nohighlight">\(i\)</span>-th disc is centered at <span class="math notranslate nohighlight">\(g_{ii}\)</span> with radius <span class="math notranslate nohighlight">\(R_i = \sum_{j \neq i} |g_{ij}|\)</span>.</p></li>
-<li><p>For the Jacobi iteration matrix <span class="math notranslate nohighlight">\(G = D^{-1}(L+U)\)</span>, the diagonal entries are <span class="math notranslate nohighlight">\(g_{ii} = 0\)</span>.</p></li>
-<li><p>The radius of the <span class="math notranslate nohighlight">\(i\)</span>-th disc for <span class="math notranslate nohighlight">\(G\)</span> is <span class="math notranslate nohighlight">\(R_i = \sum_{j \neq i} |a_{ij}/a_{ii}|\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is strictly diagonally dominant, <span class="math notranslate nohighlight">\(R_i &lt; 1\)</span> for all <span class="math notranslate nohighlight">\(i\)</span>.</p></li>
-<li><p>Since the center of every disc is 0 and all discs have radii less than 1, all eigenvalues <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(G\)</span> must satisfy <span class="math notranslate nohighlight">\(|\lambda| &lt; 1\)</span>.</p></li>
-<li><p>This ensures that the spectral radius <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>, and thus the Jacobi iteration converges for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span>.</p></li>
-</ol>
+<p>Proof. For strict row diagonal dominance, the iteration matrix satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\rho(R_J)\le\|R_J\|_\infty
+=\max_i\frac{\sum_{j\ne i}|a_{ij}|}{|a_{ii}|}&lt;1.
+\]</div>
+<p>Multiplication by <span class="math notranslate nohighlight">\(D^{-1}\)</span> on the left scales rows, so strict column dominance does not directly bound <span class="math notranslate nohighlight">\(\|R_J\|_1\)</span>. Instead, use the similar matrix</p>
+<div class="math notranslate nohighlight">
+\[
+B=DR_JD^{-1}=(L+U)D^{-1}.
+\]</div>
+<p>Its column sums give</p>
+<div class="math notranslate nohighlight">
+\[
+\rho(R_J)=\rho(B)\le\|B\|_1
+=\max_j\frac{\sum_{i\ne j}|a_{ij}|}{|a_{jj}|}&lt;1.
+\]</div>
+<p>The splitting convergence theorem therefore applies in both cases.</p>
 </div>
+</section>
+<section id="an-alternative-proof-using-gershgorin-discs">
+<h3>An Alternative Proof Using Gershgorin Discs<a class="headerlink" href="#an-alternative-proof-using-gershgorin-discs" title="Link to this heading">#</a></h3>
+<p>Gershgorin’s theorem describes eigenvalue locations using row sums. For a matrix <span class="math notranslate nohighlight">\(B=(b_{ij})\)</span>, every eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> lies in at least one disc</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda-b_{ii}|\le\sum_{j\ne i}|b_{ij}|.
+\]</div>
+<p>To see why, take an eigenvector <span class="math notranslate nohighlight">\(v\)</span> and choose <span class="math notranslate nohighlight">\(i\)</span> so that <span class="math notranslate nohighlight">\(|v_i|\)</span> is its largest component magnitude. Row <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(Bv=\lambda v\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda-b_{ii}|\,|v_i|
+=\left|\sum_{j\ne i}b_{ij}v_j\right|
+\le\sum_{j\ne i}|b_{ij}|\,|v_j|
+\le\left(\sum_{j\ne i}|b_{ij}|\right)|v_i|.
+\]</div>
+<p>Dividing by <span class="math notranslate nohighlight">\(|v_i|&gt;0\)</span> proves the claim. Each disc is centered at a diagonal entry, with radius equal to the absolute sum of the other entries in that row.</p>
+<p>For <span class="math notranslate nohighlight">\(R_J\)</span>, the diagonal entries are zero and the radii are <span class="math notranslate nohighlight">\(\sum_{j\ne i}|a_{ij}|/|a_{ii}|\)</span>. Under strict row diagonal dominance, these radii are less than one. Every disc therefore lies inside the open unit circle, giving <span class="math notranslate nohighlight">\(\rho(R_J)&lt;1\)</span>.</p>
+<p>Strict diagonal dominance is sufficient, but is not necessary: other matrices also give convergent Jacobi iterations.</p>
+<p>Symmetric positive definiteness alone does not guarantee Jacobi convergence. For example, a <span class="math notranslate nohighlight">\(3\times3\)</span> matrix with diagonal entries <span class="math notranslate nohighlight">\(1\)</span> and all off-diagonal entries <span class="math notranslate nohighlight">\(3/4\)</span> has positive eigenvalues <span class="math notranslate nohighlight">\(5/2,1/4,1/4\)</span>. But <span class="math notranslate nohighlight">\(D=I\)</span>, so <span class="math notranslate nohighlight">\(R_J=I-A\)</span> has eigenvalue <span class="math notranslate nohighlight">\(-3/2\)</span> and the iteration can diverge. Gauss-Seidel, developed next, does converge for every SPD matrix.</p>
 </section>
 </section>
 <section id="practical-considerations">
 <h2>Practical Considerations<a class="headerlink" href="#practical-considerations" title="Link to this heading">#</a></h2>
-<p>The Jacobi method provides a crucial entry point into iterative solvers, demonstrating the fundamental trade-off between simplicity/parallelism and convergence speed.</p>
+<p>Each sparse Jacobi update requires a matrix-vector product and componentwise division, so its cost is proportional to the number of nonzero entries in <span class="math notranslate nohighlight">\(A\)</span>. Low cost and parallelism are its main attractions, but convergence can be slow. The next section develops <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">Gauss-Seidel iteration</span></a>, which uses new component values as soon as they are available.</p>
 </section>
 </section>
 
@@ -672,6 +708,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-parallelism">Implementation and Parallelism</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-criteria">Convergence Criteria</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagonal-dominance-condition">Diagonal Dominance Condition</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-alternative-proof-using-gershgorin-discs">An Alternative Proof Using Gershgorin Discs</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-considerations">Practical Considerations</a></li>

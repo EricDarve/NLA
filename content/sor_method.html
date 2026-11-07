@@ -459,21 +459,22 @@
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-sor-iteration">Defining the SOR Iteration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sor-as-a-splitting-method">SOR as a Splitting Method</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relaxation-parameter-omega">The Relaxation Parameter <span class="math notranslate nohighlight">\(\omega\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relaxation-parameter">The Relaxation Parameter</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-conditions">Convergence Conditions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#necessary-condition">Necessary Condition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sufficient-condition">Sufficient Condition</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orderings">Orderings</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequential-natural-ordering-1-to-n">1. Sequential (Natural) Ordering: 1 to <span class="math notranslate nohighlight">\(n\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-sor-ssor-1-to-n-followed-by-n-to-1">2. Symmetric SOR (SSOR): 1 to <span class="math notranslate nohighlight">\(n\)</span> followed by <span class="math notranslate nohighlight">\(n\)</span> to 1</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-permutation">3. Randomized Permutation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-structural-orderings">4. Alternative Structural Orderings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orderings-and-symmetric-sweeps">Orderings and Symmetric Sweeps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#natural-ordering">Natural Ordering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-sor-ssor">Symmetric SOR (SSOR)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-orderings">Randomized Orderings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#red-black-and-multicolor-orderings">Red-Black and Multicolor Orderings</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimality-and-performance">Optimality and Performance</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-parameter">Choosing the Parameter</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-convergence-on-a-poisson-grid">Comparing Convergence on a Poisson Grid</a></li>
 </ul>
             </nav>
         </div>
@@ -487,158 +488,353 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="successive-over-relaxation-sor-method">
 <h1>Successive Over-Relaxation (SOR) Method<a class="headerlink" href="#successive-over-relaxation-sor-method" title="Link to this heading">#</a></h1>
-<p>The Successive Over-Relaxation (SOR) method, denoted as SOR(<span class="math notranslate nohighlight">\(\omega\)</span>), is a highly effective stationary iterative method that improves upon the Gauss-Seidel iteration by introducing a <strong>relaxation parameter, <span class="math notranslate nohighlight">\(\omega\)</span></strong>, designed to accelerate convergence.</p>
-<p>The motivation behind SOR is to overcome the limitation of Jacobi and Gauss-Seidel methods, which lack a parameter that can be adjusted to accelerate convergence in challenging cases. The SOR iteration is equivalent to the Gauss-Seidel method when <span class="math notranslate nohighlight">\(\omega = 1\)</span>.</p>
+<p>Successive over-relaxation (SOR) adjusts the size of each Gauss-Seidel component correction through a real <strong>relaxation parameter</strong> <span class="math notranslate nohighlight">\(\omega\)</span>. A suitable choice can accelerate convergence. The choice <span class="math notranslate nohighlight">\(\omega=1\)</span> recovers Gauss-Seidel.</p>
+<p>We consider a real system <span class="math notranslate nohighlight">\(Ax=b\)</span>, with <span class="math notranslate nohighlight">\(A\)</span> nonsingular and all diagonal entries nonzero. The parameter is fixed throughout the iteration.</p>
 <section id="defining-the-sor-iteration">
 <h2>Defining the SOR Iteration<a class="headerlink" href="#defining-the-sor-iteration" title="Link to this heading">#</a></h2>
-<p>The SOR method is a <strong>splitting method</strong> that modifies the successive update generated by the Gauss-Seidel iteration (<span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}_{\text{GS}}\)</span>) by taking a weighted average of the current iterate (<span class="math notranslate nohighlight">\(\mathbf{x}^{(k)}_{\text{SOR}}\)</span>) and the Gauss-Seidel increment (<span class="math notranslate nohighlight">\(\Delta \mathbf{x}_{\text{GS}}\)</span>).</p>
-<p>If we define the Gauss-Seidel update as <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}_{\text{GS}} = \mathbf{x}^{(k)} + \Delta \mathbf{x}_{\text{GS}}\)</span>, then the SOR update is:</p>
+<p>A <strong>sweep</strong> updates components <span class="math notranslate nohighlight">\(1,2,\ldots,n\)</span> once, in that order. Starting from <span class="math notranslate nohighlight">\(x^{(k)}\)</span>, we construct the new vector <span class="math notranslate nohighlight">\(x^{(k+1)}\)</span> one component at a time.</p>
+<p>For component <span class="math notranslate nohighlight">\(i\)</span>, first compute a provisional value by solving the <span class="math notranslate nohighlight">\(i\)</span>th equation for that component, using the latest available values of the others:</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)}_{\text{SOR}} = \mathbf{x}^{(k)}_{\text{SOR}} + \omega \, \Delta \mathbf{x}_{\text{GS}}\]</div>
-<p>In terms of the matrix components <span class="math notranslate nohighlight">\(A = D - L - U\)</span> (where <span class="math notranslate nohighlight">\(D\)</span> is diagonal, <span class="math notranslate nohighlight">\(-L\)</span> is strictly lower triangular, and <span class="math notranslate nohighlight">\(-U\)</span> is strictly upper triangular), the Gauss-Seidel update is:</p>
+\[
+\widetilde{x}_i
+=\frac{1}{a_{ii}}
+\left(
+b_i-\sum_{j&lt;i}a_{ij}x_j^{(k+1)}
+   -\sum_{j&gt;i}a_{ij}x_j^{(k)}
+\right).
+\]</div>
+<p>The first sum uses the new values <span class="math notranslate nohighlight">\(x_j^{(k+1)}\)</span> for components <span class="math notranslate nohighlight">\(j&lt;i\)</span>, which have already been updated. The second sum uses the old values <span class="math notranslate nohighlight">\(x_j^{(k)}\)</span> for components <span class="math notranslate nohighlight">\(j&gt;i\)</span>, whose turn has not yet come.</p>
+<p>The difference <span class="math notranslate nohighlight">\(\widetilde{x}_i-x_i^{(k)}\)</span> is the suggested correction to component <span class="math notranslate nohighlight">\(i\)</span>. SOR multiplies this correction by <span class="math notranslate nohighlight">\(\omega\)</span> before adding it to the old value:</p>
 <div class="math notranslate nohighlight">
-\[\Delta \mathbf{x}_{\text{GS}} = D^{-1} \big( \mathbf{b} + L \mathbf{x}^{(k+1)}_{\text{GS}} + U \mathbf{x}^{(k)} \big) - \mathbf{x}^{(k)}\]</div>
-<p>Substituting this into the relaxed form gives the defining equation for the SOR update:</p>
+\[
+x_i^{(k+1)}
+=x_i^{(k)}+\omega\bigl(\widetilde{x}_i-x_i^{(k)}\bigr).
+\]</div>
+<p>Expanding the right-hand side gives <span class="math notranslate nohighlight">\((1-\omega)x_i^{(k)}+\omega\widetilde{x}_i\)</span>. Substituting the provisional value into this expression combines the two steps into a single update:</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)}_{\text{SOR}} = \mathbf{x}^{(k)}_{\text{SOR}} + \omega \bigg[ D^{-1} \big( \mathbf{b} + L \mathbf{x}^{(k+1)}_{\text{SOR}} + U \mathbf{x}^{(k)}_{\text{SOR}} \big) - \mathbf{x}^{(k)}_{\text{SOR}} \bigg]\]</div>
+\[
+\boxed{
+x_i^{(k+1)}
+=(1-\omega)x_i^{(k)}
++\frac{\omega}{a_{ii}}
+\left(
+b_i-\sum_{j&lt;i}a_{ij}x_j^{(k+1)}
+   -\sum_{j&gt;i}a_{ij}x_j^{(k)}
+\right).
+}
+\]</div>
+<p>For a <span class="math notranslate nohighlight">\(3\times3\)</span> system, set <span class="math notranslate nohighlight">\(k=0\)</span> and apply this update successively for <span class="math notranslate nohighlight">\(i=1,2,3\)</span>. The first sweep is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+x_1^{(1)}
+&amp;=(1-\omega)x_1^{(0)}
++\frac{\omega}{a_{11}}
+\left(b_1-a_{12}x_2^{(0)}-a_{13}x_3^{(0)}\right),\\[0.5em]
+x_2^{(1)}
+&amp;=(1-\omega)x_2^{(0)}
++\frac{\omega}{a_{22}}
+\left(b_2-a_{21}x_1^{(1)}-a_{23}x_3^{(0)}\right),\\[0.5em]
+x_3^{(1)}
+&amp;=(1-\omega)x_3^{(0)}
++\frac{\omega}{a_{33}}
+\left(b_3-a_{31}x_1^{(1)}-a_{32}x_2^{(1)}\right).
+\end{aligned}
+\end{split}\]</div>
+<p>The second equation uses the newly computed <span class="math notranslate nohighlight">\(x_1^{(1)}\)</span>, and the third uses both <span class="math notranslate nohighlight">\(x_1^{(1)}\)</span> and <span class="math notranslate nohighlight">\(x_2^{(1)}\)</span>. The next sweep repeats these updates with <span class="math notranslate nohighlight">\(x^{(1)}\)</span> as the starting vector to obtain <span class="math notranslate nohighlight">\(x^{(2)}\)</span>.</p>
+<p>The relaxation happens after each component update. Later components use those already relaxed values, so SOR is generally different from completing a Gauss-Seidel sweep and then scaling the change in the whole vector. When <span class="math notranslate nohighlight">\(\omega=1\)</span>, we recover Gauss-Seidel.</p>
 </section>
 <section id="sor-as-a-splitting-method">
 <h2>SOR as a Splitting Method<a class="headerlink" href="#sor-as-a-splitting-method" title="Link to this heading">#</a></h2>
-<p>The rearranged matrix form shows that SOR fits the general splitting framework <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)} = M^{-1} N \mathbf{x}^{(k)} + M^{-1}\mathbf{b}\)</span>. By separating the <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> terms to the left-hand side, we get:</p>
+<p>Use the same sign convention as before:</p>
 <div class="math notranslate nohighlight">
-\[\Big( \frac{1}{\omega} D - L \Big) \mathbf{x}^{(k+1)}_{\text{SOR}} = \mathbf{b} + \Big( \big( \frac{1}{\omega} - 1 \big) D + U \Big) \mathbf{x}^{(k)}_{\text{SOR}}\]</div>
-<p>Thus, the splitting <span class="math notranslate nohighlight">\(A = M - N\)</span> is defined by:</p>
+\[
+A=D-L-U,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(D\)</span> contains the diagonal entries, while <span class="math notranslate nohighlight">\(-L\)</span> and <span class="math notranslate nohighlight">\(-U\)</span> are the strictly lower and strictly upper triangular parts of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>To obtain the matrix form, multiply the component update by <span class="math notranslate nohighlight">\(a_{ii}\)</span> and move all terms involving the new iterate to the left:</p>
 <div class="math notranslate nohighlight">
-\[M = \frac{1}{\omega} D - L \quad \text{and} \quad N = \Big( \frac{1}{\omega} - 1 \Big) D + U\]</div>
-<p>The SOR iteration matrix, <span class="math notranslate nohighlight">\(G_{\text{SOR}} = L_{\omega}\)</span>, is given by:</p>
+\[
+a_{ii}x_i^{(k+1)}
++\omega\sum_{j&lt;i}a_{ij}x_j^{(k+1)}
+=\omega b_i+(1-\omega)a_{ii}x_i^{(k)}
+-\omega\sum_{j&gt;i}a_{ij}x_j^{(k)}.
+\]</div>
+<p>Because <span class="math notranslate nohighlight">\(L_{ij}=-a_{ij}\)</span> below the diagonal, the left-hand side is component <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\((D-\omega L)x^{(k+1)}\)</span>. Similarly, <span class="math notranslate nohighlight">\(U_{ij}=-a_{ij}\)</span> above the diagonal converts the last sum into component <span class="math notranslate nohighlight">\(i\)</span> of <span class="math notranslate nohighlight">\(\omega Ux^{(k)}\)</span>. Collecting all component equations therefore gives</p>
 <div class="math notranslate nohighlight">
-\[L_{\omega} = (D - \omega L)^{-1} [(1 - \omega) D + \omega U]\]</div>
+\[
+(D-\omega L)x^{(k+1)}
+=\omega b+\bigl((1-\omega)D+\omega U\bigr)x^{(k)}.
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(\omega\ne0\)</span>, division by <span class="math notranslate nohighlight">\(\omega\)</span> gives the splitting</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+M&amp;=D/\omega-L,\\
+N&amp;=(1/\omega-1)D+U,
+\qquad A=M-N.
+\end{aligned}
+\end{split}\]</div>
+<p>The splitting therefore has iteration matrix <span class="math notranslate nohighlight">\(G_\omega\)</span>, the counterpart of <span class="math notranslate nohighlight">\(G\)</span> for Gauss-Seidel:</p>
+<div class="math notranslate nohighlight">
+\[
+G_\omega
+=(D-\omega L)^{-1}\bigl((1-\omega)D+\omega U\bigr)
+=I-M^{-1}A.
+\]</div>
+<p>The solve with <span class="math notranslate nohighlight">\(D-\omega L\)</span> is lower triangular. No inverse needs to be formed.</p>
 </section>
-<section id="the-relaxation-parameter-omega">
-<h2>The Relaxation Parameter <span class="math notranslate nohighlight">\(\omega\)</span><a class="headerlink" href="#the-relaxation-parameter-omega" title="Link to this heading">#</a></h2>
-<p>The parameter <span class="math notranslate nohighlight">\(\omega\)</span> distinguishes SOR into three regimes:</p>
-<ol class="arabic simple">
-<li><p><strong>Gauss-Seidel:</strong> When <span class="math notranslate nohighlight">\(\omega = 1\)</span>, the SOR splitting recovers the Gauss-Seidel method.</p></li>
-<li><p><strong>Underrelaxation (<span class="math notranslate nohighlight">\(\omega &lt; 1\)</span>):</strong> Used to damp the increment (<span class="math notranslate nohighlight">\(\Delta \mathbf{x}\)</span>). If the standard iteration is diverging, applying a smaller increment may stabilize the process.</p></li>
-<li><p><strong>Overrelaxation (<span class="math notranslate nohighlight">\(\omega &gt; 1\)</span>):</strong> This is the typical use case, where the goal is to accelerate convergence by moving further in a potentially good direction.</p></li>
-</ol>
-<p>The choice of <span class="math notranslate nohighlight">\(\omega\)</span> depends heavily on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<section id="the-relaxation-parameter">
+<h2>The Relaxation Parameter<a class="headerlink" href="#the-relaxation-parameter" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><strong>Underrelaxation, <span class="math notranslate nohighlight">\(0&lt;\omega&lt;1\)</span>:</strong> take part of each provisional correction. This damps the updates.</p></li>
+<li><p><strong>Gauss-Seidel, <span class="math notranslate nohighlight">\(\omega=1\)</span>:</strong> take the full provisional correction.</p></li>
+<li><p><strong>Overrelaxation, <span class="math notranslate nohighlight">\(\omega&gt;1\)</span>:</strong> extend the correction beyond the provisional value, with the aim of making faster progress.</p></li>
+</ul>
+<p>A change in <span class="math notranslate nohighlight">\(\omega\)</span> can improve or worsen convergence. The results below explain when convergence is guaranteed and why <span class="math notranslate nohighlight">\(\omega\ge2\)</span> cannot give convergence for every initial guess.</p>
 </section>
 <section id="python-code-example">
 <h2>Python Code Example<a class="headerlink" href="#python-code-example" title="Link to this heading">#</a></h2>
-<p>Here is a simple implementation of the SOR method in Python:</p>
+<p>The implementation follows the same in-place sweep and scaled-residual stopping convention as <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">Gauss-Seidel</span></a>. The required range <span class="math notranslate nohighlight">\(0&lt;\omega&lt;2\)</span> is checked, but this range alone does not guarantee convergence for a general matrix.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">sor</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">omega</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Solve the linear system Ax = b using the SOR iteration method.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    -----------</span>
-<span class="sd">    A : ndarray</span>
-<span class="sd">        Coefficient matrix (n x n)</span>
-<span class="sd">    b : ndarray</span>
-<span class="sd">        Right-hand side vector (n,)</span>
-<span class="sd">    omega : float</span>
-<span class="sd">        Relaxation parameter (0 &lt; omega &lt; 2)</span>
-<span class="sd">    x0 : ndarray, optional</span>
-<span class="sd">        Initial guess (n,). If None, uses zero vector.</span>
-<span class="sd">    tol : float, optional</span>
-<span class="sd">        Tolerance for convergence (default: 1e-10)</span>
-<span class="sd">    max_iter : int, optional</span>
-<span class="sd">        Maximum number of iterations (default: 1000)</span>
-<span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    x : ndarray</span>
-<span class="sd">        Approximate solution vector</span>
-<span class="sd">    iterations : int</span>
-<span class="sd">        Number of iterations performed</span>
+<span class="w">    </span><span class="sd">"""Return (x, sweeps), stopping when the scaled residual is &lt;= tol.</span>
+
+<span class="sd">    A and b are real arrays. Raise RuntimeError if the iteration limit</span>
+<span class="sd">    is reached without satisfying the stopping criterion.</span>
 <span class="sd">    """</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
-        <span class="n">x_old</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
-        <span class="c1"># Update each component using SOR iteration</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">],</span> <span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
-            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">omega</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">omega</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
-        
-        <span class="c1"># Check convergence</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_old</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: Maximum iterations (</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">) reached without convergence"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_iter</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"A must be square and b a matching vector."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">omega</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">omega</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"omega must lie strictly between 0 and 2."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tol</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"tol must be positive and finite."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_iter</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">max_iter</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"max_iter must be a nonnegative integer."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"SOR requires nonzero diagonal entries."</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x0 must have the same shape as b."</span><span class="p">)</span>
+
+    <span class="n">norm_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="n">norm_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">norm_A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">+</span> <span class="n">norm_b</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tol</span> <span class="o">*</span> <span class="n">scale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="c1"># Earlier entries already contain relaxed new values.</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span> <span class="o">@</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">provisional</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">omega</span> <span class="o">*</span> <span class="p">(</span><span class="n">provisional</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"SOR did not converge within max_iter sweeps."</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>A return count of zero means that the initial guess already satisfies the tolerance. The code accepts the exact zero solution when both residual and scale vanish. It uses dense NumPy arrays; a sparse implementation need only visit the nonzero entries in each row.</p>
 </section>
 <section id="convergence-conditions">
 <h2>Convergence Conditions<a class="headerlink" href="#convergence-conditions" title="Link to this heading">#</a></h2>
 <div class="proof theorem admonition" id="sor_convergence_conditions">
 <p class="admonition-title"><span class="caption-number">Theorem 43 </span> (SOR Convergence Conditions)</p>
 <section class="theorem-content" id="proof-content">
-<p>The SOR method converges if and only if the spectral radius of the iteration matrix <span class="math notranslate nohighlight">\(\rho(G_{\text{SOR}})\)</span> is less than one.</p>
+<p>SOR converges to the solution of <span class="math notranslate nohighlight">\(Ax=b\)</span> for every initial guess if and only if <span class="math notranslate nohighlight">\(\rho(G_\omega)&lt;1\)</span>.</p>
 </section>
-</div><section id="necessary-condition">
+</div><div class="proof admonition" id="proof">
+<p>Proof. For <span class="math notranslate nohighlight">\(\omega\ne0\)</span>, the matrix <span class="math notranslate nohighlight">\(M=D/\omega-L\)</span> is triangular with nonzero diagonal entries. Hence it is nonsingular, and the splitting convergence theorem, <a class="reference internal" href="splitting_methods_definition.html#thm:splitting_convergence">Theorem 40</a>, applies with <span class="math notranslate nohighlight">\(M^{-1}N=G_\omega\)</span>. For <span class="math notranslate nohighlight">\(\omega=0\)</span>, the update leaves every initial guess unchanged and <span class="math notranslate nohighlight">\(G_0=I\)</span>, so neither convergence for every initial guess nor <span class="math notranslate nohighlight">\(\rho(G_0)&lt;1\)</span> holds.</p>
+</div>
+<section id="necessary-condition">
 <h3>Necessary Condition<a class="headerlink" href="#necessary-condition" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="sor_necessary_condition">
 <p class="admonition-title"><span class="caption-number">Theorem 44 </span> (Necessary Condition for SOR Convergence)</p>
 <section class="theorem-content" id="proof-content">
-<p>A <strong>necessary condition</strong> for the convergence of the SOR method is <span class="math notranslate nohighlight">\(0 &lt; \omega &lt; 2\)</span>.</p>
+<p>For real <span class="math notranslate nohighlight">\(\omega\)</span>, a necessary condition for SOR to converge for every initial guess is <span class="math notranslate nohighlight">\(0&lt;\omega&lt;2\)</span>.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. This can be proven by analyzing the determinant of the iteration matrix. Since <span class="math notranslate nohighlight">\(\det(G_{\text{SOR}}) = (1 - \omega)^n\)</span>, and the spectral radius must satisfy</p>
+<p>Proof. Recall the iteration matrix</p>
 <div class="math notranslate nohighlight">
-\[\rho(G_{\text{SOR}}) \ge |\det(G_{\text{SOR}})|^{1/n} = |1 - \omega|,\]</div>
-<p>convergence requires <span class="math notranslate nohighlight">\(|\omega - 1| &lt; 1\)</span>, which yields <span class="math notranslate nohighlight">\(0 &lt; \omega &lt; 2\)</span>.</p>
+\[
+G_\omega=(D-\omega L)^{-1}\bigl((1-\omega)D+\omega U\bigr).
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(L\)</span> is strictly lower triangular, <span class="math notranslate nohighlight">\(D-\omega L\)</span> is lower triangular with diagonal entries <span class="math notranslate nohighlight">\(a_{11},\ldots,a_{nn}\)</span>. Likewise, <span class="math notranslate nohighlight">\((1-\omega)D+\omega U\)</span> is upper triangular with diagonal entries <span class="math notranslate nohighlight">\((1-\omega)a_{11},\ldots,(1-\omega)a_{nn}\)</span>.</p>
+<p>The determinant of a triangular matrix is the product of its diagonal entries. Therefore,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\det(D-\omega L)
+&amp;=\prod_{i=1}^n a_{ii}=\det(D),\\
+\det\bigl((1-\omega)D+\omega U\bigr)
+&amp;=\prod_{i=1}^n\bigl((1-\omega)a_{ii}\bigr)
+=(1-\omega)^n\det(D).
+\end{aligned}
+\end{split}\]</div>
+<p>Taking the determinant of the product defining <span class="math notranslate nohighlight">\(G_\omega\)</span>, and using <span class="math notranslate nohighlight">\(\det(B^{-1})=1/\det(B)\)</span>, gives</p>
+<div class="math notranslate nohighlight">
+\[
+\det(G_\omega)
+=\frac{(1-\omega)^n\det(D)}{\det(D)}
+=(1-\omega)^n.
+\]</div>
+<p>The determinant is the product of the eigenvalues, and each eigenvalue magnitude is at most the spectral radius. Hence</p>
+<div class="math notranslate nohighlight">
+\[
+|\det(G_\omega)|
+=\prod_{j=1}^n|\lambda_j(G_\omega)|
+\le\rho(G_\omega)^n.
+\]</div>
+<p>Taking <span class="math notranslate nohighlight">\(n\)</span>th roots gives</p>
+<div class="math notranslate nohighlight">
+\[
+\rho(G_\omega)\ge|\det(G_\omega)|^{1/n}=|1-\omega|.
+\]</div>
+<p>Convergence requires <span class="math notranslate nohighlight">\(\rho(G_\omega)&lt;1\)</span>, hence <span class="math notranslate nohighlight">\(|1-\omega|&lt;1\)</span>, which is equivalent to <span class="math notranslate nohighlight">\(0&lt;\omega&lt;2\)</span>.</p>
 </div>
 </section>
 <section id="sufficient-condition">
 <h3>Sufficient Condition<a class="headerlink" href="#sufficient-condition" title="Link to this heading">#</a></h3>
-<p>The convergence of SOR is guaranteed under certain conditions on the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>For symmetric positive definite matrices, this necessary range is also sufficient.</p>
 <div class="proof theorem admonition" id="sor_sufficient_condition">
 <p class="admonition-title"><span class="caption-number">Theorem 45 </span> (Sufficient Condition for SOR Convergence)</p>
 <section class="theorem-content" id="proof-content">
-<p>If <span class="math notranslate nohighlight">\(A\)</span> is a <strong>Symmetric Positive Definite</strong> matrix, SOR converges for any relaxation parameter <span class="math notranslate nohighlight">\(\omega\)</span> such that <span class="math notranslate nohighlight">\(0 &lt; \omega &lt; 2\)</span>. This also implies that Gauss-Seidel (<span class="math notranslate nohighlight">\(\omega=1\)</span>) converges if <span class="math notranslate nohighlight">\(A\)</span> is SPD.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is symmetric positive definite, SOR converges for every initial guess whenever <span class="math notranslate nohighlight">\(0&lt;\omega&lt;2\)</span>. In particular, Gauss-Seidel converges when <span class="math notranslate nohighlight">\(A\)</span> is SPD.</p>
 </section>
-</div></section>
+</div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>This proof is optional.</strong> It extends the optional energy-norm proof for Gauss-Seidel. You can use the theorem without following this argument.</p>
+</div>
+<div class="proof admonition" id="proof">
+<p>Proof. We extend the energy-norm argument used for Gauss-Seidel. Put <span class="math notranslate nohighlight">\(M=D/\omega-L\)</span> and recall that</p>
+<div class="math notranslate nohighlight">
+\[
+G_\omega=I-M^{-1}A,
+\qquad
+\|e\|_A=\sqrt{e^TAe}.
+\]</div>
+<p>For an error vector <span class="math notranslate nohighlight">\(e\)</span>, let <span class="math notranslate nohighlight">\(s=G_\omega e-e\)</span> be its change during one sweep. Then</p>
+<div class="math notranslate nohighlight">
+\[
+Ms=-Ae,\qquad G_\omega e=e+s.
+\]</div>
+<p>Expanding the squared energy norm gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|G_\omega e\|_A^2-\|e\|_A^2
+&amp;=2s^TAe+s^TAs\\
+&amp;=-2s^TMs+s^TAs\\
+&amp;=-s^T(M+M^T-A)s.
+\end{aligned}
+\end{split}\]</div>
+<p>Here we used <span class="math notranslate nohighlight">\(Ae=-Ms\)</span> and the scalar identity <span class="math notranslate nohighlight">\(s^TMs=s^TM^Ts\)</span>. Symmetry gives <span class="math notranslate nohighlight">\(U=L^T\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[
+M+M^T-A=(2/\omega-1)D.
+\]</div>
+<p>The diagonal entries of an SPD matrix are positive. Since <span class="math notranslate nohighlight">\(0&lt;\omega&lt;2\)</span>, we obtain</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\|e\|_A^2-\|G_\omega e\|_A^2
+=\frac{2-\omega}{\omega}\,s^TDs&gt;0
+\quad(e\ne0).
+}
+\]</div>
+<p>The inequality is strict because <span class="math notranslate nohighlight">\(s=0\)</span> would imply <span class="math notranslate nohighlight">\(Ae=0\)</span>, hence <span class="math notranslate nohighlight">\(e=0\)</span>. As in the Gauss-Seidel proof, we need one reduction factor that works for every error direction. The continuous function <span class="math notranslate nohighlight">\(e\mapsto\|G_\omega e\|_A\)</span> attains its maximum on the compact energy unit sphere <span class="math notranslate nohighlight">\(\|e\|_A=1\)</span>. This maximum is some <span class="math notranslate nohighlight">\(\gamma&lt;1\)</span>, since every value is less than one. Scaling and repeating the bound gives <span class="math notranslate nohighlight">\(\|e^{(k)}\|_A\le\gamma^k\|e^{(0)}\|_A\to0\)</span>, proving convergence.</p>
+</div>
+<p>The factor <span class="math notranslate nohighlight">\((2-\omega)/\omega\)</span> explains the permitted range: every nonzero error loses energy within this interval. The rate also depends on the correction <span class="math notranslate nohighlight">\(s\)</span>, which changes with <span class="math notranslate nohighlight">\(\omega\)</span>, so this factor alone does not identify the fastest choice.</p>
 </section>
-<section id="orderings">
-<h2>Orderings<a class="headerlink" href="#orderings" title="Link to this heading">#</a></h2>
-<p>The selection of the ordering, or permutation, of variables is a fundamental concern for the Successive Over-Relaxation (SOR) method, as this iterative approach, like Gauss-Seidel, relies on computing components successively based on a <strong>fixed prescribed order</strong>. The sequence in which components are updated influences both the rate of convergence and the potential for parallelism.</p>
-<p>We can identify several common types of orderings used with SOR:</p>
-<section id="sequential-natural-ordering-1-to-n">
-<h3>1. Sequential (Natural) Ordering: 1 to <span class="math notranslate nohighlight">\(n\)</span><a class="headerlink" href="#sequential-natural-ordering-1-to-n" title="Link to this heading">#</a></h3>
-<p>This is the standard, fixed, prescribed order in which the entries of the solution vector <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> are computed. This ordering corresponds to iterating through the indices from <span class="math notranslate nohighlight">\(j=1\)</span> up to <span class="math notranslate nohighlight">\(j=n\)</span> in sequence.</p>
-<ul class="simple">
-<li><p>In the context of matrices derived from partial differential equations (PDEs), common sequential orderings (such as row-wise or column-wise enumeration of grid points) are often referred to as <strong>natural orderings</strong>. These typically represent <strong>consistent orderings</strong>.</p></li>
-<li><p>For matrices derived from convection-diffusion problems, optimal convergence speed using SOR often depends critically on ordering the variables in the direction of the convection flow.</p></li>
-</ul>
 </section>
-<section id="symmetric-sor-ssor-1-to-n-followed-by-n-to-1">
-<h3>2. Symmetric SOR (SSOR): 1 to <span class="math notranslate nohighlight">\(n\)</span> followed by <span class="math notranslate nohighlight">\(n\)</span> to 1<a class="headerlink" href="#symmetric-sor-ssor-1-to-n-followed-by-n-to-1" title="Link to this heading">#</a></h3>
-<p>The Symmetric Successive Over-Relaxation (SSOR) method uses a pair of sweeps: a forward sweep (1 to <span class="math notranslate nohighlight">\(n\)</span>) followed by a backward sweep (<span class="math notranslate nohighlight">\(n\)</span> to 1).</p>
-<ul class="simple">
-<li><p>An SSOR step consists of the standard SOR step, followed by a <strong>backward SOR step</strong>. This backward sweep is defined analogously to the backward Gauss-Seidel sweep, where coordinate corrections are performed in the reverse order, <span class="math notranslate nohighlight">\(n, n-1, \dots, 1\)</span>.</p></li>
-<li><p>This symmetrization is crucial because, if the matrix <span class="math notranslate nohighlight">\(A\)</span> is symmetric and positive definite (SPD), the iteration matrix resulting from the forward/backward sweeps is similar to an SPD matrix. This property makes <strong>SSOR highly effective as a preconditioner</strong> in iterative acceleration methods, particularly the Conjugate Gradient (CG) method.</p></li>
-</ul>
+<section id="orderings-and-symmetric-sweeps">
+<h2>Orderings and Symmetric Sweeps<a class="headerlink" href="#orderings-and-symmetric-sweeps" title="Link to this heading">#</a></h2>
+<p>The order of the component updates influences convergence and opportunities for parallel computation.</p>
+<section id="natural-ordering">
+<h3>Natural Ordering<a class="headerlink" href="#natural-ordering" title="Link to this heading">#</a></h3>
+<p>A forward sweep visits components <span class="math notranslate nohighlight">\(1,\ldots,n\)</span>. For a grid problem, this often means traversing grid points row by row or column by column. Different orderings can change convergence substantially. For convection-diffusion problems, an ordering that follows the flow can be useful.</p>
 </section>
-<section id="randomized-permutation">
-<h3>3. Randomized Permutation<a class="headerlink" href="#randomized-permutation" title="Link to this heading">#</a></h3>
-<p>The SOR iteration can also be implemented using a <strong>different randomized permutation at every iteration</strong>.</p>
+<section id="symmetric-sor-ssor">
+<h3>Symmetric SOR (SSOR)<a class="headerlink" href="#symmetric-sor-ssor" title="Link to this heading">#</a></h3>
+<p>SSOR pairs a forward SOR sweep with a backward sweep through <span class="math notranslate nohighlight">\(n,\ldots,1\)</span>. Each component correction in the backward sweep again uses the latest available values.</p>
+<p>A forward-backward pair can also provide an inexpensive approximate solve inside another method. Used this way, it is a <strong>preconditioner</strong>, as described in the chapter introduction. For SPD <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(0&lt;\omega&lt;2\)</span>, the associated SSOR preconditioner is SPD and can be used with the <strong>conjugate gradient (CG) method</strong>, introduced in the next chapter. This positive-definiteness statement concerns the preconditioner, not the iteration matrix. The <a class="reference external" href="https://netlib.org/linalg/old_html_templates/subsection2.6.2.4.html">Netlib description of SSOR</a> discusses this use.</p>
 </section>
-<section id="alternative-structural-orderings">
-<h3>4. Alternative Structural Orderings<a class="headerlink" href="#alternative-structural-orderings" title="Link to this heading">#</a></h3>
-<p>Beyond simple sequential or randomized orderings, specific structural permutations can be vital for accelerating SOR, especially when solving systems derived from PDEs. These include <strong>red-black and multicolor orderings</strong>, which are techniques that partition the variables (or nodes in the associated graph) into independent sets such that no two variables in the same set are directly coupled in the matrix.</p>
-<p>For example, in a 2D grid corresponding to a discretized PDE, a <strong>red-black ordering</strong> colors the grid points alternately (like a chessboard), so that all “red” points can be updated independently of each other, followed by all “black” points. This allows for greater parallelism and can improve convergence rates. <strong>Multicolor orderings</strong> generalize this idea to more than two colors, further dividing the variables into multiple independent sets, which is especially useful for matrices with more complex sparsity patterns. By updating all variables of the same color simultaneously, these orderings exploit the matrix structure to enhance the efficiency and scalability of the SOR method.</p>
+<section id="randomized-orderings">
+<h3>Randomized Orderings<a class="headerlink" href="#randomized-orderings" title="Link to this heading">#</a></h3>
+<p>One can choose a new order of the components at each sweep. The iteration matrix then changes between sweeps, so the fixed-matrix convergence theorem above does not directly analyze that method.</p>
+</section>
+<section id="red-black-and-multicolor-orderings">
+<h3>Red-Black and Multicolor Orderings<a class="headerlink" href="#red-black-and-multicolor-orderings" title="Link to this heading">#</a></h3>
+<p>For some sparse problems, variables can be grouped into colors so that no two variables of the same color are directly coupled. All components within one color can then be updated in parallel, followed by the next color.</p>
+<p>On a rectangular grid with coupling only between horizontal and vertical neighbors, a red-black, or chessboard, coloring works: every neighbor has the opposite color. More general sparsity patterns may require additional colors. Coloring increases opportunities for parallelism, but its effect on convergence depends on the problem.</p>
 </section>
 </section>
-<section id="optimality-and-performance">
-<h2>Optimality and Performance<a class="headerlink" href="#optimality-and-performance" title="Link to this heading">#</a></h2>
-<p>The primary difficulty in implementing SOR is determining the <strong>optimal relaxation parameter, <span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span></strong>, which minimizes <span class="math notranslate nohighlight">\(\rho(L_{\omega})\)</span>. When <span class="math notranslate nohighlight">\(\omega_{\text{opt}}\)</span> is used, SOR can significantly outperform Jacobi and Gauss-Seidel. The SOR method is a classic example of achieving substantial acceleration by leveraging knowledge about the matrix structure to tune a parameter, transforming a linearly convergent method into one with potentially a faster convergence rate.</p>
+<section id="choosing-the-parameter">
+<h2>Choosing the Parameter<a class="headerlink" href="#choosing-the-parameter" title="Link to this heading">#</a></h2>
+<p>For the fastest asymptotic convergence, we seek a parameter that minimizes <span class="math notranslate nohighlight">\(\rho(G_\omega)\)</span>. For SPD matrices, every choice in <span class="math notranslate nohighlight">\((0,2)\)</span> converges, but some choices can require many more sweeps than others. A value that helps one matrix or ordering need not help another.</p>
+<p>Useful parameter formulas exist for particular structured problems. For general systems, parameter selection often relies on estimates or numerical trials.</p>
+</section>
+<section id="comparing-convergence-on-a-poisson-grid">
+<h2>Comparing Convergence on a Poisson Grid<a class="headerlink" href="#comparing-convergence-on-a-poisson-grid" title="Link to this heading">#</a></h2>
+<p>A regular-grid Poisson problem gives a concrete comparison of Jacobi, Gauss-Seidel, and SOR. Consider</p>
+<div class="math notranslate nohighlight">
+\[
+-\frac{\partial^2 u}{\partial x^2}
+-\frac{\partial^2 u}{\partial y^2}=f
+\]</div>
+<p>on the unit square, with prescribed values of <span class="math notranslate nohighlight">\(u\)</span> on the boundary. Use <span class="math notranslate nohighlight">\(N\)</span> interior grid points in each direction, so there are <span class="math notranslate nohighlight">\(N^2\)</span> unknowns and the grid spacing is <span class="math notranslate nohighlight">\(h=1/(N+1)\)</span>. The standard five-point approximation couples each unknown to its four horizontal and vertical neighbors. After multiplying the equations by <span class="math notranslate nohighlight">\(h^2\)</span>, the matrix has diagonal entries <span class="math notranslate nohighlight">\(4\)</span> and entries <span class="math notranslate nohighlight">\(-1\)</span> for neighboring unknowns. Boundary values contribute to the right-hand side.</p>
+<p>For Gauss-Seidel and SOR, use the red-black ordering described above: update all red points, then all black points. For this model problem, the optimal SOR parameter is known explicitly:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\omega_{\mathrm{opt}}=\frac{2}{1+\sin(\pi h)}.}
+\]</div>
+<p>The spectral radii and their behavior for small <span class="math notranslate nohighlight">\(h\)</span> are as follows. These formulas are stated without proof; see <a class="reference external" href="https://www.stat.uchicago.edu/~lekheng/courses/302/demmel/demmch6.pdf#page=21">Demmel, Section 6.5.4</a> for their derivation.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Method</p></th>
+<th class="head text-left"><p>Spectral radius <span class="math notranslate nohighlight">\(\rho\)</span></p></th>
+<th class="head text-left"><p>Approximate gap <span class="math notranslate nohighlight">\(1-\rho\)</span> for small <span class="math notranslate nohighlight">\(h\)</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Jacobi</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\cos(\pi h)\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\pi^2h^2/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Gauss-Seidel</p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\cos^2(\pi h)\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\pi^2h^2\)</span></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>SOR with <span class="math notranslate nohighlight">\(\omega_{\mathrm{opt}}\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(\omega_{\mathrm{opt}}-1\)</span></p></td>
+<td class="text-left"><p><span class="math notranslate nohighlight">\(2\pi h\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>All three spectral radii approach one as the grid is refined, so convergence becomes slower. The gap from one tells us how quickly this happens. To interpret it, use <span class="math notranslate nohighlight">\(\rho^k\)</span> as a model for the eventual error decay. Reducing this factor to <span class="math notranslate nohighlight">\(\epsilon\)</span>, with <span class="math notranslate nohighlight">\(0&lt;\epsilon&lt;1\)</span>, requires approximately</p>
+<div class="math notranslate nohighlight">
+\[
+k\approx\frac{\log(1/\epsilon)}{-\log\rho}
+\approx\frac{\log(1/\epsilon)}{1-\rho},
+\]</div>
+<p>where the second approximation applies when <span class="math notranslate nohighlight">\(\rho\)</span> is close to one.</p>
+<p>For a fixed error reduction, Jacobi and Gauss-Seidel therefore require asymptotically <span class="math notranslate nohighlight">\(O(N^2)\)</span> sweeps, with Gauss-Seidel taking about half as many. Optimally tuned SOR requires <span class="math notranslate nohighlight">\(O(N)\)</span> sweeps on this comparison. <strong>Halving the grid spacing roughly quadruples the sweep count for Jacobi and Gauss-Seidel, but only doubles it for optimal SOR.</strong></p>
+<p>For example, on a <span class="math notranslate nohighlight">\(63\times63\)</span> interior grid, <span class="math notranslate nohighlight">\(\omega_{\mathrm{opt}}\approx1.906\)</span>. The estimate <span class="math notranslate nohighlight">\(\rho^k\le10^{-6}\)</span> gives about <span class="math notranslate nohighlight">\(11{,}500\)</span> Jacobi sweeps, <span class="math notranslate nohighlight">\(5{,}700\)</span> Gauss-Seidel sweeps, and <span class="math notranslate nohighlight">\(140\)</span> optimal SOR sweeps. These numbers compare asymptotic decay factors; they are not measured iteration counts or guaranteed error bounds. Actual counts also depend on the initial error and the behavior before the asymptotic regime.</p>
+<p>The figure shows both the difference on a fixed grid and how it grows with grid refinement. Logarithmic axes keep the widely different sweep counts visible.</p>
+<figure class="align-default" id="fig-poisson-convergence">
+<a class="reference internal image-reference" href="../_images/poisson_convergence.svg"><img alt="Left, spectral-radius decay factors on a 63 by 63 Poisson grid reach one millionth after 11463 Jacobi sweeps, 5732 Gauss-Seidel sweeps, and 141 optimal SOR sweeps. Right, predicted counts grow much faster for Jacobi and Gauss-Seidel as the grid is refined." src="../_images/poisson_convergence.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">Left: the asymptotic model <span class="math notranslate nohighlight">\(\rho^k\)</span> for the three methods; dots mark the first integer sweep count below <span class="math notranslate nohighlight">\(10^{-6}\)</span>. Right: the corresponding counts on progressively finer grids. Each successive grid halves <span class="math notranslate nohighlight">\(h\)</span>, roughly quadrupling the Jacobi and Gauss-Seidel counts but doubling the optimal SOR count. SOR uses the optimal parameter for each grid. These curves are predictions from the spectral radii, not measured errors or finite-step error bounds.</span><a class="headerlink" href="#fig-poisson-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Each sparse sweep costs <span class="math notranslate nohighlight">\(O(N^2)\)</span> operations because every grid point has at most four neighbors. Thus reducing the number of sweeps can save substantial work, although Jacobi offers more parallelism. The advantage here also relies on choosing <span class="math notranslate nohighlight">\(\omega\)</span> well: setting <span class="math notranslate nohighlight">\(\omega=1\)</span> gives exactly the Gauss-Seidel rate. The optimal formula above is specific to this grid problem and ordering, not a rule for arbitrary SPD matrices.</p>
+<p>SOR uses a fixed relaxation parameter. The <a class="reference internal" href="chebyshev_acceleration.html"><span class="std std-doc">next section</span></a> develops another acceleration strategy: choose changing coefficients using bounds for the eigenvalues.</p>
 </section>
 </section>
 
@@ -710,21 +906,22 @@
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-the-sor-iteration">Defining the SOR Iteration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sor-as-a-splitting-method">SOR as a Splitting Method</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relaxation-parameter-omega">The Relaxation Parameter <span class="math notranslate nohighlight">\(\omega\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-relaxation-parameter">The Relaxation Parameter</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-conditions">Convergence Conditions</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#necessary-condition">Necessary Condition</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sufficient-condition">Sufficient Condition</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orderings">Orderings</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sequential-natural-ordering-1-to-n">1. Sequential (Natural) Ordering: 1 to <span class="math notranslate nohighlight">\(n\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-sor-ssor-1-to-n-followed-by-n-to-1">2. Symmetric SOR (SSOR): 1 to <span class="math notranslate nohighlight">\(n\)</span> followed by <span class="math notranslate nohighlight">\(n\)</span> to 1</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-permutation">3. Randomized Permutation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-structural-orderings">4. Alternative Structural Orderings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orderings-and-symmetric-sweeps">Orderings and Symmetric Sweeps</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#natural-ordering">Natural Ordering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-sor-ssor">Symmetric SOR (SSOR)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#randomized-orderings">Randomized Orderings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#red-black-and-multicolor-orderings">Red-Black and Multicolor Orderings</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimality-and-performance">Optimality and Performance</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-parameter">Choosing the Parameter</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-convergence-on-a-poisson-grid">Comparing Convergence on a Poisson Grid</a></li>
 </ul>
   </nav></div>
 

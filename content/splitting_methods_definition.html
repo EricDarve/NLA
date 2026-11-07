@@ -457,9 +457,13 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-a-splitting-method">Definition of a Splitting Method</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#necessary-and-sufficient-condition-for-convergence">Necessary and Sufficient Condition for Convergence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-analogy">Conceptual Analogy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-a-splitting-to-an-iteration">From a Splitting to an Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-error-evolves">How the Error Evolves</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-criterion">The Convergence Criterion</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extension-to-nondiagonalizable-matrices-optional">Extension to Nondiagonalizable Matrices (Optional)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-criterion-tells-us">What the Criterion Tells Us</a></li>
 </ul>
             </nav>
         </div>
@@ -473,122 +477,133 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="splitting-methods-and-convergence-theory">
 <h1>Splitting Methods and Convergence Theory<a class="headerlink" href="#splitting-methods-and-convergence-theory" title="Link to this heading">#</a></h1>
-<section id="definition-of-a-splitting-method">
-<h2>Definition of a Splitting Method<a class="headerlink" href="#definition-of-a-splitting-method" title="Link to this heading">#</a></h2>
-<p>A <strong>stationary iterative method</strong> for solving a linear system <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> begins by expressing the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> as the difference of two matrices, <span class="math notranslate nohighlight">\(M\)</span> and <span class="math notranslate nohighlight">\(N\)</span>. This decomposition is known as a <strong>splitting</strong> of <span class="math notranslate nohighlight">\(A\)</span>:</p>
+<p>The <a class="reference internal" href="classical_iterative_methods.html"><span class="std std-doc">chapter introduction</span></a> described iteration as a sequence of inexpensive corrections. A matrix splitting makes that idea precise. We first derive the update, then ask when repeated updates converge.</p>
+<section id="from-a-splitting-to-an-iteration">
+<h2>From a Splitting to an Iteration<a class="headerlink" href="#from-a-splitting-to-an-iteration" title="Link to this heading">#</a></h2>
+<p>Consider <span class="math notranslate nohighlight">\(Ax=b\)</span>, where <span class="math notranslate nohighlight">\(A\)</span> is a real nonsingular <span class="math notranslate nohighlight">\(n\times n\)</span> matrix. Write <span class="math notranslate nohighlight">\(x\)</span> for the exact solution and <span class="math notranslate nohighlight">\(x^{(k)}\)</span> for the approximation after <span class="math notranslate nohighlight">\(k\)</span> iterations, starting from a chosen <span class="math notranslate nohighlight">\(x^{(0)}\)</span>. The superscript counts iterations, not powers.</p>
+<p>Choose a nonsingular matrix <span class="math notranslate nohighlight">\(M\)</span> whose linear systems are inexpensive to solve, and write</p>
 <div class="math notranslate nohighlight">
-\[A = M - N\]</div>
-<p>For the splitting to be useful for iteration, the matrix <span class="math notranslate nohighlight">\(M\)</span> must be chosen such that it is nonsingular. <span class="math notranslate nohighlight">\(M\)</span> is frequently referred to as the <strong>preconditioning matrix</strong> or sometimes <span class="math notranslate nohighlight">\(C\)</span> in the context of splitting <span class="math notranslate nohighlight">\(A=C-R\)</span>.</p>
-<p>This decomposition allows the original equation <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span> to be rewritten as <span class="math notranslate nohighlight">\(M\mathbf{x} = N\mathbf{x} + \mathbf{b}\)</span>. This linear system directly defines the iterative procedure:</p>
+\[
+A=M-N.
+\]</div>
+<p>This is a <strong>splitting</strong> of <span class="math notranslate nohighlight">\(A\)</span>. Since the exact solution satisfies <span class="math notranslate nohighlight">\(Mx=Nx+b\)</span>, we define the iteration by</p>
 <div class="math notranslate nohighlight">
-\[M \mathbf{x}^{(k+1)} = N \mathbf{x}^{(k)} + \mathbf{b}\]</div>
-<p>If we multiply by <span class="math notranslate nohighlight">\(M^{-1}\)</span> (which exists since <span class="math notranslate nohighlight">\(M\)</span> is nonsingular), the iterative step can be explicitly written in the fixed-point form:</p>
-<div class="math notranslate nohighlight">
-\[\mathbf{x}^{(k+1)} = M^{-1} N \mathbf{x}^{(k)} + M^{-1} \mathbf{b} = R \mathbf{x}^{(k)} + \mathbf{c}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(R = M^{-1}N\)</span> is the <strong>iteration matrix</strong> and <span class="math notranslate nohighlight">\(\mathbf{c} = M^{-1}\mathbf{b}\)</span>. Common iterative methods, such as Jacobi, Gauss-Seidel, and SOR, are all derived from specific choices of this splitting.</p>
-</section>
-<section id="necessary-and-sufficient-condition-for-convergence">
-<h2>Necessary and Sufficient Condition for Convergence<a class="headerlink" href="#necessary-and-sufficient-condition-for-convergence" title="Link to this heading">#</a></h2>
-<p>The fundamental question of whether a splitting method converges hinges entirely on the properties of the iteration matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
-<div class="proof theorem admonition" id="thm:splitting_convergence">
-<p class="admonition-title"><span class="caption-number">Theorem 40 </span> (Convergence of Splitting Methods)</p>
-<section class="theorem-content" id="proof-content">
-<p>These iterative schemes converge for any initial guess <span class="math notranslate nohighlight">\(x^{(0)}\)</span> and any right-hand side vector <span class="math notranslate nohighlight">\(b\)</span> if and only if the <strong>spectral radius</strong> of the iteration matrix <span class="math notranslate nohighlight">\(R = M^{-1}N\)</span> is strictly less than one:</p>
-<div class="math notranslate nohighlight">
-\[\rho(R) &lt; 1\]</div>
-<p>The spectral radius <span class="math notranslate nohighlight">\(\rho(R)\)</span> is defined as the maximum absolute value of all eigenvalues <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(R\)</span>.</p>
-</section>
-</div><div class="proof admonition" id="proof">
-<p>Proof. The convergence proof relies on analyzing the behavior of the error vector <span class="math notranslate nohighlight">\(\mathbf{e}^{(k)} = \mathbf{x}^{(k)} - \mathbf{x}\)</span>, where <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> is the exact solution to <span class="math notranslate nohighlight">\(A\mathbf{x}=\mathbf{b}\)</span>.</p>
-<h2 class="rubric" id="establishing-the-error-recursion">1. Establishing the Error Recursion</h2>
-<p>The exact solution <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> satisfies the steady-state equation derived from the splitting:</p>
-<div class="math notranslate nohighlight">
-\[M \mathbf{x} = N \mathbf{x} + \mathbf{b}\]</div>
-<p>The iterative solution satisfies the recurrence relation:</p>
-<div class="math notranslate nohighlight">
-\[M \mathbf{x}^{(k+1)} = N \mathbf{x}^{(k)} + \mathbf{b}\]</div>
-<p>Subtracting the exact equation from the iteration equation yields the relationship between consecutive error vectors:</p>
+\[
+Mx^{(k+1)}=Nx^{(k)}+b.
+\]</div>
+<p>Each step uses the current approximation on the right and solves a system with <span class="math notranslate nohighlight">\(M\)</span> to obtain the next approximation. Equivalently,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
-M (\mathbf{x}^{(k+1)} - \mathbf{x}) &amp;= N (\mathbf{x}^{(k)} - \mathbf{x})\\
-M \mathbf{e}^{(k+1)} &amp;= N \mathbf{e}^{(k)}
+x^{(k+1)}&amp;=Rx^{(k)}+c,\\
+R&amp;=M^{-1}N=I-M^{-1}A,
+\qquad c=M^{-1}b.
 \end{aligned}
 \end{split}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(M\)</span> is nonsingular, we can isolate <span class="math notranslate nohighlight">\(\mathbf{e}^{(k+1)}\)</span>:</p>
+<p>The matrix <span class="math notranslate nohighlight">\(R\)</span> is the <strong>iteration matrix</strong>. The method is <strong>stationary</strong> because <span class="math notranslate nohighlight">\(R\)</span> and <span class="math notranslate nohighlight">\(c\)</span> are fixed throughout the iteration. In practice, we solve with <span class="math notranslate nohighlight">\(M\)</span>; these formulas do not require forming <span class="math notranslate nohighlight">\(M^{-1}\)</span>.</p>
+<p>The update also has a useful correction form. Define the residual <span class="math notranslate nohighlight">\(r^{(k)}=b-Ax^{(k)}\)</span>. Subtracting <span class="math notranslate nohighlight">\(Mx^{(k)}\)</span> from the iteration equation gives</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{e}^{(k+1)} = M^{-1} N \mathbf{e}^{(k)} = R \mathbf{e}^{(k)}\]</div>
-<p>By repeated substitution, the error after <span class="math notranslate nohighlight">\(k\)</span> steps depends linearly on the initial error <span class="math notranslate nohighlight">\(\mathbf{e}^{(0)}\)</span> and the <span class="math notranslate nohighlight">\(k\)</span>-th power of the iteration matrix:</p>
+\[
+M\bigl(x^{(k+1)}-x^{(k)}\bigr)=r^{(k)}.
+\]</div>
+<p>The exact correction would satisfy <span class="math notranslate nohighlight">\(A(x-x^{(k)})=r^{(k)}\)</span>. Replacing <span class="math notranslate nohighlight">\(A\)</span> by <span class="math notranslate nohighlight">\(M\)</span> makes this correction cheaper to compute. Choosing <span class="math notranslate nohighlight">\(M=A\)</span> would solve the original problem in one step, but would require the very solve we are trying to avoid. Simpler choices are cheaper, but may need many steps or fail to converge.</p>
+</section>
+<section id="how-the-error-evolves">
+<h2>How the Error Evolves<a class="headerlink" href="#how-the-error-evolves" title="Link to this heading">#</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(e^{(k)}=x^{(k)}-x\)</span>. Subtract the exact equation <span class="math notranslate nohighlight">\(Mx=Nx+b\)</span> from the iteration equation:</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{e}^{(k)} = R^k \mathbf{e}^{(0)}\]</div>
-<p>Convergence requires that <span class="math notranslate nohighlight">\(\lim_{k\to\infty} \mathbf{e}^{(k)} = \mathbf{0}\)</span>, which necessitates that the sequence of matrix powers <span class="math notranslate nohighlight">\(R^k\)</span> tends to the zero matrix. This happens if and only if <span class="math notranslate nohighlight">\(\rho(R) &lt; 1\)</span>.</p>
-<h2 class="rubric" id="proof-of-necessity-rho-r-ge-1-implies-divergence">2. Proof of Necessity (<span class="math notranslate nohighlight">\(\rho(R) \ge 1 \implies\)</span> Divergence)</h2>
-<p>Suppose <span class="math notranslate nohighlight">\(\rho(R) \ge 1\)</span>. Let <span class="math notranslate nohighlight">\(\lambda\)</span> be an eigenvalue of <span class="math notranslate nohighlight">\(R\)</span> such that <span class="math notranslate nohighlight">\(|\lambda| = \rho(R)\)</span>, and let <span class="math notranslate nohighlight">\(\mathbf{z} \neq \mathbf{0}\)</span> be its corresponding eigenvector: <span class="math notranslate nohighlight">\(R\mathbf{z} = \lambda\mathbf{z}\)</span>.</p>
-<p>If we choose the initial error <span class="math notranslate nohighlight">\(\mathbf{e}^{(0)}\)</span> to be proportional to this eigenvector, <span class="math notranslate nohighlight">\(\mathbf{e}^{(0)} = \alpha\mathbf{z}\)</span> (<span class="math notranslate nohighlight">\(\alpha \neq 0\)</span>), then the error at step <span class="math notranslate nohighlight">\(k\)</span> is:</p>
+\[\begin{split}
+\begin{aligned}
+M\bigl(x^{(k+1)}-x\bigr)&amp;=N\bigl(x^{(k)}-x\bigr),\\
+e^{(k+1)}&amp;=Re^{(k)}.
+\end{aligned}
+\end{split}\]</div>
+<p>Repeated substitution gives</p>
 <div class="math notranslate nohighlight">
-\[\mathbf{e}^{(k)} = R^k \mathbf{e}^{(0)} = R^k (\alpha\mathbf{z}) = \alpha (R^k \mathbf{z}) = \alpha \lambda^k \mathbf{z}\]</div>
-<p>Taking the norm of the error vector:</p>
+\[
+\boxed{e^{(k)}=R^ke^{(0)}.}
+\]</div>
+<p>Convergence for every initial guess is therefore equivalent to <span class="math notranslate nohighlight">\(R^k\to0\)</span>. This connects the linear-system iteration to the behavior of matrix powers studied in the eigenvalue chapter.</p>
+</section>
+<section id="the-convergence-criterion">
+<h2>The Convergence Criterion<a class="headerlink" href="#the-convergence-criterion" title="Link to this heading">#</a></h2>
+<p>If an error lies along an eigenvector of <span class="math notranslate nohighlight">\(R\)</span> with eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span>, each step multiplies it by <span class="math notranslate nohighlight">\(\lambda\)</span>. That error decays exactly when <span class="math notranslate nohighlight">\(|\lambda|&lt;1\)</span>. This suggests checking the largest eigenvalue magnitude, called the <strong>spectral radius</strong>:</p>
 <div class="math notranslate nohighlight">
-\[\|\mathbf{e}^{(k)}\| = |\alpha| |\lambda|^k \|\mathbf{z}\| = |\alpha| (\rho(R))^k \|\mathbf{z}\|\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\rho(R) \ge 1\)</span> and <span class="math notranslate nohighlight">\(\mathbf{z} \neq \mathbf{0}\)</span>, the norm <span class="math notranslate nohighlight">\(\|\mathbf{e}^{(k)}\|\)</span> does not converge to zero. Therefore, convergence fails if <span class="math notranslate nohighlight">\(\rho(R) \ge 1\)</span>.</p>
-<h2 class="rubric" id="proof-of-sufficiency-diagonalizable-case">3. Proof of Sufficiency (Diagonalizable Case)</h2>
-<p>Assume <span class="math notranslate nohighlight">\(\rho(R) &lt; 1\)</span>. If <span class="math notranslate nohighlight">\(R\)</span> is <strong>diagonalizable</strong>, there exists a nonsingular matrix <span class="math notranslate nohighlight">\(S\)</span> such that <span class="math notranslate nohighlight">\(R = S \Lambda S^{-1}\)</span>, where <span class="math notranslate nohighlight">\(\Lambda\)</span> is the diagonal matrix containing the eigenvalues <span class="math notranslate nohighlight">\(\lambda_i\)</span> of <span class="math notranslate nohighlight">\(R\)</span>.</p>
-<p>The <span class="math notranslate nohighlight">\(k\)</span>-th power of <span class="math notranslate nohighlight">\(R\)</span> is given by:</p>
+\[
+\rho(R)=\max_j|\lambda_j(R)|.
+\]</div>
+<div class="proof theorem admonition" id="thm:splitting_convergence">
+<p class="admonition-title"><span class="caption-number">Theorem 40 </span> (Convergence of Splitting Methods)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(A=M-N\)</span>, with <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(M\)</span> nonsingular. The iteration converges to <span class="math notranslate nohighlight">\(A^{-1}b\)</span> for every initial guess and every right-hand side if and only if</p>
 <div class="math notranslate nohighlight">
-\[R^k = S \Lambda^k S^{-1}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\rho(R) &lt; 1\)</span>, we have <span class="math notranslate nohighlight">\(|\lambda_i| &lt; 1\)</span> for all eigenvalues. As <span class="math notranslate nohighlight">\(k \to \infty\)</span>, the power of each individual eigenvalue approaches zero, <span class="math notranslate nohighlight">\(\lim_{k\to\infty} \lambda_i^k = 0\)</span>. Consequently, the diagonal matrix <span class="math notranslate nohighlight">\(\Lambda^k\)</span> converges to the zero matrix:</p>
+\[
+\boxed{\rho(M^{-1}N)&lt;1.}
+\]</div>
+<p>This result does not require the iteration matrix to be diagonalizable.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. We have reduced the question to when <span class="math notranslate nohighlight">\(R^k\to0\)</span>, where <span class="math notranslate nohighlight">\(R=M^{-1}N\)</span>.</p>
+<p><strong>Necessity.</strong> For any eigenpair <span class="math notranslate nohighlight">\(Rz=\lambda z\)</span> with <span class="math notranslate nohighlight">\(z\ne0\)</span>,</p>
 <div class="math notranslate nohighlight">
-\[\lim_{k\to\infty} \Lambda^k = \mathbf{0}\]</div>
-<p>Therefore, <span class="math notranslate nohighlight">\(R^k\)</span> also converges to the zero matrix:</p>
+\[
+R^kz=\lambda^kz.
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(R^k\to0\)</span>, this vector must tend to zero, which requires <span class="math notranslate nohighlight">\(|\lambda|&lt;1\)</span>. Hence <span class="math notranslate nohighlight">\(\rho(R)&lt;1\)</span>.</p>
+<p><strong>Sufficiency when <span class="math notranslate nohighlight">\(R\)</span> is diagonalizable.</strong> Write <span class="math notranslate nohighlight">\(R=X\Lambda X^{-1}\)</span>. If <span class="math notranslate nohighlight">\(\rho(R)&lt;1\)</span>, every diagonal entry of <span class="math notranslate nohighlight">\(\Lambda^k\)</span> tends to zero, so</p>
 <div class="math notranslate nohighlight">
-\[\lim_{k\to\infty} R^k = S \left( \lim_{k\to\infty} \Lambda^k \right) S^{-1} = S \mathbf{0} S^{-1} = \mathbf{0}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\mathbf{e}^{(k)} = R^k \mathbf{e}^{(0)}\)</span>, the error converges to zero for any initial guess <span class="math notranslate nohighlight">\(\mathbf{e}^{(0)}\)</span>.</p>
-<h2 class="rubric" id="proof-of-sufficiency-general-case">4. Proof of Sufficiency (General Case)</h2>
-<p>This proof segment, which demonstrates the convergence of splitting methods when the iteration matrix <span class="math notranslate nohighlight">\(G\)</span> is not diagonalizable, relies on constructing a specialized matrix norm that is arbitrarily close to the spectral radius <span class="math notranslate nohighlight">\(\rho(G)\)</span>. This technique ensures that if <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>, the norm of <span class="math notranslate nohighlight">\(G\)</span> is also strictly less than 1, guaranteeing the convergence of the sequence <span class="math notranslate nohighlight">\(G^k\)</span>.</p>
-<h3 class="rubric" id="leveraging-the-spectral-radius-property">1. Leveraging the Spectral Radius Property</h3>
-<p>A fundamental result in matrix analysis states that for any matrix <span class="math notranslate nohighlight">\(G \in \mathbb{C}^{n \times n}\)</span> and any <span class="math notranslate nohighlight">\(\epsilon &gt; 0\)</span>, there exists a subordinate matrix norm (or consistent norm) <span class="math notranslate nohighlight">\(\|\cdot\|_*\)</span> such that <span class="math notranslate nohighlight">\(\|G\|_* &lt; \rho(G) + \epsilon\)</span>.</p>
-<p>Since we assume <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>, we can choose <span class="math notranslate nohighlight">\(\epsilon\)</span> such that <span class="math notranslate nohighlight">\(\rho(G) + \epsilon &lt; 1\)</span>. If we can construct a norm <span class="math notranslate nohighlight">\(\| \cdot \|_Z\)</span> such that <span class="math notranslate nohighlight">\(\|G\|_Z &lt; 1\)</span>, then because all induced matrix norms are <strong>consistent</strong> (satisfying <span class="math notranslate nohighlight">\(\|G^k\|_Z \le \|G\|_Z^k\)</span>), the powers of <span class="math notranslate nohighlight">\(G\)</span> must converge to zero:</p>
+\[
+R^k=X\operatorname{diag}(\lambda_1^k,\ldots,\lambda_n^k)X^{-1}
+\longrightarrow0.
+\]</div>
+<p>This proves the result for diagonalizable matrices. The extension below shows why the same criterion holds without an eigenvector basis.</p>
+</div>
+<section id="extension-to-nondiagonalizable-matrices-optional">
+<h3>Extension to Nondiagonalizable Matrices (Optional)<a class="headerlink" href="#extension-to-nondiagonalizable-matrices-optional" title="Link to this heading">#</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This argument completes the proof in the general case. It uses a Schur decomposition and a change of scale between coordinates. You can skip it on a first reading and use the convergence criterion as stated.</p>
+</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Assume <span class="math notranslate nohighlight">\(\rho(R)&lt;1\)</span>. A diagonalization may not exist, but a complex Schur decomposition always does:</p>
 <div class="math notranslate nohighlight">
-\[\lim_{k\to\infty} \|\mathbf{e}^{(k)}\|_Z = \lim_{k\to\infty} \|G^k \mathbf{e}^{(0)}\|_Z \le \lim_{k\to\infty} \|G\|_Z^k \|\mathbf{e}^{(0)}\|_Z = 0\]</div>
-<h3 class="rubric" id="using-the-schur-decomposition-to-construct-the-norm">2. Using the Schur Decomposition to Construct the Norm</h3>
-<p>To explicitly construct such a norm, we use the <strong>Schur decomposition</strong>. Every square matrix <span class="math notranslate nohighlight">\(G\)</span> can be decomposed as:</p>
+\[
+R=QTQ^H.
+\]</div>
+<p>As in the <a class="reference internal" href="eigendecomposition.html"><span class="std std-doc">Schur decomposition</span></a> studied earlier, <span class="math notranslate nohighlight">\(Q\)</span> is unitary, <span class="math notranslate nohighlight">\(Q^H\)</span> denotes its conjugate transpose, and <span class="math notranslate nohighlight">\(T\)</span> is upper triangular. Its diagonal entries are the eigenvalues of <span class="math notranslate nohighlight">\(R\)</span>. The entries above the diagonal couple the coordinates; we make those entries small by rescaling.</p>
+<p>For <span class="math notranslate nohighlight">\(0&lt;\delta&lt;1\)</span>, set</p>
 <div class="math notranslate nohighlight">
-\[G = Q T Q^H\]</div>
-<p>where <span class="math notranslate nohighlight">\(Q\)</span> is a <strong>unitary matrix</strong> (<span class="math notranslate nohighlight">\(Q^H Q = I\)</span>) and <span class="math notranslate nohighlight">\(T\)</span> is an <strong>upper triangular matrix</strong>. The diagonal elements of <span class="math notranslate nohighlight">\(T\)</span>, denoted <span class="math notranslate nohighlight">\(t_{ii}\)</span>, are the eigenvalues <span class="math notranslate nohighlight">\(\lambda_i\)</span> of <span class="math notranslate nohighlight">\(G\)</span>.</p>
-<p>We define a diagonal scaling matrix <span class="math notranslate nohighlight">\(D\)</span> with strictly positive entries:</p>
+\[
+D=\operatorname{diag}(1,\delta,\ldots,\delta^{n-1}),
+\qquad B=D^{-1}TD.
+\]</div>
+<p>Then <span class="math notranslate nohighlight">\(b_{ij}=t_{ij}\delta^{j-i}\)</span> for <span class="math notranslate nohighlight">\(i\le j\)</span>. The diagonal is unchanged, while every entry above it tends to zero as <span class="math notranslate nohighlight">\(\delta\to0\)</span>. Consequently, the maximum absolute row sum satisfies</p>
 <div class="math notranslate nohighlight">
-\[D = \text{diag}(\delta^{-1}, \delta^{-2}, \dots, \delta^{-n})\]</div>
-<p>where <span class="math notranslate nohighlight">\(\delta\)</span> is a small positive parameter to be determined later.</p>
-<p>We now analyze the similarity transformation of <span class="math notranslate nohighlight">\(T\)</span> by <span class="math notranslate nohighlight">\(D\)</span>: <span class="math notranslate nohighlight">\(B = D T D^{-1}\)</span>.</p>
-<p>The entries of <span class="math notranslate nohighlight">\(B\)</span> are found to be:</p>
+\[
+\|B\|_\infty
+=\max_i\left(
+|\lambda_i|+\sum_{j&gt;i}|t_{ij}|\delta^{j-i}
+\right)
+\longrightarrow\rho(R)&lt;1.
+\]</div>
+<p>Choose and fix a sufficiently small <span class="math notranslate nohighlight">\(\delta\)</span> so that <span class="math notranslate nohighlight">\(\|B\|_\infty&lt;1\)</span>. Repeated use of the <a class="reference internal" href="operator_norms.html"><span class="std std-doc">matrix norm inequality</span></a> <span class="math notranslate nohighlight">\(\|BC\|_\infty\le\|B\|_\infty\|C\|_\infty\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[[D T D^{-1}]_{ij} = t_{ij} \delta^{j-i}, \quad j \ge i\]</div>
-<p>and 0 otherwise.</p>
-<p>We evaluate the matrix <span class="math notranslate nohighlight">\(\infty\)</span>-norm of <span class="math notranslate nohighlight">\(B\)</span>, <span class="math notranslate nohighlight">\(\|B\|_{\infty}\)</span>, which is the maximum absolute row sum:</p>
+\[
+\|B^k\|_\infty\le\|B\|_\infty^k\longrightarrow0.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Q\)</span>, <span class="math notranslate nohighlight">\(D\)</span>, and their inverses are fixed,</p>
 <div class="math notranslate nohighlight">
-\[\| D T D^{-1} \|_{\infty} \le \max_i \{ |t_{ii}| + n \max_{j&gt;i} \{ |t_{ij}| \delta^{j-i} \} \}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>, all diagonal entries <span class="math notranslate nohighlight">\(|t_{ii}| = |\lambda_i| \le \rho(G)\)</span>. By choosing <span class="math notranslate nohighlight">\(\delta\)</span> sufficiently small, we can make the off-diagonal terms (where <span class="math notranslate nohighlight">\(j &gt; i\)</span> and <span class="math notranslate nohighlight">\(\delta^{j-i}\)</span> is positive) arbitrarily small.</p>
-<p>Specifically, since <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>, we can choose <span class="math notranslate nohighlight">\(\delta\)</span> small enough to ensure that:</p>
-<div class="math notranslate nohighlight">
-\[\| D T D^{-1} \|_{\infty} \le \rho(G) + \epsilon &lt; 1\]</div>
-<h3 class="rubric" id="defining-the-norm-and-concluding-convergence">3. Defining the Norm and Concluding Convergence</h3>
-<p>Define the change of basis matrix <span class="math notranslate nohighlight">\(Z = D Q^H\)</span>. Since <span class="math notranslate nohighlight">\(D\)</span> and <span class="math notranslate nohighlight">\(Q\)</span> are nonsingular, <span class="math notranslate nohighlight">\(Z\)</span> is nonsingular. We use <span class="math notranslate nohighlight">\(Z\)</span> to define a vector norm:</p>
-<div class="math notranslate nohighlight">
-\[\|\mathbf{x}\|_Z = \|Z\mathbf{x}\|_{\infty}\]</div>
-<p>The corresponding induced operator norm for <span class="math notranslate nohighlight">\(G\)</span> is given by <span class="math notranslate nohighlight">\(\|G\|_Z = \|Z G Z^{-1}\|_{\infty}\)</span>.</p>
-<p>Substituting the Schur form of <span class="math notranslate nohighlight">\(G\)</span> and the definition of <span class="math notranslate nohighlight">\(Z\)</span> into the norm expression:</p>
-<div class="math notranslate nohighlight">
-\[\| G \|_Z = \| (D Q^H) (Q T Q^H) (D Q^H)^{-1} \|_{\infty} = \| D T D^{-1} \|_{\infty}\]</div>
-<p>We established in the previous step that, by choosing <span class="math notranslate nohighlight">\(\delta\)</span> appropriately, <span class="math notranslate nohighlight">\(\| D T D^{-1} \|_{\infty} &lt; 1\)</span>.</p>
-<p>Therefore, we have constructed an induced norm <span class="math notranslate nohighlight">\(\| \cdot \|_Z\)</span> such that:</p>
-<div class="math notranslate nohighlight">
-\[\| G \|_Z &lt; 1\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\| G^k \|_Z \le \| G \|_Z^k\)</span>, the error term <span class="math notranslate nohighlight">\(\mathbf{e}^{(k)} = G^k \mathbf{e}^{(0)}\)</span> converges to zero as <span class="math notranslate nohighlight">\(k \to \infty\)</span>, thus proving that the splitting method converges for the general case if <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>.</p>
+\[
+R^k=QD B^kD^{-1}Q^H\longrightarrow0.
+\]</div>
+<p>Thus the error tends to zero for every initial guess, including when <span class="math notranslate nohighlight">\(R\)</span> is not diagonalizable.</p>
 </div>
 </section>
-<section id="conceptual-analogy">
-<h2>Conceptual Analogy<a class="headerlink" href="#conceptual-analogy" title="Link to this heading">#</a></h2>
-<p>The iteration matrix <span class="math notranslate nohighlight">\(R\)</span> acts like a filter applied repeatedly to the error <span class="math notranslate nohighlight">\(e^{(0)}\)</span>. For the iteration to converge, <span class="math notranslate nohighlight">\(R\)</span> must shrink the error in all possible directions. The eigenvalues of <span class="math notranslate nohighlight">\(R\)</span> represent the scaling factors applied in specific invariant directions. If the largest scaling factor (the spectral radius <span class="math notranslate nohighlight">\(\rho(R)\)</span>) is less than 1, every component of the error, regardless of how complex the geometry of the matrix <span class="math notranslate nohighlight">\(R\)</span> is (diagonalizable or not, analogous to a perfectly spherical shrink or a distorted, complicated squeeze), is guaranteed to decay exponentially to zero over time.</p>
+</section>
+<section id="what-the-criterion-tells-us">
+<h2>What the Criterion Tells Us<a class="headerlink" href="#what-the-criterion-tells-us" title="Link to this heading">#</a></h2>
+<p>The eigenvalues determine whether all initial errors eventually decay. They do not guarantee that the error decreases at every step in the usual norm. Coupling between coordinates can cause temporary growth even when <span class="math notranslate nohighlight">\(\rho(R)&lt;1\)</span>.</p>
+<p>A spectral radius close to one can make convergence slow. The choice of splitting therefore matters both for the cost of each step and for the number of steps needed. The next sections examine this tradeoff for <a class="reference internal" href="jacobi_method.html"><span class="std std-doc">Jacobi</span></a>, <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">Gauss-Seidel</span></a>, and <a class="reference internal" href="sor_method.html"><span class="std std-doc">SOR</span></a>.</p>
 </section>
 </section>
 
@@ -658,9 +673,13 @@ M \mathbf{e}^{(k+1)} &amp;= N \mathbf{e}^{(k)}
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definition-of-a-splitting-method">Definition of a Splitting Method</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#necessary-and-sufficient-condition-for-convergence">Necessary and Sufficient Condition for Convergence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-analogy">Conceptual Analogy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-a-splitting-to-an-iteration">From a Splitting to an Iteration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-error-evolves">How the Error Evolves</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-convergence-criterion">The Convergence Criterion</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extension-to-nondiagonalizable-matrices-optional">Extension to Nondiagonalizable Matrices (Optional)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-criterion-tells-us">What the Criterion Tells Us</a></li>
 </ul>
   </nav></div>
 

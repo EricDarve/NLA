@@ -460,8 +460,13 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#splitting-and-iteration">Splitting and Iteration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-and-implementation">Algorithm and Implementation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditions-for-convergence">Conditions for Convergence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-analogy">Conceptual Analogy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditions-for-convergence">Conditions for Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-for-strict-diagonal-dominance">Proof for Strict Diagonal Dominance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-positive-definiteness-helps">Why Positive Definiteness Helps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-for-symmetric-positive-definite-matrices">Proof for Symmetric Positive Definite Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-considerations">Practical Considerations</a></li>
 </ul>
             </nav>
         </div>
@@ -475,147 +480,213 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-gauss-seidel-iteration-method">
 <h1>The Gauss-Seidel Iteration Method<a class="headerlink" href="#the-gauss-seidel-iteration-method" title="Link to this heading">#</a></h1>
-<p>The Gauss-Seidel (GS) method, also known as the Seidel process or successive iteration method, is a stationary iterative algorithm designed to solve <span class="math notranslate nohighlight">\(A\mathbf{x} = \mathbf{b}\)</span>. Although commonly attributed to Gauss and Seidel, historical accounts note that Gauss nowhere mentioned it, and Seidel (1874) mentioned the process but recommended against its use.</p>
-<p>The Gauss-Seidel method improves upon the Jacobi iteration by using updated solution components as soon as they become available within the current iteration. This characteristic makes it a <strong>successive iteration</strong> method, in contrast to the Jacobi method, which performs updates simultaneously.</p>
+<p>Gauss-Seidel iteration uses newly computed solution components as soon as they become available. This lets a correction influence later components within the same sweep through the unknowns. Jacobi, by comparison, uses only values from the preceding sweep.</p>
+<p>We consider a real linear system <span class="math notranslate nohighlight">\(Ax=b\)</span>, where <span class="math notranslate nohighlight">\(A\)</span> is nonsingular and has nonzero diagonal entries.</p>
 <section id="splitting-and-iteration">
 <h2>Splitting and Iteration<a class="headerlink" href="#splitting-and-iteration" title="Link to this heading">#</a></h2>
-<p>Like the Jacobi method, Gauss-Seidel is a splitting method, where the coefficient matrix <span class="math notranslate nohighlight">\(A\)</span> is decomposed as <span class="math notranslate nohighlight">\(A = M - N\)</span>. We use the standard decomposition of <span class="math notranslate nohighlight">\(A\)</span> into its diagonal (<span class="math notranslate nohighlight">\(D\)</span>), strictly lower triangular (<span class="math notranslate nohighlight">\(L\)</span>), and strictly upper triangular (<span class="math notranslate nohighlight">\(U\)</span>) parts, such that <span class="math notranslate nohighlight">\(A = D - L - U\)</span>.</p>
-<p>For the (forward) Gauss-Seidel method, the splitting matrices are chosen as:</p>
+<p>Use the same sign convention as for Jacobi:</p>
 <div class="math notranslate nohighlight">
-\[M = D - L \quad \text{and} \quad N = U\]</div>
-<p>Substituting this splitting into the general stationary iteration form <span class="math notranslate nohighlight">\(M \mathbf{x}^{(k+1)} = \mathbf{b} + N \mathbf{x}^{(k)}\)</span> yields the defining equation for the Gauss-Seidel iteration:</p>
+\[
+A=D-L-U,
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(D\)</span> contains the diagonal entries, while <span class="math notranslate nohighlight">\(-L\)</span> and <span class="math notranslate nohighlight">\(-U\)</span> are the strictly lower and strictly upper triangular parts of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>Forward Gauss-Seidel uses <span class="math notranslate nohighlight">\(M=D-L\)</span> and <span class="math notranslate nohighlight">\(N=U\)</span>. The splitting iteration is therefore</p>
 <div class="math notranslate nohighlight">
-\[(D - L) \mathbf{x}^{(k+1)} = \mathbf{b} + U \mathbf{x}^{(k)}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(D-L\)</span> is a lower triangular matrix, computing <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> involves solving a triangular system. The Gauss-Seidel iteration matrix is <span class="math notranslate nohighlight">\(G = R_{GS} = (D-L)^{-1}U\)</span>.</p>
-<p>In component form, the update for the <span class="math notranslate nohighlight">\(i\)</span>-th component <span class="math notranslate nohighlight">\(x_i\)</span> uses the newly computed components <span class="math notranslate nohighlight">\(x_j^{(k+1)}\)</span> for <span class="math notranslate nohighlight">\(j &lt; i\)</span> and the previously calculated components <span class="math notranslate nohighlight">\(x_j^{(k)}\)</span> for <span class="math notranslate nohighlight">\(j &gt; i\)</span>:</p>
+\[
+(D-L)x^{(k+1)}=b+Ux^{(k)}.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(D-L\)</span> is lower triangular, each sweep is a forward substitution. We denote the Gauss-Seidel iteration matrix by <span class="math notranslate nohighlight">\(G\)</span>; it is <span class="math notranslate nohighlight">\(R=M^{-1}N\)</span> for this splitting:</p>
 <div class="math notranslate nohighlight">
-\[x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \right)\]</div>
+\[
+G=(D-L)^{-1}U.
+\]</div>
+<p>In component form,</p>
+<div class="math notranslate nohighlight">
+\[
+x_i^{(k+1)}
+=\frac{1}{a_{ii}}
+\left(
+b_i-\sum_{j&lt;i}a_{ij}x_j^{(k+1)}
+   -\sum_{j&gt;i}a_{ij}x_j^{(k)}
+\right).
+\]</div>
+<p>The first sum uses values already updated in this sweep. The second uses values that have not yet been updated.</p>
 </section>
 <section id="algorithm-and-implementation">
 <h2>Algorithm and Implementation<a class="headerlink" href="#algorithm-and-implementation" title="Link to this heading">#</a></h2>
-<p>A key difference between Gauss-Seidel and Jacobi iteration lies in the dependencies: because the components of <span class="math notranslate nohighlight">\(\mathbf{x}^{(k+1)}\)</span> must be computed sequentially (or successively), the Gauss-Seidel method is <strong>less parallel</strong> than the Jacobi method. Conversely, Gauss-Seidel typically converges <strong>faster than Jacobi, often requiring about half the number of iterations in many cases.</strong></p>
+<p>A sweep can overwrite the solution vector in place. When updating component <span class="math notranslate nohighlight">\(i\)</span>, the entries before it already contain new values, while those after it still contain old values.</p>
+<p>These dependencies make a standard Gauss-Seidel sweep less parallel than Jacobi. Reusing new values often improves convergence, but the comparison depends on the matrix and the ordering of the unknowns.</p>
 </section>
 <section id="python-code-example">
 <h2>Python Code Example<a class="headerlink" href="#python-code-example" title="Link to this heading">#</a></h2>
-<p>Here is a simple implementation of the Gauss-Seidel method in Python:</p>
+<p>As in the <a class="reference internal" href="jacobi_method.html"><span class="std std-doc">Jacobi implementation</span></a>, the stopping criterion checks the scaled residual</p>
+<div class="math notranslate nohighlight">
+\[
+\eta(x^{(k)})=
+\frac{\|b-Ax^{(k)}\|_\infty}
+{\|A\|_\infty\|x^{(k)}\|_\infty+\|b\|_\infty}.
+\]</div>
+<p>This checks how accurately the equations are satisfied. Small changes between iterates alone can give a misleading stopping test.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">gauss_seidel</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Solve the linear system Ax = b using the Gauss-Seidel iteration method.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    -----------</span>
-<span class="sd">    A : ndarray</span>
-<span class="sd">        Coefficient matrix (n x n)</span>
-<span class="sd">    b : ndarray</span>
-<span class="sd">        Right-hand side vector (n,)</span>
-<span class="sd">    x0 : ndarray, optional</span>
-<span class="sd">        Initial guess (n,). If None, uses zero vector.</span>
-<span class="sd">    tol : float, optional</span>
-<span class="sd">        Tolerance for convergence (default: 1e-10)</span>
-<span class="sd">    max_iter : int, optional</span>
-<span class="sd">        Maximum number of iterations (default: 1000)</span>
-<span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    --------</span>
-<span class="sd">    x : ndarray</span>
-<span class="sd">        Approximate solution vector</span>
-<span class="sd">    iterations : int</span>
-<span class="sd">        Number of iterations performed</span>
+<span class="w">    </span><span class="sd">"""Return (x, sweeps), stopping when the scaled residual is &lt;= tol.</span>
+
+<span class="sd">    A and b are real arrays. Raise RuntimeError if the iteration limit</span>
+<span class="sd">    is reached without satisfying the stopping criterion.</span>
 <span class="sd">    """</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">x0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
-        <span class="n">x_old</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        
-        <span class="c1"># Update each component using the latest available values</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">],</span> <span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
-            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
-        
-        <span class="c1"># Check convergence</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_old</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: Maximum iterations (</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">) reached without convergence"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_iter</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"A must be square and b a matching vector."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">tol</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tol</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"tol must be positive and finite."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_iter</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">max_iter</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"max_iter must be a nonnegative integer."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Gauss-Seidel requires nonzero diagonal entries."</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"x0 must have the same shape as b."</span><span class="p">)</span>
+
+    <span class="n">norm_A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="n">norm_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">A</span> <span class="o">@</span> <span class="n">x</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">norm_A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">+</span> <span class="n">norm_b</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tol</span> <span class="o">*</span> <span class="n">scale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">max_iter</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="c1"># x[:i] is new; x[i+1:] is still from the old sweep.</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">@</span> <span class="n">x</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span> <span class="o">@</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sigma</span><span class="p">)</span> <span class="o">/</span> <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+
+    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Gauss-Seidel did not converge within max_iter sweeps."</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The returned count is zero if the initial guess already satisfies the tolerance. The code also accepts the exact zero solution when both the residual and its scale are zero.</p>
+<p>The implementation uses dense NumPy arrays. For sparse matrices, each row update needs only the nonzero entries in that row.</p>
 </section>
 <section id="conditions-for-convergence">
 <h2>Conditions for Convergence<a class="headerlink" href="#conditions-for-convergence" title="Link to this heading">#</a></h2>
-<p>The convergence of the Gauss-Seidel iteration is determined by the spectral radius of the iteration matrix <span class="math notranslate nohighlight">\(G = (D-L)^{-1}U\)</span>. The scheme converges for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span> if and only if <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>.</p>
-<p>We present sufficient conditions that guarantee convergence:</p>
+<p>By the splitting convergence theorem, Gauss-Seidel converges for every initial guess if and only if <span class="math notranslate nohighlight">\(\rho(G)&lt;1\)</span>. Two useful matrix properties guarantee this condition.</p>
 <div class="proof theorem admonition" id="thm:gauss_seidel_convergence">
-<p class="admonition-title"><span class="caption-number">Theorem 42 </span> (Convergence of Gauss-Seidel Method)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 42 </span> (Convergence of the Gauss-Seidel Method)</p>
 <section class="theorem-content" id="proof-content">
-<p>The associated Gauss-Seidel iteration converges for any initial guess <span class="math notranslate nohighlight">\(\mathbf{x}^{(0)}\)</span> if <span class="math notranslate nohighlight">\(A\)</span> satisfies one of the following conditions:</p>
-<ol class="arabic">
-<li><p><strong>Strict Diagonal Dominance:</strong> <span class="math notranslate nohighlight">\(A\)</span> is <strong>strictly row diagonally dominant</strong> (or strictly column diagonally dominant), i.e.,</p>
-<div class="math notranslate nohighlight">
-\[|a_{ii}| &gt; \sum_{j \neq i} |a_{ij}| \quad \text{for all } i\]</div>
-</li>
-<li><p><strong>Symmetric Positive Definite (SPD):</strong> <span class="math notranslate nohighlight">\(A\)</span> is <strong>Symmetric Positive Definite</strong>.</p></li>
+<p>Gauss-Seidel converges to the unique solution of <span class="math notranslate nohighlight">\(Ax=b\)</span> for every initial guess if either of the following holds:</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is strictly row diagonally dominant,
+<span class="math notranslate nohighlight">\(|a_{ii}|&gt;\sum_{j\ne i}|a_{ij}|\)</span> for every <span class="math notranslate nohighlight">\(i\)</span>, or strictly column diagonally dominant,
+<span class="math notranslate nohighlight">\(|a_{jj}|&gt;\sum_{i\ne j}|a_{ij}|\)</span> for every <span class="math notranslate nohighlight">\(j\)</span>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(A\)</span> is symmetric positive definite (SPD).</p></li>
 </ol>
+<p>These are sufficient conditions; neither is required for every convergent Gauss-Seidel iteration.</p>
 </section>
-</div><div class="proof admonition" id="proof">
-<p>Proof. We prove the convergence under the condition of strict row diagonal dominance (SRDD).</p>
-<p>Let <span class="math notranslate nohighlight">\(G = (D-L)^{-1}U\)</span> be the Gauss-Seidel iteration matrix. By the splitting method convergence theorem, we need to show that if <span class="math notranslate nohighlight">\(A\)</span> is SRDD, then <span class="math notranslate nohighlight">\(\rho(G) &lt; 1\)</span>. This is equivalent to showing that for any eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> of <span class="math notranslate nohighlight">\(G\)</span>, we have <span class="math notranslate nohighlight">\(|\lambda| &lt; 1\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Assume Contradiction:</strong> Assume there exists an eigenvalue <span class="math notranslate nohighlight">\(\lambda\)</span> such that <span class="math notranslate nohighlight">\(|\lambda| \ge 1\)</span>. Let <span class="math notranslate nohighlight">\(\mathbf{x} \neq \mathbf{0}\)</span> be the corresponding eigenvector:</p>
+</div><section id="proof-for-strict-diagonal-dominance">
+<h3>Proof for Strict Diagonal Dominance<a class="headerlink" href="#proof-for-strict-diagonal-dominance" title="Link to this heading">#</a></h3>
+<div class="proof admonition" id="proof">
+<p>Proof. We show that an eigenvalue with magnitude at least one would force a strictly diagonally dominant matrix to be singular, which is impossible.</p>
+<p>Suppose <span class="math notranslate nohighlight">\(Gz=\lambda z\)</span> with <span class="math notranslate nohighlight">\(z\ne0\)</span> and <span class="math notranslate nohighlight">\(|\lambda|\ge1\)</span>. Multiplying by <span class="math notranslate nohighlight">\(D-L\)</span> gives</p>
 <div class="math notranslate nohighlight">
-\[G \mathbf{x} = \lambda \mathbf{x}\]</div>
-</li>
-<li><p><strong>Derive Singular Matrix:</strong> Substitute the splitting definition <span class="math notranslate nohighlight">\(G = (D-L)^{-1}U\)</span>:</p>
+\[
+Uz=\lambda(D-L)z,
+\qquad
+Bz=0,
+\qquad B=\lambda D-\lambda L-U.
+\]</div>
+<p>Thus <span class="math notranslate nohighlight">\(B\)</span> is singular. Its diagonal entries are <span class="math notranslate nohighlight">\(\lambda a_{ii}\)</span>. Its lower triangular entries are <span class="math notranslate nohighlight">\(\lambda a_{ij}\)</span>, and its upper triangular entries are <span class="math notranslate nohighlight">\(a_{ij}\)</span>. Since <span class="math notranslate nohighlight">\(|\lambda|\ge1\)</span>, every off-diagonal magnitude is at most <span class="math notranslate nohighlight">\(|\lambda|\,|a_{ij}|\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> is strictly row diagonally dominant, then</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
-    (D-L)^{-1}U \mathbf{x} &amp;= \lambda \mathbf{x} \\
-    U \mathbf{x} &amp;= \lambda (D - L) \mathbf{x}
-    \end{aligned}\end{split}\]</div>
-<p>Rearranging this gives:</p>
+\[
+\sum_{j\ne i}|B_{ij}|
+\le|\lambda|\sum_{j\ne i}|a_{ij}|
+&lt;|\lambda|\,|a_{ii}|
+=|B_{ii}|.
+\]</div>
+<p>Hence <span class="math notranslate nohighlight">\(B\)</span> is also strictly row diagonally dominant. If <span class="math notranslate nohighlight">\(A\)</span> is strictly column diagonally dominant, the same argument applied to column sums gives</p>
 <div class="math notranslate nohighlight">
-\[(\lambda D - \lambda L - U) \mathbf{x} = \mathbf{0}\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\mathbf{x} \neq \mathbf{0}\)</span>, the matrix <span class="math notranslate nohighlight">\(A(\lambda) = \lambda D - \lambda L - U\)</span> must be <strong>singular</strong>.</p>
-</li>
-<li><p><strong>Establish Diagonal Dominance of <span class="math notranslate nohighlight">\(A(\lambda)\)</span>:</strong> We now show that if <span class="math notranslate nohighlight">\(A\)</span> is SRDD and <span class="math notranslate nohighlight">\(|\lambda| \ge 1\)</span>, then <span class="math notranslate nohighlight">\(A(\lambda)\)</span> must also be SRDD, implying it is nonsingular (which leads to a contradiction).</p>
-<ul>
-<li><p>The entries of <span class="math notranslate nohighlight">\(A(\lambda)\)</span> are:</p>
-<ul class="simple">
-<li><p>Diagonal: <span class="math notranslate nohighlight">\(A(\lambda)_{ii} = \lambda a_{ii}\)</span></p></li>
-<li><p>Lower triangular (for <span class="math notranslate nohighlight">\(j &lt; i\)</span>): <span class="math notranslate nohighlight">\(A(\lambda)_{ij} = -\lambda a_{ij}\)</span></p></li>
-<li><p>Upper triangular (for <span class="math notranslate nohighlight">\(j &gt; i\)</span>): <span class="math notranslate nohighlight">\(A(\lambda)_{ij} = -a_{ij}\)</span></p></li>
-</ul>
-</li>
-<li><p>Consider the <span class="math notranslate nohighlight">\(i\)</span>-th row of <span class="math notranslate nohighlight">\(A(\lambda)\)</span>. The magnitude of the diagonal element is <span class="math notranslate nohighlight">\(|A(\lambda)_{ii}| = |\lambda| |a_{ii}|\)</span>.</p></li>
-<li><p>The sum of the magnitudes of the off-diagonal elements in the <span class="math notranslate nohighlight">\(i\)</span>-th row is:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}\begin{aligned}
-        \sum_{j \neq i} |A(\lambda)_{ij}| &amp;= \sum_{j &lt; i} |-\lambda a_{ij}| + \sum_{j &gt; i} |-a_{ij}| \\
-        &amp;= |\lambda| \sum_{j &lt; i} |a_{ij}| + \sum_{j &gt; i} |a_{ij}|
-        \end{aligned}\end{split}\]</div>
-</li>
-<li><p>Since <span class="math notranslate nohighlight">\(A\)</span> is SRDD, we know that <span class="math notranslate nohighlight">\(|a_{ii}| &gt; \sum_{j \neq i} |a_{ij}| = \sum_{j &lt; i} |a_{ij}| + \sum_{j &gt; i} |a_{ij}|\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(|\lambda| \ge 1\)</span>, and <span class="math notranslate nohighlight">\(|a_{ij}| \ge 0\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[|\lambda| \sum_{j &lt; i} |a_{ij}| \ge \sum_{j &lt; i} |a_{ij}|\]</div>
-</li>
-<li><p>Therefore:</p>
-<div class="math notranslate nohighlight">
-\[\sum_{j \neq i} |A(\lambda)_{ij}| \le |\lambda| \sum_{j &lt; i} |a_{ij}| + |\lambda| \sum_{j &gt; i} |a_{ij}| = |\lambda| \left( \sum_{j \neq i} |a_{ij}| \right)\]</div>
-</li>
-<li><p>Since <span class="math notranslate nohighlight">\(A\)</span> is strictly dominant, <span class="math notranslate nohighlight">\(\sum_{j \neq i} |a_{ij}| &lt; |a_{ii}|\)</span>.</p></li>
-<li><p>Thus, <span class="math notranslate nohighlight">\(\sum_{j \neq i} |A(\lambda)_{ij}| &lt; |\lambda| |a_{ii}| = |A(\lambda)_{ii}|\)</span>.</p></li>
-</ul>
-</li>
-</ol>
-<p><strong>Conclusion:</strong> <span class="math notranslate nohighlight">\(A(\lambda)\)</span> is strictly row diagonally dominant. A strictly diagonally dominant matrix is nonsingular. This contradicts the necessity that <span class="math notranslate nohighlight">\(A(\lambda)\)</span> must be singular if <span class="math notranslate nohighlight">\(|\lambda| \ge 1\)</span>. Therefore, our initial assumption must be false, and we conclude that <strong><span class="math notranslate nohighlight">\(|\lambda| &lt; 1\)</span></strong>. The Gauss-Seidel iteration converges.</p>
+\[
+\sum_{i\ne j}|B_{ij}|
+\le|\lambda|\sum_{i\ne j}|a_{ij}|
+&lt;|\lambda|\,|a_{jj}|
+=|B_{jj}|.
+\]</div>
+<p>For a strictly row diagonally dominant matrix, every Gershgorin disc excludes zero, so the matrix is nonsingular. For column dominance, apply the same argument to <span class="math notranslate nohighlight">\(B^T\)</span>, which is nonsingular exactly when <span class="math notranslate nohighlight">\(B\)</span> is. In either case, <span class="math notranslate nohighlight">\(B\)</span> is nonsingular, contradicting <span class="math notranslate nohighlight">\(Bz=0\)</span>. Therefore every eigenvalue of <span class="math notranslate nohighlight">\(G\)</span> has magnitude less than one, proving convergence.</p>
 </div>
 </section>
-<section id="conceptual-analogy">
-<h2>Conceptual Analogy<a class="headerlink" href="#conceptual-analogy" title="Link to this heading">#</a></h2>
-<p>The Gauss-Seidel method is like having a team of specialized construction workers updating a skyscraper sequentially: the foundation workers (lower indices) immediately use freshly poured concrete from their upstream colleagues to speed up their work, which generally results in the building (the solution) reaching stability much faster than if every team waited for every other team to finish their previous task (as in Jacobi). However, the critical path (the dependency on the previous worker’s job) makes it harder to use 1,000 workers simultaneously compared to the independent setup of Jacobi.</p>
+<section id="why-positive-definiteness-helps">
+<h3>Why Positive Definiteness Helps<a class="headerlink" href="#why-positive-definiteness-helps" title="Link to this heading">#</a></h3>
+<p>Recall that an SPD matrix satisfies <span class="math notranslate nohighlight">\(A=A^T\)</span> and <span class="math notranslate nohighlight">\(v^TAv&gt;0\)</span> for every nonzero real vector <span class="math notranslate nohighlight">\(v\)</span>. For such a matrix, we can measure the error using the <strong>energy norm</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\|e\|_A=\sqrt{e^TAe}.
+\]</div>
+<p>This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. We use it because Gauss-Seidel reduces <span class="math notranslate nohighlight">\(e^TAe\)</span>: with all other components fixed, each component update chooses the value that minimizes this quadratic expression. A complete sweep therefore reduces the energy error unless the solution has already been reached.</p>
+<p>Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.</p>
+</section>
+<section id="proof-for-symmetric-positive-definite-matrices">
+<h3>Proof for Symmetric Positive Definite Matrices<a class="headerlink" href="#proof-for-symmetric-positive-definite-matrices" title="Link to this heading">#</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>This proof is optional.</strong> It involves more advanced mathematical arguments and is intended for students who want to deepen their understanding. You can skip it on a first reading.</p>
+</div>
+<div class="proof admonition" id="proof">
+<p>Proof. Assume <span class="math notranslate nohighlight">\(A=A^T\)</span> is positive definite, and put <span class="math notranslate nohighlight">\(M=D-L\)</span>. Each diagonal entry satisfies <span class="math notranslate nohighlight">\(a_{ii}=e_i^TAe_i&gt;0\)</span>, where <span class="math notranslate nohighlight">\(e_i\)</span> is the <span class="math notranslate nohighlight">\(i\)</span>th coordinate vector. Thus <span class="math notranslate nohighlight">\(D\)</span> is positive definite and <span class="math notranslate nohighlight">\(M\)</span> is nonsingular. Symmetry gives <span class="math notranslate nohighlight">\(U=L^T\)</span>, hence</p>
+<div class="math notranslate nohighlight">
+\[
+M+M^T-A=D.
+\]</div>
+<p>Let <span class="math notranslate nohighlight">\(e\)</span> be the error before a sweep. The error after the sweep is <span class="math notranslate nohighlight">\(Ge\)</span>, where</p>
+<div class="math notranslate nohighlight">
+\[
+G=M^{-1}U=I-M^{-1}A.
+\]</div>
+<p>Write <span class="math notranslate nohighlight">\(s=Ge-e\)</span> for the change in the error during this sweep. It satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+Ms=-Ae,
+\qquad Ge=e+s.
+\]</div>
+<p>Expand the change in squared energy norm:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|Ge\|_A^2-\|e\|_A^2
+&amp;=(e+s)^TA(e+s)-e^TAe\\
+&amp;=2s^TAe+s^TAs\\
+&amp;=-2s^TMs+s^TAs\\
+&amp;=-s^T(M+M^T-A)s\\
+&amp;=-s^TDs.
+\end{aligned}
+\end{split}\]</div>
+<p>The third line uses <span class="math notranslate nohighlight">\(Ae=-Ms\)</span>. The fourth uses the scalar identity <span class="math notranslate nohighlight">\(s^TMs=s^TM^Ts\)</span>.</p>
+<p>If <span class="math notranslate nohighlight">\(e\ne0\)</span>, then <span class="math notranslate nohighlight">\(s\ne0\)</span>: otherwise <span class="math notranslate nohighlight">\(Ms=-Ae\)</span> would give <span class="math notranslate nohighlight">\(Ae=0\)</span>, contradicting the nonsingularity of <span class="math notranslate nohighlight">\(A\)</span>. Since <span class="math notranslate nohighlight">\(D\)</span> is positive definite, we obtain</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\|e\|_A^2-\|Ge\|_A^2
+=s^TDs=\sum_i a_{ii}s_i^2&gt;0.
+}
+\]</div>
+<p>To finish, we need a reduction factor that works for every error direction. Since <span class="math notranslate nohighlight">\(A\)</span> is positive definite, the energy unit sphere <span class="math notranslate nohighlight">\(\|e\|_A=1\)</span> is a closed, bounded ellipsoid and hence compact. The continuous function <span class="math notranslate nohighlight">\(e\mapsto\|Ge\|_A\)</span> attains its maximum there. Every value is strictly less than one, so this maximum, call it <span class="math notranslate nohighlight">\(\gamma\)</span>, satisfies <span class="math notranslate nohighlight">\(0\le\gamma&lt;1\)</span>.</p>
+<p>Scaling any error vector to unit energy norm then gives <span class="math notranslate nohighlight">\(\|Ge\|_A\le\gamma\|e\|_A\)</span>. Repeating this bound yields</p>
+<div class="math notranslate nohighlight">
+\[
+\|e^{(k)}\|_A
+=\|G^ke^{(0)}\|_A
+\le\gamma^k\|e^{(0)}\|_A
+\longrightarrow0.
+\]</div>
+<p>Therefore Gauss-Seidel converges for every initial guess.</p>
+</div>
+<p>The energy identity explains why symmetry and positive definiteness matter: each sweep reduces the squared energy error by a sum of positive diagonal weights times squared component corrections. This decrease is in the <span class="math notranslate nohighlight">\(A\)</span>-norm; the Euclidean error need not decrease at every sweep. For another energy-norm proof, see <a class="reference external" href="https://www.math.iit.edu/~fass/577_ch4_end.pdf#page=7">Fass, Theorem 4.19</a>.</p>
+</section>
+</section>
+<section id="practical-considerations">
+<h2>Practical Considerations<a class="headerlink" href="#practical-considerations" title="Link to this heading">#</a></h2>
+<p>Guaranteed convergence can still be slow. Gauss-Seidel is useful both as a simple solver and as a component of more advanced methods. The <a class="reference internal" href="sor_method.html"><span class="std std-doc">next section</span></a> introduces SOR, which adjusts the component corrections through a relaxation parameter.</p>
 </section>
 </section>
 
@@ -688,8 +759,13 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#splitting-and-iteration">Splitting and Iteration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-and-implementation">Algorithm and Implementation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-code-example">Python Code Example</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditions-for-convergence">Conditions for Convergence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-analogy">Conceptual Analogy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conditions-for-convergence">Conditions for Convergence</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-for-strict-diagonal-dominance">Proof for Strict Diagonal Dominance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-positive-definiteness-helps">Why Positive Definiteness Helps</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proof-for-symmetric-positive-definite-matrices">Proof for Symmetric Positive Definite Matrices</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-considerations">Practical Considerations</a></li>
 </ul>
   </nav></div>
 
