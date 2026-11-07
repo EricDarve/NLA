@@ -623,7 +623,31 @@ Bz=0,
 \[
 \|e\|_A=\sqrt{e^TAe}.
 \]</div>
-<p>This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. We use it because Gauss-Seidel reduces <span class="math notranslate nohighlight">\(e^TAe\)</span>: with all other components fixed, each component update chooses the value that minimizes this quadratic expression. A complete sweep therefore reduces the energy error unless the solution has already been reached.</p>
+<p>This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. To understand why it is useful, consider the <strong>quadratic energy</strong></p>
+<div class="math notranslate nohighlight">
+\[
+\Phi(z)=\frac12 z^TAz-b^Tz.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(z\)</span> is a candidate solution, while <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span> is the exact solution. Completing the square gives</p>
+<div class="math notranslate nohighlight">
+\[
+\Phi(z)-\Phi(x)=\frac12(z-x)^TA(z-x)=\frac12\|z-x\|_A^2.
+\]</div>
+<p>Thus minimizing the energy is equivalent to reducing the squared energy error. Hold every component except <span class="math notranslate nohighlight">\(z_i\)</span> fixed. The derivative along this coordinate is</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\partial\Phi}{\partial z_i}
+=a_{ii}z_i+\sum_{j\ne i}a_{ij}z_j-b_i.
+\]</div>
+<p>Setting it to zero gives exactly the Gauss-Seidel component update, using the latest values of the other components. Since <span class="math notranslate nohighlight">\(a_{ii}&gt;0\)</span>, this is the unique minimum along that coordinate. Each update therefore moves parallel to one coordinate axis to the lowest energy on that line. Two such moves make a complete sweep in two dimensions.</p>
+<figure class="align-default" id="fig-gauss-seidel-energy">
+<a class="reference internal image-reference" href="../_images/gauss_seidel_energy.svg"><img alt="Elliptical energy contours with Gauss-Seidel updates alternating horizontally and vertically toward the origin. Each coordinate update ends where the contour is tangent to the direction of the move." src="../_images/gauss_seidel_energy.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">Coordinate minimization for <span class="math notranslate nohighlight">\(A=\begin{pmatrix}1&amp;-0.8\\-0.8&amp;1\end{pmatrix}\)</span> and <span class="math notranslate nohighlight">\(b=0\)</span>. Starting at <span class="math notranslate nohighlight">\(x^{(0)}=(2.4,1.8)^T\)</span>, first minimize along the horizontal direction, then along the vertical direction. One sweep gives <span class="math notranslate nohighlight">\(x^{(1)}=(1.44,1.152)^T\)</span>. At each endpoint, the contour is tangent to the direction just followed: the derivative in that direction is zero. Further sweeps approach the solution <span class="math notranslate nohighlight">\(x=0\)</span>.</span><a class="headerlink" href="#fig-gauss-seidel-energy" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>A complete sweep reduces the energy error unless the solution has already been reached. The plot makes this decrease visible through successively smaller ellipses.</p>
 <p>Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.</p>
 </section>
 <section id="proof-for-symmetric-positive-definite-matrices">

@@ -163,7 +163,36 @@ $$
 \|e\|_A=\sqrt{e^TAe}.
 $$
 
-This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. We use it because Gauss-Seidel reduces $e^TAe$: with all other components fixed, each component update chooses the value that minimizes this quadratic expression. A complete sweep therefore reduces the energy error unless the solution has already been reached.
+This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. To understand why it is useful, consider the **quadratic energy**
+
+$$
+\Phi(z)=\frac12 z^TAz-b^Tz.
+$$
+
+Here $z$ is a candidate solution, while $x=A^{-1}b$ is the exact solution. Completing the square gives
+
+$$
+\Phi(z)-\Phi(x)=\frac12(z-x)^TA(z-x)=\frac12\|z-x\|_A^2.
+$$
+
+Thus minimizing the energy is equivalent to reducing the squared energy error. Hold every component except $z_i$ fixed. The derivative along this coordinate is
+
+$$
+\frac{\partial\Phi}{\partial z_i}
+=a_{ii}z_i+\sum_{j\ne i}a_{ij}z_j-b_i.
+$$
+
+Setting it to zero gives exactly the Gauss-Seidel component update, using the latest values of the other components. Since $a_{ii}>0$, this is the unique minimum along that coordinate. Each update therefore moves parallel to one coordinate axis to the lowest energy on that line. Two such moves make a complete sweep in two dimensions.
+
+:::{figure} ../_static/gauss_seidel_energy.svg
+:alt: Elliptical energy contours with Gauss-Seidel updates alternating horizontally and vertically toward the origin. Each coordinate update ends where the contour is tangent to the direction of the move.
+:width: 100%
+:name: fig-gauss-seidel-energy
+
+Coordinate minimization for $A=\begin{pmatrix}1&-0.8\\-0.8&1\end{pmatrix}$ and $b=0$. Starting at $x^{(0)}=(2.4,1.8)^T$, first minimize along the horizontal direction, then along the vertical direction. One sweep gives $x^{(1)}=(1.44,1.152)^T$. At each endpoint, the contour is tangent to the direction just followed: the derivative in that direction is zero. Further sweeps approach the solution $x=0$.
+:::
+
+A complete sweep reduces the energy error unless the solution has already been reached. The plot makes this decrease visible through successively smaller ellipses.
 
 Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.
 
