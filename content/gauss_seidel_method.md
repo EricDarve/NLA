@@ -1,150 +1,238 @@
 # The Gauss-Seidel Iteration Method
 
-The Gauss-Seidel (GS) method, also known as the Seidel process or successive iteration method, is a stationary iterative algorithm designed to solve $A\mathbf{x} = \mathbf{b}$. Although commonly attributed to Gauss and Seidel, historical accounts note that Gauss nowhere mentioned it, and Seidel (1874) mentioned the process but recommended against its use.
+Gauss-Seidel iteration uses newly computed solution components as soon as they become available. This lets a correction influence later components within the same sweep through the unknowns. Jacobi, by comparison, uses only values from the preceding sweep.
 
-The Gauss-Seidel method improves upon the Jacobi iteration by using updated solution components as soon as they become available within the current iteration. This characteristic makes it a **successive iteration** method, in contrast to the Jacobi method, which performs updates simultaneously.
+We consider a real linear system $Ax=b$, where $A$ is nonsingular and has nonzero diagonal entries.
 
 ## Splitting and Iteration
 
-Like the Jacobi method, Gauss-Seidel is a splitting method, where the coefficient matrix $A$ is decomposed as $A = M - N$. We use the standard decomposition of $A$ into its diagonal ($D$), strictly lower triangular ($L$), and strictly upper triangular ($U$) parts, such that $A = D - L - U$.
+Use the same sign convention as for Jacobi:
 
-For the (forward) Gauss-Seidel method, the splitting matrices are chosen as:
+$$
+A=D-L-U,
+$$
 
-$$M = D - L \quad \text{and} \quad N = U$$
+where $D$ contains the diagonal entries, while $-L$ and $-U$ are the strictly lower and strictly upper triangular parts of $A$.
 
-Substituting this splitting into the general stationary iteration form $M \mathbf{x}^{(k+1)} = \mathbf{b} + N \mathbf{x}^{(k)}$ yields the defining equation for the Gauss-Seidel iteration:
+Forward Gauss-Seidel uses $M=D-L$ and $N=U$. The splitting iteration is therefore
 
-$$(D - L) \mathbf{x}^{(k+1)} = \mathbf{b} + U \mathbf{x}^{(k)}$$
+$$
+(D-L)x^{(k+1)}=b+Ux^{(k)}.
+$$
 
-Since $D-L$ is a lower triangular matrix, computing $\mathbf{x}^{(k+1)}$ involves solving a triangular system. The Gauss-Seidel iteration matrix is $G = R_{GS} = (D-L)^{-1}U$.
+Since $D-L$ is lower triangular, each sweep is a forward substitution. We denote the Gauss-Seidel iteration matrix by $G$; it is $R=M^{-1}N$ for this splitting:
 
-In component form, the update for the $i$-th component $x_i$ uses the newly computed components $x_j^{(k+1)}$ for $j < i$ and the previously calculated components $x_j^{(k)}$ for $j > i$:
+$$
+G=(D-L)^{-1}U.
+$$
 
-$$x_i^{(k+1)} = \frac{1}{a_{ii}} \left( b_i - \sum_{j=1}^{i-1} a_{ij} x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij} x_j^{(k)} \right)$$
+In component form,
+
+$$
+x_i^{(k+1)}
+=\frac{1}{a_{ii}}
+\left(
+b_i-\sum_{j<i}a_{ij}x_j^{(k+1)}
+   -\sum_{j>i}a_{ij}x_j^{(k)}
+\right).
+$$
+
+The first sum uses values already updated in this sweep. The second uses values that have not yet been updated.
 
 ## Algorithm and Implementation
 
-A key difference between Gauss-Seidel and Jacobi iteration lies in the dependencies: because the components of $\mathbf{x}^{(k+1)}$ must be computed sequentially (or successively), the Gauss-Seidel method is **less parallel** than the Jacobi method. Conversely, Gauss-Seidel typically converges **faster than Jacobi, often requiring about half the number of iterations in many cases.**
+A sweep can overwrite the solution vector in place. When updating component $i$, the entries before it already contain new values, while those after it still contain old values.
+
+These dependencies make a standard Gauss-Seidel sweep less parallel than Jacobi. Reusing new values often improves convergence, but the comparison depends on the matrix and the ordering of the unknowns.
 
 ## Python Code Example
 
-Here is a simple implementation of the Gauss-Seidel method in Python:
+As in the [Jacobi implementation](jacobi_method.md), the stopping criterion checks the scaled residual
+
+$$
+\eta(x^{(k)})=
+\frac{\|b-Ax^{(k)}\|_\infty}
+{\|A\|_\infty\|x^{(k)}\|_\infty+\|b\|_\infty}.
+$$
+
+This checks how accurately the equations are satisfied. Small changes between iterates alone can give a misleading stopping test.
 
 ```python
 import numpy as np
 
 def gauss_seidel(A, b, x0=None, tol=1e-10, max_iter=1000):
+    """Return (x, sweeps), stopping when the scaled residual is <= tol.
+
+    A and b are real arrays. Raise RuntimeError if the iteration limit
+    is reached without satisfying the stopping criterion.
     """
-    Solve the linear system Ax = b using the Gauss-Seidel iteration method.
-    
-    Parameters:
-    -----------
-    A : ndarray
-        Coefficient matrix (n x n)
-    b : ndarray
-        Right-hand side vector (n,)
-    x0 : ndarray, optional
-        Initial guess (n,). If None, uses zero vector.
-    tol : float, optional
-        Tolerance for convergence (default: 1e-10)
-    max_iter : int, optional
-        Maximum number of iterations (default: 1000)
-    
-    Returns:
-    --------
-    x : ndarray
-        Approximate solution vector
-    iterations : int
-        Number of iterations performed
-    """
-    n = len(b)
-    x = np.zeros(n) if x0 is None else x0.copy()
-    
-    for k in range(max_iter):
-        x_old = x.copy()
-        
-        # Update each component using the latest available values
-        for i in range(n):
-            sigma = np.dot(A[i, :i], x[:i]) + np.dot(A[i, i+1:], x[i+1:])
-            x[i] = (b[i] - sigma) / A[i, i]
-        
-        # Check convergence
-        if np.linalg.norm(x - x_old, ord=np.inf) < tol:
-            return x, k + 1
-    
-    print(f"Warning: Maximum iterations ({max_iter}) reached without convergence")
-    return x, max_iter
+    A = np.asarray(A, dtype=float)
+    b = np.asarray(b, dtype=float)
+    if b.ndim != 1 or A.shape != (b.size, b.size):
+        raise ValueError("A must be square and b a matching vector.")
+    if not np.isfinite(tol) or tol <= 0:
+        raise ValueError("tol must be positive and finite.")
+    if not isinstance(max_iter, (int, np.integer)) or max_iter < 0:
+        raise ValueError("max_iter must be a nonnegative integer.")
+    if np.any(np.diag(A) == 0):
+        raise ValueError("Gauss-Seidel requires nonzero diagonal entries.")
+
+    x = np.zeros_like(b) if x0 is None else np.array(x0, dtype=float, copy=True)
+    if x.shape != b.shape:
+        raise ValueError("x0 must have the same shape as b.")
+
+    norm_A = np.linalg.norm(A, ord=np.inf)
+    norm_b = np.linalg.norm(b, ord=np.inf)
+    for k in range(max_iter + 1):
+        r = b - A @ x
+        scale = norm_A * np.linalg.norm(x, ord=np.inf) + norm_b
+        if np.linalg.norm(r, ord=np.inf) <= tol * scale:
+            return x, k
+        if k < max_iter:
+            for i in range(b.size):
+                # x[:i] is new; x[i+1:] is still from the old sweep.
+                sigma = A[i, :i] @ x[:i] + A[i, i+1:] @ x[i+1:]
+                x[i] = (b[i] - sigma) / A[i, i]
+
+    raise RuntimeError("Gauss-Seidel did not converge within max_iter sweeps.")
 ```
+
+The returned count is zero if the initial guess already satisfies the tolerance. The code also accepts the exact zero solution when both the residual and its scale are zero.
+
+The implementation uses dense NumPy arrays. For sparse matrices, each row update needs only the nonzero entries in that row.
 
 ## Conditions for Convergence
 
-The convergence of the Gauss-Seidel iteration is determined by the spectral radius of the iteration matrix $G = (D-L)^{-1}U$. The scheme converges for any initial guess $\mathbf{x}^{(0)}$ if and only if $\rho(G) < 1$.
+By the splitting convergence theorem, Gauss-Seidel converges for every initial guess if and only if $\rho(G)<1$. Two useful matrix properties guarantee this condition.
 
-We present sufficient conditions that guarantee convergence:
-
-```{prf:theorem} Convergence of Gauss-Seidel Method
+:::{prf:theorem} Convergence of the Gauss-Seidel Method
 :label: thm:gauss_seidel_convergence
 
-The associated Gauss-Seidel iteration converges for any initial guess $\mathbf{x}^{(0)}$ if $A$ satisfies one of the following conditions:
+Gauss-Seidel converges to the unique solution of $Ax=b$ for every initial guess if either of the following holds:
 
-1.  **Strict Diagonal Dominance:** $A$ is **strictly row diagonally dominant** (or strictly column diagonally dominant), i.e.,
+1. $A$ is strictly row diagonally dominant,
+   $|a_{ii}|>\sum_{j\ne i}|a_{ij}|$ for every $i$, or strictly column diagonally dominant,
+   $|a_{jj}|>\sum_{i\ne j}|a_{ij}|$ for every $j$.
+2. $A$ is symmetric positive definite (SPD).
 
-    $$|a_{ii}| > \sum_{j \neq i} |a_{ij}| \quad \text{for all } i$$
+These are sufficient conditions; neither is required for every convergent Gauss-Seidel iteration.
+:::
 
-2.  **Symmetric Positive Definite (SPD):** $A$ is **Symmetric Positive Definite**.
-```
+### Proof for Strict Diagonal Dominance
 
-```{prf:proof}
+:::{prf:proof}
+We show that an eigenvalue with magnitude at least one would force a strictly diagonally dominant matrix to be singular, which is impossible.
 
-We prove the convergence under the condition of strict row diagonal dominance (SRDD).
+Suppose $Gz=\lambda z$ with $z\ne0$ and $|\lambda|\ge1$. Multiplying by $D-L$ gives
 
-Let $G = (D-L)^{-1}U$ be the Gauss-Seidel iteration matrix. By the splitting method convergence theorem, we need to show that if $A$ is SRDD, then $\rho(G) < 1$. This is equivalent to showing that for any eigenvalue $\lambda$ of $G$, we have $|\lambda| < 1$.
+$$
+Uz=\lambda(D-L)z,
+\qquad
+Bz=0,
+\qquad B=\lambda D-\lambda L-U.
+$$
 
-1.  **Assume Contradiction:** Assume there exists an eigenvalue $\lambda$ such that $|\lambda| \ge 1$. Let $\mathbf{x} \neq \mathbf{0}$ be the corresponding eigenvector:
+Thus $B$ is singular. Its diagonal entries are $\lambda a_{ii}$. Its lower triangular entries are $\lambda a_{ij}$, and its upper triangular entries are $a_{ij}$. Since $|\lambda|\ge1$, every off-diagonal magnitude is at most $|\lambda|\,|a_{ij}|$.
 
-    $$G \mathbf{x} = \lambda \mathbf{x}$$
+If $A$ is strictly row diagonally dominant, then
 
-2.  **Derive Singular Matrix:** Substitute the splitting definition $G = (D-L)^{-1}U$:
+$$
+\sum_{j\ne i}|B_{ij}|
+\le|\lambda|\sum_{j\ne i}|a_{ij}|
+<|\lambda|\,|a_{ii}|
+=|B_{ii}|.
+$$
 
-    $$\begin{aligned}
-    (D-L)^{-1}U \mathbf{x} &= \lambda \mathbf{x} \\
-    U \mathbf{x} &= \lambda (D - L) \mathbf{x}
-    \end{aligned}$$
+Hence $B$ is also strictly row diagonally dominant. If $A$ is strictly column diagonally dominant, the same argument applied to column sums gives
 
-    Rearranging this gives:
+$$
+\sum_{i\ne j}|B_{ij}|
+\le|\lambda|\sum_{i\ne j}|a_{ij}|
+<|\lambda|\,|a_{jj}|
+=|B_{jj}|.
+$$
 
-    $$(\lambda D - \lambda L - U) \mathbf{x} = \mathbf{0}$$
+For a strictly row diagonally dominant matrix, every Gershgorin disc excludes zero, so the matrix is nonsingular. For column dominance, apply the same argument to $B^T$, which is nonsingular exactly when $B$ is. In either case, $B$ is nonsingular, contradicting $Bz=0$. Therefore every eigenvalue of $G$ has magnitude less than one, proving convergence.
+:::
 
-    Since $\mathbf{x} \neq \mathbf{0}$, the matrix $A(\lambda) = \lambda D - \lambda L - U$ must be **singular**.
+### Why Positive Definiteness Helps
 
-3.  **Establish Diagonal Dominance of $A(\lambda)$:** We now show that if $A$ is SRDD and $|\lambda| \ge 1$, then $A(\lambda)$ must also be SRDD, implying it is nonsingular (which leads to a contradiction).
-    *   The entries of $A(\lambda)$ are:
-        *   Diagonal: $A(\lambda)_{ii} = \lambda a_{ii}$
-        *   Lower triangular (for $j < i$): $A(\lambda)_{ij} = -\lambda a_{ij}$
-        *   Upper triangular (for $j > i$): $A(\lambda)_{ij} = -a_{ij}$
-    *   Consider the $i$-th row of $A(\lambda)$. The magnitude of the diagonal element is $|A(\lambda)_{ii}| = |\lambda| |a_{ii}|$.
-    *   The sum of the magnitudes of the off-diagonal elements in the $i$-th row is:
+Recall that an SPD matrix satisfies $A=A^T$ and $v^TAv>0$ for every nonzero real vector $v$. For such a matrix, we can measure the error using the **energy norm**
 
-        $$\begin{aligned}
-        \sum_{j \neq i} |A(\lambda)_{ij}| &= \sum_{j < i} |-\lambda a_{ij}| + \sum_{j > i} |-a_{ij}| \\
-        &= |\lambda| \sum_{j < i} |a_{ij}| + \sum_{j > i} |a_{ij}|
-        \end{aligned}$$
+$$
+\|e\|_A=\sqrt{e^TAe}.
+$$
 
-    *   Since $A$ is SRDD, we know that $|a_{ii}| > \sum_{j \neq i} |a_{ij}| = \sum_{j < i} |a_{ij}| + \sum_{j > i} |a_{ij}|$.
-    *   Since $|\lambda| \ge 1$, and $|a_{ij}| \ge 0$:
+This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. We use it because Gauss-Seidel reduces $e^TAe$: with all other components fixed, each component update chooses the value that minimizes this quadratic expression. A complete sweep therefore reduces the energy error unless the solution has already been reached.
 
-        $$|\lambda| \sum_{j < i} |a_{ij}| \ge \sum_{j < i} |a_{ij}|$$
+Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.
 
-    *   Therefore:
+### Proof for Symmetric Positive Definite Matrices
 
-        $$\sum_{j \neq i} |A(\lambda)_{ij}| \le |\lambda| \sum_{j < i} |a_{ij}| + |\lambda| \sum_{j > i} |a_{ij}| = |\lambda| \left( \sum_{j \neq i} |a_{ij}| \right)$$
+:::{note}
+**This proof is optional.** It involves more advanced mathematical arguments and is intended for students who want to deepen their understanding. You can skip it on a first reading.
+:::
 
-    *   Since $A$ is strictly dominant, $\sum_{j \neq i} |a_{ij}| < |a_{ii}|$.
-    *   Thus, $\sum_{j \neq i} |A(\lambda)_{ij}| < |\lambda| |a_{ii}| = |A(\lambda)_{ii}|$.
+:::{prf:proof}
+Assume $A=A^T$ is positive definite, and put $M=D-L$. Each diagonal entry satisfies $a_{ii}=e_i^TAe_i>0$, where $e_i$ is the $i$th coordinate vector. Thus $D$ is positive definite and $M$ is nonsingular. Symmetry gives $U=L^T$, hence
 
-**Conclusion:** $A(\lambda)$ is strictly row diagonally dominant. A strictly diagonally dominant matrix is nonsingular. This contradicts the necessity that $A(\lambda)$ must be singular if $|\lambda| \ge 1$. Therefore, our initial assumption must be false, and we conclude that **$|\lambda| < 1$**. The Gauss-Seidel iteration converges.
-```
+$$
+M+M^T-A=D.
+$$
 
-## Conceptual Analogy
+Let $e$ be the error before a sweep. The error after the sweep is $Ge$, where
 
-The Gauss-Seidel method is like having a team of specialized construction workers updating a skyscraper sequentially: the foundation workers (lower indices) immediately use freshly poured concrete from their upstream colleagues to speed up their work, which generally results in the building (the solution) reaching stability much faster than if every team waited for every other team to finish their previous task (as in Jacobi). However, the critical path (the dependency on the previous worker's job) makes it harder to use 1,000 workers simultaneously compared to the independent setup of Jacobi.
+$$
+G=M^{-1}U=I-M^{-1}A.
+$$
+
+Write $s=Ge-e$ for the change in the error during this sweep. It satisfies
+
+$$
+Ms=-Ae,
+\qquad Ge=e+s.
+$$
+
+Expand the change in squared energy norm:
+
+$$
+\begin{aligned}
+\|Ge\|_A^2-\|e\|_A^2
+&=(e+s)^TA(e+s)-e^TAe\\
+&=2s^TAe+s^TAs\\
+&=-2s^TMs+s^TAs\\
+&=-s^T(M+M^T-A)s\\
+&=-s^TDs.
+\end{aligned}
+$$
+
+The third line uses $Ae=-Ms$. The fourth uses the scalar identity $s^TMs=s^TM^Ts$.
+
+If $e\ne0$, then $s\ne0$: otherwise $Ms=-Ae$ would give $Ae=0$, contradicting the nonsingularity of $A$. Since $D$ is positive definite, we obtain
+
+$$
+\boxed{
+\|e\|_A^2-\|Ge\|_A^2
+=s^TDs=\sum_i a_{ii}s_i^2>0.
+}
+$$
+
+To finish, we need a reduction factor that works for every error direction. Since $A$ is positive definite, the energy unit sphere $\|e\|_A=1$ is a closed, bounded ellipsoid and hence compact. The continuous function $e\mapsto\|Ge\|_A$ attains its maximum there. Every value is strictly less than one, so this maximum, call it $\gamma$, satisfies $0\le\gamma<1$.
+
+Scaling any error vector to unit energy norm then gives $\|Ge\|_A\le\gamma\|e\|_A$. Repeating this bound yields
+
+$$
+\|e^{(k)}\|_A
+=\|G^ke^{(0)}\|_A
+\le\gamma^k\|e^{(0)}\|_A
+\longrightarrow0.
+$$
+
+Therefore Gauss-Seidel converges for every initial guess.
+:::
+
+The energy identity explains why symmetry and positive definiteness matter: each sweep reduces the squared energy error by a sum of positive diagonal weights times squared component corrections. This decrease is in the $A$-norm; the Euclidean error need not decrease at every sweep. For another energy-norm proof, see [Fass, Theorem 4.19](https://www.math.iit.edu/~fass/577_ch4_end.pdf#page=7).
+
+## Practical Considerations
+
+Guaranteed convergence can still be slow. Gauss-Seidel is useful both as a simple solver and as a component of more advanced methods. The [next section](sor_method.md) introduces SOR, which adjusts the component corrections through a relaxation parameter.

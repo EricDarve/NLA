@@ -1,72 +1,40 @@
 # Classical Iterative Methods
 
-Splitting methods form the basis of a fundamental class of **stationary iterative methods** used to solve linear systems $A\mathbf{x} = \mathbf{b}$. A stationary iterative method generates a sequence of iterates $\mathbf{x}^{(k)}$ converging to the solution $\mathbf{x} = A^{-1}\mathbf{b}$, where the calculation of $\mathbf{x}^{(k+1)}$ from $\mathbf{x}^{(k)}$ is computationally inexpensive.
+For a large sparse linear system $Ax=b$, computing a factorization may require too much work or storage. Iterative methods offer another approach: start with a guess and improve it through a sequence of inexpensive corrections.
 
-A splitting method begins by decomposing the coefficient matrix $A$ into the difference of two matrices, $M$ and $N$ (or sometimes $C$ and $R$, or $M$ and $K$):
+This chapter introduces simple methods that help explain how iteration works, why it can succeed or fail, and how it can be accelerated.
 
-$$
-A = M - N
-$$
+## Why Use an Iterative Method?
 
-Here, $M$ must be chosen such that it is nonsingular and a linear system involving $M$ is easily solvable.
+A sparse matrix contains relatively few nonzero entries. Such matrices arise naturally when each unknown interacts with only a few others. For example, a differential equation discretized on a grid often couples each grid point to its immediate neighbors.
 
-The original equation $A\mathbf{x} = \mathbf{b}$ can then be rewritten as $M\mathbf{x} = N\mathbf{x} + \mathbf{b}$. This leads directly to the core iterative step:
+Working with these local interactions can be inexpensive. Factorization, however, can introduce additional nonzero entries into the factors. This **fill-in** increases the work and memory required, sometimes substantially.
 
-$$
-M \mathbf{x}^{(k+1)} = N \mathbf{x}^{(k)} + \mathbf{b}
-$$
+An iterative method can work directly with the sparse matrix and a few vectors. Its attraction is that each correction can be much cheaper than a factorization. The total cost then depends on how many corrections are needed to obtain an accurate enough solution. Sparse direct methods remain useful; the choice depends on the problem and the accuracy required.
 
-This can alternatively be expressed as:
+## The Basic Idea: Repeated Inexpensive Corrections
 
-$$
-\mathbf{x}^{(k+1)} = M^{-1} N \mathbf{x}^{(k)} + M^{-1} \mathbf{b} = R \mathbf{x}^{(k)} + \mathbf{c}.
-$$
+Begin with an approximate solution and check how well it satisfies the equations. The mismatch is called the **residual**. Use that mismatch to compute a correction, update the approximation, and repeat.
 
-The convergence of these iterative schemes is determined solely by the **spectral radius** of the iteration matrix $R = M^{-1}N$. These iterative schemes converge for any initial guess $\mathbf{x}^{(0)}$ and $\mathbf{b}$ if and only if $\rho(M^{-1} N) < 1$.
+The key is to make the correction affordable. A **splitting method** separates the matrix into a part that gives an easy linear solve and a remainder handled using the current approximation. Different choices lead to different iterative methods.
 
-Classical splitting methods are defined by specific choices for $M$:
+When the same update rule is used throughout, the method is called **stationary**. These methods are simple to understand and implement, but cheap updates alone do not guarantee a useful solver. The approximations may converge slowly or fail to converge. We therefore need to understand both whether a method converges and how quickly it does so.
 
-* **Jacobi Method:** $M = D$, where $D$ is the diagonal of $A$.
-* **Gauss-Seidel Method:** $M = D - L$, where $L$ is the strictly lower triangular part of $A$.
-* **Successive Over-Relaxation (SOR):** $M = \frac{1}{\omega}D - L$, where $\omega$ is the relaxation parameter. SOR includes Gauss-Seidel as the special case when $\omega=1$.
+## What This Chapter Develops
 
-More advanced techniques, like **Chebyshev iteration**, utilize properties of the spectrum of the iteration matrix to accelerate convergence, positioning them as an effective refinement of the basic stationary approach.
+The [next section](splitting_methods_definition.md) makes the splitting idea precise and establishes a convergence criterion. The following sections develop the main methods:
 
-## Motivation: The Problem with Direct Methods for Large Sparse Systems
+- **[Jacobi](jacobi_method.md)** updates every component using the previous approximation. The updates are independent, making the method well suited to parallel computation.
+- **[Gauss-Seidel](gauss_seidel_method.md)** uses newly computed values as soon as they become available. This changes how information passes through the system and introduces dependencies between updates.
+- **[Successive over-relaxation (SOR)](sor_method.md)** adjusts the size of each Gauss-Seidel correction. A suitable choice can accelerate convergence.
+- **[Chebyshev acceleration](chebyshev_acceleration.md)** chooses changing coefficients using bounds for the eigenvalues. It connects the polynomial ideas from the eigenvalue chapter to solving linear systems.
 
-Splitting methods and other iterative techniques are essential for solving **large sparse linear systems** ($A\mathbf{x} = \mathbf{b}$) because classical **direct solution methods** suffer from catastrophic computational and memory disadvantages in this context.
+On a first reading, focus on how each method computes its corrections and what guarantees convergence. The arguments marked optional give further justification, but can be skipped without losing the main progression.
 
-## The Problem with LU and Cholesky Factorization
+## Their Role in Larger Solvers
 
-Direct methods, such as Gaussian elimination leading to LU factorization (or Cholesky factorization for symmetric positive definite matrices), are highly efficient for dense matrices, typically requiring $O(n^3)$ floating point operations (flops). LU factorization requires $O(n^3)$ flops, and Cholesky factorization requires $n^3/3$ flops.
+Classical methods can be slow when used on their own, but their inexpensive corrections remain useful inside more powerful algorithms.
 
-However, when $A$ is a **large sparse matrix** (often arising from the discretization of Partial Differential Equations, where the number of non-zero entries may be linear, $O(n)$), these direct methods face two critical issues:
+One role is **preconditioning**: a simple approximate solve helps another iterative method make faster progress. We return to this idea in the later [preconditioning section](preconditioning.md).
 
-1. **High Computational Cost:** While sparsity helps reduce the $O(n^3)$ cost, for truly large systems (especially arising from 3D models), the computational expense remains too high. For a band matrix with semi-bandwidth $w$, the factorization cost is approximately $N w^2/2$ flops, where $N$ is the order of the matrix.
-2. **Fill-in:** During the factorization process (e.g., $A=LU$ or $A=LL^T$), new non-zero entries (**fill-in**) are often introduced in positions that were originally zero in $A$. This fill-in drastically increases the memory required to store the factors $L$ and $U$ and complicates the data structures needed to manage the sparse matrix efficiently. In the context of large-scale problems, the demand for computer storage can become unmanageable.
-
-Because of these limitations, iterative methods are practically mandatory for solving systems arising from modern, complex models, such as three-dimensional PDEs.
-
-## Advantages and Limitations of Splitting Methods
-
-The splitting approach provides a viable alternative by reformulating the solution process into an iterative sequence:
-
-### Advantages
-
-*   **Exploitation of Sparsity:** Splitting methods naturally exploit the sparsity of $A$. Since the primary operation required per iteration is a matrix-vector product ($N\mathbf{x}^{(k)}$) and solving a system with $M$ ($M\mathbf{x}^{(k+1)} = \dots$), and $M$ is chosen to be simple (like diagonal or triangular) and $N$ may be sparser than $A$, the computational work per step is minimal.
-*   **Computational Simplicity and Parallelism:** These methods are relatively easy to program and require minimal storage (low storage requirement is a main appeal of iterative methods). The updates in methods like Jacobi iteration can often be performed simultaneously or in parallel, making them attractive for parallel computing environments.
-*   **Flexibility (Preconditioning):** The matrix $M$ is commonly referred to as the **preconditioning matrix**. The splitting methods themselves, especially in their symmetric variants (SSOR), serve as essential building blocks for more robust and powerful modern techniques, notably the **preconditioned Conjugate Gradient (CG)** method or other Krylov subspace methods.
-
-### Limitations
-
-*   **Convergence Rate and Guarantee:** The method may converge very slowly or, potentially, not converge at all ($\rho(M^{-1}N) \ge 1$). For example, the Jacobi method is guaranteed to converge only if the matrix is strictly row or column diagonally dominant.
-*   **Suboptimal Performance:** For sufficiently large problems ($n$ large), basic splitting methods like Jacobi and SOR are generally inferior in performance to highly advanced methods like Fast Fourier Transform (FFT), block cyclic reduction, and Multigrid.
-*   **Polynomial Acceleration:** Certain splittings, such as SOR, can lead to iteration matrices where polynomial acceleration (like Chebyshev acceleration) is difficult or yields only minor improvements, especially if the spectrum of the iteration matrix is located on a circle.
-
-## Use Cases, Applications, and Motivation
-
-Splitting methods are highly motivated by applications that lead to massive, sparse linear systems:
-
-*   **Discretization of PDEs:** A primary application is solving systems arising from finite difference or finite element discretizations of Partial Differential Equations, particularly elliptic types. In these cases, the coefficient matrix $A$ is typically large and highly sparse, with a well-defined structure (e.g., matrices consisting of a few nonzero diagonals).
-*   **Preconditioning:** The most significant modern use case for classical splitting methods is as preconditioners. The matrix $M$ is sought to be a simple, easily invertible approximation of $A$ such that the preconditioned system $M^{-1} A \mathbf{x} = M^{-1} \mathbf{b}$ has a much smaller condition number $\kappa(M^{-1}A)$ than $\kappa(A)$. A small condition number leads to fast convergence when combined with Krylov subspace acceleration methods (like Conjugate Gradient or GMRES).
-*   **Building Blocks for Multilevel Methods:** Basic iterative methods remain relevant as they often serve as "smoothers" within sophisticated multilevel methods like Multigrid, where their simplicity and ability to quickly damp high-frequency error components are leveraged.
+Another role is **smoothing** in multigrid. For suitable grid-based problems, classical iterations can quickly reduce error that oscillates between neighboring points. Coarser grids then help remove error that varies more slowly. This division of work can make a simple iteration valuable even when it would be slow as a complete solver.
