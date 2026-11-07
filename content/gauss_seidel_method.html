@@ -648,7 +648,22 @@ Bz=0,
 </figcaption>
 </figure>
 <p>A complete sweep reduces the energy error unless the solution has already been reached. The plot makes this decrease visible through successively smaller ellipses.</p>
-<p>Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.</p>
+<p>For comparison, apply Jacobi to the same system from the same starting point. Both new coordinates use the old vector, so its first sweep gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+x^{(1)}_{\mathrm{Jacobi}}
+=\begin{pmatrix}0.8(1.8)\\0.8(2.4)\end{pmatrix}
+=\begin{pmatrix}1.44\\1.92\end{pmatrix}.
+\end{split}\]</div>
+<p>Gauss-Seidel instead uses the new first coordinate <span class="math notranslate nohighlight">\(1.44\)</span> in the second update, giving <span class="math notranslate nohighlight">\(0.8(1.44)=1.152\)</span>. The next figure shows four sweeps computed with each method. Jacobi moves back and forth across the long axis of the ellipses, while Gauss-Seidel follows successive coordinate minima and approaches the solution faster in this example.</p>
+<figure class="align-default" id="fig-jacobi-gauss-seidel">
+<a class="reference internal image-reference" href="../_images/jacobi_gauss_seidel.svg"><img alt="Four computed sweeps from the same starting point. Jacobi alternates across the long axis of the energy contours; Gauss-Seidel takes horizontal and vertical coordinate-minimizing steps and ends closer to the origin." src="../_images/jacobi_gauss_seidel.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 22 </span><span class="caption-text">Actual iterates for the same quadratic energy as above, with identical axes and contours. Filled points numbered <span class="math notranslate nohighlight">\(0\)</span> through <span class="math notranslate nohighlight">\(4\)</span> mark completed sweeps. On the left, each arrow connects two Jacobi iterates; it represents a simultaneous update, not minimization along the segment. On the right, blue horizontal and orange vertical arrows show the two Gauss-Seidel component updates; open circles mark the intermediate points.</span><a class="headerlink" href="#fig-jacobi-gauss-seidel" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Gauss-Seidel’s energy decrease explains the geometry, but strict decrease alone is not enough to prove convergence to zero. The optional proof below establishes a fixed reduction factor less than one that works for every error direction.</p>
 </section>
 <section id="proof-for-symmetric-positive-definite-matrices">
 <h3>Proof for Symmetric Positive Definite Matrices<a class="headerlink" href="#proof-for-symmetric-positive-definite-matrices" title="Link to this heading">#</a></h3>

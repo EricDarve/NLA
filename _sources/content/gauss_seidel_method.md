@@ -194,7 +194,25 @@ Coordinate minimization for $A=\begin{pmatrix}1&-0.8\\-0.8&1\end{pmatrix}$ and $
 
 A complete sweep reduces the energy error unless the solution has already been reached. The plot makes this decrease visible through successively smaller ellipses.
 
-Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.
+For comparison, apply Jacobi to the same system from the same starting point. Both new coordinates use the old vector, so its first sweep gives
+
+$$
+x^{(1)}_{\mathrm{Jacobi}}
+=\begin{pmatrix}0.8(1.8)\\0.8(2.4)\end{pmatrix}
+=\begin{pmatrix}1.44\\1.92\end{pmatrix}.
+$$
+
+Gauss-Seidel instead uses the new first coordinate $1.44$ in the second update, giving $0.8(1.44)=1.152$. The next figure shows four sweeps computed with each method. Jacobi moves back and forth across the long axis of the ellipses, while Gauss-Seidel follows successive coordinate minima and approaches the solution faster in this example.
+
+:::{figure} ../_static/jacobi_gauss_seidel.svg
+:alt: Four computed sweeps from the same starting point. Jacobi alternates across the long axis of the energy contours; Gauss-Seidel takes horizontal and vertical coordinate-minimizing steps and ends closer to the origin.
+:width: 100%
+:name: fig-jacobi-gauss-seidel
+
+Actual iterates for the same quadratic energy as above, with identical axes and contours. Filled points numbered $0$ through $4$ mark completed sweeps. On the left, each arrow connects two Jacobi iterates; it represents a simultaneous update, not minimization along the segment. On the right, blue horizontal and orange vertical arrows show the two Gauss-Seidel component updates; open circles mark the intermediate points.
+:::
+
+Gauss-Seidel's energy decrease explains the geometry, but strict decrease alone is not enough to prove convergence to zero. The optional proof below establishes a fixed reduction factor less than one that works for every error direction.
 
 ### Proof for Symmetric Positive Definite Matrices
 
