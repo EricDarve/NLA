@@ -264,4 +264,6 @@ The energy identity explains why symmetry and positive definiteness matter: each
 
 ## Practical Considerations
 
+For the standard five-point Poisson problem on a square grid with red-black ordering, **Gauss-Seidel converges about twice as fast as Jacobi in terms of sweeps**. Its spectral radius satisfies $\rho(G)=\rho(R_J)^2$, so one Gauss-Seidel sweep gives the same asymptotic decay factor as two Jacobi sweeps. It therefore needs about half as many sweeps for the same error reduction. This comparison is specific to this model problem; it is not a general guarantee or a claim about elapsed computing time. The [Poisson-grid comparison in the SOR section](sor_method.md) illustrates these rates.
+
 Guaranteed convergence can still be slow. Gauss-Seidel is useful both as a simple solver and as a component of more advanced methods. The [next section](sor_method.md) introduces SOR, which adjusts the component corrections through a relaxation parameter.
