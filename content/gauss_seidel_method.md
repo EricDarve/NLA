@@ -163,9 +163,56 @@ $$
 \|e\|_A=\sqrt{e^TAe}.
 $$
 
-This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. We use it because Gauss-Seidel reduces $e^TAe$: with all other components fixed, each component update chooses the value that minimizes this quadratic expression. A complete sweep therefore reduces the energy error unless the solution has already been reached.
+This is the Euclidean norm after weighting the eigenvector components by the square roots of the positive eigenvalues. To understand why it is useful, consider the **quadratic energy**
 
-Strict decrease alone is not enough to prove convergence to zero. The optional proof establishes a fixed reduction factor less than one that works for every error direction.
+$$
+\Phi(z)=\frac12 z^TAz-b^Tz.
+$$
+
+Here $z$ is a candidate solution, while $x=A^{-1}b$ is the exact solution. Completing the square gives
+
+$$
+\Phi(z)-\Phi(x)=\frac12(z-x)^TA(z-x)=\frac12\|z-x\|_A^2.
+$$
+
+Thus minimizing the energy is equivalent to reducing the squared energy error. Hold every component except $z_i$ fixed. The derivative along this coordinate is
+
+$$
+\frac{\partial\Phi}{\partial z_i}
+=a_{ii}z_i+\sum_{j\ne i}a_{ij}z_j-b_i.
+$$
+
+Setting it to zero gives exactly the Gauss-Seidel component update, using the latest values of the other components. Since $a_{ii}>0$, this is the unique minimum along that coordinate. Each update therefore moves parallel to one coordinate axis to the lowest energy on that line. Two such moves make a complete sweep in two dimensions.
+
+:::{figure} ../_static/gauss_seidel_energy.svg
+:alt: Elliptical energy contours with Gauss-Seidel updates alternating horizontally and vertically toward the origin. Each coordinate update ends where the contour is tangent to the direction of the move.
+:width: 100%
+:name: fig-gauss-seidel-energy
+
+Coordinate minimization for $A=\begin{pmatrix}1&-0.8\\-0.8&1\end{pmatrix}$ and $b=0$. Starting at $x^{(0)}=(2.4,1.8)^T$, first minimize along the horizontal direction, then along the vertical direction. One sweep gives $x^{(1)}=(1.44,1.152)^T$. At each endpoint, the contour is tangent to the direction just followed: the derivative in that direction is zero. Further sweeps approach the solution $x=0$.
+:::
+
+A complete sweep reduces the energy error unless the solution has already been reached. The plot makes this decrease visible through successively smaller ellipses.
+
+For comparison, apply Jacobi to the same system from the same starting point. Both new coordinates use the old vector, so its first sweep gives
+
+$$
+x^{(1)}_{\mathrm{Jacobi}}
+=\begin{pmatrix}0.8(1.8)\\0.8(2.4)\end{pmatrix}
+=\begin{pmatrix}1.44\\1.92\end{pmatrix}.
+$$
+
+Gauss-Seidel instead uses the new first coordinate $1.44$ in the second update, giving $0.8(1.44)=1.152$. The next figure shows four sweeps computed with each method. Jacobi moves back and forth across the long axis of the ellipses, while Gauss-Seidel follows successive coordinate minima and approaches the solution faster in this example.
+
+:::{figure} ../_static/jacobi_gauss_seidel.svg
+:alt: Four computed sweeps from the same starting point. Jacobi alternates across the long axis of the energy contours; Gauss-Seidel takes horizontal and vertical coordinate-minimizing steps and ends closer to the origin.
+:width: 100%
+:name: fig-jacobi-gauss-seidel
+
+Actual iterates for the same quadratic energy as above, with identical axes and contours. Filled points numbered $0$ through $4$ mark completed sweeps. On the left, each arrow connects two Jacobi iterates; it represents a simultaneous update, not minimization along the segment. On the right, blue horizontal and orange vertical arrows show the two Gauss-Seidel component updates; open circles mark the intermediate points.
+:::
+
+Gauss-Seidel's energy decrease explains the geometry, but strict decrease alone is not enough to prove convergence to zero. The optional proof below establishes a fixed reduction factor less than one that works for every error direction.
 
 ### Proof for Symmetric Positive Definite Matrices
 
@@ -234,5 +281,7 @@ Therefore Gauss-Seidel converges for every initial guess.
 The energy identity explains why symmetry and positive definiteness matter: each sweep reduces the squared energy error by a sum of positive diagonal weights times squared component corrections. This decrease is in the $A$-norm; the Euclidean error need not decrease at every sweep. For another energy-norm proof, see [Fass, Theorem 4.19](https://www.math.iit.edu/~fass/577_ch4_end.pdf#page=7).
 
 ## Practical Considerations
+
+For the standard five-point Poisson problem on a square grid with red-black ordering, **Gauss-Seidel converges about twice as fast as Jacobi in terms of sweeps**. Its spectral radius satisfies $\rho(G)=\rho(R_J)^2$, so one Gauss-Seidel sweep gives the same asymptotic decay factor as two Jacobi sweeps. It therefore needs about half as many sweeps for the same error reduction. This comparison is specific to this model problem; it is not a general guarantee or a claim about elapsed computing time. The [Poisson-grid comparison in the SOR section](sor_method.md) illustrates these rates.
 
 Guaranteed convergence can still be slow. Gauss-Seidel is useful both as a simple solver and as a component of more advanced methods. The [next section](sor_method.md) introduces SOR, which adjusts the component corrections through a relaxation parameter.
