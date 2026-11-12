@@ -2,7 +2,7 @@
 
 The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. The short recurrence comes afterward, as a way to perform this construction efficiently.
 
-Throughout this section, $A\in\mathbb R^{n\times n}$ is symmetric positive definite (SPD), and $x=A^{-1}b$ is the exact solution. We write $x_k$ for the approximation after $k$ steps and $r_k=b-Ax_k$ for its residual, using subscripts instead of the superscripts in the chapter introduction. We first take $x_0=0$, so $r_0=b$. If $b=0$, the initial guess is already the solution. All orthogonality and optimality statements below concern exact arithmetic.
+Throughout this section, $A\in\mathbb R^{n\times n}$ is symmetric positive definite (SPD), and $x=A^{-1}b$ is the exact solution. As in the chapter introduction, $x_k$ is the approximation after $k$ steps. We write $e_k=x-x_k$ for its error and $r_k=b-Ax_k=Ae_k$ for its residual. We first take $x_0=0$, so $r_0=b$. If $b=0$, the initial guess is already the solution. All orthogonality and optimality statements below concern exact arithmetic.
 
 ## Nested Krylov Spaces and Search Directions
 
@@ -502,20 +502,20 @@ The residuals, rather than the A-orthogonal search directions, are therefore par
 
 ### Orthogonality Relations in Matrix Notation
 
-Let $Q_k=[q_1,\ldots,q_k]$, $P_k=[p_1,\ldots,p_k]$, and $R_k=[r_0,\ldots,r_{k-1}]$. Here $R_k$ collects residual vectors; it is not a triangular QR factor. Their properties are
+Let $Q_k=[q_1,\ldots,q_k]$, $P_k=[p_1,\ldots,p_k]$, and $\mathcal R_k=[r_0,\ldots,r_{k-1}]$. The matrix $\mathcal R_k$ collects residual vectors. Their properties are
 
 $$
 \begin{aligned}
 Q_k^TQ_k&=I,\\
-R_k^TR_k&=\operatorname{diag}(\|r_0\|_2^2,\ldots,\|r_{k-1}\|_2^2),\\
+\mathcal R_k^T\mathcal R_k&=\operatorname{diag}(\|r_0\|_2^2,\ldots,\|r_{k-1}\|_2^2),\\
 P_k^TAP_k&=D_k.
 \end{aligned}
 $$
 
-The matrices $Q_k^TAQ_k=T_k$ and $R_k^TAR_k$ are symmetric tridiagonal. The first is the Lanczos projection. The second follows because $R_k=Q_kS_k$ for a nonsingular diagonal matrix $S_k$ of signed residual norms, so
+The matrices $Q_k^TAQ_k=T_k$ and $\mathcal R_k^TA\mathcal R_k$ are symmetric tridiagonal. The first is the Lanczos projection. The second follows because $\mathcal R_k=Q_kS_k$ for a nonsingular diagonal matrix $S_k$ of signed residual norms, so
 
 $$
-R_k^TAR_k=S_kT_kS_k.
+\mathcal R_k^TA\mathcal R_k=S_kT_kS_k.
 $$
 
 There is also a direct subspace proof. If $i\ge j+2$, then $Ar_j\in\mathcal K_{j+2}\subseteq\mathcal K_i$ and $r_i\perp\mathcal K_i$, giving $r_i^TAr_j=0$. Symmetry supplies the zeros on the other side of the diagonal.
@@ -785,14 +785,14 @@ q_k=\sigma_k\frac{r_{k-1}}{\|r_{k-1}\|_2},
 \qquad \sigma_k\in\{-1,1\}.
 $$
 
-For $Q_k=[q_1,\ldots,q_k]$, $P_k=[p_1,\ldots,p_k]$, and $R_k=[r_0,\ldots,r_{k-1}]$,
+For $Q_k=[q_1,\ldots,q_k]$, $P_k=[p_1,\ldots,p_k]$, and $\mathcal R_k=[r_0,\ldots,r_{k-1}]$,
 
 $$
 \begin{aligned}
 Q_k^TQ_k&=I,\\
 P_k^TAP_k&=D_k\quad\text{(positive diagonal)},\\
-R_k^TR_k&\text{ is positive diagonal},\\
-Q_k^TAQ_k=T_k&\text{ and }R_k^TAR_k\text{ are symmetric tridiagonal}.
+\mathcal R_k^T\mathcal R_k&\text{ is positive diagonal},\\
+Q_k^TAQ_k=T_k&\text{ and }\mathcal R_k^TA\mathcal R_k\text{ are symmetric tridiagonal}.
 \end{aligned}
 $$
 

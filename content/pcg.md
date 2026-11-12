@@ -1,370 +1,236 @@
 # Preconditioned Conjugate Gradient
 
-Preconditioning can accelerate CG by improving the condition number and eigenvalue distribution of the system it solves. The construction must preserve the symmetric positive definite (SPD) structure that CG requires.
+The [preconditioning survey](preconditioning.md) described how an inexpensive approximate solve can improve a Krylov method. For CG, the transformation must preserve symmetry and positive definiteness. **Preconditioned conjugate gradient (PCG)** implements that transformation without forming the transformed matrix or the preconditioner's factors.
 
-A left-preconditioned matrix $MA$ or right-preconditioned matrix $AM$ is generally not symmetric. We first describe a symmetric transformation, then derive an implementation that applies the preconditioner directly.
-
-```{note}
-Here $M$ denotes an SPD approximation to $A^{-1}$. The operation $Mr$ corresponds to applying $M^{-1}r$ in the notation of the preceding survey. In practice, $M$ may be supplied as a function that performs an approximate solve; it need not be an explicitly stored matrix.
-```
+We assume that $A$ and $M$ are real, symmetric positive definite (SPD), and that $M$ is fixed. As in the preceding section, **$M$ approximates $A$, and applying the preconditioner means solving $Mz=r$**. We keep the CG notation $x_k$, $r_k=b-Ax_k$, $p_k$, $\mu_k$, and $\tau_k$.
 
 ## The Transformed System
 
-Since $M$ is SPD, it admits a factorization $M = C^T C$, for example a Cholesky factorization, with $C$ nonsingular.
-
-To construct the equivalent system, multiply $Ax=b$ by $C$:
+Write $M=CC^T$, with $C$ nonsingular. The symmetric transformation from the preceding section is
 
 $$
-C A x = C b
+\widetilde A=C^{-1}AC^{-T},
+\qquad \widetilde b=C^{-1}b,
+\qquad y=C^Tx,
 $$
 
-Introduce the variable $y$ through $x = C^T y$. Substitution gives
+so $\widetilde A y=\widetilde b$. Here $C^{-T}=(C^T)^{-1}$. For every nonzero vector $v$,
 
 $$
-(C A C^T) y = C b
+v^T\widetilde A v=(C^{-T}v)^TA(C^{-T}v)>0,
 $$
 
-The transformed system is $A'y = b'$, with
+and $\widetilde A$ is symmetric. Ordinary CG therefore applies to this transformed SPD system. A useful preconditioner improves its eigenvalue distribution or condition number. The relevant condition number is $\kappa_2(\widetilde A)$, not generally $\kappa_2(M^{-1}A)$.
 
-* $A' = C A C^T$
-* $b' = C b$
-* $x = C^T y$
-
-Because $A$ is SPD and $C$ is nonsingular, $A'$ is also SPD. We can therefore apply ordinary CG to $A'y=b'$. A useful preconditioner makes this system easier to solve, ideally with $\kappa(A') \ll \kappa(A)$.
-
-## CG on the Transformed System
-
-Applying the [CG recurrence](conjugate_gradient.md) to $A'y=b'$ gives the following steps. Here $s$ is the transformed residual, $p$ is a search direction, and $q=A'p$ is a matrix-vector product.
-
-1.  **Initialize:**
-    * $y^{(0)}$ (e.g., $y^{(0)} = 0$)
-    * $s^{(0)} = b' - A'y^{(0)} = Cb - (CAC^T)y^{(0)}$
-    * $p^{(1)} = s^{(0)}$
-2.  **Iterate for $k=1, 2, \dots$**
-    * $q^{(k)} = A' p^{(k)} = (C A C^T) p^{(k)}$
-    * $\mu_k = \frac{\| s^{(k-1)} \|_2^2}{(p^{(k)})^T q^{(k)}}$
-    * $y^{(k)} = y^{(k-1)} + \mu_k p^{(k)}$
-    * $s^{(k)} = s^{(k-1)} - \mu_k q^{(k)}$
-    * $\tau_k = \frac{\| s^{(k)} \|_2^2}{\| s^{(k-1)} \|_2^2}$
-    * $p^{(k+1)} = s^{(k)} + \tau_k p^{(k)}$
-
-This formulation requires access to $C$ and $C^T$: every product with $A'$ applies $C^T$, then $A$, then $C$. A preconditioner may instead be available only as a function that computes $Mr$, so its factors are unavailable. We would like to express the same iteration using that operation.
+The factors explain the construction. The practical algorithm below needs only products with $A$ and solves with $M$.
 
 ## Returning to the Original Variables
 
-The **preconditioned conjugate gradient (PCG)** algorithm expresses this iteration in terms of $x$ and the original residual $r = b - Ax$.
+Start transformed CG from $y_0=C^Tx_0$. Write $s_k=\widetilde b-\widetilde A y_k$ for its residual, $\widetilde p_k$ for its search direction, and $\widetilde w_k=\widetilde A\widetilde p_k$. Tildes distinguish these directions and products from those in the original coordinates.
 
-The change of variables also transforms the search directions and residuals. Substituting these relations into the CG recurrence replaces the separate applications of $C$ and $C^T$ by their product $M=C^TC$.
+The solution and residual satisfy
 
-The resulting iteration needs only the preconditioning operation $z=Mr$. Before deriving the updates, we can see how the change of variables affects the search space.
+$$
+\begin{aligned}
+x_k&=C^{-T}y_k,\\
+s_k&=C^{-1}b-C^{-1}AC^{-T}y_k\\
+&=C^{-1}(b-Ax_k)=C^{-1}r_k.
+\end{aligned}
+$$
 
-## The Krylov Subspace Connection
+Map the search direction back in the same way as the solution:
 
-For a zero initial guess, CG on $A'y=b'$ searches for its approximation to $y$ in
+$$
+p_k=C^{-T}\widetilde p_k,
+\qquad w_k=Ap_k,
+\qquad \widetilde w_k=C^{-1}w_k.
+$$
 
-$$\mathcal{K}_k(A', b') = \mathcal{K}_k(CAC^T, Cb)$$
+Multiplying the transformed solution update by $C^{-T}$ and the transformed residual update by $C$ gives
 
-This space is generated by $b',A'b',\ldots,(A')^{k-1}b'$.
+$$
+\begin{aligned}
+x_k&=x_{k-1}+\mu_kp_k,\\
+r_k&=r_{k-1}-\mu_kw_k.
+\end{aligned}
+$$
 
-Since $x=C^Ty$, the corresponding approximations to $x$ lie in the image of this space under $C^T$:
+These have exactly the same form as ordinary CG. The change appears in the direction update. Transforming $\widetilde p_{k+1}=s_k+\tau_k\widetilde p_k$ gives
 
-$$\text{Space for } x = C^T \, \mathcal{K}_k(CAC^T, Cb)$$
+$$
+\begin{aligned}
+p_{k+1}
+&=C^{-T}s_k+\tau_kp_k\\
+&=C^{-T}C^{-1}r_k+\tau_kp_k\\
+&=M^{-1}r_k+\tau_kp_k.
+\end{aligned}
+$$
 
-Using $M=C^TC$, the first three generating vectors become
+Define the **preconditioned residual** $z_k$ by the solve
 
-* The first vector:
-    $C^T (b') = C^T(Cb) = (C^T C)b = \mathbf{Mb}$
+$$
+\boxed{Mz_k=r_k.}
+$$
 
-* The second vector:
-    $C^T (A'b') = C^T(CAC^T)(Cb) = (C^T C) A (C^T C) b = \mathbf{(MA)Mb}$
+The new search direction is therefore $p_{k+1}=z_k+\tau_kp_k$, starting from $p_1=z_0$.
 
-* The third vector:
-    $C^T ((A')^2 b') = C^T(CAC^T)(CAC^T)(Cb) = (C^T C) A (C^T C) A (C^T C) b = \mathbf{(MA)^2 Mb}$
+### The Scalar Coefficients
+
+Ordinary CG on the transformed system uses $\|s_k\|_2^2$. In original variables,
+
+$$
+\|s_k\|_2^2
+=(C^{-1}r_k)^T(C^{-1}r_k)
+=r_k^TM^{-1}r_k=r_k^Tz_k.
+$$
+
+The step-length denominator also transforms directly:
+
+$$
+\widetilde p_k^T\widetilde w_k
+=\widetilde p_k^TC^{-1}w_k
+=p_k^Tw_k.
+$$
+
+Thus the coefficients are
+
+$$
+\boxed{
+\mu_k=\frac{r_{k-1}^Tz_{k-1}}{p_k^Tw_k},
+\qquad
+\tau_k=\frac{r_k^Tz_k}{r_{k-1}^Tz_{k-1}}.
+}
+$$
+
+Only the residual inner products change from the unpreconditioned CG formulas. Since $M^{-1}$ is SPD, $r_k^Tz_k>0$ for a nonzero residual. Likewise, $p_k^TAp_k>0$ for a nonzero direction.
+
+## The Search Space and Optimality
+
+Transformed CG searches in $y_0+\mathcal K_k(\widetilde A,s_0)$. To identify the corresponding correction space for $x$, map its generating vectors by $C^{-T}$. The first two become
+
+$$
+\begin{aligned}
+C^{-T}s_0&=M^{-1}r_0,\\
+C^{-T}\widetilde A s_0&=M^{-1}AM^{-1}r_0.
+\end{aligned}
+$$
 
 Continuing this pattern gives
 
-$$C^T \, \mathcal{K}_k(CAC^T, Cb) = \text{span} \{ Mb, (MA)Mb, (MA)^2 Mb, \dots \} = \mathcal{K}_k(MA, Mb)$$
-
-Thus the search space for $x$ can be generated using $A$ and $M$ alone. PCG chooses the approximation in this space with the smallest original energy error, $\|x-x^{(k)}\|_A$. The factors $C$ and $C^T$ explain the construction, but need not appear in the implementation.
-
-## Derivation of the Practical PCG Algorithm
-
-To obtain the updates, express each vector in the transformed CG recurrence in terms of the original variables. Superscripts in parentheses denote the iteration number; the subscript $pcg$ distinguishes the search directions in the original coordinates.
-
-### Relating the Two Sets of Variables
-
-The required relations are:
-
-* **Solution:** $x^{(k)} = C^T y^{(k)}$
-* **Residual:** The original residual $r^{(k)} = b - Ax^{(k)}$ and the transformed residual $s^{(k)}$ satisfy
-    
-    $$
-    \begin{aligned}
-    s^{(k)} &= Cb - (CAC^T) y^{(k)} \\
-        &= Cb - CA(C^T y^{(k)}) \\
-        &= C\big(b - A x^{(k)}\big) \\
-        &= C r^{(k)}
-    \end{aligned}
-    $$
-
-* **Search direction:** Map the transformed direction back to the original coordinates:
-    
-    $$p_{pcg}^{(k)} = C^T p^{(k)}$$
-
-* **Preconditioner:** Recall that $M = C^T C$.
-* **Preconditioned residual:** We will use $z^{(k)}=Mr^{(k)}$ in the updates below.
-
-These relations let us translate each CG update.
-
-### Solution Update
-
-The transformed solution update is
-
 $$
-y^{(k)} = y^{(k-1)} + \mu_k \, p^{(k)}
+\boxed{
+x_k\in x_0+\mathcal K_k(M^{-1}A,M^{-1}r_0).
+}
 $$
 
-Multiplying by $C^T$ gives
+The transformed energy error equals the original energy error. If $y_*=C^Tx$ is the transformed exact solution, then
 
 $$
-C^T y^{(k)} = C^T y^{(k-1)} + \mu_k \, (C^T p^{(k)})
+\|y_*-y_k\|_{\widetilde A}^2
+=(x-x_k)^TC\widetilde A C^T(x-x_k)
+=\|x-x_k\|_A^2.
 $$
 
-Substituting $x^{(k)} = C^T y^{(k)}$ and $p_{pcg}^{(k)} = C^T p^{(k)}$ gives
+Consequently, PCG minimizes the original energy error over its preconditioned search space. The standard CG bound applies with $\kappa_2(\widetilde A)$. We obtain a new search space while retaining the objective that made CG useful.
+
+The orthogonality relations transform as well. In exact arithmetic, the search directions remain A-orthogonal, while residuals are orthogonal in the $M^{-1}$ inner product:
 
 $$
-\mathbf{x^{(k)} = x^{(k-1)} + \mu_k \, p_{pcg}^{(k)}}
+p_i^TAp_j=0,
+\qquad r_i^TM^{-1}r_j=0
+\quad(i\ne j).
 $$
 
-### Residual Update
-
-The transformed residual update is
-
-$$
-s^{(k)} = s^{(k-1)} - \mu_k \, q^{(k)}
-$$
-
-To express $q^{(k)} = A' p^{(k)}$ in the original coordinates, define
-
-$$
-q_{pcg}^{(k)} = A (C^T p^{(k)}) = A p_{pcg}^{(k)}
-$$
-
-Then
-
-$$
-q^{(k)} = C (A p_{pcg}^{(k)}) = C q_{pcg}^{(k)}
-$$
-
-Substituting the relations for $s$ and $q$ into the residual update gives
-
-$$
-C r^{(k)} = C r^{(k-1)} - \mu_k \, (C q_{pcg}^{(k)})
-$$
-
-Since $C$ is nonsingular, multiplying by $C^{-1}$ gives
-
-$$
-\mathbf{r^{(k)} = r^{(k-1)} - \mu_k \, q_{pcg}^{(k)}}
-$$
-
-### Search Direction Update
-
-The transformed search direction update is
-
-$$
-p^{(k+1)} = s^{(k)} + \tau_k \, p^{(k)}
-$$
-
-Multiplying by $C^T$ gives
-
-$$
-C^T p^{(k+1)} = C^T s^{(k)} + \tau_k \, (C^T p^{(k)})
-$$
-
-In the original coordinates, this becomes
-
-$$
-p_{pcg}^{(k+1)} = (C^T s^{(k)}) + \tau_k \, p_{pcg}^{(k)}
-$$
-
-The remaining term uses $s^{(k)} = C r^{(k)}$:
-
-$$
-C^T s^{(k)} = C^T (C r^{(k)}) = (C^T C) r^{(k)} = M r^{(k)}
-$$
-
-Define the **preconditioned residual** $z^{(k)} = M r^{(k)}$. This is the one application of $M$ needed at each step. The search direction update is therefore
-
-$$
-\mathbf{p_{pcg}^{(k+1)} = z^{(k)} + \tau_k \, p_{pcg}^{(k)}}
-$$
-
-### Step-Length Scalars ($\mu_k$ and $\tau_k$)
-
-It remains to express $\mu_k$ and $\tau_k$ using the original residuals and directions.
-
-The direction coefficient in transformed CG is
-
-$$
-\tau_k = \frac{\| s^{(k)} \|_2^2}{\| s^{(k-1)} \|_2^2}
-$$
-
-Using $s^{(k)}=Cr^{(k)}$ and $z^{(k)}=Mr^{(k)}$, its numerator becomes
-
-$$
-\| s^{(k)} \|_2^2 = (s^{(k)})^T s^{(k)} = (C r^{(k)})^T (C r^{(k)})
-= (r^{(k)})^T C^T C r^{(k)} = (r^{(k)})^T (M r^{(k)}) = \mathbf{[r^{(k)}]^T z^{(k)}}
-$$
-
-Thus the transformed residual norm can be computed from the dot product of the original residual and its preconditioned value. Applying the same identity to the denominator gives
-
-$$
-\mathbf{\tau_k = \frac{[r^{(k)}]^T z^{(k)}}{[r^{(k-1)}]^T z^{(k-1)}}}
-$$
-
-The step length in transformed CG is
-
-$$
-\mu_k = \frac{ \| s^{(k-1)} \|_2^2 }{(p^{(k)})^T q^{(k)}}
-$$
-
-The numerator follows from the same identity at step $k-1$:
-
-$$
-\| s^{(k-1)} \|_2^2 = \mathbf{[r^{(k-1)}]^T z^{(k-1)}}
-$$
-
-The denominator is:
-
-$$
-(p^{(k)})^T q^{(k)} = (p^{(k)})^T (C q_{pcg}^{(k)}) = (C^T p^{(k)})^T q_{pcg}^{(k)} = \mathbf{(p_{pcg}^{(k)})^T q_{pcg}^{(k)}}
-$$
-
-Substitution gives
-
-$$
-\mathbf{\mu_k = \frac{[r^{(k-1)}]^T z^{(k-1)}}{(p_{pcg}^{(k)})^T q_{pcg}^{(k)}}}
-$$
+The original residuals need not be Euclidean-orthogonal, unlike in unpreconditioned CG.
 
 ## The PCG Algorithm
 
-The updates use one product with $A$ and one application of $M$ per iteration, together with inner products and vector updates. Like ordinary CG, PCG stores only a few vectors.
+Choose $x_0$ and compute $r_0=b-Ax_0$. If it is already sufficiently small, stop. Otherwise solve $Mz_0=r_0$ and set $p_1=z_0$. For $k=1,2,\ldots$, perform
 
-```{important}
-### Algorithm: Preconditioned Conjugate Gradient (PCG)
+$$
+\begin{aligned}
+w_k&=Ap_k,\\
+\mu_k&=\frac{r_{k-1}^Tz_{k-1}}{p_k^Tw_k},\\
+x_k&=x_{k-1}+\mu_kp_k,\\
+r_k&=r_{k-1}-\mu_kw_k.
+\end{aligned}
+$$
 
-**Goal:** Solve $Ax=b$, given an SPD matrix $A$ and an SPD preconditioner $M$.
+Check for convergence before generating another direction. If more work is needed, solve $Mz_k=r_k$ and set
 
-1.  **Initialize:**
-    * Choose $x^{(0)}$ (e.g., $x^{(0)} = 0$)
-    * $r^{(0)} = b - Ax^{(0)}$
-    * $z^{(0)} = M r^{(0)}$
-    * $p_{pcg}^{(1)} = z^{(0)}$
-    * $\rho_0 = [r^{(0)}]^T z^{(0)}$
+$$
+\tau_k=\frac{r_k^Tz_k}{r_{k-1}^Tz_{k-1}},
+\qquad p_{k+1}=z_k+\tau_kp_k.
+$$
 
-2.  **Iterate for $k=1, 2, \dots$ until convergence:**
-    * $q_{pcg}^{(k)} = A p_{pcg}^{(k)}$
-    * $\mu_k = \frac{\rho_{k-1}}{(p_{pcg}^{(k)})^T q_{pcg}^{(k)}}$
-    * $x^{(k)} = x^{(k-1)} + \mu_k p_{pcg}^{(k)}$
-    * $r^{(k)} = r^{(k-1)} - \mu_k q_{pcg}^{(k)}$
-
-    * *Check for convergence (e.g., $\|r^{(k)}\|_2 < \epsilon$)*
-
-    * $z^{(k)} = M r^{(k)}$
-    * $\rho_k = [r^{(k)}]^T z^{(k)}$
-    * $\tau_k = \frac{\rho_k}{\rho_{k-1}}$
-    * $p_{pcg}^{(k+1)} = z^{(k)} + \tau_k p_{pcg}^{(k)}$
-
-3.  **Return $x^{(k)}$**
-```
+Each update uses one matrix-vector product and one preconditioner solve, along with inner products and vector updates. Only a fixed number of vectors is stored. These are the standard [preconditioned CG operations](https://netlib.org/linalg/html_templates/node54.html); the factors $C$ do not appear in the implementation.
 
 ## Python Implementation
 
-The function below accepts `A` and `M` as matrices or as functions that apply their respective operations. A function for `M` can perform an approximate solve. The stopping test uses the preconditioned residual norm $\sqrt{r^TMr}$; an explicit check of $b-Ax$ is useful before accepting a computed solution.
+Here `A` is a matrix or a function computing $Av$, and `solve_M(r)` returns the solution of $Mz=r$. It must represent a fixed linear SPD operation, as assumed in the derivation. For example, a diagonal preconditioner uses componentwise division, not multiplication by the diagonal.
+
+The stopping target is $\|b-Ax_k\|_2\le\mathrm{tol}\,\|r_0\|_2$, relative to the initial residual, as in the GMRES example. This avoids making the tolerance depend on an arbitrary scaling of $M$. The code monitors the recursively updated residual, then explicitly verifies the residual before returning. That final check costs an additional product with $A$.
 
 ```python
 import numpy as np
 
-def pcg(A, b, M, tol=1e-10, max_iter=None):
+
+def pcg(A, b, solve_M, x0=None, tol=1e-10, max_iter=None):
+    """Return x when the original residual meets the relative tolerance.
+
+    A is real SPD. solve_M(r) solves M z = r for a fixed SPD M.
+    Raise RuntimeError if convergence cannot be verified.
     """
-    Solves the system Ax=b using the Preconditioned Conjugate Gradient (PCG) algorithm.
-
-    This implementation follows our derivation, where the
-    preconditioned system is A' = CAC^T and the preconditioner matrix
-    is defined as M = C^T C.
-
-    The preconditioning step applies an approximation to A^{-1}:
-    z = M*r. Supply M as a matrix or as a function that performs
-    this operation, for example using an approximate solve.
-
-    Args:
-        A (np.ndarray or func): The system matrix A (n x n).
-                                 Can be a dense/sparse matrix or a function
-                                 that computes A @ v.
-        b (np.ndarray): The right-hand side vector (n x 1).
-        M (np.ndarray or func): The preconditioner matrix M (n x n).
-                                 Can be a dense/sparse matrix or a function
-                                 that computes M @ v.
-        tol (float, optional): The convergence tolerance. The loop stops
-                               when the M-norm of the residual,
-                               sqrt(r.T @ z), is less than tol.
-        max_iter (int, optional): The maximum number of iterations.
-                                 Defaults to 10*n.
-
-    Returns:
-        np.ndarray: The solution vector x (n x 1).
-    """
-    
-    # --- Setup ---
-    # Determine how to apply A and M (as matrix or function)
-    if callable(A):
-        matvec_A = A
-    else:
-        matvec_A = lambda v: A @ v
-        
-    if callable(M):
-        matvec_M = M
-    else:
-        matvec_M = lambda v: M @ v
-
-    n = len(b)
+    b = np.asarray(b, dtype=float)
+    if b.ndim != 1 or b.size == 0:
+        raise ValueError("b must be a nonempty vector.")
+    if not np.isfinite(tol) or tol <= 0:
+        raise ValueError("tol must be positive and finite.")
     if max_iter is None:
-        max_iter = n * 10  # Set a reasonable default max iterations
+        max_iter = 10 * b.size
+    if not isinstance(max_iter, (int, np.integer)) or max_iter < 0:
+        raise ValueError("max_iter must be a nonnegative integer.")
 
-    # --- Initialization (k=0) ---
-    x = np.zeros(n)
-    r = b.copy()          # r_0 = b - A*x_0 (since x_0=0)
-    z = matvec_M(r)       # z_0 = M*r_0
-    p = z.copy()          # p_1 = z_0
-    
-    # rho_0 = r_0^T * z_0 = ||r_0||_M^2
-    rho = r @ z
-    
-    # --- Iteration (k=1, 2, ...) ---
+    matvec = A if callable(A) else lambda v: A @ v
+    x = np.zeros_like(b) if x0 is None else np.array(x0, dtype=float, copy=True)
+    if x.shape != b.shape:
+        raise ValueError("x0 must have the same shape as b.")
+    r = b - matvec(x)
+    norm_r0 = np.linalg.norm(r)
+    target = tol * norm_r0
+    if norm_r0 <= target:
+        return x
+    z = np.asarray(solve_M(r), dtype=float)
+    rz = r @ z
+    if not np.isfinite(rz) or rz <= 0:
+        raise ValueError("The preconditioner must be positive definite.")
+    p = z.copy()
+
     for k in range(max_iter):
-        
-        # M-norm of residual. (r^T * M * r)^(1/2)
-        norm_r_M = np.sqrt(rho)
-        if norm_r_M < tol:
-            print(f"PCG converged in {k} iterations (M-norm of residual < {tol}).")
-            return x
+        w = matvec(p)
+        denominator = p @ w
+        if not np.isfinite(denominator) or denominator <= 0:
+            raise ValueError("A must be positive definite.")
+        mu = rz / denominator
+        x += mu * p
+        r -= mu * w
 
-        q = matvec_A(p)     # q_k = A*p_k
-        
-        # mu_k = (r_{k-1}^T * z_{k-1}) / (p_k^T * q_k)
-        mu = rho / (p @ q)
-        
-        x += mu * p         # x_k = x_{k-1} + mu_k * p_k
-        r -= mu * q         # r_k = r_{k-1} - mu_k * q_k
-        z = matvec_M(r)     # z_k = M*r_k
-        
-        rho_old = rho
-        rho = r @ z         # rho_k = r_k^T * z_k
-        
-        tau = rho / rho_old  # tau_k = rho_k / rho_{k-1}
-        p = z + tau * p      # p_{k+1} = z_k + tau_k * p_k
+        if np.linalg.norm(r) <= target:
+            if np.linalg.norm(b - matvec(x)) <= target:
+                return x
+            raise RuntimeError("The explicit residual did not meet the tolerance.")
 
-    print(f"PCG failed to converge after {max_iter} iterations.")
-    return x
+        z = np.asarray(solve_M(r), dtype=float)
+        rz_new = r @ z
+        if not np.isfinite(rz_new) or rz_new <= 0:
+            raise ValueError("The preconditioner must be positive definite.")
+        tau = rz_new / rz
+        p = z + tau * p
+        rz = rz_new
+
+    raise RuntimeError("PCG did not converge within max_iter updates.")
 ```
+
+For a Jacobi preconditioner $M=\operatorname{diag}(A)$, supply `solve_M = lambda r: r / A.diagonal()`. More advanced preconditioners replace this function with triangular, block, or multilevel solves from the preceding survey. The interface stays the same.
+
+PCG is ordinary CG in transformed coordinates, expressed using the original variables. Its exact-arithmetic convergence and optimality follow from that connection. In computation, the quality and cost of the preconditioner, loss of orthogonality, and the residual stopping check determine how useful that connection is in practice.

@@ -60,22 +60,22 @@ Here $R_k$ is upper triangular, $t_k\in\mathbb R^k$, and $\rho_k$ is a scalar. A
 Tridiagonal structure gives $R_k$ only two possible nonzero diagonals above its main diagonal. This allows both the factorization and the solution to be updated with short recurrences. To see why we need not store $Q_k$, define solution directions by
 
 $$
-D_k=Q_kR_k^{-1}=[d_1,\ldots,d_k],
-\qquad Q_k=D_kR_k.
+V_k=Q_kR_k^{-1}=[v_1,\ldots,v_k],
+\qquad Q_k=V_kR_k.
 $$
 
 This is a mathematical definition, not an instruction to form an inverse. Column $k$ of the second identity gives
 
 $$
-d_k=\frac{q_k-(R_k)_{k-1,k}d_{k-1}-(R_k)_{k-2,k}d_{k-2}}
+v_k=\frac{q_k-(R_k)_{k-1,k}v_{k-1}-(R_k)_{k-2,k}v_{k-2}}
 {(R_k)_{kk}},
 $$
 
 with terms having indices below $1$ omitted. Only the last two solution directions are needed. The previous directions and the first $k-1$ entries of the rotated right-hand side remain unchanged, so
 
 $$
-x_k=x_0+D_k t_k
-=x_{k-1}+(t_k)_k d_k.
+x_k=x_0+V_k t_k
+=x_{k-1}+(t_k)_k v_k.
 $$
 
 Thus we can update the approximation immediately rather than saving the entire Lanczos basis for a final combination.
@@ -99,7 +99,7 @@ $$
 \le2\|r_0\|_2
 \left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^k,
 \qquad
-\kappa=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}.
+\kappa=\kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}.
 $$
 
 For an indefinite matrix, the spectrum lies on both sides of zero, so this positive-interval bound does not apply. The polynomial must be small on both parts of the spectrum while remaining one at zero. MINRES still minimizes the residual, but its rate depends on the eigenvalue distribution.
@@ -122,3 +122,5 @@ $$
 CG minimizes the energy error; MINRES minimizes the Euclidean residual. Their iterates generally differ. CG guarantees nonincreasing energy error, while MINRES guarantees nonincreasing Euclidean residual norms, in exact arithmetic.
 
 CG is the usual choice for SPD systems. MINRES extends residual minimization to symmetric indefinite systems, where the energy norm used by CG is unavailable. Both retain a fixed amount of vector work and storage per iteration.
+
+Even with a short recurrence, many iterations may be needed. The [next section](preconditioning.md) changes the system seen by the iterative method while preserving the solution of $Ax=b$.

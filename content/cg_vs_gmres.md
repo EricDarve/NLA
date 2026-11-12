@@ -67,3 +67,5 @@ The growing basis can make long GMRES runs expensive in both work and memory. **
 Restarting limits **working storage to $O(mn)$** and **work per cycle to $O(m\operatorname{nnz}(A)+m^2n)$**. Total work also depends on how many cycles are needed.
 
 The current approximation is retained, but the earlier search directions are discarded. Thus restarted GMRES no longer minimizes the residual over the full Krylov space accumulated since the original start. Restarting can require more iterations and can cause stagnation, as the example at the end of the [GMRES section](gmres.md) shows. CG's short recurrence already keeps storage fixed, so it needs no restart to control basis storage.
+
+For symmetric matrices, we can retain the GMRES residual objective while avoiding its growing basis storage. The [next section](minres.md) develops this specialization, MINRES, which also applies to symmetric indefinite systems.

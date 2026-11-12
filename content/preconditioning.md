@@ -40,7 +40,17 @@ $$
 AM^{-1}y=b,\qquad x=M^{-1}y.
 $$
 
-Now the transformed residual is exactly $b-AM^{-1}y=b-Ax$. Right-preconditioned GMRES therefore minimizes the original Euclidean residual norm. Neither placement is universally better; they produce different search spaces and residual histories. The [PETSc discussion of preconditioning](https://petsc.org/main/manual/ksp/#preconditioning-within-ksp) explains this distinction in solver implementations.
+Now the transformed residual is exactly $b-AM^{-1}y=b-Ax$. Right-preconditioned GMRES therefore minimizes the original Euclidean residual norm.
+
+For the same initial approximation $x_0$, use $y_0=Mx_0$ in the right-preconditioned system. With a fixed $M$, the two methods actually offer the same correction space in the original variables:
+
+$$
+M^{-1}\mathcal K_k(AM^{-1},r_0)
+=\mathcal K_k(M^{-1}A,M^{-1}r_0),
+\qquad r_0=b-Ax_0.
+$$
+
+This follows by applying $M^{-1}$ to each generating vector: $M^{-1}(AM^{-1})^jr_0=(M^{-1}A)^jM^{-1}r_0$. The iterates can differ because left and right preconditioning minimize different residual norms. The [PETSc discussion of preconditioning](https://petsc.org/main/manual/ksp/#preconditioning-within-ksp) explains these residual choices in solver implementations.
 
 ### Symmetric Preconditioning for CG and MINRES
 
@@ -68,7 +78,7 @@ $$
 
 the two matrices have the same eigenvalues, although their Euclidean condition numbers need not agree.
 
-The practical [preconditioned CG algorithm](pcg.md) implements this transformation using only solves $Mz=r$; it need not form $C$ or $\widetilde A$. For symmetric indefinite $A$, the same construction preserves symmetry and allows preconditioned MINRES with an SPD preconditioner. Positive definiteness of $A$ is still required for standard CG.
+The practical [preconditioned CG algorithm](pcg.md) implements this transformation using only solves $Mz=r$; it need not form $C$ or $\widetilde A$. For symmetric indefinite $A$, the same construction preserves symmetry and allows preconditioned MINRES with an SPD preconditioner. Its residual minimization then uses $\|C^{-1}r\|_2=\sqrt{r^TM^{-1}r}$, so the original Euclidean residual need not decrease at every step. Positive definiteness of $A$ is still required for standard CG.
 
 ## Classical Iteration Preconditioners
 
@@ -187,4 +197,4 @@ Compare total time and memory, including setup, application, and communication. 
 
 The discussion above assumes a fixed linear operation. If an inner solve is stopped adaptively, its action may vary between iterations or be nonlinear in the right-hand side. Standard fixed-preconditioner theory then does not apply directly. **Flexible GMRES** accommodates such preconditioning; the [PETSc flexible GMRES documentation](https://petsc.org/release/manualpages/KSP/KSPFGMRES/) gives examples.
 
-The [next section](pcg.md) derives PCG. It uses the alternative notation $M\approx A^{-1}$ for the applied operation; thus its multiplication $Mr$ corresponds to the solve $M^{-1}r$ in this survey. Both conventions are common, so always check which one is in use.
+The [next section](pcg.md) derives PCG from the symmetric transformation above. We keep the same convention: $M\approx A$, and applying the preconditioner means solving $Mz=r$. The implementation uses this solve without needing the factor $C$.

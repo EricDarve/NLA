@@ -122,7 +122,7 @@ G_k^T\cdots G_1^T\underline H_k
 =\begin{pmatrix}R_k\\0\end{pmatrix},
 $$
 
-where $R_k$ is $k\times k$ and upper triangular. Here $R_k$ is a QR factor, rather than the matrix of residual vectors denoted by $R_k$ in the preceding CG section.
+where $R_k$ is $k\times k$ and upper triangular.
 
 Apply exactly the same rotations to the right-hand side:
 
@@ -175,7 +175,7 @@ At iteration $k$, standard GMRES stores $k$ basis vectors and orthogonalizes the
 
 To limit the growing cost, **restarted GMRES**, written GMRES($m$), keeps at most $m$ search directions per cycle. After a cycle, form the approximation, use it as a new initial guess, and build a new Krylov basis from its residual. Stop earlier if the requested accuracy is reached.
 
-Restarting retains the current approximation but discards the basis. It limits storage, but the new search spaces no longer contain all the earlier directions. It can therefore require more iterations than unrestarted GMRES, and can fail to converge. The next section [compares these costs with CG](cg_vs_gmres.md).
+Restarting retains the current approximation but discards the basis. It limits storage, but the new search spaces no longer contain all the earlier directions. It can therefore require more iterations than unrestarted GMRES, and can fail to converge.
 
 ## Convergence of GMRES
 
@@ -287,3 +287,5 @@ $$
 The minimum is attained at $z=0$. Thus $x_k=0$ and $\|r_k\|_2=1$ for every $k<n$. At step $n$, the space contains $e_n$ and GMRES gives the exact solution.
 
 This matrix is orthogonal, with all eigenvalues on the unit circle, yet there is no residual reduction before the last step. Optimality over each search space does not imply rapid convergence. Restarting this example with $m<n$ repeats the same unproductive cycle, so restarted GMRES does not converge.
+
+The [next section](cg_vs_gmres.md) compares the objectives, work, and storage of CG and GMRES before we specialize residual minimization to symmetric matrices with MINRES.
