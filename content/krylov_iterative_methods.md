@@ -1,56 +1,55 @@
 # Krylov Subspace Methods
 
-## Searching for an Optimal Solution
+## Searching for a Better Approximation
 
-In the previous chapters, we explored classical iterative methods like Jacobi, Gauss-Seidel, and SOR. These "splitting" methods provide a simple and intuitive way to approach the linear system $Ax=b$, but their convergence can be slow and highly dependent on the properties of the matrix $A$. We now turn our attention to a more powerful and sophisticated family of techniques: **Krylov subspace methods**.
+Jacobi, Gauss-Seidel, and SOR improve an approximate solution through inexpensive corrections. Their convergence can nevertheless be slow. Krylov subspace methods use information gathered over successive iterations to choose a correction from an expanding space of possibilities.
 
-These methods represent a fundamental shift in strategy. Instead of a simple fixed-point iteration, we will build a sequence of approximate solutions $x^{(k)}$ by searching within a carefully constructed, expanding subspace. This subspace, known as the **Krylov subspace**, is the heart of the entire approach.
-
-**Definition: The Krylov Subspace**
-
-Given a matrix $A$ and a starting vector (typically the initial residual $r^{(0)} = b - Ax^{(0)}$), the $k$-th Krylov subspace ${\mathcal K}_k$ is the space spanned by the first $k$ vectors in the sequence $\{r^{(0)}, Ar^{(0)}, A^2r^{(0)}, \ldots\}$:
+We consider a real nonsingular system $Ax=b$. Let $x$ denote the exact solution, $x^{(0)}$ an initial guess, and $r^{(0)}=b-Ax^{(0)}$ its residual. The residual identifies which equations are not yet satisfied. Applying $A$ repeatedly to this vector provides additional search directions, giving the **Krylov subspace**
 
 $$
-{\mathcal K}_k(A, r^{(0)}) = \text{span}\{ r^{(0)}, A r^{(0)}, A^2 r^{(0)}, \ldots, A^{k-1} r^{(0)} \}
+\mathcal K_k(A,r^{(0)})
+=\operatorname{span}\{r^{(0)},Ar^{(0)},\ldots,A^{k-1}r^{(0)}\}.
 $$
 
-The core idea of Krylov methods is to find an $x^{(k)}$ in the affine subspace $x^{(0)} + {\mathcal K}_k$ that is "optimal" in some sense. Assuming $x^{(0)} = 0$ for simplicity, our goal is to find $x^{(k)} \in {\mathcal K}_k(A, b)$ that best approximates the true solution $x$.
-
-## The Central Challenge: What is "Optimal"?
-
-This brings us to the central question: **How do we define the "optimal" solution** within the Krylov subspace?
-
-Let's say we have an orthogonal basis $Q_k$ for ${\mathcal K}_k$. Our approximate solution would then be $x^{(k)} = Q_k y_k$ for some vector of coefficients $y_k$.
-
-The most natural and desirable choice would be to find the $x^{(k)}$ that is *closest* to the true, unknown solution $x$. This means we would try to minimize the 2-norm of the **true error** $e^{(k)} = x - x^{(k)}$:
+These are the same spaces used in the earlier [Arnoldi](arnoldi_iteration.md) and [Lanczos](lanczos_iteration.md) methods for eigenvalue approximation. Here we use them to construct a correction to a linear-system solution:
 
 $$
-y_k = \underset{y \in \mathbb{R}^k}{\rm argmin} \, \| x - Q_k y \|_2
+\boxed{x^{(k)}=x^{(0)}+z^{(k)},
+\qquad z^{(k)}\in\mathcal K_k(A,r^{(0)}).}
 $$
 
-The solution to this least-squares problem is the orthogonal projection of $x$ onto the subspace, given by $y_k = Q_k^T x$.
+Thus each approximation can combine all the directions available so far. If $x^{(0)}=0$, then $r^{(0)}=b$, and we simply search for $x^{(k)}$ in $\mathcal K_k(A,b)$. This is the starting choice used in the next section.
 
-Here we hit a wall. To compute $Q_k^T x$, we would need to know $x$. But $x = A^{-1}b$ is the very solution we are trying to find! This "best" possible solution is intractable.
+Building these spaces requires matrix-vector products, so we can work with a sparse matrix or a procedure that computes $Av$ without storing $A$. In practice, we construct a suitable basis rather than forming the powers $A^j$ explicitly.
 
+## The Central Challenge: What Is “Optimal”?
 
-## Two Tractable Paths to Optimality
+Once the search space is chosen, we still need to select an approximation within it. The most direct goal would be to minimize the Euclidean error $\|x-x^{(k)}\|_2$.
 
-Instead, Krylov methods define alternative, *computable* optimality criteria that we *can* solve. The choice of criterion depends on the properties of the matrix $A$, and different choices give rise to different methods.
+If we had an orthonormal basis for the space, the best approximation would be an orthogonal projection of the exact solution onto the search space. But computing that projection requires information about $x$, the solution we are trying to find. The subspace is available; this error-minimizing choice is not directly computable from it.
 
-In this chapter, we will focus on the two most important and widely used methods.
+We therefore need a criterion that uses the known data $A$ and $b$. Two choices lead to CG and GMRES.
 
-1.  **The Conjugate Gradient Method (CG)**
-    * **For:** Symmetric Positive Definite (SPD) matrices.
-    * **The Idea:** For SPD matrices, we can define a special "energy" norm, known as the **A-norm**: $\|v\|_A = \sqrt{v^T A v}$. It turns out that finding the $x^{(k)} \in {\mathcal K}_k$ that minimizes the **$A$-norm of the true error** is a tractable problem. This insight leads to the celebrated Conjugate Gradient method, a remarkably efficient algorithm that (in exact arithmetic) guarantees convergence in at most $n$ steps.
+## Two Computable Paths to Optimality
 
-2.  **The Generalized Minimal Residual Method (GMRES)**
-    * **For:** General, nonsingular matrices.
-    * **The Idea:** When $A$ is not SPD, the $A$-norm is not available. Instead, we take a different approach. While we cannot measure the error $e^{(k)}$, we *can* measure the **residual** $r^{(k)} = b - Ax^{(k)}$. The GMRES method seeks the $x^{(k)} \in {\mathcal K}_k$ that minimizes the 2-norm of this residual.
+**Conjugate gradient (CG)** applies when $A$ is symmetric positive definite (SPD). It chooses the approximation that minimizes the error in the **energy norm**, $\|v\|_A=\sqrt{v^TAv}$, over the current search space.
 
-        $$
-        \text{Find } x^{(k)} \in {\mathcal K}_k(A, b) \quad \text{such that} \quad \| b - A x^{(k)} \|_2 \text{ is minimized.}
-        $$
-        
-    This is a standard linear least-squares problem (in $k$ dimensions) that we can solve at each step.
+Although the exact error is unknown, this minimization is computable. As in the [energy interpretation of Gauss-Seidel](gauss_seidel_method.md), minimizing the squared energy error is equivalent to minimizing the quadratic $\Phi(v)=\tfrac12v^TAv-b^Tv$. We can evaluate and minimize this quadratic using $A$ and $b$. CG performs that minimization over the growing Krylov space, using a short recurrence that stores only a few vectors.
 
-We will begin by deriving the Conjugate Gradient method, leveraging the special properties of SPD matrices, before moving on to the more general (and more complex) framework of GMRES.
+**Generalized minimal residual (GMRES)** applies to general nonsingular matrices. It chooses the approximation that minimizes $\|b-Ax^{(k)}\|_2$ over the current search space. The residual is computable, and the minimization reduces to a smaller linear least-squares problem. Arnoldi provides the orthonormal basis and the small matrices needed for this calculation.
+
+In exact arithmetic, both methods choose the best approximation according to their own criterion. CG minimizes the energy norm of the error; GMRES minimizes the Euclidean norm of the residual. These are different objectives and need not select the same approximation.
+
+## The Main Practical Challenges
+
+An expanding space offers more choices, but we must manage its cost. Standard GMRES stores the Krylov basis, and orthogonalizing each new vector requires more work as the basis grows. Restarting limits storage and work, but can slow convergence. CG exploits symmetry and positive definiteness to avoid storing the full basis.
+
+Optimality within a search space also does not guarantee rapid convergence. The space may need many directions before it contains an accurate approximation. **Preconditioning** addresses this difficulty by changing the system into an equivalent form that is easier for the iteration to solve. The preconditioner must improve convergence while remaining inexpensive to apply.
+
+Finally, we must decide when to stop. The residual is available, while the exact error usually is not. As in the earlier analysis of linear solves, a small residual must be interpreted together with the sensitivity of the problem. Rounding errors can also affect the orthogonality and recurrence relations used by the methods.
+
+## The Path through This Chapter
+
+We begin with [CG](conjugate_gradient.md) for SPD matrices, then develop [GMRES](gmres.md) for general systems. The [comparison of CG and GMRES](cg_vs_gmres.md) brings together their optimality properties, costs, and uses.
+
+Next, [MINRES](minres.md) shows how to minimize the residual while retaining a short recurrence for symmetric matrices, including indefinite ones. The final sections develop [preconditioning](preconditioning.md) and [preconditioned CG](pcg.md), connecting the choice of an inexpensive approximate solve to the convergence of the Krylov method.
