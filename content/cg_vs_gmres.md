@@ -1,58 +1,69 @@
 # CG vs. GMRES
 
-Both the Conjugate Gradients (CG) and GMRES algorithms are foundational Krylov subspace methods for solving large, sparse linear systems $Ax=b$. However, they are designed for different classes of problems, and their computational costs and practical behaviors differ dramatically.
+The [conjugate gradient method (CG)](conjugate_gradient.md) and [GMRES](gmres.md) both approximate the solution of $Ax=b$ in growing Krylov spaces. Their main differences are the quantity they minimize and the work needed to build each new direction.
 
-The primary difference stems from the underlying process they use to build their respective Krylov subspaces:
+Their basis constructions explain the difference in cost:
 
-* **CG** is built upon the **Lanczos process**, which only applies to symmetric matrices.
-* **GMRES** is built upon the **Arnoldi process**, which applies to any square matrix.
+* **CG** is connected to the **Lanczos process**, which uses symmetry to obtain a short recurrence.
+* **GMRES** uses the **Arnoldi process**, which constructs an orthonormal basis for a general square matrix.
 
-This single distinction leads to all the major differences in their performance, cost, and applicability.
+Symmetry gives the short recurrence; positive definiteness gives CG its energy norm and minimization property.
 
 ## Key Differences
 
 ### Applicability
 
-* **Conjugate Gradients (CG):** This is a specialized algorithm. It is guaranteed to converge *only* if the matrix $A$ is **symmetric positive definite (SPD)**. It leverages this symmetry to achieve high efficiency.
-* **GMRES:** This is a general-purpose algorithm. It can be applied to **any square, invertible matrix** $A$, including those that are non-symmetric, indefinite, or both.
+* **CG:** The standard theory assumes that $A$ is **symmetric positive definite (SPD)**. For an indefinite matrix, the step denominator $p_k^TAp_k$ can vanish, so the same guarantees do not apply.
+* **GMRES:** It applies to **any square, nonsingular matrix** $A$, including nonsymmetric and symmetric indefinite matrices. It also works for SPD matrices, although CG usually requires less work and storage.
 
 ### Recurrence and Optimality
 
-* **Conjugate Gradients (CG):** By leveraging the $A$-norm, CG satisfies an optimality condition using a **short-term (three-term) recurrence**. This means that to compute the next vector, it only needs information from the previous two steps.
-* **GMRES:** Lacking symmetry, GMRES must use a **long-term recurrence** (the full Arnoldi process). To enforce orthogonality, each new basis vector $q_{k+1}$ must be explicitly orthogonalized against *all* preceding vectors $q_1, \dots, q_k$. It finds the solution in the subspace that minimizes the 2-norm of the residual.
+For an initial guess $x_0$, let $r_0=b-Ax_0$ and $\mathcal K_k=\mathcal K_k(A,r_0)$. Both methods search in $x_0+\mathcal K_k$, but use different criteria:
+
+$$
+\begin{aligned}
+\text{CG:}\qquad
+x_k&=\underset{z\in x_0+\mathcal K_k}{\operatorname{argmin}}\|x-z\|_A,\\
+\text{GMRES:}\qquad
+x_k&=\underset{z\in x_0+\mathcal K_k}{\operatorname{argmin}}\|b-Az\|_2.
+\end{aligned}
+$$
+
+Here $x=A^{-1}b$ and $\|v\|_A=\sqrt{v^TAv}$. As shown in the CG derivation, its minimization can be performed without knowing $x$.
+
+* **CG** uses short updates for the solution, residual, and search direction. A-orthogonality makes projections onto older search directions vanish, so only a few vectors are needed.
+* **Standard GMRES** uses the full Arnoldi basis. For a general nonsymmetric matrix, each new vector must be orthogonalized against all preceding basis vectors $q_1,\ldots,q_k$.
+
+In exact arithmetic, CG's energy error decreases, while GMRES's residual norm cannot increase. CG's Euclidean residual norm need not decrease at every step. These are different guarantees, so comparing residual histories alone does not compare their respective optimality properties.
 
 ### Computational and Storage Cost
 
-This is the most significant practical difference. The short-term recurrence of CG makes it extremely cheap, while the long-term recurrence of GMRES makes its cost grow with each iteration.
+For a sparse $n\times n$ matrix, let $\operatorname{nnz}(A)$ denote its number of nonzero entries. The costs below exclude storing $A$ and assume no preconditioning. CG's work per step stays fixed, while the orthogonalization work of unrestarted GMRES grows with the basis.
 
 * **Conjugate Gradients (CG):**
-    * **Cost per Iteration $k$:** $O(\text{nnz}(A) + n)$. This cost is **constant**. It is dominated by one sparse matrix-vector product ($O(\text{nnz})$) and a few vector operations ($O(n)$).
+    * **Cost per Iteration $k$:** $O(\operatorname{nnz}(A) + n)$, independent of $k$. It consists of one sparse matrix-vector product and a few vector operations.
     * **Storage:** $O(n)$. CG only needs to store a few vectors (the solution, residual, and direction vectors).
 
 * **GMRES:**
-    * **Cost per Iteration $k$:** $O(\text{nnz}(A) + kn)$. This cost **grows linearly with $k$**. The $\text{nnz}(A)$ term is the matrix-vector product, but the $kn$ term comes from orthogonalizing the new vector against the $k$ previous basis vectors. This $kn$ term quickly becomes the dominant cost.
-    * **Storage:** $O(kn)$. GMRES must store the entire basis $Q_k = [q_1, \dots, q_k]$ to perform the orthogonalization, so its memory footprint grows at each step.
+    * **Cost per Iteration $k$:** $O(\operatorname{nnz}(A) + kn)$. The $kn$ term comes from orthogonalizing against the $k$ previous basis vectors and can dominate when $k$ is large.
+    * **Storage:** $O(kn)$. GMRES stores the basis $Q_k=[q_1,\ldots,q_k]$ and the next vector. The small Hessenberg and QR factors require $O(k^2)$ additional storage, included in $O(kn)$ since $k\le n$.
 
 ### Comparison Summary Table
 
-| Algorithm | Applicability | Cost at Iteration $k$ | Total Storage | Total Time (after $k$ steps) |
+| Algorithm | Applicability | Work at Iteration $k$ | Working Storage | Total Work after $k$ Steps |
 | :--- | :--- | :---: | :---: | :---: |
-| **CG** | Symmetric Positive Definite | $O(\text{nnz} + n)$ | $O(n)$ | $O(k \, (\text{nnz} + n))$ |
-| **GMRES** | Any Square Matrix | $O(\text{nnz} + kn)$ | $O(kn)$ | $O(k \cdot \text{nnz} + k^2n)$ |
+| **CG** | SPD | $O(\operatorname{nnz}(A) + n)$ | $O(n)$ | $O(k(\operatorname{nnz}(A) + n))$ |
+| **GMRES** | Square, nonsingular | $O(\operatorname{nnz}(A) + kn)$ | $O(kn)$ | $O(k\operatorname{nnz}(A) + k^2n)$ |
 
 ### The Practicality of Restarting
 
-The comparison table makes the primary weakness of GMRES clear: **it struggles with large $k$**.
-
-The $k^2n$ time complexity and $kn$ storage cost mean that running GMRES for many iterations is computationally prohibitive. It becomes unacceptably slow, and its memory requirement will eventually exceed the system's capacity.
-
-This leads to a common practical compromise: **restarted GMRES**, often denoted as **GMRES($m$)**.
+The growing basis can make long GMRES runs expensive in both work and memory. **Restarted GMRES**, denoted GMRES($m$), limits this growth by keeping at most $m$ search directions per cycle.
 
 1.  We choose a fixed restart parameter $m$ (e.g., $m=20$ or $m=50$).
-2.  We run $m$ steps of the "inner" GMRES algorithm.
-3.  We compute the approximate solution $x^{(m)}$ and use it as the new starting guess.
-4.  We "restart" the algorithm, discarding the entire Krylov basis $Q_m$ and building a new one from the new residual $r^{(m)} = b - A x^{(m)}$.
+2.  We run up to $m$ GMRES steps, stopping earlier if the requested accuracy is reached.
+3.  We form the current approximation and use it as the new starting guess.
+4.  We discard the basis and build a new one from the current residual.
 
-This "restarting" procedure effectively caps the computational and storage costs at $O(mn)$ and $O(m \cdot \text{nnz} + m^2n)$, respectively.
+Restarting limits **working storage to $O(mn)$** and **work per cycle to $O(m\operatorname{nnz}(A)+m^2n)$**. Total work also depends on how many cycles are needed.
 
-The drawback, however, is significant: **restarting slows down convergence**. By throwing away the Krylov subspace, we lose all the information the algorithm has gathered about the matrix. This can lead to a much higher total number of iterations and, in some difficult cases, can cause the algorithm to stagnate completely. CG, by contrast, never needs to be restarted.
+The current approximation is retained, but the earlier search directions are discarded. Thus restarted GMRES no longer minimizes the residual over the full Krylov space accumulated since the original start. Restarting can require more iterations and can cause stagnation, as the example at the end of the [GMRES section](gmres.md) shows. CG's short recurrence already keeps storage fixed, so it needs no restart to control basis storage.

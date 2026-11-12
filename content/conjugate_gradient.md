@@ -1,933 +1,832 @@
 # The Conjugate Gradient (CG) Method
 
-## The Search for Coefficients and a Flawed First Attempt
+The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. The short recurrence comes afterward, as a way to perform this construction efficiently.
 
-Our goal is to build our solution $x_k$ from an expanding basis $\{p_1, \dots, p_k\}$ that spans the Krylov subspace ${\mathcal K}_k$. We assume $x_0 = 0$ and the Krylov process is built from $q_1 = b / \|b\|_2$.
+Throughout this section, $A\in\mathbb R^{n\times n}$ is symmetric positive definite (SPD), and $x=A^{-1}b$ is the exact solution. We write $x_k$ for the approximation after $k$ steps and $r_k=b-Ax_k$ for its residual, using subscripts instead of the superscripts in the chapter introduction. We first take $x_0=0$, so $r_0=b$. If $b=0$, the initial guess is already the solution. All orthogonality and optimality statements below concern exact arithmetic.
 
-We are looking for a basis $\{p_k\}$ such that 
+## Nested Krylov Spaces and Search Directions
 
-$$\text{span}(p_1, \dots, p_k) = {\mathcal K}_k(A, b).$$
-
-If we can find this basis, and also find the corresponding scalar coefficients $\mu_k$, our iterative solution $x_k$ can be built up one step at a time. The full solution $x$ would be:
+Starting from $b\ne0$, define
 
 $$
-x = \sum_{k=1}^n \mu_k \, p_k
+\mathcal K_0=\{0\},
+\qquad
+\mathcal K_k=\operatorname{span}\{b,Ab,\ldots,A^{k-1}b\}.
 $$
 
-And our $k$-th iterate is simply the partial sum:
+These spaces are nested:
 
 $$
-x_k = \sum_{l=1}^k \mu_l \, p_l
+\mathcal K_0\subseteq\mathcal K_1\subseteq\mathcal K_2\subseteq\cdots.
 $$
 
-This framework provides a beautifully simple update rule:
+Each multiplication can add at most one new independent direction. While the spaces are growing, $\dim\mathcal K_k=k$. We seek directions $p_1,p_2,\ldots$ that follow this growth:
 
 $$
-x_{k+1} = x_k + \mu_{k+1} \, p_{k+1}
+\operatorname{span}\{p_1,\ldots,p_k\}=\mathcal K_k.
 $$
 
-The entire problem is now reduced to finding a computationally feasible method to calculate the **search directions** $p_k$ and the **step lengths** (or coefficients) $\mu_k$.
-
-**Attempt 1: A Standard Orthogonal Basis**
-
-Let's explore the most natural first choice for our basis: a set of **orthogonal** vectors. As we know, the Lanczos process provides exactly such a basis, $\{q_1, \dots, q_n\}$.
-
-Let's set our search directions $p_k = q_k$.
-
-Let $P$ be the $n \times n$ matrix whose columns are these basis vectors, $P = [p_1, \dots, p_n]$. Since we have chosen an orthogonal basis, we have $P^T P = I$.
-
-The full solution $x$ can be written in this basis as:
+With such a basis, an approximation in $\mathcal K_k$ has the form
 
 $$
-x = P \mu
+x_k=\sum_{j=1}^k\mu_jp_j.
 $$
 
-where $\mu$ is the $n \times 1$ vector of coefficients $[\mu_1, \dots, \mu_n]^T$.
-
-Finding the coefficients $\mu$ *seems* easy. We can simply pre-multiply by $P^T$:
+If the optimal coefficients of the old directions remain unchanged when we enlarge the space, only one new term is needed:
 
 $$
-P^T x = P^T P \mu = I \mu = \mu
+x_k=x_{k-1}+\mu_kp_k.
 $$
 
-This gives us an exact, closed-form formula for our coefficients: $\mu_k = p_k^T x$.
+This is what an orthogonal basis can provide. We need to choose both the geometry that defines orthogonality and a normalization for each direction.
 
-But here we hit the exact same wall we encountered in the introduction. **We cannot compute $p_k^T x$ because we do not know $x$!**
+## A First Attempt: Minimize the Euclidean Error
 
-This first, natural attempt has failed. It requires the very solution we are trying to find. This tells us that if our simple update $x_{k+1} = x_k + \mu_{k+1} p_{k+1}$ is to work, we need a different, more clever choice for our basis $\{p_k\}$. Simple orthogonality is not enough.
-
-**Attempt 2: A New Optimality Condition**
-
-Our first attempt failed because computing the coefficients $\mu = P^T x$ required knowing the solution $x$. However, we have another equation at our disposal.
-
-We know $Ax = b$. Let's try pre-multiplying by $P^T$:
+A natural goal is to find the vector in $\mathcal K_k$ that minimizes $\|x-x_k\|_2$. Choose mutually orthogonal directions adapted to the nested spaces. The new direction must satisfy
 
 $$
-P^T A x = P^T b
+p_k\in\mathcal K_k,
+\qquad p_k\perp\mathcal K_{k-1}.
 $$
 
-This is the true starting point for the entire Conjugate Gradient algorithm! We know the vector $b$. Therefore, assuming we can construct the basis matrix $P$, the right-hand side $P^T b$ is a quantity we can actually compute.
-
-Now, let's see what this means for our coefficients $\mu$. We again start with the expansion of our solution $x = P \mu$ and insert it into this new equation:
+When $\dim\mathcal K_k=k$, these conditions specify a unique direction up to a nonzero scalar: the orthogonal complement of $\mathcal K_{k-1}$ inside $\mathcal K_k$ is one-dimensional. If we give each direction unit Euclidean norm, these are precisely the [Lanczos vectors](lanczos_iteration.md), up to their signs:
 
 $$
-P^T b = P^T (A x) = P^T A (P \mu)
+p_k=q_k,
+\qquad Q_k=[q_1,\ldots,q_k],
+\qquad Q_k^TQ_k=I.
 $$
 
-This gives us a $n \times n$ linear system for the unknown coefficients $\mu$:
+Suppose the final Krylov space containing $x$ has dimension $m\le n$. Its orthonormal basis gives the expansion
 
 $$
-(P^T A P) \mu = P^T b
+x=\sum_{j=1}^m\mu_jp_j,
+\qquad \mu_j=p_j^Tx.
 $$
 
-We have successfully eliminated the unknown solution $x$ from the calculation. However, we are now faced with solving a new linear system. To find $\mu$, we must deal with the matrix $P^T A P$.
+The Euclidean best approximation in $\mathcal K_k$ is the partial sum through $k$. Orthogonality ensures that adding a new direction does not change the previous coefficients. We will justify below why a Krylov space containing $x$ is reached in at most $n$ steps, possibly earlier.
 
-This brings us to our second, much more clever attempt. In Attempt 1, we chose $p_k = q_k$ (an orthogonal basis) and found that $P^T P = I$. But this didn't help us.
+The figure illustrates this process in two dimensions. The first approximation is the closest point to $x$ on the line $\mathcal K_1$. Adding the perpendicular direction $p_2$ captures the remaining component without changing the coefficient along $p_1$.
 
-In Attempt 2, we will make a different choice. What if we choose our basis vectors $p_k$ such that the new system matrix, $P^T A P$, becomes trivial to solve?
+:::{figure} ../_static/cg_euclidean_projection.svg
+:alt: Left, the exact solution projects perpendicularly onto the first Krylov line, giving the Euclidean best approximation x1. Right, adding the second orthogonal direction reaches the solution without changing the first component.
+:width: 100%
+:name: fig-cg-euclidean-projection
 
-The ideal scenario is to choose the basis $\{p_k\}$ such that:
+Euclidean projection for $A=\begin{pmatrix}2&-1\\-1&2\end{pmatrix}$ and $b=(3,0)^T$. Here $p_1=(1,0)^T$, $p_2=(0,1)^T$, and $x=(2,1)^T$. Left: the circle centered at $x$ touches $\mathcal K_1$ at the nearest point $x_1=2p_1$; the error is perpendicular to the line. Right: $\mathcal K_2$ is the whole plane, so adding $p_2$ gives $x_2=2p_1+p_2=x$. These are the best Euclidean approximations of our first attempt. Drawing them uses the exact solution, which is unavailable in the actual solve.
+:::
 
-$$
-P^T A P = D
-$$
+The difficulty is the coefficient formula: $p_j^Tx$ involves the unknown solution. Lanczos gives us the directions, but does not directly give these projection coefficients. We need an inner product that lets us use the known equation $Ax=b$.
 
-where $D$ is a **diagonal** matrix.
+## The Key Change: Use the A-Inner Product
 
-This property, as we noted earlier, is called **A-orthogonality** or **conjugacy**. The basis vectors $p_k$ are "conjugate" with respect to $A$.
-
-$$
-p_k^T A p_j = 0 \quad \text{for all } k \neq j
-$$
-
-The solution for the *full* coefficient vector $\mu$ is then simply:
+Compare the two quantities
 
 $$
-\mu_k = \frac{(P^T b)_k}{d_k} = \frac{p_k^T b}{p_k^T A p_k}
+p_j^Tx
+\qquad\text{and}\qquad
+p_j^TAx=p_j^Tb.
 $$
 
-This is a breakthrough! We have found a formula for each coefficient $\mu_k$ that is entirely computable, assuming we can find the basis vectors $p_k$.
+The second can be evaluated from known data. This suggests replacing Euclidean orthogonality by orthogonality in the geometry defined by $A$.
 
-## The Meaning of $P^T A P = D$: The A-Inner Product
-
-Let's pause to understand the condition $P^T A P = D$ more deeply. When we say that this matrix is diagonal, what are we really requiring of our basis vectors $p_i$?
-
-This equation is a compact way of stating a new orthogonality condition. The $(i, j)$ entry of $P^T A P$ is $p_i^T A p_j$. We are therefore demanding that:
-
-$$
-p_i^T A p_j = 0 \quad \text{for all } i \neq j
-$$
-
-This leads us to define a new **inner product** (or dot product) based on our matrix $A$.
-
-```{prf:definition} The A-Inner Product
+:::{prf:definition} The A-Inner Product
 :label: a_inner_prod
 
-Given a Symmetric Positive Definite (SPD) matrix $A$, the **A-inner product** between two vectors $y$ and $z$ is defined as:
+For an SPD matrix $A$, define
 
 $$
-\langle y, z \rangle_A = y^T A z
+\langle y,z\rangle_A=y^TAz,
+\qquad
+\|z\|_A=\sqrt{z^TAz}.
 $$
 
-This is a valid inner product precisely *because* $A$ is SPD.
-```
+Two vectors are **A-orthogonal**, or **conjugate**, if $y^TAz=0$.
+:::
 
-### Geometric Interpretation of the A-Inner Product
+The expression $y^TAz$ is linear in each vector. Symmetry of $A$ makes it symmetric in $y$ and $z$, and positive definiteness gives $z^TAz>0$ for every nonzero $z$. Together, these properties make it a valid inner product. A general nonsymmetric or indefinite matrix does not provide this geometry.
 
-This is not just a mathematical abstraction. It has a clear geometric meaning. Recall that since $A$ is SPD, it has an eigendecomposition:
-
-$$
-A = Q \Lambda Q^T
-$$
-
-where $Q$ is an orthogonal matrix (its columns are the eigenvectors of $A$) and $\Lambda$ is a diagonal matrix of positive eigenvalues $\lambda_i > 0$.
-
-Let's plug this into our new inner product:
+This is the [energy norm](gauss_seidel_method.md) introduced for Gauss-Seidel. To see its geometry, write $A=V\Lambda V^T$, with $V$ orthogonal and $\Lambda$ positive diagonal. Then
 
 $$
-\langle y, z \rangle_A = y^T A z = y^T (Q \Lambda Q^T) z = (y^T Q) \Lambda (Q^T z) = (Q^T y)^T \Lambda (Q^T z)
+\begin{aligned}
+\langle y,z\rangle_A
+&=(\Lambda^{1/2}V^Ty)^T(\Lambda^{1/2}V^Tz)\\
+&=(A^{1/2}y)^T(A^{1/2}z),\\
+\|z\|_A&=\|A^{1/2}z\|_2.
+\end{aligned}
 $$
 
-We can group this differently using the symmetric square root of $A$, $A^{1/2} = Q \Lambda^{1/2} Q^T$:
+Thus the new inner product is an ordinary dot product after rotating into the eigenvector coordinates and scaling by $\sqrt{\lambda_i}$. The symmetric square root $A^{1/2}=V\Lambda^{1/2}V^T$ includes a final orthogonal change of coordinates, which preserves dot products. No square root is needed in the algorithm.
+
+We can interpret this scaling as a **change of units** along the eigenvector directions. In those coordinates, the A-inner product weights the product of the $i$th components by $\lambda_i$. Equivalently, multiply each vector's $i$th component by $\sqrt{\lambda_i}$, then take the ordinary dot product. The operation is familiar; the coordinate scales have changed.
+
+:::{figure} ../_static/cg_inner_product.svg
+:alt: Two vectors before and after doubling their first coordinates. They are not perpendicular in the original Euclidean coordinates, but become perpendicular after rescaling, illustrating their A-orthogonality for A diagonal with entries 4 and 1.
+:width: 100%
+:name: fig-cg-inner-product
+
+The same vectors measured in two coordinate systems. For $A=\operatorname{diag}(4,1)$, the axes already follow the eigenvector directions. Rescaling the first coordinate by $\sqrt4=2$ turns squares of the gray grid into rectangles. The transformed vectors have ordinary dot product zero, so the original vectors are A-orthogonal. A change of units preserves the weighted inner product through this transformation, but can change Euclidean angles: A-orthogonality need not look like a right angle in the original coordinates.
+:::
+
+### Computable Expansion Coefficients
+
+From this point on, $p_j$ denotes an **A-orthogonal search direction**, replacing the Euclidean directions of the first attempt. We still require the first $k$ directions to span $\mathcal K_k$:
 
 $$
-\langle y, z \rangle_A = y^T (A^{1/2} A^{1/2}) z = (A^{1/2} y)^T (A^{1/2} z)
+p_i^TAp_j=0\quad(i\ne j),
+\qquad
+\operatorname{span}\{p_1,\ldots,p_k\}=\mathcal K_k.
 $$
 
-This shows that the A-inner product of $y$ and $z$ is just the **standard Euclidean dot product** of two *transformed* vectors, $A^{1/2}y$ and $A^{1/2}z$.
-
-This transformation $v \to A^{1/2} v = (\Lambda^{1/2} Q^T) v$ can be understood in steps:
-
-1.  **Rotate ($Q^T v$):** First, we apply $Q^T$ to the vectors, which is like rotating our coordinate system to align with the eigenvectors of $A$.
-2.  **Rescale ($\Lambda^{1/2} ...$):** Second, we multiply by the diagonal matrix $\Lambda^{1/2}$, which rescales the vectors along these new axes by $\sqrt{\lambda_i}$.
-3.  **Dot Product:** Finally, we take the standard dot product of these transformed vectors.
-
-So, when we require $P^T A P = D$, we are simply saying:
-**The basis vectors $p_i$ must be orthogonal with respect to this new, A-defined inner product.**
-
-This is a very natural choice, as it's the geometry defined by the operator $A$ itself.
-
-### The A-Norm
-
-Just as the standard dot product defines the standard 2-norm, this new A-inner product defines a new norm, called the **A-norm**:
+As before, the new direction is unique up to scaling: it lies in $\mathcal K_k$ and is A-orthogonal to $\mathcal K_{k-1}$. Taking the A-inner product of the full expansion with $p_i$ gives
 
 $$
-\|z\|_A = \sqrt{\langle z, z \rangle_A} = \sqrt{z^T A z}
+\begin{aligned}
+p_i^Tb=p_i^TAx
+&=\sum_{j=1}^m\mu_jp_i^TAp_j\\
+&=\mu_i p_i^TAp_i.
+\end{aligned}
 $$
 
-Using our derivation from above, we can see this is equivalent to:
+Consequently,
 
 $$
-\|z\|_A = \| \Lambda^{1/2} Q^T z \|_2 = \| A^{1/2} z \|_2
+\boxed{\mu_i=\frac{p_i^Tb}{p_i^TAp_i}.}
 $$
 
-As we will see, minimizing the **A-norm of the error** is the central, underlying principle of the Conjugate Gradient method.
+The denominator is positive. Both numerator and denominator are computable once $p_i$ is known. Changing the inner product has removed the unknown solution from the coefficient calculation.
 
-```{note} 
-We could require our basis to be fully **A-orthonormal**, meaning $p_i^T A p_j = \delta_{ij}$ (i.e., $P^T A P = I$). This would mean $\langle p_i, p_i \rangle_A = \|p_i\|_A^2 = 1$. However, for computational reasons, the standard CG algorithm uses a different normalization, which we will see shortly.
-```
-
-## Summary: The CG Algorithm Framework
-
-Our entire derivation so far has established the core algebraic requirements for the Conjugate Gradient algorithm.
-
-The algorithm's goal is to build a sequence of **A-orthogonal search directions** $p_i$, which are stored as the columns of a matrix $P$. This A-orthogonality is defined by the condition:
+In matrix notation, define $P_k=[p_1,\ldots,p_k]$ and $d_j=p_j^TAp_j$. Then
 
 $$
-P^T A P = D
+P_k^TAP_k=D_k=\operatorname{diag}(d_1,\ldots,d_k),
+\qquad
+D_k\begin{pmatrix}\mu_1\\\vdots\\\mu_k\end{pmatrix}=P_k^Tb.
 $$
 
-where $D$ is a diagonal matrix with entries $d_k = p_k^T A p_k$.
+We could normalize every $p_j$ to have unit A-norm, making $D_k=I$. Instead, we leave the scale free for now. A later choice will simplify the recurrence.
 
-If we can find such a basis, the exact solution $x = P \mu$ can be found without knowing $x$. We compute the coefficients $\mu_k$ by solving the diagonal system:
+## Why the Partial Sum Is Optimal
 
-$$
-P^T b = D \mu \quad \implies \quad \mu_k = \frac{p_k^T b}{d_k}
-$$
+The computable coefficients have a geometric meaning: they give the A-orthogonal projection of $x$ onto $\mathcal K_k$.
 
-Crucially, this structure allows us to build the final solution iteratively. The $k$-th iterate $x_k$ is the optimal solution in the $k$-th subspace, and we can compute the next iterate with a simple update:
+:::{prf:theorem} CG Optimality in the Energy Norm
+:label: cg_energy_optimality
 
-$$
-x_{k+1} = x_k + \mu_{k+1} \, p_{k+1}
-$$
-
-The remaining challenge is to find an efficient way to generate this $p_k$ sequence.
-
-## CG Optimality: A-Norm Projection
-
-We can further interpret the solution $x_k$ in a least-squares sense.
-
-The core principle of the CG method is that the error at step $k$, $e^{(k)} = x - x_k$, is **A-orthogonal** to the entire subspace ${\mathcal K}_k$. This is the very definition of an orthogonal projection in the $A$-inner product.
-
-We can verify this algebraically. Using $x_k = P_k \mu^{(k)}$, we show that $P_k^T A e^{(k)} = 0$:
+Let $p_1,\ldots,p_k$ be an A-orthogonal basis of $\mathcal K_k$, and set
 
 $$
-P_k^T A (x - x_k) = P_k^T A (x - P_k \mu^{(k)}) = P_k^T b - (P_k^T A P_k) \mu^{(k)} = P_k^T b - D_k \mu^{(k)}
+x_k=\sum_{j=1}^k\frac{p_j^Tb}{p_j^TAp_j}\,p_j.
 $$
 
-Since $\mu^{(k)} = D_k^{-1} P_k^T b$, this becomes:
+Then $x_k$ is the unique minimizer of $\|x-z\|_A$ over $z\in\mathcal K_k$. Equivalently,
 
 $$
-P_k^T b - D_k (D_k^{-1} P_k^T b) = P_k^T b - P_k^T b = 0
+p_j^TA(x-x_k)=0\qquad(j\le k).
 $$
+:::
 
-This result confirms that $x_k$ is the solution to a least-squares problem using the A-norm:
-
-$$
-\mu^{(k)} = \underset{y \in \mathbb{R}^k}{\rm argmin} \, \| P_k y - x \|_A, \quad \text{and} \quad x_k = P_k \mu^{(k)}
-$$
-
-This is the central optimality guarantee of the method: **CG produces the approximation in the Krylov subspace ${\mathcal K}_k$ that is closest to the true solution $x$ in the $A$-norm.**
-
-
-## Computing the Search Directions $p_k$
-
-We have established the *properties* of the A-orthogonal basis $\{p_k\}$ and *why* it gives us an optimal solution $x_k$ at every step. The final and most important piece of the puzzle is *how* to compute this sequence of vectors efficiently.
-
-In principle, one could use a Gram-Schmidt-like process on the Krylov basis $\{b, Ab, A^2b, \ldots\}$ to make it A-orthogonal. However, this would require storing all previous vectors, which is not feasible for large systems.
-
-A much more efficient approach exists, and it relies on the **residual vector**:
+:::{prf:proof}
+For each $j\le k$, A-orthogonality gives
 
 $$
-r_k = b - A x_k, \quad \text{with } r_0 = b
+p_j^TA(x-x_k)
+=p_j^Tb-\mu_jp_j^TAp_j=0.
 $$
 
-since $x_0 = 0$.
-
-The residual is the key. Let's establish its relationship to the Krylov subspace ${\mathcal K}_k$.
-
-Recall that ${\mathcal K}_k = \text{span}(q_1, A q_1, \dots, A^{k-1} q_1)$, where $q_1 = b/\|b\|_2$. By definition, our $k-1$ iterate $x_{k-1} \in {\mathcal K}_{k-1}$. From the properties of a Krylov subspace, if $x_{k-1} \in {\mathcal K}_{k-1}$, then $A x_{k-1} \in {\mathcal K}_k$.
-
-Now, let's look at the residual $r_{k-1}$:
+Any other candidate in $\mathcal K_k$ is $x_k+v$, with $v\in\mathcal K_k$. Expanding its squared error yields
 
 $$
-r_{k-1} = b - A x_{k-1}
+\begin{aligned}
+\|x-(x_k+v)\|_A^2
+&=\|x-x_k\|_A^2-2v^TA(x-x_k)+\|v\|_A^2\\
+&=\|x-x_k\|_A^2+\|v\|_A^2.
+\end{aligned}
 $$
 
-Since $b \in {\mathcal K}_k$ (it's proportional to $q_1$) and $A x_{k-1} \in {\mathcal K}_k$, their linear combination $r_{k-1}$ must also be in ${\mathcal K}_k$.
+The last term is positive unless $v=0$, proving the unique minimum.
+:::
 
-This logic applies to all previous residuals, so we have:
+Enlarging the space adds one A-orthogonal direction, so the old coefficients stay fixed. The update $x_k=x_{k-1}+\mu_kp_k$ is therefore also a minimization over the whole current space, not just along the latest line.
 
-$$
-r_0, r_1, \dots, r_{k-1} \in {\mathcal K}_k
-$$
-
-We also know that ${\mathcal K}_k = \text{span}(p_1, \dots, p_k)$. Therefore, we have proved the following relationship:
+The same projection identity shows how the error decreases. Since
+$x-x_{k-1}=(x-x_k)+\mu_kp_k$ and $p_k^TA(x-x_k)=0$,
 
 $$
-\text{span}(r_0, \dots, r_{k-1}) \subset \text{span}(p_1, \dots, p_k)
+\|x-x_{k-1}\|_A^2
+=\|x-x_k\|_A^2+\mu_k^2p_k^TAp_k.
 $$
 
-This connects the residuals (which we can compute) to the search directions (which we need). We will show below that, in fact, these two subspaces are equal. This equivalence is what makes the CG algorithm so efficient.
+Each nonzero step removes an A-orthogonal component of the error.
 
-## Key Result: Residual Orthogonality
+As in Gauss-Seidel, define the quadratic energy
 
-We now prove a fundamental property of the Conjugate Gradient algorithm: the residual $r_k$ is orthogonal to the entire subspace ${\mathcal K}_k$ that was used to generate the iterate $x_k$. This is a crucial result that will lead to the algorithm's short recurrences.
+$$
+\Phi(z)=\frac12z^TAz-b^Tz.
+$$
 
-```{prf:theorem} Orthogonality of Residuals
+Since $Ax=b$,
+
+$$
+\Phi(z)-\Phi(x)=\frac12\|z-x\|_A^2.
+$$
+
+Thus CG also minimizes this computable quadratic over $\mathcal K_k$. It differs from Gauss-Seidel by choosing its directions from the Krylov spaces rather than the coordinate axes.
+
+## Use the Residual to Find the Next Direction
+
+We now have the coefficient formula. The remaining task is to construct the A-orthogonal directions.
+
+One possibility is to start with $p_1=b$, generate a new vector $Ap_k$, and subtract its A-projections onto the previous directions. For $i\le k-2$, symmetry gives
+
+$$
+p_i^TA(Ap_k)=(Ap_i)^TAp_k=0,
+$$
+
+because $Ap_i\in\mathcal K_{i+1}\subseteq\mathcal K_{k-1}$ and $p_k$ is A-orthogonal to that space. Thus only the projections onto $p_{k-1}$ and $p_k$ remain. This gives a three-term recurrence based on $Ap_k$.
+
+We will instead use the **residual**, which gives a computationally more efficient construction: only the latest search direction is needed, and the coefficients simplify to ratios involving residual norms. Recall its definition:
+
+$$
+r_k=b-Ax_k.
+$$
+
+Because $x_k\in\mathcal K_k$, multiplication by $A$ gives $Ax_k\in\mathcal K_{k+1}$. Also $b\in\mathcal K_{k+1}$, so
+
+$$
+\boxed{r_k\in\mathcal K_{k+1}.}
+$$
+
+The optimality condition tells us more.
+
+:::{prf:theorem} Orthogonality of Residuals
 :label: cg_residual_orthogonality
 
-The residual $r_k = b - A x_k$ is orthogonal to the subspace ${\mathcal K}_k$.
+The residual of the energy-minimizing approximation satisfies
 
 $$
-r_k \perp {\mathcal K}_k
-$$
-```
-
-```{prf:proof}
-To prove this, we must show that $r_k$ is orthogonal to every basis vector of ${\mathcal K}_k$. Since ${\mathcal K}_k = \text{span}(p_1, \dots, p_k)$, this is equivalent to showing that $p_l^T r_k = 0$ for all $l \le k$.
-
-Let's take the inner product for any $l$ where $1 \le l \le k$:
-
-$$
-p_l^T r_k = p_l^T (b - A x_k) = p_l^T b - p_l^T A x_k
+r_k\perp\mathcal K_k
 $$
 
-Now, we substitute the expansion of $x_k = \sum_{i=1}^k \mu_i p_i$:
+in the ordinary Euclidean inner product.
+:::
+
+:::{prf:proof}
+For any $v\in\mathcal K_k$, the projection property gives
 
 $$
-p_l^T r_k = p_l^T b - p_l^T A \left( \sum_{i=1}^k \mu_i p_i \right)
-= p_l^T b - \sum_{i=1}^k \mu_i (p_l^T A p_i)
+v^Tr_k=v^T(b-Ax_k)=v^TA(x-x_k)=0.
 $$
+:::
 
-From our framework, we know two things:
-1.  $p_l^T b = \mu_l d_l$, where $d_l = p_l^T A p_l$.
-2.  The basis vectors are A-orthogonal, so $p_l^T A p_i = 0$ for all $i \neq l$.
+Notice the two different orthogonalities: the error is **A-orthogonal** to $\mathcal K_k$, while the residual is **Euclidean-orthogonal** to it.
 
-Because of the A-orthogonality, the only term that survives in the summation is when $i = l$. This gives:
+If $r_k\ne0$, it belongs to $\mathcal K_{k+1}$ but cannot belong to $\mathcal K_k$, since it is orthogonal to that space. It therefore supplies precisely the new independent direction we need. If $r_k=0$, then $Ax_k=b$ and we stop.
 
-$$
-p_l^T r_k = (p_l^T b) - \mu_l (p_l^T A p_l)
-= (d_l \mu_l) - \mu_l (d_l)
-= 0
-$$
+### Constructing an A-Orthogonal Direction from the Residual
 
-Since this holds for all $l \le k$, the residual $r_k$ is orthogonal to all basis vectors of ${\mathcal K}_k$ and thus to the entire subspace.
-```
-
-## The Equivalence of Residual and Search Subspaces
-
-We now prove a critical result that provides the "engine" for the CG algorithm's efficiency: the space spanned by the residuals is the same as the Krylov subspace.
-
-```{prf:theorem} Residuals as a Basis
-:label: cg_residual_basis
-
-The subspace spanned by the first $k$ residuals is the same as the $k$-th Krylov subspace, which is spanned by the first $k$ search directions.
+Suppose $p_1,\ldots,p_k$ are already known. There is one new A-orthogonal direction in $\mathcal K_{k+1}$; call it $p_{k+1}$ for now. We will find it by expanding the nonzero residual in this basis:
 
 $$
-\text{span}(r_0, \dots, r_{k-1}) = {\mathcal K}_k = \text{span}(p_1, \dots, p_k)
-$$
-```
-
-```{prf:proof}
-We already established the subset relation:
-
-$$
-\text{span}(r_0, \dots, r_{k-1}) \subset {\mathcal K}_k
+r_k=\sum_{\ell=1}^{k+1}u_{\ell,k+1}p_\ell.
 $$
 
-To prove that these two spaces are equal, we only need to show that their dimensions are equal. By definition, $\dim({\mathcal K}_k) = \dim(\text{span}(p_1, \dots, p_k)) = k$.
-
-Thus, our goal is to prove that $\dim(\text{span}(r_0, \dots, r_{k-1})) = k$. This is true if and only if the set $\{r_0, \dots, r_{k-1}\}$ is linearly independent.
-
-Let's use the key orthogonality result from the previous section ({prf:ref}`cg_residual_orthogonality`), which stated that $r_k \perp {\mathcal K}_k$.
-
-* We know that $r_l \in {\mathcal K}_{l+1}$ for any $l$.
-* This means that for any $l < k$, $r_l \in {\mathcal K}_{l+1} \subset {\mathcal K}_k$.
-* Since $r_k \perp {\mathcal K}_k$, it must be orthogonal to all vectors within it, including all previous residuals.
-
-Therefore, we have:
+For each known direction $p_i$, taking its A-inner product with this equation isolates one coefficient:
 
 $$
-r_k^T r_l = 0 \quad \text{for all } l < k
+p_i^TAr_k=u_{i,k+1}p_i^TAp_i,
+\qquad
+u_{i,k+1}=\frac{p_i^TAr_k}{d_i}
+\quad(i\le k).
 $$
 
-This proves that the set of residual vectors $\{r_0, \dots, r_{k-1}\}$ is an **orthogonal set**.
-
-An orthogonal set of vectors is linearly independent if and only if it does not contain the zero vector. So, we only need to show that $r_k \neq 0$.
-
-Let's assume $r_k = 0$ for some $k \le n$.
-
-* By definition, $r_k = b - A x_k$.
-* If $r_k = 0$, then $b - A x_k = 0$, which means $A x_k = b$.
-* This implies that $x_k = x$. The algorithm has converged and found the **exact solution**.
-
-This gives us our conclusion: **Unless the algorithm has converged to the exact solution, the residual $r_k$ is non-zero.**
-
-This confirms that $\dim(\text{span}(r_0, \dots, r_{k-1})) = k$.
-
-Since we have a $k$-dimensional subspace $\text{span}(r_0, \dots, r_{k-1})$ that is a subset of the $k$-dimensional subspace ${\mathcal K}_k$, the two subspaces must be identical.
-```
-
-```{note}
-By construction, the CG algorithm will find the exact solution in at most $n$ steps (at which point ${\mathcal K}_n = \mathbb{R}^n$). Until convergence, the set $\{r_0, \dots, r_{k-1}\}$ is an orthogonal, linearly independent set of $k$ non-zero vectors.
-```
-
-## The Three-Term Recurrence
-
-We are now ready to derive the final, crucial component of the CG algorithm: an efficient way to compute the next search direction $p_{k+1}$. We will show that it can be computed using only the current residual $r_k$ and the previous search direction $p_k$.
-
-We begin with two facts we have already established:
-
-1.  **Equal Subspaces ({prf:ref}`cg_residual_basis`):** ${\mathcal K}_{k+1} = \text{span}(r_0, \dots, r_k) = \text{span}(p_1, \dots, p_{k+1})$.
-2.  **Residual Orthogonality ({prf:ref}`cg_residual_orthogonality`):** $r_k \perp {\mathcal K}_k$.
-
-From fact #1, we know that $r_k \in {\mathcal K}_{k+1}$. This means we can express $r_k$ as a linear combination of the A-orthogonal basis vectors $\{p_l\}$:
+The coefficient of $p_{k+1}$ is nonzero because $r_k\notin\mathcal K_k$. We choose the scale of $p_{k+1}$ so that this coefficient is $1$. Rearranging then gives the construction
 
 $$
-r_k = \sum_{l=1}^{k+1} u_{l,k+1} \, p_l
+\boxed{
+p_{k+1}=r_k-\sum_{i=1}^k\frac{p_i^TAr_k}{d_i}\,p_i.
+}
 $$
 
-Our goal is to prove that almost all of the coefficients $u_{l,k+1}$ are zero.
+This is A-orthogonalization of the residual. It produces a nonzero vector in $\mathcal K_{k+1}$ that is A-orthogonal to every previous direction. Starting with $p_1=r_0=b$, we can therefore construct the entire sequence and calculate every step length.
 
-Let's find a formula for these coefficients. We can isolate $u_{i,k+1}$ by taking the A-inner product of the entire equation with $p_i$ (for any $i \le k+1$):
+At this stage the method is fully specified. The next question is how much of this orthogonalization we actually need to perform.
 
-$$
-p_i^T A r_k = p_i^T A \left( \sum_{l=1}^{k+1} u_{l,k+1} \, p_l \right) = \sum_{l=1}^{k+1} u_{l,k+1} \, (p_i^T A p_l)
-$$
+## Only the Latest Direction Is Needed
 
-Because the $p$-vectors are A-orthogonal, the term $p_i^T A p_l$ is zero for all $i \neq l$. The only term that survives the summation is when $l=i$, which gives $p_i^T A p_i = d_i$.
+Most coefficients in the preceding sum vanish. To see why, use symmetry:
 
 $$
-p_i^T A r_k = u_{i,k+1} \, d_i
+p_i^TAr_k=(Ap_i)^Tr_k.
 $$
 
-This gives us an explicit formula for the coefficients:
+For $i<k$, the nesting of the Krylov spaces gives
 
 $$
-u_{i,k+1} = \frac{p_i^T A r_k}{d_i} = \frac{(A p_i)^T r_k}{d_i}
+Ap_i\in\mathcal K_{i+1}\subseteq\mathcal K_k.
 $$
 
-Now, let's apply our second key fact, $r_k \perp {\mathcal K}_k$.
-
-* We know that $p_i \in {\mathcal K}_i$.
-* By the definition of a Krylov subspace, $A p_i \in {\mathcal K}_{i+1}$.
-
-Consider any coefficient $u_{i,k+1}$ where **$i < k$**.
-
-* $A p_i \in {\mathcal K}_{i+1} \subset {\mathcal K}_k$.
-* Since $A p_i$ is a vector inside ${\mathcal K}_k$, and $r_k$ is orthogonal to all vectors in ${\mathcal K}_k$, their inner product must be zero:
-
-    $$
-    (A p_i)^T r_k = 0 \quad \text{for all } i < k
-    $$
-
-* This immediately implies that $u_{i,k+1} = 0$ for all $i < k$.
-
-The expansion of $r_k$ in the $p$-basis therefore collapses. The only coefficients that are not forced to be zero are $u_{k,k+1}$ and $u_{k+1,k+1}$.
+Since $r_k\perp\mathcal K_k$, it follows that $(Ap_i)^Tr_k=0$ for all $i<k$. Only the coefficient of $p_k$ remains:
 
 $$
-r_k = u_{k,k+1} \, p_k + u_{k+1,k+1} \, p_{k+1}
+r_k=u_{k,k+1}p_k+p_{k+1},
+\qquad
+u_{k,k+1}=\frac{p_k^TAr_k}{d_k}.
 $$
 
-This is the key recurrence. By rearranging it, we can define our next search direction $p_{k+1}$ as a simple combination of the current residual $r_k$ and the previous search direction $p_k$:
+Thus
 
 $$
-p_{k+1} = \frac{1}{u_{k+1,k+1}} (r_k - u_{k,k+1} \, p_k)
+\boxed{p_{k+1}=r_k-u_{k,k+1}p_k.}
 $$
 
-At this point, we have not yet chosen the normalization for $p_{k+1}$. To simplify, we choose the following normalization:
+Although we required A-orthogonality to *all* previous directions, we need to subtract only the projection onto the latest one. The Krylov structure and symmetry make all the earlier projections zero automatically. Our normalization is now fixed: each direction contains the current residual with coefficient $1$; its A-norm is generally not $1$.
 
-$$
-u_{k+1,k+1} = 1, \quad u_{k,k+1} = \frac{p_k^T A r_k}{d_k}, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k \,.
-$$
+## The Residual Basis and Its Orthogonality
 
-**This is the key three-term recurrence relation to update $p_{k+1}$ in CG.**
+The same subspace argument also identifies the residual sequence.
 
-With this normalization, the $p_k$ are not normalized to have unit $A$-norm. But this normalization turns out to be computationally more efficient.
-
-## The Residuals are Orthogonal to Each Other
-
-```{prf:theorem} Orthogonality of Residuals to Each Other
+:::{prf:theorem} Orthogonality of Residuals to Each Other
 :label: cg_residuals_orthogonal
 
-The sequence of residual vectors $\{r_0, r_1, \ldots\}$ generated by the Conjugate Gradient algorithm is an **orthogonal set**.
+Before termination, the nonzero residuals are mutually Euclidean-orthogonal:
 
 $$
-r_k^T r_l = 0 \quad \text{for all } k \neq l
+r_i^Tr_j=0\qquad(i\ne j).
 $$
-```
+:::
 
-```{prf:proof}
+:::{prf:proof}
+For $i<j$, we have $r_i\in\mathcal K_{i+1}\subseteq\mathcal K_j$, while $r_j\perp\mathcal K_j$. Hence $r_i^Tr_j=0$.
+:::
 
-We will prove $r_k^T r_l = 0$ for all $k \neq l$.
+:::{prf:theorem} Residuals as a Basis
+:label: cg_residual_basis
 
-Without loss of generality, let us assume $l < k$.
-
-We will use two facts we have already established:
-
-1.  **From {prf:ref}`cg_residual_orthogonality`:** The residual $r_k$ is orthogonal to the entire subspace ${\mathcal K}_k$.
-
-    $$
-    r_k \perp {\mathcal K}_k = \text{span}(p_1, \dots, p_k)
-    $$
-
-2.  **From {prf:ref}`cg_residual_basis`:** The residual $r_l$ is an element of the subspace ${\mathcal K}_{l+1}$.
-
-    $$
-    r_l = b - A x_l \quad \text{where } b \in {\mathcal K}_{l+1} \text{ and } x_l \in {\mathcal K}_l \implies A x_l \in {\mathcal K}_{l+1}
-    $$
-
-    Thus, $r_l \in {\mathcal K}_{l+1}$.
-
-Since we assumed $l < k$, we get:
+If $r_0,\ldots,r_{k-1}$ are nonzero, then
 
 $$
-{\mathcal K}_{l+1} \subset {\mathcal K}_k
+\operatorname{span}\{r_0,\ldots,r_{k-1}\}
+=\mathcal K_k
+=\operatorname{span}\{p_1,\ldots,p_k\}.
 $$
+:::
 
-This means $r_l$ is a vector within the subspace ${\mathcal K}_k$.
+:::{prf:proof}
+Each $r_i$ belongs to $\mathcal K_{i+1}\subseteq\mathcal K_k$. These $k$ residuals are nonzero and mutually orthogonal, so they are linearly independent. They therefore span $\mathcal K_k$, whose dimension is at most $k$.
+:::
 
-From fact #1, we know that $r_k$ is orthogonal to *all* vectors in ${\mathcal K}_k$. Since $r_l$ is in ${\mathcal K}_k$, $r_k$ must be orthogonal to $r_l$.
+The residuals form a Euclidean-orthogonal basis; the search directions form an A-orthogonal basis. Both describe the same nested Krylov spaces. This distinction explains how the residual can generate a new search direction without itself being A-orthogonal to the previous directions.
 
-Thus, $r_k^T r_l = 0$.
-```
+## Deriving the Efficient Coefficients
 
-## Deriving the Efficient Computational Formulas
+The direction construction is already short. We can also simplify its scalar coefficients so that each iteration needs only one matrix-vector product.
 
-We have done the hard work of establishing the orthogonality properties of the search directions and residuals. Now, we reap the rewards.
+### The Step Length
 
-In this section, we simplify the formulas for the coefficients $\mu_k$ and $u_{k,k+1}$. The goal is to eliminate as many matrix-vector multiplications as possible. We will discover that the parameters governing this sophisticated algorithm depend simply on the lengths (norms) of the residual vectors.
-
-### Simplifying the Step Size $\mu_k$
-
-Recall our formula for the optimal step size coefficient:
-
-$$
-\mu_k = \frac{p_k^T b}{d_k}
-$$
-
-We can rewrite the numerator $p_k^T b$ in a much more convenient form.
-Since $r_{k-1} = b - A x_{k-1}$, we have $b = r_{k-1} + A x_{k-1}$. Substituting this into the numerator:
+Recall that $\mu_k=p_k^Tb/d_k$. Since $b=r_{k-1}+Ax_{k-1}$ and $p_k$ is A-orthogonal to $\mathcal K_{k-1}$,
 
 $$
-p_k^T b = p_k^T (r_{k-1} + A x_{k-1}) = p_k^T r_{k-1} + p_k^T A x_{k-1}
+\begin{aligned}
+p_k^Tb
+&=p_k^Tr_{k-1}+p_k^TAx_{k-1}\\
+&=p_k^Tr_{k-1}.
+\end{aligned}
 $$
 
-The second term vanishes. Why?
-
-* $x_{k-1}$ lies in the subspace ${\mathcal K}_{k-1}$.
-* By construction, the new search direction $p_k$ is **A-orthogonal** to ${\mathcal K}_{k-1}$.
-* Therefore, $p_k^T A x_{k-1} = 0$.
-
-So, $p_k^T b = p_k^T r_{k-1}$.
-
-We can simplify further. Recall that $p_k$ is essentially the "new" part of the residual. From the 3-term recurrence relation (reversed), we know that $p_k$ differs from $r_{k-1}$ only by a multiple of the previous direction $p_{k-1}$:
+For $k>1$, the short direction formula gives $p_k=r_{k-1}-u_{k-1,k}p_{k-1}$. The residual is orthogonal to $p_{k-1}\in\mathcal K_{k-1}$, so
 
 $$
-p_k = r_{k-1} - u_{k-1,k}p_{k-1}
+p_k^Tr_{k-1}
+=\|r_{k-1}\|_2^2-u_{k-1,k}p_{k-1}^Tr_{k-1}
+=\|r_{k-1}\|_2^2.
 $$
 
-Using the fact that $p_{k-1} \perp r_{k-1}$ ({prf:ref}`cg_residual_orthogonality`), the inner product simplifies:
+For $k=1$, the same identity follows from $p_1=r_0$. Therefore,
 
 $$
-p_k^T r_{k-1} = (r_{k-1} - u_{k-1,k} p_{k-1})^T r_{k-1} = \| r_{k-1} \|_2^2
+\boxed{\mu_k=\frac{\|r_{k-1}\|_2^2}{p_k^TAp_k}.}
 $$
 
-Substituting this into our $\mu_k$ definition gives the final, computationally efficient formula:
+The residual also updates cheaply. Substituting $x_k=x_{k-1}+\mu_kp_k$ into its definition gives
 
 $$
-\mu_k = \frac{\|r_{k-1}\|_2^2}{d_k}
+\begin{aligned}
+r_k&=b-A(x_{k-1}+\mu_kp_k)\\
+&=r_{k-1}-\mu_kAp_k.
+\end{aligned}
 $$
 
-### Simplifying the Direction Update $\tau_k$
+The product $Ap_k$ is already needed for the denominator of $\mu_k$, so this update needs no additional matrix-vector product.
 
-Next, we simplify the coefficient used to generate the next search direction. Recall the recurrence relation for the residual:
+### The Direction Coefficient
 
-$$
-r_k = u_{k,k+1} \, p_k + p_{k+1}
-$$
-
-We need to calculate $u_{k,k+1}$. The formula we derived was:
+The remaining coefficient is $u_{k,k+1}=p_k^TAr_k/d_k$. From the residual update,
 
 $$
-u_{k,k+1} = \frac{p_k^T A r_k}{d_k}
+Ap_k=\frac{r_{k-1}-r_k}{\mu_k}.
 $$
 
-We can transform the term $p_k^T A$ by looking at how the residual changes.
-Since $r_k = r_{k-1} - \mu_k A p_k$, we can rearrange to find $A p_k$:
+Recall that $d_k=p_k^TAp_k$. Multiplying the step-length formula from the preceding subsection by $d_k$ gives $\mu_kd_k=\|r_{k-1}\|_2^2$. Using this identity, symmetry, and residual orthogonality, we obtain
 
 $$
-A p_k = \frac{1}{\mu_k} (r_{k-1} - r_k)
+\begin{aligned}
+u_{k,k+1}
+&=\frac{(Ap_k)^Tr_k}{d_k}\\
+&=\frac{r_{k-1}^Tr_k-r_k^Tr_k}{\mu_kd_k}\\
+&=-\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
+\end{aligned}
 $$
 
-Now, substitute this expression for $A p_k$ into the formula for $u_{k,k+1}$:
+Define its negative by
 
 $$
-u_{k,k+1} = \frac{(A p_k)^T r_k}{d_k} = \frac{1}{d_k \mu_k} (r_{k-1} - r_k)^T r_k
+\tau_k=-u_{k,k+1}
+=\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
 $$
 
-Expanding the dot product:
+The direction update becomes
 
 $$
-(r_{k-1} - r_k)^T r_k = r_{k-1}^T r_k - r_k^T r_k
+\boxed{p_{k+1}=r_k+\tau_kp_k.}
 $$
 
-By the mutual orthogonality of residuals ({prf:ref}`cg_residuals_orthogonal`), $r_{k-1}^T r_k = 0$. Thus:
-
-$$
-(r_{k-1} - r_k)^T r_k = - \| r_k \|_2^2
-$$
-
-Substituting this back, and using the identity derived in step 1 ($\mu_k d_k = \|r_{k-1}\|_2^2$):
-
-$$
-u_{k,k+1} = \frac{- \| r_k \|_2^2}{\mu_k d_k} = - \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2}
-$$
-
-This is an amazingly simple expression! It depends *only* on the ratio of the squared norms of consecutive residuals.
-
-We define the parameter $\tau_k$ (often denoted as $\beta_k$ in standard texts) as:
-
-$$
-\tau_k = - u_{k,k+1} = \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2}
-$$
-
-This parameter $\tau_k$ allows us to update the search direction efficiently:
-
-$$
-p_{k+1} = r_k + \tau_k p_k
-$$
+The symbols $\mu_k$ and $\tau_k$ are often written $\alpha_k$ and $\beta_k$ in other descriptions of CG.
 
 ## The Conjugate Gradient Algorithm
 
-After all our derivations, we arrive at a final algorithm that is both remarkably simple and computationally efficient. The various orthogonalities we proved are all implicitly enforced by the specific choice of the coefficients $\mu_k$ and $\tau_k$.
-
-The complete CG algorithm is as follows:
-
-Start with $x_0 = 0, r_0 = b$.
-For the first iteration, set $p_1 = r_0$.
-
-Then iterate for $k=1, 2, \dots$
+Start with $x_0=0$ and $r_0=b$. If $r_0=0$, stop. Otherwise, set $p_1=r_0$. For $k=1,2,\ldots$, perform
 
 $$
-\begin{align*}
-\mu_k &= \frac{\|r_{k-1}\|_2^2}{p_k^T A p_k} && \text{Step length} \\
-x_k &= x_{k-1} + \mu_k \, p_k && \text{Update solution} \\
-r_k &= r_{k-1} - \mu_k \, A p_k && \text{Update residual} \\
-\tau_k &= \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2} && \text{Direction update factor} \\
-p_{k+1} &= r_k + \tau_k \, p_k && \text{Update search direction}
-\end{align*}
+\begin{aligned}
+w_k&=Ap_k, &&\text{one matrix-vector product},\\
+\mu_k&=\frac{r_{k-1}^Tr_{k-1}}{p_k^Tw_k}, &&\text{step length},\\
+x_k&=x_{k-1}+\mu_kp_k, &&\text{solution update},\\
+r_k&=r_{k-1}-\mu_kw_k, &&\text{residual update}.
+\end{aligned}
 $$
 
-This recurrence is the computationally most efficient implementation of the CG algorithm. Each iteration requires only one sparse matrix-vector product ($A p_k$) and a few vector operations (additions and dot products). No large, dense matrices are ever formed or stored.
-
-The CG algorithm is one of the most powerful and efficient iterative methods ever developed, but it is critical to remember that its derivation, and thus its guarantee of convergence, **applies only to Symmetric Positive Definite (SPD) matrices**.
-
-## Key Takeaways: What to Memorize for CG
-
-Here is a summary of the most important concepts, subspace relations, and orthogonality conditions that define the Conjugate Gradient algorithm.
-
-### Core Definitions
-
-* **A-Inner Product:** $\langle y, z \rangle_A = y^T A z$
-* **A-Norm:** $\|z\|_A = \sqrt{z^T A z}$
-* **Residual:** $r_k = b - A x_k$
-
-### The Krylov Subspace
-
-The entire algorithm lives in the Krylov subspace ${\mathcal K}_k$. A key insight is that this one subspace has multiple, equivalent bases that we use:
+If $r_k=0$, stop before forming another direction. Otherwise, compute
 
 $$
-{\mathcal K}_k = \text{span}(b, Ab, \dots, A^{k-1}b) = \text{span}(p_1, \dots, p_k) = \text{span}(r_0, \dots, r_{k-1})
+\begin{aligned}
+\tau_k&=\frac{r_k^Tr_k}{r_{k-1}^Tr_{k-1}},\\
+p_{k+1}&=r_k+\tau_kp_k.
+\end{aligned}
 $$
 
-We also know that our iterate $x_k \in {\mathcal K}_k$, and if $y \in {\mathcal K}_k$, then $Ay \in {\mathcal K}_{k+1}$.
+Positive definiteness ensures $p_k^TAp_k>0$ for every nonzero search direction. Each iteration uses one matrix-vector product, two inner products when previously computed residual norms are reused, and a few vector updates. Only a fixed number of vectors is stored; the full basis matrices are not formed.
 
-### Key Orthogonality Relations
+For a general initial guess, start with $r_0=b-Ax_0$ and use exactly the same recurrence. It searches in $x_0+\mathcal K_k(A,r_0)$ and minimizes the energy error there. This is equivalent to applying the zero-start derivation to the correction equation $A(x-x_0)=r_0$.
 
-These three properties are the "magic" that makes CG work efficiently.
+In floating-point arithmetic, stop when an explicitly checked residual is sufficiently small, using a scaled residual criterion such as the one in the [Jacobi implementation](jacobi_method.md). The recursively updated residual can drift from $b-Ax_k$, so an explicit residual check is useful before accepting the answer. A small residual controls backward error; forward accuracy also depends on conditioning.
 
-* **Search Directions ($p_k$):** The search directions are **A-orthogonal**.
+## Connection to Lanczos and Matrix Relations
 
-    $$
-    p_k^T A p_l = 0 \quad (\text{for } k \neq l)
-    $$
-
-* **Residual ($r_k$):** The current residual is **orthogonal** to the entire current subspace.
-
-    $$
-    r_k \perp {\mathcal K}_k
-    $$
-
-* **Residuals ($r_k, r_l$):** The residual vectors are **mutually orthogonal**.
-
-    $$
-    r_k^T r_l = 0 \quad (\text{for } k \neq l)
-    $$
-
-### The Central Optimality Guarantee
-
-**A-Norm Minimization:** The CG algorithm produces the approximation $x_k$ in the Krylov subspace ${\mathcal K}_k$ that is closest to the true solution $x$ in the $A$-norm.
-
-## Orthogonality Relations in Matrix Notation
-
-We can formalize the key properties of the CG algorithm by defining matrices whose columns are the vectors we have generated.
-
-* $Q = [q_1, \dots, q_n]$: The orthonormal basis vectors from the Lanczos process.
-* $P = [p_1, \dots, p_n]$: The A-orthogonal search direction vectors.
-* $R = [r_0, \dots, r_{n-1}]$: The mutually orthogonal residual vectors.
-
-### The Link Between Lanczos and CG Residuals
-
-We have shown that the Krylov subspace ${\mathcal K}_k$ has two equivalent bases:
-* ${\mathcal K}_k = \text{span}(q_1, \dots, q_k)$
-* ${\mathcal K}_k = \text{span}(r_0, \dots, r_{k-1})$
-
-Let's look at the "new" vector added at step $k$:
-1.  **Lanczos:** The Lanczos process constructs $q_k$ to be in ${\mathcal K}_k$ and orthonormal to all previous vectors, so $q_k \perp {\mathcal K}_{k-1}$.
-2.  **CG:** We proved in {prf:ref}`cg_residual_orthogonality` that $r_{k-1} \perp {\mathcal K}_{k-1}$.
-
-Both $q_k$ and $r_{k-1}$ are non-zero vectors in ${\mathcal K}_k$ that are orthogonal to ${\mathcal K}_{k-1}$. Since this orthogonal complement (${\mathcal K}_k \ominus {\mathcal K}_{k-1}$) is a one-dimensional subspace, the two vectors must be parallel:
+The Euclidean directions from our first attempt reappear as normalized CG residuals. Both $q_k$ from Lanczos and $r_{k-1}$ satisfy
 
 $$
-\text{span}(q_k) = \text{span}(r_{k-1})
+q_k,\ r_{k-1}\in\mathcal K_k,
+\qquad
+q_k,\ r_{k-1}\perp\mathcal K_{k-1}.
 $$
 
-This provides a deep connection: the CG algorithm's residual vectors are, up to scaling, the same as the orthogonal vectors generated by the Lanczos process.
-
-### A Summary of Matrix Properties
-
-This connection, along with our previous theorems, leads to a beautiful and concise summary of the matrix relationships.
-
-* **Identity Matrices:**
-    * $Q^T Q = I$: The Lanczos vectors are orthonormal by definition.
-
-* **Diagonal Matrices:**
-    * $R^T R = D_R$: The residuals are mutually orthogonal ({prf:ref}`cg_residuals_orthogonal`).
-    * $P^T A P = D$: The search directions are A-orthogonal (the central requirement of CG).
-
-* **Symmetric Tri-diagonal Matrices:**
-    * $Q^T A Q = T$: This is the fundamental result of the Lanczos process.
-    * $R^T A R = T_R$: This is the analogous (and less obvious) property for the residuals.
-
-```{prf:proof}
-$R^TAR$ is tri-diagonal because span($q_k$) = span($r_{k-1}$) and $Q^T A Q$ is tri-diagonal.
-
-We can also prove this result directly using the orthogonality properties of the residuals. We show that $r_i^T A r_j = 0$ if $|i-j| \ge 2$.
-
-1.  We know that $r_j \in {\mathcal K}_{j+1}$.
-2.  By the property of Krylov subspaces, $A r_j \in A({\mathcal K}_{j+1}) \subset {\mathcal K}_{j+2}$.
-3.  From {prf:ref}`cg_residual_orthogonality`, we know the residual $r_i$ is orthogonal to the entire subspace ${\mathcal K}_i$ (i.e., $r_i \perp {\mathcal K}_i$).
-4.  Assume, without loss of generality, that $i \ge j+2$.
-5.  If $i \ge j+2$, then the subspace ${\mathcal K}_{j+2}$ is a subset of ${\mathcal K}_i$. This means $A r_j$ (which is in ${\mathcal K}_{j+2}$) is also a vector in ${\mathcal K}_i$.
-6.  Since $r_i \perp {\mathcal K}_i$, it must be orthogonal to every vector in it, including $A r_j$.
-7.  Therefore, $r_i^T (A r_j) = 0$ for all $i \ge j+2$. By symmetry, this holds for $j \ge i+2$ as well.
-
-```
-
-## Connection to the Lanczos Process
-
-The Conjugate Gradient method is not just related to the Lanczos process; it is a direct and efficient implementation of it. We can show that the CG iterate $x_k$ can be found by implicitly solving the tridiagonal system $T_k$ generated by the Lanczos iteration.
-
-Let's derive this important connection.
-
-1.  **Start with CG Orthogonality:** We begin with our key result from {prf:ref}`cg_residual_orthogonality`: the residual $r_k = b - A x_k$ is orthogonal to the Krylov subspace ${\mathcal K}_k$.
-
-2.  **Use the Lanczos Basis:** The Lanczos algorithm generates an orthonormal basis $Q_k = [q_1, \dots, q_k]$ for ${\mathcal K}_k$. The orthogonality condition $r_k \perp {\mathcal K}_k$ can therefore be written in matrix form:
-
-    $$
-    Q_k^T r_k = 0 \implies Q_k^T (b - A x_k) = 0
-    $$
-
-    This rearranges to:
-
-    $$
-    Q_k^T A x_k = Q_k^T b
-    $$
-
-3.  **Express $x_k$ in the Lanczos Basis:** Since our solution $x_k$ is in ${\mathcal K}_k$, we can express it as a linear combination of the $Q_k$ basis vectors:
-
-    $$
-    x_k = Q_k y_k
-    $$
-
-    where $y_k \in \mathbb{R}^k$ is a vector of unknown coefficients.
-
-4.  **Substitute and Solve:** We substitute this expression for $x_k$ back into our equation from step 2:
-
-    $$
-    Q_k^T A (Q_k y_k) = Q_k^T b
-    $$
-
-    Grouping the terms, we get:
-
-    $$
-    (Q_k^T A Q_k) y_k = Q_k^T b
-    $$
-
-5.  **Identify the Components:**
-    * **The Matrix:** From our previous chapter on the Lanczos process, we recognize this as the definition of the $k \times k$ symmetric tridiagonal matrix $T_k$:
-
-        $$
-        T_k = Q_k^T A Q_k
-        $$
-
-    * **The Right-Hand Side:** We defined our starting vector for Lanczos as $q_1 = b / \|b\|_2$. Therefore, $Q_k^T b$ simplifies significantly. Its first component is $q_1^T b = (b^T / \|b\|_2) b = \|b\|_2$. All other components are $q_i^T b = q_i^T (\|b\|_2 q_1) = 0$ due to orthogonality.
-
-        $$
-        Q_k^T b = \begin{bmatrix} q_1^T b \\ q_2^T b \\ \vdots \\ q_k^T b \end{bmatrix} = \begin{bmatrix} \|b\|_2 \\ 0 \\ \vdots \\ 0 \end{bmatrix} = \|b\|_2 e_1
-        $$
-
-6.  **The Final System:** By substituting these components, we arrive at the final result:
-
-    $$
-    T_k y_k = \|b\|_2 e_1
-    $$
-
-This proves that the coefficients $y_k$ for the CG solution $x_k = Q_k y_k$ can be found by solving this small, symmetric tridiagonal system.
-
-This is a profound insight. The CG algorithm is a way to solve this tridiagonal system and "build" the solution $x_k = Q_k y_k$ iteratively and implicitly, without ever forming $T_k$ or $Q_k$.
-
-## Why Is It Called the "Conjugate Gradient" Algorithm?
-
-The name "Conjugate Gradient" is not arbitrary; it is a literal, two-word description of the two key properties of the algorithm. Let's break down each part.
-
-### The "Conjugate" Part
-
-The "Conjugate" part refers to the search directions $\{p_k\}$. As we have seen, the entire algorithm is built on the requirement that these directions are A-orthogonal.
+Before termination, this new orthogonal direction is one-dimensional. Thus, for signs $\sigma_k\in\{-1,1\}$ determined by the Lanczos convention,
 
 $$
-p_k^T A p_l = 0 \quad \text{for } k \neq l
+\boxed{q_k=\sigma_k\frac{r_{k-1}}{\|r_{k-1}\|_2}.}
 $$
 
-The general mathematical term for this relationship is that the vectors $p_k$ are **conjugate** with respect to the matrix $A$.
+The residuals, rather than the A-orthogonal search directions, are therefore parallel to the Lanczos vectors.
 
-This is the algorithm's "secret sauce." A simpler (but far less effective) method like Steepest Descent simply moves in the direction of the new gradient at each step. By enforcing A-orthogonality, the CG algorithm ensures that when we take a step in the direction $p_k$, we find the *optimal* and *final* coefficient for that basis vector. Minimizing the error in the new direction $p_{k+1}$ does not "undo" the minimization we already performed in the previous directions $p_1, \dots, p_k$.
+### Orthogonality Relations in Matrix Notation
 
-### The "Gradient" Part
-
-The "Gradient" part comes from the fact that the algorithm is related to gradient-based optimization methods.
-
-To see this, we must define the function that the CG algorithm is minimizing. As we noted in our optimality proof, CG's goal is to find the $x_k$ that minimizes the **A-norm of the error**. Let's define this as our loss function $L(y)$ for an arbitrary vector $y$:
+Let $Q_k=[q_1,\ldots,q_k]$, $P_k=[p_1,\ldots,p_k]$, and $R_k=[r_0,\ldots,r_{k-1}]$. Here $R_k$ collects residual vectors; it is not a triangular QR factor. Their properties are
 
 $$
-L(y) = \frac{1}{2} \|x - y\|_A^2 = \frac{1}{2} (x-y)^T A (x-y)
+\begin{aligned}
+Q_k^TQ_k&=I,\\
+R_k^TR_k&=\operatorname{diag}(\|r_0\|_2^2,\ldots,\|r_{k-1}\|_2^2),\\
+P_k^TAP_k&=D_k.
+\end{aligned}
 $$
 
-(We add the $\frac{1}{2}$ for cosmetic reasons, to cancel the '2' that appears during differentiation).
-
-Now, let's find the **gradient** of this loss function with respect to $y$.
+The matrices $Q_k^TAQ_k=T_k$ and $R_k^TAR_k$ are symmetric tridiagonal. The first is the Lanczos projection. The second follows because $R_k=Q_kS_k$ for a nonsingular diagonal matrix $S_k$ of signed residual norms, so
 
 $$
-L(y) = \frac{1}{2} (x^T A x - 2 x^T A y + y^T A y)
+R_k^TAR_k=S_kT_kS_k.
 $$
 
-The gradient $\nabla L(y)$ is the vector of partial derivatives:
+There is also a direct subspace proof. If $i\ge j+2$, then $Ar_j\in\mathcal K_{j+2}\subseteq\mathcal K_i$ and $r_i\perp\mathcal K_i$, giving $r_i^TAr_j=0$. Symmetry supplies the zeros on the other side of the diagonal.
+
+### The Small Tridiagonal System
+
+Write the CG approximation in the Lanczos basis as $x_k=Q_ky_k$. Residual orthogonality then gives
 
 $$
-\nabla L(y) = \frac{1}{2} (-2 A x + 2 A y) = A y - A x
+\begin{aligned}
+0=Q_k^Tr_k&=Q_k^Tb-Q_k^TAQ_ky_k,\\
+T_ky_k&=\|b\|_2e_1.
+\end{aligned}
 $$
 
-Since $A x = b$, this simplifies to:
+The right-hand side follows from $q_1=b/\|b\|_2$ and the orthogonality of the remaining columns to $q_1$. Here $e_1$ is the first coordinate vector. Since $A$ is SPD, so is $T_k=Q_k^TAQ_k$, and this projected system has a unique solution.
+
+CG computes $x_k=Q_ky_k$ implicitly through its short recurrence, without storing $Q_k$ or explicitly forming and solving each $T_k$. This explains both its connection to Lanczos and its small storage requirement.
+
+## Why the Name Conjugate Gradient?
+
+The search directions are **conjugate** because $p_i^TAp_j=0$ for $i\ne j$. This makes the coefficient along each direction final: adding a new conjugate direction does not undo the minimizations already performed.
+
+The **gradient** comes from the quadratic energy. Its gradient is
 
 $$
-\nabla L(y) = A y - b = -(b - A y) = -r(y)
+\nabla\Phi(z)=Az-b,
+\qquad
+\nabla\Phi(x_k)=-r_k.
 $$
 
-This is a profound result: **The gradient of the error function is the negative of the residual.**
-
-This means the residual vector $r_k = b - A x_k$ that we use in our algorithm is, up to a sign, the gradient of the error function at our current iterate $x_k$. The residual $r_k$ is the direction of "steepest ascent" for the error, so $-r_k$ is the direction of "steepest descent."
-
-### Putting It All Together
-
-Now we can see the whole picture by looking at the update rule for the search direction:
-
-$$
-p_{k+1} = r_k + \tau_k \, p_k
-$$
-
-This equation shows that the new search direction $p_{k+1}$ is a linear combination of two vectors:
-
-1.  **The Gradient:** The residual $r_k$, which we just proved is the gradient (up to a sign) of the error.
-2.  **The Previous Direction:** The vector $p_k$.
-
-This is why the algorithm is called **Conjugate Gradient**. It is a gradient-based method that takes the current **gradient** ($r_k$) and *corrects* it with the previous direction ($\tau_k p_k$) to create a new direction $p_{k+1}$ that is **conjugate** (A-orthogonal) to all previous directions.
+Equivalently, the squared-error objective $L(z)=\tfrac12\|x-z\|_A^2$ differs from $\Phi(z)$ by a constant and has the same gradient. Thus $r_k$ is the **negative gradient**, the direction of steepest decrease in the Euclidean geometry. Steepest descent would use $r_k$ alone; CG adds a multiple of $p_k$ to make the new direction conjugate to all previous ones.
 
 ## Convergence of the CG Method
 
-We have shown that CG is an optimal and efficient algorithm. We now turn to the most practical question: how fast does it converge?
+The construction explains which approximation CG selects. Its usefulness depends on how quickly the Krylov spaces contain accurate approximations.
 
-### Finite Convergence (A Theoretical Guarantee)
+### Finite Convergence in Exact Arithmetic
 
-In a world without floating-point errors, the Conjugate Gradient algorithm is a *direct method*, not an iterative one.
-
-```{prf:theorem} Finite Convergence of CG
+:::{prf:theorem} Finite Convergence of CG
 :label: cg_finite_convergence
 
-In exact arithmetic, the CG algorithm is guaranteed to find the exact solution $x$ in at most $n$ iterations, where $n$ is the dimension of $A$.
-```
+For an SPD $n\times n$ matrix, CG finds the exact solution in at most $n$ iterations in exact arithmetic. It may terminate earlier.
+:::
 
-```{prf:proof}
+:::{prf:proof}
+If $r_0,\ldots,r_{n-1}$ are all nonzero, they are $n$ mutually orthogonal vectors and hence form a basis of $\mathbb R^n$. By {prf:ref}`cg_residual_basis`, $\mathcal K_n=\mathbb R^n$. The next residual $r_n$ is orthogonal to this whole space, so it must be zero. If any earlier residual vanishes, the solution has already been found.
+:::
 
-The algorithm terminates when $r_k = 0$. We proved ({prf:ref}`cg_residuals_orthogonal`) that the residuals $r_0, \dots, r_{k-1}$ are mutually orthogonal. A set of $n$ non-zero, mutually orthogonal vectors forms a basis for $\mathbb{R}^n$. Therefore, the algorithm *must* find a zero residual (the exact solution) in at most $n$ steps.
-```
+The Krylov space can stop growing before it fills $\mathbb R^n$. If $\mathcal K_{m+1}=\mathcal K_m$, then $r_m\in\mathcal K_{m+1}=\mathcal K_m$ and $r_m\perp\mathcal K_m$, forcing $r_m=0$. Thus termination occurs when growth stops, and the full solution has an expansion in the directions already constructed. We never need to assume that $\mathcal K_n$ has dimension $n$ for every right-hand side.
 
-This property is not why we use CG. For the large, sparse systems we care about, $n$ might be in the millions or billions, so $n$ iterations is impossibly expensive. Furthermore, in floating-point arithmetic, orthogonality is quickly lost, and the $n$-step guarantee fails.
+For a large sparse problem, the practical goal is an accurate approximation in far fewer than $n$ steps. Finite termination is a theoretical property, not a reason to classify CG as a direct solver. In floating-point arithmetic, conjugacy and residual orthogonality can be lost, so the $n$-step guarantee does not generally hold.
 
-The *true* goal of CG is not to run $n$ steps, but to get an excellent approximation in a number of steps $k \ll n$. This is why we treat it as an iterative method and analyze its *rate* of convergence.
+### The Error Polynomial and the Condition Number
 
-### The Rate of Convergence and the Condition Number
-
-The rate of convergence is governed by the properties of the matrix $A$, specifically its **eigenvalue distribution**. This is most easily summarized by the **condition number** $\kappa(A)$.
-
-For an SPD matrix $A$, the condition number is the ratio of its largest to its smallest eigenvalue:
+The [Chebyshev analysis](chebyshev_acceleration.md) described error reduction through polynomials of $A$. The same viewpoint applies to CG. Since $x_k\in\mathcal K_k(A,b)$ and $b=Ax$, its error can be written
 
 $$
-\kappa(A) = \frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}
+x-x_k=p(A)x,
+\qquad \deg p\le k,
+\qquad p(0)=1.
 $$
 
-A well-conditioned matrix has $\kappa(A) \approx 1$ (all eigenvalues are similar). An ill-conditioned matrix has $\kappa(A) \gg 1$ (eigenvalues are spread over many orders of magnitude).
+Conversely, every polynomial satisfying these conditions gives a candidate in $\mathcal K_k$: because $p(0)=1$, we can write $p(\lambda)=1-\lambda s(\lambda)$ with $\deg s\le k-1$. Then $x-p(A)x=s(A)b\in\mathcal K_k$. Thus minimizing over these polynomials is exactly the same as minimizing over the Krylov space. CG chooses the candidate with the smallest energy error.
 
-A standard (though often pessimistic) bound on the error of the CG algorithm is given by:
+To bound this error, write $x=\sum_j c_jv_j$ in an orthonormal eigenvector basis of $A$. Then
 
 $$
-\|x - x_k\|_A \leq 2 \left( \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1} \right)^k \|x - x_0\|_A
+\begin{aligned}
+\|p(A)x\|_A^2
+&=\sum_j\lambda_j c_j^2|p(\lambda_j)|^2\\
+&\le\left(\max_j|p(\lambda_j)|\right)^2\|x\|_A^2.
+\end{aligned}
 $$
 
-### Interpreting the Error Bound
+Let $\lambda_{\min}$ and $\lambda_{\max}$ be the smallest and largest eigenvalues. Bounding all values on this enclosing interval gives
 
-Let's analyze the term that governs the convergence: $\rho = \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1}$. The error is reduced by this factor at each iteration $k$.
+$$
+\|x-x_k\|_A
+\le
+\min_{\substack{\deg p\le k\\p(0)=1}}
+\max_{\lambda\in[\lambda_{\min},\lambda_{\max}]}|p(\lambda)|\,\|x-x_0\|_A.
+$$
 
-* **Well-conditioned case ($\kappa(A) \approx 1$):** If $\kappa(A)$ is close to 1, then $\sqrt{\kappa(A)} \approx 1$, and the numerator $(\sqrt{\kappa(A)} - 1)$ is very close to 0. This makes $\rho$ very small, and the error $\rho^k$ plummets to zero in just a few iterations.
+The same bound holds for a general $x_0$ by applying the argument to the correction equation. In particular, CG has no larger energy error than the Chebyshev approximation of the same degree and initial guess.
 
-* **Ill-conditioned case ($\kappa(A) \gg 1$):** If $\kappa(A)$ is very large, then $\sqrt{\kappa(A)}$ is also large. The fraction $\rho$ will be a number very close to 1. This means the error $\rho^k$ decreases *very slowly*, and we will need many iterations to achieve a good approximation.
+For SPD $A$, define the 2-norm condition number and the associated convergence factor by
 
-This bound confirms our intuition: **CG converges quickly for well-conditioned matrices and slowly for ill-conditioned matrices.**
+$$
+\kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)},
+\qquad
+\rho=\frac{\sqrt{\kappa_2(A)}-1}{\sqrt{\kappa_2(A)}+1}.
+$$
 
-### The Real Story: Eigenvalue Clustering
+Applying the Chebyshev bound from {prf:ref}`thm:chebyshev-convergence` gives, for $k\ge1$,
 
-This bound is often a "worst-case" scenario. The true convergence rate is more nuanced and depends on the *clustering* of eigenvalues.
+$$
+\boxed{
+\|x-x_k\|_A
+\le2\rho^k\|x-x_0\|_A.
+}
+$$
 
-* If $A$ has only $m$ distinct eigenvalues, CG will find the exact solution in at most $m$ steps.
-* More practically, if $A$ has its eigenvalues "clustered" into $m$ small groups, CG will converge very quickly (as if it were solving an $m \times m$ problem).
+If $\kappa_2(A)=1$, then $A$ is a positive multiple of the identity and CG solves the system in one step. When the condition number is close to one, the factor $\rho$ is small and the bound predicts rapid convergence. For large $\kappa_2(A)$, the factor approaches one and the guarantee weakens. The factor bounds the overall error decay; it is not an assertion that the actual error decreases by exactly $\rho$ at every step.
 
-This is the entire motivation for **preconditioning**, which is the most important topic in practical iterative methods. The goal of a preconditioner is to transform the system $Ax=b$ into a new system $\tilde{A}\tilde{x}=\tilde{b}$ where the matrix $\tilde{A}$ has the same solution but has a condition number close to 1 or has highly clustered eigenvalues.
+### Eigenvalue Clustering
 
-### The Superlinear Convergence Phenomenon
+The condition-number bound uses only the extreme eigenvalues. The actual rate depends on the whole eigenvalue distribution and on the initial error.
 
-In practice, the convergence of CG is often observed to accelerate as the iterations proceed. This behavior, where the error reduction per step becomes progressively larger, is known as superlinear convergence.
+If $A$ has $s$ distinct eigenvalues $\theta_1,\ldots,\theta_s$, consider
 
-This acceleration is not just "fast" convergence; it is a "rate-improving" convergence. While the term "convergence rate" is a misnomer for a direct method, the phenomenon is real when CG is used iteratively. It is explained by the connection to the Lanczos process. The Lanczos algorithm (and thus CG) has a property of finding the extreme eigenvalues (and eigenvectors) first. As the CG iteration proceeds, it effectively "finds" and eliminates the error components associated with these converged "Ritz values" (eigenvalue approximations).
+$$
+p(\lambda)=\prod_{j=1}^s\left(1-\frac{\lambda}{\theta_j}\right).
+$$
 
-Once these components are removed, the algorithm behaves as if it is solving a new problem on the remaining subspace. This new, implicit problem has a smaller effective condition number ($\kappa_{eff}$). Since the convergence rate at any given stage is governed by the current $\kappa_{eff}$, the rate itself improves as $k$ increases, leading to the observed superlinear acceleration.
+It equals $1$ at zero and vanishes at every eigenvalue, so $p(A)=0$. This candidate has zero error, and CG optimality proves exact convergence in at most $s$ steps. Only eigenvalues present in the initial error are needed in this argument, so convergence can occur even sooner.
+
+Tight eigenvalue clusters can also help: a polynomial can be small on the clusters without being small throughout the entire interval between the extreme eigenvalues. This can make convergence much faster than the condition-number bound predicts. The widths and separation of the clusters matter; $s$ clusters do not generally imply termination in $s$ steps.
+
+The following experiment compares two $120\times120$ SPD systems with the same condition number, $\kappa_2(A)=100$. One has evenly spread eigenvalues; the other has three tight clusters. Both start from zero with the same initial-error coefficients in their eigenvector bases. The plotted errors come from actual CG iterations, using the known solution to measure the energy error.
+
+:::{figure} ../_static/cg_convergence.svg
+:alt: Left, 120 eigenvalues spread between 1 and 100 compared with 120 eigenvalues grouped near 1, 20, and 100. Right, computed relative CG energy errors: the clustered system reaches 10 to the minus 12 in 23 iterations and the spread system in 73, both below their shared condition-number bound.
+:width: 100%
+:name: fig-cg-convergence
+
+Same condition number, different convergence. The matrices are diagonal, so their coordinate axes are eigenvector directions. The spread spectrum is evenly spaced in $[1,100]$; the clustered spectrum has 40 eigenvalues in each of $[1,1.1]$, $[19.95,20.05]$, and $[99.9,100]$. In both cases, $x=(1,\ldots,1)^T/\sqrt{120}$, $b=Ax$, and $x_0=0$. The right panel shows the computed relative energy error and their common bound $2(9/11)^k$. Each run stops once the measured error is below $10^{-12}$. Clustering gives faster convergence here, even though all 120 eigenvalues remain distinct.
+:::
+
+This motivates [preconditioning](preconditioning.md): transform the system into an equivalent problem for which an inexpensive iterative solve converges faster. For CG, the transformation must retain the SPD structure. We develop this in [preconditioned CG](pcg.md).
+
+### Superlinear Acceleration
+
+CG sometimes converges faster as the iterations proceed. In this setting, **superlinear convergence** refers to an improving effective error-reduction factor, rather than one fixed geometric rate throughout the calculation. Such acceleration is possible, but not guaranteed for every problem or at every step.
+
+The Lanczos connection helps explain it. Recall that the **Ritz values** are the eigenvalues of the small matrix $T_k=Q_k^TAQ_k$. As they approximate some eigenvalues of $A$, particularly well-separated extreme eigenvalues, the CG error polynomial can strongly suppress the associated error components. The remaining components may occupy a much narrower spectral interval. CG can then behave as though it were solving a problem with a smaller effective condition number. The improvement is gradual; it does not require those components to become exactly zero.
+
+## Key Results to Remember
+
+Assume $A$ is SPD and work in exact arithmetic. As in the derivation, take $x_0=0$, write $x=A^{-1}b$, and define
+
+$$
+e_k=x-x_k,
+\qquad r_k=b-Ax_k=Ae_k,
+\qquad \mathcal K_k=\mathcal K_k(A,b).
+$$
+
+The geometry is defined by $\langle u,v\rangle_A=u^TAv$ and $\|v\|_A=\sqrt{v^TAv}$.
+
+The formulas below use $x_0=0$. The basis statements apply while the listed residuals and search directions are nonzero. For a general initial guess, apply them to the correction equation $A(x-x_0)=r_0$: replace $b$ by $r_0$ and the approximations $x_k$ by $x_k-x_0$. The errors and residuals are unchanged.
+
+### One Krylov Space, Several Bases
+
+The search directions, residuals, and Lanczos vectors span the same nested spaces:
+
+$$
+\begin{aligned}
+\mathcal K_k
+&=\operatorname{span}\{b,Ab,\ldots,A^{k-1}b\}\\
+&=\operatorname{span}\{p_1,\ldots,p_k\}\\
+&=\operatorname{span}\{r_0,\ldots,r_{k-1}\}\\
+&=\operatorname{span}\{q_1,\ldots,q_k\}.
+\end{aligned}
+$$
+
+The approximation and the next residual satisfy
+
+$$
+x_k\in\mathcal K_k,
+\qquad
+r_k\in\mathcal K_{k+1}.
+$$
+
+### The Orthogonality Relations
+
+The search directions are **A-orthogonal**, while the residuals are **Euclidean-orthogonal**:
+
+$$
+\boxed{
+\begin{aligned}
+p_i^TAp_j&=0 &&(i\ne j),\\
+r_i^Tr_j&=0 &&(i\ne j).
+\end{aligned}
+}
+$$
+
+The error and residual are orthogonal to the current search space in different inner products:
+
+$$
+\boxed{
+\begin{aligned}
+v^TAe_k&=0 &&\text{for every }v\in\mathcal K_k,\\
+v^Tr_k&=0 &&\text{for every }v\in\mathcal K_k.
+\end{aligned}
+}
+$$
+
+These two statements are equivalent because $r_k=Ae_k$. In particular, $p_i^Tr_k=0$ for $i\le k$. A nonzero $r_k$ is therefore a new direction outside $\mathcal K_k$, even though it is generally not A-orthogonal to all the previous search directions.
+
+### Optimality over the Whole Search Space
+
+CG produces the unique best approximation in the energy norm:
+
+$$
+\boxed{x_k=\underset{z\in\mathcal K_k}{\operatorname{argmin}}\,\|x-z\|_A.}
+$$
+
+Equivalently, it minimizes the computable quadratic energy:
+
+$$
+x_k=\underset{z\in\mathcal K_k}{\operatorname{argmin}}\,\Phi(z),
+\qquad
+\Phi(z)=\frac12z^TAz-b^Tz.
+$$
+
+The projection identity makes the optimality explicit. For every $z\in\mathcal K_k$,
+
+$$
+\|x-z\|_A^2=\|x-x_k\|_A^2+\|x_k-z\|_A^2.
+$$
+
+Thus the energy error decreases as the search space grows. The Euclidean residual norm, however, need not decrease at every step.
+
+There is also an equivalent residual interpretation. Since
+
+$$
+\|r_k\|_{A^{-1}}^2
+:=r_k^TA^{-1}r_k
+=e_k^TAe_k,
+$$
+
+CG minimizes the residual in the $A^{-1}$-norm over the search space. It does not generally minimize the residual in the Euclidean norm.
+
+### Computable Coefficients and Short Updates
+
+With the normalization $p_1=r_0$ and $p_{k+1}=r_k+\tau_kp_k$, the coefficients are
+
+$$
+\begin{aligned}
+\mu_k
+&=\frac{p_k^Tr_0}{p_k^TAp_k}
+=\frac{\|r_{k-1}\|_2^2}{p_k^TAp_k},\\
+\tau_k&=\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
+\end{aligned}
+$$
+
+The iterates, residuals, and directions update by
+
+$$
+\boxed{
+\begin{aligned}
+x_k&=x_{k-1}+\mu_kp_k,\\
+r_k&=r_{k-1}-\mu_kAp_k,\\
+p_{k+1}&=r_k+\tau_kp_k.
+\end{aligned}
+}
+$$
+
+The step along $p_k$ minimizes the energy along that line. Conjugacy ensures that this step also gives the minimum over the entire enlarged space without changing the old expansion coefficients. Stop if $r_k=0$, before generating another direction. Each iteration uses one matrix-vector product and stores only a fixed number of vectors.
+
+### The Lanczos Connection
+
+The normalized residuals are the Lanczos vectors up to signs:
+
+$$
+q_k=\sigma_k\frac{r_{k-1}}{\|r_{k-1}\|_2},
+\qquad \sigma_k\in\{-1,1\}.
+$$
+
+For $Q_k=[q_1,\ldots,q_k]$, $P_k=[p_1,\ldots,p_k]$, and $R_k=[r_0,\ldots,r_{k-1}]$,
+
+$$
+\begin{aligned}
+Q_k^TQ_k&=I,\\
+P_k^TAP_k&=D_k\quad\text{(positive diagonal)},\\
+R_k^TR_k&\text{ is positive diagonal},\\
+Q_k^TAQ_k=T_k&\text{ and }R_k^TAR_k\text{ are symmetric tridiagonal}.
+\end{aligned}
+$$
+
+With $q_1=b/\|b\|_2$, the same approximation can be written
+
+$$
+x_k=Q_ky_k,
+\qquad T_ky_k=\|b\|_2e_1.
+$$
+
+CG solves this projected problem implicitly through the short updates.
+
+### Convergence and Its Limits
+
+CG finds the exact solution in at most $n$ steps, or at most $s$ steps if $A$ has $s$ distinct eigenvalues. Earlier termination is possible when fewer eigenvalues are present in the initial error.
+
+Its optimality can also be expressed through error polynomials:
+
+$$
+\|e_k\|_A
+=\min_{\substack{\deg p\le k\\p(0)=1}}\|p(A)e_0\|_A.
+$$
+
+With $\kappa_2(A)=\lambda_{\max}(A)/\lambda_{\min}(A)$, the condition-number bound for $k\ge1$ is
+
+$$
+\boxed{
+\|e_k\|_A
+\le2\left(
+\frac{\sqrt{\kappa_2(A)}-1}{\sqrt{\kappa_2(A)}+1}
+\right)^k\|e_0\|_A.
+}
+$$
+
+Eigenvalue clustering can give faster convergence than this bound predicts, and convergence can accelerate as some error components are suppressed. These improvements depend on the problem; they are not guaranteed at every step.
+
+In floating-point arithmetic, the orthogonality relations and finite-termination guarantee need not hold exactly. Check the explicitly computed residual before accepting a solution, and use preconditioning when the unpreconditioned iteration converges too slowly.

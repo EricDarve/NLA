@@ -1,98 +1,124 @@
-# MINRES
+# The Minimal Residual Method (MINRES)
 
-We have seen that GMRES is a general-purpose method for any square matrix, but its cost grows with each iteration. By contrast, the Conjugate Gradient (CG) method is incredibly efficient, but it applies *only* to symmetric positive definite (SPD) matrices.
+GMRES minimizes the residual over a Krylov subspace for general nonsingular matrices, but its work and storage grow with the subspace. When $A$ is symmetric, we can perform the same minimization using short recurrences. This gives the **minimal residual method (MINRES)**, developed by Paige and Saunders.
 
-This raises a natural question: what if we have a matrix $A$ that is **symmetric, but not positive definite (indefinite)?**
+Unlike CG, MINRES does not require positive definiteness. In particular, it applies to **symmetric indefinite** matrices, whose eigenvalues include both positive and negative values.
 
-* CG is not applicable, as the $A$-norm is not a valid norm and the algorithm is not guaranteed to converge.
-* GMRES *is* applicable, but it fails to exploit the symmetry of $A$. We would be paying the full $O(kn)$ cost per iteration, which is unnecessary.
-
-This is the problem solved by the **Minimal Residual (MINRES)** algorithm, developed by Paige and Saunders. MINRES is, in essence, a specialized and highly efficient version of GMRES that leverages symmetry.
+Throughout this section, $A\in\mathbb R^{n\times n}$ is symmetric and nonsingular. We use the same notation as in GMRES: $x$ is the exact solution, $x_0$ the initial guess, $r_0=b-Ax_0$, and $\beta=\|r_0\|_2$. If $r_0=0$, we are already done. Otherwise, the search space is $x_0+\mathcal K_k(A,r_0)$. The derivation assumes exact arithmetic.
 
 ## From Arnoldi to Lanczos
 
-The core distinction between GMRES and MINRES is analogous to the difference between the Arnoldi and Lanczos processes:
+For a symmetric matrix, the Arnoldi process reduces to the [Lanczos process](lanczos_iteration.md). The projected matrix becomes symmetric tridiagonal, and generating each basis vector requires only the two preceding vectors.
 
-* **GMRES** is built on the **Arnoldi process** ($A Q_k = Q_{k+1} \underline{H}_k$) for general matrices, producing a Hessenberg matrix $\underline{H}_k$.
-* **MINRES** is built on the **Lanczos process** for symmetric matrices. When $A$ is symmetric, the Arnoldi process simplifies *exactly* to the Lanczos process. The resulting Hessenberg matrix $\underline{H}_k$ becomes a tridiagonal matrix, which we will call $\underline{T}_k$.
-
-The Lanczos relation gives us:
+While Lanczos generates a new direction, its relation is
 
 $$
-A Q_k = Q_{k+1} \underline{T}_k
+AQ_k=Q_{k+1}\underline T_k,
 $$
 
-where $\underline{T}_k$ is a $(k+1) \times k$ *tridiagonal* matrix.
+where $Q_k=[q_1,\ldots,q_k]$ has orthonormal columns and $q_1=r_0/\beta$. The matrix $\underline T_k$ is $(k+1)\times k$: its first $k$ rows form a symmetric tridiagonal matrix $T_k$, and its last row can have a nonzero entry only in column $k$. Thus it is the tridiagonal specialization of GMRES's rectangular Hessenberg matrix $\underline H_k$.
 
 ## The MINRES Least-Squares Problem
 
-Like GMRES, MINRES seeks to minimize the 2-norm of the residual at each step:
+As in GMRES, write a candidate as $x_0+Q_k y$. Since $r_0=Q_{k+1}(\beta e_1)$, where $e_1$ is the first coordinate vector in $\mathbb R^{k+1}$,
 
 $$
-\min_{y \in \mathbb{R}^k} \|r^{(k)}\|_2 = \min_y \| b - A Q_k y \|_2
+\begin{aligned}
+\|b-A(x_0+Q_k y)\|_2
+&=\|r_0-AQ_k y\|_2\\
+&=\|Q_{k+1}(\beta e_1-\underline T_k y)\|_2\\
+&=\|\beta e_1-\underline T_k y\|_2.
+\end{aligned}
 $$
 
-We follow the exact same derivation as in GMRES, substituting the Lanczos relation instead of the Arnoldi relation:
+The last equality uses the orthonormal columns of $Q_{k+1}$. Therefore MINRES solves
 
 $$
-\begin{align}
-\| b - A Q_k y \|_2
-& = \| (\beta e_1) Q_{k+1} - (Q_{k+1} \underline{T}_k) y \|_2 \\[.5em]
-& = \left\| Q_{k+1} \left( \beta e_1 - \underline{T}_k y \right) \right\|_2 \\[.5em]
-& = \| \beta e_1 - \underline{T}_k y \|_2
-\end{align}
+\boxed{
+y_k=\underset{y\in\mathbb R^k}{\operatorname{argmin}}
+\|\beta e_1-\underline T_k y\|_2,
+\qquad x_k=x_0+Q_k y_k.
+}
 $$
 
-Thus, the GMRES problem is reduced from minimizing over a Hessenberg matrix $\underline{H}_k$ to minimizing over a tridiagonal matrix $\underline{T}_k$.
+**For a symmetric nonsingular matrix, MINRES and unrestarted GMRES give the same iterates in exact arithmetic when started from the same $x_0$.** They search the same space and minimize the same residual norm. MINRES uses symmetry to carry out this calculation more cheaply.
 
 ## Efficiency Gains
 
-This reduction in structure is the source of all the efficiency gains. We solve this small least-squares problem just as we do in GMRES: by maintaining a QR factorization using Givens rotations.
+We solve the small problem with Givens rotations, just as in GMRES:
 
 $$
-G_k^T \cdots G_1^T \underline{T}_k =
-\begin{pmatrix}
-R_k \\ 0
-\end{pmatrix}
+G_k^T\cdots G_1^T\underline T_k
+=\begin{pmatrix}R_k\\0\end{pmatrix},
+\qquad
+G_k^T\cdots G_1^T(\beta e_1)
+=\begin{pmatrix}t_k\\\rho_k\end{pmatrix}.
 $$
 
-However, because $\underline{T}_k$ is sparse (tridiagonal), the Givens rotations required to update this factorization are also very simple. The resulting upper-triangular matrix $R_k$ is also sparse (it has only two upper diagonals).
+Here $R_k$ is upper triangular, $t_k\in\mathbb R^k$, and $\rho_k$ is a scalar. As in GMRES, nonsingularity of $A$ ensures that $R_k$ is nonsingular. We have $R_k y_k=t_k$ and $\|r_k\|_2=|\rho_k|$, where $r_k=b-Ax_k$.
 
-More importantly, the underlying Lanczos process is a **short-term recurrence**, just like in CG. We no longer need to store the entire $Q_k$ basis or perform the $O(kn)$ orthogonalization.
+Tridiagonal structure gives $R_k$ only two possible nonzero diagonals above its main diagonal. This allows both the factorization and the solution to be updated with short recurrences. To see why we need not store $Q_k$, define solution directions by
 
-As a result, the cost per iteration of MINRES is only **$O(\text{nnz} + n)$**.
+$$
+D_k=Q_kR_k^{-1}=[d_1,\ldots,d_k],
+\qquad Q_k=D_kR_k.
+$$
 
-This is a remarkable result. We have developed an algorithm for general symmetric matrices that has the **exact same asymptotic cost as CG**, but with the broader applicability of GMRES (for symmetric systems).
+This is a mathematical definition, not an instruction to form an inverse. Column $k$ of the second identity gives
+
+$$
+d_k=\frac{q_k-(R_k)_{k-1,k}d_{k-1}-(R_k)_{k-2,k}d_{k-2}}
+{(R_k)_{kk}},
+$$
+
+with terms having indices below $1$ omitted. Only the last two solution directions are needed. The previous directions and the first $k-1$ entries of the rotated right-hand side remain unchanged, so
+
+$$
+x_k=x_0+D_k t_k
+=x_{k-1}+(t_k)_k d_k.
+$$
+
+Thus we can update the approximation immediately rather than saving the entire Lanczos basis for a final combination.
+
+Each standard MINRES step uses one matrix-vector product and a fixed number of vector operations. Its cost is $O(\operatorname{nnz}(A)+n)$, where $\operatorname{nnz}(A)$ counts the nonzero matrix entries, and its vector storage is $O(n)$, as for CG. This short-recurrence implementation is described on the [Stanford MINRES page](https://web.stanford.edu/group/SOL/software/minres/).
 
 ## Convergence
 
-The convergence of MINRES is governed by the eigenvalue distribution, and for the SPD case, it satisfies a bound similar to that of CG:
+MINRES inherits the residual-minimizing property of GMRES. Since the search spaces grow,
 
 $$
-\|r^{(k)}\|_2 \le 2 \, \| r^{(0)} \|_2 \left( \frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1} \right)^k
+\|r_{k+1}\|_2\le\|r_k\|_2.
 $$
 
-For symmetric indefinite problems, MINRES is the method of choice.
+The norm may stay unchanged at some steps; minimization does not guarantee rapid convergence. For a nonsingular system, exact termination occurs in at most $n$ steps, including earlier termination when the Lanczos space stops growing, as in GMRES.
+
+Symmetry gives an orthonormal eigenvector basis, so the eigenvector-conditioning factor in the GMRES bound is one. If $A$ is also positive definite, the [Chebyshev bound](chebyshev_acceleration.md) gives
+
+$$
+\|r_k\|_2
+\le2\|r_0\|_2
+\left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right)^k,
+\qquad
+\kappa=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}.
+$$
+
+For an indefinite matrix, the spectrum lies on both sides of zero, so this positive-interval bound does not apply. The polynomial must be small on both parts of the spectrum while remaining one at zero. MINRES still minimizes the residual, but its rate depends on the eigenvalue distribution.
+
+In floating-point arithmetic, Lanczos vectors can lose orthogonality. The exact convergence statements need not hold literally, and an explicitly computed residual should be checked before accepting the answer. Reorthogonalization can help, but increases the work and storage beyond the basic short-recurrence method.
 
 ## CG vs. MINRES
 
-* **Conjugate Gradients (CG)** finds the approximation $x^{(k)}_{CG} \in \mathcal{K}_k$ that minimizes the **$A$-norm of the error**:
+For SPD $A$, both methods search the same Krylov space but use different objectives:
 
-    $$
-    \min_{x \in \mathcal{K}_k} \| x - x^{(k)} \|_A
-    $$
+$$
+\begin{aligned}
+x_k^{\mathrm{CG}}
+&=\underset{v\in x_0+\mathcal K_k}{\operatorname{argmin}}\|x-v\|_A,\\
+x_k^{\mathrm{MINRES}}
+&=\underset{v\in x_0+\mathcal K_k}{\operatorname{argmin}}\|b-Av\|_2.
+\end{aligned}
+$$
 
-* **Minimal Residual (MINRES)** finds the approximation $x^{(k)}_{MINRES} \in \mathcal{K}_k$ that minimizes the **2-norm of the residual**:
+CG minimizes the energy error; MINRES minimizes the Euclidean residual. Their iterates generally differ. CG guarantees nonincreasing energy error, while MINRES guarantees nonincreasing Euclidean residual norms, in exact arithmetic.
 
-    $$
-    \min_{x \in \mathcal{K}_k} \| b - A x^{(k)} \|_2
-    $$
-
-Even though both are for symmetric systems, both are built on the Lanczos process, and both have the same efficient $O(\text{nnz} + n)$ cost, their iterates ($x^{(k)}_{CG}$ vs. $x^{(k)}_{MINRES}$) are different at each step.
-
-CG guarantees a monotonically decreasing $A$-norm of the error, while MINRES guarantees a monotonically decreasing 2-norm of the residual.
-
-This clarifies the "job" of each algorithm:
-
-* **CG:** The method of choice for **SPD** systems.
-* **MINRES:** The method of choice for **symmetric indefinite** systems (where the $A$-norm isn't a norm and CG fails).
+CG is the usual choice for SPD systems. MINRES extends residual minimization to symmetric indefinite systems, where the energy norm used by CG is unavailable. Both retain a fixed amount of vector work and storage per iteration.

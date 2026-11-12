@@ -1,135 +1,190 @@
 # Preconditioning
 
-In our previous discussions on iterative methods like the Conjugate Gradient (CG) algorithm and GMRES, we observed a critical fact: their convergence speed is highly dependent on the properties of the system matrix $A$. Specifically, convergence is slow when the **condition number** $\kappa(A)$ is large, or when the **eigenvalues** are spread out. Convergence improves significantly if the matrix is "closer" to the identity, has clustered eigenvalues, and its eigenbasis is well-conditioned.
+CG and GMRES can require many iterations when their Krylov spaces contain good approximations only slowly. For CG, a large condition number weakens the convergence bound, although eigenvalue clustering can still give rapid convergence. For nonsymmetric systems, GMRES convergence also depends on the eigenvectors and, more generally, on how polynomials of the matrix act on the residual. Eigenvalues alone do not determine its behavior.
 
-For many practical problems, especially those arising from the discretization of partial differential equations, $\kappa(A)$ can be very large, rendering our standard iterative methods impractically slow. This motivates the central topic of this section: **preconditioning**.
+**Preconditioning** changes the system seen by the iterative method while preserving the solution of $Ax=b$. The aim is to make each iteration more effective without adding too much work. This section surveys the main approaches; their usefulness depends on both the matrix and the computing hardware.
 
 ## The Goal of a Preconditioner
 
-The core idea of preconditioning is simple: instead of solving the original, difficult system $Ax=b$, we solve a related, "easier" system that has the same solution. We do this by applying a **preconditioner** $M$, which is a matrix that *approximates* $A$ but is much easier to invert.
-
-A good preconditioner $M$ must balance two competing goals:
-
-1.  **Improve Convergence:** The preconditioned system (e.g., $M^{-1}A$) must be "nicer" than the original $A$. Ideally, its eigenvalues are clustered, and its condition number $\kappa(M^{-1}A)$ is much smaller than $\kappa(A)$. The best possible (but impractical) choice is $M=A$, which gives $M^{-1}A = I$ and $\kappa(M^{-1}A)=1$, allowing convergence in one iteration.
-2.  **Be Easy to Apply:** The preconditioner is only useful if it is computationally cheap. We must be able to solve linear systems of the form $Mz=r$ (i.e., compute $M^{-1}r$) very quickly in each iteration of our method (e.g., CG or GMRES).
-
-The art of preconditioning lies in finding a matrix $M$ that strikes the optimal trade-off between these two goals.
-
-## Three Types of Preconditioning
-
-There are three main ways to apply a preconditioner $M$ (or its components $M_1, M_2$) to the system $Ax=b$.
-
-1.  **Left Preconditioning:** We multiply from the left by an approximation $M_1 \approx A$. We solve the modified system:
-
-    $$(M_1^{-1} A) x = M_1^{-1} b$$
-
-    This is a common choice for non-symmetric solvers like GMRES, as it directly acts on the system matrix to improve its properties.
-
-2.  **Right Preconditioning:** We use an approximation $M_2 \approx A$ and introduce a variable substitution $x = M_2^{-1} z$. This leads to the system:
-
-    $$(A M_2^{-1}) z = b, \quad \text{followed by} \quad x = M_2^{-1} z$$
-    
-    This is also common for GMRES. A key advantage of right preconditioning is that the residual of the original system, $r = b - Ax$, can be computed directly, which is often desirable.
-
-3.  **Symmetric (Split) Preconditioning:** We use two matrices, $M_1$ and $M_2$, to "split" the preconditioning:
-
-    $$(M_1^{-1} A M_2^{-1}) z = M_1^{-1} b, \quad \text{followed by} \quad x = M_2^{-1} z$$
-
-This third case is **essential for methods like CG and MINRES**. The Conjugate Gradient algorithm *requires* the system matrix to be Symmetric Positive Definite (SPD). If $A$ is SPD, the left-preconditioned matrix $M_1^{-1} A$ is generally *not* symmetric, so we cannot apply CG.
-
-To preserve symmetry, we must construct the preconditioned system in a symmetric way. For example, if we have a preconditioner $M$ that is itself SPD, we can find its Cholesky factor $C$ such that $M = C C^T$. We can then set $M_1 = C$ and $M_2 = C^T$. This transforms $Ax=b$ into the equivalent system:
+Let $A$ be nonsingular. We choose a nonsingular matrix $M$ that approximates $A$ in a useful way and is inexpensive to solve with. Applying the preconditioner means computing
 
 $$
-(C^{-1} A C^{-T}) z = C^{-1} b, \quad \text{where} \quad x = C^{-T} z
+Mz=r,\qquad\text{or equivalently}\qquad z=M^{-1}r.
 $$
 
-The new system matrix $A' = C^{-1} A C^{-T}$ is SPD, and we can now safely apply the standard CG algorithm to $A'z = b'$.
+**We normally do not form $M^{-1}$.** We provide a procedure that solves with $M$, perhaps using sparse factors, local solves, or a multigrid cycle.
 
-## Examples of Preconditioners
+A useful preconditioner balances three costs: construction, storage, and application at every iteration. Fewer iterations do not necessarily mean a faster solve if the preconditioner is expensive. Setup can be worthwhile when reused for several right-hand sides.
 
-Choosing a preconditioner is arguably the most critical and problem-dependent step in successfully using iterative solvers. There is no single "best" preconditioner; the choice is always a trade-off between **effectiveness** (how much it reduces the iteration count), **computational cost** (how expensive it is to apply $M^{-1}r$), and **storage cost**.
+The ideal choice $M=A$ gives $M^{-1}A=I$, but then applying the preconditioner requires solving the original problem. Practical choices retain enough of the structure of $A$ to help convergence while making the solve cheaper. Approximating every entry accurately is not the goal; the effect on the iterative method matters.
 
-We will survey the main families, progressing from the simplest "classical" methods to more advanced, specialized, and powerful techniques.
+## Left, Right, and Symmetric Preconditioning
 
-### 1. Classical Iteration Preconditioners
+The placement of the preconditioner affects both the matrix and the residual minimized by GMRES. In this discussion, $M$ is fixed and its inverse is applied as a linear operation.
 
-These simple preconditioners are derived directly from the classical iterative methods (Jacobi, Gauss-Seidel, SOR) we studied earlier. The preconditioner $M$ is chosen to be the part of the matrix $A$ that is "inverted" in a single step of that method. Let $A = D - L - U$, where $D$ is the diagonal, $-L$ is the strict lower triangle, and $-U$ is the strict upper triangle.
+### Left Preconditioning
 
-* **Jacobi:** $M = D$. The preconditioner is just the diagonal of $A$.
-* **Gauss-Seidel:** $M = D - L$. The preconditioner is the lower-triangular part of $A$.
-* **Successive Over-Relaxation (SOR):** $M = \frac{1}{\omega}(D - \omega L)$.
+Multiply the equation by $M^{-1}$:
 
-| Pros | Cons |
-| :--- | :--- |
-| ✅ **Very cheap:** Trivial to construct and apply. | ❌ **Often weak:** Convergence improvement is minimal for ill-conditioned systems. |
-| ✅ **Low memory:** $M$ is (at most) a triangle or diagonal of $A$. | ❌ **Sequential (Gauss-Seidel/SOR):** The forward solve $Mz=r$ is sequential and does not parallelize well. |
-| ✅ **Parallel (Jacobi):** The Jacobi preconditioner is "embarrassingly parallel," as $M^{-1} = D^{-1}$ is just a component-wise division. | ❌ **Limited Applicability:** May not be SPD, and can fail if a diagonal entry is zero. |
+$$
+M^{-1}Ax=M^{-1}b.
+$$
 
-**Applicability:**
-While rarely effective as standalone preconditioners for difficult problems, they are **crucial components of other methods**. For instance, they are often used as "smoothers" within the **Multigrid** algorithm.
+The residual of this transformed system is $M^{-1}(b-Ax)$. Thus left-preconditioned GMRES minimizes $\|M^{-1}(b-Ax)\|_2$ over its current search space. This is a weighted measure of the original residual; it can be small even when $\|b-Ax\|_2$ is not. Check the original residual before accepting the solution.
 
-### 2. Incomplete Factorization Preconditioners (ILU/IC)
+### Right Preconditioning
 
-This is the most common and "workhorse" family of general-purpose preconditioners. The idea is to perform an LU or Cholesky factorization of $A$, but to *discard* some or all of the "fill-in" (new non-zeros) that is created during the factorization.
+Introduce $y=Mx$, so $x=M^{-1}y$:
 
-* **Incomplete Cholesky (IC):** Used for **SPD matrices** (e.g., with CG). We compute an approximate Cholesky factor $C$ such that $A \approx C C^T = M$. We then use $M = C C^T$ as the preconditioner.
-* **Incomplete LU (ILU):** Used for **non-symmetric matrices** (e.g., with GMRES). We compute $L$ and $U$ such that $A \approx L U = M$.
+$$
+AM^{-1}y=b,\qquad x=M^{-1}y.
+$$
 
-The level of fill-in is controlled by different strategies:
+Now the transformed residual is exactly $b-AM^{-1}y=b-Ax$. Right-preconditioned GMRES therefore minimizes the original Euclidean residual norm. Neither placement is universally better; they produce different search spaces and residual histories. The [PETSc discussion of preconditioning](https://petsc.org/main/manual/ksp/#preconditioning-within-ksp) explains this distinction in solver implementations.
 
-* **ILU(0) / IC(0):** The "zero-fill" variants. We only keep entries in $L$ and $U$ where $A$ originally had a non-zero. The sparsity pattern of $L+U$ is identical to that of $A$.
-* **ILU(k) / IC(k):** "Level-based" fill. We allow fill-in up to a "level" $k$. $k=0$ is ILU(0). Higher $k$ means more fill, a more accurate $M$, but more cost.
-* **ILUT:** "Threshold-based" ILU. We discard any fill-in entries that are smaller than a given drop tolerance $\tau$.
+### Symmetric Preconditioning for CG and MINRES
 
-| Pros | Cons |
-| :--- | :--- |
-| ✅ **Very effective:** Often provides a massive reduction in iterations. A huge step up from classical methods. | ❌ **Sequential solves:** Applying $M^{-1}$ requires a forward and a backward triangular solve, which are difficult to parallelize. |
-| ✅ **General purpose:** Often the first-choice preconditioner for unstructured sparse systems. | ❌ **Breakdown:** The factorization can fail (e.g., encounter a zero pivot), especially for ILU(0). IC(0) is only guaranteed to exist for M-matrices. |
-| ✅ **Tunable:** The level `k` or threshold `t` gives a direct knob to trade off cost vs. effectiveness. | ❌ **Construction cost:** Can be expensive to compute, though this is usually an "offline" (one-time) cost. |
+For SPD $A$, choose an SPD preconditioner $M$. Although $M^{-1}A$ generally is not symmetric in the Euclidean inner product, we can describe an equivalent SPD system. Write $M=CC^T$, with $C$ nonsingular, and set $y=C^Tx$. Then
 
-**Applicability:**
-ILU/IC are the default preconditioners for unstructured sparse linear systems on single-core or shared-memory (CPU) architectures. IC is essential for preconditioning CG, and ILU is a staple for GMRES.
+$$
+\widetilde A y=\widetilde b,
+\qquad
+\widetilde A=C^{-1}AC^{-T},
+\qquad
+\widetilde b=C^{-1}b.
+$$
 
-### 3. Sparse Approximate Inverse (SPAI) Preconditioners
+Here $C^{-T}=(C^T)^{-1}$. Symmetry is preserved, and for every nonzero $v$,
 
-This family operates on a completely different philosophy. Instead of finding $M \approx A$ and applying $M^{-1}$ with a solve, we try to *directly compute* a sparse matrix $M$ that approximates $A^{-1}$.
+$$
+v^T\widetilde A v=(C^{-T}v)^TA(C^{-T}v)>0.
+$$
 
-The preconditioning step is then just a **matrix-vector product**: $z = M r$.
+Thus ordinary CG applies to the transformed system. Its condition-number bound uses $\kappa_2(\widetilde A)$, the ratio of this SPD matrix's extreme eigenvalues. Since
 
-This is typically set up as an optimization problem: for a given sparsity pattern, find $M$ that minimizes $\| I - MA \|_F$ (for left preconditioning) or $\| I - AM \|_F$ (for right preconditioning) in the Frobenius norm.
+$$
+M^{-1}A=C^{-T}\widetilde A C^T,
+$$
 
-| Pros | Cons |
-| :--- | :--- |
-| ✅ **Fully parallel:** The "apply" step is a sparse matrix-vector product, which is ideal for parallel hardware like GPUs. | ❌ **High construction cost:** Finding $M$ can be very expensive, often more so than an ILU factorization. |
-| ✅ **Overcomes triangular solve bottleneck:** This is the main motivation for using SPAI. | ❌ **Effectiveness:** Often less effective at reducing iterations than a comparable ILU. The "best" sparse approximation of $A^{-1}$ is often not sparse at all. |
+the two matrices have the same eigenvalues, although their Euclidean condition numbers need not agree.
 
-**Applicability:**
-These are specialized for high-performance, massively parallel systems where the sequential nature of ILU/IC becomes the primary performance bottleneck.
+The practical [preconditioned CG algorithm](pcg.md) implements this transformation using only solves $Mz=r$; it need not form $C$ or $\widetilde A$. For symmetric indefinite $A$, the same construction preserves symmetry and allows preconditioned MINRES with an SPD preconditioner. Positive definiteness of $A$ is still required for standard CG.
 
-### 4. Advanced & Specialized Preconditioners
+## Classical Iteration Preconditioners
 
-This group includes highly powerful methods that are often tailored to specific problem structures, such as those from PDEs.
+The classical splitting methods provide simple preconditioners. With the convention $A=D-L-U$, $D$ is diagonal, while $-L$ and $-U$ are the strictly lower and upper parts of $A$.
 
-* **Algebraic Multigrid (AMG):** This is a "black-box" version of geometric multigrid. It works *only from the matrix $A$* to automatically build a hierarchy of "coarse" problems. It then uses simple smoothers (like Jacobi or Gauss-Seidel) on each level to eliminate error at different frequencies.
+**Jacobi** uses $M=D$. Application is componentwise division, so setup and storage are small and the work is easy to parallelize. It requires nonzero diagonal entries. For SPD $A$, $D$ is positive definite and is a valid CG preconditioner. It corrects differences in diagonal scales but can leave strong coupling between unknowns untreated.
 
-    * **Pros:** **Optimal complexity.** For many elliptic PDEs, this is an $O(N)$ method. The number of iterations is *independent* of the problem size $N$.
-    * **Cons:** Very complex to implement. Makes assumptions about the matrix (e.g., near M-matrix) to build its coarse grids, and can fail if these are not met.
-    * **Applicability:** The standard, go-to solver/preconditioner for large sparse systems from elliptic PDEs (e.g., finite element methods).
+**Block Jacobi** groups unknowns and uses a block diagonal $M$, usually containing principal diagonal blocks of $A$. Each application solves the blocks independently. This captures coupling within a block and retains parallelism, but ignores coupling between blocks. Principal blocks of an SPD matrix are SPD, so exact block solves give an SPD preconditioner.
 
-* **Domain Decomposition (DD):** This is a family of "divide-and-conquer" methods designed for parallel computing. The problem domain is split into subdomains (like a puzzle).
+**Gauss-Seidel** uses $M=D-L$, and **SOR** uses
 
-    * **Pros:** **Inherently parallel.** Designed from the ground up to run on distributed-memory supercomputers.
-    * **Cons:** Requires significant setup, and its performance depends on correctly handling the "interface" problem between subdomains, often requiring a "coarse-grid solve."
-    * **Applicability:** The standard for large-scale, parallel PDE simulations (CFD, structural mechanics).
+$$
+M=\frac1\omega(D-\omega L),\qquad \omega\ne0.
+$$
 
-* **Block / Physics-Based Preconditioners:** For systems of coupled PDEs (e.g., Stokes flow, Maxwell's equations), the matrix $A$ has a natural block structure.
+Both apply a forward triangular solve and depend on the ordering of the unknowns. These solves have dependencies that limit parallelism. The preconditioners are generally nonsymmetric, so a forward sweep alone does not provide the SPD preconditioner required by CG.
 
-    * **Pros:** By building a preconditioner $M$ that *respects this block structure*, we can achieve far superior results than a "monolithic" preconditioner (like ILU) that ignores it.
-    * **Cons:** **Highly specialized.** You must use knowledge of the physics to design the preconditioner.
-    * **Applicability:** Essential for any multi-physics problem (e.g., fluid-structure interaction, electromagnetics).
+**Symmetric SOR (SSOR)** combines forward and backward sweeps. For SPD $A$, where $U=L^T$, its preconditioning matrix is
 
-## Summary
+$$
+M=\frac{1}{\omega(2-\omega)}
+(D-\omega L)D^{-1}(D-\omega U),
+\qquad 0<\omega<2.
+$$
 
-As this survey shows, there is no "best" preconditioner. **Jacobi** is cheap but weak. **ILU** is a good default but not parallel. **SPAI** is parallel but expensive to build. **AMG** is optimal for its target class but complex and not universal. **Domain Decomposition** is for supercomputers.
+This is SPD: the two triangular factors are transposes, $D$ is positive diagonal, and the scalar is positive. At $\omega=1$ it gives symmetric Gauss-Seidel. Applying its inverse requires two triangular solves and a diagonal scaling.
 
-The choice is a key part of the "art" of numerical linear algebra, requiring an understanding of the problem's origin (PDEs, data science), its structure (SPD, non-symmetric, block), and the computational hardware (CPU, GPU, cluster).
+These methods are inexpensive starting points. They are also used as **smoothers** in multigrid: a few sweeps reduce error components that the coarse problem does not represent well.
+
+## Incomplete Factorizations: ILU and IC
+
+Sparse LU and Cholesky factorizations create **fill-in**, entries in the factors at positions where the original matrix was zero. Incomplete factorizations reduce storage and work by discarding selected entries during elimination:
+
+* **Incomplete LU (ILU):** Construct sparse triangular factors with $A\approx LU=M$. Application requires solving $Lw=r$, then $Uz=w$. ILU is commonly paired with GMRES for nonsymmetric systems.
+* **Incomplete Cholesky (IC):** For SPD problems, construct $A\approx CC^T=M$. If $C$ is nonsingular, this gives an SPD preconditioner suitable for CG. Application uses a forward and a backward solve.
+
+The main ways to control fill are:
+
+* **ILU(0) and IC(0):** Allow factor entries only in the corresponding triangular positions of the original sparsity pattern, including the diagonal. Numerical cancellation can still make an allowed entry zero.
+* **Level-of-fill methods, ILU($k$) and IC($k$):** Assign levels to potential fill positions according to the elimination process and retain those up to level $k$. Larger levels permit more fill and usually more work and storage; they do not guarantee a particular improvement in convergence.
+* **Threshold methods, such as ILUT:** Drop entries according to their magnitudes relative to a chosen scale. ILUT commonly combines a drop tolerance with a limit on the number of retained entries per row.
+
+These are useful general-purpose choices, but they can break down through zero, small, or unsuitable pivots. **Even SPD $A$ does not guarantee that an arbitrary incomplete Cholesky construction succeeds:** dropping entries changes the subsequent pivots. Scaling, reordering, allowing more fill, or adding a suitable positive diagonal shift can help. The [Netlib discussion of incomplete factorizations](https://netlib.org/templates/templates.html) describes these issues.
+
+Effectiveness depends on the ordering and dropping rules. Triangular solves can be difficult to parallelize efficiently, although parallel and block variants are available. IC is one option for CG, alongside diagonal, block, and multilevel preconditioners.
+
+## Sparse Approximate Inverses
+
+An alternative is to construct a sparse matrix $B$ that approximates $A^{-1}$ directly. We use a different symbol because $B$ represents the operation previously written $M^{-1}$. Application is a sparse matrix-vector product:
+
+$$
+z=Br.
+$$
+
+A common **sparse approximate inverse (SPAI)** construction chooses entries in a prescribed or adaptively enlarged sparsity pattern to make
+
+$$
+\|I-BA\|_F\quad\text{or}\quad\|I-AB\|_F
+$$
+
+small for left or right preconditioning, respectively. Here $\|\cdot\|_F$ is the Frobenius norm. The construction reduces to small least-squares problems for rows or columns of $B$.
+
+Application is easy to parallelize because it avoids triangular solves. The difficulty is obtaining a useful inverse approximation with few nonzeros: a sparse $A$ can have a dense inverse, and setup can be expensive. There is no general ranking of SPAI and ILU; the useful trade-off depends on accuracy, sparsity, and hardware.
+
+An unconstrained SPAI need not be symmetric or positive definite, even when $A$ is SPD. For CG, an SPD construction is needed, such as a factored approximate inverse $B=G^TG$ with nonsingular $G$.
+
+## Polynomial Preconditioners
+
+We can also approximate $A^{-1}$ by a low-degree polynomial $B=p(A)$. Applying $B$ uses repeated matrix-vector products, avoiding factorization and triangular solves. The [Chebyshev iteration](chebyshev_acceleration.md) provides one way to build such an approximation when suitable spectral bounds are available.
+
+This approach can suit parallel hardware, but each application costs several matrix-vector products. For SPD $A$, the polynomial must be positive at every eigenvalue to make $p(A)$ an SPD preconditioner. The degree and spectral information determine its usefulness.
+
+## Multigrid Preconditioners
+
+Local relaxation often removes rapidly varying error while leaving slowly varying error. **Multigrid** combines relaxation with corrections on coarser spaces, where the remaining error is easier to represent and remove. A cycle supplies an approximate solve $z\approx A^{-1}r$ for the outer Krylov method. With fixed linear relaxation and coarse solves, running a fixed cycle from zero defines a linear preconditioning operation.
+
+**Geometric multigrid** constructs the hierarchy from meshes and the underlying differential equation. **Algebraic multigrid (AMG)** builds coarse spaces mainly from the matrix. AMG may also use supplied information about slowly varying modes, such as the rigid-body motions in elasticity. It does not require an explicit geometric mesh.
+
+For suitable elliptic problems, a well-designed hierarchy can have $O(n)$ work per cycle and an iteration count that stays bounded as the mesh is refined. These properties require effective smoothing and coarse correction, with controlled storage across levels. They are not automatic: strong anisotropy, coefficient jumps, and coupled equations can require specialized choices.
+
+For CG, the entire approximate-inverse operation must be SPD. Compatible coarse operators, a positive definite coarse solve, and appropriately paired smoothing steps are needed. A generic multigrid cycle is not automatically suitable. For example, the [hypre AMG documentation](https://hypre.readthedocs.io/en/latest/solvers-boomeramg.html) explains the need for symmetric smoothing with CG.
+
+## Domain Decomposition
+
+**Domain decomposition** divides the unknowns into subdomains, approximately solves local problems, and combines the corrections. The local solves can run in parallel. Block Jacobi is a simple nonoverlapping example; **additive Schwarz** allows overlapping subdomains and adds their local corrections.
+
+Local solves handle nearby interactions, but information can travel slowly across many subdomains. A **coarse space** adds global corrections and is often essential to keep iteration counts controlled as the number of subdomains grows. Overlap, the coarse space, local solver accuracy, and communication all affect performance.
+
+SPD variants can be used with CG. Other variants, including some ways of combining local corrections, are nonsymmetric and are better paired with GMRES. Domain decomposition and multigrid can also be combined, for example by using multigrid inside each subdomain.
+
+## Block and Physics-Based Preconditioners
+
+Coupled equations often give a natural block structure. A block diagonal preconditioner approximately solves each field separately. A block triangular preconditioner also accounts for coupling between fields.
+
+For example, eliminating the first block of
+
+$$
+A=\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}
+$$
+
+leads to the **Schur complement**
+
+$$
+S=A_{22}-A_{21}A_{11}^{-1}A_{12},
+$$
+
+assuming $A_{11}$ is invertible. A block factorization preconditioner uses inexpensive approximations to the solves with $A_{11}$ and $S$. Neither inverse needs to be formed. This connects preconditioning to the [block elimination](block_matrices.md) developed earlier.
+
+Such methods are useful for problems such as velocity-pressure systems in fluid flow. Their strength comes from representing the coupling, but designing a useful approximation to $S$ requires knowledge of the equations. Block triangular choices are generally nonsymmetric; SPD block diagonal choices can preserve the structure needed by CG or MINRES.
+
+## Choosing and Applying a Preconditioner
+
+Start with the structure of the problem. Diagonal or block scaling is inexpensive. ILU and IC retain more local coupling. Multigrid and domain decomposition add corrections over larger spatial scales. Block methods exploit coupling between different fields. These families are often combined.
+
+Compare total time and memory, including setup, application, and communication. Also check the outer method's requirements: standard CG and preconditioned MINRES need an SPD preconditioning operation.
+
+The discussion above assumes a fixed linear operation. If an inner solve is stopped adaptively, its action may vary between iterations or be nonlinear in the right-hand side. Standard fixed-preconditioner theory then does not apply directly. **Flexible GMRES** accommodates such preconditioning; the [PETSc flexible GMRES documentation](https://petsc.org/release/manualpages/KSP/KSPFGMRES/) gives examples.
+
+The [next section](pcg.md) derives PCG. It uses the alternative notation $M\approx A^{-1}$ for the applied operation; thus its multiplication $Mr$ corresponds to the solve $M^{-1}r$ in this survey. Both conventions are common, so always check which one is in use.

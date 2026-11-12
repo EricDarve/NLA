@@ -1,40 +1,40 @@
 # Preconditioned Conjugate Gradient
 
-Our previous discussion on the convergence of the Conjugate Gradient (CG) method highlighted its dependence on the condition number $\kappa(A)$. To accelerate convergence, we must apply a preconditioner, but we face a critical constraint: **we must maintain the Symmetric Positive Definite (SPD) property** of the system matrix.
+Preconditioning can accelerate CG by improving the condition number and eigenvalue distribution of the system it solves. The construction must preserve the symmetric positive definite (SPD) structure that CG requires.
 
-A general-purpose left preconditioner $MA$ or right preconditioner $AM$ will destroy the symmetry of $A$. We must therefore use a **symmetric preconditioner**. 
+A left-preconditioned matrix $MA$ or right-preconditioned matrix $AM$ is generally not symmetric. We first describe a symmetric transformation, then derive an implementation that applies the preconditioner directly.
 
 ```{note}
-Below we will denote $M$ instead of $M^{-1}$ (as in the previous section) for convenience and clarity.
+Here $M$ denotes an SPD approximation to $A^{-1}$. The operation $Mr$ corresponds to applying $M^{-1}r$ in the notation of the preceding survey. In practice, $M$ may be supplied as a function that performs an approximate solve; it need not be an explicitly stored matrix.
 ```
 
 ## The Transformed System
 
-Let us assume we have an SPD preconditioner $M$. Since $M$ is SPD, it admits a factorization $M = C^T C$ (e.g., a Cholesky factorization), where $C$ is a non-singular matrix.
+Since $M$ is SPD, it admits a factorization $M = C^T C$, for example a Cholesky factorization, with $C$ nonsingular.
 
-Following the symmetric preconditioning strategy, we will solve an *equivalent* system. Instead of $Ax=b$, we start by multiplying by $C$:
+To construct the equivalent system, multiply $Ax=b$ by $C$:
 
 $$
 C A x = C b
 $$
 
-Now, we introduce a change of variables, $x = C^T y$. Substituting this into our equation gives:
+Introduce the variable $y$ through $x = C^T y$. Substitution gives
 
 $$
 (C A C^T) y = C b
 $$
 
-We have now defined a new, transformed linear system $A'y = b'$, where:
+The transformed system is $A'y = b'$, with
 
-* **$A' = C A C^T$**
-* **$b' = C b$**
-* **$x = C^T y$**
+* $A' = C A C^T$
+* $b' = C b$
+* $x = C^T y$
 
-The new matrix $A'$ is SPD (as $A$ is SPD and $C$ is non-singular), so we can apply the standard CG algorithm to $A'y = b'$. The new system $A'y=b'$ is designed to have a much smaller condition number than $A$, i.e., $\kappa(A') \ll \kappa(A)$.
+Because $A$ is SPD and $C$ is nonsingular, $A'$ is also SPD. We can therefore apply ordinary CG to $A'y=b'$. A useful preconditioner makes this system easier to solve, ideally with $\kappa(A') \ll \kappa(A)$.
 
-## A "Direct" (but Cumbersome) Implementation
+## CG on the Transformed System
 
-If we apply the standard CG algorithm (as derived in our previous chapter) directly to $A'y=b'$, we get the following:
+Applying the [CG recurrence](conjugate_gradient.md) to $A'y=b'$ gives the following steps. Here $s$ is the transformed residual, $p$ is a search direction, and $q=A'p$ is a matrix-vector product.
 
 1.  **Initialize:**
     * $y^{(0)}$ (e.g., $y^{(0)} = 0$)
@@ -48,70 +48,55 @@ If we apply the standard CG algorithm (as derived in our previous chapter) direc
     * $\tau_k = \frac{\| s^{(k)} \|_2^2}{\| s^{(k-1)} \|_2^2}$
     * $p^{(k+1)} = s^{(k)} + \tau_k p^{(k)}$
 
-This algorithm is mathematically correct, but it is **cumbersome and impractical**.
+This formulation requires access to $C$ and $C^T$: every product with $A'$ applies $C^T$, then $A$, then $C$. A preconditioner may instead be available only as a function that computes $Mr$, so its factors are unavailable. We would like to express the same iteration using that operation.
 
-The primary issue is the explicit appearance of $C$ and $C^T$. This implementation would require us to:
+## Returning to the Original Variables
 
-1.  First, compute the factor $C$ from $M$.
-2.  In every single iteration, compute $q^{(k)}$ by performing a matrix-vector product with $C^T$, then with $A$, and then with $C$.
+The **preconditioned conjugate gradient (PCG)** algorithm expresses this iteration in terms of $x$ and the original residual $r = b - Ax$.
 
-This is computationally expensive and complex. Furthermore, we almost never have $C$ and $C^T$ explicitly. A preconditioner $M$ is typically provided as a "black box," i.e., a function that performs a solve and gives $z = M r$ for a given $r$.
+The change of variables also transforms the search directions and residuals. Substituting these relations into the CG recurrence replaces the separate applications of $C$ and $C^T$ by their product $M=C^TC$.
 
-## The PCG Simplification
-
-The **Preconditioned Conjugate Gradient (PCG)** algorithm is the solution to this problem. PCG is *algebraically equivalent* to the "cumbersome" algorithm above, but it is derived by performing a careful change of variables back to $x$ and the original residual $r = b - Ax$.
-
-By substituting $x = C^T y$, $p_{pcg} = C^T p_{cg}$, and $s_{cg} = C r_{pcg}$ (where $cg$ denotes the "direct" algorithm's vectors and $pcg$ denotes the final algorithm's vectors), a significant simplification occurs. All references to $C$ and $C^T$ cancel out, and they are replaced by a single operation involving $M$.
-
-This simplified algorithm avoids $C$ entirely, and its only preconditioning-related step is the solution of a single linear system and computing $z = M r$, which is exactly what a preconditioner is designed to do.
+The resulting iteration needs only the preconditioning operation $z=Mr$. Before deriving the updates, we can see how the change of variables affects the search space.
 
 ## The Krylov Subspace Connection
 
-We provide a brief explanation of *why* the "cumbersome" factor $C$ can be algebraically eliminated, allowing us to build a practical algorithm that only uses the preconditioner $M$. Following this, we will go through the step by step derivation.
+For a zero initial guess, CG on $A'y=b'$ searches for its approximation to $y$ in
 
-Let's break down the logic:
+$$\mathcal{K}_k(A', b') = \mathcal{K}_k(CAC^T, Cb)$$
 
-1.  **The "Cumbersome" Space:** If we literally ran CG on the transformed system $A'y = b'$, where $A' = CAC^T$ and $b' = Cb$, the algorithm would build its solution for $y$ from the Krylov subspace:
+This space is generated by $b',A'b',\ldots,(A')^{k-1}b'$.
 
-    $$\mathcal{K}_k(A', b') = \mathcal{K}_k(CAC^T, Cb)$$
+Since $x=C^Ty$, the corresponding approximations to $x$ lie in the image of this space under $C^T$:
 
-    This is the space $\text{span} \{ b', A'b', (A')^2 b', \dots \}$.
+$$\text{Space for } x = C^T \, \mathcal{K}_k(CAC^T, Cb)$$
 
-2.  **The "Target" Space:** We don't ultimately care about $y$; we want $x$. The relationship between them is $x = C^T y$. Therefore, the space containing our actual solution $x$ is found by multiplying every vector in the $y$-space by $C^T$:
+Using $M=C^TC$, the first three generating vectors become
 
-    $$\text{Space for } x = C^T \, \mathcal{K}_k(CAC^T, Cb)$$
+* The first vector:
+    $C^T (b') = C^T(Cb) = (C^T C)b = \mathbf{Mb}$
 
-3.  **The "Aha!" Moment (The Algebra):** This is where the magic happens. We define our preconditioner as $M = C^T C$. (This requires $M$ to be SPD, as we noted). Now, let's look at the vectors that form this new "target" space for $x$:
+* The second vector:
+    $C^T (A'b') = C^T(CAC^T)(Cb) = (C^T C) A (C^T C) b = \mathbf{(MA)Mb}$
 
-    * **The 0-th vector:**
-        $C^T (b') = C^T(Cb) = (C^T C)b = \mathbf{Mb}$
+* The third vector:
+    $C^T ((A')^2 b') = C^T(CAC^T)(CAC^T)(Cb) = (C^T C) A (C^T C) A (C^T C) b = \mathbf{(MA)^2 Mb}$
 
-    * **The 1-st vector:**
-        $C^T (A'b') = C^T(CAC^T)(Cb) = (C^T C) A (C^T C) b = \mathbf{(MA)Mb}$
+Continuing this pattern gives
 
-    * **The 2-nd vector:**
-        $C^T ((A')^2 b') = C^T(CAC^T)(CAC^T)(Cb) = (C^T C) A (C^T C) A (C^T C) b = \mathbf{(MA)^2 Mb}$
+$$C^T \, \mathcal{K}_k(CAC^T, Cb) = \text{span} \{ Mb, (MA)Mb, (MA)^2 Mb, \dots \} = \mathcal{K}_k(MA, Mb)$$
 
-4.  **The Conclusion:** The "target" space for $x$ is, in fact, a different (and more convenient) Krylov subspace:
-
-    $$C^T \, \mathcal{K}_k(CAC^T, Cb) = \text{span} \{ Mb, (MA)Mb, (MA)^2 Mb, \dots \} = \mathcal{K}_k(MA, Mb)$$
-
-This is a critical insight. It proves that although we *conceptually* started with a transformed system involving $C$, the solution $x$ we are looking for lives in a Krylov subspace generated *only by $M$ and $A$*.
-
-The PCG algorithm is a clever implementation that finds the best solution in $\mathcal{K}_k(MA, Mb)$ without ever needing to know $C$ or $C^T$. It only needs to be able to compute matrix-vector products with $A$ and, in its "preconditioning" step, with $M$.
+Thus the search space for $x$ can be generated using $A$ and $M$ alone. PCG chooses the approximation in this space with the smallest original energy error, $\|x-x^{(k)}\|_A$. The factors $C$ and $C^T$ explain the construction, but need not appear in the implementation.
 
 ## Derivation of the Practical PCG Algorithm
 
-We have established that applying the standard CG algorithm to the transformed system $A'y = b'$, where $A' = CAC^T$ and $b' = Cb$, is mathematically sound but operationally cumbersome.
+To obtain the updates, express each vector in the transformed CG recurrence in terms of the original variables. Superscripts in parentheses denote the iteration number; the subscript $pcg$ distinguishes the search directions in the original coordinates.
 
-We will now derive the practical **Preconditioned Conjugate Gradient (PCG)** algorithm. We do this by starting with the "cumbersome" CG algorithm (which iterates on $y, s, p$) and performing a careful change of variables to create an equivalent algorithm that works directly with our original solution $x$ and residual $r = b - Ax$.
+### Relating the Two Sets of Variables
 
-## The "Dictionary" of Variables
-
-Our derivation relies on a "dictionary" that relates the vectors from the cumbersome algorithm to the new, practical vectors.
+The required relations are:
 
 * **Solution:** $x^{(k)} = C^T y^{(k)}$
-* **Residual:** We use the original residual $r^{(k)} = b - Ax^{(k)}$. The relationship to the cumbersome residual $s^{(k)} = Cb - A'y^{(k)}$ is:
+* **Residual:** The original residual $r^{(k)} = b - Ax^{(k)}$ and the transformed residual $s^{(k)}$ satisfy
     
     $$
     \begin{aligned}
@@ -122,132 +107,129 @@ Our derivation relies on a "dictionary" that relates the vectors from the cumber
     \end{aligned}
     $$
 
-* **Search Direction:** We define a new "practical" search direction $p_{pcg}^{(k)}$:
+* **Search direction:** Map the transformed direction back to the original coordinates:
     
     $$p_{pcg}^{(k)} = C^T p^{(k)}$$
 
 * **Preconditioner:** Recall that $M = C^T C$.
-* **Work Vector:** We will define a new work vector $z^{(k)}$ to handle the preconditioning step.
+* **Preconditioned residual:** We will use $z^{(k)}=Mr^{(k)}$ in the updates below.
 
-We will now transform the cumbersome algorithm, line by line.
+These relations let us translate each CG update.
 
-### 1. Solution Update
+### Solution Update
 
-The cumbersome solution update is:
+The transformed solution update is
 
 $$
 y^{(k)} = y^{(k-1)} + \mu_k \, p^{(k)}
 $$
 
-To find our practical update for $x$, we simply multiply the entire equation by $C^T$:
+Multiplying by $C^T$ gives
 
 $$
 C^T y^{(k)} = C^T y^{(k-1)} + \mu_k \, (C^T p^{(k)})
 $$
 
-Using our dictionary ($x^{(k)} = C^T y^{(k)}$ and $p_{pcg}^{(k)} = C^T p^{(k)}$), this immediately simplifies to:
+Substituting $x^{(k)} = C^T y^{(k)}$ and $p_{pcg}^{(k)} = C^T p^{(k)}$ gives
 
 $$
 \mathbf{x^{(k)} = x^{(k-1)} + \mu_k \, p_{pcg}^{(k)}}
 $$
 
-### 2. Residual Update
+### Residual Update
 
-The cumbersome residual update is:
+The transformed residual update is
 
 $$
 s^{(k)} = s^{(k-1)} - \mu_k \, q^{(k)}
 $$
 
-We first need to transform $q^{(k)} = A' p^{(k)} = (CAC^T)p^{(k)}$. Let's define an intermediate vector $q_{pcg}^{(k)}$:
+To express $q^{(k)} = A' p^{(k)}$ in the original coordinates, define
 
 $$
 q_{pcg}^{(k)} = A (C^T p^{(k)}) = A p_{pcg}^{(k)}
 $$
 
-With this definition, we can write $q^{(k)}$ as:
+Then
 
 $$
 q^{(k)} = C (A p_{pcg}^{(k)}) = C q_{pcg}^{(k)}
 $$
 
-Now, substitute the $s$ and $q$ relations into the cumbersome update:
+Substituting the relations for $s$ and $q$ into the residual update gives
 
 $$
 C r^{(k)} = C r^{(k-1)} - \mu_k \, (C q_{pcg}^{(k)})
 $$
 
-Since $C$ is non-singular, we can multiply from the left by $C^{-1}$ to cancel it from every term:
+Since $C$ is nonsingular, multiplying by $C^{-1}$ gives
 
 $$
 \mathbf{r^{(k)} = r^{(k-1)} - \mu_k \, q_{pcg}^{(k)}}
 $$
 
-### 3. Search Direction Update
+### Search Direction Update
 
-The cumbersome search direction update is:
+The transformed search direction update is
 
 $$
 p^{(k+1)} = s^{(k)} + \tau_k \, p^{(k)}
 $$
 
-To find our practical update for $p_{pcg}$, we multiply the entire equation by $C^T$:
+Multiplying by $C^T$ gives
 
 $$
 C^T p^{(k+1)} = C^T s^{(k)} + \tau_k \, (C^T p^{(k)})
 $$
 
-Using our dictionary, this becomes:
+In the original coordinates, this becomes
 
 $$
 p_{pcg}^{(k+1)} = (C^T s^{(k)}) + \tau_k \, p_{pcg}^{(k)}
 $$
 
-Now let's simplify the $C^T s^{(k)}$ term using $s^{(k)} = C r^{(k)}$:
+The remaining term uses $s^{(k)} = C r^{(k)}$:
 
 $$
 C^T s^{(k)} = C^T (C r^{(k)}) = (C^T C) r^{(k)} = M r^{(k)}
 $$
 
-To make the algorithm efficient, we introduce a new **work vector $z^{(k)} = M r^{(k)}$**. This is the only place where the preconditioner $M$ is applied.
-Substituting this in, we get the final update rule:
+Define the **preconditioned residual** $z^{(k)} = M r^{(k)}$. This is the one application of $M$ needed at each step. The search direction update is therefore
 
 $$
 \mathbf{p_{pcg}^{(k+1)} = z^{(k)} + \tau_k \, p_{pcg}^{(k)}}
 $$
 
-### 4. Step-Length Scalars ($\mu_k$ and $\tau_k$)
+### Step-Length Scalars ($\mu_k$ and $\tau_k$)
 
-The final step is to re-write the scalars $\mu_k$ and $\tau_k$ using only our practical vectors.
+It remains to express $\mu_k$ and $\tau_k$ using the original residuals and directions.
 
-**The $\tau_k$ Scalar (Ratio of Residual Norms):**
+The direction coefficient in transformed CG is
 
 $$
 \tau_k = \frac{\| s^{(k)} \|_2^2}{\| s^{(k-1)} \|_2^2}
 $$
 
-Let's analyze the numerator. We can use our new $z$ vector:
+Using $s^{(k)}=Cr^{(k)}$ and $z^{(k)}=Mr^{(k)}$, its numerator becomes
 
 $$
 \| s^{(k)} \|_2^2 = (s^{(k)})^T s^{(k)} = (C r^{(k)})^T (C r^{(k)})
 = (r^{(k)})^T C^T C r^{(k)} = (r^{(k)})^T (M r^{(k)}) = \mathbf{[r^{(k)}]^T z^{(k)}}
 $$
 
-This is a great simplification. $C$ has vanished, replaced by $M$, and the norm calculation is transformed into a simple dot product.
-
-The full scalar is therefore:
+Thus the transformed residual norm can be computed from the dot product of the original residual and its preconditioned value. Applying the same identity to the denominator gives
 
 $$
 \mathbf{\tau_k = \frac{[r^{(k)}]^T z^{(k)}}{[r^{(k-1)}]^T z^{(k-1)}}}
 $$
 
-**The $\mu_k$ Scalar (Step Length):**
+The step length in transformed CG is
 
 $$
 \mu_k = \frac{ \| s^{(k-1)} \|_2^2 }{(p^{(k)})^T q^{(k)}}
 $$
 
-The numerator is simply the one we just found, for step $k-1$:
+The numerator follows from the same identity at step $k-1$:
 
 $$
 \| s^{(k-1)} \|_2^2 = \mathbf{[r^{(k-1)}]^T z^{(k-1)}}
@@ -259,15 +241,15 @@ $$
 (p^{(k)})^T q^{(k)} = (p^{(k)})^T (C q_{pcg}^{(k)}) = (C^T p^{(k)})^T q_{pcg}^{(k)} = \mathbf{(p_{pcg}^{(k)})^T q_{pcg}^{(k)}}
 $$
 
-Combining these gives the final, practical expression:
+Substitution gives
 
 $$
 \mathbf{\mu_k = \frac{[r^{(k-1)}]^T z^{(k-1)}}{(p_{pcg}^{(k)})^T q_{pcg}^{(k)}}}
 $$
 
-## Summary: The Final PCG Algorithm
+## The PCG Algorithm
 
-By collecting all the practical, simplified steps (highlighted in bold), we arrive at the complete Preconditioned Conjugate Gradient algorithm. Note how it no longer contains $C$, $C^T$, $y$, $s$, or $p$. It is a self-contained algorithm operating on $x, r, p_{pcg},$ and $z$.
+The updates use one product with $A$ and one application of $M$ per iteration, together with inner products and vector updates. Like ordinary CG, PCG stores only a few vectors.
 
 ```{important}
 ### Algorithm: Preconditioned Conjugate Gradient (PCG)
@@ -299,9 +281,7 @@ By collecting all the practical, simplified steps (highlighted in bold), we arri
 
 ## Python Implementation
 
-Below is a Python implementation of the Preconditioned Conjugate Gradient (PCG) algorithm.
-
-This implementation is written as a self-contained function. It assumes that `A` and `M` are provided as matrices or as functions that can perform a matrix-vector product.
+The function below accepts `A` and `M` as matrices or as functions that apply their respective operations. A function for `M` can perform an approximate solve. The stopping test uses the preconditioned residual norm $\sqrt{r^TMr}$; an explicit check of $b-Ax$ is useful before accepting a computed solution.
 
 ```python
 import numpy as np
@@ -314,9 +294,9 @@ def pcg(A, b, M, tol=1e-10, max_iter=None):
     preconditioned system is A' = CAC^T and the preconditioner matrix
     is defined as M = C^T C.
 
-    The key preconditioning step is z = M*r, which is a matrix-vector
-    product, not a linear solve. This implies M is an approximation
-    of A^{-1}.
+    The preconditioning step applies an approximation to A^{-1}:
+    z = M*r. Supply M as a matrix or as a function that performs
+    this operation, for example using an approximate solve.
 
     Args:
         A (np.ndarray or func): The system matrix A (n x n).
@@ -330,7 +310,7 @@ def pcg(A, b, M, tol=1e-10, max_iter=None):
                                when the M-norm of the residual,
                                sqrt(r.T @ z), is less than tol.
         max_iter (int, optional): The maximum number of iterations.
-                                 Defaults to n*10 if not set.
+                                 Defaults to 10*n.
 
     Returns:
         np.ndarray: The solution vector x (n x 1).
