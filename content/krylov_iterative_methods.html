@@ -457,9 +457,11 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#searching-for-an-optimal-solution">Searching for an Optimal Solution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-challenge-what-is-optimal">The Central Challenge: What is “Optimal”?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-tractable-paths-to-optimality">Two Tractable Paths to Optimality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#searching-for-a-better-approximation">Searching for a Better Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-challenge-what-is-optimal">The Central Challenge: What Is “Optimal”?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-computable-paths-to-optimality">Two Computable Paths to Optimality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-main-practical-challenges">The Main Practical Challenges</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-path-through-this-chapter">The Path through This Chapter</a></li>
 </ul>
             </nav>
         </div>
@@ -473,55 +475,47 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="krylov-subspace-methods">
 <h1>Krylov Subspace Methods<a class="headerlink" href="#krylov-subspace-methods" title="Link to this heading">#</a></h1>
-<section id="searching-for-an-optimal-solution">
-<h2>Searching for an Optimal Solution<a class="headerlink" href="#searching-for-an-optimal-solution" title="Link to this heading">#</a></h2>
-<p>In the previous chapters, we explored classical iterative methods like Jacobi, Gauss-Seidel, and SOR. These “splitting” methods provide a simple and intuitive way to approach the linear system <span class="math notranslate nohighlight">\(Ax=b\)</span>, but their convergence can be slow and highly dependent on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>. We now turn our attention to a more powerful and sophisticated family of techniques: <strong>Krylov subspace methods</strong>.</p>
-<p>These methods represent a fundamental shift in strategy. Instead of a simple fixed-point iteration, we will build a sequence of approximate solutions <span class="math notranslate nohighlight">\(x^{(k)}\)</span> by searching within a carefully constructed, expanding subspace. This subspace, known as the <strong>Krylov subspace</strong>, is the heart of the entire approach.</p>
-<p><strong>Definition: The Krylov Subspace</strong></p>
-<p>Given a matrix <span class="math notranslate nohighlight">\(A\)</span> and a starting vector (typically the initial residual <span class="math notranslate nohighlight">\(r^{(0)} = b - Ax^{(0)}\)</span>), the <span class="math notranslate nohighlight">\(k\)</span>-th Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> is the space spanned by the first <span class="math notranslate nohighlight">\(k\)</span> vectors in the sequence <span class="math notranslate nohighlight">\(\{r^{(0)}, Ar^{(0)}, A^2r^{(0)}, \ldots\}\)</span>:</p>
+<section id="searching-for-a-better-approximation">
+<h2>Searching for a Better Approximation<a class="headerlink" href="#searching-for-a-better-approximation" title="Link to this heading">#</a></h2>
+<p>Jacobi, Gauss-Seidel, and SOR improve an approximate solution through inexpensive corrections. Their convergence can nevertheless be slow. Krylov subspace methods use information gathered over successive iterations to choose a correction from an expanding space of possibilities.</p>
+<p>We consider a real nonsingular system <span class="math notranslate nohighlight">\(Ax=b\)</span>. Let <span class="math notranslate nohighlight">\(x\)</span> denote the exact solution, <span class="math notranslate nohighlight">\(x^{(0)}\)</span> an initial guess, and <span class="math notranslate nohighlight">\(r^{(0)}=b-Ax^{(0)}\)</span> its residual. The residual identifies which equations are not yet satisfied. Applying <span class="math notranslate nohighlight">\(A\)</span> repeatedly to this vector provides additional search directions, giving the <strong>Krylov subspace</strong></p>
 <div class="math notranslate nohighlight">
 \[
-{\mathcal K}_k(A, r^{(0)}) = \text{span}\{ r^{(0)}, A r^{(0)}, A^2 r^{(0)}, \ldots, A^{k-1} r^{(0)} \}
+\mathcal K_k(A,r^{(0)})
+=\operatorname{span}\{r^{(0)},Ar^{(0)},\ldots,A^{k-1}r^{(0)}\}.
 \]</div>
-<p>The core idea of Krylov methods is to find an <span class="math notranslate nohighlight">\(x^{(k)}\)</span> in the affine subspace <span class="math notranslate nohighlight">\(x^{(0)} + {\mathcal K}_k\)</span> that is “optimal” in some sense. Assuming <span class="math notranslate nohighlight">\(x^{(0)} = 0\)</span> for simplicity, our goal is to find <span class="math notranslate nohighlight">\(x^{(k)} \in {\mathcal K}_k(A, b)\)</span> that best approximates the true solution <span class="math notranslate nohighlight">\(x\)</span>.</p>
+<p>These are the same spaces used in the earlier <a class="reference internal" href="arnoldi_iteration.html"><span class="std std-doc">Arnoldi</span></a> and <a class="reference internal" href="lanczos_iteration.html"><span class="std std-doc">Lanczos</span></a> methods for eigenvalue approximation. Here we use them to construct a correction to a linear-system solution:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{x^{(k)}=x^{(0)}+z^{(k)},
+\qquad z^{(k)}\in\mathcal K_k(A,r^{(0)}).}
+\]</div>
+<p>Thus each approximation can combine all the directions available so far. If <span class="math notranslate nohighlight">\(x^{(0)}=0\)</span>, then <span class="math notranslate nohighlight">\(r^{(0)}=b\)</span>, and we simply search for <span class="math notranslate nohighlight">\(x^{(k)}\)</span> in <span class="math notranslate nohighlight">\(\mathcal K_k(A,b)\)</span>. This is the starting choice used in the next section.</p>
+<p>Building these spaces requires matrix-vector products, so we can work with a sparse matrix or a procedure that computes <span class="math notranslate nohighlight">\(Av\)</span> without storing <span class="math notranslate nohighlight">\(A\)</span>. In practice, we construct a suitable basis rather than forming the powers <span class="math notranslate nohighlight">\(A^j\)</span> explicitly.</p>
 </section>
 <section id="the-central-challenge-what-is-optimal">
-<h2>The Central Challenge: What is “Optimal”?<a class="headerlink" href="#the-central-challenge-what-is-optimal" title="Link to this heading">#</a></h2>
-<p>This brings us to the central question: <strong>How do we define the “optimal” solution</strong> within the Krylov subspace?</p>
-<p>Let’s say we have an orthogonal basis <span class="math notranslate nohighlight">\(Q_k\)</span> for <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. Our approximate solution would then be <span class="math notranslate nohighlight">\(x^{(k)} = Q_k y_k\)</span> for some vector of coefficients <span class="math notranslate nohighlight">\(y_k\)</span>.</p>
-<p>The most natural and desirable choice would be to find the <span class="math notranslate nohighlight">\(x^{(k)}\)</span> that is <em>closest</em> to the true, unknown solution <span class="math notranslate nohighlight">\(x\)</span>. This means we would try to minimize the 2-norm of the <strong>true error</strong> <span class="math notranslate nohighlight">\(e^{(k)} = x - x^{(k)}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-y_k = \underset{y \in \mathbb{R}^k}{\rm argmin} \, \| x - Q_k y \|_2
-\]</div>
-<p>The solution to this least-squares problem is the orthogonal projection of <span class="math notranslate nohighlight">\(x\)</span> onto the subspace, given by <span class="math notranslate nohighlight">\(y_k = Q_k^T x\)</span>.</p>
-<p>Here we hit a wall. To compute <span class="math notranslate nohighlight">\(Q_k^T x\)</span>, we would need to know <span class="math notranslate nohighlight">\(x\)</span>. But <span class="math notranslate nohighlight">\(x = A^{-1}b\)</span> is the very solution we are trying to find! This “best” possible solution is intractable.</p>
+<h2>The Central Challenge: What Is “Optimal”?<a class="headerlink" href="#the-central-challenge-what-is-optimal" title="Link to this heading">#</a></h2>
+<p>Once the search space is chosen, we still need to select an approximation within it. The most direct goal would be to minimize the Euclidean error <span class="math notranslate nohighlight">\(\|x-x^{(k)}\|_2\)</span>.</p>
+<p>If we had an orthonormal basis for the space, the best approximation would be an orthogonal projection of the exact solution onto the search space. But computing that projection requires information about <span class="math notranslate nohighlight">\(x\)</span>, the solution we are trying to find. The subspace is available; this error-minimizing choice is not directly computable from it.</p>
+<p>We therefore need a criterion that uses the known data <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>. Two choices lead to CG and GMRES.</p>
 </section>
-<section id="two-tractable-paths-to-optimality">
-<h2>Two Tractable Paths to Optimality<a class="headerlink" href="#two-tractable-paths-to-optimality" title="Link to this heading">#</a></h2>
-<p>Instead, Krylov methods define alternative, <em>computable</em> optimality criteria that we <em>can</em> solve. The choice of criterion depends on the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>, and different choices give rise to different methods.</p>
-<p>In this chapter, we will focus on the two most important and widely used methods.</p>
-<ol class="arabic">
-<li><p><strong>The Conjugate Gradient Method (CG)</strong></p>
-<ul class="simple">
-<li><p><strong>For:</strong> Symmetric Positive Definite (SPD) matrices.</p></li>
-<li><p><strong>The Idea:</strong> For SPD matrices, we can define a special “energy” norm, known as the <strong>A-norm</strong>: <span class="math notranslate nohighlight">\(\|v\|_A = \sqrt{v^T A v}\)</span>. It turns out that finding the <span class="math notranslate nohighlight">\(x^{(k)} \in {\mathcal K}_k\)</span> that minimizes the <strong><span class="math notranslate nohighlight">\(A\)</span>-norm of the true error</strong> is a tractable problem. This insight leads to the celebrated Conjugate Gradient method, a remarkably efficient algorithm that (in exact arithmetic) guarantees convergence in at most <span class="math notranslate nohighlight">\(n\)</span> steps.</p></li>
-</ul>
-</li>
-<li><p><strong>The Generalized Minimal Residual Method (GMRES)</strong></p>
-<ul>
-<li><p><strong>For:</strong> General, nonsingular matrices.</p></li>
-<li><p><strong>The Idea:</strong> When <span class="math notranslate nohighlight">\(A\)</span> is not SPD, the <span class="math notranslate nohighlight">\(A\)</span>-norm is not available. Instead, we take a different approach. While we cannot measure the error <span class="math notranslate nohighlight">\(e^{(k)}\)</span>, we <em>can</em> measure the <strong>residual</strong> <span class="math notranslate nohighlight">\(r^{(k)} = b - Ax^{(k)}\)</span>. The GMRES method seeks the <span class="math notranslate nohighlight">\(x^{(k)} \in {\mathcal K}_k\)</span> that minimizes the 2-norm of this residual.</p>
-<div class="math notranslate nohighlight">
-\[
-        \text{Find } x^{(k)} \in {\mathcal K}_k(A, b) \quad \text{such that} \quad \| b - A x^{(k)} \|_2 \text{ is minimized.}
-        \]</div>
-</li>
-</ul>
-<p>This is a standard linear least-squares problem (in <span class="math notranslate nohighlight">\(k\)</span> dimensions) that we can solve at each step.</p>
-</li>
-</ol>
-<p>We will begin by deriving the Conjugate Gradient method, leveraging the special properties of SPD matrices, before moving on to the more general (and more complex) framework of GMRES.</p>
+<section id="two-computable-paths-to-optimality">
+<h2>Two Computable Paths to Optimality<a class="headerlink" href="#two-computable-paths-to-optimality" title="Link to this heading">#</a></h2>
+<p><strong>Conjugate gradient (CG)</strong> applies when <span class="math notranslate nohighlight">\(A\)</span> is symmetric positive definite (SPD). It chooses the approximation that minimizes the error in the <strong>energy norm</strong>, <span class="math notranslate nohighlight">\(\|v\|_A=\sqrt{v^TAv}\)</span>, over the current search space.</p>
+<p>Although the exact error is unknown, this minimization is computable. As in the <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">energy interpretation of Gauss-Seidel</span></a>, minimizing the squared energy error is equivalent to minimizing the quadratic <span class="math notranslate nohighlight">\(\Phi(v)=\tfrac12v^TAv-b^Tv\)</span>. We can evaluate and minimize this quadratic using <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>. CG performs that minimization over the growing Krylov space, using a short recurrence that stores only a few vectors.</p>
+<p><strong>Generalized minimal residual (GMRES)</strong> applies to general nonsingular matrices. It chooses the approximation that minimizes <span class="math notranslate nohighlight">\(\|b-Ax^{(k)}\|_2\)</span> over the current search space. The residual is computable, and the minimization reduces to a smaller linear least-squares problem. Arnoldi provides the orthonormal basis and the small matrices needed for this calculation.</p>
+<p>In exact arithmetic, both methods choose the best approximation according to their own criterion. CG minimizes the energy norm of the error; GMRES minimizes the Euclidean norm of the residual. These are different objectives and need not select the same approximation.</p>
+</section>
+<section id="the-main-practical-challenges">
+<h2>The Main Practical Challenges<a class="headerlink" href="#the-main-practical-challenges" title="Link to this heading">#</a></h2>
+<p>An expanding space offers more choices, but we must manage its cost. Standard GMRES stores the Krylov basis, and orthogonalizing each new vector requires more work as the basis grows. Restarting limits storage and work, but can slow convergence. CG exploits symmetry and positive definiteness to avoid storing the full basis.</p>
+<p>Optimality within a search space also does not guarantee rapid convergence. The space may need many directions before it contains an accurate approximation. <strong>Preconditioning</strong> addresses this difficulty by changing the system into an equivalent form that is easier for the iteration to solve. The preconditioner must improve convergence while remaining inexpensive to apply.</p>
+<p>Finally, we must decide when to stop. The residual is available, while the exact error usually is not. As in the earlier analysis of linear solves, a small residual must be interpreted together with the sensitivity of the problem. Rounding errors can also affect the orthogonality and recurrence relations used by the methods.</p>
+</section>
+<section id="the-path-through-this-chapter">
+<h2>The Path through This Chapter<a class="headerlink" href="#the-path-through-this-chapter" title="Link to this heading">#</a></h2>
+<p>We begin with <a class="reference internal" href="conjugate_gradient.html"><span class="std std-doc">CG</span></a> for SPD matrices, then develop <a class="reference internal" href="gmres.html"><span class="std std-doc">GMRES</span></a> for general systems. The <a class="reference internal" href="cg_vs_gmres.html"><span class="std std-doc">comparison of CG and GMRES</span></a> brings together their optimality properties, costs, and uses.</p>
+<p>Next, <a class="reference internal" href="minres.html"><span class="std std-doc">MINRES</span></a> shows how to minimize the residual while retaining a short recurrence for symmetric matrices, including indefinite ones. The final sections develop <a class="reference internal" href="preconditioning.html"><span class="std std-doc">preconditioning</span></a> and <a class="reference internal" href="pcg.html"><span class="std std-doc">preconditioned CG</span></a>, connecting the choice of an inexpensive approximate solve to the convergence of the Krylov method.</p>
 </section>
 <div class="toctree-wrapper compound">
 </div>
@@ -593,9 +587,11 @@ y_k = \underset{y \in \mathbb{R}^k}{\rm argmin} \, \| x - Q_k y \|_2
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#searching-for-an-optimal-solution">Searching for an Optimal Solution</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-challenge-what-is-optimal">The Central Challenge: What is “Optimal”?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-tractable-paths-to-optimality">Two Tractable Paths to Optimality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#searching-for-a-better-approximation">Searching for a Better Approximation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-challenge-what-is-optimal">The Central Challenge: What Is “Optimal”?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#two-computable-paths-to-optimality">Two Computable Paths to Optimality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-main-practical-challenges">The Main Practical Challenges</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-path-through-this-chapter">The Path through This Chapter</a></li>
 </ul>
   </nav></div>
 
