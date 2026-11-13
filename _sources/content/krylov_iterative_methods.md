@@ -4,29 +4,28 @@
 
 Jacobi, Gauss-Seidel, and SOR improve an approximate solution through inexpensive corrections. Their convergence can nevertheless be slow. Krylov subspace methods use information gathered over successive iterations to choose a correction from an expanding space of possibilities.
 
-We consider a real nonsingular system $Ax=b$. Let $x$ denote the exact solution, $x^{(0)}$ an initial guess, and $r^{(0)}=b-Ax^{(0)}$ its residual. The residual identifies which equations are not yet satisfied. Applying $A$ repeatedly to this vector provides additional search directions, giving the **Krylov subspace**
+We consider a real nonsingular system $Ax=b$. Let $x$ denote the exact solution, $x_0$ an initial guess, and $r_0=b-Ax_0$ its residual. The residual identifies which equations are not yet satisfied. Applying $A$ repeatedly to this vector provides additional search directions, giving the **Krylov subspace**
 
 $$
-\mathcal K_k(A,r^{(0)})
-=\operatorname{span}\{r^{(0)},Ar^{(0)},\ldots,A^{k-1}r^{(0)}\}.
+\mathcal K_k(A,r_0)
+=\operatorname{span}\{r_0,Ar_0,\ldots,A^{k-1}r_0\}.
 $$
 
 These are the same spaces used in the earlier [Arnoldi](arnoldi_iteration.md) and [Lanczos](lanczos_iteration.md) methods for eigenvalue approximation. Here we use them to construct a correction to a linear-system solution:
 
 $$
-\boxed{x^{(k)}=x^{(0)}+z^{(k)},
-\qquad z^{(k)}\in\mathcal K_k(A,r^{(0)}).}
+\boxed{x_k\in x_0+\mathcal K_k(A,r_0).}
 $$
 
-Thus each approximation can combine all the directions available so far. If $x^{(0)}=0$, then $r^{(0)}=b$, and we simply search for $x^{(k)}$ in $\mathcal K_k(A,b)$. This is the starting choice used in the next section.
+This means $x_k=x_0+v$ for some correction $v\in\mathcal K_k(A,r_0)$. Thus each approximation can combine all the directions available so far. If $x_0=0$, then $r_0=b$, and we simply search for $x_k$ in $\mathcal K_k(A,b)$. This is the starting choice used in the next section.
 
 Building these spaces requires matrix-vector products, so we can work with a sparse matrix or a procedure that computes $Av$ without storing $A$. In practice, we construct a suitable basis rather than forming the powers $A^j$ explicitly.
 
 ## The Central Challenge: What Is “Optimal”?
 
-Once the search space is chosen, we still need to select an approximation within it. The most direct goal would be to minimize the Euclidean error $\|x-x^{(k)}\|_2$.
+Once the search space is chosen, we still need to select an approximation within it. The most direct goal would be to minimize the Euclidean error $\|x-x_k\|_2$.
 
-If we had an orthonormal basis for the space, the best approximation would be an orthogonal projection of the exact solution onto the search space. But computing that projection requires information about $x$, the solution we are trying to find. The subspace is available; this error-minimizing choice is not directly computable from it.
+With an orthonormal basis for the correction space, the best correction would be the orthogonal projection of $x-x_0$ onto it. But computing that projection requires information about $x$, the solution we are trying to find. The subspace is available; this error-minimizing choice is not directly computable from it.
 
 We therefore need a criterion that uses the known data $A$ and $b$. Two choices lead to CG and GMRES.
 
@@ -36,7 +35,7 @@ We therefore need a criterion that uses the known data $A$ and $b$. Two choices 
 
 Although the exact error is unknown, this minimization is computable. As in the [energy interpretation of Gauss-Seidel](gauss_seidel_method.md), minimizing the squared energy error is equivalent to minimizing the quadratic $\Phi(v)=\tfrac12v^TAv-b^Tv$. We can evaluate and minimize this quadratic using $A$ and $b$. CG performs that minimization over the growing Krylov space, using a short recurrence that stores only a few vectors.
 
-**Generalized minimal residual (GMRES)** applies to general nonsingular matrices. It chooses the approximation that minimizes $\|b-Ax^{(k)}\|_2$ over the current search space. The residual is computable, and the minimization reduces to a smaller linear least-squares problem. Arnoldi provides the orthonormal basis and the small matrices needed for this calculation.
+**Generalized minimal residual (GMRES)** applies to general nonsingular matrices. It chooses the approximation that minimizes $\|b-Ax_k\|_2$ over the current search space. The residual is computable, and the minimization reduces to a smaller linear least-squares problem. Arnoldi provides the orthonormal basis and the small matrices needed for this calculation.
 
 In exact arithmetic, both methods choose the best approximation according to their own criterion. CG minimizes the energy norm of the error; GMRES minimizes the Euclidean norm of the residual. These are different objectives and need not select the same approximation.
 

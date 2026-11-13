@@ -67,7 +67,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="MINRES" href="minres.html" />
+    <link rel="next" title="The Minimal Residual Method (MINRES)" href="minres.html" />
     <link rel="prev" title="The Generalized Minimal Residual Method (GMRES)" href="gmres.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -291,7 +291,7 @@
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">CG vs. GMRES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">The Minimal Residual Method (MINRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="preconditioning.html">Preconditioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcg.html">Preconditioned Conjugate Gradient</a></li>
 </ul>
@@ -478,43 +478,55 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="cg-vs-gmres">
 <h1>CG vs. GMRES<a class="headerlink" href="#cg-vs-gmres" title="Link to this heading">#</a></h1>
-<p>Both the Conjugate Gradients (CG) and GMRES algorithms are foundational Krylov subspace methods for solving large, sparse linear systems <span class="math notranslate nohighlight">\(Ax=b\)</span>. However, they are designed for different classes of problems, and their computational costs and practical behaviors differ dramatically.</p>
-<p>The primary difference stems from the underlying process they use to build their respective Krylov subspaces:</p>
+<p>The <a class="reference internal" href="conjugate_gradient.html"><span class="std std-doc">conjugate gradient method (CG)</span></a> and <a class="reference internal" href="gmres.html"><span class="std std-doc">GMRES</span></a> both approximate the solution of <span class="math notranslate nohighlight">\(Ax=b\)</span> in growing Krylov spaces. Their main differences are the quantity they minimize and the work needed to build each new direction.</p>
+<p>Their basis constructions explain the difference in cost:</p>
 <ul class="simple">
-<li><p><strong>CG</strong> is built upon the <strong>Lanczos process</strong>, which only applies to symmetric matrices.</p></li>
-<li><p><strong>GMRES</strong> is built upon the <strong>Arnoldi process</strong>, which applies to any square matrix.</p></li>
+<li><p><strong>CG</strong> is connected to the <strong>Lanczos process</strong>, which uses symmetry to obtain a short recurrence.</p></li>
+<li><p><strong>GMRES</strong> uses the <strong>Arnoldi process</strong>, which constructs an orthonormal basis for a general square matrix.</p></li>
 </ul>
-<p>This single distinction leads to all the major differences in their performance, cost, and applicability.</p>
+<p>Symmetry gives the short recurrence; positive definiteness gives CG its energy norm and minimization property.</p>
 <section id="key-differences">
 <h2>Key Differences<a class="headerlink" href="#key-differences" title="Link to this heading">#</a></h2>
 <section id="applicability">
 <h3>Applicability<a class="headerlink" href="#applicability" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><strong>Conjugate Gradients (CG):</strong> This is a specialized algorithm. It is guaranteed to converge <em>only</em> if the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>symmetric positive definite (SPD)</strong>. It leverages this symmetry to achieve high efficiency.</p></li>
-<li><p><strong>GMRES:</strong> This is a general-purpose algorithm. It can be applied to <strong>any square, invertible matrix</strong> <span class="math notranslate nohighlight">\(A\)</span>, including those that are non-symmetric, indefinite, or both.</p></li>
+<li><p><strong>CG:</strong> The standard theory assumes that <span class="math notranslate nohighlight">\(A\)</span> is <strong>symmetric positive definite (SPD)</strong>. For an indefinite matrix, the step denominator <span class="math notranslate nohighlight">\(p_k^TAp_k\)</span> can vanish, so the same guarantees do not apply.</p></li>
+<li><p><strong>GMRES:</strong> It applies to <strong>any square, nonsingular matrix</strong> <span class="math notranslate nohighlight">\(A\)</span>, including nonsymmetric and symmetric indefinite matrices. It also works for SPD matrices, although CG usually requires less work and storage.</p></li>
 </ul>
 </section>
 <section id="recurrence-and-optimality">
 <h3>Recurrence and Optimality<a class="headerlink" href="#recurrence-and-optimality" title="Link to this heading">#</a></h3>
+<p>For an initial guess <span class="math notranslate nohighlight">\(x_0\)</span>, let <span class="math notranslate nohighlight">\(r_0=b-Ax_0\)</span> and <span class="math notranslate nohighlight">\(\mathcal K_k=\mathcal K_k(A,r_0)\)</span>. Both methods search in <span class="math notranslate nohighlight">\(x_0+\mathcal K_k\)</span>, but use different criteria:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\text{CG:}\qquad
+x_k&amp;=\underset{z\in x_0+\mathcal K_k}{\operatorname{argmin}}\|x-z\|_A,\\
+\text{GMRES:}\qquad
+x_k&amp;=\underset{z\in x_0+\mathcal K_k}{\operatorname{argmin}}\|b-Az\|_2.
+\end{aligned}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span> and <span class="math notranslate nohighlight">\(\|v\|_A=\sqrt{v^TAv}\)</span>. As shown in the CG derivation, its minimization can be performed without knowing <span class="math notranslate nohighlight">\(x\)</span>.</p>
 <ul class="simple">
-<li><p><strong>Conjugate Gradients (CG):</strong> By leveraging the <span class="math notranslate nohighlight">\(A\)</span>-norm, CG satisfies an optimality condition using a <strong>short-term (three-term) recurrence</strong>. This means that to compute the next vector, it only needs information from the previous two steps.</p></li>
-<li><p><strong>GMRES:</strong> Lacking symmetry, GMRES must use a <strong>long-term recurrence</strong> (the full Arnoldi process). To enforce orthogonality, each new basis vector <span class="math notranslate nohighlight">\(q_{k+1}\)</span> must be explicitly orthogonalized against <em>all</em> preceding vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_k\)</span>. It finds the solution in the subspace that minimizes the 2-norm of the residual.</p></li>
+<li><p><strong>CG</strong> uses short updates for the solution, residual, and search direction. A-orthogonality makes projections onto older search directions vanish, so only a few vectors are needed.</p></li>
+<li><p><strong>Standard GMRES</strong> uses the full Arnoldi basis. For a general nonsymmetric matrix, each new vector must be orthogonalized against all preceding basis vectors <span class="math notranslate nohighlight">\(q_1,\ldots,q_k\)</span>.</p></li>
 </ul>
+<p>In exact arithmetic, CG’s energy error decreases, while GMRES’s residual norm cannot increase. CG’s Euclidean residual norm need not decrease at every step. These are different guarantees, so comparing residual histories alone does not compare their respective optimality properties.</p>
 </section>
 <section id="computational-and-storage-cost">
 <h3>Computational and Storage Cost<a class="headerlink" href="#computational-and-storage-cost" title="Link to this heading">#</a></h3>
-<p>This is the most significant practical difference. The short-term recurrence of CG makes it extremely cheap, while the long-term recurrence of GMRES makes its cost grow with each iteration.</p>
+<p>For a sparse <span class="math notranslate nohighlight">\(n\times n\)</span> matrix, let <span class="math notranslate nohighlight">\(\operatorname{nnz}(A)\)</span> denote its number of nonzero entries. The costs below exclude storing <span class="math notranslate nohighlight">\(A\)</span> and assume no preconditioning. CG’s work per step stays fixed, while the orthogonalization work of unrestarted GMRES grows with the basis.</p>
 <ul class="simple">
 <li><p><strong>Conjugate Gradients (CG):</strong></p>
 <ul>
-<li><p><strong>Cost per Iteration <span class="math notranslate nohighlight">\(k\)</span>:</strong> <span class="math notranslate nohighlight">\(O(\text{nnz}(A) + n)\)</span>. This cost is <strong>constant</strong>. It is dominated by one sparse matrix-vector product (<span class="math notranslate nohighlight">\(O(\text{nnz})\)</span>) and a few vector operations (<span class="math notranslate nohighlight">\(O(n)\)</span>).</p></li>
+<li><p><strong>Cost per Iteration <span class="math notranslate nohighlight">\(k\)</span>:</strong> <span class="math notranslate nohighlight">\(O(\operatorname{nnz}(A) + n)\)</span>, independent of <span class="math notranslate nohighlight">\(k\)</span>. It consists of one sparse matrix-vector product and a few vector operations.</p></li>
 <li><p><strong>Storage:</strong> <span class="math notranslate nohighlight">\(O(n)\)</span>. CG only needs to store a few vectors (the solution, residual, and direction vectors).</p></li>
 </ul>
 </li>
 <li><p><strong>GMRES:</strong></p>
 <ul>
-<li><p><strong>Cost per Iteration <span class="math notranslate nohighlight">\(k\)</span>:</strong> <span class="math notranslate nohighlight">\(O(\text{nnz}(A) + kn)\)</span>. This cost <strong>grows linearly with <span class="math notranslate nohighlight">\(k\)</span></strong>. The <span class="math notranslate nohighlight">\(\text{nnz}(A)\)</span> term is the matrix-vector product, but the <span class="math notranslate nohighlight">\(kn\)</span> term comes from orthogonalizing the new vector against the <span class="math notranslate nohighlight">\(k\)</span> previous basis vectors. This <span class="math notranslate nohighlight">\(kn\)</span> term quickly becomes the dominant cost.</p></li>
-<li><p><strong>Storage:</strong> <span class="math notranslate nohighlight">\(O(kn)\)</span>. GMRES must store the entire basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> to perform the orthogonalization, so its memory footprint grows at each step.</p></li>
+<li><p><strong>Cost per Iteration <span class="math notranslate nohighlight">\(k\)</span>:</strong> <span class="math notranslate nohighlight">\(O(\operatorname{nnz}(A) + kn)\)</span>. The <span class="math notranslate nohighlight">\(kn\)</span> term comes from orthogonalizing against the <span class="math notranslate nohighlight">\(k\)</span> previous basis vectors and can dominate when <span class="math notranslate nohighlight">\(k\)</span> is large.</p></li>
+<li><p><strong>Storage:</strong> <span class="math notranslate nohighlight">\(O(kn)\)</span>. GMRES stores the basis <span class="math notranslate nohighlight">\(Q_k=[q_1,\ldots,q_k]\)</span> and the next vector. The small Hessenberg and QR factors require <span class="math notranslate nohighlight">\(O(k^2)\)</span> additional storage, included in <span class="math notranslate nohighlight">\(O(kn)\)</span> since <span class="math notranslate nohighlight">\(k\le n\)</span>.</p></li>
 </ul>
 </li>
 </ul>
@@ -525,23 +537,23 @@
 <thead>
 <tr class="row-odd"><th class="head text-left"><p>Algorithm</p></th>
 <th class="head text-left"><p>Applicability</p></th>
-<th class="head text-center"><p>Cost at Iteration <span class="math notranslate nohighlight">\(k\)</span></p></th>
-<th class="head text-center"><p>Total Storage</p></th>
-<th class="head text-center"><p>Total Time (after <span class="math notranslate nohighlight">\(k\)</span> steps)</p></th>
+<th class="head text-center"><p>Work at Iteration <span class="math notranslate nohighlight">\(k\)</span></p></th>
+<th class="head text-center"><p>Working Storage</p></th>
+<th class="head text-center"><p>Total Work after <span class="math notranslate nohighlight">\(k\)</span> Steps</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td class="text-left"><p><strong>CG</strong></p></td>
-<td class="text-left"><p>Symmetric Positive Definite</p></td>
-<td class="text-center"><p><span class="math notranslate nohighlight">\(O(\text{nnz} + n)\)</span></p></td>
+<td class="text-left"><p>SPD</p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(\operatorname{nnz}(A) + n)\)</span></p></td>
 <td class="text-center"><p><span class="math notranslate nohighlight">\(O(n)\)</span></p></td>
-<td class="text-center"><p><span class="math notranslate nohighlight">\(O(k \, (\text{nnz} + n))\)</span></p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(k(\operatorname{nnz}(A) + n))\)</span></p></td>
 </tr>
 <tr class="row-odd"><td class="text-left"><p><strong>GMRES</strong></p></td>
-<td class="text-left"><p>Any Square Matrix</p></td>
-<td class="text-center"><p><span class="math notranslate nohighlight">\(O(\text{nnz} + kn)\)</span></p></td>
+<td class="text-left"><p>Square, nonsingular</p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(\operatorname{nnz}(A) + kn)\)</span></p></td>
 <td class="text-center"><p><span class="math notranslate nohighlight">\(O(kn)\)</span></p></td>
-<td class="text-center"><p><span class="math notranslate nohighlight">\(O(k \cdot \text{nnz} + k^2n)\)</span></p></td>
+<td class="text-center"><p><span class="math notranslate nohighlight">\(O(k\operatorname{nnz}(A) + k^2n)\)</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -549,17 +561,16 @@
 </section>
 <section id="the-practicality-of-restarting">
 <h3>The Practicality of Restarting<a class="headerlink" href="#the-practicality-of-restarting" title="Link to this heading">#</a></h3>
-<p>The comparison table makes the primary weakness of GMRES clear: <strong>it struggles with large <span class="math notranslate nohighlight">\(k\)</span></strong>.</p>
-<p>The <span class="math notranslate nohighlight">\(k^2n\)</span> time complexity and <span class="math notranslate nohighlight">\(kn\)</span> storage cost mean that running GMRES for many iterations is computationally prohibitive. It becomes unacceptably slow, and its memory requirement will eventually exceed the system’s capacity.</p>
-<p>This leads to a common practical compromise: <strong>restarted GMRES</strong>, often denoted as <strong>GMRES(<span class="math notranslate nohighlight">\(m\)</span>)</strong>.</p>
+<p>The growing basis can make long GMRES runs expensive in both work and memory. <strong>Restarted GMRES</strong>, denoted GMRES(<span class="math notranslate nohighlight">\(m\)</span>), limits this growth by keeping at most <span class="math notranslate nohighlight">\(m\)</span> search directions per cycle.</p>
 <ol class="arabic simple">
 <li><p>We choose a fixed restart parameter <span class="math notranslate nohighlight">\(m\)</span> (e.g., <span class="math notranslate nohighlight">\(m=20\)</span> or <span class="math notranslate nohighlight">\(m=50\)</span>).</p></li>
-<li><p>We run <span class="math notranslate nohighlight">\(m\)</span> steps of the “inner” GMRES algorithm.</p></li>
-<li><p>We compute the approximate solution <span class="math notranslate nohighlight">\(x^{(m)}\)</span> and use it as the new starting guess.</p></li>
-<li><p>We “restart” the algorithm, discarding the entire Krylov basis <span class="math notranslate nohighlight">\(Q_m\)</span> and building a new one from the new residual <span class="math notranslate nohighlight">\(r^{(m)} = b - A x^{(m)}\)</span>.</p></li>
+<li><p>We run up to <span class="math notranslate nohighlight">\(m\)</span> GMRES steps, stopping earlier if the requested accuracy is reached.</p></li>
+<li><p>We form the current approximation and use it as the new starting guess.</p></li>
+<li><p>We discard the basis and build a new one from the current residual.</p></li>
 </ol>
-<p>This “restarting” procedure effectively caps the computational and storage costs at <span class="math notranslate nohighlight">\(O(mn)\)</span> and <span class="math notranslate nohighlight">\(O(m \cdot \text{nnz} + m^2n)\)</span>, respectively.</p>
-<p>The drawback, however, is significant: <strong>restarting slows down convergence</strong>. By throwing away the Krylov subspace, we lose all the information the algorithm has gathered about the matrix. This can lead to a much higher total number of iterations and, in some difficult cases, can cause the algorithm to stagnate completely. CG, by contrast, never needs to be restarted.</p>
+<p>Restarting limits <strong>working storage to <span class="math notranslate nohighlight">\(O(mn)\)</span></strong> and <strong>work per cycle to <span class="math notranslate nohighlight">\(O(m\operatorname{nnz}(A)+m^2n)\)</span></strong>. Total work also depends on how many cycles are needed.</p>
+<p>The current approximation is retained, but the earlier search directions are discarded. Thus restarted GMRES no longer minimizes the residual over the full Krylov space accumulated since the original start. Restarting can require more iterations and can cause stagnation, as the example at the end of the <a class="reference internal" href="gmres.html"><span class="std std-doc">GMRES section</span></a> shows. CG’s short recurrence already keeps storage fixed, so it needs no restart to control basis storage.</p>
+<p>For symmetric matrices, we can retain the GMRES residual objective while avoiding its growing basis storage. The <a class="reference internal" href="minres.html"><span class="std std-doc">next section</span></a> develops this specialization, MINRES, which also applies to symmetric indefinite systems.</p>
 </section>
 </section>
 </section>
@@ -608,7 +619,7 @@
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">MINRES</p>
+        <p class="prev-next-title">The Minimal Residual Method (MINRES)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

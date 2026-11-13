@@ -291,7 +291,7 @@
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">CG vs. GMRES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">The Minimal Residual Method (MINRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="preconditioning.html">Preconditioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcg.html">Preconditioned Conjugate Gradient</a></li>
 </ul>
@@ -457,50 +457,45 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-search-for-coefficients-and-a-flawed-first-attempt">The Search for Coefficients and a Flawed First Attempt</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-meaning-of-p-t-a-p-d-the-a-inner-product">The Meaning of <span class="math notranslate nohighlight">\(P^T A P = D\)</span>: The A-Inner Product</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation-of-the-a-inner-product">Geometric Interpretation of the A-Inner Product</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-a-norm">The A-Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nested-krylov-spaces-and-search-directions">Nested Krylov Spaces and Search Directions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-first-attempt-minimize-the-euclidean-error">A First Attempt: Minimize the Euclidean Error</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-change-use-the-a-inner-product">The Key Change: Use the A-Inner Product</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computable-expansion-coefficients">Computable Expansion Coefficients</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-the-cg-algorithm-framework">Summary: The CG Algorithm Framework</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cg-optimality-a-norm-projection">CG Optimality: A-Norm Projection</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-search-directions-p-k">Computing the Search Directions <span class="math notranslate nohighlight">\(p_k\)</span></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-result-residual-orthogonality">Key Result: Residual Orthogonality</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-equivalence-of-residual-and-search-subspaces">The Equivalence of Residual and Search Subspaces</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-term-recurrence">The Three-Term Recurrence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-residuals-are-orthogonal-to-each-other">The Residuals are Orthogonal to Each Other</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-efficient-computational-formulas">Deriving the Efficient Computational Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-step-size-mu-k">Simplifying the Step Size <span class="math notranslate nohighlight">\(\mu_k\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-direction-update-tau-k">Simplifying the Direction Update <span class="math notranslate nohighlight">\(\tau_k\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-partial-sum-is-optimal">Why the Partial Sum Is Optimal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-the-residual-to-find-the-next-direction">Use the Residual to Find the Next Direction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-an-a-orthogonal-direction-from-the-residual">Constructing an A-Orthogonal Direction from the Residual</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#only-the-latest-direction-is-needed">Only the Latest Direction Is Needed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-residual-basis-and-its-orthogonality">The Residual Basis and Its Orthogonality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-efficient-coefficients">Deriving the Efficient Coefficients</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-step-length">The Step Length</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-direction-coefficient">The Direction Coefficient</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-conjugate-gradient-algorithm">The Conjugate Gradient Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-takeaways-what-to-memorize-for-cg">Key Takeaways: What to Memorize for CG</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-definitions">Core Definitions</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-krylov-subspace">The Krylov Subspace</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-orthogonality-relations">Key Orthogonality Relations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-optimality-guarantee">The Central Optimality Guarantee</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-lanczos-and-matrix-relations">Connection to Lanczos and Matrix Relations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-relations-in-matrix-notation">Orthogonality Relations in Matrix Notation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-small-tridiagonal-system">The Small Tridiagonal System</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-relations-in-matrix-notation">Orthogonality Relations in Matrix Notation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-link-between-lanczos-and-cg-residuals">The Link Between Lanczos and CG Residuals</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-summary-of-matrix-properties">A Summary of Matrix Properties</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-the-lanczos-process">Connection to the Lanczos Process</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-is-it-called-the-conjugate-gradient-algorithm">Why Is It Called the “Conjugate Gradient” Algorithm?</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-conjugate-part">The “Conjugate” Part</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gradient-part">The “Gradient” Part</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">Putting It All Together</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-name-conjugate-gradient">Why the Name Conjugate Gradient?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-the-cg-method">Convergence of the CG Method</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-convergence-a-theoretical-guarantee">Finite Convergence (A Theoretical Guarantee)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rate-of-convergence-and-the-condition-number">The Rate of Convergence and the Condition Number</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpreting-the-error-bound">Interpreting the Error Bound</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-story-eigenvalue-clustering">The Real Story: Eigenvalue Clustering</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-superlinear-convergence-phenomenon">The Superlinear Convergence Phenomenon</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-convergence-in-exact-arithmetic">Finite Convergence in Exact Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-error-polynomial-and-the-condition-number">The Error Polynomial and the Condition Number</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-clustering">Eigenvalue Clustering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#superlinear-acceleration">Superlinear Acceleration</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-to-remember">Key Results to Remember</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-krylov-space-several-bases">One Krylov Space, Several Bases</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-orthogonality-relations">The Orthogonality Relations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimality-over-the-whole-search-space">Optimality over the Whole Search Space</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computable-coefficients-and-short-updates">Computable Coefficients and Short Updates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lanczos-connection">The Lanczos Connection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-its-limits">Convergence and Its Limits</a></li>
 </ul>
 </li>
 </ul>
@@ -516,810 +511,719 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-conjugate-gradient-cg-method">
 <h1>The Conjugate Gradient (CG) Method<a class="headerlink" href="#the-conjugate-gradient-cg-method" title="Link to this heading">#</a></h1>
-<section id="the-search-for-coefficients-and-a-flawed-first-attempt">
-<h2>The Search for Coefficients and a Flawed First Attempt<a class="headerlink" href="#the-search-for-coefficients-and-a-flawed-first-attempt" title="Link to this heading">#</a></h2>
-<p>Our goal is to build our solution <span class="math notranslate nohighlight">\(x_k\)</span> from an expanding basis <span class="math notranslate nohighlight">\(\{p_1, \dots, p_k\}\)</span> that spans the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. We assume <span class="math notranslate nohighlight">\(x_0 = 0\)</span> and the Krylov process is built from <span class="math notranslate nohighlight">\(q_1 = b / \|b\|_2\)</span>.</p>
-<p>We are looking for a basis <span class="math notranslate nohighlight">\(\{p_k\}\)</span> such that</p>
-<div class="math notranslate nohighlight">
-\[\text{span}(p_1, \dots, p_k) = {\mathcal K}_k(A, b).\]</div>
-<p>If we can find this basis, and also find the corresponding scalar coefficients <span class="math notranslate nohighlight">\(\mu_k\)</span>, our iterative solution <span class="math notranslate nohighlight">\(x_k\)</span> can be built up one step at a time. The full solution <span class="math notranslate nohighlight">\(x\)</span> would be:</p>
+<p>The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. The short recurrence comes afterward, as a way to perform this construction efficiently.</p>
+<p>Throughout this section, <span class="math notranslate nohighlight">\(A\in\mathbb R^{n\times n}\)</span> is symmetric positive definite (SPD), and <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span> is the exact solution. As in the chapter introduction, <span class="math notranslate nohighlight">\(x_k\)</span> is the approximation after <span class="math notranslate nohighlight">\(k\)</span> steps. We write <span class="math notranslate nohighlight">\(e_k=x-x_k\)</span> for its error and <span class="math notranslate nohighlight">\(r_k=b-Ax_k=Ae_k\)</span> for its residual. We first take <span class="math notranslate nohighlight">\(x_0=0\)</span>, so <span class="math notranslate nohighlight">\(r_0=b\)</span>. If <span class="math notranslate nohighlight">\(b=0\)</span>, the initial guess is already the solution. All orthogonality and optimality statements below concern exact arithmetic.</p>
+<section id="nested-krylov-spaces-and-search-directions">
+<h2>Nested Krylov Spaces and Search Directions<a class="headerlink" href="#nested-krylov-spaces-and-search-directions" title="Link to this heading">#</a></h2>
+<p>Starting from <span class="math notranslate nohighlight">\(b\ne0\)</span>, define</p>
 <div class="math notranslate nohighlight">
 \[
-x = \sum_{k=1}^n \mu_k \, p_k
+\mathcal K_0=\{0\},
+\qquad
+\mathcal K_k=\operatorname{span}\{b,Ab,\ldots,A^{k-1}b\}.
 \]</div>
-<p>And our <span class="math notranslate nohighlight">\(k\)</span>-th iterate is simply the partial sum:</p>
+<p>These spaces are nested:</p>
 <div class="math notranslate nohighlight">
 \[
-x_k = \sum_{l=1}^k \mu_l \, p_l
+\mathcal K_0\subseteq\mathcal K_1\subseteq\mathcal K_2\subseteq\cdots.
 \]</div>
-<p>This framework provides a beautifully simple update rule:</p>
+<p>Each multiplication can add at most one new independent direction. While the spaces are growing, <span class="math notranslate nohighlight">\(\dim\mathcal K_k=k\)</span>. We seek directions <span class="math notranslate nohighlight">\(p_1,p_2,\ldots\)</span> that follow this growth:</p>
 <div class="math notranslate nohighlight">
 \[
-x_{k+1} = x_k + \mu_{k+1} \, p_{k+1}
+\operatorname{span}\{p_1,\ldots,p_k\}=\mathcal K_k.
 \]</div>
-<p>The entire problem is now reduced to finding a computationally feasible method to calculate the <strong>search directions</strong> <span class="math notranslate nohighlight">\(p_k\)</span> and the <strong>step lengths</strong> (or coefficients) <span class="math notranslate nohighlight">\(\mu_k\)</span>.</p>
-<p><strong>Attempt 1: A Standard Orthogonal Basis</strong></p>
-<p>Let’s explore the most natural first choice for our basis: a set of <strong>orthogonal</strong> vectors. As we know, the Lanczos process provides exactly such a basis, <span class="math notranslate nohighlight">\(\{q_1, \dots, q_n\}\)</span>.</p>
-<p>Let’s set our search directions <span class="math notranslate nohighlight">\(p_k = q_k\)</span>.</p>
-<p>Let <span class="math notranslate nohighlight">\(P\)</span> be the <span class="math notranslate nohighlight">\(n \times n\)</span> matrix whose columns are these basis vectors, <span class="math notranslate nohighlight">\(P = [p_1, \dots, p_n]\)</span>. Since we have chosen an orthogonal basis, we have <span class="math notranslate nohighlight">\(P^T P = I\)</span>.</p>
-<p>The full solution <span class="math notranslate nohighlight">\(x\)</span> can be written in this basis as:</p>
+<p>With such a basis, an approximation in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> has the form</p>
 <div class="math notranslate nohighlight">
 \[
-x = P \mu
+x_k=\sum_{j=1}^k\mu_jp_j.
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(\mu\)</span> is the <span class="math notranslate nohighlight">\(n \times 1\)</span> vector of coefficients <span class="math notranslate nohighlight">\([\mu_1, \dots, \mu_n]^T\)</span>.</p>
-<p>Finding the coefficients <span class="math notranslate nohighlight">\(\mu\)</span> <em>seems</em> easy. We can simply pre-multiply by <span class="math notranslate nohighlight">\(P^T\)</span>:</p>
+<p>If the optimal coefficients of the old directions remain unchanged when we enlarge the space, only one new term is needed:</p>
 <div class="math notranslate nohighlight">
 \[
-P^T x = P^T P \mu = I \mu = \mu
+x_k=x_{k-1}+\mu_kp_k.
 \]</div>
-<p>This gives us an exact, closed-form formula for our coefficients: <span class="math notranslate nohighlight">\(\mu_k = p_k^T x\)</span>.</p>
-<p>But here we hit the exact same wall we encountered in the introduction. <strong>We cannot compute <span class="math notranslate nohighlight">\(p_k^T x\)</span> because we do not know <span class="math notranslate nohighlight">\(x\)</span>!</strong></p>
-<p>This first, natural attempt has failed. It requires the very solution we are trying to find. This tells us that if our simple update <span class="math notranslate nohighlight">\(x_{k+1} = x_k + \mu_{k+1} p_{k+1}\)</span> is to work, we need a different, more clever choice for our basis <span class="math notranslate nohighlight">\(\{p_k\}\)</span>. Simple orthogonality is not enough.</p>
-<p><strong>Attempt 2: A New Optimality Condition</strong></p>
-<p>Our first attempt failed because computing the coefficients <span class="math notranslate nohighlight">\(\mu = P^T x\)</span> required knowing the solution <span class="math notranslate nohighlight">\(x\)</span>. However, we have another equation at our disposal.</p>
-<p>We know <span class="math notranslate nohighlight">\(Ax = b\)</span>. Let’s try pre-multiplying by <span class="math notranslate nohighlight">\(P^T\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-P^T A x = P^T b
-\]</div>
-<p>This is the true starting point for the entire Conjugate Gradient algorithm! We know the vector <span class="math notranslate nohighlight">\(b\)</span>. Therefore, assuming we can construct the basis matrix <span class="math notranslate nohighlight">\(P\)</span>, the right-hand side <span class="math notranslate nohighlight">\(P^T b\)</span> is a quantity we can actually compute.</p>
-<p>Now, let’s see what this means for our coefficients <span class="math notranslate nohighlight">\(\mu\)</span>. We again start with the expansion of our solution <span class="math notranslate nohighlight">\(x = P \mu\)</span> and insert it into this new equation:</p>
-<div class="math notranslate nohighlight">
-\[
-P^T b = P^T (A x) = P^T A (P \mu)
-\]</div>
-<p>This gives us a <span class="math notranslate nohighlight">\(n \times n\)</span> linear system for the unknown coefficients <span class="math notranslate nohighlight">\(\mu\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-(P^T A P) \mu = P^T b
-\]</div>
-<p>We have successfully eliminated the unknown solution <span class="math notranslate nohighlight">\(x\)</span> from the calculation. However, we are now faced with solving a new linear system. To find <span class="math notranslate nohighlight">\(\mu\)</span>, we must deal with the matrix <span class="math notranslate nohighlight">\(P^T A P\)</span>.</p>
-<p>This brings us to our second, much more clever attempt. In Attempt 1, we chose <span class="math notranslate nohighlight">\(p_k = q_k\)</span> (an orthogonal basis) and found that <span class="math notranslate nohighlight">\(P^T P = I\)</span>. But this didn’t help us.</p>
-<p>In Attempt 2, we will make a different choice. What if we choose our basis vectors <span class="math notranslate nohighlight">\(p_k\)</span> such that the new system matrix, <span class="math notranslate nohighlight">\(P^T A P\)</span>, becomes trivial to solve?</p>
-<p>The ideal scenario is to choose the basis <span class="math notranslate nohighlight">\(\{p_k\}\)</span> such that:</p>
-<div class="math notranslate nohighlight">
-\[
-P^T A P = D
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(D\)</span> is a <strong>diagonal</strong> matrix.</p>
-<p>This property, as we noted earlier, is called <strong>A-orthogonality</strong> or <strong>conjugacy</strong>. The basis vectors <span class="math notranslate nohighlight">\(p_k\)</span> are “conjugate” with respect to <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-p_k^T A p_j = 0 \quad \text{for all } k \neq j
-\]</div>
-<p>The solution for the <em>full</em> coefficient vector <span class="math notranslate nohighlight">\(\mu\)</span> is then simply:</p>
-<div class="math notranslate nohighlight">
-\[
-\mu_k = \frac{(P^T b)_k}{d_k} = \frac{p_k^T b}{p_k^T A p_k}
-\]</div>
-<p>This is a breakthrough! We have found a formula for each coefficient <span class="math notranslate nohighlight">\(\mu_k\)</span> that is entirely computable, assuming we can find the basis vectors <span class="math notranslate nohighlight">\(p_k\)</span>.</p>
+<p>This is what an orthogonal basis can provide. We need to choose both the geometry that defines orthogonality and a normalization for each direction.</p>
 </section>
-<section id="the-meaning-of-p-t-a-p-d-the-a-inner-product">
-<h2>The Meaning of <span class="math notranslate nohighlight">\(P^T A P = D\)</span>: The A-Inner Product<a class="headerlink" href="#the-meaning-of-p-t-a-p-d-the-a-inner-product" title="Link to this heading">#</a></h2>
-<p>Let’s pause to understand the condition <span class="math notranslate nohighlight">\(P^T A P = D\)</span> more deeply. When we say that this matrix is diagonal, what are we really requiring of our basis vectors <span class="math notranslate nohighlight">\(p_i\)</span>?</p>
-<p>This equation is a compact way of stating a new orthogonality condition. The <span class="math notranslate nohighlight">\((i, j)\)</span> entry of <span class="math notranslate nohighlight">\(P^T A P\)</span> is <span class="math notranslate nohighlight">\(p_i^T A p_j\)</span>. We are therefore demanding that:</p>
+<section id="a-first-attempt-minimize-the-euclidean-error">
+<h2>A First Attempt: Minimize the Euclidean Error<a class="headerlink" href="#a-first-attempt-minimize-the-euclidean-error" title="Link to this heading">#</a></h2>
+<p>A natural goal is to find the vector in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> that minimizes <span class="math notranslate nohighlight">\(\|x-x_k\|_2\)</span>. Choose mutually orthogonal directions adapted to the nested spaces. The new direction must satisfy</p>
 <div class="math notranslate nohighlight">
 \[
-p_i^T A p_j = 0 \quad \text{for all } i \neq j
+p_k\in\mathcal K_k,
+\qquad p_k\perp\mathcal K_{k-1}.
 \]</div>
-<p>This leads us to define a new <strong>inner product</strong> (or dot product) based on our matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>When <span class="math notranslate nohighlight">\(\dim\mathcal K_k=k\)</span>, these conditions specify a unique direction up to a nonzero scalar: the orthogonal complement of <span class="math notranslate nohighlight">\(\mathcal K_{k-1}\)</span> inside <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> is one-dimensional. If we give each direction unit Euclidean norm, these are precisely the <a class="reference internal" href="lanczos_iteration.html"><span class="std std-doc">Lanczos vectors</span></a>, up to their signs:</p>
+<div class="math notranslate nohighlight">
+\[
+p_k=q_k,
+\qquad Q_k=[q_1,\ldots,q_k],
+\qquad Q_k^TQ_k=I.
+\]</div>
+<p>Suppose the final Krylov space containing <span class="math notranslate nohighlight">\(x\)</span> has dimension <span class="math notranslate nohighlight">\(m\le n\)</span>. Its orthonormal basis gives the expansion</p>
+<div class="math notranslate nohighlight">
+\[
+x=\sum_{j=1}^m\mu_jp_j,
+\qquad \mu_j=p_j^Tx.
+\]</div>
+<p>The Euclidean best approximation in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> is the partial sum through <span class="math notranslate nohighlight">\(k\)</span>. Orthogonality ensures that adding a new direction does not change the previous coefficients. We will justify below why a Krylov space containing <span class="math notranslate nohighlight">\(x\)</span> is reached in at most <span class="math notranslate nohighlight">\(n\)</span> steps, possibly earlier.</p>
+<p>The figure illustrates this process in two dimensions. The first approximation is the closest point to <span class="math notranslate nohighlight">\(x\)</span> on the line <span class="math notranslate nohighlight">\(\mathcal K_1\)</span>. Adding the perpendicular direction <span class="math notranslate nohighlight">\(p_2\)</span> captures the remaining component without changing the coefficient along <span class="math notranslate nohighlight">\(p_1\)</span>.</p>
+<figure class="align-default" id="fig-cg-euclidean-projection">
+<a class="reference internal image-reference" href="../_images/cg_euclidean_projection.svg"><img alt="Left, the exact solution projects perpendicularly onto the first Krylov line, giving the Euclidean best approximation x1. Right, adding the second orthogonal direction reaches the solution without changing the first component." src="../_images/cg_euclidean_projection.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">Euclidean projection for <span class="math notranslate nohighlight">\(A=\begin{pmatrix}2&amp;-1\\-1&amp;2\end{pmatrix}\)</span> and <span class="math notranslate nohighlight">\(b=(3,0)^T\)</span>. Here <span class="math notranslate nohighlight">\(p_1=(1,0)^T\)</span>, <span class="math notranslate nohighlight">\(p_2=(0,1)^T\)</span>, and <span class="math notranslate nohighlight">\(x=(2,1)^T\)</span>. Left: the circle centered at <span class="math notranslate nohighlight">\(x\)</span> touches <span class="math notranslate nohighlight">\(\mathcal K_1\)</span> at the nearest point <span class="math notranslate nohighlight">\(x_1=2p_1\)</span>; the error is perpendicular to the line. Right: <span class="math notranslate nohighlight">\(\mathcal K_2\)</span> is the whole plane, so adding <span class="math notranslate nohighlight">\(p_2\)</span> gives <span class="math notranslate nohighlight">\(x_2=2p_1+p_2=x\)</span>. These are the best Euclidean approximations of our first attempt. Drawing them uses the exact solution, which is unavailable in the actual solve.</span><a class="headerlink" href="#fig-cg-euclidean-projection" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The difficulty is the coefficient formula: <span class="math notranslate nohighlight">\(p_j^Tx\)</span> involves the unknown solution. Lanczos gives us the directions, but does not directly give these projection coefficients. We need an inner product that lets us use the known equation <span class="math notranslate nohighlight">\(Ax=b\)</span>.</p>
+</section>
+<section id="the-key-change-use-the-a-inner-product">
+<h2>The Key Change: Use the A-Inner Product<a class="headerlink" href="#the-key-change-use-the-a-inner-product" title="Link to this heading">#</a></h2>
+<p>Compare the two quantities</p>
+<div class="math notranslate nohighlight">
+\[
+p_j^Tx
+\qquad\text{and}\qquad
+p_j^TAx=p_j^Tb.
+\]</div>
+<p>The second can be evaluated from known data. This suggests replacing Euclidean orthogonality by orthogonality in the geometry defined by <span class="math notranslate nohighlight">\(A\)</span>.</p>
 <div class="proof definition admonition" id="a_inner_prod">
 <p class="admonition-title"><span class="caption-number">Definition 4 </span> (The A-Inner Product)</p>
 <section class="definition-content" id="proof-content">
-<p>Given a Symmetric Positive Definite (SPD) matrix <span class="math notranslate nohighlight">\(A\)</span>, the <strong>A-inner product</strong> between two vectors <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(z\)</span> is defined as:</p>
+<p>For an SPD matrix <span class="math notranslate nohighlight">\(A\)</span>, define</p>
 <div class="math notranslate nohighlight">
 \[
-\langle y, z \rangle_A = y^T A z
+\langle y,z\rangle_A=y^TAz,
+\qquad
+\|z\|_A=\sqrt{z^TAz}.
 \]</div>
-<p>This is a valid inner product precisely <em>because</em> <span class="math notranslate nohighlight">\(A\)</span> is SPD.</p>
+<p>Two vectors are <strong>A-orthogonal</strong>, or <strong>conjugate</strong>, if <span class="math notranslate nohighlight">\(y^TAz=0\)</span>.</p>
 </section>
-</div><section id="geometric-interpretation-of-the-a-inner-product">
-<h3>Geometric Interpretation of the A-Inner Product<a class="headerlink" href="#geometric-interpretation-of-the-a-inner-product" title="Link to this heading">#</a></h3>
-<p>This is not just a mathematical abstraction. It has a clear geometric meaning. Recall that since <span class="math notranslate nohighlight">\(A\)</span> is SPD, it has an eigendecomposition:</p>
+</div><p>The expression <span class="math notranslate nohighlight">\(y^TAz\)</span> is linear in each vector. Symmetry of <span class="math notranslate nohighlight">\(A\)</span> makes it symmetric in <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(z\)</span>, and positive definiteness gives <span class="math notranslate nohighlight">\(z^TAz&gt;0\)</span> for every nonzero <span class="math notranslate nohighlight">\(z\)</span>. Together, these properties make it a valid inner product. A general nonsymmetric or indefinite matrix does not provide this geometry.</p>
+<p>This is the <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">energy norm</span></a> introduced for Gauss-Seidel. To see its geometry, write <span class="math notranslate nohighlight">\(A=V\Lambda V^T\)</span>, with <span class="math notranslate nohighlight">\(V\)</span> orthogonal and <span class="math notranslate nohighlight">\(\Lambda\)</span> positive diagonal. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\langle y,z\rangle_A
+&amp;=(\Lambda^{1/2}V^Ty)^T(\Lambda^{1/2}V^Tz)\\
+&amp;=(A^{1/2}y)^T(A^{1/2}z),\\
+\|z\|_A&amp;=\|A^{1/2}z\|_2.
+\end{aligned}
+\end{split}\]</div>
+<p>Thus the new inner product is an ordinary dot product after rotating into the eigenvector coordinates and scaling by <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>. The symmetric square root <span class="math notranslate nohighlight">\(A^{1/2}=V\Lambda^{1/2}V^T\)</span> includes a final orthogonal change of coordinates, which preserves dot products. No square root is needed in the algorithm.</p>
+<p>We can interpret this scaling as a <strong>change of units</strong> along the eigenvector directions. In those coordinates, the A-inner product weights the product of the <span class="math notranslate nohighlight">\(i\)</span>th components by <span class="math notranslate nohighlight">\(\lambda_i\)</span>. Equivalently, multiply each vector’s <span class="math notranslate nohighlight">\(i\)</span>th component by <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>, then take the ordinary dot product. The operation is familiar; the coordinate scales have changed.</p>
+<figure class="align-default" id="fig-cg-inner-product">
+<a class="reference internal image-reference" href="../_images/cg_inner_product.svg"><img alt="Two vectors before and after doubling their first coordinates. They are not perpendicular in the original Euclidean coordinates, but become perpendicular after rescaling, illustrating their A-orthogonality for A diagonal with entries 4 and 1." src="../_images/cg_inner_product.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 27 </span><span class="caption-text">The same vectors measured in two coordinate systems. For <span class="math notranslate nohighlight">\(A=\operatorname{diag}(4,1)\)</span>, the axes already follow the eigenvector directions. Rescaling the first coordinate by <span class="math notranslate nohighlight">\(\sqrt4=2\)</span> turns squares of the gray grid into rectangles. The transformed vectors have ordinary dot product zero, so the original vectors are A-orthogonal. A change of units preserves the weighted inner product through this transformation, but can change Euclidean angles: A-orthogonality need not look like a right angle in the original coordinates.</span><a class="headerlink" href="#fig-cg-inner-product" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<section id="computable-expansion-coefficients">
+<h3>Computable Expansion Coefficients<a class="headerlink" href="#computable-expansion-coefficients" title="Link to this heading">#</a></h3>
+<p>From this point on, <span class="math notranslate nohighlight">\(p_j\)</span> denotes an <strong>A-orthogonal search direction</strong>, replacing the Euclidean directions of the first attempt. We still require the first <span class="math notranslate nohighlight">\(k\)</span> directions to span <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[
-A = Q \Lambda Q^T
+p_i^TAp_j=0\quad(i\ne j),
+\qquad
+\operatorname{span}\{p_1,\ldots,p_k\}=\mathcal K_k.
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(Q\)</span> is an orthogonal matrix (its columns are the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>) and <span class="math notranslate nohighlight">\(\Lambda\)</span> is a diagonal matrix of positive eigenvalues <span class="math notranslate nohighlight">\(\lambda_i &gt; 0\)</span>.</p>
-<p>Let’s plug this into our new inner product:</p>
+<p>As before, the new direction is unique up to scaling: it lies in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> and is A-orthogonal to <span class="math notranslate nohighlight">\(\mathcal K_{k-1}\)</span>. Taking the A-inner product of the full expansion with <span class="math notranslate nohighlight">\(p_i\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+p_i^Tb=p_i^TAx
+&amp;=\sum_{j=1}^m\mu_jp_i^TAp_j\\
+&amp;=\mu_i p_i^TAp_i.
+\end{aligned}
+\end{split}\]</div>
+<p>Consequently,</p>
 <div class="math notranslate nohighlight">
 \[
-\langle y, z \rangle_A = y^T A z = y^T (Q \Lambda Q^T) z = (y^T Q) \Lambda (Q^T z) = (Q^T y)^T \Lambda (Q^T z)
+\boxed{\mu_i=\frac{p_i^Tb}{p_i^TAp_i}.}
 \]</div>
-<p>We can group this differently using the symmetric square root of <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(A^{1/2} = Q \Lambda^{1/2} Q^T\)</span>:</p>
+<p>The denominator is positive. Both numerator and denominator are computable once <span class="math notranslate nohighlight">\(p_i\)</span> is known. Changing the inner product has removed the unknown solution from the coefficient calculation.</p>
+<p>In matrix notation, define <span class="math notranslate nohighlight">\(P_k=[p_1,\ldots,p_k]\)</span> and <span class="math notranslate nohighlight">\(d_j=p_j^TAp_j\)</span>. Then</p>
 <div class="math notranslate nohighlight">
-\[
-\langle y, z \rangle_A = y^T (A^{1/2} A^{1/2}) z = (A^{1/2} y)^T (A^{1/2} z)
-\]</div>
-<p>This shows that the A-inner product of <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(z\)</span> is just the <strong>standard Euclidean dot product</strong> of two <em>transformed</em> vectors, <span class="math notranslate nohighlight">\(A^{1/2}y\)</span> and <span class="math notranslate nohighlight">\(A^{1/2}z\)</span>.</p>
-<p>This transformation <span class="math notranslate nohighlight">\(v \to A^{1/2} v = (\Lambda^{1/2} Q^T) v\)</span> can be understood in steps:</p>
-<ol class="arabic simple">
-<li><p><strong>Rotate (<span class="math notranslate nohighlight">\(Q^T v\)</span>):</strong> First, we apply <span class="math notranslate nohighlight">\(Q^T\)</span> to the vectors, which is like rotating our coordinate system to align with the eigenvectors of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><strong>Rescale (<span class="math notranslate nohighlight">\(\Lambda^{1/2} ...\)</span>):</strong> Second, we multiply by the diagonal matrix <span class="math notranslate nohighlight">\(\Lambda^{1/2}\)</span>, which rescales the vectors along these new axes by <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>.</p></li>
-<li><p><strong>Dot Product:</strong> Finally, we take the standard dot product of these transformed vectors.</p></li>
-</ol>
-<p>So, when we require <span class="math notranslate nohighlight">\(P^T A P = D\)</span>, we are simply saying:
-<strong>The basis vectors <span class="math notranslate nohighlight">\(p_i\)</span> must be orthogonal with respect to this new, A-defined inner product.</strong></p>
-<p>This is a very natural choice, as it’s the geometry defined by the operator <span class="math notranslate nohighlight">\(A\)</span> itself.</p>
+\[\begin{split}
+P_k^TAP_k=D_k=\operatorname{diag}(d_1,\ldots,d_k),
+\qquad
+D_k\begin{pmatrix}\mu_1\\\vdots\\\mu_k\end{pmatrix}=P_k^Tb.
+\end{split}\]</div>
+<p>We could normalize every <span class="math notranslate nohighlight">\(p_j\)</span> to have unit A-norm, making <span class="math notranslate nohighlight">\(D_k=I\)</span>. Instead, we leave the scale free for now. A later choice will simplify the recurrence.</p>
 </section>
-<section id="the-a-norm">
-<h3>The A-Norm<a class="headerlink" href="#the-a-norm" title="Link to this heading">#</a></h3>
-<p>Just as the standard dot product defines the standard 2-norm, this new A-inner product defines a new norm, called the <strong>A-norm</strong>:</p>
+</section>
+<section id="why-the-partial-sum-is-optimal">
+<h2>Why the Partial Sum Is Optimal<a class="headerlink" href="#why-the-partial-sum-is-optimal" title="Link to this heading">#</a></h2>
+<p>The computable coefficients have a geometric meaning: they give the A-orthogonal projection of <span class="math notranslate nohighlight">\(x\)</span> onto <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>.</p>
+<div class="proof theorem admonition" id="cg_energy_optimality">
+<p class="admonition-title"><span class="caption-number">Theorem 48 </span> (CG Optimality in the Energy Norm)</p>
+<section class="theorem-content" id="proof-content">
+<p>Let <span class="math notranslate nohighlight">\(p_1,\ldots,p_k\)</span> be an A-orthogonal basis of <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, and set</p>
 <div class="math notranslate nohighlight">
 \[
-\|z\|_A = \sqrt{\langle z, z \rangle_A} = \sqrt{z^T A z}
+x_k=\sum_{j=1}^k\frac{p_j^Tb}{p_j^TAp_j}\,p_j.
 \]</div>
-<p>Using our derivation from above, we can see this is equivalent to:</p>
+<p>Then <span class="math notranslate nohighlight">\(x_k\)</span> is the unique minimizer of <span class="math notranslate nohighlight">\(\|x-z\|_A\)</span> over <span class="math notranslate nohighlight">\(z\in\mathcal K_k\)</span>. Equivalently,</p>
 <div class="math notranslate nohighlight">
 \[
-\|z\|_A = \| \Lambda^{1/2} Q^T z \|_2 = \| A^{1/2} z \|_2
+p_j^TA(x-x_k)=0\qquad(j\le k).
 \]</div>
-<p>As we will see, minimizing the <strong>A-norm of the error</strong> is the central, underlying principle of the Conjugate Gradient method.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>We could require our basis to be fully <strong>A-orthonormal</strong>, meaning <span class="math notranslate nohighlight">\(p_i^T A p_j = \delta_{ij}\)</span> (i.e., <span class="math notranslate nohighlight">\(P^T A P = I\)</span>). This would mean <span class="math notranslate nohighlight">\(\langle p_i, p_i \rangle_A = \|p_i\|_A^2 = 1\)</span>. However, for computational reasons, the standard CG algorithm uses a different normalization, which we will see shortly.</p>
+</section>
+</div><div class="proof admonition" id="proof">
+<p>Proof. For each <span class="math notranslate nohighlight">\(j\le k\)</span>, A-orthogonality gives</p>
+<div class="math notranslate nohighlight">
+\[
+p_j^TA(x-x_k)
+=p_j^Tb-\mu_jp_j^TAp_j=0.
+\]</div>
+<p>Any other candidate in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> is <span class="math notranslate nohighlight">\(x_k+v\)</span>, with <span class="math notranslate nohighlight">\(v\in\mathcal K_k\)</span>. Expanding its squared error yields</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|x-(x_k+v)\|_A^2
+&amp;=\|x-x_k\|_A^2-2v^TA(x-x_k)+\|v\|_A^2\\
+&amp;=\|x-x_k\|_A^2+\|v\|_A^2.
+\end{aligned}
+\end{split}\]</div>
+<p>The last term is positive unless <span class="math notranslate nohighlight">\(v=0\)</span>, proving the unique minimum.</p>
 </div>
+<p>Enlarging the space adds one A-orthogonal direction, so the old coefficients stay fixed. The update <span class="math notranslate nohighlight">\(x_k=x_{k-1}+\mu_kp_k\)</span> is therefore also a minimization over the whole current space, not just along the latest line.</p>
+<p>The same projection identity shows how the error decreases. Since
+<span class="math notranslate nohighlight">\(x-x_{k-1}=(x-x_k)+\mu_kp_k\)</span> and <span class="math notranslate nohighlight">\(p_k^TA(x-x_k)=0\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|x-x_{k-1}\|_A^2
+=\|x-x_k\|_A^2+\mu_k^2p_k^TAp_k.
+\]</div>
+<p>Each nonzero step removes an A-orthogonal component of the error.</p>
+<p>As in Gauss-Seidel, define the quadratic energy</p>
+<div class="math notranslate nohighlight">
+\[
+\Phi(z)=\frac12z^TAz-b^Tz.
+\]</div>
+<p>Since <span class="math notranslate nohighlight">\(Ax=b\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\Phi(z)-\Phi(x)=\frac12\|z-x\|_A^2.
+\]</div>
+<p>Thus CG also minimizes this computable quadratic over <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>. It differs from Gauss-Seidel by choosing its directions from the Krylov spaces rather than the coordinate axes.</p>
 </section>
-</section>
-<section id="summary-the-cg-algorithm-framework">
-<h2>Summary: The CG Algorithm Framework<a class="headerlink" href="#summary-the-cg-algorithm-framework" title="Link to this heading">#</a></h2>
-<p>Our entire derivation so far has established the core algebraic requirements for the Conjugate Gradient algorithm.</p>
-<p>The algorithm’s goal is to build a sequence of <strong>A-orthogonal search directions</strong> <span class="math notranslate nohighlight">\(p_i\)</span>, which are stored as the columns of a matrix <span class="math notranslate nohighlight">\(P\)</span>. This A-orthogonality is defined by the condition:</p>
+<section id="use-the-residual-to-find-the-next-direction">
+<h2>Use the Residual to Find the Next Direction<a class="headerlink" href="#use-the-residual-to-find-the-next-direction" title="Link to this heading">#</a></h2>
+<p>We now have the coefficient formula. The remaining task is to construct the A-orthogonal directions.</p>
+<p>One possibility is to start with <span class="math notranslate nohighlight">\(p_1=b\)</span>, generate a new vector <span class="math notranslate nohighlight">\(Ap_k\)</span>, and subtract its A-projections onto the previous directions. For <span class="math notranslate nohighlight">\(i\le k-2\)</span>, symmetry gives</p>
 <div class="math notranslate nohighlight">
 \[
-P^T A P = D
+p_i^TA(Ap_k)=(Ap_i)^TAp_k=0,
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(D\)</span> is a diagonal matrix with entries <span class="math notranslate nohighlight">\(d_k = p_k^T A p_k\)</span>.</p>
-<p>If we can find such a basis, the exact solution <span class="math notranslate nohighlight">\(x = P \mu\)</span> can be found without knowing <span class="math notranslate nohighlight">\(x\)</span>. We compute the coefficients <span class="math notranslate nohighlight">\(\mu_k\)</span> by solving the diagonal system:</p>
+<p>because <span class="math notranslate nohighlight">\(Ap_i\in\mathcal K_{i+1}\subseteq\mathcal K_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> is A-orthogonal to that space. Thus only the projections onto <span class="math notranslate nohighlight">\(p_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> remain. This gives a three-term recurrence based on <span class="math notranslate nohighlight">\(Ap_k\)</span>.</p>
+<p>We will instead use the <strong>residual</strong>, which gives a computationally more efficient construction: only the latest search direction is needed, and the coefficients simplify to ratios involving residual norms. Recall its definition:</p>
 <div class="math notranslate nohighlight">
 \[
-P^T b = D \mu \quad \implies \quad \mu_k = \frac{p_k^T b}{d_k}
+r_k=b-Ax_k.
 \]</div>
-<p>Crucially, this structure allows us to build the final solution iteratively. The <span class="math notranslate nohighlight">\(k\)</span>-th iterate <span class="math notranslate nohighlight">\(x_k\)</span> is the optimal solution in the <span class="math notranslate nohighlight">\(k\)</span>-th subspace, and we can compute the next iterate with a simple update:</p>
+<p>Because <span class="math notranslate nohighlight">\(x_k\in\mathcal K_k\)</span>, multiplication by <span class="math notranslate nohighlight">\(A\)</span> gives <span class="math notranslate nohighlight">\(Ax_k\in\mathcal K_{k+1}\)</span>. Also <span class="math notranslate nohighlight">\(b\in\mathcal K_{k+1}\)</span>, so</p>
 <div class="math notranslate nohighlight">
 \[
-x_{k+1} = x_k + \mu_{k+1} \, p_{k+1}
+\boxed{r_k\in\mathcal K_{k+1}.}
 \]</div>
-<p>The remaining challenge is to find an efficient way to generate this <span class="math notranslate nohighlight">\(p_k\)</span> sequence.</p>
-</section>
-<section id="cg-optimality-a-norm-projection">
-<h2>CG Optimality: A-Norm Projection<a class="headerlink" href="#cg-optimality-a-norm-projection" title="Link to this heading">#</a></h2>
-<p>We can further interpret the solution <span class="math notranslate nohighlight">\(x_k\)</span> in a least-squares sense.</p>
-<p>The core principle of the CG method is that the error at step <span class="math notranslate nohighlight">\(k\)</span>, <span class="math notranslate nohighlight">\(e^{(k)} = x - x_k\)</span>, is <strong>A-orthogonal</strong> to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. This is the very definition of an orthogonal projection in the <span class="math notranslate nohighlight">\(A\)</span>-inner product.</p>
-<p>We can verify this algebraically. Using <span class="math notranslate nohighlight">\(x_k = P_k \mu^{(k)}\)</span>, we show that <span class="math notranslate nohighlight">\(P_k^T A e^{(k)} = 0\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-P_k^T A (x - x_k) = P_k^T A (x - P_k \mu^{(k)}) = P_k^T b - (P_k^T A P_k) \mu^{(k)} = P_k^T b - D_k \mu^{(k)}
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(\mu^{(k)} = D_k^{-1} P_k^T b\)</span>, this becomes:</p>
-<div class="math notranslate nohighlight">
-\[
-P_k^T b - D_k (D_k^{-1} P_k^T b) = P_k^T b - P_k^T b = 0
-\]</div>
-<p>This result confirms that <span class="math notranslate nohighlight">\(x_k\)</span> is the solution to a least-squares problem using the A-norm:</p>
-<div class="math notranslate nohighlight">
-\[
-\mu^{(k)} = \underset{y \in \mathbb{R}^k}{\rm argmin} \, \| P_k y - x \|_A, \quad \text{and} \quad x_k = P_k \mu^{(k)}
-\]</div>
-<p>This is the central optimality guarantee of the method: <strong>CG produces the approximation in the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> that is closest to the true solution <span class="math notranslate nohighlight">\(x\)</span> in the <span class="math notranslate nohighlight">\(A\)</span>-norm.</strong></p>
-</section>
-<section id="computing-the-search-directions-p-k">
-<h2>Computing the Search Directions <span class="math notranslate nohighlight">\(p_k\)</span><a class="headerlink" href="#computing-the-search-directions-p-k" title="Link to this heading">#</a></h2>
-<p>We have established the <em>properties</em> of the A-orthogonal basis <span class="math notranslate nohighlight">\(\{p_k\}\)</span> and <em>why</em> it gives us an optimal solution <span class="math notranslate nohighlight">\(x_k\)</span> at every step. The final and most important piece of the puzzle is <em>how</em> to compute this sequence of vectors efficiently.</p>
-<p>In principle, one could use a Gram-Schmidt-like process on the Krylov basis <span class="math notranslate nohighlight">\(\{b, Ab, A^2b, \ldots\}\)</span> to make it A-orthogonal. However, this would require storing all previous vectors, which is not feasible for large systems.</p>
-<p>A much more efficient approach exists, and it relies on the <strong>residual vector</strong>:</p>
-<div class="math notranslate nohighlight">
-\[
-r_k = b - A x_k, \quad \text{with } r_0 = b
-\]</div>
-<p>since <span class="math notranslate nohighlight">\(x_0 = 0\)</span>.</p>
-<p>The residual is the key. Let’s establish its relationship to the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
-<p>Recall that <span class="math notranslate nohighlight">\({\mathcal K}_k = \text{span}(q_1, A q_1, \dots, A^{k-1} q_1)\)</span>, where <span class="math notranslate nohighlight">\(q_1 = b/\|b\|_2\)</span>. By definition, our <span class="math notranslate nohighlight">\(k-1\)</span> iterate <span class="math notranslate nohighlight">\(x_{k-1} \in {\mathcal K}_{k-1}\)</span>. From the properties of a Krylov subspace, if <span class="math notranslate nohighlight">\(x_{k-1} \in {\mathcal K}_{k-1}\)</span>, then <span class="math notranslate nohighlight">\(A x_{k-1} \in {\mathcal K}_k\)</span>.</p>
-<p>Now, let’s look at the residual <span class="math notranslate nohighlight">\(r_{k-1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-r_{k-1} = b - A x_{k-1}
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(b \in {\mathcal K}_k\)</span> (it’s proportional to <span class="math notranslate nohighlight">\(q_1\)</span>) and <span class="math notranslate nohighlight">\(A x_{k-1} \in {\mathcal K}_k\)</span>, their linear combination <span class="math notranslate nohighlight">\(r_{k-1}\)</span> must also be in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
-<p>This logic applies to all previous residuals, so we have:</p>
-<div class="math notranslate nohighlight">
-\[
-r_0, r_1, \dots, r_{k-1} \in {\mathcal K}_k
-\]</div>
-<p>We also know that <span class="math notranslate nohighlight">\({\mathcal K}_k = \text{span}(p_1, \dots, p_k)\)</span>. Therefore, we have proved the following relationship:</p>
-<div class="math notranslate nohighlight">
-\[
-\text{span}(r_0, \dots, r_{k-1}) \subset \text{span}(p_1, \dots, p_k)
-\]</div>
-<p>This connects the residuals (which we can compute) to the search directions (which we need). We will show below that, in fact, these two subspaces are equal. This equivalence is what makes the CG algorithm so efficient.</p>
-</section>
-<section id="key-result-residual-orthogonality">
-<h2>Key Result: Residual Orthogonality<a class="headerlink" href="#key-result-residual-orthogonality" title="Link to this heading">#</a></h2>
-<p>We now prove a fundamental property of the Conjugate Gradient algorithm: the residual <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> that was used to generate the iterate <span class="math notranslate nohighlight">\(x_k\)</span>. This is a crucial result that will lead to the algorithm’s short recurrences.</p>
+<p>The optimality condition tells us more.</p>
 <div class="proof theorem admonition" id="cg_residual_orthogonality">
-<p class="admonition-title"><span class="caption-number">Theorem 48 </span> (Orthogonality of Residuals)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 49 </span> (Orthogonality of Residuals)</p>
 <section class="theorem-content" id="proof-content">
-<p>The residual <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span> is orthogonal to the subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
+<p>The residual of the energy-minimizing approximation satisfies</p>
 <div class="math notranslate nohighlight">
 \[
-r_k \perp {\mathcal K}_k
+r_k\perp\mathcal K_k
 \]</div>
+<p>in the ordinary Euclidean inner product.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. To prove this, we must show that <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to every basis vector of <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. Since <span class="math notranslate nohighlight">\({\mathcal K}_k = \text{span}(p_1, \dots, p_k)\)</span>, this is equivalent to showing that <span class="math notranslate nohighlight">\(p_l^T r_k = 0\)</span> for all <span class="math notranslate nohighlight">\(l \le k\)</span>.</p>
-<p>Let’s take the inner product for any <span class="math notranslate nohighlight">\(l\)</span> where <span class="math notranslate nohighlight">\(1 \le l \le k\)</span>:</p>
+<p>Proof. For any <span class="math notranslate nohighlight">\(v\in\mathcal K_k\)</span>, the projection property gives</p>
 <div class="math notranslate nohighlight">
 \[
-p_l^T r_k = p_l^T (b - A x_k) = p_l^T b - p_l^T A x_k
+v^Tr_k=v^T(b-Ax_k)=v^TA(x-x_k)=0.
 \]</div>
-<p>Now, we substitute the expansion of <span class="math notranslate nohighlight">\(x_k = \sum_{i=1}^k \mu_i p_i\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-p_l^T r_k = p_l^T b - p_l^T A \left( \sum_{i=1}^k \mu_i p_i \right)
-= p_l^T b - \sum_{i=1}^k \mu_i (p_l^T A p_i)
-\]</div>
-<p>From our framework, we know two things:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(p_l^T b = \mu_l d_l\)</span>, where <span class="math notranslate nohighlight">\(d_l = p_l^T A p_l\)</span>.</p></li>
-<li><p>The basis vectors are A-orthogonal, so <span class="math notranslate nohighlight">\(p_l^T A p_i = 0\)</span> for all <span class="math notranslate nohighlight">\(i \neq l\)</span>.</p></li>
-</ol>
-<p>Because of the A-orthogonality, the only term that survives in the summation is when <span class="math notranslate nohighlight">\(i = l\)</span>. This gives:</p>
-<div class="math notranslate nohighlight">
-\[
-p_l^T r_k = (p_l^T b) - \mu_l (p_l^T A p_l)
-= (d_l \mu_l) - \mu_l (d_l)
-= 0
-\]</div>
-<p>Since this holds for all <span class="math notranslate nohighlight">\(l \le k\)</span>, the residual <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to all basis vectors of <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> and thus to the entire subspace.</p>
 </div>
+<p>Notice the two different orthogonalities: the error is <strong>A-orthogonal</strong> to <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, while the residual is <strong>Euclidean-orthogonal</strong> to it.</p>
+<p>If <span class="math notranslate nohighlight">\(r_k\ne0\)</span>, it belongs to <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span> but cannot belong to <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, since it is orthogonal to that space. It therefore supplies precisely the new independent direction we need. If <span class="math notranslate nohighlight">\(r_k=0\)</span>, then <span class="math notranslate nohighlight">\(Ax_k=b\)</span> and we stop.</p>
+<section id="constructing-an-a-orthogonal-direction-from-the-residual">
+<h3>Constructing an A-Orthogonal Direction from the Residual<a class="headerlink" href="#constructing-an-a-orthogonal-direction-from-the-residual" title="Link to this heading">#</a></h3>
+<p>Suppose <span class="math notranslate nohighlight">\(p_1,\ldots,p_k\)</span> are already known. There is one new A-orthogonal direction in <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span>; call it <span class="math notranslate nohighlight">\(p_{k+1}\)</span> for now. We will find it by expanding the nonzero residual in this basis:</p>
+<div class="math notranslate nohighlight">
+\[
+r_k=\sum_{\ell=1}^{k+1}u_{\ell,k+1}p_\ell.
+\]</div>
+<p>For each known direction <span class="math notranslate nohighlight">\(p_i\)</span>, taking its A-inner product with this equation isolates one coefficient:</p>
+<div class="math notranslate nohighlight">
+\[
+p_i^TAr_k=u_{i,k+1}p_i^TAp_i,
+\qquad
+u_{i,k+1}=\frac{p_i^TAr_k}{d_i}
+\quad(i\le k).
+\]</div>
+<p>The coefficient of <span class="math notranslate nohighlight">\(p_{k+1}\)</span> is nonzero because <span class="math notranslate nohighlight">\(r_k\notin\mathcal K_k\)</span>. We choose the scale of <span class="math notranslate nohighlight">\(p_{k+1}\)</span> so that this coefficient is <span class="math notranslate nohighlight">\(1\)</span>. Rearranging then gives the construction</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+p_{k+1}=r_k-\sum_{i=1}^k\frac{p_i^TAr_k}{d_i}\,p_i.
+}
+\]</div>
+<p>This is A-orthogonalization of the residual. It produces a nonzero vector in <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span> that is A-orthogonal to every previous direction. Starting with <span class="math notranslate nohighlight">\(p_1=r_0=b\)</span>, we can therefore construct the entire sequence and calculate every step length.</p>
+<p>At this stage the method is fully specified. The next question is how much of this orthogonalization we actually need to perform.</p>
 </section>
-<section id="the-equivalence-of-residual-and-search-subspaces">
-<h2>The Equivalence of Residual and Search Subspaces<a class="headerlink" href="#the-equivalence-of-residual-and-search-subspaces" title="Link to this heading">#</a></h2>
-<p>We now prove a critical result that provides the “engine” for the CG algorithm’s efficiency: the space spanned by the residuals is the same as the Krylov subspace.</p>
-<div class="proof theorem admonition" id="cg_residual_basis">
-<p class="admonition-title"><span class="caption-number">Theorem 49 </span> (Residuals as a Basis)</p>
-<section class="theorem-content" id="proof-content">
-<p>The subspace spanned by the first <span class="math notranslate nohighlight">\(k\)</span> residuals is the same as the <span class="math notranslate nohighlight">\(k\)</span>-th Krylov subspace, which is spanned by the first <span class="math notranslate nohighlight">\(k\)</span> search directions.</p>
-<div class="math notranslate nohighlight">
-\[
-\text{span}(r_0, \dots, r_{k-1}) = {\mathcal K}_k = \text{span}(p_1, \dots, p_k)
-\]</div>
 </section>
-</div><div class="proof admonition" id="proof">
-<p>Proof. We already established the subset relation:</p>
+<section id="only-the-latest-direction-is-needed">
+<h2>Only the Latest Direction Is Needed<a class="headerlink" href="#only-the-latest-direction-is-needed" title="Link to this heading">#</a></h2>
+<p>Most coefficients in the preceding sum vanish. To see why, use symmetry:</p>
 <div class="math notranslate nohighlight">
 \[
-\text{span}(r_0, \dots, r_{k-1}) \subset {\mathcal K}_k
+p_i^TAr_k=(Ap_i)^Tr_k.
 \]</div>
-<p>To prove that these two spaces are equal, we only need to show that their dimensions are equal. By definition, <span class="math notranslate nohighlight">\(\dim({\mathcal K}_k) = \dim(\text{span}(p_1, \dots, p_k)) = k\)</span>.</p>
-<p>Thus, our goal is to prove that <span class="math notranslate nohighlight">\(\dim(\text{span}(r_0, \dots, r_{k-1})) = k\)</span>. This is true if and only if the set <span class="math notranslate nohighlight">\(\{r_0, \dots, r_{k-1}\}\)</span> is linearly independent.</p>
-<p>Let’s use the key orthogonality result from the previous section (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a>), which stated that <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p>
-<ul class="simple">
-<li><p>We know that <span class="math notranslate nohighlight">\(r_l \in {\mathcal K}_{l+1}\)</span> for any <span class="math notranslate nohighlight">\(l\)</span>.</p></li>
-<li><p>This means that for any <span class="math notranslate nohighlight">\(l &lt; k\)</span>, <span class="math notranslate nohighlight">\(r_l \in {\mathcal K}_{l+1} \subset {\mathcal K}_k\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>, it must be orthogonal to all vectors within it, including all previous residuals.</p></li>
-</ul>
-<p>Therefore, we have:</p>
+<p>For <span class="math notranslate nohighlight">\(i&lt;k\)</span>, the nesting of the Krylov spaces gives</p>
 <div class="math notranslate nohighlight">
 \[
-r_k^T r_l = 0 \quad \text{for all } l &lt; k
+Ap_i\in\mathcal K_{i+1}\subseteq\mathcal K_k.
 \]</div>
-<p>This proves that the set of residual vectors <span class="math notranslate nohighlight">\(\{r_0, \dots, r_{k-1}\}\)</span> is an <strong>orthogonal set</strong>.</p>
-<p>An orthogonal set of vectors is linearly independent if and only if it does not contain the zero vector. So, we only need to show that <span class="math notranslate nohighlight">\(r_k \neq 0\)</span>.</p>
-<p>Let’s assume <span class="math notranslate nohighlight">\(r_k = 0\)</span> for some <span class="math notranslate nohighlight">\(k \le n\)</span>.</p>
-<ul class="simple">
-<li><p>By definition, <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(r_k = 0\)</span>, then <span class="math notranslate nohighlight">\(b - A x_k = 0\)</span>, which means <span class="math notranslate nohighlight">\(A x_k = b\)</span>.</p></li>
-<li><p>This implies that <span class="math notranslate nohighlight">\(x_k = x\)</span>. The algorithm has converged and found the <strong>exact solution</strong>.</p></li>
-</ul>
-<p>This gives us our conclusion: <strong>Unless the algorithm has converged to the exact solution, the residual <span class="math notranslate nohighlight">\(r_k\)</span> is non-zero.</strong></p>
-<p>This confirms that <span class="math notranslate nohighlight">\(\dim(\text{span}(r_0, \dots, r_{k-1})) = k\)</span>.</p>
-<p>Since we have a <span class="math notranslate nohighlight">\(k\)</span>-dimensional subspace <span class="math notranslate nohighlight">\(\text{span}(r_0, \dots, r_{k-1})\)</span> that is a subset of the <span class="math notranslate nohighlight">\(k\)</span>-dimensional subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>, the two subspaces must be identical.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>By construction, the CG algorithm will find the exact solution in at most <span class="math notranslate nohighlight">\(n\)</span> steps (at which point <span class="math notranslate nohighlight">\({\mathcal K}_n = \mathbb{R}^n\)</span>). Until convergence, the set <span class="math notranslate nohighlight">\(\{r_0, \dots, r_{k-1}\}\)</span> is an orthogonal, linearly independent set of <span class="math notranslate nohighlight">\(k\)</span> non-zero vectors.</p>
-</div>
+<p>Since <span class="math notranslate nohighlight">\(r_k\perp\mathcal K_k\)</span>, it follows that <span class="math notranslate nohighlight">\((Ap_i)^Tr_k=0\)</span> for all <span class="math notranslate nohighlight">\(i&lt;k\)</span>. Only the coefficient of <span class="math notranslate nohighlight">\(p_k\)</span> remains:</p>
+<div class="math notranslate nohighlight">
+\[
+r_k=u_{k,k+1}p_k+p_{k+1},
+\qquad
+u_{k,k+1}=\frac{p_k^TAr_k}{d_k}.
+\]</div>
+<p>Thus</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{p_{k+1}=r_k-u_{k,k+1}p_k.}
+\]</div>
+<p>Although we required A-orthogonality to <em>all</em> previous directions, we need to subtract only the projection onto the latest one. The Krylov structure and symmetry make all the earlier projections zero automatically. Our normalization is now fixed: each direction contains the current residual with coefficient <span class="math notranslate nohighlight">\(1\)</span>; its A-norm is generally not <span class="math notranslate nohighlight">\(1\)</span>.</p>
 </section>
-<section id="the-three-term-recurrence">
-<h2>The Three-Term Recurrence<a class="headerlink" href="#the-three-term-recurrence" title="Link to this heading">#</a></h2>
-<p>We are now ready to derive the final, crucial component of the CG algorithm: an efficient way to compute the next search direction <span class="math notranslate nohighlight">\(p_{k+1}\)</span>. We will show that it can be computed using only the current residual <span class="math notranslate nohighlight">\(r_k\)</span> and the previous search direction <span class="math notranslate nohighlight">\(p_k\)</span>.</p>
-<p>We begin with two facts we have already established:</p>
-<ol class="arabic simple">
-<li><p><strong>Equal Subspaces (<a class="reference internal" href="#cg_residual_basis">Theorem 49</a>):</strong> <span class="math notranslate nohighlight">\({\mathcal K}_{k+1} = \text{span}(r_0, \dots, r_k) = \text{span}(p_1, \dots, p_{k+1})\)</span>.</p></li>
-<li><p><strong>Residual Orthogonality (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a>):</strong> <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p></li>
-</ol>
-<p>From fact #1, we know that <span class="math notranslate nohighlight">\(r_k \in {\mathcal K}_{k+1}\)</span>. This means we can express <span class="math notranslate nohighlight">\(r_k\)</span> as a linear combination of the A-orthogonal basis vectors <span class="math notranslate nohighlight">\(\{p_l\}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-r_k = \sum_{l=1}^{k+1} u_{l,k+1} \, p_l
-\]</div>
-<p>Our goal is to prove that almost all of the coefficients <span class="math notranslate nohighlight">\(u_{l,k+1}\)</span> are zero.</p>
-<p>Let’s find a formula for these coefficients. We can isolate <span class="math notranslate nohighlight">\(u_{i,k+1}\)</span> by taking the A-inner product of the entire equation with <span class="math notranslate nohighlight">\(p_i\)</span> (for any <span class="math notranslate nohighlight">\(i \le k+1\)</span>):</p>
-<div class="math notranslate nohighlight">
-\[
-p_i^T A r_k = p_i^T A \left( \sum_{l=1}^{k+1} u_{l,k+1} \, p_l \right) = \sum_{l=1}^{k+1} u_{l,k+1} \, (p_i^T A p_l)
-\]</div>
-<p>Because the <span class="math notranslate nohighlight">\(p\)</span>-vectors are A-orthogonal, the term <span class="math notranslate nohighlight">\(p_i^T A p_l\)</span> is zero for all <span class="math notranslate nohighlight">\(i \neq l\)</span>. The only term that survives the summation is when <span class="math notranslate nohighlight">\(l=i\)</span>, which gives <span class="math notranslate nohighlight">\(p_i^T A p_i = d_i\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-p_i^T A r_k = u_{i,k+1} \, d_i
-\]</div>
-<p>This gives us an explicit formula for the coefficients:</p>
-<div class="math notranslate nohighlight">
-\[
-u_{i,k+1} = \frac{p_i^T A r_k}{d_i} = \frac{(A p_i)^T r_k}{d_i}
-\]</div>
-<p>Now, let’s apply our second key fact, <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span>.</p>
-<ul class="simple">
-<li><p>We know that <span class="math notranslate nohighlight">\(p_i \in {\mathcal K}_i\)</span>.</p></li>
-<li><p>By the definition of a Krylov subspace, <span class="math notranslate nohighlight">\(A p_i \in {\mathcal K}_{i+1}\)</span>.</p></li>
-</ul>
-<p>Consider any coefficient <span class="math notranslate nohighlight">\(u_{i,k+1}\)</span> where <strong><span class="math notranslate nohighlight">\(i &lt; k\)</span></strong>.</p>
-<ul>
-<li><p><span class="math notranslate nohighlight">\(A p_i \in {\mathcal K}_{i+1} \subset {\mathcal K}_k\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(A p_i\)</span> is a vector inside <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>, and <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to all vectors in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>, their inner product must be zero:</p>
-<div class="math notranslate nohighlight">
-\[
-    (A p_i)^T r_k = 0 \quad \text{for all } i &lt; k
-    \]</div>
-</li>
-<li><p>This immediately implies that <span class="math notranslate nohighlight">\(u_{i,k+1} = 0\)</span> for all <span class="math notranslate nohighlight">\(i &lt; k\)</span>.</p></li>
-</ul>
-<p>The expansion of <span class="math notranslate nohighlight">\(r_k\)</span> in the <span class="math notranslate nohighlight">\(p\)</span>-basis therefore collapses. The only coefficients that are not forced to be zero are <span class="math notranslate nohighlight">\(u_{k,k+1}\)</span> and <span class="math notranslate nohighlight">\(u_{k+1,k+1}\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-r_k = u_{k,k+1} \, p_k + u_{k+1,k+1} \, p_{k+1}
-\]</div>
-<p>This is the key recurrence. By rearranging it, we can define our next search direction <span class="math notranslate nohighlight">\(p_{k+1}\)</span> as a simple combination of the current residual <span class="math notranslate nohighlight">\(r_k\)</span> and the previous search direction <span class="math notranslate nohighlight">\(p_k\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-p_{k+1} = \frac{1}{u_{k+1,k+1}} (r_k - u_{k,k+1} \, p_k)
-\]</div>
-<p>At this point, we have not yet chosen the normalization for <span class="math notranslate nohighlight">\(p_{k+1}\)</span>. To simplify, we choose the following normalization:</p>
-<div class="math notranslate nohighlight">
-\[
-u_{k+1,k+1} = 1, \quad u_{k,k+1} = \frac{p_k^T A r_k}{d_k}, \quad p_{k+1} = r_k - u_{k,k+1} \, p_k \,.
-\]</div>
-<p><strong>This is the key three-term recurrence relation to update <span class="math notranslate nohighlight">\(p_{k+1}\)</span> in CG.</strong></p>
-<p>With this normalization, the <span class="math notranslate nohighlight">\(p_k\)</span> are not normalized to have unit <span class="math notranslate nohighlight">\(A\)</span>-norm. But this normalization turns out to be computationally more efficient.</p>
-</section>
-<section id="the-residuals-are-orthogonal-to-each-other">
-<h2>The Residuals are Orthogonal to Each Other<a class="headerlink" href="#the-residuals-are-orthogonal-to-each-other" title="Link to this heading">#</a></h2>
+<section id="the-residual-basis-and-its-orthogonality">
+<h2>The Residual Basis and Its Orthogonality<a class="headerlink" href="#the-residual-basis-and-its-orthogonality" title="Link to this heading">#</a></h2>
+<p>The same subspace argument also identifies the residual sequence.</p>
 <div class="proof theorem admonition" id="cg_residuals_orthogonal">
 <p class="admonition-title"><span class="caption-number">Theorem 50 </span> (Orthogonality of Residuals to Each Other)</p>
 <section class="theorem-content" id="proof-content">
-<p>The sequence of residual vectors <span class="math notranslate nohighlight">\(\{r_0, r_1, \ldots\}\)</span> generated by the Conjugate Gradient algorithm is an <strong>orthogonal set</strong>.</p>
+<p>Before termination, the nonzero residuals are mutually Euclidean-orthogonal:</p>
 <div class="math notranslate nohighlight">
 \[
-r_k^T r_l = 0 \quad \text{for all } k \neq l
+r_i^Tr_j=0\qquad(i\ne j).
 \]</div>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. We will prove <span class="math notranslate nohighlight">\(r_k^T r_l = 0\)</span> for all <span class="math notranslate nohighlight">\(k \neq l\)</span>.</p>
-<p>Without loss of generality, let us assume <span class="math notranslate nohighlight">\(l &lt; k\)</span>.</p>
-<p>We will use two facts we have already established:</p>
-<ol class="arabic">
-<li><p><strong>From <a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a>:</strong> The residual <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-    r_k \perp {\mathcal K}_k = \text{span}(p_1, \dots, p_k)
-    \]</div>
-</li>
-<li><p><strong>From <a class="reference internal" href="#cg_residual_basis">Theorem 49</a>:</strong> The residual <span class="math notranslate nohighlight">\(r_l\)</span> is an element of the subspace <span class="math notranslate nohighlight">\({\mathcal K}_{l+1}\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-    r_l = b - A x_l \quad \text{where } b \in {\mathcal K}_{l+1} \text{ and } x_l \in {\mathcal K}_l \implies A x_l \in {\mathcal K}_{l+1}
-    \]</div>
-<p>Thus, <span class="math notranslate nohighlight">\(r_l \in {\mathcal K}_{l+1}\)</span>.</p>
-</li>
-</ol>
-<p>Since we assumed <span class="math notranslate nohighlight">\(l &lt; k\)</span>, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-{\mathcal K}_{l+1} \subset {\mathcal K}_k
-\]</div>
-<p>This means <span class="math notranslate nohighlight">\(r_l\)</span> is a vector within the subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p>
-<p>From fact #1, we know that <span class="math notranslate nohighlight">\(r_k\)</span> is orthogonal to <em>all</em> vectors in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. Since <span class="math notranslate nohighlight">\(r_l\)</span> is in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>, <span class="math notranslate nohighlight">\(r_k\)</span> must be orthogonal to <span class="math notranslate nohighlight">\(r_l\)</span>.</p>
-<p>Thus, <span class="math notranslate nohighlight">\(r_k^T r_l = 0\)</span>.</p>
+<p>Proof. For <span class="math notranslate nohighlight">\(i&lt;j\)</span>, we have <span class="math notranslate nohighlight">\(r_i\in\mathcal K_{i+1}\subseteq\mathcal K_j\)</span>, while <span class="math notranslate nohighlight">\(r_j\perp\mathcal K_j\)</span>. Hence <span class="math notranslate nohighlight">\(r_i^Tr_j=0\)</span>.</p>
 </div>
-</section>
-<section id="deriving-the-efficient-computational-formulas">
-<h2>Deriving the Efficient Computational Formulas<a class="headerlink" href="#deriving-the-efficient-computational-formulas" title="Link to this heading">#</a></h2>
-<p>We have done the hard work of establishing the orthogonality properties of the search directions and residuals. Now, we reap the rewards.</p>
-<p>In this section, we simplify the formulas for the coefficients <span class="math notranslate nohighlight">\(\mu_k\)</span> and <span class="math notranslate nohighlight">\(u_{k,k+1}\)</span>. The goal is to eliminate as many matrix-vector multiplications as possible. We will discover that the parameters governing this sophisticated algorithm depend simply on the lengths (norms) of the residual vectors.</p>
-<section id="simplifying-the-step-size-mu-k">
-<h3>Simplifying the Step Size <span class="math notranslate nohighlight">\(\mu_k\)</span><a class="headerlink" href="#simplifying-the-step-size-mu-k" title="Link to this heading">#</a></h3>
-<p>Recall our formula for the optimal step size coefficient:</p>
+<div class="proof theorem admonition" id="cg_residual_basis">
+<p class="admonition-title"><span class="caption-number">Theorem 51 </span> (Residuals as a Basis)</p>
+<section class="theorem-content" id="proof-content">
+<p>If <span class="math notranslate nohighlight">\(r_0,\ldots,r_{k-1}\)</span> are nonzero, then</p>
 <div class="math notranslate nohighlight">
 \[
-\mu_k = \frac{p_k^T b}{d_k}
-\]</div>
-<p>We can rewrite the numerator <span class="math notranslate nohighlight">\(p_k^T b\)</span> in a much more convenient form.
-Since <span class="math notranslate nohighlight">\(r_{k-1} = b - A x_{k-1}\)</span>, we have <span class="math notranslate nohighlight">\(b = r_{k-1} + A x_{k-1}\)</span>. Substituting this into the numerator:</p>
-<div class="math notranslate nohighlight">
-\[
-p_k^T b = p_k^T (r_{k-1} + A x_{k-1}) = p_k^T r_{k-1} + p_k^T A x_{k-1}
-\]</div>
-<p>The second term vanishes. Why?</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(x_{k-1}\)</span> lies in the subspace <span class="math notranslate nohighlight">\({\mathcal K}_{k-1}\)</span>.</p></li>
-<li><p>By construction, the new search direction <span class="math notranslate nohighlight">\(p_k\)</span> is <strong>A-orthogonal</strong> to <span class="math notranslate nohighlight">\({\mathcal K}_{k-1}\)</span>.</p></li>
-<li><p>Therefore, <span class="math notranslate nohighlight">\(p_k^T A x_{k-1} = 0\)</span>.</p></li>
-</ul>
-<p>So, <span class="math notranslate nohighlight">\(p_k^T b = p_k^T r_{k-1}\)</span>.</p>
-<p>We can simplify further. Recall that <span class="math notranslate nohighlight">\(p_k\)</span> is essentially the “new” part of the residual. From the 3-term recurrence relation (reversed), we know that <span class="math notranslate nohighlight">\(p_k\)</span> differs from <span class="math notranslate nohighlight">\(r_{k-1}\)</span> only by a multiple of the previous direction <span class="math notranslate nohighlight">\(p_{k-1}\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-p_k = r_{k-1} - u_{k-1,k}p_{k-1}
-\]</div>
-<p>Using the fact that <span class="math notranslate nohighlight">\(p_{k-1} \perp r_{k-1}\)</span> (<a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a>), the inner product simplifies:</p>
-<div class="math notranslate nohighlight">
-\[
-p_k^T r_{k-1} = (r_{k-1} - u_{k-1,k} p_{k-1})^T r_{k-1} = \| r_{k-1} \|_2^2
-\]</div>
-<p>Substituting this into our <span class="math notranslate nohighlight">\(\mu_k\)</span> definition gives the final, computationally efficient formula:</p>
-<div class="math notranslate nohighlight">
-\[
-\mu_k = \frac{\|r_{k-1}\|_2^2}{d_k}
+\operatorname{span}\{r_0,\ldots,r_{k-1}\}
+=\mathcal K_k
+=\operatorname{span}\{p_1,\ldots,p_k\}.
 \]</div>
 </section>
-<section id="simplifying-the-direction-update-tau-k">
-<h3>Simplifying the Direction Update <span class="math notranslate nohighlight">\(\tau_k\)</span><a class="headerlink" href="#simplifying-the-direction-update-tau-k" title="Link to this heading">#</a></h3>
-<p>Next, we simplify the coefficient used to generate the next search direction. Recall the recurrence relation for the residual:</p>
+</div><div class="proof admonition" id="proof">
+<p>Proof. Each <span class="math notranslate nohighlight">\(r_i\)</span> belongs to <span class="math notranslate nohighlight">\(\mathcal K_{i+1}\subseteq\mathcal K_k\)</span>. These <span class="math notranslate nohighlight">\(k\)</span> residuals are nonzero and mutually orthogonal, so they are linearly independent. They therefore span <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, whose dimension is at most <span class="math notranslate nohighlight">\(k\)</span>.</p>
+</div>
+<p>The residuals form a Euclidean-orthogonal basis; the search directions form an A-orthogonal basis. Both describe the same nested Krylov spaces. This distinction explains how the residual can generate a new search direction without itself being A-orthogonal to the previous directions.</p>
+</section>
+<section id="deriving-the-efficient-coefficients">
+<h2>Deriving the Efficient Coefficients<a class="headerlink" href="#deriving-the-efficient-coefficients" title="Link to this heading">#</a></h2>
+<p>The direction construction is already short. We can also simplify its scalar coefficients so that each iteration needs only one matrix-vector product.</p>
+<section id="the-step-length">
+<h3>The Step Length<a class="headerlink" href="#the-step-length" title="Link to this heading">#</a></h3>
+<p>Recall that <span class="math notranslate nohighlight">\(\mu_k=p_k^Tb/d_k\)</span>. Since <span class="math notranslate nohighlight">\(b=r_{k-1}+Ax_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> is A-orthogonal to <span class="math notranslate nohighlight">\(\mathcal K_{k-1}\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+p_k^Tb
+&amp;=p_k^Tr_{k-1}+p_k^TAx_{k-1}\\
+&amp;=p_k^Tr_{k-1}.
+\end{aligned}
+\end{split}\]</div>
+<p>For <span class="math notranslate nohighlight">\(k&gt;1\)</span>, the short direction formula gives <span class="math notranslate nohighlight">\(p_k=r_{k-1}-u_{k-1,k}p_{k-1}\)</span>. The residual is orthogonal to <span class="math notranslate nohighlight">\(p_{k-1}\in\mathcal K_{k-1}\)</span>, so</p>
 <div class="math notranslate nohighlight">
 \[
-r_k = u_{k,k+1} \, p_k + p_{k+1}
+p_k^Tr_{k-1}
+=\|r_{k-1}\|_2^2-u_{k-1,k}p_{k-1}^Tr_{k-1}
+=\|r_{k-1}\|_2^2.
 \]</div>
-<p>We need to calculate <span class="math notranslate nohighlight">\(u_{k,k+1}\)</span>. The formula we derived was:</p>
+<p>For <span class="math notranslate nohighlight">\(k=1\)</span>, the same identity follows from <span class="math notranslate nohighlight">\(p_1=r_0\)</span>. Therefore,</p>
 <div class="math notranslate nohighlight">
 \[
-u_{k,k+1} = \frac{p_k^T A r_k}{d_k}
+\boxed{\mu_k=\frac{\|r_{k-1}\|_2^2}{p_k^TAp_k}.}
 \]</div>
-<p>We can transform the term <span class="math notranslate nohighlight">\(p_k^T A\)</span> by looking at how the residual changes.
-Since <span class="math notranslate nohighlight">\(r_k = r_{k-1} - \mu_k A p_k\)</span>, we can rearrange to find <span class="math notranslate nohighlight">\(A p_k\)</span>:</p>
+<p>The residual also updates cheaply. Substituting <span class="math notranslate nohighlight">\(x_k=x_{k-1}+\mu_kp_k\)</span> into its definition gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+r_k&amp;=b-A(x_{k-1}+\mu_kp_k)\\
+&amp;=r_{k-1}-\mu_kAp_k.
+\end{aligned}
+\end{split}\]</div>
+<p>The product <span class="math notranslate nohighlight">\(Ap_k\)</span> is already needed for the denominator of <span class="math notranslate nohighlight">\(\mu_k\)</span>, so this update needs no additional matrix-vector product.</p>
+</section>
+<section id="the-direction-coefficient">
+<h3>The Direction Coefficient<a class="headerlink" href="#the-direction-coefficient" title="Link to this heading">#</a></h3>
+<p>The remaining coefficient is <span class="math notranslate nohighlight">\(u_{k,k+1}=p_k^TAr_k/d_k\)</span>. From the residual update,</p>
 <div class="math notranslate nohighlight">
 \[
-A p_k = \frac{1}{\mu_k} (r_{k-1} - r_k)
+Ap_k=\frac{r_{k-1}-r_k}{\mu_k}.
 \]</div>
-<p>Now, substitute this expression for <span class="math notranslate nohighlight">\(A p_k\)</span> into the formula for <span class="math notranslate nohighlight">\(u_{k,k+1}\)</span>:</p>
+<p>Recall that <span class="math notranslate nohighlight">\(d_k=p_k^TAp_k\)</span>. Multiplying the step-length formula from the preceding subsection by <span class="math notranslate nohighlight">\(d_k\)</span> gives <span class="math notranslate nohighlight">\(\mu_kd_k=\|r_{k-1}\|_2^2\)</span>. Using this identity, symmetry, and residual orthogonality, we obtain</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+u_{k,k+1}
+&amp;=\frac{(Ap_k)^Tr_k}{d_k}\\
+&amp;=\frac{r_{k-1}^Tr_k-r_k^Tr_k}{\mu_kd_k}\\
+&amp;=-\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
+\end{aligned}
+\end{split}\]</div>
+<p>Define its negative by</p>
 <div class="math notranslate nohighlight">
 \[
-u_{k,k+1} = \frac{(A p_k)^T r_k}{d_k} = \frac{1}{d_k \mu_k} (r_{k-1} - r_k)^T r_k
+\tau_k=-u_{k,k+1}
+=\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
 \]</div>
-<p>Expanding the dot product:</p>
+<p>The direction update becomes</p>
 <div class="math notranslate nohighlight">
 \[
-(r_{k-1} - r_k)^T r_k = r_{k-1}^T r_k - r_k^T r_k
+\boxed{p_{k+1}=r_k+\tau_kp_k.}
 \]</div>
-<p>By the mutual orthogonality of residuals (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 50</a>), <span class="math notranslate nohighlight">\(r_{k-1}^T r_k = 0\)</span>. Thus:</p>
-<div class="math notranslate nohighlight">
-\[
-(r_{k-1} - r_k)^T r_k = - \| r_k \|_2^2
-\]</div>
-<p>Substituting this back, and using the identity derived in step 1 (<span class="math notranslate nohighlight">\(\mu_k d_k = \|r_{k-1}\|_2^2\)</span>):</p>
-<div class="math notranslate nohighlight">
-\[
-u_{k,k+1} = \frac{- \| r_k \|_2^2}{\mu_k d_k} = - \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2}
-\]</div>
-<p>This is an amazingly simple expression! It depends <em>only</em> on the ratio of the squared norms of consecutive residuals.</p>
-<p>We define the parameter <span class="math notranslate nohighlight">\(\tau_k\)</span> (often denoted as <span class="math notranslate nohighlight">\(\beta_k\)</span> in standard texts) as:</p>
-<div class="math notranslate nohighlight">
-\[
-\tau_k = - u_{k,k+1} = \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2}
-\]</div>
-<p>This parameter <span class="math notranslate nohighlight">\(\tau_k\)</span> allows us to update the search direction efficiently:</p>
-<div class="math notranslate nohighlight">
-\[
-p_{k+1} = r_k + \tau_k p_k
-\]</div>
+<p>The symbols <span class="math notranslate nohighlight">\(\mu_k\)</span> and <span class="math notranslate nohighlight">\(\tau_k\)</span> are often written <span class="math notranslate nohighlight">\(\alpha_k\)</span> and <span class="math notranslate nohighlight">\(\beta_k\)</span> in other descriptions of CG.</p>
 </section>
 </section>
 <section id="the-conjugate-gradient-algorithm">
 <h2>The Conjugate Gradient Algorithm<a class="headerlink" href="#the-conjugate-gradient-algorithm" title="Link to this heading">#</a></h2>
-<p>After all our derivations, we arrive at a final algorithm that is both remarkably simple and computationally efficient. The various orthogonalities we proved are all implicitly enforced by the specific choice of the coefficients <span class="math notranslate nohighlight">\(\mu_k\)</span> and <span class="math notranslate nohighlight">\(\tau_k\)</span>.</p>
-<p>The complete CG algorithm is as follows:</p>
-<p>Start with <span class="math notranslate nohighlight">\(x_0 = 0, r_0 = b\)</span>.
-For the first iteration, set <span class="math notranslate nohighlight">\(p_1 = r_0\)</span>.</p>
-<p>Then iterate for <span class="math notranslate nohighlight">\(k=1, 2, \dots\)</span></p>
+<p>Start with <span class="math notranslate nohighlight">\(x_0=0\)</span> and <span class="math notranslate nohighlight">\(r_0=b\)</span>. If <span class="math notranslate nohighlight">\(r_0=0\)</span>, stop. Otherwise, set <span class="math notranslate nohighlight">\(p_1=r_0\)</span>. For <span class="math notranslate nohighlight">\(k=1,2,\ldots\)</span>, perform</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\begin{align*}
-\mu_k &amp;= \frac{\|r_{k-1}\|_2^2}{p_k^T A p_k} &amp;&amp; \text{Step length} \\
-x_k &amp;= x_{k-1} + \mu_k \, p_k &amp;&amp; \text{Update solution} \\
-r_k &amp;= r_{k-1} - \mu_k \, A p_k &amp;&amp; \text{Update residual} \\
-\tau_k &amp;= \frac{\| r_k \|_2^2}{\|r_{k-1}\|_2^2} &amp;&amp; \text{Direction update factor} \\
-p_{k+1} &amp;= r_k + \tau_k \, p_k &amp;&amp; \text{Update search direction}
-\end{align*}
+\begin{aligned}
+w_k&amp;=Ap_k, &amp;&amp;\text{one matrix-vector product},\\
+\mu_k&amp;=\frac{r_{k-1}^Tr_{k-1}}{p_k^Tw_k}, &amp;&amp;\text{step length},\\
+x_k&amp;=x_{k-1}+\mu_kp_k, &amp;&amp;\text{solution update},\\
+r_k&amp;=r_{k-1}-\mu_kw_k, &amp;&amp;\text{residual update}.
+\end{aligned}
 \end{split}\]</div>
-<p>This recurrence is the computationally most efficient implementation of the CG algorithm. Each iteration requires only one sparse matrix-vector product (<span class="math notranslate nohighlight">\(A p_k\)</span>) and a few vector operations (additions and dot products). No large, dense matrices are ever formed or stored.</p>
-<p>The CG algorithm is one of the most powerful and efficient iterative methods ever developed, but it is critical to remember that its derivation, and thus its guarantee of convergence, <strong>applies only to Symmetric Positive Definite (SPD) matrices</strong>.</p>
-</section>
-<section id="key-takeaways-what-to-memorize-for-cg">
-<h2>Key Takeaways: What to Memorize for CG<a class="headerlink" href="#key-takeaways-what-to-memorize-for-cg" title="Link to this heading">#</a></h2>
-<p>Here is a summary of the most important concepts, subspace relations, and orthogonality conditions that define the Conjugate Gradient algorithm.</p>
-<section id="core-definitions">
-<h3>Core Definitions<a class="headerlink" href="#core-definitions" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p><strong>A-Inner Product:</strong> <span class="math notranslate nohighlight">\(\langle y, z \rangle_A = y^T A z\)</span></p></li>
-<li><p><strong>A-Norm:</strong> <span class="math notranslate nohighlight">\(\|z\|_A = \sqrt{z^T A z}\)</span></p></li>
-<li><p><strong>Residual:</strong> <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span></p></li>
-</ul>
-</section>
-<section id="the-krylov-subspace">
-<h3>The Krylov Subspace<a class="headerlink" href="#the-krylov-subspace" title="Link to this heading">#</a></h3>
-<p>The entire algorithm lives in the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. A key insight is that this one subspace has multiple, equivalent bases that we use:</p>
-<div class="math notranslate nohighlight">
-\[
-{\mathcal K}_k = \text{span}(b, Ab, \dots, A^{k-1}b) = \text{span}(p_1, \dots, p_k) = \text{span}(r_0, \dots, r_{k-1})
-\]</div>
-<p>We also know that our iterate <span class="math notranslate nohighlight">\(x_k \in {\mathcal K}_k\)</span>, and if <span class="math notranslate nohighlight">\(y \in {\mathcal K}_k\)</span>, then <span class="math notranslate nohighlight">\(Ay \in {\mathcal K}_{k+1}\)</span>.</p>
-</section>
-<section id="key-orthogonality-relations">
-<h3>Key Orthogonality Relations<a class="headerlink" href="#key-orthogonality-relations" title="Link to this heading">#</a></h3>
-<p>These three properties are the “magic” that makes CG work efficiently.</p>
-<ul>
-<li><p><strong>Search Directions (<span class="math notranslate nohighlight">\(p_k\)</span>):</strong> The search directions are <strong>A-orthogonal</strong>.</p>
-<div class="math notranslate nohighlight">
-\[
-    p_k^T A p_l = 0 \quad (\text{for } k \neq l)
-    \]</div>
-</li>
-<li><p><strong>Residual (<span class="math notranslate nohighlight">\(r_k\)</span>):</strong> The current residual is <strong>orthogonal</strong> to the entire current subspace.</p>
-<div class="math notranslate nohighlight">
-\[
-    r_k \perp {\mathcal K}_k
-    \]</div>
-</li>
-<li><p><strong>Residuals (<span class="math notranslate nohighlight">\(r_k, r_l\)</span>):</strong> The residual vectors are <strong>mutually orthogonal</strong>.</p>
-<div class="math notranslate nohighlight">
-\[
-    r_k^T r_l = 0 \quad (\text{for } k \neq l)
-    \]</div>
-</li>
-</ul>
-</section>
-<section id="the-central-optimality-guarantee">
-<h3>The Central Optimality Guarantee<a class="headerlink" href="#the-central-optimality-guarantee" title="Link to this heading">#</a></h3>
-<p><strong>A-Norm Minimization:</strong> The CG algorithm produces the approximation <span class="math notranslate nohighlight">\(x_k\)</span> in the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> that is closest to the true solution <span class="math notranslate nohighlight">\(x\)</span> in the <span class="math notranslate nohighlight">\(A\)</span>-norm.</p>
-</section>
-</section>
-<section id="orthogonality-relations-in-matrix-notation">
-<h2>Orthogonality Relations in Matrix Notation<a class="headerlink" href="#orthogonality-relations-in-matrix-notation" title="Link to this heading">#</a></h2>
-<p>We can formalize the key properties of the CG algorithm by defining matrices whose columns are the vectors we have generated.</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(Q = [q_1, \dots, q_n]\)</span>: The orthonormal basis vectors from the Lanczos process.</p></li>
-<li><p><span class="math notranslate nohighlight">\(P = [p_1, \dots, p_n]\)</span>: The A-orthogonal search direction vectors.</p></li>
-<li><p><span class="math notranslate nohighlight">\(R = [r_0, \dots, r_{n-1}]\)</span>: The mutually orthogonal residual vectors.</p></li>
-</ul>
-<section id="the-link-between-lanczos-and-cg-residuals">
-<h3>The Link Between Lanczos and CG Residuals<a class="headerlink" href="#the-link-between-lanczos-and-cg-residuals" title="Link to this heading">#</a></h3>
-<p>We have shown that the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> has two equivalent bases:</p>
-<ul class="simple">
-<li><p><span class="math notranslate nohighlight">\({\mathcal K}_k = \text{span}(q_1, \dots, q_k)\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\({\mathcal K}_k = \text{span}(r_0, \dots, r_{k-1})\)</span></p></li>
-</ul>
-<p>Let’s look at the “new” vector added at step <span class="math notranslate nohighlight">\(k\)</span>:</p>
-<ol class="arabic simple">
-<li><p><strong>Lanczos:</strong> The Lanczos process constructs <span class="math notranslate nohighlight">\(q_k\)</span> to be in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> and orthonormal to all previous vectors, so <span class="math notranslate nohighlight">\(q_k \perp {\mathcal K}_{k-1}\)</span>.</p></li>
-<li><p><strong>CG:</strong> We proved in <a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a> that <span class="math notranslate nohighlight">\(r_{k-1} \perp {\mathcal K}_{k-1}\)</span>.</p></li>
-</ol>
-<p>Both <span class="math notranslate nohighlight">\(q_k\)</span> and <span class="math notranslate nohighlight">\(r_{k-1}\)</span> are non-zero vectors in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span> that are orthogonal to <span class="math notranslate nohighlight">\({\mathcal K}_{k-1}\)</span>. Since this orthogonal complement (<span class="math notranslate nohighlight">\({\mathcal K}_k \ominus {\mathcal K}_{k-1}\)</span>) is a one-dimensional subspace, the two vectors must be parallel:</p>
-<div class="math notranslate nohighlight">
-\[
-\text{span}(q_k) = \text{span}(r_{k-1})
-\]</div>
-<p>This provides a deep connection: the CG algorithm’s residual vectors are, up to scaling, the same as the orthogonal vectors generated by the Lanczos process.</p>
-</section>
-<section id="a-summary-of-matrix-properties">
-<h3>A Summary of Matrix Properties<a class="headerlink" href="#a-summary-of-matrix-properties" title="Link to this heading">#</a></h3>
-<p>This connection, along with our previous theorems, leads to a beautiful and concise summary of the matrix relationships.</p>
-<ul class="simple">
-<li><p><strong>Identity Matrices:</strong></p>
-<ul>
-<li><p><span class="math notranslate nohighlight">\(Q^T Q = I\)</span>: The Lanczos vectors are orthonormal by definition.</p></li>
-</ul>
-</li>
-<li><p><strong>Diagonal Matrices:</strong></p>
-<ul>
-<li><p><span class="math notranslate nohighlight">\(R^T R = D_R\)</span>: The residuals are mutually orthogonal (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 50</a>).</p></li>
-<li><p><span class="math notranslate nohighlight">\(P^T A P = D\)</span>: The search directions are A-orthogonal (the central requirement of CG).</p></li>
-</ul>
-</li>
-<li><p><strong>Symmetric Tri-diagonal Matrices:</strong></p>
-<ul>
-<li><p><span class="math notranslate nohighlight">\(Q^T A Q = T\)</span>: This is the fundamental result of the Lanczos process.</p></li>
-<li><p><span class="math notranslate nohighlight">\(R^T A R = T_R\)</span>: This is the analogous (and less obvious) property for the residuals.</p></li>
-</ul>
-</li>
-</ul>
-<div class="proof admonition" id="proof">
-<p>Proof. <span class="math notranslate nohighlight">\(R^TAR\)</span> is tri-diagonal because span(<span class="math notranslate nohighlight">\(q_k\)</span>) = span(<span class="math notranslate nohighlight">\(r_{k-1}\)</span>) and <span class="math notranslate nohighlight">\(Q^T A Q\)</span> is tri-diagonal.</p>
-<p>We can also prove this result directly using the orthogonality properties of the residuals. We show that <span class="math notranslate nohighlight">\(r_i^T A r_j = 0\)</span> if <span class="math notranslate nohighlight">\(|i-j| \ge 2\)</span>.</p>
-<ol class="arabic simple">
-<li><p>We know that <span class="math notranslate nohighlight">\(r_j \in {\mathcal K}_{j+1}\)</span>.</p></li>
-<li><p>By the property of Krylov subspaces, <span class="math notranslate nohighlight">\(A r_j \in A({\mathcal K}_{j+1}) \subset {\mathcal K}_{j+2}\)</span>.</p></li>
-<li><p>From <a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a>, we know the residual <span class="math notranslate nohighlight">\(r_i\)</span> is orthogonal to the entire subspace <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span> (i.e., <span class="math notranslate nohighlight">\(r_i \perp {\mathcal K}_i\)</span>).</p></li>
-<li><p>Assume, without loss of generality, that <span class="math notranslate nohighlight">\(i \ge j+2\)</span>.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(i \ge j+2\)</span>, then the subspace <span class="math notranslate nohighlight">\({\mathcal K}_{j+2}\)</span> is a subset of <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span>. This means <span class="math notranslate nohighlight">\(A r_j\)</span> (which is in <span class="math notranslate nohighlight">\({\mathcal K}_{j+2}\)</span>) is also a vector in <span class="math notranslate nohighlight">\({\mathcal K}_i\)</span>.</p></li>
-<li><p>Since <span class="math notranslate nohighlight">\(r_i \perp {\mathcal K}_i\)</span>, it must be orthogonal to every vector in it, including <span class="math notranslate nohighlight">\(A r_j\)</span>.</p></li>
-<li><p>Therefore, <span class="math notranslate nohighlight">\(r_i^T (A r_j) = 0\)</span> for all <span class="math notranslate nohighlight">\(i \ge j+2\)</span>. By symmetry, this holds for <span class="math notranslate nohighlight">\(j \ge i+2\)</span> as well.</p></li>
-</ol>
-</div>
-</section>
-</section>
-<section id="connection-to-the-lanczos-process">
-<h2>Connection to the Lanczos Process<a class="headerlink" href="#connection-to-the-lanczos-process" title="Link to this heading">#</a></h2>
-<p>The Conjugate Gradient method is not just related to the Lanczos process; it is a direct and efficient implementation of it. We can show that the CG iterate <span class="math notranslate nohighlight">\(x_k\)</span> can be found by implicitly solving the tridiagonal system <span class="math notranslate nohighlight">\(T_k\)</span> generated by the Lanczos iteration.</p>
-<p>Let’s derive this important connection.</p>
-<ol class="arabic">
-<li><p><strong>Start with CG Orthogonality:</strong> We begin with our key result from <a class="reference internal" href="#cg_residual_orthogonality">Theorem 48</a>: the residual <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span> is orthogonal to the Krylov subspace <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>.</p></li>
-<li><p><strong>Use the Lanczos Basis:</strong> The Lanczos algorithm generates an orthonormal basis <span class="math notranslate nohighlight">\(Q_k = [q_1, \dots, q_k]\)</span> for <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>. The orthogonality condition <span class="math notranslate nohighlight">\(r_k \perp {\mathcal K}_k\)</span> can therefore be written in matrix form:</p>
-<div class="math notranslate nohighlight">
-\[
-    Q_k^T r_k = 0 \implies Q_k^T (b - A x_k) = 0
-    \]</div>
-<p>This rearranges to:</p>
-<div class="math notranslate nohighlight">
-\[
-    Q_k^T A x_k = Q_k^T b
-    \]</div>
-</li>
-<li><p><strong>Express <span class="math notranslate nohighlight">\(x_k\)</span> in the Lanczos Basis:</strong> Since our solution <span class="math notranslate nohighlight">\(x_k\)</span> is in <span class="math notranslate nohighlight">\({\mathcal K}_k\)</span>, we can express it as a linear combination of the <span class="math notranslate nohighlight">\(Q_k\)</span> basis vectors:</p>
-<div class="math notranslate nohighlight">
-\[
-    x_k = Q_k y_k
-    \]</div>
-<p>where <span class="math notranslate nohighlight">\(y_k \in \mathbb{R}^k\)</span> is a vector of unknown coefficients.</p>
-</li>
-<li><p><strong>Substitute and Solve:</strong> We substitute this expression for <span class="math notranslate nohighlight">\(x_k\)</span> back into our equation from step 2:</p>
-<div class="math notranslate nohighlight">
-\[
-    Q_k^T A (Q_k y_k) = Q_k^T b
-    \]</div>
-<p>Grouping the terms, we get:</p>
-<div class="math notranslate nohighlight">
-\[
-    (Q_k^T A Q_k) y_k = Q_k^T b
-    \]</div>
-</li>
-<li><p><strong>Identify the Components:</strong></p>
-<ul>
-<li><p><strong>The Matrix:</strong> From our previous chapter on the Lanczos process, we recognize this as the definition of the <span class="math notranslate nohighlight">\(k \times k\)</span> symmetric tridiagonal matrix <span class="math notranslate nohighlight">\(T_k\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-        T_k = Q_k^T A Q_k
-        \]</div>
-</li>
-<li><p><strong>The Right-Hand Side:</strong> We defined our starting vector for Lanczos as <span class="math notranslate nohighlight">\(q_1 = b / \|b\|_2\)</span>. Therefore, <span class="math notranslate nohighlight">\(Q_k^T b\)</span> simplifies significantly. Its first component is <span class="math notranslate nohighlight">\(q_1^T b = (b^T / \|b\|_2) b = \|b\|_2\)</span>. All other components are <span class="math notranslate nohighlight">\(q_i^T b = q_i^T (\|b\|_2 q_1) = 0\)</span> due to orthogonality.</p>
+<p>If <span class="math notranslate nohighlight">\(r_k=0\)</span>, stop before forming another direction. Otherwise, compute</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-        Q_k^T b = \begin{bmatrix} q_1^T b \\ q_2^T b \\ \vdots \\ q_k^T b \end{bmatrix} = \begin{bmatrix} \|b\|_2 \\ 0 \\ \vdots \\ 0 \end{bmatrix} = \|b\|_2 e_1
-        \end{split}\]</div>
-</li>
-</ul>
-</li>
-<li><p><strong>The Final System:</strong> By substituting these components, we arrive at the final result:</p>
-<div class="math notranslate nohighlight">
-\[
-    T_k y_k = \|b\|_2 e_1
-    \]</div>
-</li>
-</ol>
-<p>This proves that the coefficients <span class="math notranslate nohighlight">\(y_k\)</span> for the CG solution <span class="math notranslate nohighlight">\(x_k = Q_k y_k\)</span> can be found by solving this small, symmetric tridiagonal system.</p>
-<p>This is a profound insight. The CG algorithm is a way to solve this tridiagonal system and “build” the solution <span class="math notranslate nohighlight">\(x_k = Q_k y_k\)</span> iteratively and implicitly, without ever forming <span class="math notranslate nohighlight">\(T_k\)</span> or <span class="math notranslate nohighlight">\(Q_k\)</span>.</p>
+\begin{aligned}
+\tau_k&amp;=\frac{r_k^Tr_k}{r_{k-1}^Tr_{k-1}},\\
+p_{k+1}&amp;=r_k+\tau_kp_k.
+\end{aligned}
+\end{split}\]</div>
+<p>Positive definiteness ensures <span class="math notranslate nohighlight">\(p_k^TAp_k&gt;0\)</span> for every nonzero search direction. Each iteration uses one matrix-vector product, two inner products when previously computed residual norms are reused, and a few vector updates. Only a fixed number of vectors is stored; the full basis matrices are not formed.</p>
+<p>For a general initial guess, start with <span class="math notranslate nohighlight">\(r_0=b-Ax_0\)</span> and use exactly the same recurrence. It searches in <span class="math notranslate nohighlight">\(x_0+\mathcal K_k(A,r_0)\)</span> and minimizes the energy error there. This is equivalent to applying the zero-start derivation to the correction equation <span class="math notranslate nohighlight">\(A(x-x_0)=r_0\)</span>.</p>
+<p>In floating-point arithmetic, stop when an explicitly checked residual is sufficiently small, using a scaled residual criterion such as the one in the <a class="reference internal" href="jacobi_method.html"><span class="std std-doc">Jacobi implementation</span></a>. The recursively updated residual can drift from <span class="math notranslate nohighlight">\(b-Ax_k\)</span>, so an explicit residual check is useful before accepting the answer. A small residual controls backward error; forward accuracy also depends on conditioning.</p>
 </section>
-<section id="why-is-it-called-the-conjugate-gradient-algorithm">
-<h2>Why Is It Called the “Conjugate Gradient” Algorithm?<a class="headerlink" href="#why-is-it-called-the-conjugate-gradient-algorithm" title="Link to this heading">#</a></h2>
-<p>The name “Conjugate Gradient” is not arbitrary; it is a literal, two-word description of the two key properties of the algorithm. Let’s break down each part.</p>
-<section id="the-conjugate-part">
-<h3>The “Conjugate” Part<a class="headerlink" href="#the-conjugate-part" title="Link to this heading">#</a></h3>
-<p>The “Conjugate” part refers to the search directions <span class="math notranslate nohighlight">\(\{p_k\}\)</span>. As we have seen, the entire algorithm is built on the requirement that these directions are A-orthogonal.</p>
+<section id="connection-to-lanczos-and-matrix-relations">
+<h2>Connection to Lanczos and Matrix Relations<a class="headerlink" href="#connection-to-lanczos-and-matrix-relations" title="Link to this heading">#</a></h2>
+<p>The Euclidean directions from our first attempt reappear as normalized CG residuals. Both <span class="math notranslate nohighlight">\(q_k\)</span> from Lanczos and <span class="math notranslate nohighlight">\(r_{k-1}\)</span> satisfy</p>
 <div class="math notranslate nohighlight">
 \[
-p_k^T A p_l = 0 \quad \text{for } k \neq l
+q_k,\ r_{k-1}\in\mathcal K_k,
+\qquad
+q_k,\ r_{k-1}\perp\mathcal K_{k-1}.
 \]</div>
-<p>The general mathematical term for this relationship is that the vectors <span class="math notranslate nohighlight">\(p_k\)</span> are <strong>conjugate</strong> with respect to the matrix <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<p>This is the algorithm’s “secret sauce.” A simpler (but far less effective) method like Steepest Descent simply moves in the direction of the new gradient at each step. By enforcing A-orthogonality, the CG algorithm ensures that when we take a step in the direction <span class="math notranslate nohighlight">\(p_k\)</span>, we find the <em>optimal</em> and <em>final</em> coefficient for that basis vector. Minimizing the error in the new direction <span class="math notranslate nohighlight">\(p_{k+1}\)</span> does not “undo” the minimization we already performed in the previous directions <span class="math notranslate nohighlight">\(p_1, \dots, p_k\)</span>.</p>
+<p>Before termination, this new orthogonal direction is one-dimensional. Thus, for signs <span class="math notranslate nohighlight">\(\sigma_k\in\{-1,1\}\)</span> determined by the Lanczos convention,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{q_k=\sigma_k\frac{r_{k-1}}{\|r_{k-1}\|_2}.}
+\]</div>
+<p>The residuals, rather than the A-orthogonal search directions, are therefore parallel to the Lanczos vectors.</p>
+<section id="orthogonality-relations-in-matrix-notation">
+<h3>Orthogonality Relations in Matrix Notation<a class="headerlink" href="#orthogonality-relations-in-matrix-notation" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(Q_k=[q_1,\ldots,q_k]\)</span>, <span class="math notranslate nohighlight">\(P_k=[p_1,\ldots,p_k]\)</span>, and <span class="math notranslate nohighlight">\(\mathcal R_k=[r_0,\ldots,r_{k-1}]\)</span>. The matrix <span class="math notranslate nohighlight">\(\mathcal R_k\)</span> collects residual vectors. Their properties are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Q_k^TQ_k&amp;=I,\\
+\mathcal R_k^T\mathcal R_k&amp;=\operatorname{diag}(\|r_0\|_2^2,\ldots,\|r_{k-1}\|_2^2),\\
+P_k^TAP_k&amp;=D_k.
+\end{aligned}
+\end{split}\]</div>
+<p>The matrices <span class="math notranslate nohighlight">\(Q_k^TAQ_k=T_k\)</span> and <span class="math notranslate nohighlight">\(\mathcal R_k^TA\mathcal R_k\)</span> are symmetric tridiagonal. The first is the Lanczos projection. The second follows because <span class="math notranslate nohighlight">\(\mathcal R_k=Q_kS_k\)</span> for a nonsingular diagonal matrix <span class="math notranslate nohighlight">\(S_k\)</span> of signed residual norms, so</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal R_k^TA\mathcal R_k=S_kT_kS_k.
+\]</div>
+<p>There is also a direct subspace proof. If <span class="math notranslate nohighlight">\(i\ge j+2\)</span>, then <span class="math notranslate nohighlight">\(Ar_j\in\mathcal K_{j+2}\subseteq\mathcal K_i\)</span> and <span class="math notranslate nohighlight">\(r_i\perp\mathcal K_i\)</span>, giving <span class="math notranslate nohighlight">\(r_i^TAr_j=0\)</span>. Symmetry supplies the zeros on the other side of the diagonal.</p>
 </section>
-<section id="the-gradient-part">
-<h3>The “Gradient” Part<a class="headerlink" href="#the-gradient-part" title="Link to this heading">#</a></h3>
-<p>The “Gradient” part comes from the fact that the algorithm is related to gradient-based optimization methods.</p>
-<p>To see this, we must define the function that the CG algorithm is minimizing. As we noted in our optimality proof, CG’s goal is to find the <span class="math notranslate nohighlight">\(x_k\)</span> that minimizes the <strong>A-norm of the error</strong>. Let’s define this as our loss function <span class="math notranslate nohighlight">\(L(y)\)</span> for an arbitrary vector <span class="math notranslate nohighlight">\(y\)</span>:</p>
+<section id="the-small-tridiagonal-system">
+<h3>The Small Tridiagonal System<a class="headerlink" href="#the-small-tridiagonal-system" title="Link to this heading">#</a></h3>
+<p>Write the CG approximation in the Lanczos basis as <span class="math notranslate nohighlight">\(x_k=Q_ky_k\)</span>. Residual orthogonality then gives</p>
 <div class="math notranslate nohighlight">
-\[
-L(y) = \frac{1}{2} \|x - y\|_A^2 = \frac{1}{2} (x-y)^T A (x-y)
-\]</div>
-<p>(We add the <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span> for cosmetic reasons, to cancel the ‘2’ that appears during differentiation).</p>
-<p>Now, let’s find the <strong>gradient</strong> of this loss function with respect to <span class="math notranslate nohighlight">\(y\)</span>.</p>
-<div class="math notranslate nohighlight">
-\[
-L(y) = \frac{1}{2} (x^T A x - 2 x^T A y + y^T A y)
-\]</div>
-<p>The gradient <span class="math notranslate nohighlight">\(\nabla L(y)\)</span> is the vector of partial derivatives:</p>
-<div class="math notranslate nohighlight">
-\[
-\nabla L(y) = \frac{1}{2} (-2 A x + 2 A y) = A y - A x
-\]</div>
-<p>Since <span class="math notranslate nohighlight">\(A x = b\)</span>, this simplifies to:</p>
-<div class="math notranslate nohighlight">
-\[
-\nabla L(y) = A y - b = -(b - A y) = -r(y)
-\]</div>
-<p>This is a profound result: <strong>The gradient of the error function is the negative of the residual.</strong></p>
-<p>This means the residual vector <span class="math notranslate nohighlight">\(r_k = b - A x_k\)</span> that we use in our algorithm is, up to a sign, the gradient of the error function at our current iterate <span class="math notranslate nohighlight">\(x_k\)</span>. The residual <span class="math notranslate nohighlight">\(r_k\)</span> is the direction of “steepest ascent” for the error, so <span class="math notranslate nohighlight">\(-r_k\)</span> is the direction of “steepest descent.”</p>
+\[\begin{split}
+\begin{aligned}
+0=Q_k^Tr_k&amp;=Q_k^Tb-Q_k^TAQ_ky_k,\\
+T_ky_k&amp;=\|b\|_2e_1.
+\end{aligned}
+\end{split}\]</div>
+<p>The right-hand side follows from <span class="math notranslate nohighlight">\(q_1=b/\|b\|_2\)</span> and the orthogonality of the remaining columns to <span class="math notranslate nohighlight">\(q_1\)</span>. Here <span class="math notranslate nohighlight">\(e_1\)</span> is the first coordinate vector. Since <span class="math notranslate nohighlight">\(A\)</span> is SPD, so is <span class="math notranslate nohighlight">\(T_k=Q_k^TAQ_k\)</span>, and this projected system has a unique solution.</p>
+<p>CG computes <span class="math notranslate nohighlight">\(x_k=Q_ky_k\)</span> implicitly through its short recurrence, without storing <span class="math notranslate nohighlight">\(Q_k\)</span> or explicitly forming and solving each <span class="math notranslate nohighlight">\(T_k\)</span>. This explains both its connection to Lanczos and its small storage requirement.</p>
 </section>
-<section id="putting-it-all-together">
-<h3>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="Link to this heading">#</a></h3>
-<p>Now we can see the whole picture by looking at the update rule for the search direction:</p>
+</section>
+<section id="why-the-name-conjugate-gradient">
+<h2>Why the Name Conjugate Gradient?<a class="headerlink" href="#why-the-name-conjugate-gradient" title="Link to this heading">#</a></h2>
+<p>The search directions are <strong>conjugate</strong> because <span class="math notranslate nohighlight">\(p_i^TAp_j=0\)</span> for <span class="math notranslate nohighlight">\(i\ne j\)</span>. This makes the coefficient along each direction final: adding a new conjugate direction does not undo the minimizations already performed.</p>
+<p>The <strong>gradient</strong> comes from the quadratic energy. Its gradient is</p>
 <div class="math notranslate nohighlight">
 \[
-p_{k+1} = r_k + \tau_k \, p_k
+\nabla\Phi(z)=Az-b,
+\qquad
+\nabla\Phi(x_k)=-r_k.
 \]</div>
-<p>This equation shows that the new search direction <span class="math notranslate nohighlight">\(p_{k+1}\)</span> is a linear combination of two vectors:</p>
-<ol class="arabic simple">
-<li><p><strong>The Gradient:</strong> The residual <span class="math notranslate nohighlight">\(r_k\)</span>, which we just proved is the gradient (up to a sign) of the error.</p></li>
-<li><p><strong>The Previous Direction:</strong> The vector <span class="math notranslate nohighlight">\(p_k\)</span>.</p></li>
-</ol>
-<p>This is why the algorithm is called <strong>Conjugate Gradient</strong>. It is a gradient-based method that takes the current <strong>gradient</strong> (<span class="math notranslate nohighlight">\(r_k\)</span>) and <em>corrects</em> it with the previous direction (<span class="math notranslate nohighlight">\(\tau_k p_k\)</span>) to create a new direction <span class="math notranslate nohighlight">\(p_{k+1}\)</span> that is <strong>conjugate</strong> (A-orthogonal) to all previous directions.</p>
-</section>
+<p>Equivalently, the squared-error objective <span class="math notranslate nohighlight">\(L(z)=\tfrac12\|x-z\|_A^2\)</span> differs from <span class="math notranslate nohighlight">\(\Phi(z)\)</span> by a constant and has the same gradient. Thus <span class="math notranslate nohighlight">\(r_k\)</span> is the <strong>negative gradient</strong>, the direction of steepest decrease in the Euclidean geometry. Steepest descent would use <span class="math notranslate nohighlight">\(r_k\)</span> alone; CG adds a multiple of <span class="math notranslate nohighlight">\(p_k\)</span> to make the new direction conjugate to all previous ones.</p>
 </section>
 <section id="convergence-of-the-cg-method">
 <h2>Convergence of the CG Method<a class="headerlink" href="#convergence-of-the-cg-method" title="Link to this heading">#</a></h2>
-<p>We have shown that CG is an optimal and efficient algorithm. We now turn to the most practical question: how fast does it converge?</p>
-<section id="finite-convergence-a-theoretical-guarantee">
-<h3>Finite Convergence (A Theoretical Guarantee)<a class="headerlink" href="#finite-convergence-a-theoretical-guarantee" title="Link to this heading">#</a></h3>
-<p>In a world without floating-point errors, the Conjugate Gradient algorithm is a <em>direct method</em>, not an iterative one.</p>
+<p>The construction explains which approximation CG selects. Its usefulness depends on how quickly the Krylov spaces contain accurate approximations.</p>
+<section id="finite-convergence-in-exact-arithmetic">
+<h3>Finite Convergence in Exact Arithmetic<a class="headerlink" href="#finite-convergence-in-exact-arithmetic" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="cg_finite_convergence">
-<p class="admonition-title"><span class="caption-number">Theorem 51 </span> (Finite Convergence of CG)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 52 </span> (Finite Convergence of CG)</p>
 <section class="theorem-content" id="proof-content">
-<p>In exact arithmetic, the CG algorithm is guaranteed to find the exact solution <span class="math notranslate nohighlight">\(x\)</span> in at most <span class="math notranslate nohighlight">\(n\)</span> iterations, where <span class="math notranslate nohighlight">\(n\)</span> is the dimension of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p>For an SPD <span class="math notranslate nohighlight">\(n\times n\)</span> matrix, CG finds the exact solution in at most <span class="math notranslate nohighlight">\(n\)</span> iterations in exact arithmetic. It may terminate earlier.</p>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. The algorithm terminates when <span class="math notranslate nohighlight">\(r_k = 0\)</span>. We proved (<a class="reference internal" href="#cg_residuals_orthogonal">Theorem 50</a>) that the residuals <span class="math notranslate nohighlight">\(r_0, \dots, r_{k-1}\)</span> are mutually orthogonal. A set of <span class="math notranslate nohighlight">\(n\)</span> non-zero, mutually orthogonal vectors forms a basis for <span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span>. Therefore, the algorithm <em>must</em> find a zero residual (the exact solution) in at most <span class="math notranslate nohighlight">\(n\)</span> steps.</p>
+<p>Proof. If <span class="math notranslate nohighlight">\(r_0,\ldots,r_{n-1}\)</span> are all nonzero, they are <span class="math notranslate nohighlight">\(n\)</span> mutually orthogonal vectors and hence form a basis of <span class="math notranslate nohighlight">\(\mathbb R^n\)</span>. By <a class="reference internal" href="#cg_residual_basis">Theorem 51</a>, <span class="math notranslate nohighlight">\(\mathcal K_n=\mathbb R^n\)</span>. The next residual <span class="math notranslate nohighlight">\(r_n\)</span> is orthogonal to this whole space, so it must be zero. If any earlier residual vanishes, the solution has already been found.</p>
 </div>
-<p>This property is not why we use CG. For the large, sparse systems we care about, <span class="math notranslate nohighlight">\(n\)</span> might be in the millions or billions, so <span class="math notranslate nohighlight">\(n\)</span> iterations is impossibly expensive. Furthermore, in floating-point arithmetic, orthogonality is quickly lost, and the <span class="math notranslate nohighlight">\(n\)</span>-step guarantee fails.</p>
-<p>The <em>true</em> goal of CG is not to run <span class="math notranslate nohighlight">\(n\)</span> steps, but to get an excellent approximation in a number of steps <span class="math notranslate nohighlight">\(k \ll n\)</span>. This is why we treat it as an iterative method and analyze its <em>rate</em> of convergence.</p>
+<p>The Krylov space can stop growing before it fills <span class="math notranslate nohighlight">\(\mathbb R^n\)</span>. If <span class="math notranslate nohighlight">\(\mathcal K_{m+1}=\mathcal K_m\)</span>, then <span class="math notranslate nohighlight">\(r_m\in\mathcal K_{m+1}=\mathcal K_m\)</span> and <span class="math notranslate nohighlight">\(r_m\perp\mathcal K_m\)</span>, forcing <span class="math notranslate nohighlight">\(r_m=0\)</span>. Thus termination occurs when growth stops, and the full solution has an expansion in the directions already constructed. We never need to assume that <span class="math notranslate nohighlight">\(\mathcal K_n\)</span> has dimension <span class="math notranslate nohighlight">\(n\)</span> for every right-hand side.</p>
+<p>For a large sparse problem, the practical goal is an accurate approximation in far fewer than <span class="math notranslate nohighlight">\(n\)</span> steps. Finite termination is a theoretical property, not a reason to classify CG as a direct solver. In floating-point arithmetic, conjugacy and residual orthogonality can be lost, so the <span class="math notranslate nohighlight">\(n\)</span>-step guarantee does not generally hold.</p>
 </section>
-<section id="the-rate-of-convergence-and-the-condition-number">
-<h3>The Rate of Convergence and the Condition Number<a class="headerlink" href="#the-rate-of-convergence-and-the-condition-number" title="Link to this heading">#</a></h3>
-<p>The rate of convergence is governed by the properties of the matrix <span class="math notranslate nohighlight">\(A\)</span>, specifically its <strong>eigenvalue distribution</strong>. This is most easily summarized by the <strong>condition number</strong> <span class="math notranslate nohighlight">\(\kappa(A)\)</span>.</p>
-<p>For an SPD matrix <span class="math notranslate nohighlight">\(A\)</span>, the condition number is the ratio of its largest to its smallest eigenvalue:</p>
+<section id="the-error-polynomial-and-the-condition-number">
+<h3>The Error Polynomial and the Condition Number<a class="headerlink" href="#the-error-polynomial-and-the-condition-number" title="Link to this heading">#</a></h3>
+<p>The <a class="reference internal" href="chebyshev_acceleration.html"><span class="std std-doc">Chebyshev analysis</span></a> described error reduction through polynomials of <span class="math notranslate nohighlight">\(A\)</span>. The same viewpoint applies to CG. Since <span class="math notranslate nohighlight">\(x_k\in\mathcal K_k(A,b)\)</span> and <span class="math notranslate nohighlight">\(b=Ax\)</span>, its error can be written</p>
 <div class="math notranslate nohighlight">
 \[
-\kappa(A) = \frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}
+x-x_k=p(A)x,
+\qquad \deg p\le k,
+\qquad p(0)=1.
 \]</div>
-<p>A well-conditioned matrix has <span class="math notranslate nohighlight">\(\kappa(A) \approx 1\)</span> (all eigenvalues are similar). An ill-conditioned matrix has <span class="math notranslate nohighlight">\(\kappa(A) \gg 1\)</span> (eigenvalues are spread over many orders of magnitude).</p>
-<p>A standard (though often pessimistic) bound on the error of the CG algorithm is given by:</p>
+<p>Conversely, every polynomial satisfying these conditions gives a candidate in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>: because <span class="math notranslate nohighlight">\(p(0)=1\)</span>, we can write <span class="math notranslate nohighlight">\(p(\lambda)=1-\lambda s(\lambda)\)</span> with <span class="math notranslate nohighlight">\(\deg s\le k-1\)</span>. Then <span class="math notranslate nohighlight">\(x-p(A)x=s(A)b\in\mathcal K_k\)</span>. Thus minimizing over these polynomials is exactly the same as minimizing over the Krylov space. CG chooses the candidate with the smallest energy error.</p>
+<p>To bound this error, write <span class="math notranslate nohighlight">\(x=\sum_j c_jv_j\)</span> in an orthonormal eigenvector basis of <span class="math notranslate nohighlight">\(A\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|p(A)x\|_A^2
+&amp;=\sum_j\lambda_j c_j^2|p(\lambda_j)|^2\\
+&amp;\le\left(\max_j|p(\lambda_j)|\right)^2\|x\|_A^2.
+\end{aligned}
+\end{split}\]</div>
+<p>Let <span class="math notranslate nohighlight">\(\lambda_{\min}\)</span> and <span class="math notranslate nohighlight">\(\lambda_{\max}\)</span> be the smallest and largest eigenvalues. Bounding all values on this enclosing interval gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\|x-x_k\|_A
+\le
+\min_{\substack{\deg p\le k\\p(0)=1}}
+\max_{\lambda\in[\lambda_{\min},\lambda_{\max}]}|p(\lambda)|\,\|x-x_0\|_A.
+\end{split}\]</div>
+<p>The same bound holds for a general <span class="math notranslate nohighlight">\(x_0\)</span> by applying the argument to the correction equation. In particular, CG has no larger energy error than the Chebyshev approximation of the same degree and initial guess.</p>
+<p>For SPD <span class="math notranslate nohighlight">\(A\)</span>, define the 2-norm condition number and the associated convergence factor by</p>
 <div class="math notranslate nohighlight">
 \[
-\|x - x_k\|_A \leq 2 \left( \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1} \right)^k \|x - x_0\|_A
+\kappa_2(A)=\frac{\lambda_{\max}(A)}{\lambda_{\min}(A)},
+\qquad
+\rho=\frac{\sqrt{\kappa_2(A)}-1}{\sqrt{\kappa_2(A)}+1}.
+\]</div>
+<p>Applying the Chebyshev bound from <a class="reference internal" href="chebyshev_acceleration.html#thm:chebyshev-convergence">Theorem 47</a> gives, for <span class="math notranslate nohighlight">\(k\ge1\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\|x-x_k\|_A
+\le2\rho^k\|x-x_0\|_A.
+}
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(\kappa_2(A)=1\)</span>, then <span class="math notranslate nohighlight">\(A\)</span> is a positive multiple of the identity and CG solves the system in one step. When the condition number is close to one, the factor <span class="math notranslate nohighlight">\(\rho\)</span> is small and the bound predicts rapid convergence. For large <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>, the factor approaches one and the guarantee weakens. The factor bounds the overall error decay; it is not an assertion that the actual error decreases by exactly <span class="math notranslate nohighlight">\(\rho\)</span> at every step.</p>
+</section>
+<section id="eigenvalue-clustering">
+<h3>Eigenvalue Clustering<a class="headerlink" href="#eigenvalue-clustering" title="Link to this heading">#</a></h3>
+<p>The condition-number bound uses only the extreme eigenvalues. The actual rate depends on the whole eigenvalue distribution and on the initial error.</p>
+<p>If <span class="math notranslate nohighlight">\(A\)</span> has <span class="math notranslate nohighlight">\(s\)</span> distinct eigenvalues <span class="math notranslate nohighlight">\(\theta_1,\ldots,\theta_s\)</span>, consider</p>
+<div class="math notranslate nohighlight">
+\[
+p(\lambda)=\prod_{j=1}^s\left(1-\frac{\lambda}{\theta_j}\right).
+\]</div>
+<p>It equals <span class="math notranslate nohighlight">\(1\)</span> at zero and vanishes at every eigenvalue, so <span class="math notranslate nohighlight">\(p(A)=0\)</span>. This candidate has zero error, and CG optimality proves exact convergence in at most <span class="math notranslate nohighlight">\(s\)</span> steps. Only eigenvalues present in the initial error are needed in this argument, so convergence can occur even sooner.</p>
+<p>Tight eigenvalue clusters can also help: a polynomial can be small on the clusters without being small throughout the entire interval between the extreme eigenvalues. This can make convergence much faster than the condition-number bound predicts. The widths and separation of the clusters matter; <span class="math notranslate nohighlight">\(s\)</span> clusters do not generally imply termination in <span class="math notranslate nohighlight">\(s\)</span> steps.</p>
+<p>The following experiment compares two <span class="math notranslate nohighlight">\(120\times120\)</span> SPD systems with the same condition number, <span class="math notranslate nohighlight">\(\kappa_2(A)=100\)</span>. One has evenly spread eigenvalues; the other has three tight clusters. Both start from zero with the same initial-error coefficients in their eigenvector bases. The plotted errors come from actual CG iterations, using the known solution to measure the energy error.</p>
+<figure class="align-default" id="fig-cg-convergence">
+<a class="reference internal image-reference" href="../_images/cg_convergence.svg"><img alt="Left, 120 eigenvalues spread between 1 and 100 compared with 120 eigenvalues grouped near 1, 20, and 100. Right, computed relative CG energy errors: the clustered system reaches 10 to the minus 12 in 23 iterations and the spread system in 73, both below their shared condition-number bound." src="../_images/cg_convergence.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 28 </span><span class="caption-text">Same condition number, different convergence. The matrices are diagonal, so their coordinate axes are eigenvector directions. The spread spectrum is evenly spaced in <span class="math notranslate nohighlight">\([1,100]\)</span>; the clustered spectrum has 40 eigenvalues in each of <span class="math notranslate nohighlight">\([1,1.1]\)</span>, <span class="math notranslate nohighlight">\([19.95,20.05]\)</span>, and <span class="math notranslate nohighlight">\([99.9,100]\)</span>. In both cases, <span class="math notranslate nohighlight">\(x=(1,\ldots,1)^T/\sqrt{120}\)</span>, <span class="math notranslate nohighlight">\(b=Ax\)</span>, and <span class="math notranslate nohighlight">\(x_0=0\)</span>. The right panel shows the computed relative energy error and their common bound <span class="math notranslate nohighlight">\(2(9/11)^k\)</span>. Each run stops once the measured error is below <span class="math notranslate nohighlight">\(10^{-12}\)</span>. Clustering gives faster convergence here, even though all 120 eigenvalues remain distinct.</span><a class="headerlink" href="#fig-cg-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>This motivates <a class="reference internal" href="preconditioning.html"><span class="std std-doc">preconditioning</span></a>: transform the system into an equivalent problem for which an inexpensive iterative solve converges faster. For CG, the transformation must retain the SPD structure. We develop this in <a class="reference internal" href="pcg.html"><span class="std std-doc">preconditioned CG</span></a>.</p>
+</section>
+<section id="superlinear-acceleration">
+<h3>Superlinear Acceleration<a class="headerlink" href="#superlinear-acceleration" title="Link to this heading">#</a></h3>
+<p>CG sometimes converges faster as the iterations proceed. In this setting, <strong>superlinear convergence</strong> refers to an improving effective error-reduction factor, rather than one fixed geometric rate throughout the calculation. Such acceleration is possible, but not guaranteed for every problem or at every step.</p>
+<p>The Lanczos connection helps explain it. Recall that the <strong>Ritz values</strong> are the eigenvalues of the small matrix <span class="math notranslate nohighlight">\(T_k=Q_k^TAQ_k\)</span>. As they approximate some eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, particularly well-separated extreme eigenvalues, the CG error polynomial can strongly suppress the associated error components. The remaining components may occupy a much narrower spectral interval. CG can then behave as though it were solving a problem with a smaller effective condition number. The improvement is gradual; it does not require those components to become exactly zero.</p>
+</section>
+</section>
+<section id="key-results-to-remember">
+<h2>Key Results to Remember<a class="headerlink" href="#key-results-to-remember" title="Link to this heading">#</a></h2>
+<p>Assume <span class="math notranslate nohighlight">\(A\)</span> is SPD and work in exact arithmetic. As in the derivation, take <span class="math notranslate nohighlight">\(x_0=0\)</span>, write <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span>, and define</p>
+<div class="math notranslate nohighlight">
+\[
+e_k=x-x_k,
+\qquad r_k=b-Ax_k=Ae_k,
+\qquad \mathcal K_k=\mathcal K_k(A,b).
+\]</div>
+<p>The geometry is defined by <span class="math notranslate nohighlight">\(\langle u,v\rangle_A=u^TAv\)</span> and <span class="math notranslate nohighlight">\(\|v\|_A=\sqrt{v^TAv}\)</span>.</p>
+<p>The formulas below use <span class="math notranslate nohighlight">\(x_0=0\)</span>. The basis statements apply while the listed residuals and search directions are nonzero. For a general initial guess, apply them to the correction equation <span class="math notranslate nohighlight">\(A(x-x_0)=r_0\)</span>: replace <span class="math notranslate nohighlight">\(b\)</span> by <span class="math notranslate nohighlight">\(r_0\)</span> and the approximations <span class="math notranslate nohighlight">\(x_k\)</span> by <span class="math notranslate nohighlight">\(x_k-x_0\)</span>. The errors and residuals are unchanged.</p>
+<section id="one-krylov-space-several-bases">
+<h3>One Krylov Space, Several Bases<a class="headerlink" href="#one-krylov-space-several-bases" title="Link to this heading">#</a></h3>
+<p>The search directions, residuals, and Lanczos vectors span the same nested spaces:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mathcal K_k
+&amp;=\operatorname{span}\{b,Ab,\ldots,A^{k-1}b\}\\
+&amp;=\operatorname{span}\{p_1,\ldots,p_k\}\\
+&amp;=\operatorname{span}\{r_0,\ldots,r_{k-1}\}\\
+&amp;=\operatorname{span}\{q_1,\ldots,q_k\}.
+\end{aligned}
+\end{split}\]</div>
+<p>The approximation and the next residual satisfy</p>
+<div class="math notranslate nohighlight">
+\[
+x_k\in\mathcal K_k,
+\qquad
+r_k\in\mathcal K_{k+1}.
 \]</div>
 </section>
-<section id="interpreting-the-error-bound">
-<h3>Interpreting the Error Bound<a class="headerlink" href="#interpreting-the-error-bound" title="Link to this heading">#</a></h3>
-<p>Let’s analyze the term that governs the convergence: <span class="math notranslate nohighlight">\(\rho = \frac{\sqrt{\kappa(A)} - 1}{\sqrt{\kappa(A)} + 1}\)</span>. The error is reduced by this factor at each iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
-<ul class="simple">
-<li><p><strong>Well-conditioned case (<span class="math notranslate nohighlight">\(\kappa(A) \approx 1\)</span>):</strong> If <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is close to 1, then <span class="math notranslate nohighlight">\(\sqrt{\kappa(A)} \approx 1\)</span>, and the numerator <span class="math notranslate nohighlight">\((\sqrt{\kappa(A)} - 1)\)</span> is very close to 0. This makes <span class="math notranslate nohighlight">\(\rho\)</span> very small, and the error <span class="math notranslate nohighlight">\(\rho^k\)</span> plummets to zero in just a few iterations.</p></li>
-<li><p><strong>Ill-conditioned case (<span class="math notranslate nohighlight">\(\kappa(A) \gg 1\)</span>):</strong> If <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is very large, then <span class="math notranslate nohighlight">\(\sqrt{\kappa(A)}\)</span> is also large. The fraction <span class="math notranslate nohighlight">\(\rho\)</span> will be a number very close to 1. This means the error <span class="math notranslate nohighlight">\(\rho^k\)</span> decreases <em>very slowly</em>, and we will need many iterations to achieve a good approximation.</p></li>
-</ul>
-<p>This bound confirms our intuition: <strong>CG converges quickly for well-conditioned matrices and slowly for ill-conditioned matrices.</strong></p>
+<section id="the-orthogonality-relations">
+<h3>The Orthogonality Relations<a class="headerlink" href="#the-orthogonality-relations" title="Link to this heading">#</a></h3>
+<p>The search directions are <strong>A-orthogonal</strong>, while the residuals are <strong>Euclidean-orthogonal</strong>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+p_i^TAp_j&amp;=0 &amp;&amp;(i\ne j),\\
+r_i^Tr_j&amp;=0 &amp;&amp;(i\ne j).
+\end{aligned}
+}
+\end{split}\]</div>
+<p>The error and residual are orthogonal to the current search space in different inner products:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+v^TAe_k&amp;=0 &amp;&amp;\text{for every }v\in\mathcal K_k,\\
+v^Tr_k&amp;=0 &amp;&amp;\text{for every }v\in\mathcal K_k.
+\end{aligned}
+}
+\end{split}\]</div>
+<p>These two statements are equivalent because <span class="math notranslate nohighlight">\(r_k=Ae_k\)</span>. In particular, <span class="math notranslate nohighlight">\(p_i^Tr_k=0\)</span> for <span class="math notranslate nohighlight">\(i\le k\)</span>. A nonzero <span class="math notranslate nohighlight">\(r_k\)</span> is therefore a new direction outside <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, even though it is generally not A-orthogonal to all the previous search directions.</p>
 </section>
-<section id="the-real-story-eigenvalue-clustering">
-<h3>The Real Story: Eigenvalue Clustering<a class="headerlink" href="#the-real-story-eigenvalue-clustering" title="Link to this heading">#</a></h3>
-<p>This bound is often a “worst-case” scenario. The true convergence rate is more nuanced and depends on the <em>clustering</em> of eigenvalues.</p>
-<ul class="simple">
-<li><p>If <span class="math notranslate nohighlight">\(A\)</span> has only <span class="math notranslate nohighlight">\(m\)</span> distinct eigenvalues, CG will find the exact solution in at most <span class="math notranslate nohighlight">\(m\)</span> steps.</p></li>
-<li><p>More practically, if <span class="math notranslate nohighlight">\(A\)</span> has its eigenvalues “clustered” into <span class="math notranslate nohighlight">\(m\)</span> small groups, CG will converge very quickly (as if it were solving an <span class="math notranslate nohighlight">\(m \times m\)</span> problem).</p></li>
-</ul>
-<p>This is the entire motivation for <strong>preconditioning</strong>, which is the most important topic in practical iterative methods. The goal of a preconditioner is to transform the system <span class="math notranslate nohighlight">\(Ax=b\)</span> into a new system <span class="math notranslate nohighlight">\(\tilde{A}\tilde{x}=\tilde{b}\)</span> where the matrix <span class="math notranslate nohighlight">\(\tilde{A}\)</span> has the same solution but has a condition number close to 1 or has highly clustered eigenvalues.</p>
+<section id="optimality-over-the-whole-search-space">
+<h3>Optimality over the Whole Search Space<a class="headerlink" href="#optimality-over-the-whole-search-space" title="Link to this heading">#</a></h3>
+<p>CG produces the unique best approximation in the energy norm:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{x_k=\underset{z\in\mathcal K_k}{\operatorname{argmin}}\,\|x-z\|_A.}
+\]</div>
+<p>Equivalently, it minimizes the computable quadratic energy:</p>
+<div class="math notranslate nohighlight">
+\[
+x_k=\underset{z\in\mathcal K_k}{\operatorname{argmin}}\,\Phi(z),
+\qquad
+\Phi(z)=\frac12z^TAz-b^Tz.
+\]</div>
+<p>The projection identity makes the optimality explicit. For every <span class="math notranslate nohighlight">\(z\in\mathcal K_k\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|x-z\|_A^2=\|x-x_k\|_A^2+\|x_k-z\|_A^2.
+\]</div>
+<p>Thus the energy error decreases as the search space grows. The Euclidean residual norm, however, need not decrease at every step.</p>
+<p>There is also an equivalent residual interpretation. Since</p>
+<div class="math notranslate nohighlight">
+\[
+\|r_k\|_{A^{-1}}^2
+:=r_k^TA^{-1}r_k
+=e_k^TAe_k,
+\]</div>
+<p>CG minimizes the residual in the <span class="math notranslate nohighlight">\(A^{-1}\)</span>-norm over the search space. It does not generally minimize the residual in the Euclidean norm.</p>
 </section>
-<section id="the-superlinear-convergence-phenomenon">
-<h3>The Superlinear Convergence Phenomenon<a class="headerlink" href="#the-superlinear-convergence-phenomenon" title="Link to this heading">#</a></h3>
-<p>In practice, the convergence of CG is often observed to accelerate as the iterations proceed. This behavior, where the error reduction per step becomes progressively larger, is known as superlinear convergence.</p>
-<p>This acceleration is not just “fast” convergence; it is a “rate-improving” convergence. While the term “convergence rate” is a misnomer for a direct method, the phenomenon is real when CG is used iteratively. It is explained by the connection to the Lanczos process. The Lanczos algorithm (and thus CG) has a property of finding the extreme eigenvalues (and eigenvectors) first. As the CG iteration proceeds, it effectively “finds” and eliminates the error components associated with these converged “Ritz values” (eigenvalue approximations).</p>
-<p>Once these components are removed, the algorithm behaves as if it is solving a new problem on the remaining subspace. This new, implicit problem has a smaller effective condition number (<span class="math notranslate nohighlight">\(\kappa_{eff}\)</span>). Since the convergence rate at any given stage is governed by the current <span class="math notranslate nohighlight">\(\kappa_{eff}\)</span>, the rate itself improves as <span class="math notranslate nohighlight">\(k\)</span> increases, leading to the observed superlinear acceleration.</p>
+<section id="computable-coefficients-and-short-updates">
+<h3>Computable Coefficients and Short Updates<a class="headerlink" href="#computable-coefficients-and-short-updates" title="Link to this heading">#</a></h3>
+<p>With the normalization <span class="math notranslate nohighlight">\(p_1=r_0\)</span> and <span class="math notranslate nohighlight">\(p_{k+1}=r_k+\tau_kp_k\)</span>, the coefficients are</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\mu_k
+&amp;=\frac{p_k^Tr_0}{p_k^TAp_k}
+=\frac{\|r_{k-1}\|_2^2}{p_k^TAp_k},\\
+\tau_k&amp;=\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
+\end{aligned}
+\end{split}\]</div>
+<p>The iterates, residuals, and directions update by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+\begin{aligned}
+x_k&amp;=x_{k-1}+\mu_kp_k,\\
+r_k&amp;=r_{k-1}-\mu_kAp_k,\\
+p_{k+1}&amp;=r_k+\tau_kp_k.
+\end{aligned}
+}
+\end{split}\]</div>
+<p>The step along <span class="math notranslate nohighlight">\(p_k\)</span> minimizes the energy along that line. Conjugacy ensures that this step also gives the minimum over the entire enlarged space without changing the old expansion coefficients. Stop if <span class="math notranslate nohighlight">\(r_k=0\)</span>, before generating another direction. Each iteration uses one matrix-vector product and stores only a fixed number of vectors.</p>
+</section>
+<section id="the-lanczos-connection">
+<h3>The Lanczos Connection<a class="headerlink" href="#the-lanczos-connection" title="Link to this heading">#</a></h3>
+<p>The normalized residuals are the Lanczos vectors up to signs:</p>
+<div class="math notranslate nohighlight">
+\[
+q_k=\sigma_k\frac{r_{k-1}}{\|r_{k-1}\|_2},
+\qquad \sigma_k\in\{-1,1\}.
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(Q_k=[q_1,\ldots,q_k]\)</span>, <span class="math notranslate nohighlight">\(P_k=[p_1,\ldots,p_k]\)</span>, and <span class="math notranslate nohighlight">\(\mathcal R_k=[r_0,\ldots,r_{k-1}]\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+Q_k^TQ_k&amp;=I,\\
+P_k^TAP_k&amp;=D_k\quad\text{(positive diagonal)},\\
+\mathcal R_k^T\mathcal R_k&amp;\text{ is positive diagonal},\\
+Q_k^TAQ_k=T_k&amp;\text{ and }\mathcal R_k^TA\mathcal R_k\text{ are symmetric tridiagonal}.
+\end{aligned}
+\end{split}\]</div>
+<p>With <span class="math notranslate nohighlight">\(q_1=b/\|b\|_2\)</span>, the same approximation can be written</p>
+<div class="math notranslate nohighlight">
+\[
+x_k=Q_ky_k,
+\qquad T_ky_k=\|b\|_2e_1.
+\]</div>
+<p>CG solves this projected problem implicitly through the short updates.</p>
+</section>
+<section id="convergence-and-its-limits">
+<h3>Convergence and Its Limits<a class="headerlink" href="#convergence-and-its-limits" title="Link to this heading">#</a></h3>
+<p>CG finds the exact solution in at most <span class="math notranslate nohighlight">\(n\)</span> steps, or at most <span class="math notranslate nohighlight">\(s\)</span> steps if <span class="math notranslate nohighlight">\(A\)</span> has <span class="math notranslate nohighlight">\(s\)</span> distinct eigenvalues. Earlier termination is possible when fewer eigenvalues are present in the initial error.</p>
+<p>Its optimality can also be expressed through error polynomials:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\|e_k\|_A
+=\min_{\substack{\deg p\le k\\p(0)=1}}\|p(A)e_0\|_A.
+\end{split}\]</div>
+<p>With <span class="math notranslate nohighlight">\(\kappa_2(A)=\lambda_{\max}(A)/\lambda_{\min}(A)\)</span>, the condition-number bound for <span class="math notranslate nohighlight">\(k\ge1\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\|e_k\|_A
+\le2\left(
+\frac{\sqrt{\kappa_2(A)}-1}{\sqrt{\kappa_2(A)}+1}
+\right)^k\|e_0\|_A.
+}
+\]</div>
+<p>Eigenvalue clustering can give faster convergence than this bound predicts, and convergence can accelerate as some error components are suppressed. These improvements depend on the problem; they are not guaranteed at every step.</p>
+<p>In floating-point arithmetic, the orthogonality relations and finite-termination guarantee need not hold exactly. Check the explicitly computed residual before accepting a solution, and use preconditioning when the unpreconditioned iteration converges too slowly.</p>
 </section>
 </section>
 </section>
@@ -1390,50 +1294,45 @@ p_{k+1} = r_k + \tau_k \, p_k
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-search-for-coefficients-and-a-flawed-first-attempt">The Search for Coefficients and a Flawed First Attempt</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-meaning-of-p-t-a-p-d-the-a-inner-product">The Meaning of <span class="math notranslate nohighlight">\(P^T A P = D\)</span>: The A-Inner Product</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geometric-interpretation-of-the-a-inner-product">Geometric Interpretation of the A-Inner Product</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-a-norm">The A-Norm</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nested-krylov-spaces-and-search-directions">Nested Krylov Spaces and Search Directions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-first-attempt-minimize-the-euclidean-error">A First Attempt: Minimize the Euclidean Error</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-key-change-use-the-a-inner-product">The Key Change: Use the A-Inner Product</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computable-expansion-coefficients">Computable Expansion Coefficients</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary-the-cg-algorithm-framework">Summary: The CG Algorithm Framework</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cg-optimality-a-norm-projection">CG Optimality: A-Norm Projection</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computing-the-search-directions-p-k">Computing the Search Directions <span class="math notranslate nohighlight">\(p_k\)</span></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-result-residual-orthogonality">Key Result: Residual Orthogonality</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-equivalence-of-residual-and-search-subspaces">The Equivalence of Residual and Search Subspaces</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-term-recurrence">The Three-Term Recurrence</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-residuals-are-orthogonal-to-each-other">The Residuals are Orthogonal to Each Other</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-efficient-computational-formulas">Deriving the Efficient Computational Formulas</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-step-size-mu-k">Simplifying the Step Size <span class="math notranslate nohighlight">\(\mu_k\)</span></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simplifying-the-direction-update-tau-k">Simplifying the Direction Update <span class="math notranslate nohighlight">\(\tau_k\)</span></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-partial-sum-is-optimal">Why the Partial Sum Is Optimal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-the-residual-to-find-the-next-direction">Use the Residual to Find the Next Direction</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-an-a-orthogonal-direction-from-the-residual">Constructing an A-Orthogonal Direction from the Residual</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#only-the-latest-direction-is-needed">Only the Latest Direction Is Needed</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-residual-basis-and-its-orthogonality">The Residual Basis and Its Orthogonality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-efficient-coefficients">Deriving the Efficient Coefficients</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-step-length">The Step Length</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-direction-coefficient">The Direction Coefficient</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-conjugate-gradient-algorithm">The Conjugate Gradient Algorithm</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-takeaways-what-to-memorize-for-cg">Key Takeaways: What to Memorize for CG</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-definitions">Core Definitions</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-krylov-subspace">The Krylov Subspace</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-orthogonality-relations">Key Orthogonality Relations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-central-optimality-guarantee">The Central Optimality Guarantee</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-lanczos-and-matrix-relations">Connection to Lanczos and Matrix Relations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-relations-in-matrix-notation">Orthogonality Relations in Matrix Notation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-small-tridiagonal-system">The Small Tridiagonal System</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#orthogonality-relations-in-matrix-notation">Orthogonality Relations in Matrix Notation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-link-between-lanczos-and-cg-residuals">The Link Between Lanczos and CG Residuals</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-summary-of-matrix-properties">A Summary of Matrix Properties</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#connection-to-the-lanczos-process">Connection to the Lanczos Process</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-is-it-called-the-conjugate-gradient-algorithm">Why Is It Called the “Conjugate Gradient” Algorithm?</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-conjugate-part">The “Conjugate” Part</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gradient-part">The “Gradient” Part</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">Putting It All Together</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-name-conjugate-gradient">Why the Name Conjugate Gradient?</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-the-cg-method">Convergence of the CG Method</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-convergence-a-theoretical-guarantee">Finite Convergence (A Theoretical Guarantee)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rate-of-convergence-and-the-condition-number">The Rate of Convergence and the Condition Number</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interpreting-the-error-bound">Interpreting the Error Bound</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-real-story-eigenvalue-clustering">The Real Story: Eigenvalue Clustering</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-superlinear-convergence-phenomenon">The Superlinear Convergence Phenomenon</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-convergence-in-exact-arithmetic">Finite Convergence in Exact Arithmetic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-error-polynomial-and-the-condition-number">The Error Polynomial and the Condition Number</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-clustering">Eigenvalue Clustering</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#superlinear-acceleration">Superlinear Acceleration</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-to-remember">Key Results to Remember</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-krylov-space-several-bases">One Krylov Space, Several Bases</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-orthogonality-relations">The Orthogonality Relations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimality-over-the-whole-search-space">Optimality over the Whole Search Space</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computable-coefficients-and-short-updates">Computable Coefficients and Short Updates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lanczos-connection">The Lanczos Connection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-its-limits">Convergence and Its Limits</a></li>
 </ul>
 </li>
 </ul>

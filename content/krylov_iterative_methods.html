@@ -291,7 +291,7 @@
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">CG vs. GMRES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">The Minimal Residual Method (MINRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="preconditioning.html">Preconditioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcg.html">Preconditioned Conjugate Gradient</a></li>
 </ul>
@@ -478,32 +478,31 @@
 <section id="searching-for-a-better-approximation">
 <h2>Searching for a Better Approximation<a class="headerlink" href="#searching-for-a-better-approximation" title="Link to this heading">#</a></h2>
 <p>Jacobi, Gauss-Seidel, and SOR improve an approximate solution through inexpensive corrections. Their convergence can nevertheless be slow. Krylov subspace methods use information gathered over successive iterations to choose a correction from an expanding space of possibilities.</p>
-<p>We consider a real nonsingular system <span class="math notranslate nohighlight">\(Ax=b\)</span>. Let <span class="math notranslate nohighlight">\(x\)</span> denote the exact solution, <span class="math notranslate nohighlight">\(x^{(0)}\)</span> an initial guess, and <span class="math notranslate nohighlight">\(r^{(0)}=b-Ax^{(0)}\)</span> its residual. The residual identifies which equations are not yet satisfied. Applying <span class="math notranslate nohighlight">\(A\)</span> repeatedly to this vector provides additional search directions, giving the <strong>Krylov subspace</strong></p>
+<p>We consider a real nonsingular system <span class="math notranslate nohighlight">\(Ax=b\)</span>. Let <span class="math notranslate nohighlight">\(x\)</span> denote the exact solution, <span class="math notranslate nohighlight">\(x_0\)</span> an initial guess, and <span class="math notranslate nohighlight">\(r_0=b-Ax_0\)</span> its residual. The residual identifies which equations are not yet satisfied. Applying <span class="math notranslate nohighlight">\(A\)</span> repeatedly to this vector provides additional search directions, giving the <strong>Krylov subspace</strong></p>
 <div class="math notranslate nohighlight">
 \[
-\mathcal K_k(A,r^{(0)})
-=\operatorname{span}\{r^{(0)},Ar^{(0)},\ldots,A^{k-1}r^{(0)}\}.
+\mathcal K_k(A,r_0)
+=\operatorname{span}\{r_0,Ar_0,\ldots,A^{k-1}r_0\}.
 \]</div>
 <p>These are the same spaces used in the earlier <a class="reference internal" href="arnoldi_iteration.html"><span class="std std-doc">Arnoldi</span></a> and <a class="reference internal" href="lanczos_iteration.html"><span class="std std-doc">Lanczos</span></a> methods for eigenvalue approximation. Here we use them to construct a correction to a linear-system solution:</p>
 <div class="math notranslate nohighlight">
 \[
-\boxed{x^{(k)}=x^{(0)}+z^{(k)},
-\qquad z^{(k)}\in\mathcal K_k(A,r^{(0)}).}
+\boxed{x_k\in x_0+\mathcal K_k(A,r_0).}
 \]</div>
-<p>Thus each approximation can combine all the directions available so far. If <span class="math notranslate nohighlight">\(x^{(0)}=0\)</span>, then <span class="math notranslate nohighlight">\(r^{(0)}=b\)</span>, and we simply search for <span class="math notranslate nohighlight">\(x^{(k)}\)</span> in <span class="math notranslate nohighlight">\(\mathcal K_k(A,b)\)</span>. This is the starting choice used in the next section.</p>
+<p>This means <span class="math notranslate nohighlight">\(x_k=x_0+v\)</span> for some correction <span class="math notranslate nohighlight">\(v\in\mathcal K_k(A,r_0)\)</span>. Thus each approximation can combine all the directions available so far. If <span class="math notranslate nohighlight">\(x_0=0\)</span>, then <span class="math notranslate nohighlight">\(r_0=b\)</span>, and we simply search for <span class="math notranslate nohighlight">\(x_k\)</span> in <span class="math notranslate nohighlight">\(\mathcal K_k(A,b)\)</span>. This is the starting choice used in the next section.</p>
 <p>Building these spaces requires matrix-vector products, so we can work with a sparse matrix or a procedure that computes <span class="math notranslate nohighlight">\(Av\)</span> without storing <span class="math notranslate nohighlight">\(A\)</span>. In practice, we construct a suitable basis rather than forming the powers <span class="math notranslate nohighlight">\(A^j\)</span> explicitly.</p>
 </section>
 <section id="the-central-challenge-what-is-optimal">
 <h2>The Central Challenge: What Is “Optimal”?<a class="headerlink" href="#the-central-challenge-what-is-optimal" title="Link to this heading">#</a></h2>
-<p>Once the search space is chosen, we still need to select an approximation within it. The most direct goal would be to minimize the Euclidean error <span class="math notranslate nohighlight">\(\|x-x^{(k)}\|_2\)</span>.</p>
-<p>If we had an orthonormal basis for the space, the best approximation would be an orthogonal projection of the exact solution onto the search space. But computing that projection requires information about <span class="math notranslate nohighlight">\(x\)</span>, the solution we are trying to find. The subspace is available; this error-minimizing choice is not directly computable from it.</p>
+<p>Once the search space is chosen, we still need to select an approximation within it. The most direct goal would be to minimize the Euclidean error <span class="math notranslate nohighlight">\(\|x-x_k\|_2\)</span>.</p>
+<p>With an orthonormal basis for the correction space, the best correction would be the orthogonal projection of <span class="math notranslate nohighlight">\(x-x_0\)</span> onto it. But computing that projection requires information about <span class="math notranslate nohighlight">\(x\)</span>, the solution we are trying to find. The subspace is available; this error-minimizing choice is not directly computable from it.</p>
 <p>We therefore need a criterion that uses the known data <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>. Two choices lead to CG and GMRES.</p>
 </section>
 <section id="two-computable-paths-to-optimality">
 <h2>Two Computable Paths to Optimality<a class="headerlink" href="#two-computable-paths-to-optimality" title="Link to this heading">#</a></h2>
 <p><strong>Conjugate gradient (CG)</strong> applies when <span class="math notranslate nohighlight">\(A\)</span> is symmetric positive definite (SPD). It chooses the approximation that minimizes the error in the <strong>energy norm</strong>, <span class="math notranslate nohighlight">\(\|v\|_A=\sqrt{v^TAv}\)</span>, over the current search space.</p>
 <p>Although the exact error is unknown, this minimization is computable. As in the <a class="reference internal" href="gauss_seidel_method.html"><span class="std std-doc">energy interpretation of Gauss-Seidel</span></a>, minimizing the squared energy error is equivalent to minimizing the quadratic <span class="math notranslate nohighlight">\(\Phi(v)=\tfrac12v^TAv-b^Tv\)</span>. We can evaluate and minimize this quadratic using <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>. CG performs that minimization over the growing Krylov space, using a short recurrence that stores only a few vectors.</p>
-<p><strong>Generalized minimal residual (GMRES)</strong> applies to general nonsingular matrices. It chooses the approximation that minimizes <span class="math notranslate nohighlight">\(\|b-Ax^{(k)}\|_2\)</span> over the current search space. The residual is computable, and the minimization reduces to a smaller linear least-squares problem. Arnoldi provides the orthonormal basis and the small matrices needed for this calculation.</p>
+<p><strong>Generalized minimal residual (GMRES)</strong> applies to general nonsingular matrices. It chooses the approximation that minimizes <span class="math notranslate nohighlight">\(\|b-Ax_k\|_2\)</span> over the current search space. The residual is computable, and the minimization reduces to a smaller linear least-squares problem. Arnoldi provides the orthonormal basis and the small matrices needed for this calculation.</p>
 <p>In exact arithmetic, both methods choose the best approximation according to their own criterion. CG minimizes the energy norm of the error; GMRES minimizes the Euclidean norm of the residual. These are different objectives and need not select the same approximation.</p>
 </section>
 <section id="the-main-practical-challenges">

@@ -291,7 +291,7 @@
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">CG vs. GMRES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">The Minimal Residual Method (MINRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="preconditioning.html">Preconditioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcg.html">Preconditioned Conjugate Gradient</a></li>
 </ul>
@@ -458,23 +458,25 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-conjugate-gradients-to-gmres">From Conjugate Gradients to GMRES</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-analogy-and-computational-cost">The Arnoldi Analogy and Computational Cost</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-new-objective-minimizing-the-residual">A New Objective: Minimizing the Residual</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-gmres-least-squares-problem">Deriving the GMRES Least-Squares Problem</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-relation">The Arnoldi Relation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transforming-the-problem">Transforming the Problem</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-algorithm-computational-steps">The GMRES Algorithm: Computational Steps</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-step">The Arnoldi Step</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-qr-factorization-and-solve">Update the QR Factorization and Solve</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-the-final-solution">Compute the Final Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-the-small-problem-efficiently">Solving the Small Problem Efficiently</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-arnoldi-step">One Arnoldi Step</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-qr-factorization">Update the QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#form-the-approximation-and-check-it">Form the Approximation and Check It</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-arnoldi-has-no-new-direction">When Arnoldi Has No New Direction</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-and-restarting">Computational Cost and Restarting</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-gmres">Convergence of GMRES</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-residual-minimization-guarantees">What Residual Minimization Guarantees</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-polynomial-problem">The GMRES Polynomial Problem</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-formal-error-bound">A Formal Error Bound</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-failure-case-for-gmres">A “Failure Case” for GMRES</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-bound-using-eigenvalues">A Bound Using Eigenvalues</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-with-no-residual-reduction-until-the-last-step">An Example with No Residual Reduction Until the Last Step</a></li>
 </ul>
 </li>
 </ul>
@@ -492,248 +494,256 @@
 <h1>The Generalized Minimal Residual Method (GMRES)<a class="headerlink" href="#the-generalized-minimal-residual-method-gmres" title="Link to this heading">#</a></h1>
 <section id="from-conjugate-gradients-to-gmres">
 <h2>From Conjugate Gradients to GMRES<a class="headerlink" href="#from-conjugate-gradients-to-gmres" title="Link to this heading">#</a></h2>
-<p>In our study of iterative methods, the <strong>Conjugate Gradient (CG) algorithm</strong> is a powerful and efficient tool. However, its use is strictly limited to systems where the matrix <span class="math notranslate nohighlight">\(A\)</span> is <strong>symmetric positive definite (SPD)</strong>. When we face a general, non-symmetric square matrix, CG is no longer applicable, and we require a new approach.</p>
-<p>This is the problem that the <strong>Generalized Minimal Residual (GMRES)</strong> method solves.</p>
-</section>
-<section id="the-arnoldi-analogy-and-computational-cost">
-<h2>The Arnoldi Analogy and Computational Cost<a class="headerlink" href="#the-arnoldi-analogy-and-computational-cost" title="Link to this heading">#</a></h2>
-<p>GMRES is a Krylov subspace method, just like CG. The relationship between them is best understood through the lens of the processes that build their respective subspaces:</p>
-<ul class="simple">
-<li><p><strong>CG</strong> is based on the <strong>Lanczos process</strong>, which leverages the symmetry of <span class="math notranslate nohighlight">\(A\)</span> to build an orthogonal basis using a short-term (three-term) recurrence. This is computationally cheap and requires minimal storage.</p></li>
-<li><p><strong>GMRES</strong> is based on the <strong>Arnoldi process</strong>, which applies to <em>any</em> matrix. This generality comes at a price: the Arnoldi process requires a long-term recurrence. To maintain orthogonality, each new vector must be explicitly orthogonalized against <em>all</em> previously generated basis vectors.</p></li>
-</ul>
-<p>This distinction in the underlying process has a direct impact on the algorithms:</p>
-<ol class="arabic simple">
-<li><p><strong>Applicability:</strong> CG is restricted to SPD matrices, while GMRES can be applied to any square matrix.</p></li>
-<li><p><strong>Cost:</strong> GMRES has a significantly higher computational and storage cost per iteration. It must store a complete basis <span class="math notranslate nohighlight">\(Q_k\)</span> for the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>, and the work to generate <span class="math notranslate nohighlight">\(q_{k+1}\)</span> grows with each step <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
-</ol>
-<p>Conceptually, the GMRES approach is more straightforward than CG. Because it cannot rely on the special properties of an <span class="math notranslate nohighlight">\(A\)</span>-conjugate basis, it lacks the optimization opportunities that make CG so efficient (like short-term recurrences). Instead, GMRES “just solves a least-squares problem” at each step.</p>
+<p>The <a class="reference internal" href="conjugate_gradient.html"><span class="std std-doc">conjugate gradient method</span></a> uses symmetry and positive definiteness to minimize the energy norm of the error with a short recurrence. For a general nonsymmetric matrix, that construction no longer gives the same guarantees. <strong>Generalized minimal residual (GMRES)</strong> instead minimizes the Euclidean norm of the residual, using Arnoldi to build its search space.</p>
+<p>We consider a real nonsingular system <span class="math notranslate nohighlight">\(Ax=b\)</span>, with <span class="math notranslate nohighlight">\(A\in\mathbb R^{n\times n}\)</span>. As in the CG section, <span class="math notranslate nohighlight">\(x\)</span> denotes the exact solution and <span class="math notranslate nohighlight">\(x_k\)</span> the approximation after <span class="math notranslate nohighlight">\(k\)</span> iterations. The derivation and convergence results below assume exact arithmetic; practical stopping checks are discussed afterward.</p>
 </section>
 <section id="a-new-objective-minimizing-the-residual">
 <h2>A New Objective: Minimizing the Residual<a class="headerlink" href="#a-new-objective-minimizing-the-residual" title="Link to this heading">#</a></h2>
-<p>The fundamental difference between CG and GMRES lies in the cost function they are designed to optimize.</p>
-<p>Recall that CG is built to find the approximation <span class="math notranslate nohighlight">\(x^{(k)} \in \mathcal{K}_k\)</span> that minimizes the <strong><span class="math notranslate nohighlight">\(A\)</span>-norm of the error</strong> (<span class="math notranslate nohighlight">\(e^{(k)} = x - x^{(k)}\)</span>):</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p><strong>CG Objective:</strong> <span class="math notranslate nohighlight">\(\min_{x^{(k)} \in \mathcal{K}_k} \| x - x^{(k)} \|_A^2\)</span>, where <span class="math notranslate nohighlight">\(\| z \|_A^2 = z^T A z\)</span></p>
-</div>
-<p>This objective function is computationally convenient <em>only</em> when <span class="math notranslate nohighlight">\(A\)</span> is SPD, as it defines a valid norm.</p>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>GMRES takes a more direct and intuitive approach. It abandons the <span class="math notranslate nohighlight">\(A\)</span>-norm and instead seeks to find the approximation <span class="math notranslate nohighlight">\(x^{(k)}\)</span> in the Krylov subspace that minimizes the <strong>2-norm of the residual</strong> (<span class="math notranslate nohighlight">\(r^{(k)} = b - Ax^{(k)}\)</span>).</p>
-</div>
-<p>This new objective function is precisely what gives the method its name: <strong>G</strong>eneralized <strong>M</strong>inimal <strong>RES</strong>idual.</p>
-<p>This choice makes sense. The residual is the only quantity we can easily measure without knowing the true solution <span class="math notranslate nohighlight">\(x\)</span>. Minimizing the residual’s norm is the most natural goal for finding an approximate solution.</p>
-<p>This choice of minimizing <span class="math notranslate nohighlight">\(\| r^{(k)} \|_2\)</span> is formally equivalent to minimizing the <span class="math notranslate nohighlight">\(A^TA\)</span>-norm of the error. If we let our approximation <span class="math notranslate nohighlight">\(x^{(k)}\)</span> be represented by <span class="math notranslate nohighlight">\(Q_k y\)</span> (where <span class="math notranslate nohighlight">\(Q_k\)</span> is the Arnoldi basis for <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>), we see the direct connection:</p>
+<p>Choose an initial guess <span class="math notranslate nohighlight">\(x_0\)</span> and compute</p>
 <div class="math notranslate nohighlight">
-\[\begin{split}
-\begin{align}
-\| x - x^{(k)} \|_{A^TA}^2 &amp; = (x - Q_k y)^T A^TA (x - Q_k y) \\[.5em]
-&amp; = \| A(x - Q_k y) \|_2^2 \\[.5em]
-&amp; = \| b - A Q_k y \|_2^2 = \| r^{(k)} \|_2^2
-\end{align}
-\end{split}\]</div>
-<p>Thus, at each step <span class="math notranslate nohighlight">\(k\)</span>, GMRES finds the vector <span class="math notranslate nohighlight">\(x^{(k)} \in \mathcal{K}_k\)</span> that makes the residual <span class="math notranslate nohighlight">\(r^{(k)}\)</span> as small as possible in the Euclidean 2-norm. In the following sections, we will explore how this minimization problem is solved efficiently.</p>
+\[
+r_0=b-Ax_0,
+\qquad \beta=\|r_0\|_2.
+\]</div>
+<p>If <span class="math notranslate nohighlight">\(r_0=0\)</span>, the initial guess is already the solution. Otherwise, search for a correction in</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal K_k=\mathcal K_k(A,r_0)
+=\operatorname{span}\{r_0,Ar_0,\ldots,A^{k-1}r_0\}.
+\]</div>
+<p>Thus the candidates are <span class="math notranslate nohighlight">\(x_0+z\)</span> with <span class="math notranslate nohighlight">\(z\in\mathcal K_k\)</span>. When <span class="math notranslate nohighlight">\(x_0=0\)</span>, this reduces to the search in <span class="math notranslate nohighlight">\(\mathcal K_k(A,b)\)</span> used in the preceding CG derivation.</p>
+<p>CG chooses the candidate with the smallest energy error. GMRES chooses the candidate with the smallest residual:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+x_k=\underset{v\in x_0+\mathcal K_k}{\operatorname{argmin}}
+\|b-Av\|_2,
+\qquad r_k=b-Ax_k.
+}
+\]</div>
+<p>This objective is computable from <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span>, without knowing <span class="math notranslate nohighlight">\(x\)</span>. It is also an error minimization in a different norm: since <span class="math notranslate nohighlight">\(r_k=A(x-x_k)\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+\|r_k\|_2^2
+=(x-x_k)^TA^TA(x-x_k)
+=\|x-x_k\|_{A^TA}^2.
+\]</div>
+<p>Nonsingularity makes <span class="math notranslate nohighlight">\(A^TA\)</span> positive definite, so this is a valid norm. This identity explains the objective; <strong>GMRES does not form <span class="math notranslate nohighlight">\(A^TA\)</span></strong>. We solve the least-squares problem using the orthogonal transformations developed earlier in the book.</p>
 </section>
 <section id="deriving-the-gmres-least-squares-problem">
 <h2>Deriving the GMRES Least-Squares Problem<a class="headerlink" href="#deriving-the-gmres-least-squares-problem" title="Link to this heading">#</a></h2>
-<p>In the previous section, we established that the core task of GMRES is to find the approximation <span class="math notranslate nohighlight">\(x^{(k)} = Q_k y\)</span> that minimizes the 2-norm of the residual. This gives us the following formal optimization problem for the coefficients <span class="math notranslate nohighlight">\(y \in \mathbb{R}^k\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[
-\min_{y \in \mathbb{R}^k} \| b - A Q_k y \|_2
-\]</div>
-<p>with <span class="math notranslate nohighlight">\(x_k = Q_k y\)</span>.</p>
-<p>At first glance, this appears to be a large, <span class="math notranslate nohighlight">\(N \times k\)</span> least-squares problem. The key to solving it efficiently lies in the <strong>Arnoldi process</strong> used to build the <span class="math notranslate nohighlight">\(Q_k\)</span> basis.</p>
 <section id="the-arnoldi-relation">
 <h3>The Arnoldi Relation<a class="headerlink" href="#the-arnoldi-relation" title="Link to this heading">#</a></h3>
-<p>Recall the fundamental Arnoldi relation, which connects <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(Q_k\)</span>, and <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>:</p>
+<p>Start the <a class="reference internal" href="arnoldi_iteration.html"><span class="std std-doc">Arnoldi process</span></a> with <span class="math notranslate nohighlight">\(q_1=r_0/\beta\)</span>. Let <span class="math notranslate nohighlight">\(Q_k=[q_1,\ldots,q_k]\)</span> contain its orthonormal basis vectors. Every candidate can be written as</p>
 <div class="math notranslate nohighlight">
 \[
-A Q_k = Q_{k+1} \underline{H}_k
+x_0+Q_k y,
+\qquad y\in\mathbb R^k.
 \]</div>
-<p>Here, <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> is the <span class="math notranslate nohighlight">\((k+1) \times k\)</span> <strong>upper-Hessenberg matrix</strong> of coefficients generated by the process. This matrix is precisely <span class="math notranslate nohighlight">\(Q_{k+1}^T A Q_k\)</span>.</p>
+<p>Recall that Arnoldi gives <span class="math notranslate nohighlight">\(AQ_k=Q_kH_k+f_ke_k^T\)</span>, where <span class="math notranslate nohighlight">\(H_k\)</span> is <span class="math notranslate nohighlight">\(k\times k\)</span> and upper Hessenberg. The remainder is <span class="math notranslate nohighlight">\(f_k=h_{k+1,k}q_{k+1}\)</span> when it is nonzero. Appending this last direction gives</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\boxed{
+AQ_k=Q_{k+1}\underline H_k,
+\qquad
+\underline H_k=
+\begin{pmatrix}
+H_k\\
+h_{k+1,k}e_k^T
+\end{pmatrix}.
+}
+\end{split}\]</div>
+<p>Here <span class="math notranslate nohighlight">\(\underline H_k\)</span> is <span class="math notranslate nohighlight">\((k+1)\times k\)</span>, and <span class="math notranslate nohighlight">\(e_k\)</span> is the last coordinate vector in <span class="math notranslate nohighlight">\(\mathbb R^k\)</span>. Its only possible nonzero entries below the diagonal lie immediately below it. This is the rectangular form of the Arnoldi relation. The case <span class="math notranslate nohighlight">\(h_{k+1,k}=0\)</span>, when there is no new direction, is discussed below.</p>
 </section>
 <section id="transforming-the-problem">
 <h3>Transforming the Problem<a class="headerlink" href="#transforming-the-problem" title="Link to this heading">#</a></h3>
-<p>We can substitute this relation directly into our minimization problem:</p>
-<div class="math notranslate nohighlight">
-\[
-\min_y \| b - Q_{k+1} \underline{H}_k y \|_2
-\]</div>
-<p>Next, we must handle the vector <span class="math notranslate nohighlight">\(b\)</span>. The Arnoldi process was <em>started</em> with the normalized initial residual, <span class="math notranslate nohighlight">\(q_1 = b / \|b\|_2\)</span>. This means <span class="math notranslate nohighlight">\(b = \|b\|_2 q_1\)</span>. The vector <span class="math notranslate nohighlight">\(q_1\)</span> is, by definition, the first column of the <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> basis.</p>
-<p>Therefore, we can express the vector <span class="math notranslate nohighlight">\(b\)</span> perfectly within the <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> basis:</p>
-<div class="math notranslate nohighlight">
-\[
-b = Q_{k+1} (\|b\|_2 \, e_1)
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(e_1 = [1, 0, \dots, 0]^T\)</span> is the first standard basis vector in <span class="math notranslate nohighlight">\(\mathbb{R}^{k+1}\)</span>.</p>
-<p>Let’s substitute this final piece back into our problem. We are now minimizing:</p>
-<div class="math notranslate nohighlight">
-\[
-\| Q_{k+1} (\|b\|_2 \, e_1) - Q_{k+1} \underline{H}_k y \|_2
-\]</div>
-<p>We can factor out the <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> matrix:</p>
-<div class="math notranslate nohighlight">
-\[
-\min_y \left\| Q_{k+1} \left( (\|b\|_2 \, e_1) - \underline{H}_k y \right) \right\|_2
-\]</div>
-<p>This is the crucial step. Because <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> is an <span class="math notranslate nohighlight">\(N \times (k+1)\)</span> matrix with <strong>orthonormal columns</strong>, it acts as an isometry. This means it preserves the 2-norm of any vector it multiplies (i.e., <span class="math notranslate nohighlight">\(\| Q_{k+1} z \|_2 = \|z\|_2\)</span> for any <span class="math notranslate nohighlight">\(z \in \mathbb{R}^{k+1}\)</span>).</p>
-<p>This property allows us to “remove” <span class="math notranslate nohighlight">\(Q_{k+1}\)</span> from the outside of the norm, transforming our large <span class="math notranslate nohighlight">\(N \times k\)</span> problem into a <em>small</em> <span class="math notranslate nohighlight">\((k+1) \times k\)</span> problem:</p>
-<div class="math notranslate nohighlight">
-\[
-\min_{y \in \mathbb{R}^k} \big\| \|b\|_2 \, e_1 - \underline{H}_k \, y \big\|_2, \qquad x_k = Q_k y.
-\]</div>
-<p>This is the central least-squares problem that GMRES solves at each iteration. It is a small, <span class="math notranslate nohighlight">\((k+1) \times k\)</span> problem that can be solved very efficiently, typically using a QR factorization of <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> (which is itself cheap, as <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> is upper Hessenberg).</p>
-</section>
-</section>
-<section id="the-gmres-algorithm-computational-steps">
-<h2>The GMRES Algorithm: Computational Steps<a class="headerlink" href="#the-gmres-algorithm-computational-steps" title="Link to this heading">#</a></h2>
-<p>The derivation in the previous section established that at each step <span class="math notranslate nohighlight">\(k\)</span>, we must solve the small least-squares problem:</p>
-<div class="math notranslate nohighlight">
-\[
-\min_{y \in \mathbb{R}^k} \big\| \beta e_1 - \underline{H}_k \, y \big\|_2
-\]</div>
-<p>where <span class="math notranslate nohighlight">\(\beta = \|b\|_2 = \|r^{(0)}\|_2\)</span>.</p>
-<p>Solving this from scratch at every iteration would be inefficient. A practical GMRES implementation is <em>incremental</em>. It cleverly updates the solution from step <span class="math notranslate nohighlight">\(k-1\)</span> to step <span class="math notranslate nohighlight">\(k\)</span>. This is achieved by maintaining a QR factorization of the <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> matrix, which is updated at each step using Givens rotations.</p>
-<p>The algorithm proceeds in the following three stages at each iteration <span class="math notranslate nohighlight">\(k\)</span>.</p>
-<section id="the-arnoldi-step">
-<h3>The Arnoldi Step<a class="headerlink" href="#the-arnoldi-step" title="Link to this heading">#</a></h3>
-<p>We first run one step of the Arnoldi process. This involves:</p>
-<ol class="arabic simple">
-<li><p>Computing <span class="math notranslate nohighlight">\(w = A q_k\)</span>.</p></li>
-<li><p>Orthogonalizing <span class="math notranslate nohighlight">\(w\)</span> against all previous basis vectors <span class="math notranslate nohighlight">\(q_1, \dots, q_k\)</span>. The coefficients from this orthogonalization form the <span class="math notranslate nohighlight">\(k\)</span>-th column of the Hessenberg matrix <span class="math notranslate nohighlight">\(\underline{H}_k\)</span>.</p></li>
-<li><p>Normalizing the resulting vector to get the new basis vector, <span class="math notranslate nohighlight">\(q_{k+1}\)</span>.</p></li>
-</ol>
-<p>This single step provides us with the <span class="math notranslate nohighlight">\(k\)</span>-th column of <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> and the new basis vector <span class="math notranslate nohighlight">\(q_{k+1}\)</span>.</p>
-</section>
-<section id="update-the-qr-factorization-and-solve">
-<h3>Update the QR Factorization and Solve<a class="headerlink" href="#update-the-qr-factorization-and-solve" title="Link to this heading">#</a></h3>
-<p>This is the core of the GMRES computation. We have the <span class="math notranslate nohighlight">\((k+1) \times k\)</span> least-squares problem. We solve it by maintaining the QR factorization of <span class="math notranslate nohighlight">\(\underline{H}_k\)</span>.</p>
-<p>Because <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> is upper Hessenberg, its QR factorization is cheap to compute and, more importantly, <em>cheap to update</em>. When we add column <span class="math notranslate nohighlight">\(k\)</span> (which we just computed in the Arnoldi step), we only need to introduce a single new Givens rotation, <span class="math notranslate nohighlight">\(G_k\)</span>, to zero out the new subdiagonal element.</p>
-<p>Let <span class="math notranslate nohighlight">\(G_1, \dots, G_k\)</span> be the sequence of Givens rotations that transforms <span class="math notranslate nohighlight">\(\underline{H}_k\)</span> into an upper-triangular matrix <span class="math notranslate nohighlight">\(R_k\)</span> (padded with a row of zeros).</p>
+<p>The residual for a candidate <span class="math notranslate nohighlight">\(x_0+Q_k y\)</span> is <span class="math notranslate nohighlight">\(r_0-AQ_k y\)</span>. Because <span class="math notranslate nohighlight">\(q_1\)</span> is the first column of <span class="math notranslate nohighlight">\(Q_{k+1}\)</span>, we have <span class="math notranslate nohighlight">\(r_0=\beta q_1=Q_{k+1}(\beta e_1)\)</span>, where <span class="math notranslate nohighlight">\(e_1\)</span> is the first coordinate vector in <span class="math notranslate nohighlight">\(\mathbb R^{k+1}\)</span>. Substitution gives</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-G_k^T \cdots G_1^T \underline{H}_k =
-\begin{pmatrix}
-R_k \\ 0
-\end{pmatrix}
+\begin{aligned}
+r_0-AQ_k y
+&amp;=Q_{k+1}(\beta e_1)-Q_{k+1}\underline H_k y\\
+&amp;=Q_{k+1}(\beta e_1-\underline H_k y).
+\end{aligned}
 \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(R_k\)</span> is a <span class="math notranslate nohighlight">\(k \times k\)</span> upper-triangular matrix.</p>
-<p>To solve the least-squares problem, we must apply the <em>exact same</em> sequence of rotations to the right-hand-side vector, <span class="math notranslate nohighlight">\(\beta e_1\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\min_y \left\| \left( G_k^T \cdots G_1^T \right) (\beta e_1) -
-\begin{pmatrix}
-R_k \\ 0
-\end{pmatrix}
-y \right\|_2
-\end{split}\]</div>
-<p>Let’s define the rotated right-hand-side vector as <span class="math notranslate nohighlight">\(g_k\)</span>:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-g_k = \left( G_k^T \cdots G_1^T \right) (\beta e_1) = \begin{pmatrix} p_k \\ \rho_k \end{pmatrix}
-\end{split}\]</div>
-<p>Here, <span class="math notranslate nohighlight">\(p_k\)</span> is a vector of length <span class="math notranslate nohighlight">\(k\)</span>, and <span class="math notranslate nohighlight">\(\rho_k\)</span> is a single scalar. Our minimization problem is now:</p>
-<div class="math notranslate nohighlight">
-\[\begin{split}
-\min_y \left\| \begin{pmatrix} p_k \\ \rho_k \end{pmatrix} -
-\begin{pmatrix}
-R_k \\ 0
-\end{pmatrix}
-y \right\|_2^2
-=
-\min_y \left\| \begin{pmatrix} p_k - R_k y \\ \rho_k \end{pmatrix} \right\|_2^2
-= \min_y \| p_k - R_k y \|_2^2 + |\rho_k|^2
-\end{split}\]</div>
-<p>The minimum is achieved when we make the first term zero. We find our coefficient vector <span class="math notranslate nohighlight">\(y^{(k)}\)</span> by solving the <span class="math notranslate nohighlight">\(k \times k\)</span> upper-triangular system:</p>
+<p>Orthonormal columns preserve Euclidean lengths. Indeed, <span class="math notranslate nohighlight">\(Q_{k+1}^TQ_{k+1}=I\)</span> implies</p>
 <div class="math notranslate nohighlight">
 \[
-R_k \, y^{(k)} = p_k
+\|Q_{k+1}z\|_2^2
+=z^TQ_{k+1}^TQ_{k+1}z
+=z^Tz=\|z\|_2^2.
 \]</div>
-<p>This is easily solved by back-substitution.</p>
-<p>A key result in this approach is that the 2-norm of the residual at this step is exactly the leftover scalar term, <span class="math notranslate nohighlight">\(\rho_k\)</span>.</p>
+<p>The original <span class="math notranslate nohighlight">\(n\times k\)</span> least-squares problem therefore reduces to</p>
 <div class="math notranslate nohighlight">
 \[
-\| r^{(k)} \|_2 = \| \beta e_1 - \underline{H}_k y^{(k)} \|_2 = |\rho_k|
+\boxed{
+y_k=\underset{y\in\mathbb R^k}{\operatorname{argmin}}
+\|\beta e_1-\underline H_k y\|_2,
+\qquad x_k=x_0+Q_k y_k.
+}
 \]</div>
-<p>This gives us a cheap way to monitor the residual norm at every single iteration <em>without</em> computing the solution <span class="math notranslate nohighlight">\(x^{(k)}\)</span> or the residual <span class="math notranslate nohighlight">\(r^{(k)}\)</span>. We use <span class="math notranslate nohighlight">\(\rho_k\)</span> as our stopping criterion.</p>
+<p>This is the central GMRES calculation: choose the best combination of the available basis vectors by solving a <span class="math notranslate nohighlight">\((k+1)\times k\)</span> least-squares problem.</p>
 </section>
-<section id="compute-the-final-solution">
-<h3>Compute the Final Solution<a class="headerlink" href="#compute-the-final-solution" title="Link to this heading">#</a></h3>
-<p>We only perform this final step once the residual norm <span class="math notranslate nohighlight">\(\rho_k\)</span> is small enough (i.e., <span class="math notranslate nohighlight">\(\rho_k &lt; \text{tol} \cdot \beta\)</span>).</p>
-<p>Once the loop terminates at iteration <span class="math notranslate nohighlight">\(k\)</span>, we have the coefficient vector <span class="math notranslate nohighlight">\(y^{(k)}\)</span> from solving <span class="math notranslate nohighlight">\(R_k y^{(k)} = p_k\)</span>. The final approximate solution is the linear combination of the Krylov basis vectors defined by <span class="math notranslate nohighlight">\(y^{(k)}\)</span>:</p>
+</section>
+<section id="solving-the-small-problem-efficiently">
+<h2>Solving the Small Problem Efficiently<a class="headerlink" href="#solving-the-small-problem-efficiently" title="Link to this heading">#</a></h2>
+<section id="one-arnoldi-step">
+<h3>One Arnoldi Step<a class="headerlink" href="#one-arnoldi-step" title="Link to this heading">#</a></h3>
+<p>At iteration <span class="math notranslate nohighlight">\(k\)</span>, compute <span class="math notranslate nohighlight">\(w=Aq_k\)</span>, subtract its components along <span class="math notranslate nohighlight">\(q_1,\ldots,q_k\)</span>, and record the coefficients in column <span class="math notranslate nohighlight">\(k\)</span> of <span class="math notranslate nohighlight">\(\underline H_k\)</span>. Normalize the remaining vector to obtain <span class="math notranslate nohighlight">\(q_{k+1}\)</span>, provided its norm <span class="math notranslate nohighlight">\(h_{k+1,k}\)</span> is nonzero.</p>
+<p>Unlike Lanczos for a symmetric matrix, Arnoldi generally needs to orthogonalize against every preceding basis vector. The extra work is the cost of treating general nonsymmetric systems.</p>
+</section>
+<section id="update-the-qr-factorization">
+<h3>Update the QR Factorization<a class="headerlink" href="#update-the-qr-factorization" title="Link to this heading">#</a></h3>
+<p>We use <a class="reference internal" href="givens_rotations.html"><span class="std std-doc">Givens rotations</span></a> to solve the small least-squares problem. There is no need to factor the whole matrix again at every step.</p>
+<p>First apply the rotations from the previous iteration to the new column. Since <span class="math notranslate nohighlight">\(\underline H_k\)</span> is upper Hessenberg, only one additional rotation is needed to eliminate the remaining entry in row <span class="math notranslate nohighlight">\(k+1\)</span>. Write <span class="math notranslate nohighlight">\(G_j^T\)</span> for the rotation acting on rows <span class="math notranslate nohighlight">\(j\)</span> and <span class="math notranslate nohighlight">\(j+1\)</span>; earlier rotations act as the identity on any newly added rows. Together they give</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+G_k^T\cdots G_1^T\underline H_k
+=\begin{pmatrix}R_k\\0\end{pmatrix},
+\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(R_k\)</span> is <span class="math notranslate nohighlight">\(k\times k\)</span> and upper triangular.</p>
+<p>Apply exactly the same rotations to the right-hand side:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+g_k=G_k^T\cdots G_1^T(\beta e_1)
+=\begin{pmatrix}t_k\\\rho_k\end{pmatrix},
+\qquad t_k\in\mathbb R^k,\quad \rho_k\in\mathbb R.
+\end{split}\]</div>
+<p>The vector <span class="math notranslate nohighlight">\(t_k\)</span> contains the first <span class="math notranslate nohighlight">\(k\)</span> entries of the transformed right-hand side; <span class="math notranslate nohighlight">\(\rho_k\)</span> is its last entry. Orthogonal rotations preserve the norm, so</p>
 <div class="math notranslate nohighlight">
 \[
-x^{(k)} = Q_k \, y^{(k)}
+\|\beta e_1-\underline H_k y\|_2^2
+=\|t_k-R_k y\|_2^2+|\rho_k|^2.
 \]</div>
-<p>This final matrix-vector product is the last computation required to get our answer.</p>
+<p>Since <span class="math notranslate nohighlight">\(A\)</span> is nonsingular and <span class="math notranslate nohighlight">\(Q_k\)</span> has independent columns, <span class="math notranslate nohighlight">\(AQ_k\)</span> has rank <span class="math notranslate nohighlight">\(k\)</span>. The Arnoldi relation then gives full column rank for <span class="math notranslate nohighlight">\(\underline H_k\)</span>, so <span class="math notranslate nohighlight">\(R_k\)</span> is nonsingular. We can make the first term zero by solving</p>
+<div class="math notranslate nohighlight">
+\[
+R_k y_k=t_k.
+\]</div>
+<p>Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{\|r_k\|_2=|\rho_k|.}
+\]</div>
+<p>This is the computational benefit of updating the QR factorization: we can monitor the residual norm using one scalar, without forming <span class="math notranslate nohighlight">\(x_k\)</span> or <span class="math notranslate nohighlight">\(r_k\)</span> at every step. We can also postpone the triangular solve for <span class="math notranslate nohighlight">\(y_k\)</span> until we need the approximate solution. This is the implementation strategy described in <a class="reference external" href="https://netlib.org/linalg/html_templates/node29.html">Netlib’s GMRES notes</a>.</p>
 </section>
+<section id="form-the-approximation-and-check-it">
+<h3>Form the Approximation and Check It<a class="headerlink" href="#form-the-approximation-and-check-it" title="Link to this heading">#</a></h3>
+<p>For example, a relative-residual stopping test is <span class="math notranslate nohighlight">\(|\rho_k|\le\mathrm{tol}\,\beta\)</span>, where <code class="docutils literal notranslate"><span class="pre">tol</span></code> is the requested reduction relative to the initial residual. Once this test is met, solve for <span class="math notranslate nohighlight">\(y_k\)</span> and form</p>
+<div class="math notranslate nohighlight">
+\[
+x_k=x_0+Q_k y_k.
+\]</div>
+<p>In floating-point arithmetic, loss of basis orthogonality and rounding errors can make <span class="math notranslate nohighlight">\(|\rho_k|\)</span> differ from <span class="math notranslate nohighlight">\(\|b-Ax_k\|_2\)</span>. Check the explicitly computed residual before accepting the answer. A scaled residual test, such as the one in the <a class="reference internal" href="jacobi_method.html"><span class="std std-doc">Jacobi implementation</span></a>, measures backward error; solution accuracy also depends on the conditioning of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</section>
+<section id="when-arnoldi-has-no-new-direction">
+<h3>When Arnoldi Has No New Direction<a class="headerlink" href="#when-arnoldi-has-no-new-direction" title="Link to this heading">#</a></h3>
+<p>If <span class="math notranslate nohighlight">\(h_{k+1,k}=0\)</span>, do not divide by it to form <span class="math notranslate nohighlight">\(q_{k+1}\)</span>. Instead, use the relation <span class="math notranslate nohighlight">\(AQ_k=Q_kH_k\)</span>. It says that <span class="math notranslate nohighlight">\(A\)</span> maps <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> into itself. Since <span class="math notranslate nohighlight">\(A\)</span> is nonsingular, the <span class="math notranslate nohighlight">\(k\)</span> columns of <span class="math notranslate nohighlight">\(AQ_k\)</span> are independent and form another basis of this same space. In particular, <span class="math notranslate nohighlight">\(r_0\in\mathcal K_k\)</span> can be written as <span class="math notranslate nohighlight">\(AQ_k y\)</span> for some <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<p>The reduced system <span class="math notranslate nohighlight">\(H_k y=\beta e_1\)</span> therefore gives an exact solution <span class="math notranslate nohighlight">\(x=x_0+Q_k y\)</span>. For a nonsingular system, this exact termination of Arnoldi is successful completion of GMRES. No extra basis vector is needed.</p>
+</section>
+</section>
+<section id="computational-cost-and-restarting">
+<h2>Computational Cost and Restarting<a class="headerlink" href="#computational-cost-and-restarting" title="Link to this heading">#</a></h2>
+<p>At iteration <span class="math notranslate nohighlight">\(k\)</span>, standard GMRES stores <span class="math notranslate nohighlight">\(k\)</span> basis vectors and orthogonalizes the next vector against all of them. This requires <span class="math notranslate nohighlight">\(O(nk)\)</span> storage for the basis and <span class="math notranslate nohighlight">\(O(nk)\)</span> work for orthogonalization, in addition to the matrix-vector product. Updating the small QR factorization costs <span class="math notranslate nohighlight">\(O(k)\)</span> work, and its factors require <span class="math notranslate nohighlight">\(O(k^2)\)</span> storage. A triangular solve costs <span class="math notranslate nohighlight">\(O(k^2)\)</span> when an approximation is requested. CG, by contrast, stores only a fixed number of vectors and uses a fixed amount of vector work per step.</p>
+<p>To limit the growing cost, <strong>restarted GMRES</strong>, written GMRES(<span class="math notranslate nohighlight">\(m\)</span>), keeps at most <span class="math notranslate nohighlight">\(m\)</span> search directions per cycle. After a cycle, form the approximation, use it as a new initial guess, and build a new Krylov basis from its residual. Stop earlier if the requested accuracy is reached.</p>
+<p>Restarting retains the current approximation but discards the basis. It limits storage, but the new search spaces no longer contain all the earlier directions. It can therefore require more iterations than unrestarted GMRES, and can fail to converge.</p>
 </section>
 <section id="convergence-of-gmres">
 <h2>Convergence of GMRES<a class="headerlink" href="#convergence-of-gmres" title="Link to this heading">#</a></h2>
-<p>Understanding <em>when</em> GMRES converges is a complex topic, as it depends on the entirety of the matrix <span class="math notranslate nohighlight">\(A\)</span>, not just on individual properties like its condition number (as in CG for SPD matrices).</p>
-<p>The key to understanding its convergence lies in the polynomial approximation problem that GMRES implicitly solves.</p>
+<section id="what-residual-minimization-guarantees">
+<h3>What Residual Minimization Guarantees<a class="headerlink" href="#what-residual-minimization-guarantees" title="Link to this heading">#</a></h3>
+<p>For unrestarted GMRES, the search spaces grow with <span class="math notranslate nohighlight">\(k\)</span>. The old approximation remains an available candidate at the next step, so</p>
+<div class="math notranslate nohighlight">
+\[
+\|r_{k+1}\|_2\le\|r_k\|_2.
+\]</div>
+<p>Thus residual norms cannot increase in exact arithmetic. They can, however, stay unchanged for several steps. If Arnoldi does not terminate earlier, <span class="math notranslate nohighlight">\(n\)</span> independent basis vectors span <span class="math notranslate nohighlight">\(\mathbb R^n\)</span>, so unrestarted GMRES finds the exact solution in at most <span class="math notranslate nohighlight">\(n\)</span> steps. Neither statement guarantees that a useful tolerance is reached quickly.</p>
+</section>
 <section id="the-gmres-polynomial-problem">
 <h3>The GMRES Polynomial Problem<a class="headerlink" href="#the-gmres-polynomial-problem" title="Link to this heading">#</a></h3>
-<p>Recall that at step <span class="math notranslate nohighlight">\(k\)</span>, GMRES finds the approximation <span class="math notranslate nohighlight">\(x^{(k)} = Q_k y\)</span> in the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> that minimizes the 2-norm of the residual. Any vector <span class="math notranslate nohighlight">\(x^{(k)} \in \mathcal{K}_k\)</span> can be written as <span class="math notranslate nohighlight">\(x^{(k)} = q(A)b\)</span> for some polynomial <span class="math notranslate nohighlight">\(q\)</span> of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>.</p>
-<p>Therefore, the residual <span class="math notranslate nohighlight">\(r^{(k)}\)</span> can be expressed as:</p>
+<p>Every correction in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> has the form <span class="math notranslate nohighlight">\(s(A)r_0\)</span>, where <span class="math notranslate nohighlight">\(s\)</span> is a polynomial of degree at most <span class="math notranslate nohighlight">\(k-1\)</span>. Its residual is</p>
 <div class="math notranslate nohighlight">
 \[
-r^{(k)} = b - A x^{(k)} = b - A q(A) b = (I - A q(A)) b
+r_0-As(A)r_0=(I-As(A))r_0=p(A)r_0,
+\qquad p(z)=1-zs(z).
 \]</div>
-<p>If we define a new polynomial <span class="math notranslate nohighlight">\(p(z) = 1 - z q(z)\)</span>, we can see that:</p>
-<ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(p(z)\)</span> is a polynomial of degree at most <span class="math notranslate nohighlight">\(k\)</span>.</p></li>
-<li><p><span class="math notranslate nohighlight">\(p(0) = 1 - 0 \cdot q(0) = 1\)</span>.</p></li>
-</ol>
-<p>Thus, GMRES finds the <span class="math notranslate nohighlight">\(x^{(k)}\)</span> corresponding to the polynomial <span class="math notranslate nohighlight">\(p \in \mathcal{P}_k\)</span> (the set of polynomials of degree <span class="math notranslate nohighlight">\(\le k\)</span>) that satisfies <span class="math notranslate nohighlight">\(p(0)=1\)</span> and minimizes the norm of the resulting residual:</p>
+<p>The polynomial <span class="math notranslate nohighlight">\(p\)</span> has degree at most <span class="math notranslate nohighlight">\(k\)</span> and <span class="math notranslate nohighlight">\(p(0)=1\)</span>. Conversely, every such <span class="math notranslate nohighlight">\(p\)</span> can be written this way because <span class="math notranslate nohighlight">\(1-p(z)\)</span> has a factor <span class="math notranslate nohighlight">\(z\)</span>. Hence the GMRES minimization is exactly</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\|r^{(k)}\|_2 = \min_{ \substack{p \in \mathcal{P}_k \\ p(0) = 1} } \| p(A) b \|_2
+\boxed{
+\|r_k\|_2
+=\min_{\substack{p\in\mathcal P_k\\p(0)=1}}\|p(A)r_0\|_2,
+}
 \end{split}\]</div>
-<p>This tells us that <strong>GMRES converges quickly if there exists a low-degree polynomial <span class="math notranslate nohighlight">\(p\)</span> such that <span class="math notranslate nohighlight">\(p(0)=1\)</span> and <span class="math notranslate nohighlight">\(p(A)b\)</span> is small.</strong></p>
+<p>where <span class="math notranslate nohighlight">\(\mathcal P_k\)</span> denotes the real polynomials of degree at most <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<p>This connects GMRES to <a class="reference internal" href="chebyshev_acceleration.html"><span class="std std-doc">Chebyshev acceleration</span></a>: both seek a polynomial equal to one at zero and small on the relevant matrix directions. Chebyshev chooses one using spectral bounds; GMRES chooses the polynomial that minimizes the actual residual for the given starting vector.</p>
 </section>
-<section id="a-formal-error-bound">
-<h3>A Formal Error Bound<a class="headerlink" href="#a-formal-error-bound" title="Link to this heading">#</a></h3>
-<p>This polynomial formulation leads to a famous (though often pessimistic) upper bound on the GMRES residual.</p>
+<section id="a-bound-using-eigenvalues">
+<h3>A Bound Using Eigenvalues<a class="headerlink" href="#a-bound-using-eigenvalues" title="Link to this heading">#</a></h3>
 <div class="proof theorem admonition" id="gmres_residual_bound">
-<p class="admonition-title"><span class="caption-number">Theorem 52 </span> (GMRES Residual Bound)</p>
+<p class="admonition-title"><span class="caption-number">Theorem 53 </span> (GMRES Residual Bound)</p>
 <section class="theorem-content" id="proof-content">
-<p>Suppose that <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable with an eigenvalue decomposition <span class="math notranslate nohighlight">\(A = X \Lambda X^{-1}\)</span>. Then the GMRES residual at step <span class="math notranslate nohighlight">\(k\)</span> is bounded by:</p>
+<p>For unrestarted GMRES, suppose <span class="math notranslate nohighlight">\(A\)</span> is diagonalizable over <span class="math notranslate nohighlight">\(\mathbb C\)</span>, with <span class="math notranslate nohighlight">\(A=X\Lambda X^{-1}\)</span> and eigenvalues <span class="math notranslate nohighlight">\(\lambda_1,\ldots,\lambda_n\)</span>. Then</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
-\|r^{(k)}\|_2 \le \|b\|_2 \cdot \kappa(X) \cdot \min_{ \substack{p \in \mathcal{P}_k \\p(0) = 1} } \max_{\lambda \in \Lambda(A)} |p(\lambda)|
+\|r_k\|_2
+\le\kappa_2(X)\,\|r_0\|_2
+\min_{\substack{p\in\mathcal P_k\\p(0)=1}}
+\max_{1\le j\le n}|p(\lambda_j)|,
 \end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(\Lambda(A)\)</span> is the set of <span class="math notranslate nohighlight">\(A\)</span>’s eigenvalues and <span class="math notranslate nohighlight">\(\kappa(X) = \|X\|_2 \|X^{-1}\|_2\)</span> is the condition number of the eigenvector matrix <span class="math notranslate nohighlight">\(X\)</span>.</p>
+<p>where <span class="math notranslate nohighlight">\(\kappa_2(X)=\|X\|_2\|X^{-1}\|_2\)</span> measures the conditioning of the eigenvector basis.</p>
 </section>
-</div><p>This bound reveals the two key factors governing GMRES convergence:</p>
-<ol class="arabic simple">
-<li><p><strong>Eigenvalue Distribution:</strong> The term <span class="math notranslate nohighlight">\(\min \max |p(\lambda)|\)</span>. We need to find a low-degree polynomial <span class="math notranslate nohighlight">\(p\)</span> (with <span class="math notranslate nohighlight">\(p(0)=1\)</span>) that is as small as possible on <em>all</em> eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>.</p>
-<ul class="simple">
-<li><p><strong>Good Case:</strong> If the eigenvalues are clustered in a few compact groups, all far from the origin, it is easy to construct such a polynomial.</p></li>
-<li><p><strong>Bad Case:</strong> If the eigenvalues are distributed widely, or worse, accumulate near the origin, it is very difficult for a low-degree polynomial to be small on all of them simultaneously.</p></li>
-</ul>
-</li>
-<li><p><strong>Non-Normality of <span class="math notranslate nohighlight">\(A\)</span>:</strong> The term <span class="math notranslate nohighlight">\(\kappa(X)\)</span>.</p>
-<ul class="simple">
-<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is a <strong>normal matrix</strong> (e.g., symmetric, skew-symmetric, or unitary), its eigenvectors are orthogonal, and <span class="math notranslate nohighlight">\(\kappa(X) = 1\)</span>. In this case, convergence is governed <em>only</em> by the eigenvalue distribution.</p></li>
-<li><p>If <span class="math notranslate nohighlight">\(A\)</span> is <strong>non-normal</strong>, its eigenvectors can be nearly linearly dependent, making <span class="math notranslate nohighlight">\(\kappa(X)\)</span> very large. A large <span class="math notranslate nohighlight">\(\kappa(X)\)</span> can permit slow convergence even when the eigenvalue distribution appears favorable. This is the most significant departure from the convergence behavior of CG.</p></li>
-</ul>
-</li>
-</ol>
+</div><div class="proof admonition" id="proof">
+<p>Proof. For any admissible polynomial,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\|p(A)r_0\|_2
+&amp;=\|Xp(\Lambda)X^{-1}r_0\|_2\\
+&amp;\le\|X\|_2\,\|X^{-1}\|_2\,\|r_0\|_2
+\max_j|p(\lambda_j)|.
+\end{aligned}
+\end{split}\]</div>
+<p>Minimizing over the same polynomials on both sides proves the bound.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>The factor is <span class="math notranslate nohighlight">\(\kappa_2(X)\)</span>, not <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>.</strong> The columns of <span class="math notranslate nohighlight">\(X\)</span> are eigenvectors, so <span class="math notranslate nohighlight">\(\kappa_2(X)\)</span> measures the conditioning of their basis. In contrast, <span class="math notranslate nohighlight">\(\kappa_2(A)=\|A\|_2\|A^{-1}\|_2\)</span> measures the sensitivity of the linear system. These can differ enormously: in the most nonnormal example below, <span class="math notranslate nohighlight">\(\kappa_2(A)\approx133\)</span>, while <span class="math notranslate nohighlight">\(\kappa_2(X)\approx2\times10^{32}\)</span>.</p>
+</div>
+<p>This bound, developed in the <a class="reference external" href="https://math.berkeley.edu/~mgu/MA228A/saad-schultz.pdf">original GMRES paper</a>, separates two effects. Favorable eigenvalue locations allow a low-degree polynomial to be small at all eigenvalues while remaining one at zero. For example, suppose all eigenvalues lie in a disc <span class="math notranslate nohighlight">\(|z-a|\le\delta&lt;|a|\)</span> centered at a nonzero real number <span class="math notranslate nohighlight">\(a\)</span>. The polynomial <span class="math notranslate nohighlight">\((1-z/a)^k\)</span> then has magnitude at most <span class="math notranslate nohighlight">\((\delta/|a|)^k\)</span> on that disc. Eigenvalues spread around the origin may be much harder to suppress.</p>
+<p>The factor <span class="math notranslate nohighlight">\(\kappa_2(X)\)</span> accounts for the eigenvector basis. For a normal matrix, meaning <span class="math notranslate nohighlight">\(A^TA=AA^T\)</span> here, we can choose <span class="math notranslate nohighlight">\(X\)</span> unitary and this factor is one. Even then, the actual residual depends on how <span class="math notranslate nohighlight">\(r_0\)</span> is distributed among the eigenvectors. For a nonnormal matrix, a poorly conditioned eigenvector basis can make the bound much larger. Eigenvalue locations alone then provide limited guidance. The theorem does not cover matrices without an eigenvector basis, although GMRES itself still applies.</p>
+<p>The figure isolates this issue by keeping the eigenvalues fixed while changing the eigenvectors. All three matrices have the same cluster away from zero. Nevertheless, GMRES takes substantially longer for the matrices with ill-conditioned eigenvector bases. A polynomial that is small at the eigenvalues need not make <span class="math notranslate nohighlight">\(p(A)r_0\)</span> equally small when those eigenvectors are nearly linearly dependent.</p>
+<figure class="align-default" id="fig-gmres-nonnormal-convergence">
+<a class="reference internal image-reference" href="../_images/gmres_nonnormal_convergence.svg"><img alt="Three matrices share the same 33 real eigenvalues in the interval 0.75 to 1.25. Their GMRES convergence curves become slower as the condition number of the unit-column eigenvector matrix grows from one to about 3.5 times ten to the thirteen and two times ten to the thirty-two." src="../_images/gmres_nonnormal_convergence.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 29 </span><span class="caption-text">Same eigenvalues, different convergence. The legend reports <span class="math notranslate nohighlight">\(\kappa_2(X)\)</span> for the eigenvector matrix, not <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>. The <span class="math notranslate nohighlight">\(33\times33\)</span> matrices have diagonal entries evenly spaced in <span class="math notranslate nohighlight">\([0.75,1.25]\)</span>, first superdiagonal entries <span class="math notranslate nohighlight">\(0\)</span>, <span class="math notranslate nohighlight">\(0.25\)</span>, or <span class="math notranslate nohighlight">\(1\)</span>, and all other entries zero. Left: the identical spectra. Right: computed unrestarted GMRES residuals for the same right-hand side and <span class="math notranslate nohighlight">\(x_0=0\)</span>; the target <span class="math notranslate nohighlight">\(10^{-8}\)</span> is reached in 9, 16, and 31 steps. Every column of <span class="math notranslate nohighlight">\(X\)</span> has unit length, so its condition number reflects the geometry of the eigenvectors rather than arbitrary column scaling. The computation uses reorthogonalization to preserve basis orthogonality. This is one illustrative family; <span class="math notranslate nohighlight">\(\kappa_2(X)\)</span> alone does not determine a convergence curve.</span><a class="headerlink" href="#fig-gmres-nonnormal-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 </section>
-<section id="a-failure-case-for-gmres">
-<h3>A “Failure Case” for GMRES<a class="headerlink" href="#a-failure-case-for-gmres" title="Link to this heading">#</a></h3>
-<p>A classic example of worst-case behavior occurs when the eigenvalues are uniformly distributed on the unit circle.</p>
-<p>Consider a simple <strong>permutation matrix</strong> <span class="math notranslate nohighlight">\(A\)</span> that represents a single cycle on <span class="math notranslate nohighlight">\(n\)</span> elements, for instance, <span class="math notranslate nohighlight">\(\pi(i) = (i \mod n) + 1\)</span>. The eigenvalues of this matrix are the <span class="math notranslate nohighlight">\(n\)</span> roots of unity, which are perfectly spread around the unit circle.</p>
-<p>Let’s try to solve <span class="math notranslate nohighlight">\(Ax = e_1\)</span>. The solution <span class="math notranslate nohighlight">\(x\)</span> is the vector <span class="math notranslate nohighlight">\(e_r\)</span> such that <span class="math notranslate nohighlight">\(\pi(r) = 1\)</span>, which in this case is <span class="math notranslate nohighlight">\(e_n\)</span>. The Krylov subspace is:</p>
+<section id="an-example-with-no-residual-reduction-until-the-last-step">
+<h3>An Example with No Residual Reduction Until the Last Step<a class="headerlink" href="#an-example-with-no-residual-reduction-until-the-last-step" title="Link to this heading">#</a></h3>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> cyclically shift the coordinate vectors:</p>
 <div class="math notranslate nohighlight">
 \[
-\mathcal{K}_k(A, e_1) = \text{span} \{e_1, A e_1, \dots, A^{k-1} e_1\} = \text{span} \{e_1, e_2, \dots, e_k\}
+Ae_j=e_{j+1}\quad(1\le j&lt;n),
+\qquad Ae_n=e_1.
 \]</div>
-<p>The subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> is simply the coordinate subspace spanned by the first <span class="math notranslate nohighlight">\(k\)</span> standard basis vectors.</p>
-<p>The true solution is <span class="math notranslate nohighlight">\(x = e_n\)</span>. This solution vector is <strong>orthogonal</strong> to the Krylov subspace <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span> for all <span class="math notranslate nohighlight">\(k &lt; n\)</span>. Because the GMRES approximation <span class="math notranslate nohighlight">\(x^{(k)}\)</span> <em>must</em> lie in <span class="math notranslate nohighlight">\(\mathcal{K}_k\)</span>, the algorithm cannot make <em>any</em> progress toward the solution. The residual norm will remain completely stagnant.</p>
-<p>Only at iteration <span class="math notranslate nohighlight">\(k=n\)</span> does the subspace <span class="math notranslate nohighlight">\(\mathcal{K}_n\)</span> finally contain the solution. GMRES will find the exact solution in <span class="math notranslate nohighlight">\(n\)</span> steps (as it must, in exact arithmetic), but it shows zero convergence until the very last iteration. This is a catastrophic failure of “fast” convergence, and it stems directly from an eigenvalue distribution that makes the polynomial problem <span class="math notranslate nohighlight">\(\min \max |p(\lambda)|\)</span> impossible to solve well for <span class="math notranslate nohighlight">\(k &lt; n\)</span>.</p>
+<p>Take <span class="math notranslate nohighlight">\(b=e_1\)</span> and <span class="math notranslate nohighlight">\(x_0=0\)</span>. The solution is <span class="math notranslate nohighlight">\(x=e_n\)</span>, while</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal K_k(A,e_1)=\operatorname{span}\{e_1,\ldots,e_k\}.
+\]</div>
+<p>For <span class="math notranslate nohighlight">\(k&lt;n\)</span>, applying <span class="math notranslate nohighlight">\(A\)</span> to this space gives <span class="math notranslate nohighlight">\(\operatorname{span}\{e_2,\ldots,e_{k+1}\}\)</span>, which is perpendicular to <span class="math notranslate nohighlight">\(b=e_1\)</span>. Therefore every candidate <span class="math notranslate nohighlight">\(z\in\mathcal K_k\)</span> satisfies</p>
+<div class="math notranslate nohighlight">
+\[
+\|b-Az\|_2^2
+=\|e_1\|_2^2+\|Az\|_2^2
+=1+\|Az\|_2^2\ge1.
+\]</div>
+<p>The minimum is attained at <span class="math notranslate nohighlight">\(z=0\)</span>. Thus <span class="math notranslate nohighlight">\(x_k=0\)</span> and <span class="math notranslate nohighlight">\(\|r_k\|_2=1\)</span> for every <span class="math notranslate nohighlight">\(k&lt;n\)</span>. At step <span class="math notranslate nohighlight">\(n\)</span>, the space contains <span class="math notranslate nohighlight">\(e_n\)</span> and GMRES gives the exact solution.</p>
+<p>This matrix is orthogonal, with all eigenvalues on the unit circle, yet there is no residual reduction before the last step. Optimality over each search space does not imply rapid convergence. Restarting this example with <span class="math notranslate nohighlight">\(m&lt;n\)</span> repeats the same unproductive cycle, so restarted GMRES does not converge.</p>
+<p>The <a class="reference internal" href="cg_vs_gmres.html"><span class="std std-doc">next section</span></a> compares the objectives, work, and storage of CG and GMRES before we specialize residual minimization to symmetric matrices with MINRES.</p>
 </section>
 </section>
 </section>
@@ -805,23 +815,25 @@ r^{(k)} = b - A x^{(k)} = b - A q(A) b = (I - A q(A)) b
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#from-conjugate-gradients-to-gmres">From Conjugate Gradients to GMRES</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-analogy-and-computational-cost">The Arnoldi Analogy and Computational Cost</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-new-objective-minimizing-the-residual">A New Objective: Minimizing the Residual</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deriving-the-gmres-least-squares-problem">Deriving the GMRES Least-Squares Problem</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-relation">The Arnoldi Relation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transforming-the-problem">Transforming the Problem</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-algorithm-computational-steps">The GMRES Algorithm: Computational Steps</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-arnoldi-step">The Arnoldi Step</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-qr-factorization-and-solve">Update the QR Factorization and Solve</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compute-the-final-solution">Compute the Final Solution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solving-the-small-problem-efficiently">Solving the Small Problem Efficiently</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#one-arnoldi-step">One Arnoldi Step</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-qr-factorization">Update the QR Factorization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#form-the-approximation-and-check-it">Form the Approximation and Check It</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-arnoldi-has-no-new-direction">When Arnoldi Has No New Direction</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#computational-cost-and-restarting">Computational Cost and Restarting</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-of-gmres">Convergence of GMRES</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-residual-minimization-guarantees">What Residual Minimization Guarantees</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gmres-polynomial-problem">The GMRES Polynomial Problem</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-formal-error-bound">A Formal Error Bound</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-failure-case-for-gmres">A “Failure Case” for GMRES</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-bound-using-eigenvalues">A Bound Using Eigenvalues</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#an-example-with-no-residual-reduction-until-the-last-step">An Example with No Residual Reduction Until the Last Step</a></li>
 </ul>
 </li>
 </ul>

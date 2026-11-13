@@ -68,7 +68,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Preconditioned Conjugate Gradient" href="pcg.html" />
-    <link rel="prev" title="MINRES" href="minres.html" />
+    <link rel="prev" title="The Minimal Residual Method (MINRES)" href="minres.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -291,7 +291,7 @@
 <li class="toctree-l2"><a class="reference internal" href="conjugate_gradient.html">The Conjugate Gradient (CG) Method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gmres.html">The Generalized Minimal Residual Method (GMRES)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cg_vs_gmres.html">CG vs. GMRES</a></li>
-<li class="toctree-l2"><a class="reference internal" href="minres.html">MINRES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minres.html">The Minimal Residual Method (MINRES)</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Preconditioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcg.html">Preconditioned Conjugate Gradient</a></li>
 </ul>
@@ -458,15 +458,23 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-goal-of-a-preconditioner">The Goal of a Preconditioner</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-types-of-preconditioning">Three Types of Preconditioning</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-preconditioners">Examples of Preconditioners</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-iteration-preconditioners">1. Classical Iteration Preconditioners</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-factorization-preconditioners-ilu-ic">2. Incomplete Factorization Preconditioners (ILU/IC)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-approximate-inverse-spai-preconditioners">3. Sparse Approximate Inverse (SPAI) Preconditioners</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-specialized-preconditioners">4. Advanced &amp; Specialized Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#left-right-and-symmetric-preconditioning">Left, Right, and Symmetric Preconditioning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#left-preconditioning">Left Preconditioning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#right-preconditioning">Right Preconditioning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-preconditioning-for-cg-and-minres">Symmetric Preconditioning for CG and MINRES</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-iteration-preconditioners">Classical Iteration Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-factorizations-ilu-and-ic">Incomplete Factorizations: ILU and IC</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-the-2d-poisson-matrix-and-ilu-0">Example: The 2D Poisson Matrix and ILU(0)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-approximate-inverses">Sparse Approximate Inverses</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#polynomial-preconditioners">Polynomial Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multigrid-preconditioners">Multigrid Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#domain-decomposition">Domain Decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-and-physics-based-preconditioners">Block and Physics-Based Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-and-applying-a-preconditioner">Choosing and Applying a Preconditioner</a></li>
 </ul>
             </nav>
         </div>
@@ -480,170 +488,217 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="preconditioning">
 <h1>Preconditioning<a class="headerlink" href="#preconditioning" title="Link to this heading">#</a></h1>
-<p>In our previous discussions on iterative methods like the Conjugate Gradient (CG) algorithm and GMRES, we observed a critical fact: their convergence speed is highly dependent on the properties of the system matrix <span class="math notranslate nohighlight">\(A\)</span>. Specifically, convergence is slow when the <strong>condition number</strong> <span class="math notranslate nohighlight">\(\kappa(A)\)</span> is large, or when the <strong>eigenvalues</strong> are spread out. Convergence improves significantly if the matrix is “closer” to the identity, has clustered eigenvalues, and its eigenbasis is well-conditioned.</p>
-<p>For many practical problems, especially those arising from the discretization of partial differential equations, <span class="math notranslate nohighlight">\(\kappa(A)\)</span> can be very large, rendering our standard iterative methods impractically slow. This motivates the central topic of this section: <strong>preconditioning</strong>.</p>
+<p>CG and GMRES can require many iterations when their Krylov spaces contain good approximations only slowly. For CG, a large condition number weakens the convergence bound, although eigenvalue clustering can still give rapid convergence. For nonsymmetric systems, GMRES convergence also depends on the eigenvectors and, more generally, on how polynomials of the matrix act on the residual. Eigenvalues alone do not determine its behavior.</p>
+<p><strong>Preconditioning</strong> changes the system seen by the iterative method while preserving the solution of <span class="math notranslate nohighlight">\(Ax=b\)</span>. The aim is to make each iteration more effective without adding too much work. This section surveys the main approaches; their usefulness depends on both the matrix and the computing hardware.</p>
 <section id="the-goal-of-a-preconditioner">
 <h2>The Goal of a Preconditioner<a class="headerlink" href="#the-goal-of-a-preconditioner" title="Link to this heading">#</a></h2>
-<p>The core idea of preconditioning is simple: instead of solving the original, difficult system <span class="math notranslate nohighlight">\(Ax=b\)</span>, we solve a related, “easier” system that has the same solution. We do this by applying a <strong>preconditioner</strong> <span class="math notranslate nohighlight">\(M\)</span>, which is a matrix that <em>approximates</em> <span class="math notranslate nohighlight">\(A\)</span> but is much easier to invert.</p>
-<p>A good preconditioner <span class="math notranslate nohighlight">\(M\)</span> must balance two competing goals:</p>
-<ol class="arabic simple">
-<li><p><strong>Improve Convergence:</strong> The preconditioned system (e.g., <span class="math notranslate nohighlight">\(M^{-1}A\)</span>) must be “nicer” than the original <span class="math notranslate nohighlight">\(A\)</span>. Ideally, its eigenvalues are clustered, and its condition number <span class="math notranslate nohighlight">\(\kappa(M^{-1}A)\)</span> is much smaller than <span class="math notranslate nohighlight">\(\kappa(A)\)</span>. The best possible (but impractical) choice is <span class="math notranslate nohighlight">\(M=A\)</span>, which gives <span class="math notranslate nohighlight">\(M^{-1}A = I\)</span> and <span class="math notranslate nohighlight">\(\kappa(M^{-1}A)=1\)</span>, allowing convergence in one iteration.</p></li>
-<li><p><strong>Be Easy to Apply:</strong> The preconditioner is only useful if it is computationally cheap. We must be able to solve linear systems of the form <span class="math notranslate nohighlight">\(Mz=r\)</span> (i.e., compute <span class="math notranslate nohighlight">\(M^{-1}r\)</span>) very quickly in each iteration of our method (e.g., CG or GMRES).</p></li>
-</ol>
-<p>The art of preconditioning lies in finding a matrix <span class="math notranslate nohighlight">\(M\)</span> that strikes the optimal trade-off between these two goals.</p>
-</section>
-<section id="three-types-of-preconditioning">
-<h2>Three Types of Preconditioning<a class="headerlink" href="#three-types-of-preconditioning" title="Link to this heading">#</a></h2>
-<p>There are three main ways to apply a preconditioner <span class="math notranslate nohighlight">\(M\)</span> (or its components <span class="math notranslate nohighlight">\(M_1, M_2\)</span>) to the system <span class="math notranslate nohighlight">\(Ax=b\)</span>.</p>
-<ol class="arabic">
-<li><p><strong>Left Preconditioning:</strong> We multiply from the left by an approximation <span class="math notranslate nohighlight">\(M_1 \approx A\)</span>. We solve the modified system:</p>
-<div class="math notranslate nohighlight">
-\[(M_1^{-1} A) x = M_1^{-1} b\]</div>
-<p>This is a common choice for non-symmetric solvers like GMRES, as it directly acts on the system matrix to improve its properties.</p>
-</li>
-<li><p><strong>Right Preconditioning:</strong> We use an approximation <span class="math notranslate nohighlight">\(M_2 \approx A\)</span> and introduce a variable substitution <span class="math notranslate nohighlight">\(x = M_2^{-1} z\)</span>. This leads to the system:</p>
-<div class="math notranslate nohighlight">
-\[(A M_2^{-1}) z = b, \quad \text{followed by} \quad x = M_2^{-1} z\]</div>
-<p>This is also common for GMRES. A key advantage of right preconditioning is that the residual of the original system, <span class="math notranslate nohighlight">\(r = b - Ax\)</span>, can be computed directly, which is often desirable.</p>
-</li>
-<li><p><strong>Symmetric (Split) Preconditioning:</strong> We use two matrices, <span class="math notranslate nohighlight">\(M_1\)</span> and <span class="math notranslate nohighlight">\(M_2\)</span>, to “split” the preconditioning:</p>
-<div class="math notranslate nohighlight">
-\[(M_1^{-1} A M_2^{-1}) z = M_1^{-1} b, \quad \text{followed by} \quad x = M_2^{-1} z\]</div>
-</li>
-</ol>
-<p>This third case is <strong>essential for methods like CG and MINRES</strong>. The Conjugate Gradient algorithm <em>requires</em> the system matrix to be Symmetric Positive Definite (SPD). If <span class="math notranslate nohighlight">\(A\)</span> is SPD, the left-preconditioned matrix <span class="math notranslate nohighlight">\(M_1^{-1} A\)</span> is generally <em>not</em> symmetric, so we cannot apply CG.</p>
-<p>To preserve symmetry, we must construct the preconditioned system in a symmetric way. For example, if we have a preconditioner <span class="math notranslate nohighlight">\(M\)</span> that is itself SPD, we can find its Cholesky factor <span class="math notranslate nohighlight">\(C\)</span> such that <span class="math notranslate nohighlight">\(M = C C^T\)</span>. We can then set <span class="math notranslate nohighlight">\(M_1 = C\)</span> and <span class="math notranslate nohighlight">\(M_2 = C^T\)</span>. This transforms <span class="math notranslate nohighlight">\(Ax=b\)</span> into the equivalent system:</p>
+<p>Let <span class="math notranslate nohighlight">\(A\)</span> be nonsingular. We choose a nonsingular matrix <span class="math notranslate nohighlight">\(M\)</span> that approximates <span class="math notranslate nohighlight">\(A\)</span> in a useful way and is inexpensive to solve with. Applying the preconditioner means computing</p>
 <div class="math notranslate nohighlight">
 \[
-(C^{-1} A C^{-T}) z = C^{-1} b, \quad \text{where} \quad x = C^{-T} z
+Mz=r,\qquad\text{or equivalently}\qquad z=M^{-1}r.
 \]</div>
-<p>The new system matrix <span class="math notranslate nohighlight">\(A' = C^{-1} A C^{-T}\)</span> is SPD, and we can now safely apply the standard CG algorithm to <span class="math notranslate nohighlight">\(A'z = b'\)</span>.</p>
+<p><strong>We normally do not form <span class="math notranslate nohighlight">\(M^{-1}\)</span>.</strong> We provide a procedure that solves with <span class="math notranslate nohighlight">\(M\)</span>, perhaps using sparse factors, local solves, or a multigrid cycle.</p>
+<p>A useful preconditioner balances three costs: construction, storage, and application at every iteration. Fewer iterations do not necessarily mean a faster solve if the preconditioner is expensive. Setup can be worthwhile when reused for several right-hand sides.</p>
+<p>The ideal choice <span class="math notranslate nohighlight">\(M=A\)</span> gives <span class="math notranslate nohighlight">\(M^{-1}A=I\)</span>, but then applying the preconditioner requires solving the original problem. Practical choices retain enough of the structure of <span class="math notranslate nohighlight">\(A\)</span> to help convergence while making the solve cheaper. Approximating every entry accurately is not the goal; the effect on the iterative method matters.</p>
 </section>
-<section id="examples-of-preconditioners">
-<h2>Examples of Preconditioners<a class="headerlink" href="#examples-of-preconditioners" title="Link to this heading">#</a></h2>
-<p>Choosing a preconditioner is arguably the most critical and problem-dependent step in successfully using iterative solvers. There is no single “best” preconditioner; the choice is always a trade-off between <strong>effectiveness</strong> (how much it reduces the iteration count), <strong>computational cost</strong> (how expensive it is to apply <span class="math notranslate nohighlight">\(M^{-1}r\)</span>), and <strong>storage cost</strong>.</p>
-<p>We will survey the main families, progressing from the simplest “classical” methods to more advanced, specialized, and powerful techniques.</p>
+<section id="left-right-and-symmetric-preconditioning">
+<h2>Left, Right, and Symmetric Preconditioning<a class="headerlink" href="#left-right-and-symmetric-preconditioning" title="Link to this heading">#</a></h2>
+<p>The placement of the preconditioner affects both the matrix and the residual minimized by GMRES. In this discussion, <span class="math notranslate nohighlight">\(M\)</span> is fixed and its inverse is applied as a linear operation.</p>
+<section id="left-preconditioning">
+<h3>Left Preconditioning<a class="headerlink" href="#left-preconditioning" title="Link to this heading">#</a></h3>
+<p>Multiply the equation by <span class="math notranslate nohighlight">\(M^{-1}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+M^{-1}Ax=M^{-1}b.
+\]</div>
+<p>The residual of this transformed system is <span class="math notranslate nohighlight">\(M^{-1}(b-Ax)\)</span>. Thus left-preconditioned GMRES minimizes <span class="math notranslate nohighlight">\(\|M^{-1}(b-Ax)\|_2\)</span> over its current search space. This is a weighted measure of the original residual; it can be small even when <span class="math notranslate nohighlight">\(\|b-Ax\|_2\)</span> is not. Check the original residual before accepting the solution.</p>
+</section>
+<section id="right-preconditioning">
+<h3>Right Preconditioning<a class="headerlink" href="#right-preconditioning" title="Link to this heading">#</a></h3>
+<p>Introduce <span class="math notranslate nohighlight">\(y=Mx\)</span>, so <span class="math notranslate nohighlight">\(x=M^{-1}y\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[
+AM^{-1}y=b,\qquad x=M^{-1}y.
+\]</div>
+<p>Now the transformed residual is exactly <span class="math notranslate nohighlight">\(b-AM^{-1}y=b-Ax\)</span>. Right-preconditioned GMRES therefore minimizes the original Euclidean residual norm.</p>
+<p>For the same initial approximation <span class="math notranslate nohighlight">\(x_0\)</span>, use <span class="math notranslate nohighlight">\(y_0=Mx_0\)</span> in the right-preconditioned system. With a fixed <span class="math notranslate nohighlight">\(M\)</span>, the two methods actually offer the same correction space in the original variables:</p>
+<div class="math notranslate nohighlight">
+\[
+M^{-1}\mathcal K_k(AM^{-1},r_0)
+=\mathcal K_k(M^{-1}A,M^{-1}r_0),
+\qquad r_0=b-Ax_0.
+\]</div>
+<p>This follows by applying <span class="math notranslate nohighlight">\(M^{-1}\)</span> to each generating vector: <span class="math notranslate nohighlight">\(M^{-1}(AM^{-1})^jr_0=(M^{-1}A)^jM^{-1}r_0\)</span>. The iterates can differ because left and right preconditioning minimize different residual norms. The <a class="reference external" href="https://petsc.org/main/manual/ksp/#preconditioning-within-ksp">PETSc discussion of preconditioning</a> explains these residual choices in solver implementations.</p>
+</section>
+<section id="symmetric-preconditioning-for-cg-and-minres">
+<h3>Symmetric Preconditioning for CG and MINRES<a class="headerlink" href="#symmetric-preconditioning-for-cg-and-minres" title="Link to this heading">#</a></h3>
+<p>For SPD <span class="math notranslate nohighlight">\(A\)</span>, choose an SPD preconditioner <span class="math notranslate nohighlight">\(M\)</span>. Although <span class="math notranslate nohighlight">\(M^{-1}A\)</span> generally is not symmetric in the Euclidean inner product, we can describe an equivalent SPD system. Write <span class="math notranslate nohighlight">\(M=CC^T\)</span>, with <span class="math notranslate nohighlight">\(C\)</span> nonsingular, and set <span class="math notranslate nohighlight">\(y=C^Tx\)</span>. Then</p>
+<div class="math notranslate nohighlight">
+\[
+\widetilde A y=\widetilde b,
+\qquad
+\widetilde A=C^{-1}AC^{-T},
+\qquad
+\widetilde b=C^{-1}b.
+\]</div>
+<p>Here <span class="math notranslate nohighlight">\(C^{-T}=(C^T)^{-1}\)</span>. Symmetry is preserved, and for every nonzero <span class="math notranslate nohighlight">\(v\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[
+v^T\widetilde A v=(C^{-T}v)^TA(C^{-T}v)&gt;0.
+\]</div>
+<p>Thus ordinary CG applies to the transformed system. Its condition-number bound uses <span class="math notranslate nohighlight">\(\kappa_2(\widetilde A)\)</span>, the ratio of this SPD matrix’s extreme eigenvalues. Since</p>
+<div class="math notranslate nohighlight">
+\[
+M^{-1}A=C^{-T}\widetilde A C^T,
+\]</div>
+<p>the two matrices have the same eigenvalues, although their Euclidean condition numbers need not agree.</p>
+<p>The practical <a class="reference internal" href="pcg.html"><span class="std std-doc">preconditioned CG algorithm</span></a> implements this transformation using only solves <span class="math notranslate nohighlight">\(Mz=r\)</span>; it need not form <span class="math notranslate nohighlight">\(C\)</span> or <span class="math notranslate nohighlight">\(\widetilde A\)</span>. For symmetric indefinite <span class="math notranslate nohighlight">\(A\)</span>, the same construction preserves symmetry and allows preconditioned MINRES with an SPD preconditioner. Its residual minimization then uses <span class="math notranslate nohighlight">\(\|C^{-1}r\|_2=\sqrt{r^TM^{-1}r}\)</span>, so the original Euclidean residual need not decrease at every step. Positive definiteness of <span class="math notranslate nohighlight">\(A\)</span> is still required for standard CG.</p>
+</section>
+</section>
 <section id="classical-iteration-preconditioners">
-<h3>1. Classical Iteration Preconditioners<a class="headerlink" href="#classical-iteration-preconditioners" title="Link to this heading">#</a></h3>
-<p>These simple preconditioners are derived directly from the classical iterative methods (Jacobi, Gauss-Seidel, SOR) we studied earlier. The preconditioner <span class="math notranslate nohighlight">\(M\)</span> is chosen to be the part of the matrix <span class="math notranslate nohighlight">\(A\)</span> that is “inverted” in a single step of that method. Let <span class="math notranslate nohighlight">\(A = D - L - U\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the diagonal, <span class="math notranslate nohighlight">\(-L\)</span> is the strict lower triangle, and <span class="math notranslate nohighlight">\(-U\)</span> is the strict upper triangle.</p>
+<h2>Classical Iteration Preconditioners<a class="headerlink" href="#classical-iteration-preconditioners" title="Link to this heading">#</a></h2>
+<p>The classical splitting methods provide simple preconditioners. With the convention <span class="math notranslate nohighlight">\(A=D-L-U\)</span>, <span class="math notranslate nohighlight">\(D\)</span> is diagonal, while <span class="math notranslate nohighlight">\(-L\)</span> and <span class="math notranslate nohighlight">\(-U\)</span> are the strictly lower and upper parts of <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p><strong>Jacobi</strong> uses <span class="math notranslate nohighlight">\(M=D\)</span>. Application is componentwise division, so setup and storage are small and the work is easy to parallelize. It requires nonzero diagonal entries. For SPD <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(D\)</span> is positive definite and is a valid CG preconditioner. It corrects differences in diagonal scales but can leave strong coupling between unknowns untreated.</p>
+<p><strong>Block Jacobi</strong> groups unknowns and uses a block diagonal <span class="math notranslate nohighlight">\(M\)</span>, usually containing principal diagonal blocks of <span class="math notranslate nohighlight">\(A\)</span>. Each application solves the blocks independently. This captures coupling within a block and retains parallelism, but ignores coupling between blocks. Principal blocks of an SPD matrix are SPD, so exact block solves give an SPD preconditioner.</p>
+<p><strong>Gauss-Seidel</strong> uses <span class="math notranslate nohighlight">\(M=D-L\)</span>, and <strong>SOR</strong> uses</p>
+<div class="math notranslate nohighlight">
+\[
+M=\frac1\omega(D-\omega L),\qquad \omega\ne0.
+\]</div>
+<p>Both apply a forward triangular solve and depend on the ordering of the unknowns. These solves have dependencies that limit parallelism. The preconditioners are generally nonsymmetric, so a forward sweep alone does not provide the SPD preconditioner required by CG.</p>
+<p><strong>Symmetric SOR (SSOR)</strong> combines forward and backward sweeps. For SPD <span class="math notranslate nohighlight">\(A\)</span>, where <span class="math notranslate nohighlight">\(U=L^T\)</span>, its preconditioning matrix is</p>
+<div class="math notranslate nohighlight">
+\[
+M=\frac{1}{\omega(2-\omega)}
+(D-\omega L)D^{-1}(D-\omega U),
+\qquad 0&lt;\omega&lt;2.
+\]</div>
+<p>This is SPD: the two triangular factors are transposes, <span class="math notranslate nohighlight">\(D\)</span> is positive diagonal, and the scalar is positive. At <span class="math notranslate nohighlight">\(\omega=1\)</span> it gives symmetric Gauss-Seidel. Applying its inverse requires two triangular solves and a diagonal scaling.</p>
+<p>These methods are inexpensive starting points. They are also used as <strong>smoothers</strong> in multigrid: a few sweeps reduce error components that the coarse problem does not represent well.</p>
+</section>
+<section id="incomplete-factorizations-ilu-and-ic">
+<h2>Incomplete Factorizations: ILU and IC<a class="headerlink" href="#incomplete-factorizations-ilu-and-ic" title="Link to this heading">#</a></h2>
+<p>Sparse LU and Cholesky factorizations create <strong>fill-in</strong>, entries in the factors at positions where the original matrix was zero. Incomplete factorizations reduce storage and work by discarding selected entries during elimination:</p>
 <ul class="simple">
-<li><p><strong>Jacobi:</strong> <span class="math notranslate nohighlight">\(M = D\)</span>. The preconditioner is just the diagonal of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><strong>Gauss-Seidel:</strong> <span class="math notranslate nohighlight">\(M = D - L\)</span>. The preconditioner is the lower-triangular part of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><strong>Successive Over-Relaxation (SOR):</strong> <span class="math notranslate nohighlight">\(M = \frac{1}{\omega}(D - \omega L)\)</span>.</p></li>
+<li><p><strong>Incomplete LU (ILU):</strong> Construct sparse triangular factors with <span class="math notranslate nohighlight">\(A\approx LU=M\)</span>. Application requires solving <span class="math notranslate nohighlight">\(Lw=r\)</span>, then <span class="math notranslate nohighlight">\(Uz=w\)</span>. ILU is commonly paired with GMRES for nonsymmetric systems.</p></li>
+<li><p><strong>Incomplete Cholesky (IC):</strong> For SPD problems, construct <span class="math notranslate nohighlight">\(A\approx CC^T=M\)</span>. If <span class="math notranslate nohighlight">\(C\)</span> is nonsingular, this gives an SPD preconditioner suitable for CG. Application uses a forward and a backward solve.</p></li>
 </ul>
+<p>The main ways to control fill are:</p>
+<ul class="simple">
+<li><p><strong>ILU(0) and IC(0):</strong> Allow factor entries only in the corresponding triangular positions of the original sparsity pattern, including the diagonal. Numerical cancellation can still make an allowed entry zero.</p></li>
+<li><p><strong>Level-of-fill methods, ILU(<span class="math notranslate nohighlight">\(k\)</span>) and IC(<span class="math notranslate nohighlight">\(k\)</span>):</strong> Assign levels to potential fill positions according to the elimination process and retain those up to level <span class="math notranslate nohighlight">\(k\)</span>. Larger levels permit more fill and usually more work and storage; they do not guarantee a particular improvement in convergence.</p></li>
+<li><p><strong>Threshold methods, such as ILUT:</strong> Drop entries according to their magnitudes relative to a chosen scale. ILUT commonly combines a drop tolerance with a limit on the number of retained entries per row.</p></li>
+</ul>
+<p>These are useful general-purpose choices, but they can break down through zero, small, or unsuitable pivots. <strong>Even SPD <span class="math notranslate nohighlight">\(A\)</span> does not guarantee that an arbitrary incomplete Cholesky construction succeeds:</strong> dropping entries changes the subsequent pivots. Scaling, reordering, allowing more fill, or adding a suitable positive diagonal shift can help. The <a class="reference external" href="https://netlib.org/templates/templates.html">Netlib discussion of incomplete factorizations</a> describes these issues.</p>
+<p>Effectiveness depends on the ordering and dropping rules. Triangular solves can be difficult to parallelize efficiently, although parallel and block variants are available. IC is one option for CG, alongside diagonal, block, and multilevel preconditioners.</p>
+<section id="example-the-2d-poisson-matrix-and-ilu-0">
+<h3>Example: The 2D Poisson Matrix and ILU(0)<a class="headerlink" href="#example-the-2d-poisson-matrix-and-ilu-0" title="Link to this heading">#</a></h3>
+<p>Consider <span class="math notranslate nohighlight">\(-u_{xx}-u_{yy}=f\)</span> on the unit square, with <span class="math notranslate nohighlight">\(u=0\)</span> on its boundary. Use an <span class="math notranslate nohighlight">\(m\times m\)</span> grid of interior points, with spacing <span class="math notranslate nohighlight">\(h=1/(m+1)\)</span>, and order the unknowns row by row. The standard five-point difference approximation gives an <span class="math notranslate nohighlight">\(m^2\times m^2\)</span> SPD matrix <span class="math notranslate nohighlight">\(A\)</span>: its diagonal entries are <span class="math notranslate nohighlight">\(4/h^2\)</span>, and each horizontal or vertical neighbor contributes <span class="math notranslate nohighlight">\(-1/h^2\)</span>.</p>
+<p>Its eigenvalues are known explicitly:</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\lambda_{pq}(A)=\frac{4}{h^2}\left[
+\sin^2\!\left(\frac{p\pi h}{2}\right)
++\sin^2\!\left(\frac{q\pi h}{2}\right)
+\right],
+\qquad p,q=1,\ldots,m.
+}
+\]</div>
+<p>The corresponding grid vectors have entries <span class="math notranslate nohighlight">\(\sin(p\pi ih)\sin(q\pi jh)\)</span>. Applying the stencil separates into one-dimensional differences in the two coordinate directions, so their eigenvalue contributions add. This is the standard <a class="reference external" href="https://people.eecs.berkeley.edu/~demmel/ma221_Fall24/Lectures/Lecture_11.pdf#page=3">sine-mode construction for the Poisson equation</a>.</p>
+<p>Now compute strict ILU(0), keeping the original factor sparsity and using this same ordering, without pivoting or diagonal modification. Set <span class="math notranslate nohighlight">\(M=LU\)</span>. In this particular symmetric problem, <span class="math notranslate nohighlight">\(U=DL^T\)</span> for a positive diagonal matrix <span class="math notranslate nohighlight">\(D\)</span>, so <span class="math notranslate nohighlight">\(M=LDL^T\)</span> is SPD. We compute all eigenvalues of <span class="math notranslate nohighlight">\(M^{-1}A\)</span> numerically using its equivalent symmetric transformation, as described above. This does not require forming an inverse. The calculation also verifies the factor sparsity, so it is genuinely ILU(0), rather than an ILU approximation with extra fill.</p>
+<p>For <span class="math notranslate nohighlight">\(m=30\)</span>, there are 900 unknowns:</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
-<tr class="row-odd"><th class="head text-left"><p>Pros</p></th>
-<th class="head text-left"><p>Cons</p></th>
+<tr class="row-odd"><th class="head text-left"><p>Matrix</p></th>
+<th class="head text-right"><p>Smallest eigenvalue</p></th>
+<th class="head text-right"><p>Largest eigenvalue</p></th>
+<th class="head text-right"><p>Largest/smallest ratio</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td class="text-left"><p>✅ <strong>Very cheap:</strong> Trivial to construct and apply.</p></td>
-<td class="text-left"><p>❌ <strong>Often weak:</strong> Convergence improvement is minimal for ill-conditioned systems.</p></td>
+<tr class="row-even"><td class="text-left"><p><span class="math notranslate nohighlight">\(A\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(19.7223\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(7668.28\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(388.8\)</span></p></td>
 </tr>
-<tr class="row-odd"><td class="text-left"><p>✅ <strong>Low memory:</strong> <span class="math notranslate nohighlight">\(M\)</span> is (at most) a triangle or diagonal of <span class="math notranslate nohighlight">\(A\)</span>.</p></td>
-<td class="text-left"><p>❌ <strong>Sequential (Gauss-Seidel/SOR):</strong> The forward solve <span class="math notranslate nohighlight">\(Mz=r\)</span> is sequential and does not parallelize well.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p>✅ <strong>Parallel (Jacobi):</strong> The Jacobi preconditioner is “embarrassingly parallel,” as <span class="math notranslate nohighlight">\(M^{-1} = D^{-1}\)</span> is just a component-wise division.</p></td>
-<td class="text-left"><p>❌ <strong>Limited Applicability:</strong> May not be SPD, and can fail if a diagonal entry is zero.</p></td>
+<tr class="row-odd"><td class="text-left"><p><span class="math notranslate nohighlight">\(M^{-1}A\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(0.03420\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(1.20455\)</span></p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(35.2\)</span></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>Applicability:</strong>
-While rarely effective as standalone preconditioners for difficult problems, they are <strong>crucial components of other methods</strong>. For instance, they are often used as “smoothers” within the <strong>Multigrid</strong> algorithm.</p>
-</section>
-<section id="incomplete-factorization-preconditioners-ilu-ic">
-<h3>2. Incomplete Factorization Preconditioners (ILU/IC)<a class="headerlink" href="#incomplete-factorization-preconditioners-ilu-ic" title="Link to this heading">#</a></h3>
-<p>This is the most common and “workhorse” family of general-purpose preconditioners. The idea is to perform an LU or Cholesky factorization of <span class="math notranslate nohighlight">\(A\)</span>, but to <em>discard</em> some or all of the “fill-in” (new non-zeros) that is created during the factorization.</p>
-<ul class="simple">
-<li><p><strong>Incomplete Cholesky (IC):</strong> Used for <strong>SPD matrices</strong> (e.g., with CG). We compute an approximate Cholesky factor <span class="math notranslate nohighlight">\(C\)</span> such that <span class="math notranslate nohighlight">\(A \approx C C^T = M\)</span>. We then use <span class="math notranslate nohighlight">\(M = C C^T\)</span> as the preconditioner.</p></li>
-<li><p><strong>Incomplete LU (ILU):</strong> Used for <strong>non-symmetric matrices</strong> (e.g., with GMRES). We compute <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> such that <span class="math notranslate nohighlight">\(A \approx L U = M\)</span>.</p></li>
-</ul>
-<p>The level of fill-in is controlled by different strategies:</p>
-<ul class="simple">
-<li><p><strong>ILU(0) / IC(0):</strong> The “zero-fill” variants. We only keep entries in <span class="math notranslate nohighlight">\(L\)</span> and <span class="math notranslate nohighlight">\(U\)</span> where <span class="math notranslate nohighlight">\(A\)</span> originally had a non-zero. The sparsity pattern of <span class="math notranslate nohighlight">\(L+U\)</span> is identical to that of <span class="math notranslate nohighlight">\(A\)</span>.</p></li>
-<li><p><strong>ILU(k) / IC(k):</strong> “Level-based” fill. We allow fill-in up to a “level” <span class="math notranslate nohighlight">\(k\)</span>. <span class="math notranslate nohighlight">\(k=0\)</span> is ILU(0). Higher <span class="math notranslate nohighlight">\(k\)</span> means more fill, a more accurate <span class="math notranslate nohighlight">\(M\)</span>, but more cost.</p></li>
-<li><p><strong>ILUT:</strong> “Threshold-based” ILU. We discard any fill-in entries that are smaller than a given drop tolerance <span class="math notranslate nohighlight">\(\tau\)</span>.</p></li>
-</ul>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Pros</p></th>
-<th class="head text-left"><p>Cons</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p>✅ <strong>Very effective:</strong> Often provides a massive reduction in iterations. A huge step up from classical methods.</p></td>
-<td class="text-left"><p>❌ <strong>Sequential solves:</strong> Applying <span class="math notranslate nohighlight">\(M^{-1}\)</span> requires a forward and a backward triangular solve, which are difficult to parallelize.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p>✅ <strong>General purpose:</strong> Often the first-choice preconditioner for unstructured sparse systems.</p></td>
-<td class="text-left"><p>❌ <strong>Breakdown:</strong> The factorization can fail (e.g., encounter a zero pivot), especially for ILU(0). IC(0) is only guaranteed to exist for M-matrices.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p>✅ <strong>Tunable:</strong> The level <code class="docutils literal notranslate"><span class="pre">k</span></code> or threshold <code class="docutils literal notranslate"><span class="pre">t</span></code> gives a direct knob to trade off cost vs. effectiveness.</p></td>
-<td class="text-left"><p>❌ <strong>Construction cost:</strong> Can be expensive to compute, though this is usually an “offline” (one-time) cost.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><strong>Applicability:</strong>
-ILU/IC are the default preconditioners for unstructured sparse linear systems on single-core or shared-memory (CPU) architectures. IC is essential for preconditioning CG, and ILU is a staple for GMRES.</p>
-</section>
-<section id="sparse-approximate-inverse-spai-preconditioners">
-<h3>3. Sparse Approximate Inverse (SPAI) Preconditioners<a class="headerlink" href="#sparse-approximate-inverse-spai-preconditioners" title="Link to this heading">#</a></h3>
-<p>This family operates on a completely different philosophy. Instead of finding <span class="math notranslate nohighlight">\(M \approx A\)</span> and applying <span class="math notranslate nohighlight">\(M^{-1}\)</span> with a solve, we try to <em>directly compute</em> a sparse matrix <span class="math notranslate nohighlight">\(M\)</span> that approximates <span class="math notranslate nohighlight">\(A^{-1}\)</span>.</p>
-<p>The preconditioning step is then just a <strong>matrix-vector product</strong>: <span class="math notranslate nohighlight">\(z = M r\)</span>.</p>
-<p>This is typically set up as an optimization problem: for a given sparsity pattern, find <span class="math notranslate nohighlight">\(M\)</span> that minimizes <span class="math notranslate nohighlight">\(\| I - MA \|_F\)</span> (for left preconditioning) or <span class="math notranslate nohighlight">\(\| I - AM \|_F\)</span> (for right preconditioning) in the Frobenius norm.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>Pros</p></th>
-<th class="head text-left"><p>Cons</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p>✅ <strong>Fully parallel:</strong> The “apply” step is a sparse matrix-vector product, which is ideal for parallel hardware like GPUs.</p></td>
-<td class="text-left"><p>❌ <strong>High construction cost:</strong> Finding <span class="math notranslate nohighlight">\(M\)</span> can be very expensive, often more so than an ILU factorization.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p>✅ <strong>Overcomes triangular solve bottleneck:</strong> This is the main motivation for using SPAI.</p></td>
-<td class="text-left"><p>❌ <strong>Effectiveness:</strong> Often less effective at reducing iterations than a comparable ILU. The “best” sparse approximation of <span class="math notranslate nohighlight">\(A^{-1}\)</span> is often not sparse at all.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><strong>Applicability:</strong>
-These are specialized for high-performance, massively parallel systems where the sequential nature of ILU/IC becomes the primary performance bottleneck.</p>
-</section>
-<section id="advanced-specialized-preconditioners">
-<h3>4. Advanced &amp; Specialized Preconditioners<a class="headerlink" href="#advanced-specialized-preconditioners" title="Link to this heading">#</a></h3>
-<p>This group includes highly powerful methods that are often tailored to specific problem structures, such as those from PDEs.</p>
-<ul class="simple">
-<li><p><strong>Algebraic Multigrid (AMG):</strong> This is a “black-box” version of geometric multigrid. It works <em>only from the matrix <span class="math notranslate nohighlight">\(A\)</span></em> to automatically build a hierarchy of “coarse” problems. It then uses simple smoothers (like Jacobi or Gauss-Seidel) on each level to eliminate error at different frequencies.</p>
-<ul>
-<li><p><strong>Pros:</strong> <strong>Optimal complexity.</strong> For many elliptic PDEs, this is an <span class="math notranslate nohighlight">\(O(N)\)</span> method. The number of iterations is <em>independent</em> of the problem size <span class="math notranslate nohighlight">\(N\)</span>.</p></li>
-<li><p><strong>Cons:</strong> Very complex to implement. Makes assumptions about the matrix (e.g., near M-matrix) to build its coarse grids, and can fail if these are not met.</p></li>
-<li><p><strong>Applicability:</strong> The standard, go-to solver/preconditioner for large sparse systems from elliptic PDEs (e.g., finite element methods).</p></li>
-</ul>
-</li>
-<li><p><strong>Domain Decomposition (DD):</strong> This is a family of “divide-and-conquer” methods designed for parallel computing. The problem domain is split into subdomains (like a puzzle).</p>
-<ul>
-<li><p><strong>Pros:</strong> <strong>Inherently parallel.</strong> Designed from the ground up to run on distributed-memory supercomputers.</p></li>
-<li><p><strong>Cons:</strong> Requires significant setup, and its performance depends on correctly handling the “interface” problem between subdomains, often requiring a “coarse-grid solve.”</p></li>
-<li><p><strong>Applicability:</strong> The standard for large-scale, parallel PDE simulations (CFD, structural mechanics).</p></li>
-</ul>
-</li>
-<li><p><strong>Block / Physics-Based Preconditioners:</strong> For systems of coupled PDEs (e.g., Stokes flow, Maxwell’s equations), the matrix <span class="math notranslate nohighlight">\(A\)</span> has a natural block structure.</p>
-<ul>
-<li><p><strong>Pros:</strong> By building a preconditioner <span class="math notranslate nohighlight">\(M\)</span> that <em>respects this block structure</em>, we can achieve far superior results than a “monolithic” preconditioner (like ILU) that ignores it.</p></li>
-<li><p><strong>Cons:</strong> <strong>Highly specialized.</strong> You must use knowledge of the physics to design the preconditioner.</p></li>
-<li><p><strong>Applicability:</strong> Essential for any multi-physics problem (e.g., fluid-structure interaction, electromagnetics).</p></li>
-</ul>
-</li>
-</ul>
+<p>The improvement is more than a change of scale: the eigenvalue ratio decreases, and about <span class="math notranslate nohighlight">\(92\%\)</span> of the preconditioned eigenvalues lie in <span class="math notranslate nohighlight">\([0.75,1.25]\)</span>. The ideal preconditioner would put every eigenvalue at <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>This clustering makes the polynomial problem easier. For example, <span class="math notranslate nohighlight">\(p(\lambda)=(1-\lambda)^k\)</span> equals one at zero and has magnitude at most <span class="math notranslate nohighlight">\((1/4)^k\)</span> on <span class="math notranslate nohighlight">\([0.75,1.25]\)</span>. A few smaller eigenvalues remain outside this cluster and still need to be reduced. This connects the spectral picture to the polynomial convergence arguments for CG and GMRES.</p>
+<figure class="align-default" id="fig-poisson-ilu0-spectrum">
+<a class="reference internal image-reference" href="../_images/poisson_ilu0_spectrum.svg"><img alt="Histograms of all 900 eigenvalues of a two-dimensional Dirichlet Poisson matrix and its strict ILU(0)-preconditioned operator. The eigenvalue ratio falls from about 389 to 35, and 92 percent of the preconditioned eigenvalues lie between 0.75 and 1.25. Below, GMRES reaches a relative residual of ten to the minus eight in 93 steps without preconditioning and 33 with ILU(0)." src="../_images/poisson_ilu0_spectrum.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 30 </span><span class="caption-text">Poisson on a <span class="math notranslate nohighlight">\(30\times30\)</span> interior grid of the unit square. Top: the complete eigenvalue distributions before and after natural-order ILU(0); note the different horizontal scales. Bottom: computed unrestarted GMRES convergence from <span class="math notranslate nohighlight">\(x_0=0\)</span>, using the same fixed random right-hand side. The preconditioned run uses right preconditioning, so both curves measure the original relative residual <span class="math notranslate nohighlight">\(\|b-Ax_k\|_2/\|b\|_2\)</span>. The matrices <span class="math notranslate nohighlight">\(AM^{-1}\)</span> and <span class="math notranslate nohighlight">\(M^{-1}A\)</span> have the same eigenvalues. Reorthogonalization preserves the basis orthogonality in this experiment.</span><a class="headerlink" href="#fig-poisson-ilu0-spectrum" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The spectral improvement is accompanied by fewer iterations: 33 rather than 93 to reach <span class="math notranslate nohighlight">\(10^{-8}\)</span>. Each preconditioned step also needs two triangular solves, so iteration counts alone do not measure total running time.</p>
+<p>Here the positive eigenvalue ratio is the condition number of the equivalent SPD matrix, not generally the Euclidean condition number of <span class="math notranslate nohighlight">\(M^{-1}A\)</span>. The SPD property of this ILU(0) product is specific to the symmetric construction used here; a generic ILU preconditioner need not preserve symmetry or positive definiteness.</p>
 </section>
 </section>
-<section id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
-<p>As this survey shows, there is no “best” preconditioner. <strong>Jacobi</strong> is cheap but weak. <strong>ILU</strong> is a good default but not parallel. <strong>SPAI</strong> is parallel but expensive to build. <strong>AMG</strong> is optimal for its target class but complex and not universal. <strong>Domain Decomposition</strong> is for supercomputers.</p>
-<p>The choice is a key part of the “art” of numerical linear algebra, requiring an understanding of the problem’s origin (PDEs, data science), its structure (SPD, non-symmetric, block), and the computational hardware (CPU, GPU, cluster).</p>
+<section id="sparse-approximate-inverses">
+<h2>Sparse Approximate Inverses<a class="headerlink" href="#sparse-approximate-inverses" title="Link to this heading">#</a></h2>
+<p>An alternative is to construct a sparse matrix <span class="math notranslate nohighlight">\(B\)</span> that approximates <span class="math notranslate nohighlight">\(A^{-1}\)</span> directly. We use a different symbol because <span class="math notranslate nohighlight">\(B\)</span> represents the operation previously written <span class="math notranslate nohighlight">\(M^{-1}\)</span>. Application is a sparse matrix-vector product:</p>
+<div class="math notranslate nohighlight">
+\[
+z=Br.
+\]</div>
+<p>A common <strong>sparse approximate inverse (SPAI)</strong> construction chooses entries in a prescribed or adaptively enlarged sparsity pattern to make</p>
+<div class="math notranslate nohighlight">
+\[
+\|I-BA\|_F\quad\text{or}\quad\|I-AB\|_F
+\]</div>
+<p>small for left or right preconditioning, respectively. Here <span class="math notranslate nohighlight">\(\|\cdot\|_F\)</span> is the Frobenius norm. The construction reduces to small least-squares problems for rows or columns of <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<p>Application is easy to parallelize because it avoids triangular solves. The difficulty is obtaining a useful inverse approximation with few nonzeros: a sparse <span class="math notranslate nohighlight">\(A\)</span> can have a dense inverse, and setup can be expensive. There is no general ranking of SPAI and ILU; the useful trade-off depends on accuracy, sparsity, and hardware.</p>
+<p>An unconstrained SPAI need not be symmetric or positive definite, even when <span class="math notranslate nohighlight">\(A\)</span> is SPD. For CG, an SPD construction is needed, such as a factored approximate inverse <span class="math notranslate nohighlight">\(B=G^TG\)</span> with nonsingular <span class="math notranslate nohighlight">\(G\)</span>.</p>
+</section>
+<section id="polynomial-preconditioners">
+<h2>Polynomial Preconditioners<a class="headerlink" href="#polynomial-preconditioners" title="Link to this heading">#</a></h2>
+<p>We can also approximate <span class="math notranslate nohighlight">\(A^{-1}\)</span> by a low-degree polynomial <span class="math notranslate nohighlight">\(B=p(A)\)</span>. Applying <span class="math notranslate nohighlight">\(B\)</span> uses repeated matrix-vector products, avoiding factorization and triangular solves. The <a class="reference internal" href="chebyshev_acceleration.html"><span class="std std-doc">Chebyshev iteration</span></a> provides one way to build such an approximation when suitable spectral bounds are available.</p>
+<p>This approach can suit parallel hardware, but each application costs several matrix-vector products. For SPD <span class="math notranslate nohighlight">\(A\)</span>, the polynomial must be positive at every eigenvalue to make <span class="math notranslate nohighlight">\(p(A)\)</span> an SPD preconditioner. The degree and spectral information determine its usefulness.</p>
+</section>
+<section id="multigrid-preconditioners">
+<h2>Multigrid Preconditioners<a class="headerlink" href="#multigrid-preconditioners" title="Link to this heading">#</a></h2>
+<p>Local relaxation often removes rapidly varying error while leaving slowly varying error. <strong>Multigrid</strong> combines relaxation with corrections on coarser spaces, where the remaining error is easier to represent and remove. A cycle supplies an approximate solve <span class="math notranslate nohighlight">\(z\approx A^{-1}r\)</span> for the outer Krylov method. With fixed linear relaxation and coarse solves, running a fixed cycle from zero defines a linear preconditioning operation.</p>
+<p><strong>Geometric multigrid</strong> constructs the hierarchy from meshes and the underlying differential equation. <strong>Algebraic multigrid (AMG)</strong> builds coarse spaces mainly from the matrix. AMG may also use supplied information about slowly varying modes, such as the rigid-body motions in elasticity. It does not require an explicit geometric mesh.</p>
+<p>For suitable elliptic problems, a well-designed hierarchy can have <span class="math notranslate nohighlight">\(O(n)\)</span> work per cycle and an iteration count that stays bounded as the mesh is refined. These properties require effective smoothing and coarse correction, with controlled storage across levels. They are not automatic: strong anisotropy, coefficient jumps, and coupled equations can require specialized choices.</p>
+<p>For CG, the entire approximate-inverse operation must be SPD. Compatible coarse operators, a positive definite coarse solve, and appropriately paired smoothing steps are needed. A generic multigrid cycle is not automatically suitable. For example, the <a class="reference external" href="https://hypre.readthedocs.io/en/latest/solvers-boomeramg.html">hypre AMG documentation</a> explains the need for symmetric smoothing with CG.</p>
+</section>
+<section id="domain-decomposition">
+<h2>Domain Decomposition<a class="headerlink" href="#domain-decomposition" title="Link to this heading">#</a></h2>
+<p><strong>Domain decomposition</strong> divides the unknowns into subdomains, approximately solves local problems, and combines the corrections. The local solves can run in parallel. Block Jacobi is a simple nonoverlapping example; <strong>additive Schwarz</strong> allows overlapping subdomains and adds their local corrections.</p>
+<p>Local solves handle nearby interactions, but information can travel slowly across many subdomains. A <strong>coarse space</strong> adds global corrections and is often essential to keep iteration counts controlled as the number of subdomains grows. Overlap, the coarse space, local solver accuracy, and communication all affect performance.</p>
+<p>SPD variants can be used with CG. Other variants, including some ways of combining local corrections, are nonsymmetric and are better paired with GMRES. Domain decomposition and multigrid can also be combined, for example by using multigrid inside each subdomain.</p>
+</section>
+<section id="block-and-physics-based-preconditioners">
+<h2>Block and Physics-Based Preconditioners<a class="headerlink" href="#block-and-physics-based-preconditioners" title="Link to this heading">#</a></h2>
+<p>Coupled equations often give a natural block structure. A block diagonal preconditioner approximately solves each field separately. A block triangular preconditioner also accounts for coupling between fields.</p>
+<p>For example, eliminating the first block of</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{pmatrix}A_{11}&amp;A_{12}\\A_{21}&amp;A_{22}\end{pmatrix}
+\end{split}\]</div>
+<p>leads to the <strong>Schur complement</strong></p>
+<div class="math notranslate nohighlight">
+\[
+S=A_{22}-A_{21}A_{11}^{-1}A_{12},
+\]</div>
+<p>assuming <span class="math notranslate nohighlight">\(A_{11}\)</span> is invertible. A block factorization preconditioner uses inexpensive approximations to the solves with <span class="math notranslate nohighlight">\(A_{11}\)</span> and <span class="math notranslate nohighlight">\(S\)</span>. Neither inverse needs to be formed. This connects preconditioning to the <a class="reference internal" href="block_matrices.html"><span class="std std-doc">block elimination</span></a> developed earlier.</p>
+<p>Such methods are useful for problems such as velocity-pressure systems in fluid flow. Their strength comes from representing the coupling, but designing a useful approximation to <span class="math notranslate nohighlight">\(S\)</span> requires knowledge of the equations. Block triangular choices are generally nonsymmetric; SPD block diagonal choices can preserve the structure needed by CG or MINRES.</p>
+</section>
+<section id="choosing-and-applying-a-preconditioner">
+<h2>Choosing and Applying a Preconditioner<a class="headerlink" href="#choosing-and-applying-a-preconditioner" title="Link to this heading">#</a></h2>
+<p>Start with the structure of the problem. Diagonal or block scaling is inexpensive. ILU and IC retain more local coupling. Multigrid and domain decomposition add corrections over larger spatial scales. Block methods exploit coupling between different fields. These families are often combined.</p>
+<p>Compare total time and memory, including setup, application, and communication. Also check the outer method’s requirements: standard CG and preconditioned MINRES need an SPD preconditioning operation.</p>
+<p>The discussion above assumes a fixed linear operation. If an inner solve is stopped adaptively, its action may vary between iterations or be nonlinear in the right-hand side. Standard fixed-preconditioner theory then does not apply directly. <strong>Flexible GMRES</strong> accommodates such preconditioning; the <a class="reference external" href="https://petsc.org/release/manualpages/KSP/KSPFGMRES/">PETSc flexible GMRES documentation</a> gives examples.</p>
+<p>The <a class="reference internal" href="pcg.html"><span class="std std-doc">next section</span></a> derives PCG from the symmetric transformation above. We keep the same convention: <span class="math notranslate nohighlight">\(M\approx A\)</span>, and applying the preconditioner means solving <span class="math notranslate nohighlight">\(Mz=r\)</span>. The implementation uses this solve without needing the factor <span class="math notranslate nohighlight">\(C\)</span>.</p>
 </section>
 </section>
 
@@ -683,7 +738,7 @@ These are specialized for high-performance, massively parallel systems where the
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">MINRES</p>
+        <p class="prev-next-title">The Minimal Residual Method (MINRES)</p>
       </div>
     </a>
     <a class="right-next"
@@ -714,15 +769,23 @@ These are specialized for high-performance, massively parallel systems where the
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-goal-of-a-preconditioner">The Goal of a Preconditioner</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-types-of-preconditioning">Three Types of Preconditioning</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-preconditioners">Examples of Preconditioners</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-iteration-preconditioners">1. Classical Iteration Preconditioners</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-factorization-preconditioners-ilu-ic">2. Incomplete Factorization Preconditioners (ILU/IC)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-approximate-inverse-spai-preconditioners">3. Sparse Approximate Inverse (SPAI) Preconditioners</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-specialized-preconditioners">4. Advanced &amp; Specialized Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#left-right-and-symmetric-preconditioning">Left, Right, and Symmetric Preconditioning</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#left-preconditioning">Left Preconditioning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#right-preconditioning">Right Preconditioning</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#symmetric-preconditioning-for-cg-and-minres">Symmetric Preconditioning for CG and MINRES</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#classical-iteration-preconditioners">Classical Iteration Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#incomplete-factorizations-ilu-and-ic">Incomplete Factorizations: ILU and IC</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-the-2d-poisson-matrix-and-ilu-0">Example: The 2D Poisson Matrix and ILU(0)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sparse-approximate-inverses">Sparse Approximate Inverses</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#polynomial-preconditioners">Polynomial Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#multigrid-preconditioners">Multigrid Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#domain-decomposition">Domain Decomposition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#block-and-physics-based-preconditioners">Block and Physics-Based Preconditioners</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-and-applying-a-preconditioner">Choosing and Applying a Preconditioner</a></li>
 </ul>
   </nav></div>
 
