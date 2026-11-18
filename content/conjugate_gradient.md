@@ -383,6 +383,7 @@ The residuals form a Euclidean-orthogonal basis; the search directions form an A
 
 The direction construction is already short. We can also simplify its scalar coefficients so that each iteration needs only one matrix-vector product.
 
+(cg-step-length-derivation)=
 ### The Step Length
 
 Recall that $\mu_k=p_k^Tb/d_k$. Since $b=r_{k-1}+Ax_{k-1}$ and $p_k$ is A-orthogonal to $\mathcal K_{k-1}$,
@@ -420,6 +421,7 @@ $$
 
 The product $Ap_k$ is already needed for the denominator of $\mu_k$, so this update needs no additional matrix-vector product.
 
+(cg-direction-coefficient-derivation)=
 ### The Direction Coefficient
 
 The remaining coefficient is $u_{k,k+1}=p_k^TAr_k/d_k$. From the residual update,
@@ -837,24 +839,34 @@ Consider one CG step starting at $x_k$, with residual $r_k=b-Ax_k$. CG chooses a
 
 ### The step length on the energy curve
 
-With the direction chosen, write $f(t)=\Phi(x_k+tp_{k+1})$ for the energy along the search line. Since $\nabla\Phi(z)=Az-b$, the slope at position $t$ is
+The {ref}`earlier derivation of the step length <cg-step-length-derivation>` found $\mu_{k+1}$ as the coefficient of $p_{k+1}$ in the A-orthogonal expansion of the solution. We can recover that coefficient by asking where the search line reaches its lowest energy. Substituting $x_k+tp_{k+1}$ into the energy $\Phi(z)=\tfrac12 z^TAz-b^Tz$ gives a quadratic in $t$,
 
 $$
 \begin{aligned}
-f'(t)
-&=p_{k+1}^T\bigl(A(x_k+tp_{k+1})-b\bigr)\\
-&=-p_{k+1}^Tr_k+t\,p_{k+1}^TAp_{k+1}.
+f(t)&=\Phi(x_k+tp_{k+1})\\
+&=\Phi(x_k)+t\,p_{k+1}^T(Ax_k-b)
+  +\tfrac12 t^2\,p_{k+1}^TAp_{k+1}\\
+&=\Phi(x_k)-t\,\|r_k\|_2^2
+  +\tfrac12 t^2\,p_{k+1}^TAp_{k+1}.
 \end{aligned}
 $$
 
-The initial slope is $-\|r_k\|_2^2$. This follows from $p_1=r_0$ at the first step and from $r_k\perp p_k$ in the direction update thereafter. The slope increases by $p_{k+1}^TAp_{k+1}>0$ per unit of $t$. Setting it equal to zero gives the step to the bottom of the parabola,
+In the expansion, symmetry of $A$ lets us combine the two cross terms. The last line uses $Ax_k-b=-r_k$ and $p_{k+1}^Tr_k=\|r_k\|_2^2$. The latter identity holds because $p_{k+1}=r_k+\tau_kp_k$ with $r_k\perp p_k$ for $k\ge1$, and $p_1=r_0$ at the first step.
+
+The parabola opens upward because $p_{k+1}^TAp_{k+1}>0$. Its minimum occurs where the slope vanishes. Differentiating with respect to $t$ gives
+
+$$
+f'(t)=-\|r_k\|_2^2+t\,p_{k+1}^TAp_{k+1}.
+$$
+
+Setting $f'(\mu_{k+1})=0$ recovers the step length and the corresponding iterate,
 
 $$
 \mu_{k+1}=\frac{\|r_k\|_2^2}{p_{k+1}^TAp_{k+1}},
 \qquad x_{k+1}=x_k+\mu_{k+1}p_{k+1}.
 $$
 
-For example, take $A=\left(\begin{smallmatrix}2&-1\\-1&2\end{smallmatrix}\right)$, $b=(3,0)^T$, and $x_0=0$. Along $p_1=b$ the slope is $f'(t)=-9+18t$, so the first step ends at $t=1/2$.
+For example, take $A=\left(\begin{smallmatrix}2&-1\\-1&2\end{smallmatrix}\right)$, $b=(3,0)^T$, and $x_0=0$. Along $p_1=b$ the energy is $f(t)=-9t+9t^2$. Its slope $f'(t)=-9+18t$ vanishes at $t=1/2$, as shown below.
 
 :::{figure} ../_static/cg_step_parabola.svg
 :alt: The energy reaches its minimum at one half, where the downhill slope falls from nine to zero.
@@ -863,16 +875,17 @@ For example, take $A=\left(\begin{smallmatrix}2&-1\\-1&2\end{smallmatrix}\right)
 The right panel plots the downhill slope $-f'(t)$. The shaded triangle has area $\tfrac12(1/2)(9)=2.25$, the energy lost over the first step in the left panel.
 :::
 
-The contour plot shows this same minimization in the plane through $x_k$ spanned by $r_k$ and $p_k$ (for $k\ge1$). At $x_k$, the residual points straight downhill. Adding $\tau_kp_k$ gives the blue search direction. CG follows that line to $x_{k+1}$, where the slope is zero.
+The contour plot shows two consecutive CG steps in the plane through $x_{k-1}$, $x_k$, and $x_{k+1}$. The horizontal step follows $p_k$. At its endpoint $x_k$, the line search gives $p_k^Tr_k=0$. Since $r_k=-\nabla\Phi(x_k)$ is normal to the energy contour there, the horizontal search line is tangent to that contour.
 
 :::{figure} ../_static/cg_step_in_plane.svg
-:alt: From the starting point x_k, the residual and a horizontal component add to give the blue search direction. The endpoint x_{k+1} lies at the center of the energy contours.
+:width: 80%
+:alt: The step from x_{k-1} to x_k is horizontal and tangent to the contour at x_k. The projected previous residual is horizontal, the current residual is vertical, and the step to x_{k+1} is diagonal.
 :align: center
 
-The blue arrow shows $p_{k+1}$. The black dot along it marks the actual step, $\mu_{k+1}p_{k+1}$ from $x_k$. Each ellipse is a contour of the energy in the displayed plane.
+The ellipses are energy contours in the plane of the two steps. The black arrows show the downhill direction in that plane at each iterate. The blue triangle shows how the search direction is built from the residual and a component along the previous step. At $x_{k-1}$ this is the projection of $r_{k-1}$. At $x_k$ the full residual $r_k=p_{k+1}-\tau_kp_k$ already lies in the plane.
 :::
 
-The endpoint is also the center of the ellipses. The whole plane lies in $\mathcal K_{k+1}$, and $x_{k+1}$ minimizes the energy over that space. Since $x_{k+1}$ belongs to the plane, it minimizes the energy there as well.
+The residuals are perpendicular in the full space. Because $r_k$ lies in the drawing plane, projecting $r_{k-1}$ into that plane preserves their right angle. From $x_k$, CG follows $p_{k+1}=r_k+\tau_kp_k$ to $x_{k+1}$, the minimum of the energy in this slice.
 
 ### Why the direction coefficient is a squared length ratio
 
@@ -893,13 +906,14 @@ $$
 $$
 
 :::{figure} ../_static/cg_direction_triangle.svg
+:width: 70%
 :alt: Two right triangles share a vertical leg. The line joining the residual tips is perpendicular to the projected next search direction.
 :align: center
 
 The red segment joins the residual tips. The blue diagonal shows the part of $p_{k+1}$ in their plane. Projection preserves its right angle with the red segment because the red segment lies entirely in the plane.
 :::
 
-Let $a=\|r_{k-1}\|_2$ and $b_k=\|r_k\|_2$ be the horizontal and vertical lengths. The red segment has slope $-b_k/a$. The blue diagonal rises by $b_k$ and runs to the right by $\tau_k a$, so its slope is $b_k/(\tau_k a)$. Perpendicular lines have negative reciprocal slopes. Equating the blue slope to $a/b_k$ gives
+Let $a=\|r_{k-1}\|_2$ and $b_k=\|r_k\|_2$ be the horizontal and vertical lengths. The red segment has slope $-b_k/a$. The blue diagonal rises by $b_k$ and runs to the right by $\tau_k a$, so its slope is $b_k/(\tau_k a)$. The {ref}`earlier derivation of the direction coefficient <cg-direction-coefficient-derivation>` used the residual update to evaluate the dot product $p_k^TAr_k$. Here the same conjugacy condition appears as a right angle. Setting the blue slope equal to the negative reciprocal of the red slope gives the same formula for $\tau_k$ directly from the drawing.
 
 $$
 \frac{b_k}{\tau_k a}=\frac{a}{b_k}
@@ -912,7 +926,7 @@ In the full space, the angle $\theta$ between $r_k$ and $p_{k+1}$ also depends o
 
 ### A direction perpendicular to all the residual edges
 
-The same picture extends to earlier residuals. Draw $r_0,\ldots,r_k$ from a common origin and join consecutive tips. For each edge, the residual update and conjugacy give
+The triangle uses only $p_{k+1}^TAp_k=0$. Earlier we proved that $p_{k+1}$ is A-orthogonal to *every* preceding search direction. Each of those conditions gives a right angle of its own. Draw $r_0,\ldots,r_k$ from a common origin and join consecutive tips. For each edge, the residual update and conjugacy give
 
 $$
 p_{k+1}^T(r_{i-1}-r_i)=\mu_i p_{k+1}^TAp_i=0,
@@ -922,18 +936,21 @@ $$
 For two tips, $p_{k+1}$ is perpendicular to the line joining them. For three, it is perpendicular to the plane through them. In general, the **affine span** of the tips is the set reached by starting at one tip and adding linear combinations of these edges. The search direction is perpendicular to every direction in that span.
 
 :::{figure} ../_static/cg_direction_corner.svg
+:width: 90%
 :alt: Three mutually orthogonal residuals end at the vertices of a triangle. The next search direction is perpendicular to its face.
 :align: center
 
 The drawing uses three consecutive residuals, ending at $r_{k+1}$. The red edges are multiples of $Ap_k$ and $Ap_{k+1}$, so the next direction $p_{k+2}$ is perpendicular to both. The drawing shows its projection onto the space of the three residuals.
 :::
 
-Perpendicularity to each edge means $p_{k+1}$ has the same dot product with every residual through $r_k$. At the most recent tip we can evaluate this dot product using $p_k^Tr_k=0$, which gives
+Perpendicularity to each edge means that $p_{k+1}$ has the same dot product with every residual from $r_0$ through $r_k$. We can evaluate the last one using $p_k^Tr_k=0$, which gives $(r_k+\tau_kp_k)^Tr_k=\|r_k\|_2^2$. Thus
 
 $$
-p_{k+1}^Tr_j=p_{k+1}^Tr_k
-=(r_k+\tau_kp_k)^Tr_k=\|r_k\|_2^2,
-\qquad 0\le j\le k.
+p_{k+1}^Tr_0
+=p_{k+1}^Tr_1
+=\cdots
+=p_{k+1}^Tr_k
+=\|r_k\|_2^2.
 $$
 
 This gives an energy interpretation. At any earlier iterate $x_j$, the initial rate of decrease along a direction $d$ is $-\nabla\Phi(x_j)^Td=r_j^Td$. Thus $p_{k+1}$ would give the same initial downhill rate at *every* iterate from $x_0$ through $x_k$. To see how the direction combines information from these iterates, expand it in the orthogonal residual basis. The coefficient of $r_j$ is $p_{k+1}^Tr_j/\|r_j\|_2^2$, so
@@ -944,7 +961,7 @@ $$
 =\frac{p_k}{\|r_{k-1}\|_2^2}+\frac{r_k}{\|r_k\|_2^2}.
 $$
 
-Each term in the sum gives downhill rate one at its own iterate and zero at the others. The last equality separates the newest term. All the earlier terms are already stored in $p_k$ with a common scale factor. Multiplying through by $\|r_k\|_2^2$ recovers the short update for $p_{k+1}$.
+Each term in the sum gives downhill rate one at its own iterate and zero at the others. The last equality separates the newest term. In the original derivation, orthogonality made all but the most recent projection coefficient vanish. In the residual picture, $p_k$ already contains every earlier residual with the required relative weights. Multiplying through by $\|r_k\|_2^2$ gives the same short update, $p_{k+1}=r_k+\tau_kp_k$.
 
 ### Two connections with other methods
 
@@ -967,4 +984,4 @@ r_k^{\mathrm{MINRES}}
 =\frac{\|r_k\|_2^2}{\|p_{k+1}\|_2^2}\,p_{k+1}.
 $$
 
-The CG residual $r_k$ is one of the tips. The MINRES residual is the foot of the perpendicular from the origin to their affine span.
+The CG residual $r_k$ is the tip that minimizes the $A^{-1}$-norm over this affine span, as we saw from $\|r_k\|_{A^{-1}}=\|x-x_k\|_A$. MINRES measures distance in the Euclidean norm, so its residual is the foot of the perpendicular from the origin.
