@@ -649,11 +649,9 @@ Same condition number, different convergence. The matrices are diagonal, so thei
 
 This motivates [preconditioning](preconditioning.md): transform the system into an equivalent problem for which an inexpensive iterative solve converges faster. For CG, the transformation must retain the SPD structure. We develop this in [preconditioned CG](pcg.md).
 
-### Superlinear Acceleration
+### Why CG Can Accelerate
 
-CG sometimes converges faster as the iterations proceed. In this setting, **superlinear convergence** refers to an improving effective error-reduction factor, rather than one fixed geometric rate throughout the calculation. Such acceleration is possible, but not guaranteed for every problem or at every step.
-
-The Lanczos connection helps explain it. The **Ritz values**, which are the eigenvalues of the small matrix $T_k=Q_k^TAQ_k$, approximate some eigenvalues of $A$. Once well-separated extreme eigenvalues are approximated accurately, the CG error polynomial can strongly suppress their error components. The remaining components may occupy a much narrower spectral interval, so CG behaves as though the condition number were smaller. This acceleration does not require any component to become exactly zero.
+The condition-number bound uses the same interval $[\lambda_{\min},\lambda_{\max}]$ at every step. In practice, later steps can reduce the energy error faster than earlier ones. To see why, recall that the **Ritz values**, the eigenvalues of the Lanczos matrix $T_k=Q_k^TAQ_k$, are roots of the CG error polynomial. When a Ritz value closely approximates an isolated extreme eigenvalue of $A$, the polynomial can strongly suppress the corresponding error component. The components that still contribute appreciably to the error may then occupy a narrower spectral interval, allowing CG to converge faster.
 
 ## Key Results to Remember
 
@@ -837,13 +835,13 @@ In floating-point arithmetic, the orthogonality relations and finite-termination
 
 The algebraic derivation above gives the two CG coefficients. The geometry below gives a second derivation of the same formulas and can be skipped without affecting the rest of the chapter.
 
-Consider one step starting at $x_k$, with residual $r_k=b-Ax_k$. The coefficient $\tau_k$ sets the next search direction,
+Consider one step starting at $x_k$, with nonzero residual $r_k=b-Ax_k$, in exact arithmetic. CG starts with $p_1=r_0$. For $k\ge1$, the coefficient $\tau_k$ determines how much of $p_k$ to retain in the new direction,
 
 $$
-p_{k+1}=r_k+\tau_kp_k,
+p_{k+1}=r_k+\tau_kp_k.
 $$
 
-and $\mu_{k+1}$ sets the distance traveled along it. Assume exact arithmetic and a nonzero residual throughout this discussion.
+The step coefficient $\mu_{k+1}$ scales this direction. The displacement is $x_{k+1}-x_k=\mu_{k+1}p_{k+1}$, so the Euclidean distance traveled is $\mu_{k+1}\|p_{k+1}\|_2$.
 
 ### The Step Length on the Energy Curve
 
