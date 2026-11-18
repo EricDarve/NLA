@@ -1,6 +1,6 @@
 # The Conjugate Gradient (CG) Method
 
-The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. The short recurrence comes afterward, as a way to perform this construction efficiently.
+The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. Symmetry and the Krylov structure then reduce the construction to a short recurrence.
 
 Throughout this section, $A\in\mathbb R^{n\times n}$ is symmetric positive definite (SPD), and $x=A^{-1}b$ is the exact solution. As in the chapter introduction, $x_k$ is the approximation after $k$ steps. We write $e_k=x-x_k$ for its error and $r_k=b-Ax_k=Ae_k$ for its residual. We first take $x_0=0$, so $r_0=b$. If $b=0$, the initial guess is already the solution. All orthogonality and optimality statements below concern exact arithmetic.
 
@@ -57,14 +57,14 @@ p_k=q_k,
 \qquad Q_k^TQ_k=I.
 $$
 
-Suppose the final Krylov space containing $x$ has dimension $m\le n$. Its orthonormal basis gives the expansion
+Suppose $x$ first belongs to $\mathcal K_m$, where $m\le n$. The orthonormal basis of this space gives the expansion
 
 $$
 x=\sum_{j=1}^m\mu_jp_j,
 \qquad \mu_j=p_j^Tx.
 $$
 
-The Euclidean best approximation in $\mathcal K_k$ is the partial sum through $k$. Orthogonality ensures that adding a new direction does not change the previous coefficients. We will justify below why a Krylov space containing $x$ is reached in at most $n$ steps, possibly earlier.
+The Euclidean best approximation in $\mathcal K_k$ is the partial sum through $k$. Orthogonality ensures that adding a new direction does not change the previous coefficients. The finite-convergence theorem below shows that some $m\le n$ exists.
 
 The figure illustrates this process in two dimensions. The first approximation is the closest point to $x$ on the line $\mathcal K_1$. Adding the perpendicular direction $p_2$ captures the remaining component without changing the coefficient along $p_1$.
 
@@ -73,7 +73,7 @@ The figure illustrates this process in two dimensions. The first approximation i
 :width: 100%
 :name: fig-cg-euclidean-projection
 
-Euclidean projection for $A=\begin{pmatrix}2&-1\\-1&2\end{pmatrix}$ and $b=(3,0)^T$. Here $p_1=(1,0)^T$, $p_2=(0,1)^T$, and $x=(2,1)^T$. Left: the circle centered at $x$ touches $\mathcal K_1$ at the nearest point $x_1=2p_1$; the error is perpendicular to the line. Right: $\mathcal K_2$ is the whole plane, so adding $p_2$ gives $x_2=2p_1+p_2=x$. These are the best Euclidean approximations of our first attempt. Drawing them uses the exact solution, which is unavailable in the actual solve.
+Euclidean projection for $A=\begin{pmatrix}2&-1\\-1&2\end{pmatrix}$ and $b=(3,0)^T$. Here $p_1=(1,0)^T$, $p_2=(0,1)^T$, and $x=(2,1)^T$. In the left panel, the circle centered at $x$ touches $\mathcal K_1$ at the nearest point $x_1=2p_1$, where the error is perpendicular to the line. In the right panel, $\mathcal K_2$ is the whole plane, so adding $p_2$ gives $x_2=2p_1+p_2=x$. Drawing these Euclidean projections requires the exact solution, which is unavailable in the actual solve.
 :::
 
 The difficulty is the coefficient formula: $p_j^Tx$ involves the unknown solution. Lanczos gives us the directions, but does not directly give these projection coefficients. We need an inner product that lets us use the known equation $Ax=b$.
@@ -119,7 +119,7 @@ $$
 
 Thus the new inner product is an ordinary dot product after rotating into the eigenvector coordinates and scaling by $\sqrt{\lambda_i}$. The symmetric square root $A^{1/2}=V\Lambda^{1/2}V^T$ includes a final orthogonal change of coordinates, which preserves dot products. No square root is needed in the algorithm.
 
-We can interpret this scaling as a **change of units** along the eigenvector directions. In those coordinates, the A-inner product weights the product of the $i$th components by $\lambda_i$. Equivalently, multiply each vector's $i$th component by $\sqrt{\lambda_i}$, then take the ordinary dot product. The operation is familiar; the coordinate scales have changed.
+We can interpret this scaling as a **change of units** along the eigenvector directions. In those coordinates, the A-inner product weights the product of the $i$th components by $\lambda_i$. Equivalently, multiply each vector's $i$th component by $\sqrt{\lambda_i}$, then take the ordinary dot product. This is an ordinary dot product after changing the coordinate scales.
 
 :::{figure} ../_static/cg_inner_product.svg
 :alt: Two vectors before and after doubling their first coordinates. They are not perpendicular in the original Euclidean coordinates, but become perpendicular after rescaling, illustrating their A-orthogonality for A diagonal with entries 4 and 1.
@@ -165,7 +165,7 @@ P_k^TAP_k=D_k=\operatorname{diag}(d_1,\ldots,d_k),
 D_k\begin{pmatrix}\mu_1\\\vdots\\\mu_k\end{pmatrix}=P_k^Tb.
 $$
 
-We could normalize every $p_j$ to have unit A-norm, making $D_k=I$. Instead, we leave the scale free for now. A later choice will simplify the recurrence.
+We leave the scale of each $p_j$ free. When we construct the directions from the residuals, we will choose a normalization that gives a short recurrence.
 
 ## Why the Partial Sum Is Optimal
 
@@ -236,7 +236,7 @@ Thus CG also minimizes this computable quadratic over $\mathcal K_k$. It differs
 
 ## Use the Residual to Find the Next Direction
 
-We now have the coefficient formula. The remaining task is to construct the A-orthogonal directions.
+The coefficient formula is useful only if we can construct the A-orthogonal directions from known quantities. The residual provides the new Krylov direction and leads directly to an efficient recurrence.
 
 One possibility is to start with $p_1=b$, generate a new vector $Ap_k$, and subtract its A-projections onto the previous directions. For $i\le k-2$, symmetry gives
 
@@ -246,7 +246,7 @@ $$
 
 because $Ap_i\in\mathcal K_{i+1}\subseteq\mathcal K_{k-1}$ and $p_k$ is A-orthogonal to that space. Thus only the projections onto $p_{k-1}$ and $p_k$ remain. This gives a three-term recurrence based on $Ap_k$.
 
-We will instead use the **residual**, which gives a computationally more efficient construction: only the latest search direction is needed, and the coefficients simplify to ratios involving residual norms. Recall its definition:
+Using the **residual** is more efficient because only the latest search direction is needed, and the coefficients reduce to ratios of residual norms. Recall that
 
 $$
 r_k=b-Ax_k.
@@ -286,7 +286,7 @@ If $r_k\ne0$, it belongs to $\mathcal K_{k+1}$ but cannot belong to $\mathcal K_
 
 ### Constructing an A-Orthogonal Direction from the Residual
 
-Suppose $p_1,\ldots,p_k$ are already known. There is one new A-orthogonal direction in $\mathcal K_{k+1}$; call it $p_{k+1}$ for now. We will find it by expanding the nonzero residual in this basis:
+Suppose $p_1,\ldots,p_k$ are already known. There is one new A-orthogonal direction in $\mathcal K_{k+1}$. Call it $p_{k+1}$ and expand the nonzero residual in the enlarged basis:
 
 $$
 r_k=\sum_{\ell=1}^{k+1}u_{\ell,k+1}p_\ell.
@@ -309,9 +309,7 @@ p_{k+1}=r_k-\sum_{i=1}^k\frac{p_i^TAr_k}{d_i}\,p_i.
 }
 $$
 
-This is A-orthogonalization of the residual. It produces a nonzero vector in $\mathcal K_{k+1}$ that is A-orthogonal to every previous direction. Starting with $p_1=r_0=b$, we can therefore construct the entire sequence and calculate every step length.
-
-At this stage the method is fully specified. The next question is how much of this orthogonalization we actually need to perform.
+This is A-orthogonalization of the residual. It produces a nonzero vector in $\mathcal K_{k+1}$ that is A-orthogonal to every previous direction. Starting with $p_1=r_0=b$, it constructs the entire sequence. The sum appears to require all previous directions, but symmetry and the nesting of the Krylov spaces reduce it to one term.
 
 ## Only the Latest Direction Is Needed
 
@@ -341,7 +339,7 @@ $$
 \boxed{p_{k+1}=r_k-u_{k,k+1}p_k.}
 $$
 
-Although we required A-orthogonality to *all* previous directions, we need to subtract only the projection onto the latest one. The Krylov structure and symmetry make all the earlier projections zero automatically. Our normalization is now fixed: each direction contains the current residual with coefficient $1$; its A-norm is generally not $1$.
+Although we required A-orthogonality to *all* previous directions, we need to subtract only the projection onto the latest one. The Krylov structure and symmetry make all the earlier projections zero automatically. This fixes the normalization: each new direction contains the current residual with coefficient $1$. Its A-norm is generally not $1$.
 
 ## The Residual Basis and Its Orthogonality
 
@@ -374,19 +372,19 @@ $$
 :::
 
 :::{prf:proof}
-Each $r_i$ belongs to $\mathcal K_{i+1}\subseteq\mathcal K_k$. These $k$ residuals are nonzero and mutually orthogonal, so they are linearly independent. They therefore span $\mathcal K_k$, whose dimension is at most $k$.
+Each $r_i$ belongs to $\mathcal K_{i+1}\subseteq\mathcal K_k$. These $k$ residuals are nonzero and mutually orthogonal, so they are linearly independent. Since $\mathcal K_k$ is generated by $k$ vectors, its dimension is at most $k$. The $k$ independent residuals therefore form a basis of $\mathcal K_k$.
 :::
 
-The residuals form a Euclidean-orthogonal basis; the search directions form an A-orthogonal basis. Both describe the same nested Krylov spaces. This distinction explains how the residual can generate a new search direction without itself being A-orthogonal to the previous directions.
+The residuals form a Euclidean-orthogonal basis, while the search directions form an A-orthogonal basis. Both describe the same nested Krylov spaces. This distinction explains how the residual can generate a new search direction without itself being A-orthogonal to the previous directions.
 
 ## Deriving the Efficient Coefficients
 
-The direction construction is already short. We can also simplify its scalar coefficients so that each iteration needs only one matrix-vector product.
+The direction update now involves only $r_k$ and $p_k$. Its two scalar coefficients can also be written using quantities already computed during the iteration.
 
 (cg-step-length-derivation)=
 ### The Step Length
 
-Recall that $\mu_k=p_k^Tb/d_k$. Since $b=r_{k-1}+Ax_{k-1}$ and $p_k$ is A-orthogonal to $\mathcal K_{k-1}$,
+From the expansion formula, $\mu_k=p_k^Tb/d_k$, where $d_k=p_k^TAp_k$. Since $b=r_{k-1}+Ax_{k-1}$ and $p_k$ is A-orthogonal to $\mathcal K_{k-1}$,
 
 $$
 \begin{aligned}
@@ -424,13 +422,13 @@ The product $Ap_k$ is already needed for the denominator of $\mu_k$, so this upd
 (cg-direction-coefficient-derivation)=
 ### The Direction Coefficient
 
-The remaining coefficient is $u_{k,k+1}=p_k^TAr_k/d_k$. From the residual update,
+The direction update still contains $u_{k,k+1}=p_k^TAr_k/d_k$. The residual update gives
 
 $$
 Ap_k=\frac{r_{k-1}-r_k}{\mu_k}.
 $$
 
-Recall that $d_k=p_k^TAp_k$. Multiplying the step-length formula from the preceding subsection by $d_k$ gives $\mu_kd_k=\|r_{k-1}\|_2^2$. Using this identity, symmetry, and residual orthogonality, we obtain
+Multiplying the step-length formula by $d_k$ gives $\mu_kd_k=\|r_{k-1}\|_2^2$. Using this identity, symmetry, and residual orthogonality, we obtain
 
 $$
 \begin{aligned}
@@ -454,8 +452,6 @@ $$
 \boxed{p_{k+1}=r_k+\tau_kp_k.}
 $$
 
-The symbols $\mu_k$ and $\tau_k$ are often written $\alpha_k$ and $\beta_k$ in other descriptions of CG.
-
 ## The Conjugate Gradient Algorithm
 
 Start with $x_0=0$ and $r_0=b$. If $r_0=0$, stop. Otherwise, set $p_1=r_0$. For $k=1,2,\ldots$, perform
@@ -478,15 +474,21 @@ p_{k+1}&=r_k+\tau_kp_k.
 \end{aligned}
 $$
 
-Positive definiteness ensures $p_k^TAp_k>0$ for every nonzero search direction. Each iteration uses one matrix-vector product, two inner products when previously computed residual norms are reused, and a few vector updates. Only a fixed number of vectors is stored; the full basis matrices are not formed.
+Positive definiteness ensures $p_k^TAp_k>0$ for every nonzero search direction. Each iteration uses one matrix-vector product, two inner products when previously computed residual norms are reused, and a few vector updates. Only a fixed number of vectors is stored. The full basis matrices are not formed.
 
 For a general initial guess, start with $r_0=b-Ax_0$ and use exactly the same recurrence. It searches in $x_0+\mathcal K_k(A,r_0)$ and minimizes the energy error there. This is equivalent to applying the zero-start derivation to the correction equation $A(x-x_0)=r_0$.
 
-In floating-point arithmetic, stop when an explicitly checked residual is sufficiently small, using a scaled residual criterion such as the one in the [Jacobi implementation](jacobi_method.md). The recursively updated residual can drift from $b-Ax_k$, so an explicit residual check is useful before accepting the answer. A small residual controls backward error; forward accuracy also depends on conditioning.
+In floating-point arithmetic, the recursively updated residual can drift from $b-Ax_k$. Before accepting the answer, recompute the residual explicitly and check a scaled quantity such as
+
+$$
+\eta_k=\frac{\|b-Ax_k\|_2}{\|A\|_2\|x_k\|_2+\|b\|_2}.
+$$
+
+A small $\eta_k$ means that small relative perturbations to $A$ and $b$ make $x_k$ an exact solution. This is a small normwise backward error. Forward accuracy also depends on the conditioning of $A$.
 
 ## Connection to Lanczos and Matrix Relations
 
-The Euclidean directions from our first attempt reappear as normalized CG residuals. Both $q_k$ from Lanczos and $r_{k-1}$ satisfy
+CG and Lanczos build the same Krylov spaces with different bases. The Euclidean directions from our first attempt reappear as normalized CG residuals. Both $q_k$ from Lanczos and $r_{k-1}$ satisfy
 
 $$
 q_k,\ r_{k-1}\in\mathcal K_k,
@@ -514,13 +516,11 @@ P_k^TAP_k&=D_k.
 \end{aligned}
 $$
 
-The matrices $Q_k^TAQ_k=T_k$ and $\mathcal R_k^TA\mathcal R_k$ are symmetric tridiagonal. The first is the Lanczos projection. The second follows because $\mathcal R_k=Q_kS_k$ for a nonsingular diagonal matrix $S_k$ of signed residual norms, so
+The matrices $Q_k^TAQ_k=T_k$ and $\mathcal R_k^TA\mathcal R_k$ are symmetric tridiagonal. The first is the Lanczos projection. Since the normalized residuals are the Lanczos vectors up to signs, $\mathcal R_k=Q_kS_k$ for a nonsingular diagonal matrix $S_k$ of signed residual norms. Therefore,
 
 $$
 \mathcal R_k^TA\mathcal R_k=S_kT_kS_k.
 $$
-
-There is also a direct subspace proof. If $i\ge j+2$, then $Ar_j\in\mathcal K_{j+2}\subseteq\mathcal K_i$ and $r_i\perp\mathcal K_i$, giving $r_i^TAr_j=0$. Symmetry supplies the zeros on the other side of the diagonal.
 
 ### The Small Tridiagonal System
 
@@ -549,7 +549,7 @@ $$
 \nabla\Phi(x_k)=-r_k.
 $$
 
-Equivalently, the squared-error objective $L(z)=\tfrac12\|x-z\|_A^2$ differs from $\Phi(z)$ by a constant and has the same gradient. Thus $r_k$ is the **negative gradient**, the direction of steepest decrease in the Euclidean geometry. Steepest descent would use $r_k$ alone; CG adds a multiple of $p_k$ to make the new direction conjugate to all previous ones.
+Equivalently, the squared-error objective $L(z)=\tfrac12\|x-z\|_A^2$ differs from $\Phi(z)$ by a constant and has the same gradient. Thus $r_k$ is the **negative gradient**, the direction of steepest decrease in the Euclidean geometry. Steepest descent would use $r_k$ alone. CG adds a multiple of $p_k$ to make the new direction conjugate to all previous ones.
 
 ## Convergence of the CG Method
 
@@ -569,7 +569,7 @@ If $r_0,\ldots,r_{n-1}$ are all nonzero, they are $n$ mutually orthogonal vector
 
 The Krylov space can stop growing before it fills $\mathbb R^n$. If $\mathcal K_{m+1}=\mathcal K_m$, then $r_m\in\mathcal K_{m+1}=\mathcal K_m$ and $r_m\perp\mathcal K_m$, forcing $r_m=0$. Thus termination occurs when growth stops, and the full solution has an expansion in the directions already constructed. We never need to assume that $\mathcal K_n$ has dimension $n$ for every right-hand side.
 
-For a large sparse problem, the practical goal is an accurate approximation in far fewer than $n$ steps. Finite termination is a theoretical property, not a reason to classify CG as a direct solver. In floating-point arithmetic, conjugacy and residual orthogonality can be lost, so the $n$-step guarantee does not generally hold.
+For a large sparse problem, the practical goal is an accurate approximation in far fewer than $n$ steps. Finite termination is a theoretical property. In floating-point arithmetic, conjugacy and residual orthogonality can be lost, so the $n$-step guarantee does not generally hold.
 
 ### The Error Polynomial and the Condition Number
 
@@ -621,7 +621,7 @@ $$
 }
 $$
 
-If $\kappa_2(A)=1$, then $A$ is a positive multiple of the identity and CG solves the system in one step. When the condition number is close to one, the factor $\rho$ is small and the bound predicts rapid convergence. For large $\kappa_2(A)$, the factor approaches one and the guarantee weakens. The factor bounds the overall error decay; it is not an assertion that the actual error decreases by exactly $\rho$ at every step.
+If $\kappa_2(A)=1$, then $A$ is a positive multiple of the identity and CG solves the system in one step. When the condition number is close to one, the factor $\rho$ is small and the bound predicts rapid convergence. For large $\kappa_2(A)$, the factor approaches one and the guarantee weakens. The factor bounds the overall error decay. It does not say that the actual error decreases by exactly $\rho$ at every step.
 
 ### Eigenvalue Clustering
 
@@ -635,16 +635,16 @@ $$
 
 It equals $1$ at zero and vanishes at every eigenvalue, so $p(A)=0$. This candidate has zero error, and CG optimality proves exact convergence in at most $s$ steps. Only eigenvalues present in the initial error are needed in this argument, so convergence can occur even sooner.
 
-Tight eigenvalue clusters can also help: a polynomial can be small on the clusters without being small throughout the entire interval between the extreme eigenvalues. This can make convergence much faster than the condition-number bound predicts. The widths and separation of the clusters matter; $s$ clusters do not generally imply termination in $s$ steps.
+Tight eigenvalue clusters can also help because a polynomial can be small on the clusters without being small throughout the entire interval between the extreme eigenvalues. This can make convergence much faster than the condition-number bound predicts. The widths and separation of the clusters matter. Having $s$ clusters does not generally imply termination in $s$ steps.
 
-The following experiment compares two $120\times120$ SPD systems with the same condition number, $\kappa_2(A)=100$. One has evenly spread eigenvalues; the other has three tight clusters. Both start from zero with the same initial-error coefficients in their eigenvector bases. The plotted errors come from actual CG iterations, using the known solution to measure the energy error.
+The following experiment compares two $120\times120$ SPD systems with the same condition number, $\kappa_2(A)=100$. One has evenly spread eigenvalues, while the other has three tight clusters. Both start from zero with the same initial-error coefficients in their eigenvector bases. The plotted errors come from actual CG iterations, using the known solution to measure the energy error.
 
 :::{figure} ../_static/cg_convergence.svg
 :alt: Left, 120 eigenvalues spread between 1 and 100 compared with 120 eigenvalues grouped near 1, 20, and 100. Right, computed relative CG energy errors: the clustered system reaches 10 to the minus 12 in 23 iterations and the spread system in 73, both below their shared condition-number bound.
 :width: 100%
 :name: fig-cg-convergence
 
-Same condition number, different convergence. The matrices are diagonal, so their coordinate axes are eigenvector directions. The spread spectrum is evenly spaced in $[1,100]$; the clustered spectrum has 40 eigenvalues in each of $[1,1.1]$, $[19.95,20.05]$, and $[99.9,100]$. In both cases, $x=(1,\ldots,1)^T/\sqrt{120}$, $b=Ax$, and $x_0=0$. The right panel shows the computed relative energy error and their common bound $2(9/11)^k$. Each run stops once the measured error is below $10^{-12}$. Clustering gives faster convergence here, even though all 120 eigenvalues remain distinct.
+Same condition number, different convergence. The matrices are diagonal, so their coordinate axes are eigenvector directions. The spread spectrum is evenly spaced in $[1,100]$. The clustered spectrum has 40 eigenvalues in each of $[1,1.1]$, $[19.95,20.05]$, and $[99.9,100]$. In both cases, $x=(1,\ldots,1)^T/\sqrt{120}$, $b=Ax$, and $x_0=0$. The right panel shows the computed relative energy error and their common bound $2(9/11)^k$. Each run stops once the measured error is below $10^{-12}$. Clustering gives faster convergence here, even though all 120 eigenvalues remain distinct.
 :::
 
 This motivates [preconditioning](preconditioning.md): transform the system into an equivalent problem for which an inexpensive iterative solve converges faster. For CG, the transformation must retain the SPD structure. We develop this in [preconditioned CG](pcg.md).
@@ -653,7 +653,7 @@ This motivates [preconditioning](preconditioning.md): transform the system into 
 
 CG sometimes converges faster as the iterations proceed. In this setting, **superlinear convergence** refers to an improving effective error-reduction factor, rather than one fixed geometric rate throughout the calculation. Such acceleration is possible, but not guaranteed for every problem or at every step.
 
-The Lanczos connection helps explain it. Recall that the **Ritz values** are the eigenvalues of the small matrix $T_k=Q_k^TAQ_k$. As they approximate some eigenvalues of $A$, particularly well-separated extreme eigenvalues, the CG error polynomial can strongly suppress the associated error components. The remaining components may occupy a much narrower spectral interval. CG can then behave as though it were solving a problem with a smaller effective condition number. The improvement is gradual; it does not require those components to become exactly zero.
+The Lanczos connection helps explain it. The **Ritz values**, which are the eigenvalues of the small matrix $T_k=Q_k^TAQ_k$, approximate some eigenvalues of $A$. Once well-separated extreme eigenvalues are approximated accurately, the CG error polynomial can strongly suppress their error components. The remaining components may occupy a much narrower spectral interval, so CG behaves as though the condition number were smaller. This acceleration does not require any component to become exactly zero.
 
 ## Key Results to Remember
 
@@ -741,7 +741,7 @@ $$
 
 Thus the energy error decreases as the search space grows. The Euclidean residual norm, however, need not decrease at every step.
 
-There is also an equivalent residual interpretation. Since
+The same optimality statement can be written in terms of the residual. Since
 
 $$
 \|r_k\|_{A^{-1}}^2
@@ -749,7 +749,7 @@ $$
 =e_k^TAe_k,
 $$
 
-CG minimizes the residual in the $A^{-1}$-norm over the search space. It does not generally minimize the residual in the Euclidean norm.
+CG minimizes $\|b-Az\|_{A^{-1}}$ over $z\in\mathcal K_k$. It does not generally minimize the Euclidean residual norm $\|b-Az\|_2$.
 
 ### Computable Coefficients and Short Updates
 
@@ -829,15 +829,23 @@ $$
 }
 $$
 
-Eigenvalue clustering can give faster convergence than this bound predicts, and convergence can accelerate as some error components are suppressed. These improvements depend on the problem; they are not guaranteed at every step.
+Eigenvalue clustering can give faster convergence than this bound predicts, and convergence can accelerate as some error components are suppressed. These improvements depend on the problem. They are not guaranteed at every step.
 
 In floating-point arithmetic, the orthogonality relations and finite-termination guarantee need not hold exactly. Check the explicitly computed residual before accepting a solution, and use preconditioning when the unpreconditioned iteration converges too slowly.
 
 ## Optional Reading: The Geometry of the CG Coefficients
 
-Consider one CG step starting at $x_k$, with residual $r_k=b-Ax_k$. CG chooses a search direction $p_{k+1}$ and moves along it until the energy is smallest. At the first step, $p_1=r_0$. At later steps, $p_{k+1}=r_k+\tau_kp_k$. The coefficient $\tau_k$ sets the direction, and $\mu_{k+1}$ sets the distance along it. Assume exact arithmetic and a nonzero residual throughout this discussion.
+The algebraic derivation above gives the two CG coefficients. The geometry below gives a second derivation of the same formulas and can be skipped without affecting the rest of the chapter.
 
-### The step length on the energy curve
+Consider one step starting at $x_k$, with residual $r_k=b-Ax_k$. The coefficient $\tau_k$ sets the next search direction,
+
+$$
+p_{k+1}=r_k+\tau_kp_k,
+$$
+
+and $\mu_{k+1}$ sets the distance traveled along it. Assume exact arithmetic and a nonzero residual throughout this discussion.
+
+### The Step Length on the Energy Curve
 
 The {ref}`earlier derivation of the step length <cg-step-length-derivation>` found $\mu_{k+1}$ as the coefficient of $p_{k+1}$ in the A-orthogonal expansion of the solution. We can recover that coefficient by asking where the search line reaches its lowest energy. Substituting $x_k+tp_{k+1}$ into the energy $\Phi(z)=\tfrac12 z^TAz-b^Tz$ gives a quadratic in $t$,
 
@@ -887,7 +895,7 @@ The ellipses are energy contours in the plane of the two steps. The black arrows
 
 The residuals are perpendicular in the full space. Because $r_k$ lies in the drawing plane, projecting $r_{k-1}$ into that plane preserves their right angle. From $x_k$, CG follows $p_{k+1}=r_k+\tau_kp_k$ to $x_{k+1}$, the minimum of the energy in this slice.
 
-### Why the direction coefficient is a squared length ratio
+### Why the Direction Coefficient Is a Squared Length Ratio
 
 Now draw the last two residuals, $r_{k-1}$ and $r_k$, as arrows from a common origin. They are perpendicular, so we can use them as the horizontal and vertical directions in the drawing. The arrow joining their tips is parallel to $Ap_k$, by the residual update
 
@@ -922,9 +930,7 @@ $$
 =\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
 $$
 
-In the full space, the angle $\theta$ between $r_k$ and $p_{k+1}$ also depends on the length of the old direction. The two terms in $p_{k+1}=r_k+\tau_kp_k$ are perpendicular, so $\tan\theta=\tau_k\|p_k\|_2/\|r_k\|_2$. This ratio measures how far the new direction tilts away from the downhill direction $r_k$.
-
-### A direction perpendicular to all the residual edges
+### A Direction Perpendicular to All the Residual Edges
 
 The triangle uses only $p_{k+1}^TAp_k=0$. Earlier we proved that $p_{k+1}$ is A-orthogonal to *every* preceding search direction. Each of those conditions gives a right angle of its own. Draw $r_0,\ldots,r_k$ from a common origin and join consecutive tips. For each edge, the residual update and conjugacy give
 
@@ -962,26 +968,3 @@ $$
 $$
 
 Each term in the sum gives downhill rate one at its own iterate and zero at the others. The last equality separates the newest term. In the original derivation, orthogonality made all but the most recent projection coefficient vanish. In the residual picture, $p_k$ already contains every earlier residual with the required relative weights. Multiplying through by $\|r_k\|_2^2$ gives the same short update, $p_{k+1}=r_k+\tau_kp_k$.
-
-### Two connections with other methods
-
-For a **nonlinear** objective $\Phi$, we can still define $r_j=-\nabla\Phi(x_j)$. The vector $y_k=r_{k-1}-r_k$ then measures the change in the gradient during step $k$. Choosing $p_{k+1}=r_k+\tau_kp_k$ perpendicular to $y_k$ gives the *Hestenes–Stiefel* coefficient of nonlinear CG. Solving $(r_k+\tau_kp_k)^Ty_k=0$ yields
-
-$$
-\tau_k=-\frac{r_k^Ty_k}{p_k^Ty_k},\qquad p_k^Ty_k\ne0.
-$$
-
-For our quadratic energy, $y_k=\mu_kAp_k$, so this condition is exactly the conjugacy condition used in the triangle argument.
-
-The residual tips also give a picture of the **minimum residual method (MINRES)**. Starting from $x_0=0$, the residuals attainable after searching $\mathcal K_k$ are the vectors $b-Az$ with $z\in\mathcal K_k$. These fill the affine span of the tips. Indeed, it contains $r_0=b$, and its edges $\mu_iAp_i$ span $A\mathcal K_k$ because the $p_i$ span $\mathcal K_k$.
-
-MINRES chooses the point in this span closest to the origin in Euclidean distance. Within $\mathcal K_{k+1}$, the span has dimension $k$, so its perpendicular direction is precisely $p_{k+1}$. The closest point therefore has the form $\alpha p_{k+1}$. Every point on the span has the same dot product $\|r_k\|_2^2$ with $p_{k+1}$. Substituting the closest point gives
-
-$$
-\alpha\|p_{k+1}\|_2^2=\|r_k\|_2^2,
-\qquad
-r_k^{\mathrm{MINRES}}
-=\frac{\|r_k\|_2^2}{\|p_{k+1}\|_2^2}\,p_{k+1}.
-$$
-
-The CG residual $r_k$ is the tip that minimizes the $A^{-1}$-norm over this affine span, as we saw from $\|r_k\|_{A^{-1}}=\|x-x_k\|_A$. MINRES measures distance in the Euclidean norm, so its residual is the foot of the perpendicular from the origin.
