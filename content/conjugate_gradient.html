@@ -486,7 +486,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-convergence-in-exact-arithmetic">Finite Convergence in Exact Arithmetic</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-error-polynomial-and-the-condition-number">The Error Polynomial and the Condition Number</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-clustering">Eigenvalue Clustering</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#superlinear-acceleration">Superlinear Acceleration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-cg-can-accelerate">Why CG Can Accelerate</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-to-remember">Key Results to Remember</a><ul class="nav section-nav flex-column">
@@ -496,6 +496,12 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computable-coefficients-and-short-updates">Computable Coefficients and Short Updates</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lanczos-connection">The Lanczos Connection</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-its-limits">Convergence and Its Limits</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-reading-the-geometry-of-the-cg-coefficients">Optional Reading: The Geometry of the CG Coefficients</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-step-length-on-the-energy-curve">The Step Length on the Energy Curve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-direction-coefficient-is-a-squared-length-ratio">Why the Direction Coefficient Is a Squared Length Ratio</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-direction-perpendicular-to-all-the-residual-edges">A Direction Perpendicular to All the Residual Edges</a></li>
 </ul>
 </li>
 </ul>
@@ -511,7 +517,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="the-conjugate-gradient-cg-method">
 <h1>The Conjugate Gradient (CG) Method<a class="headerlink" href="#the-conjugate-gradient-cg-method" title="Link to this heading">#</a></h1>
-<p>The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. The short recurrence comes afterward, as a way to perform this construction efficiently.</p>
+<p>The conjugate gradient method chooses an approximation from a growing Krylov subspace. Its main idea is to change the inner product used to define the best approximation. This makes the coefficients computable without knowing the exact solution. Symmetry and the Krylov structure then reduce the construction to a short recurrence.</p>
 <p>Throughout this section, <span class="math notranslate nohighlight">\(A\in\mathbb R^{n\times n}\)</span> is symmetric positive definite (SPD), and <span class="math notranslate nohighlight">\(x=A^{-1}b\)</span> is the exact solution. As in the chapter introduction, <span class="math notranslate nohighlight">\(x_k\)</span> is the approximation after <span class="math notranslate nohighlight">\(k\)</span> steps. We write <span class="math notranslate nohighlight">\(e_k=x-x_k\)</span> for its error and <span class="math notranslate nohighlight">\(r_k=b-Ax_k=Ae_k\)</span> for its residual. We first take <span class="math notranslate nohighlight">\(x_0=0\)</span>, so <span class="math notranslate nohighlight">\(r_0=b\)</span>. If <span class="math notranslate nohighlight">\(b=0\)</span>, the initial guess is already the solution. All orthogonality and optimality statements below concern exact arithmetic.</p>
 <section id="nested-krylov-spaces-and-search-directions">
 <h2>Nested Krylov Spaces and Search Directions<a class="headerlink" href="#nested-krylov-spaces-and-search-directions" title="Link to this heading">#</a></h2>
@@ -559,19 +565,19 @@ p_k=q_k,
 \qquad Q_k=[q_1,\ldots,q_k],
 \qquad Q_k^TQ_k=I.
 \]</div>
-<p>Suppose the final Krylov space containing <span class="math notranslate nohighlight">\(x\)</span> has dimension <span class="math notranslate nohighlight">\(m\le n\)</span>. Its orthonormal basis gives the expansion</p>
+<p>Suppose <span class="math notranslate nohighlight">\(x\)</span> first belongs to <span class="math notranslate nohighlight">\(\mathcal K_m\)</span>, where <span class="math notranslate nohighlight">\(m\le n\)</span>. The orthonormal basis of this space gives the expansion</p>
 <div class="math notranslate nohighlight">
 \[
 x=\sum_{j=1}^m\mu_jp_j,
 \qquad \mu_j=p_j^Tx.
 \]</div>
-<p>The Euclidean best approximation in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> is the partial sum through <span class="math notranslate nohighlight">\(k\)</span>. Orthogonality ensures that adding a new direction does not change the previous coefficients. We will justify below why a Krylov space containing <span class="math notranslate nohighlight">\(x\)</span> is reached in at most <span class="math notranslate nohighlight">\(n\)</span> steps, possibly earlier.</p>
+<p>The Euclidean best approximation in <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> is the partial sum through <span class="math notranslate nohighlight">\(k\)</span>. Orthogonality ensures that adding a new direction does not change the previous coefficients. The finite-convergence theorem below shows that some <span class="math notranslate nohighlight">\(m\le n\)</span> exists.</p>
 <p>The figure illustrates this process in two dimensions. The first approximation is the closest point to <span class="math notranslate nohighlight">\(x\)</span> on the line <span class="math notranslate nohighlight">\(\mathcal K_1\)</span>. Adding the perpendicular direction <span class="math notranslate nohighlight">\(p_2\)</span> captures the remaining component without changing the coefficient along <span class="math notranslate nohighlight">\(p_1\)</span>.</p>
 <figure class="align-default" id="fig-cg-euclidean-projection">
 <a class="reference internal image-reference" href="../_images/cg_euclidean_projection.svg"><img alt="Left, the exact solution projects perpendicularly onto the first Krylov line, giving the Euclidean best approximation x1. Right, adding the second orthogonal direction reaches the solution without changing the first component." src="../_images/cg_euclidean_projection.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 26 </span><span class="caption-text">Euclidean projection for <span class="math notranslate nohighlight">\(A=\begin{pmatrix}2&amp;-1\\-1&amp;2\end{pmatrix}\)</span> and <span class="math notranslate nohighlight">\(b=(3,0)^T\)</span>. Here <span class="math notranslate nohighlight">\(p_1=(1,0)^T\)</span>, <span class="math notranslate nohighlight">\(p_2=(0,1)^T\)</span>, and <span class="math notranslate nohighlight">\(x=(2,1)^T\)</span>. Left: the circle centered at <span class="math notranslate nohighlight">\(x\)</span> touches <span class="math notranslate nohighlight">\(\mathcal K_1\)</span> at the nearest point <span class="math notranslate nohighlight">\(x_1=2p_1\)</span>; the error is perpendicular to the line. Right: <span class="math notranslate nohighlight">\(\mathcal K_2\)</span> is the whole plane, so adding <span class="math notranslate nohighlight">\(p_2\)</span> gives <span class="math notranslate nohighlight">\(x_2=2p_1+p_2=x\)</span>. These are the best Euclidean approximations of our first attempt. Drawing them uses the exact solution, which is unavailable in the actual solve.</span><a class="headerlink" href="#fig-cg-euclidean-projection" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">Euclidean projection for <span class="math notranslate nohighlight">\(A=\begin{pmatrix}2&amp;-1\\-1&amp;2\end{pmatrix}\)</span> and <span class="math notranslate nohighlight">\(b=(3,0)^T\)</span>. Here <span class="math notranslate nohighlight">\(p_1=(1,0)^T\)</span>, <span class="math notranslate nohighlight">\(p_2=(0,1)^T\)</span>, and <span class="math notranslate nohighlight">\(x=(2,1)^T\)</span>. In the left panel, the circle centered at <span class="math notranslate nohighlight">\(x\)</span> touches <span class="math notranslate nohighlight">\(\mathcal K_1\)</span> at the nearest point <span class="math notranslate nohighlight">\(x_1=2p_1\)</span>, where the error is perpendicular to the line. In the right panel, <span class="math notranslate nohighlight">\(\mathcal K_2\)</span> is the whole plane, so adding <span class="math notranslate nohighlight">\(p_2\)</span> gives <span class="math notranslate nohighlight">\(x_2=2p_1+p_2=x\)</span>. Drawing these Euclidean projections requires the exact solution, which is unavailable in the actual solve.</span><a class="headerlink" href="#fig-cg-euclidean-projection" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>The difficulty is the coefficient formula: <span class="math notranslate nohighlight">\(p_j^Tx\)</span> involves the unknown solution. Lanczos gives us the directions, but does not directly give these projection coefficients. We need an inner product that lets us use the known equation <span class="math notranslate nohighlight">\(Ax=b\)</span>.</p>
@@ -610,7 +616,7 @@ p_j^TAx=p_j^Tb.
 \end{aligned}
 \end{split}\]</div>
 <p>Thus the new inner product is an ordinary dot product after rotating into the eigenvector coordinates and scaling by <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>. The symmetric square root <span class="math notranslate nohighlight">\(A^{1/2}=V\Lambda^{1/2}V^T\)</span> includes a final orthogonal change of coordinates, which preserves dot products. No square root is needed in the algorithm.</p>
-<p>We can interpret this scaling as a <strong>change of units</strong> along the eigenvector directions. In those coordinates, the A-inner product weights the product of the <span class="math notranslate nohighlight">\(i\)</span>th components by <span class="math notranslate nohighlight">\(\lambda_i\)</span>. Equivalently, multiply each vector’s <span class="math notranslate nohighlight">\(i\)</span>th component by <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>, then take the ordinary dot product. The operation is familiar; the coordinate scales have changed.</p>
+<p>We can interpret this scaling as a <strong>change of units</strong> along the eigenvector directions. In those coordinates, the A-inner product weights the product of the <span class="math notranslate nohighlight">\(i\)</span>th components by <span class="math notranslate nohighlight">\(\lambda_i\)</span>. Equivalently, multiply each vector’s <span class="math notranslate nohighlight">\(i\)</span>th component by <span class="math notranslate nohighlight">\(\sqrt{\lambda_i}\)</span>, then take the ordinary dot product. This is an ordinary dot product after changing the coordinate scales.</p>
 <figure class="align-default" id="fig-cg-inner-product">
 <a class="reference internal image-reference" href="../_images/cg_inner_product.svg"><img alt="Two vectors before and after doubling their first coordinates. They are not perpendicular in the original Euclidean coordinates, but become perpendicular after rescaling, illustrating their A-orthogonality for A diagonal with entries 4 and 1." src="../_images/cg_inner_product.svg" style="width: 100%;" />
 </a>
@@ -649,7 +655,7 @@ P_k^TAP_k=D_k=\operatorname{diag}(d_1,\ldots,d_k),
 \qquad
 D_k\begin{pmatrix}\mu_1\\\vdots\\\mu_k\end{pmatrix}=P_k^Tb.
 \end{split}\]</div>
-<p>We could normalize every <span class="math notranslate nohighlight">\(p_j\)</span> to have unit A-norm, making <span class="math notranslate nohighlight">\(D_k=I\)</span>. Instead, we leave the scale free for now. A later choice will simplify the recurrence.</p>
+<p>We leave the scale of each <span class="math notranslate nohighlight">\(p_j\)</span> free. When we construct the directions from the residuals, we will choose a normalization that gives a short recurrence.</p>
 </section>
 </section>
 <section id="why-the-partial-sum-is-optimal">
@@ -710,14 +716,14 @@ p_j^TA(x-x_k)
 </section>
 <section id="use-the-residual-to-find-the-next-direction">
 <h2>Use the Residual to Find the Next Direction<a class="headerlink" href="#use-the-residual-to-find-the-next-direction" title="Link to this heading">#</a></h2>
-<p>We now have the coefficient formula. The remaining task is to construct the A-orthogonal directions.</p>
+<p>The coefficient formula is useful only if we can construct the A-orthogonal directions from known quantities. The residual provides the new Krylov direction and leads directly to an efficient recurrence.</p>
 <p>One possibility is to start with <span class="math notranslate nohighlight">\(p_1=b\)</span>, generate a new vector <span class="math notranslate nohighlight">\(Ap_k\)</span>, and subtract its A-projections onto the previous directions. For <span class="math notranslate nohighlight">\(i\le k-2\)</span>, symmetry gives</p>
 <div class="math notranslate nohighlight">
 \[
 p_i^TA(Ap_k)=(Ap_i)^TAp_k=0,
 \]</div>
 <p>because <span class="math notranslate nohighlight">\(Ap_i\in\mathcal K_{i+1}\subseteq\mathcal K_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> is A-orthogonal to that space. Thus only the projections onto <span class="math notranslate nohighlight">\(p_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> remain. This gives a three-term recurrence based on <span class="math notranslate nohighlight">\(Ap_k\)</span>.</p>
-<p>We will instead use the <strong>residual</strong>, which gives a computationally more efficient construction: only the latest search direction is needed, and the coefficients simplify to ratios involving residual norms. Recall its definition:</p>
+<p>Using the <strong>residual</strong> is more efficient because only the latest search direction is needed, and the coefficients reduce to ratios of residual norms. Recall that</p>
 <div class="math notranslate nohighlight">
 \[
 r_k=b-Ax_k.
@@ -749,7 +755,7 @@ v^Tr_k=v^T(b-Ax_k)=v^TA(x-x_k)=0.
 <p>If <span class="math notranslate nohighlight">\(r_k\ne0\)</span>, it belongs to <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span> but cannot belong to <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, since it is orthogonal to that space. It therefore supplies precisely the new independent direction we need. If <span class="math notranslate nohighlight">\(r_k=0\)</span>, then <span class="math notranslate nohighlight">\(Ax_k=b\)</span> and we stop.</p>
 <section id="constructing-an-a-orthogonal-direction-from-the-residual">
 <h3>Constructing an A-Orthogonal Direction from the Residual<a class="headerlink" href="#constructing-an-a-orthogonal-direction-from-the-residual" title="Link to this heading">#</a></h3>
-<p>Suppose <span class="math notranslate nohighlight">\(p_1,\ldots,p_k\)</span> are already known. There is one new A-orthogonal direction in <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span>; call it <span class="math notranslate nohighlight">\(p_{k+1}\)</span> for now. We will find it by expanding the nonzero residual in this basis:</p>
+<p>Suppose <span class="math notranslate nohighlight">\(p_1,\ldots,p_k\)</span> are already known. There is one new A-orthogonal direction in <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span>. Call it <span class="math notranslate nohighlight">\(p_{k+1}\)</span> and expand the nonzero residual in the enlarged basis:</p>
 <div class="math notranslate nohighlight">
 \[
 r_k=\sum_{\ell=1}^{k+1}u_{\ell,k+1}p_\ell.
@@ -769,8 +775,7 @@ u_{i,k+1}=\frac{p_i^TAr_k}{d_i}
 p_{k+1}=r_k-\sum_{i=1}^k\frac{p_i^TAr_k}{d_i}\,p_i.
 }
 \]</div>
-<p>This is A-orthogonalization of the residual. It produces a nonzero vector in <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span> that is A-orthogonal to every previous direction. Starting with <span class="math notranslate nohighlight">\(p_1=r_0=b\)</span>, we can therefore construct the entire sequence and calculate every step length.</p>
-<p>At this stage the method is fully specified. The next question is how much of this orthogonalization we actually need to perform.</p>
+<p>This is A-orthogonalization of the residual. It produces a nonzero vector in <span class="math notranslate nohighlight">\(\mathcal K_{k+1}\)</span> that is A-orthogonal to every previous direction. Starting with <span class="math notranslate nohighlight">\(p_1=r_0=b\)</span>, it constructs the entire sequence. The sum appears to require all previous directions, but symmetry and the nesting of the Krylov spaces reduce it to one term.</p>
 </section>
 </section>
 <section id="only-the-latest-direction-is-needed">
@@ -797,7 +802,7 @@ u_{k,k+1}=\frac{p_k^TAr_k}{d_k}.
 \[
 \boxed{p_{k+1}=r_k-u_{k,k+1}p_k.}
 \]</div>
-<p>Although we required A-orthogonality to <em>all</em> previous directions, we need to subtract only the projection onto the latest one. The Krylov structure and symmetry make all the earlier projections zero automatically. Our normalization is now fixed: each direction contains the current residual with coefficient <span class="math notranslate nohighlight">\(1\)</span>; its A-norm is generally not <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<p>Although we required A-orthogonality to <em>all</em> previous directions, we need to subtract only the projection onto the latest one. The Krylov structure and symmetry make all the earlier projections zero automatically. This fixes the normalization: each new direction contains the current residual with coefficient <span class="math notranslate nohighlight">\(1\)</span>. Its A-norm is generally not <span class="math notranslate nohighlight">\(1\)</span>.</p>
 </section>
 <section id="the-residual-basis-and-its-orthogonality">
 <h2>The Residual Basis and Its Orthogonality<a class="headerlink" href="#the-residual-basis-and-its-orthogonality" title="Link to this heading">#</a></h2>
@@ -826,16 +831,16 @@ r_i^Tr_j=0\qquad(i\ne j).
 \]</div>
 </section>
 </div><div class="proof admonition" id="proof">
-<p>Proof. Each <span class="math notranslate nohighlight">\(r_i\)</span> belongs to <span class="math notranslate nohighlight">\(\mathcal K_{i+1}\subseteq\mathcal K_k\)</span>. These <span class="math notranslate nohighlight">\(k\)</span> residuals are nonzero and mutually orthogonal, so they are linearly independent. They therefore span <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>, whose dimension is at most <span class="math notranslate nohighlight">\(k\)</span>.</p>
+<p>Proof. Each <span class="math notranslate nohighlight">\(r_i\)</span> belongs to <span class="math notranslate nohighlight">\(\mathcal K_{i+1}\subseteq\mathcal K_k\)</span>. These <span class="math notranslate nohighlight">\(k\)</span> residuals are nonzero and mutually orthogonal, so they are linearly independent. Since <span class="math notranslate nohighlight">\(\mathcal K_k\)</span> is generated by <span class="math notranslate nohighlight">\(k\)</span> vectors, its dimension is at most <span class="math notranslate nohighlight">\(k\)</span>. The <span class="math notranslate nohighlight">\(k\)</span> independent residuals therefore form a basis of <span class="math notranslate nohighlight">\(\mathcal K_k\)</span>.</p>
 </div>
-<p>The residuals form a Euclidean-orthogonal basis; the search directions form an A-orthogonal basis. Both describe the same nested Krylov spaces. This distinction explains how the residual can generate a new search direction without itself being A-orthogonal to the previous directions.</p>
+<p>The residuals form a Euclidean-orthogonal basis, while the search directions form an A-orthogonal basis. Both describe the same nested Krylov spaces. This distinction explains how the residual can generate a new search direction without itself being A-orthogonal to the previous directions.</p>
 </section>
 <section id="deriving-the-efficient-coefficients">
 <h2>Deriving the Efficient Coefficients<a class="headerlink" href="#deriving-the-efficient-coefficients" title="Link to this heading">#</a></h2>
-<p>The direction construction is already short. We can also simplify its scalar coefficients so that each iteration needs only one matrix-vector product.</p>
+<p>The direction update now involves only <span class="math notranslate nohighlight">\(r_k\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span>. Its two scalar coefficients can also be written using quantities already computed during the iteration.</p>
 <section id="the-step-length">
-<h3>The Step Length<a class="headerlink" href="#the-step-length" title="Link to this heading">#</a></h3>
-<p>Recall that <span class="math notranslate nohighlight">\(\mu_k=p_k^Tb/d_k\)</span>. Since <span class="math notranslate nohighlight">\(b=r_{k-1}+Ax_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> is A-orthogonal to <span class="math notranslate nohighlight">\(\mathcal K_{k-1}\)</span>,</p>
+<span id="cg-step-length-derivation"></span><h3>The Step Length<a class="headerlink" href="#the-step-length" title="Link to this heading">#</a></h3>
+<p>From the expansion formula, <span class="math notranslate nohighlight">\(\mu_k=p_k^Tb/d_k\)</span>, where <span class="math notranslate nohighlight">\(d_k=p_k^TAp_k\)</span>. Since <span class="math notranslate nohighlight">\(b=r_{k-1}+Ax_{k-1}\)</span> and <span class="math notranslate nohighlight">\(p_k\)</span> is A-orthogonal to <span class="math notranslate nohighlight">\(\mathcal K_{k-1}\)</span>,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -867,13 +872,13 @@ r_k&amp;=b-A(x_{k-1}+\mu_kp_k)\\
 <p>The product <span class="math notranslate nohighlight">\(Ap_k\)</span> is already needed for the denominator of <span class="math notranslate nohighlight">\(\mu_k\)</span>, so this update needs no additional matrix-vector product.</p>
 </section>
 <section id="the-direction-coefficient">
-<h3>The Direction Coefficient<a class="headerlink" href="#the-direction-coefficient" title="Link to this heading">#</a></h3>
-<p>The remaining coefficient is <span class="math notranslate nohighlight">\(u_{k,k+1}=p_k^TAr_k/d_k\)</span>. From the residual update,</p>
+<span id="cg-direction-coefficient-derivation"></span><h3>The Direction Coefficient<a class="headerlink" href="#the-direction-coefficient" title="Link to this heading">#</a></h3>
+<p>The direction update still contains <span class="math notranslate nohighlight">\(u_{k,k+1}=p_k^TAr_k/d_k\)</span>. The residual update gives</p>
 <div class="math notranslate nohighlight">
 \[
 Ap_k=\frac{r_{k-1}-r_k}{\mu_k}.
 \]</div>
-<p>Recall that <span class="math notranslate nohighlight">\(d_k=p_k^TAp_k\)</span>. Multiplying the step-length formula from the preceding subsection by <span class="math notranslate nohighlight">\(d_k\)</span> gives <span class="math notranslate nohighlight">\(\mu_kd_k=\|r_{k-1}\|_2^2\)</span>. Using this identity, symmetry, and residual orthogonality, we obtain</p>
+<p>Multiplying the step-length formula by <span class="math notranslate nohighlight">\(d_k\)</span> gives <span class="math notranslate nohighlight">\(\mu_kd_k=\|r_{k-1}\|_2^2\)</span>. Using this identity, symmetry, and residual orthogonality, we obtain</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{aligned}
@@ -894,7 +899,6 @@ u_{k,k+1}
 \[
 \boxed{p_{k+1}=r_k+\tau_kp_k.}
 \]</div>
-<p>The symbols <span class="math notranslate nohighlight">\(\mu_k\)</span> and <span class="math notranslate nohighlight">\(\tau_k\)</span> are often written <span class="math notranslate nohighlight">\(\alpha_k\)</span> and <span class="math notranslate nohighlight">\(\beta_k\)</span> in other descriptions of CG.</p>
 </section>
 </section>
 <section id="the-conjugate-gradient-algorithm">
@@ -917,13 +921,18 @@ r_k&amp;=r_{k-1}-\mu_kw_k, &amp;&amp;\text{residual update}.
 p_{k+1}&amp;=r_k+\tau_kp_k.
 \end{aligned}
 \end{split}\]</div>
-<p>Positive definiteness ensures <span class="math notranslate nohighlight">\(p_k^TAp_k&gt;0\)</span> for every nonzero search direction. Each iteration uses one matrix-vector product, two inner products when previously computed residual norms are reused, and a few vector updates. Only a fixed number of vectors is stored; the full basis matrices are not formed.</p>
+<p>Positive definiteness ensures <span class="math notranslate nohighlight">\(p_k^TAp_k&gt;0\)</span> for every nonzero search direction. Each iteration uses one matrix-vector product, two inner products when previously computed residual norms are reused, and a few vector updates. Only a fixed number of vectors is stored. The full basis matrices are not formed.</p>
 <p>For a general initial guess, start with <span class="math notranslate nohighlight">\(r_0=b-Ax_0\)</span> and use exactly the same recurrence. It searches in <span class="math notranslate nohighlight">\(x_0+\mathcal K_k(A,r_0)\)</span> and minimizes the energy error there. This is equivalent to applying the zero-start derivation to the correction equation <span class="math notranslate nohighlight">\(A(x-x_0)=r_0\)</span>.</p>
-<p>In floating-point arithmetic, stop when an explicitly checked residual is sufficiently small, using a scaled residual criterion such as the one in the <a class="reference internal" href="jacobi_method.html"><span class="std std-doc">Jacobi implementation</span></a>. The recursively updated residual can drift from <span class="math notranslate nohighlight">\(b-Ax_k\)</span>, so an explicit residual check is useful before accepting the answer. A small residual controls backward error; forward accuracy also depends on conditioning.</p>
+<p>In floating-point arithmetic, the recursively updated residual can drift from <span class="math notranslate nohighlight">\(b-Ax_k\)</span>. Before accepting the answer, recompute the residual explicitly and check a scaled quantity such as</p>
+<div class="math notranslate nohighlight">
+\[
+\eta_k=\frac{\|b-Ax_k\|_2}{\|A\|_2\|x_k\|_2+\|b\|_2}.
+\]</div>
+<p>A small <span class="math notranslate nohighlight">\(\eta_k\)</span> means that small relative perturbations to <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(b\)</span> make <span class="math notranslate nohighlight">\(x_k\)</span> an exact solution. This is a small normwise backward error. Forward accuracy also depends on the conditioning of <span class="math notranslate nohighlight">\(A\)</span>.</p>
 </section>
 <section id="connection-to-lanczos-and-matrix-relations">
 <h2>Connection to Lanczos and Matrix Relations<a class="headerlink" href="#connection-to-lanczos-and-matrix-relations" title="Link to this heading">#</a></h2>
-<p>The Euclidean directions from our first attempt reappear as normalized CG residuals. Both <span class="math notranslate nohighlight">\(q_k\)</span> from Lanczos and <span class="math notranslate nohighlight">\(r_{k-1}\)</span> satisfy</p>
+<p>CG and Lanczos build the same Krylov spaces with different bases. The Euclidean directions from our first attempt reappear as normalized CG residuals. Both <span class="math notranslate nohighlight">\(q_k\)</span> from Lanczos and <span class="math notranslate nohighlight">\(r_{k-1}\)</span> satisfy</p>
 <div class="math notranslate nohighlight">
 \[
 q_k,\ r_{k-1}\in\mathcal K_k,
@@ -947,12 +956,11 @@ Q_k^TQ_k&amp;=I,\\
 P_k^TAP_k&amp;=D_k.
 \end{aligned}
 \end{split}\]</div>
-<p>The matrices <span class="math notranslate nohighlight">\(Q_k^TAQ_k=T_k\)</span> and <span class="math notranslate nohighlight">\(\mathcal R_k^TA\mathcal R_k\)</span> are symmetric tridiagonal. The first is the Lanczos projection. The second follows because <span class="math notranslate nohighlight">\(\mathcal R_k=Q_kS_k\)</span> for a nonsingular diagonal matrix <span class="math notranslate nohighlight">\(S_k\)</span> of signed residual norms, so</p>
+<p>The matrices <span class="math notranslate nohighlight">\(Q_k^TAQ_k=T_k\)</span> and <span class="math notranslate nohighlight">\(\mathcal R_k^TA\mathcal R_k\)</span> are symmetric tridiagonal. The first is the Lanczos projection. Since the normalized residuals are the Lanczos vectors up to signs, <span class="math notranslate nohighlight">\(\mathcal R_k=Q_kS_k\)</span> for a nonsingular diagonal matrix <span class="math notranslate nohighlight">\(S_k\)</span> of signed residual norms. Therefore,</p>
 <div class="math notranslate nohighlight">
 \[
 \mathcal R_k^TA\mathcal R_k=S_kT_kS_k.
 \]</div>
-<p>There is also a direct subspace proof. If <span class="math notranslate nohighlight">\(i\ge j+2\)</span>, then <span class="math notranslate nohighlight">\(Ar_j\in\mathcal K_{j+2}\subseteq\mathcal K_i\)</span> and <span class="math notranslate nohighlight">\(r_i\perp\mathcal K_i\)</span>, giving <span class="math notranslate nohighlight">\(r_i^TAr_j=0\)</span>. Symmetry supplies the zeros on the other side of the diagonal.</p>
 </section>
 <section id="the-small-tridiagonal-system">
 <h3>The Small Tridiagonal System<a class="headerlink" href="#the-small-tridiagonal-system" title="Link to this heading">#</a></h3>
@@ -978,7 +986,7 @@ T_ky_k&amp;=\|b\|_2e_1.
 \qquad
 \nabla\Phi(x_k)=-r_k.
 \]</div>
-<p>Equivalently, the squared-error objective <span class="math notranslate nohighlight">\(L(z)=\tfrac12\|x-z\|_A^2\)</span> differs from <span class="math notranslate nohighlight">\(\Phi(z)\)</span> by a constant and has the same gradient. Thus <span class="math notranslate nohighlight">\(r_k\)</span> is the <strong>negative gradient</strong>, the direction of steepest decrease in the Euclidean geometry. Steepest descent would use <span class="math notranslate nohighlight">\(r_k\)</span> alone; CG adds a multiple of <span class="math notranslate nohighlight">\(p_k\)</span> to make the new direction conjugate to all previous ones.</p>
+<p>Equivalently, the squared-error objective <span class="math notranslate nohighlight">\(L(z)=\tfrac12\|x-z\|_A^2\)</span> differs from <span class="math notranslate nohighlight">\(\Phi(z)\)</span> by a constant and has the same gradient. Thus <span class="math notranslate nohighlight">\(r_k\)</span> is the <strong>negative gradient</strong>, the direction of steepest decrease in the Euclidean geometry. Steepest descent would use <span class="math notranslate nohighlight">\(r_k\)</span> alone. CG adds a multiple of <span class="math notranslate nohighlight">\(p_k\)</span> to make the new direction conjugate to all previous ones.</p>
 </section>
 <section id="convergence-of-the-cg-method">
 <h2>Convergence of the CG Method<a class="headerlink" href="#convergence-of-the-cg-method" title="Link to this heading">#</a></h2>
@@ -994,7 +1002,7 @@ T_ky_k&amp;=\|b\|_2e_1.
 <p>Proof. If <span class="math notranslate nohighlight">\(r_0,\ldots,r_{n-1}\)</span> are all nonzero, they are <span class="math notranslate nohighlight">\(n\)</span> mutually orthogonal vectors and hence form a basis of <span class="math notranslate nohighlight">\(\mathbb R^n\)</span>. By <a class="reference internal" href="#cg_residual_basis">Theorem 51</a>, <span class="math notranslate nohighlight">\(\mathcal K_n=\mathbb R^n\)</span>. The next residual <span class="math notranslate nohighlight">\(r_n\)</span> is orthogonal to this whole space, so it must be zero. If any earlier residual vanishes, the solution has already been found.</p>
 </div>
 <p>The Krylov space can stop growing before it fills <span class="math notranslate nohighlight">\(\mathbb R^n\)</span>. If <span class="math notranslate nohighlight">\(\mathcal K_{m+1}=\mathcal K_m\)</span>, then <span class="math notranslate nohighlight">\(r_m\in\mathcal K_{m+1}=\mathcal K_m\)</span> and <span class="math notranslate nohighlight">\(r_m\perp\mathcal K_m\)</span>, forcing <span class="math notranslate nohighlight">\(r_m=0\)</span>. Thus termination occurs when growth stops, and the full solution has an expansion in the directions already constructed. We never need to assume that <span class="math notranslate nohighlight">\(\mathcal K_n\)</span> has dimension <span class="math notranslate nohighlight">\(n\)</span> for every right-hand side.</p>
-<p>For a large sparse problem, the practical goal is an accurate approximation in far fewer than <span class="math notranslate nohighlight">\(n\)</span> steps. Finite termination is a theoretical property, not a reason to classify CG as a direct solver. In floating-point arithmetic, conjugacy and residual orthogonality can be lost, so the <span class="math notranslate nohighlight">\(n\)</span>-step guarantee does not generally hold.</p>
+<p>For a large sparse problem, the practical goal is an accurate approximation in far fewer than <span class="math notranslate nohighlight">\(n\)</span> steps. Finite termination is a theoretical property. In floating-point arithmetic, conjugacy and residual orthogonality can be lost, so the <span class="math notranslate nohighlight">\(n\)</span>-step guarantee does not generally hold.</p>
 </section>
 <section id="the-error-polynomial-and-the-condition-number">
 <h3>The Error Polynomial and the Condition Number<a class="headerlink" href="#the-error-polynomial-and-the-condition-number" title="Link to this heading">#</a></h3>
@@ -1039,7 +1047,7 @@ x-x_k=p(A)x,
 \le2\rho^k\|x-x_0\|_A.
 }
 \]</div>
-<p>If <span class="math notranslate nohighlight">\(\kappa_2(A)=1\)</span>, then <span class="math notranslate nohighlight">\(A\)</span> is a positive multiple of the identity and CG solves the system in one step. When the condition number is close to one, the factor <span class="math notranslate nohighlight">\(\rho\)</span> is small and the bound predicts rapid convergence. For large <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>, the factor approaches one and the guarantee weakens. The factor bounds the overall error decay; it is not an assertion that the actual error decreases by exactly <span class="math notranslate nohighlight">\(\rho\)</span> at every step.</p>
+<p>If <span class="math notranslate nohighlight">\(\kappa_2(A)=1\)</span>, then <span class="math notranslate nohighlight">\(A\)</span> is a positive multiple of the identity and CG solves the system in one step. When the condition number is close to one, the factor <span class="math notranslate nohighlight">\(\rho\)</span> is small and the bound predicts rapid convergence. For large <span class="math notranslate nohighlight">\(\kappa_2(A)\)</span>, the factor approaches one and the guarantee weakens. The factor bounds the overall error decay. It does not say that the actual error decreases by exactly <span class="math notranslate nohighlight">\(\rho\)</span> at every step.</p>
 </section>
 <section id="eigenvalue-clustering">
 <h3>Eigenvalue Clustering<a class="headerlink" href="#eigenvalue-clustering" title="Link to this heading">#</a></h3>
@@ -1050,21 +1058,20 @@ x-x_k=p(A)x,
 p(\lambda)=\prod_{j=1}^s\left(1-\frac{\lambda}{\theta_j}\right).
 \]</div>
 <p>It equals <span class="math notranslate nohighlight">\(1\)</span> at zero and vanishes at every eigenvalue, so <span class="math notranslate nohighlight">\(p(A)=0\)</span>. This candidate has zero error, and CG optimality proves exact convergence in at most <span class="math notranslate nohighlight">\(s\)</span> steps. Only eigenvalues present in the initial error are needed in this argument, so convergence can occur even sooner.</p>
-<p>Tight eigenvalue clusters can also help: a polynomial can be small on the clusters without being small throughout the entire interval between the extreme eigenvalues. This can make convergence much faster than the condition-number bound predicts. The widths and separation of the clusters matter; <span class="math notranslate nohighlight">\(s\)</span> clusters do not generally imply termination in <span class="math notranslate nohighlight">\(s\)</span> steps.</p>
-<p>The following experiment compares two <span class="math notranslate nohighlight">\(120\times120\)</span> SPD systems with the same condition number, <span class="math notranslate nohighlight">\(\kappa_2(A)=100\)</span>. One has evenly spread eigenvalues; the other has three tight clusters. Both start from zero with the same initial-error coefficients in their eigenvector bases. The plotted errors come from actual CG iterations, using the known solution to measure the energy error.</p>
+<p>Tight eigenvalue clusters can also help because a polynomial can be small on the clusters without being small throughout the entire interval between the extreme eigenvalues. This can make convergence much faster than the condition-number bound predicts. The widths and separation of the clusters matter. Having <span class="math notranslate nohighlight">\(s\)</span> clusters does not generally imply termination in <span class="math notranslate nohighlight">\(s\)</span> steps.</p>
+<p>The following experiment compares two <span class="math notranslate nohighlight">\(120\times120\)</span> SPD systems with the same condition number, <span class="math notranslate nohighlight">\(\kappa_2(A)=100\)</span>. One has evenly spread eigenvalues, while the other has three tight clusters. Both start from zero with the same initial-error coefficients in their eigenvector bases. The plotted errors come from actual CG iterations, using the known solution to measure the energy error.</p>
 <figure class="align-default" id="fig-cg-convergence">
 <a class="reference internal image-reference" href="../_images/cg_convergence.svg"><img alt="Left, 120 eigenvalues spread between 1 and 100 compared with 120 eigenvalues grouped near 1, 20, and 100. Right, computed relative CG energy errors: the clustered system reaches 10 to the minus 12 in 23 iterations and the spread system in 73, both below their shared condition-number bound." src="../_images/cg_convergence.svg" style="width: 100%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 28 </span><span class="caption-text">Same condition number, different convergence. The matrices are diagonal, so their coordinate axes are eigenvector directions. The spread spectrum is evenly spaced in <span class="math notranslate nohighlight">\([1,100]\)</span>; the clustered spectrum has 40 eigenvalues in each of <span class="math notranslate nohighlight">\([1,1.1]\)</span>, <span class="math notranslate nohighlight">\([19.95,20.05]\)</span>, and <span class="math notranslate nohighlight">\([99.9,100]\)</span>. In both cases, <span class="math notranslate nohighlight">\(x=(1,\ldots,1)^T/\sqrt{120}\)</span>, <span class="math notranslate nohighlight">\(b=Ax\)</span>, and <span class="math notranslate nohighlight">\(x_0=0\)</span>. The right panel shows the computed relative energy error and their common bound <span class="math notranslate nohighlight">\(2(9/11)^k\)</span>. Each run stops once the measured error is below <span class="math notranslate nohighlight">\(10^{-12}\)</span>. Clustering gives faster convergence here, even though all 120 eigenvalues remain distinct.</span><a class="headerlink" href="#fig-cg-convergence" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 28 </span><span class="caption-text">Same condition number, different convergence. The matrices are diagonal, so their coordinate axes are eigenvector directions. The spread spectrum is evenly spaced in <span class="math notranslate nohighlight">\([1,100]\)</span>. The clustered spectrum has 40 eigenvalues in each of <span class="math notranslate nohighlight">\([1,1.1]\)</span>, <span class="math notranslate nohighlight">\([19.95,20.05]\)</span>, and <span class="math notranslate nohighlight">\([99.9,100]\)</span>. In both cases, <span class="math notranslate nohighlight">\(x=(1,\ldots,1)^T/\sqrt{120}\)</span>, <span class="math notranslate nohighlight">\(b=Ax\)</span>, and <span class="math notranslate nohighlight">\(x_0=0\)</span>. The right panel shows the computed relative energy error and their common bound <span class="math notranslate nohighlight">\(2(9/11)^k\)</span>. Each run stops once the measured error is below <span class="math notranslate nohighlight">\(10^{-12}\)</span>. Clustering gives faster convergence here, even though all 120 eigenvalues remain distinct.</span><a class="headerlink" href="#fig-cg-convergence" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>This motivates <a class="reference internal" href="preconditioning.html"><span class="std std-doc">preconditioning</span></a>: transform the system into an equivalent problem for which an inexpensive iterative solve converges faster. For CG, the transformation must retain the SPD structure. We develop this in <a class="reference internal" href="pcg.html"><span class="std std-doc">preconditioned CG</span></a>.</p>
 </section>
-<section id="superlinear-acceleration">
-<h3>Superlinear Acceleration<a class="headerlink" href="#superlinear-acceleration" title="Link to this heading">#</a></h3>
-<p>CG sometimes converges faster as the iterations proceed. In this setting, <strong>superlinear convergence</strong> refers to an improving effective error-reduction factor, rather than one fixed geometric rate throughout the calculation. Such acceleration is possible, but not guaranteed for every problem or at every step.</p>
-<p>The Lanczos connection helps explain it. Recall that the <strong>Ritz values</strong> are the eigenvalues of the small matrix <span class="math notranslate nohighlight">\(T_k=Q_k^TAQ_k\)</span>. As they approximate some eigenvalues of <span class="math notranslate nohighlight">\(A\)</span>, particularly well-separated extreme eigenvalues, the CG error polynomial can strongly suppress the associated error components. The remaining components may occupy a much narrower spectral interval. CG can then behave as though it were solving a problem with a smaller effective condition number. The improvement is gradual; it does not require those components to become exactly zero.</p>
+<section id="why-cg-can-accelerate">
+<h3>Why CG Can Accelerate<a class="headerlink" href="#why-cg-can-accelerate" title="Link to this heading">#</a></h3>
+<p>The condition-number bound uses the same interval <span class="math notranslate nohighlight">\([\lambda_{\min},\lambda_{\max}]\)</span> at every step. In practice, later steps can reduce the energy error faster than earlier ones. To see why, recall that the <strong>Ritz values</strong>, the eigenvalues of the Lanczos matrix <span class="math notranslate nohighlight">\(T_k=Q_k^TAQ_k\)</span>, are roots of the CG error polynomial. When a Ritz value closely approximates an isolated extreme eigenvalue of <span class="math notranslate nohighlight">\(A\)</span>, the polynomial can strongly suppress the corresponding error component. The components that still contribute appreciably to the error may then occupy a narrower spectral interval, allowing CG to converge faster.</p>
 </section>
 </section>
 <section id="key-results-to-remember">
@@ -1143,14 +1150,14 @@ x_k=\underset{z\in\mathcal K_k}{\operatorname{argmin}}\,\Phi(z),
 \|x-z\|_A^2=\|x-x_k\|_A^2+\|x_k-z\|_A^2.
 \]</div>
 <p>Thus the energy error decreases as the search space grows. The Euclidean residual norm, however, need not decrease at every step.</p>
-<p>There is also an equivalent residual interpretation. Since</p>
+<p>The same optimality statement can be written in terms of the residual. Since</p>
 <div class="math notranslate nohighlight">
 \[
 \|r_k\|_{A^{-1}}^2
 :=r_k^TA^{-1}r_k
 =e_k^TAe_k,
 \]</div>
-<p>CG minimizes the residual in the <span class="math notranslate nohighlight">\(A^{-1}\)</span>-norm over the search space. It does not generally minimize the residual in the Euclidean norm.</p>
+<p>CG minimizes <span class="math notranslate nohighlight">\(\|b-Az\|_{A^{-1}}\)</span> over <span class="math notranslate nohighlight">\(z\in\mathcal K_k\)</span>. It does not generally minimize the Euclidean residual norm <span class="math notranslate nohighlight">\(\|b-Az\|_2\)</span>.</p>
 </section>
 <section id="computable-coefficients-and-short-updates">
 <h3>Computable Coefficients and Short Updates<a class="headerlink" href="#computable-coefficients-and-short-updates" title="Link to this heading">#</a></h3>
@@ -1222,8 +1229,125 @@ x_k=Q_ky_k,
 \right)^k\|e_0\|_A.
 }
 \]</div>
-<p>Eigenvalue clustering can give faster convergence than this bound predicts, and convergence can accelerate as some error components are suppressed. These improvements depend on the problem; they are not guaranteed at every step.</p>
+<p>Eigenvalue clustering can give faster convergence than this bound predicts, and convergence can accelerate as some error components are suppressed. These improvements depend on the problem. They are not guaranteed at every step.</p>
 <p>In floating-point arithmetic, the orthogonality relations and finite-termination guarantee need not hold exactly. Check the explicitly computed residual before accepting a solution, and use preconditioning when the unpreconditioned iteration converges too slowly.</p>
+</section>
+</section>
+<section id="optional-reading-the-geometry-of-the-cg-coefficients">
+<h2>Optional Reading: The Geometry of the CG Coefficients<a class="headerlink" href="#optional-reading-the-geometry-of-the-cg-coefficients" title="Link to this heading">#</a></h2>
+<p>The algebraic derivation above gives the two CG coefficients. The geometry below gives a second derivation of the same formulas and can be skipped without affecting the rest of the chapter.</p>
+<p>Consider one step starting at <span class="math notranslate nohighlight">\(x_k\)</span>, with nonzero residual <span class="math notranslate nohighlight">\(r_k=b-Ax_k\)</span>, in exact arithmetic. CG starts with <span class="math notranslate nohighlight">\(p_1=r_0\)</span>. For <span class="math notranslate nohighlight">\(k\ge1\)</span>, the coefficient <span class="math notranslate nohighlight">\(\tau_k\)</span> determines how much of <span class="math notranslate nohighlight">\(p_k\)</span> to retain in the new direction,</p>
+<div class="math notranslate nohighlight">
+\[
+p_{k+1}=r_k+\tau_kp_k.
+\]</div>
+<p>The step coefficient <span class="math notranslate nohighlight">\(\mu_{k+1}\)</span> scales this direction. The displacement is <span class="math notranslate nohighlight">\(x_{k+1}-x_k=\mu_{k+1}p_{k+1}\)</span>, so the Euclidean distance traveled is <span class="math notranslate nohighlight">\(\mu_{k+1}\|p_{k+1}\|_2\)</span>.</p>
+<section id="the-step-length-on-the-energy-curve">
+<h3>The Step Length on the Energy Curve<a class="headerlink" href="#the-step-length-on-the-energy-curve" title="Link to this heading">#</a></h3>
+<p>The <a class="reference internal" href="#cg-step-length-derivation"><span class="std std-ref">earlier derivation of the step length</span></a> found <span class="math notranslate nohighlight">\(\mu_{k+1}\)</span> as the coefficient of <span class="math notranslate nohighlight">\(p_{k+1}\)</span> in the A-orthogonal expansion of the solution. We can recover that coefficient by asking where the search line reaches its lowest energy. Substituting <span class="math notranslate nohighlight">\(x_k+tp_{k+1}\)</span> into the energy <span class="math notranslate nohighlight">\(\Phi(z)=\tfrac12 z^TAz-b^Tz\)</span> gives a quadratic in <span class="math notranslate nohighlight">\(t\)</span>,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+f(t)&amp;=\Phi(x_k+tp_{k+1})\\
+&amp;=\Phi(x_k)+t\,p_{k+1}^T(Ax_k-b)
+  +\tfrac12 t^2\,p_{k+1}^TAp_{k+1}\\
+&amp;=\Phi(x_k)-t\,\|r_k\|_2^2
+  +\tfrac12 t^2\,p_{k+1}^TAp_{k+1}.
+\end{aligned}
+\end{split}\]</div>
+<p>In the expansion, symmetry of <span class="math notranslate nohighlight">\(A\)</span> lets us combine the two cross terms. The last line uses <span class="math notranslate nohighlight">\(Ax_k-b=-r_k\)</span> and <span class="math notranslate nohighlight">\(p_{k+1}^Tr_k=\|r_k\|_2^2\)</span>. The latter identity holds because <span class="math notranslate nohighlight">\(p_{k+1}=r_k+\tau_kp_k\)</span> with <span class="math notranslate nohighlight">\(r_k\perp p_k\)</span> for <span class="math notranslate nohighlight">\(k\ge1\)</span>, and <span class="math notranslate nohighlight">\(p_1=r_0\)</span> at the first step.</p>
+<p>The parabola opens upward because <span class="math notranslate nohighlight">\(p_{k+1}^TAp_{k+1}&gt;0\)</span>. Its minimum occurs where the slope vanishes. Differentiating with respect to <span class="math notranslate nohighlight">\(t\)</span> gives</p>
+<div class="math notranslate nohighlight">
+\[
+f'(t)=-\|r_k\|_2^2+t\,p_{k+1}^TAp_{k+1}.
+\]</div>
+<p>Setting <span class="math notranslate nohighlight">\(f'(\mu_{k+1})=0\)</span> recovers the step length and the corresponding iterate,</p>
+<div class="math notranslate nohighlight">
+\[
+\mu_{k+1}=\frac{\|r_k\|_2^2}{p_{k+1}^TAp_{k+1}},
+\qquad x_{k+1}=x_k+\mu_{k+1}p_{k+1}.
+\]</div>
+<p>For example, take <span class="math notranslate nohighlight">\(A=\left(\begin{smallmatrix}2&amp;-1\\-1&amp;2\end{smallmatrix}\right)\)</span>, <span class="math notranslate nohighlight">\(b=(3,0)^T\)</span>, and <span class="math notranslate nohighlight">\(x_0=0\)</span>. Along <span class="math notranslate nohighlight">\(p_1=b\)</span> the energy is <span class="math notranslate nohighlight">\(f(t)=-9t+9t^2\)</span>. Its slope <span class="math notranslate nohighlight">\(f'(t)=-9+18t\)</span> vanishes at <span class="math notranslate nohighlight">\(t=1/2\)</span>, as shown below.</p>
+<figure class="align-center" id="id1">
+<img alt="The energy reaches its minimum at one half, where the downhill slope falls from nine to zero." src="../_images/cg_step_parabola.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 29 </span><span class="caption-text">The right panel plots the downhill slope <span class="math notranslate nohighlight">\(-f'(t)\)</span>. The shaded triangle has area <span class="math notranslate nohighlight">\(\tfrac12(1/2)(9)=2.25\)</span>, the energy lost over the first step in the left panel.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The contour plot shows two consecutive CG steps in the plane through <span class="math notranslate nohighlight">\(x_{k-1}\)</span>, <span class="math notranslate nohighlight">\(x_k\)</span>, and <span class="math notranslate nohighlight">\(x_{k+1}\)</span>. The horizontal step follows <span class="math notranslate nohighlight">\(p_k\)</span>. At its endpoint <span class="math notranslate nohighlight">\(x_k\)</span>, the line search gives <span class="math notranslate nohighlight">\(p_k^Tr_k=0\)</span>. Since <span class="math notranslate nohighlight">\(r_k=-\nabla\Phi(x_k)\)</span> is normal to the energy contour there, the horizontal search line is tangent to that contour.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/cg_step_in_plane.svg"><img alt="The step from x_{k-1} to x_k is horizontal and tangent to the contour at x_k. The projected previous residual is horizontal, the current residual is vertical, and the step to x_{k+1} is diagonal." src="../_images/cg_step_in_plane.svg" style="width: 80%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 30 </span><span class="caption-text">The ellipses are energy contours in the plane of the two steps. The black arrows show the downhill direction in that plane at each iterate. The blue triangle shows how the search direction is built from the residual and a component along the previous step. At <span class="math notranslate nohighlight">\(x_{k-1}\)</span> this is the projection of <span class="math notranslate nohighlight">\(r_{k-1}\)</span>. At <span class="math notranslate nohighlight">\(x_k\)</span> the full residual <span class="math notranslate nohighlight">\(r_k=p_{k+1}-\tau_kp_k\)</span> already lies in the plane.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The residuals are perpendicular in the full space. Because <span class="math notranslate nohighlight">\(r_k\)</span> lies in the drawing plane, projecting <span class="math notranslate nohighlight">\(r_{k-1}\)</span> into that plane preserves their right angle. From <span class="math notranslate nohighlight">\(x_k\)</span>, CG follows <span class="math notranslate nohighlight">\(p_{k+1}=r_k+\tau_kp_k\)</span> to <span class="math notranslate nohighlight">\(x_{k+1}\)</span>, the minimum of the energy in this slice.</p>
+</section>
+<section id="why-the-direction-coefficient-is-a-squared-length-ratio">
+<h3>Why the Direction Coefficient Is a Squared Length Ratio<a class="headerlink" href="#why-the-direction-coefficient-is-a-squared-length-ratio" title="Link to this heading">#</a></h3>
+<p>Now draw the last two residuals, <span class="math notranslate nohighlight">\(r_{k-1}\)</span> and <span class="math notranslate nohighlight">\(r_k\)</span>, as arrows from a common origin. They are perpendicular, so we can use them as the horizontal and vertical directions in the drawing. The arrow joining their tips is parallel to <span class="math notranslate nohighlight">\(Ap_k\)</span>, by the residual update</p>
+<div class="math notranslate nohighlight">
+\[
+r_{k-1}-r_k=\mu_kAp_k.
+\]</div>
+<p>We want <span class="math notranslate nohighlight">\(p_{k+1}\)</span> to be A-orthogonal to <span class="math notranslate nohighlight">\(p_k\)</span>. In this picture that means ordinary perpendicularity to the arrow joining the tips, since <span class="math notranslate nohighlight">\(p_{k+1}^T(r_{k-1}-r_k)=\mu_kp_{k+1}^TAp_k=0\)</span>.</p>
+<p>Only the part of each search direction in the drawing is visible. Write <span class="math notranslate nohighlight">\(E_k=\operatorname{span}\{r_{k-1},r_k\}\)</span> for this residual plane and <span class="math notranslate nohighlight">\(\operatorname{proj}_{E_k}\)</span> for Euclidean orthogonal projection onto it. The part of <span class="math notranslate nohighlight">\(p_k\)</span> inherited from earlier steps belongs to <span class="math notranslate nohighlight">\(\mathcal K_{k-1}\)</span>, perpendicular to both residuals. Consequently,</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{proj}_{E_k}p_k=r_{k-1},
+\qquad
+\operatorname{proj}_{E_k}p_{k+1}=r_k+\tau_kr_{k-1}.
+\]</div>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/cg_direction_triangle.svg"><img alt="Two right triangles share a vertical leg. The line joining the residual tips is perpendicular to the projected next search direction." src="../_images/cg_direction_triangle.svg" style="width: 70%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 31 </span><span class="caption-text">The red segment joins the residual tips. The blue diagonal shows the part of <span class="math notranslate nohighlight">\(p_{k+1}\)</span> in their plane. Projection preserves its right angle with the red segment because the red segment lies entirely in the plane.</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Let <span class="math notranslate nohighlight">\(a=\|r_{k-1}\|_2\)</span> and <span class="math notranslate nohighlight">\(b_k=\|r_k\|_2\)</span> be the horizontal and vertical lengths. The red segment has slope <span class="math notranslate nohighlight">\(-b_k/a\)</span>. The blue diagonal rises by <span class="math notranslate nohighlight">\(b_k\)</span> and runs to the right by <span class="math notranslate nohighlight">\(\tau_k a\)</span>, so its slope is <span class="math notranslate nohighlight">\(b_k/(\tau_k a)\)</span>. The <a class="reference internal" href="#cg-direction-coefficient-derivation"><span class="std std-ref">earlier derivation of the direction coefficient</span></a> used the residual update to evaluate the dot product <span class="math notranslate nohighlight">\(p_k^TAr_k\)</span>. Here the same conjugacy condition appears as a right angle. Setting the blue slope equal to the negative reciprocal of the red slope gives the same formula for <span class="math notranslate nohighlight">\(\tau_k\)</span> directly from the drawing.</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{b_k}{\tau_k a}=\frac{a}{b_k}
+\qquad\Longrightarrow\qquad
+\tau_k=\frac{b_k^2}{a^2}
+=\frac{\|r_k\|_2^2}{\|r_{k-1}\|_2^2}.
+\]</div>
+</section>
+<section id="a-direction-perpendicular-to-all-the-residual-edges">
+<h3>A Direction Perpendicular to All the Residual Edges<a class="headerlink" href="#a-direction-perpendicular-to-all-the-residual-edges" title="Link to this heading">#</a></h3>
+<p>The triangle uses only <span class="math notranslate nohighlight">\(p_{k+1}^TAp_k=0\)</span>. Earlier we proved that <span class="math notranslate nohighlight">\(p_{k+1}\)</span> is A-orthogonal to <em>every</em> preceding search direction. Each of those conditions gives a right angle of its own. Draw <span class="math notranslate nohighlight">\(r_0,\ldots,r_k\)</span> from a common origin and join consecutive tips. For each edge, the residual update and conjugacy give</p>
+<div class="math notranslate nohighlight">
+\[
+p_{k+1}^T(r_{i-1}-r_i)=\mu_i p_{k+1}^TAp_i=0,
+\qquad 1\le i\le k.
+\]</div>
+<p>For two tips, <span class="math notranslate nohighlight">\(p_{k+1}\)</span> is perpendicular to the line joining them. For three, it is perpendicular to the plane through them. In general, the <strong>affine span</strong> of the tips is the set reached by starting at one tip and adding linear combinations of these edges. The search direction is perpendicular to every direction in that span.</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="../_images/cg_direction_corner.svg"><img alt="Three mutually orthogonal residuals end at the vertices of a triangle. The next search direction is perpendicular to its face." src="../_images/cg_direction_corner.svg" style="width: 90%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 32 </span><span class="caption-text">The drawing uses three consecutive residuals, ending at <span class="math notranslate nohighlight">\(r_{k+1}\)</span>. The red edges are multiples of <span class="math notranslate nohighlight">\(Ap_k\)</span> and <span class="math notranslate nohighlight">\(Ap_{k+1}\)</span>, so the next direction <span class="math notranslate nohighlight">\(p_{k+2}\)</span> is perpendicular to both. The drawing shows its projection onto the space of the three residuals.</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Perpendicularity to each edge means that <span class="math notranslate nohighlight">\(p_{k+1}\)</span> has the same dot product with every residual from <span class="math notranslate nohighlight">\(r_0\)</span> through <span class="math notranslate nohighlight">\(r_k\)</span>. We can evaluate the last one using <span class="math notranslate nohighlight">\(p_k^Tr_k=0\)</span>, which gives <span class="math notranslate nohighlight">\((r_k+\tau_kp_k)^Tr_k=\|r_k\|_2^2\)</span>. Thus</p>
+<div class="math notranslate nohighlight">
+\[
+p_{k+1}^Tr_0
+=p_{k+1}^Tr_1
+=\cdots
+=p_{k+1}^Tr_k
+=\|r_k\|_2^2.
+\]</div>
+<p>This gives an energy interpretation. At any earlier iterate <span class="math notranslate nohighlight">\(x_j\)</span>, the initial rate of decrease along a direction <span class="math notranslate nohighlight">\(d\)</span> is <span class="math notranslate nohighlight">\(-\nabla\Phi(x_j)^Td=r_j^Td\)</span>. Thus <span class="math notranslate nohighlight">\(p_{k+1}\)</span> would give the same initial downhill rate at <em>every</em> iterate from <span class="math notranslate nohighlight">\(x_0\)</span> through <span class="math notranslate nohighlight">\(x_k\)</span>. To see how the direction combines information from these iterates, expand it in the orthogonal residual basis. The coefficient of <span class="math notranslate nohighlight">\(r_j\)</span> is <span class="math notranslate nohighlight">\(p_{k+1}^Tr_j/\|r_j\|_2^2\)</span>, so</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{p_{k+1}}{\|r_k\|_2^2}
+=\sum_{j=0}^k\frac{r_j}{\|r_j\|_2^2}
+=\frac{p_k}{\|r_{k-1}\|_2^2}+\frac{r_k}{\|r_k\|_2^2}.
+\]</div>
+<p>Each term in the sum gives downhill rate one at its own iterate and zero at the others. The last equality separates the newest term. In the original derivation, orthogonality made all but the most recent projection coefficient vanish. In the residual picture, <span class="math notranslate nohighlight">\(p_k\)</span> already contains every earlier residual with the required relative weights. Multiplying through by <span class="math notranslate nohighlight">\(\|r_k\|_2^2\)</span> gives the same short update, <span class="math notranslate nohighlight">\(p_{k+1}=r_k+\tau_kp_k\)</span>.</p>
 </section>
 </section>
 </section>
@@ -1323,7 +1447,7 @@ x_k=Q_ky_k,
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#finite-convergence-in-exact-arithmetic">Finite Convergence in Exact Arithmetic</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-error-polynomial-and-the-condition-number">The Error Polynomial and the Condition Number</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#eigenvalue-clustering">Eigenvalue Clustering</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#superlinear-acceleration">Superlinear Acceleration</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-cg-can-accelerate">Why CG Can Accelerate</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-results-to-remember">Key Results to Remember</a><ul class="nav section-nav flex-column">
@@ -1333,6 +1457,12 @@ x_k=Q_ky_k,
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#computable-coefficients-and-short-updates">Computable Coefficients and Short Updates</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-lanczos-connection">The Lanczos Connection</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#convergence-and-its-limits">Convergence and Its Limits</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-reading-the-geometry-of-the-cg-coefficients">Optional Reading: The Geometry of the CG Coefficients</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-step-length-on-the-energy-curve">The Step Length on the Energy Curve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-the-direction-coefficient-is-a-squared-length-ratio">Why the Direction Coefficient Is a Squared Length Ratio</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-direction-perpendicular-to-all-the-residual-edges">A Direction Perpendicular to All the Residual Edges</a></li>
 </ul>
 </li>
 </ul>
