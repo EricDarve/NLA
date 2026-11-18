@@ -125,6 +125,49 @@ These are useful general-purpose choices, but they can break down through zero, 
 
 Effectiveness depends on the ordering and dropping rules. Triangular solves can be difficult to parallelize efficiently, although parallel and block variants are available. IC is one option for CG, alongside diagonal, block, and multilevel preconditioners.
 
+### Example: The 2D Poisson Matrix and ILU(0)
+
+Consider $-u_{xx}-u_{yy}=f$ on the unit square, with $u=0$ on its boundary. Use an $m\times m$ grid of interior points, with spacing $h=1/(m+1)$, and order the unknowns row by row. The standard five-point difference approximation gives an $m^2\times m^2$ SPD matrix $A$: its diagonal entries are $4/h^2$, and each horizontal or vertical neighbor contributes $-1/h^2$.
+
+Its eigenvalues are known explicitly:
+
+$$
+\boxed{
+\lambda_{pq}(A)=\frac{4}{h^2}\left[
+\sin^2\!\left(\frac{p\pi h}{2}\right)
++\sin^2\!\left(\frac{q\pi h}{2}\right)
+\right],
+\qquad p,q=1,\ldots,m.
+}
+$$
+
+The corresponding grid vectors have entries $\sin(p\pi ih)\sin(q\pi jh)$. Applying the stencil separates into one-dimensional differences in the two coordinate directions, so their eigenvalue contributions add. This is the standard [sine-mode construction for the Poisson equation](https://people.eecs.berkeley.edu/~demmel/ma221_Fall24/Lectures/Lecture_11.pdf#page=3).
+
+Now compute strict ILU(0), keeping the original factor sparsity and using this same ordering, without pivoting or diagonal modification. Set $M=LU$. In this particular symmetric problem, $U=DL^T$ for a positive diagonal matrix $D$, so $M=LDL^T$ is SPD. We compute all eigenvalues of $M^{-1}A$ numerically using its equivalent symmetric transformation, as described above. This does not require forming an inverse. The calculation also verifies the factor sparsity, so it is genuinely ILU(0), rather than an ILU approximation with extra fill.
+
+For $m=30$, there are 900 unknowns:
+
+| Matrix | Smallest eigenvalue | Largest eigenvalue | Largest/smallest ratio |
+| :--- | ---: | ---: | ---: |
+| $A$ | $19.7223$ | $7668.28$ | $388.8$ |
+| $M^{-1}A$ | $0.03420$ | $1.20455$ | $35.2$ |
+
+The improvement is more than a change of scale: the eigenvalue ratio decreases, and about $92\%$ of the preconditioned eigenvalues lie in $[0.75,1.25]$. The ideal preconditioner would put every eigenvalue at $1$.
+
+This clustering makes the polynomial problem easier. For example, $p(\lambda)=(1-\lambda)^k$ equals one at zero and has magnitude at most $(1/4)^k$ on $[0.75,1.25]$. A few smaller eigenvalues remain outside this cluster and still need to be reduced. This connects the spectral picture to the polynomial convergence arguments for CG and GMRES.
+
+:::{figure} ../_static/poisson_ilu0_spectrum.svg
+:alt: Histograms of all 900 eigenvalues of a two-dimensional Dirichlet Poisson matrix and its strict ILU(0)-preconditioned operator. The eigenvalue ratio falls from about 389 to 35, and 92 percent of the preconditioned eigenvalues lie between 0.75 and 1.25. Below, GMRES reaches a relative residual of ten to the minus eight in 93 steps without preconditioning and 33 with ILU(0).
+:width: 100%
+:name: fig-poisson-ilu0-spectrum
+
+Poisson on a $30\times30$ interior grid of the unit square. Top: the complete eigenvalue distributions before and after natural-order ILU(0); note the different horizontal scales. Bottom: computed unrestarted GMRES convergence from $x_0=0$, using the same fixed random right-hand side. The preconditioned run uses right preconditioning, so both curves measure the original relative residual $\|b-Ax_k\|_2/\|b\|_2$. The matrices $AM^{-1}$ and $M^{-1}A$ have the same eigenvalues. Reorthogonalization preserves the basis orthogonality in this experiment.
+:::
+
+The spectral improvement is accompanied by fewer iterations: 33 rather than 93 to reach $10^{-8}$. Each preconditioned step also needs two triangular solves, so iteration counts alone do not measure total running time.
+
+Here the positive eigenvalue ratio is the condition number of the equivalent SPD matrix, not generally the Euclidean condition number of $M^{-1}A$. The SPD property of this ILU(0) product is specific to the symmetric construction used here; a generic ILU preconditioner need not preserve symmetry or positive definiteness.
+
 ## Sparse Approximate Inverses
 
 An alternative is to construct a sparse matrix $B$ that approximates $A^{-1}$ directly. We use a different symbol because $B$ represents the operation previously written $M^{-1}$. Application is a sparse matrix-vector product:
